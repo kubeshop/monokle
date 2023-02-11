@@ -74,6 +74,7 @@ export function createFileEntry({fileEntryPath, fileMap, helmChartId, extension}
   const fileEntry: FileEntry = {
     name: path.basename(fileEntryPath),
     filePath: fileEntryPath,
+    rootFolderPath: fileMap[ROOT_FILE_ENTRY].filePath,
     isExcluded: false,
     isSupported: false,
     helmChartId,
@@ -97,6 +98,7 @@ export function createRootFileEntry(rootFolder: string, fileMap: FileMapType) {
   const rootEntry: FileEntry = {
     name: ROOT_FILE_ENTRY,
     filePath: rootFolder,
+    rootFolderPath: rootFolder,
     isExcluded: false,
     isSupported: false,
     extension: path.extname(rootFolder),

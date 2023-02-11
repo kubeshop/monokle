@@ -20,8 +20,8 @@ import {ContextMenu, Dots} from '@atoms';
 
 import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRename} from '@hooks/fileTreeHooks';
 
-import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
-import {useSelectorWithRef} from '@utils/hooks';
+import {deleteFileEntry, dispatchDeleteAlert} from '@utils/files';
+import {useRefSelector} from '@utils/hooks';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -40,11 +40,15 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
-  const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const fileMapRef = useRefSelector(state => state.main.fileMap);
 
   const resource = useResource({id: itemInstance.id, storage: 'local'});
   const resourceRef = React.useRef(resource);
   resourceRef.current = resource;
+
+  const fileEntry = useAppSelector(state =>
+    resource?.origin.filePath ? state.main.fileMap[resource.origin.filePath] : undefined
+  );
 
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const filters = useAppSelector(state => state.main.resourceFilter);
@@ -178,13 +182,13 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
         disabled: isInPreviewMode,
         onClick: () => {
           Modal.confirm({
-            title: `Are you sure you want to delete "${absolutePath ? path.basename(absolutePath) : undefined}"?`,
+            title: `Are you sure you want to delete "${fileEntry ? fileEntry.name : undefined}"?`,
             icon: <ExclamationCircleOutlined />,
             onOk() {
-              if (!absolutePath) {
+              if (!fileEntry) {
                 return;
               }
-              deleteEntity(absolutePath, args => dispatchDeleteAlert(dispatch, args));
+              deleteFileEntry(fileEntry).then(result => dispatchDeleteAlert(dispatch, result));
             },
           });
         },
@@ -202,6 +206,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
       },
     ],
     [
+      fileEntry,
       isInPreviewMode,
       isRoot,
       absolutePath,

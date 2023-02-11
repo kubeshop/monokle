@@ -11,9 +11,8 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
 import {isDefined} from '@shared/utils/filter';
 
-import * as S from './FilePaneTree.styled';
-import TreeNodeFile from './TreeNodeFile';
-import TreeNodeFolder from './TreeNodeFolder';
+import * as S from './FileSystemTree.styled';
+import FileSystemTreeNode from './TreeNode';
 
 const FileSystemTree: React.FC = () => {
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
@@ -40,12 +39,6 @@ const FileSystemTree: React.FC = () => {
       />
     </S.TreeContainer>
   );
-};
-
-const FileSystemTreeNode: React.FC<{node: any}> = props => {
-  const {node} = props;
-  const isFolder = useAppSelector(state => isDefined(state.main.fileMap[node.key]?.children));
-  return isFolder ? <TreeNodeFolder folderPath={node.key} /> : <TreeNodeFile filePath={node.key} />;
 };
 
 function createFileNodes(folderPath: string, fileMap: FileMapType) {

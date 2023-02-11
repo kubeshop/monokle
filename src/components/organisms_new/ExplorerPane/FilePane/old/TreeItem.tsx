@@ -1,7 +1,6 @@
 import {shell} from 'electron';
 
 import React, {useCallback, useMemo, useState} from 'react';
-import {useHotkeys} from 'react-hotkeys-hook';
 import {useSelector} from 'react-redux';
 
 import {Modal} from 'antd';
@@ -18,13 +17,10 @@ import {isKustomizationFile} from '@redux/services/kustomize';
 
 import {ContextMenu, Dots, Spinner} from '@atoms';
 
-import {deleteEntity} from '@utils/files';
-
+// import {deleteEntity} from '@utils/files';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {hotkeys} from '@shared/constants/hotkeys';
 import {TreeItemProps} from '@shared/models/explorer';
 import {Colors} from '@shared/styles/colors';
-import {defineHotkey} from '@shared/utils/hotkey';
 import {showItemInFolder} from '@shared/utils/shell';
 
 import * as S from './TreeItem.styled';
@@ -56,9 +52,7 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     parentKey: isMatchItem,
   } = props;
   const {
-    setProcessingEntity,
     onDuplicate,
-    onDelete,
     onRename,
     onExcludeFromProcessing,
     onIncludeToProcessing,
@@ -99,22 +93,22 @@ const TreeItem: React.FC<TreeItemProps> = props => {
     [fileMap, fileOrFolderContainedInFilter, isFolder, isSupported, isTextExtension, relativePath]
   );
 
-  useHotkeys(
-    defineHotkey(hotkeys.DELETE_RESOURCE.key),
-    () => {
-      if (treeKey === selectedPath) {
-        deleteEntityWizard(
-          {entityAbsolutePath: absolutePath},
-          () => {
-            setProcessingEntity({processingEntityID: selectedPath, processingType: 'delete'});
-            deleteEntity(absolutePath, onDelete);
-          },
-          () => {}
-        );
-      }
-    },
-    [selectedPath]
-  );
+  // useHotkeys(
+  //   defineHotkey(hotkeys.DELETE_RESOURCE.key),
+  //   () => {
+  //     if (treeKey === selectedPath) {
+  //       deleteEntityWizard(
+  //         {entityAbsolutePath: absolutePath},
+  //         () => {
+  //           setProcessingEntity({processingEntityID: selectedPath, processingType: 'delete'});
+  //           deleteEntity(absolutePath, onDelete);
+  //         },
+  //         () => {}
+  //       );
+  //     }
+  //   },
+  //   [selectedPath]
+  // );
 
   const canPreview = useCallback(
     (entryPath: string): boolean => {
@@ -273,22 +267,22 @@ const TreeItem: React.FC<TreeItemProps> = props => {
               onRename(absolutePath, osPlatform);
             },
           },
-          {
-            key: 'delete_entity',
-            label: 'Delete',
-            disabled: isInPreviewMode || isInClusterMode,
-            onClick: (e: any) => {
-              e.domEvent.stopPropagation();
-              deleteEntityWizard(
-                {entityAbsolutePath: absolutePath},
-                () => {
-                  setProcessingEntity({processingEntityID: treeKey, processingType: 'delete'});
-                  deleteEntity(absolutePath, onDelete);
-                },
-                () => {}
-              );
-            },
-          },
+          // {
+          //   key: 'delete_entity',
+          //   label: 'Delete',
+          //   disabled: isInPreviewMode || isInClusterMode,
+          //   onClick: (e: any) => {
+          //     e.domEvent.stopPropagation();
+          //     deleteEntityWizard(
+          //       {entityAbsolutePath: absolutePath},
+          //       () => {
+          //         setProcessingEntity({processingEntityID: treeKey, processingType: 'delete'});
+          //         deleteEntity(absolutePath, onDelete);
+          //       },
+          //       () => {}
+          //     );
+          //   },
+          // },
         ]
       : []),
     {key: 'divider-4', type: 'divider'},

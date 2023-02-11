@@ -1,1 +1,1 @@
-export {default} from './FilePaneNew';
+export {default} from './FilePane';

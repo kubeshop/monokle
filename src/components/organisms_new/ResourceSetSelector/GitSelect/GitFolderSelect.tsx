@@ -91,6 +91,7 @@ const generateGitFileMap = (resources: K8sResource<'local'>[]) => {
   folderPaths.forEach(folderPath => {
     const subfolders = folderPaths.filter(key => dirname(key) === folderPath);
     fileMap[folderPath] = {
+      rootFolderPath: fileMap[ROOT_FILE_ENTRY].filePath,
       children: subfolders,
       filePath: folderPath,
       name: basename(folderPath),

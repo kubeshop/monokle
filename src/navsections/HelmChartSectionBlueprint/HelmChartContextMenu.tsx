@@ -11,14 +11,13 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
-import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ContextMenu, Dots} from '@atoms';
 
 import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRename} from '@hooks/fileTreeHooks';
 
-import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
+import {deleteFileEntry, dispatchDeleteAlert} from '@utils/files';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {HelmValuesFile} from '@shared/models/helm';
@@ -46,7 +45,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const rootFolderPath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY].filePath);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
@@ -61,7 +60,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
   const {onRename} = useRename();
 
-  const refreshFolder = useCallback(() => setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath), [fileMap]);
+  const refreshFolder = useCallback(() => setRootFolder(rootFolderPath), [rootFolderPath]);
   const {onExcludeFromProcessing} = useProcessing(refreshFolder);
 
   const helmItem = useMemo(
@@ -72,7 +71,10 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
       DEFAULT_HELM_VALUE,
     [helmChartMap, helmTemplatesMap, helmValuesMap, itemInstance.id]
   );
-  const absolutePath = useMemo(() => getAbsoluteFilePath(helmItem.filePath, fileMap), [fileMap, helmItem]);
+
+  const fileEntry = useAppSelector(state => state.main.fileMap[helmItem.filePath]);
+
+  const absolutePath = useMemo(() => path.join(rootFolderPath, helmItem.filePath), [rootFolderPath, helmItem]);
   const basename = useMemo(
     () => (osPlatform === 'win32' ? path.win32.basename(absolutePath) : path.basename(absolutePath)),
     [absolutePath, osPlatform]
@@ -185,7 +187,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
             title: `Are you sure you want to delete "${basename}"?`,
             icon: <ExclamationCircleOutlined />,
             onOk() {
-              deleteEntity(absolutePath, args => dispatchDeleteAlert(dispatch, args));
+              deleteFileEntry(fileEntry).then(result => dispatchDeleteAlert(dispatch, result));
             },
           });
         },
@@ -217,6 +219,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
       osPlatform,
       platformFileManagerName,
       target,
+      fileEntry,
     ]
   );
 

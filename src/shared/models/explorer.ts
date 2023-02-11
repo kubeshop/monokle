@@ -2,8 +2,6 @@ import {Dispatch, SetStateAction} from 'react';
 
 import {DataNode} from 'antd/lib/tree';
 
-import {DeleteEntityCallback} from './fileExplorer';
-
 // Props injected by Collapse when it clones the Panel
 export type InjectedPanelProps = {
   isActive?: boolean;
@@ -42,7 +40,6 @@ export type TreeItemProps = {
   setProcessingEntity: Dispatch<SetStateAction<ProcessingEntity>>;
   processingEntity: ProcessingEntity;
   onDuplicate: (absolutePath: string, entityName: string, dirName: string) => void;
-  onDelete: (args: DeleteEntityCallback) => void;
   onRename: (absolutePath: string, osPlatform: NodeJS.Platform) => void;
   onCreateFileFolder: (absolutePath: string, type: 'file' | 'folder') => void;
   onExcludeFromProcessing?: (relativePath: string) => void;

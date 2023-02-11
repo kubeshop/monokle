@@ -1,5 +1,5 @@
 import fs from 'fs';
-import {lstat} from 'fs/promises';
+import {lstat, rm} from 'fs/promises';
 import log from 'loglevel';
 import path from 'path';
 
@@ -7,7 +7,9 @@ import {setAlert} from '@redux/reducers/alert';
 
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {DeleteEntityCallback} from '@shared/models/fileExplorer';
+import {FileEntry} from '@shared/models/fileEntry';
+import {DeleteFileEntryResult} from '@shared/models/fileExplorer';
+import {isDefined} from '@shared/utils/filter';
 
 export function doesPathExist(absolutePath: string) {
   try {
@@ -55,33 +57,36 @@ export function getFileStats(filePath: string, silent?: boolean): fs.Stats | und
  * Function which is called whenever the entity was deleted or not
  */
 
-export async function deleteEntity(absolutePath: string, callback: (args: DeleteEntityCallback) => any): Promise<void> {
-  if (path.isAbsolute(absolutePath)) {
-    const isDirectory = (await lstat(absolutePath)).isDirectory();
-    const name = path.basename(absolutePath);
+export async function deleteFileEntry(entry: FileEntry): Promise<DeleteFileEntryResult> {
+  const absolutePath = path.join(entry.rootFolderPath, entry.filePath);
 
-    return fs.rm(absolutePath, {recursive: true, force: true}, err => {
-      callback({isDirectory, name, err});
-    });
+  if (path.isAbsolute(absolutePath)) {
+    try {
+      await rm(absolutePath, {recursive: true, force: true});
+    } catch {
+      return {entry, error: 'Failed to remove path.'};
+    }
   }
+  return {entry, error: 'Path is not absolute.'};
 }
 
-export function dispatchDeleteAlert(dispatch: AppDispatch, args: DeleteEntityCallback) {
-  const {isDirectory, name, err} = args;
+export function dispatchDeleteAlert(dispatch: AppDispatch, args: DeleteFileEntryResult) {
+  const {entry, error} = args;
+  const isFolder = isDefined(entry.children);
 
-  if (err) {
+  if (error) {
     dispatch(
       setAlert({
         title: 'Deleting failed',
-        message: `Something went wrong during deleting ${name} ${isDirectory ? 'directory' : 'file'}`,
+        message: `Something went wrong during deleting ${entry.name} ${isFolder ? 'folder' : 'file'}`,
         type: AlertEnum.Error,
       })
     );
   } else {
     dispatch(
       setAlert({
-        title: `Successfully deleted a ${isDirectory ? 'directory' : 'file'}`,
-        message: `You have successfully deleted ${name} ${isDirectory ? 'directory' : 'file'}`,
+        title: `Successfully deleted a ${isFolder ? 'folder' : 'file'}`,
+        message: `You have successfully deleted ${entry.name} ${isFolder ? 'folder' : 'file'}`,
         type: AlertEnum.Success,
       })
     );
