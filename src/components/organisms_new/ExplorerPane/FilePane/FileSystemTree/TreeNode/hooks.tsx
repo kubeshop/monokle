@@ -5,6 +5,8 @@ import {ItemType as AntdMenuItem} from 'antd/lib/menu/hooks/useItems';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
+import {join} from 'path';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {scanExcludesSelector} from '@redux/selectors';
@@ -14,10 +16,12 @@ import {isKustomizationFile} from '@redux/services/kustomize';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {deleteFileEntry, dispatchDeleteAlert, isFileEntryDisabled} from '@utils/files';
+import {useOpenOnGithub} from '@utils/git';
 import {useRefSelector} from '@utils/hooks';
 
 import {FileEntry} from '@shared/models/fileEntry';
 import {isDefined} from '@shared/utils/filter';
+import {showItemInFolder} from '@shared/utils/shell';
 
 export const useCanPreview = (fileEntry?: FileEntry, isDisabled?: boolean) => {
   const localResourceMetaMapRef = useResourceMetaMapRef('local');
@@ -117,6 +121,8 @@ export const useCommonMenuItems = (fileEntry?: FileEntry) => {
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
 
+  const {canOpenOnGithub, openOnGithub} = useOpenOnGithub(fileEntry?.filePath);
+
   const reloadRootFolder = useCallback(() => {
     if (!fileEntry) {
       return;
@@ -165,16 +171,28 @@ export const useCommonMenuItems = (fileEntry?: FileEntry) => {
     newMenuItems.push({
       key: 'open-in-github',
       label: 'Open on GitHub',
-      onClick: () => {},
+      disabled: !canOpenOnGithub,
+      onClick: openOnGithub,
     });
 
     newMenuItems.push({
       key: 'reveal',
       label: `Reveal in ${platformFileManagerName}`,
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        showItemInFolder(join(fileEntry.rootFolderPath, fileEntry.filePath));
+      },
     });
 
     return newMenuItems;
-  }, [fileEntry, platformFileManagerName, addEntryToScanExcludes, removeEntryFromScanExcludes]);
+  }, [
+    fileEntry,
+    platformFileManagerName,
+    addEntryToScanExcludes,
+    removeEntryFromScanExcludes,
+    openOnGithub,
+    canOpenOnGithub,
+  ]);
 
   return menuItems;
 };
@@ -185,6 +203,7 @@ export const useFileMenuItems = (
 ) => {
   const {canBePreviewed, isInClusterMode, isInPreviewMode} = stateArgs;
 
+  const commonMenuItems = useCommonMenuItems(fileEntry);
   const dispatch = useAppDispatch();
   const localResourceMetaMapRef = useResourceMetaMapRef('local');
 
@@ -238,8 +257,10 @@ export const useFileMenuItems = (
       onClick: () => {},
     });
 
+    newMenuItems.push(...commonMenuItems);
+
     return newMenuItems;
-  }, [fileEntry, canBePreviewed, localResourceMetaMapRef]);
+  }, [fileEntry, canBePreviewed, commonMenuItems, localResourceMetaMapRef]);
 
   return menuItems;
 };
