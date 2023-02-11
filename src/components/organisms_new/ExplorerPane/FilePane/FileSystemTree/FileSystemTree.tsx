@@ -5,7 +5,9 @@ import {DataNode} from 'antd/lib/tree';
 import fastDeepEqual from 'fast-deep-equal';
 import path from 'path';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {selectFile} from '@redux/reducers/main';
+import {selectedFilePathSelector} from '@redux/selectors';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
@@ -15,7 +17,9 @@ import * as S from './FileSystemTree.styled';
 import FileSystemTreeNode from './TreeNode';
 
 const FileSystemTree: React.FC = () => {
+  const dispatch = useAppDispatch();
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
+  const selectedFilePath = useAppSelector(selectedFilePathSelector);
 
   const treeData = useAppSelector(state => {
     const rootEntry = state.main.fileMap[ROOT_FILE_ENTRY];
@@ -36,6 +40,13 @@ const FileSystemTree: React.FC = () => {
         treeData={treeData}
         height={containerHeight}
         titleRender={node => <FileSystemTreeNode node={node} />}
+        selectedKeys={selectedFilePath ? [selectedFilePath] : []}
+        onClick={(mouseEvent, nodeEvent) => {
+          mouseEvent.preventDefault();
+          if (typeof nodeEvent.key === 'string') {
+            dispatch(selectFile({filePath: nodeEvent.key}));
+          }
+        }}
       />
     </S.TreeContainer>
   );
