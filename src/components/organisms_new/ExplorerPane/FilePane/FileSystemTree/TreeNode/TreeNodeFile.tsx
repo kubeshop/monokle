@@ -31,7 +31,7 @@ const TreeNodeFile: React.FC<Props> = props => {
 
   const contextMenuButtonRef = useRef<HTMLDivElement>(null);
 
-  const menuItems = useFileMenuItems({canBePreviewed, isInClusterMode, isInPreviewMode}, fileEntry);
+  const menuItems = useFileMenuItems({canBePreviewed}, fileEntry);
 
   const onContextMenu = useCallback(() => {
     if (isDisabled || !contextMenuButtonRef.current) {

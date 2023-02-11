@@ -5,11 +5,12 @@ import {ItemType as AntdMenuItem} from 'antd/lib/menu/hooks/useItems';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
-import {join} from 'path';
+import {basename, dirname, join} from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {updateProjectConfig} from '@redux/reducers/appConfig';
-import {openNewResourceWizard, openRenameEntityModal} from '@redux/reducers/ui';
+import {openCreateFileFolderModal, openNewResourceWizard, openRenameEntityModal} from '@redux/reducers/ui';
 import {scanExcludesSelector} from '@redux/selectors';
 import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
@@ -18,10 +19,11 @@ import {isKustomizationFile, isKustomizationResource} from '@redux/services/kust
 import {startPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {deleteFileEntry, dispatchDeleteAlert, isFileEntryDisabled} from '@utils/files';
+import {deleteFileEntry, dispatchDeleteAlert, duplicateEntity, isFileEntryDisabled} from '@utils/files';
 import {useOpenOnGithub} from '@utils/git';
 import {useRefSelector} from '@utils/hooks';
 
+import {AlertEnum} from '@shared/models/alert';
 import {FileEntry} from '@shared/models/fileEntry';
 import {isDefined} from '@shared/utils/filter';
 import {showItemInFolder} from '@shared/utils/shell';
@@ -124,6 +126,43 @@ export const usePreview = () => {
   );
 
   return preview;
+};
+
+export const useDuplicate = () => {
+  const dispatch = useAppDispatch();
+
+  const duplicate = useCallback(
+    (fileEntry: FileEntry) => {
+      const absolutePath = join(fileEntry.rootFolderPath, fileEntry.filePath);
+      const fileName = basename(absolutePath);
+      const dirName = dirname(absolutePath);
+
+      duplicateEntity(absolutePath, fileName, dirName, args => {
+        const {duplicatedFileName, err} = args;
+
+        if (err) {
+          dispatch(
+            setAlert({
+              title: 'Duplication failed',
+              message: `Something went wrong during duplicating "${absolutePath}"`,
+              type: AlertEnum.Error,
+            })
+          );
+        } else {
+          dispatch(
+            setAlert({
+              title: `Duplication succeded`,
+              message: `You have successfully created ${duplicatedFileName}`,
+              type: AlertEnum.Success,
+            })
+          );
+        }
+      });
+    },
+    [dispatch]
+  );
+
+  return duplicate;
 };
 
 export const useFileScanning = (onConfirm: () => void) => {
@@ -269,12 +308,13 @@ export const useCommonMenuItems = (fileEntry?: FileEntry) => {
 
 export const useFileMenuItems = (stateArgs: {canBePreviewed: boolean}, fileEntry?: FileEntry) => {
   const {canBePreviewed} = stateArgs;
-
+  const dispatch = useAppDispatch();
   const commonMenuItems = useCommonMenuItems(fileEntry);
   const localResourceMetaMapRef = useResourceMetaMapRef('local');
   const createNewResource = useCreateResource();
 
   const preview = usePreview();
+  const duplicate = useDuplicate();
 
   const menuItems = useMemo(() => {
     const isFolder = isDefined(fileEntry?.children);
@@ -305,7 +345,11 @@ export const useFileMenuItems = (stateArgs: {canBePreviewed: boolean}, fileEntry
     newMenuItems.push({
       key: 'new-file',
       label: 'New File',
-      onClick: () => {},
+      onClick: () => {
+        dispatch(
+          openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath), type: 'file'})
+        );
+      },
     });
 
     newMenuItems.push({
@@ -326,13 +370,24 @@ export const useFileMenuItems = (stateArgs: {canBePreviewed: boolean}, fileEntry
     newMenuItems.push({
       key: 'duplicate',
       label: 'Duplicate',
-      onClick: () => {},
+      onClick: () => {
+        duplicate(fileEntry);
+      },
     });
 
     newMenuItems.push(...commonMenuItems);
 
     return newMenuItems;
-  }, [fileEntry, canBePreviewed, commonMenuItems, createNewResource, preview, localResourceMetaMapRef]);
+  }, [
+    fileEntry,
+    canBePreviewed,
+    commonMenuItems,
+    createNewResource,
+    preview,
+    duplicate,
+    localResourceMetaMapRef,
+    dispatch,
+  ]);
 
   return menuItems;
 };
@@ -342,9 +397,8 @@ export const useFolderMenuItems = (
   fileEntry?: FileEntry
 ) => {
   const {isInClusterMode, isInPreviewMode} = stateArgs;
-
+  const dispatch = useAppDispatch();
   const commonMenuItems = useCommonMenuItems(fileEntry);
-
   const createNewResource = useCreateResource();
 
   const menuItems = useMemo(() => {
@@ -358,7 +412,11 @@ export const useFolderMenuItems = (
     newMenuItems.push({
       key: 'new-folder',
       label: 'New Folder',
-      onClick: () => {},
+      onClick: () => {
+        dispatch(
+          openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath), type: 'folder'})
+        );
+      },
     });
 
     newMenuItems.push({
@@ -373,7 +431,7 @@ export const useFolderMenuItems = (
     newMenuItems.push(...commonMenuItems);
 
     return newMenuItems;
-  }, [fileEntry, commonMenuItems, isInClusterMode, isInPreviewMode, createNewResource]);
+  }, [fileEntry, commonMenuItems, isInClusterMode, isInPreviewMode, createNewResource, dispatch]);
 
   return menuItems;
 };
