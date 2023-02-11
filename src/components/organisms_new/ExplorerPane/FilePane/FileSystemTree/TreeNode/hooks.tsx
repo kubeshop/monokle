@@ -1,11 +1,17 @@
 import {useCallback, useMemo, useRef, useState} from 'react';
 
+import {Modal} from 'antd';
 import {ItemType as AntdMenuItem} from 'antd/lib/menu/hooks/useItems';
 
+import {ExclamationCircleOutlined} from '@ant-design/icons';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateProjectConfig} from '@redux/reducers/appConfig';
+import {scanExcludesSelector} from '@redux/selectors';
 import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile} from '@redux/services/kustomize';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {deleteFileEntry, dispatchDeleteAlert, isFileEntryDisabled} from '@utils/files';
 import {useRefSelector} from '@utils/hooks';
@@ -55,21 +61,91 @@ export const useIsDisabled = (fileEntry?: FileEntry) => {
   return isDisabled;
 };
 
+export const useFileScanning = (onConfirm: () => void) => {
+  const scanExcludes = useAppSelector(scanExcludesSelector);
+  const projectConfigRef = useRefSelector(state => state.config.projectConfig);
+  const dispatch = useAppDispatch();
+
+  const openConfirmModal = useCallback(() => {
+    Modal.confirm({
+      title: 'You should reload the file explorer to have your changes applied. Do you want to do it now?',
+      icon: <ExclamationCircleOutlined />,
+      cancelText: 'Not now',
+      onOk: () => {
+        onConfirm();
+      },
+    });
+  }, [onConfirm]);
+
+  const addEntryToScanExcludes = useCallback(
+    (relativePath: string) => {
+      dispatch(
+        updateProjectConfig({
+          config: {
+            ...projectConfigRef.current,
+            scanExcludes: [...scanExcludes, relativePath],
+          },
+          fromConfigFile: false,
+        })
+      );
+      openConfirmModal();
+    },
+    [dispatch, openConfirmModal, scanExcludes, projectConfigRef]
+  );
+
+  const removeEntryFromScanExcludes = useCallback(
+    (relativePath: string) => {
+      dispatch(
+        updateProjectConfig({
+          config: {
+            ...projectConfigRef.current,
+            scanExcludes: scanExcludes.filter(scanExclude => scanExclude !== relativePath),
+          },
+          fromConfigFile: false,
+        })
+      );
+      openConfirmModal();
+    },
+    [dispatch, openConfirmModal, scanExcludes, projectConfigRef]
+  );
+
+  return {addEntryToScanExcludes, removeEntryFromScanExcludes};
+};
+
 export const useFileMenuItems = (
   stateArgs: {canBePreviewed: boolean; isInClusterMode: boolean; isInPreviewMode: boolean},
   fileEntry?: FileEntry
 ) => {
   const {canBePreviewed, isInClusterMode, isInPreviewMode} = stateArgs;
 
+  const dispatch = useAppDispatch();
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
   const localResourceMetaMapRef = useResourceMetaMapRef('local');
+
+  const reloadRootFolder = useCallback(() => {
+    if (!fileEntry) {
+      return;
+    }
+    dispatch(setRootFolder(fileEntry.rootFolderPath));
+  }, [fileEntry, dispatch]);
+
+  const {addEntryToScanExcludes, removeEntryFromScanExcludes} = useFileScanning(reloadRootFolder);
+
   const onClickPreviewRef = useRef(() => {});
 
   const menuItems = useMemo(() => {
     if (!fileEntry) {
       return [];
     }
+
+    const isNonResourceFile =
+      isKustomizationFile(fileEntry, localResourceMetaMapRef.current) ||
+      isHelmChartFile(fileEntry.filePath) ||
+      isHelmValuesFile(fileEntry.filePath) ||
+      isHelmTemplateFile(fileEntry.filePath) ||
+      !fileEntry.isSupported ||
+      !fileEntry.isExcluded;
 
     const isFolder = isDefined(fileEntry?.children);
     const newMenuItems: AntdMenuItem[] = [];
@@ -105,13 +181,13 @@ export const useFileMenuItems = (
       newMenuItems.push({
         key: 'add-resource',
         label: 'Add Resource',
-        disabled:
-          isKustomizationFile(fileEntry, localResourceMetaMapRef.current) ||
-          isHelmChartFile(fileEntry.filePath) ||
-          isHelmValuesFile(fileEntry.filePath) ||
-          isHelmTemplateFile(fileEntry.filePath) ||
-          !fileEntry.isSupported ||
-          !fileEntry.isExcluded,
+        disabled: isNonResourceFile,
+      });
+
+      newMenuItems.push({
+        key: 'filter_on_file',
+        label: 'Filter on this file',
+        disabled: isNonResourceFile,
       });
 
       newMenuItems.push({
@@ -120,6 +196,18 @@ export const useFileMenuItems = (
         onClick: () => {},
       });
     }
+
+    newMenuItems.push({
+      key: 'update_scanning',
+      label: `${fileEntry.isExcluded ? 'Remove from' : 'Add to'} Files: Exclude`,
+      onClick: () => {
+        if (fileEntry.isExcluded) {
+          removeEntryFromScanExcludes(fileEntry.filePath);
+        } else {
+          addEntryToScanExcludes(fileEntry.filePath);
+        }
+      },
+    });
 
     newMenuItems.push({
       key: 'copy-full-path',
@@ -149,7 +237,16 @@ export const useFileMenuItems = (
       key: 'reveal',
       label: `Reveal in ${platformFileManagerName}`,
     });
-  }, [fileEntry, canBePreviewed, isInClusterMode, isInPreviewMode, platformFileManagerName, localResourceMetaMapRef]);
+  }, [
+    fileEntry,
+    canBePreviewed,
+    isInClusterMode,
+    isInPreviewMode,
+    platformFileManagerName,
+    addEntryToScanExcludes,
+    removeEntryFromScanExcludes,
+    localResourceMetaMapRef,
+  ]);
 
   return menuItems;
 };
