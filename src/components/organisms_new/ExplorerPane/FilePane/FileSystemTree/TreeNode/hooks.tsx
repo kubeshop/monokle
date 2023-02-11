@@ -153,13 +153,19 @@ export const useCommonMenuItems = (fileEntry?: FileEntry) => {
     newMenuItems.push({
       key: 'copy-full-path',
       label: 'Copy path',
-      onClick: () => {},
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        navigator.clipboard.writeText(join(fileEntry.rootFolderPath, fileEntry.filePath));
+      },
     });
 
     newMenuItems.push({
       key: 'copy-relative-path',
       label: 'Copy relative path',
-      onClick: () => {},
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        navigator.clipboard.writeText(fileEntry.filePath);
+      },
     });
 
     newMenuItems.push({
