@@ -111,7 +111,7 @@
     "@sentry/electron": "4.1.2",
     "@simbathesailor/use-what-changed": "^2.0.0",
     "@trodi/electron-splashscreen": "1.0.2",
-    "@types/analytics-node": "3.1.9",
+    "@types/analytics-node": "3.1.10",
     "ajv": "6.12.6",
     "analytics-node": "6.1.0",
     "antd": "4.24.7",
