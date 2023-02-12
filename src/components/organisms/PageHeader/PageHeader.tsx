@@ -186,36 +186,42 @@ const PageHeader = () => {
             <S.Logo id="monokle-logo-header" onClick={onClickLogoHandler} src={MonokleKubeshopLogo} alt="Monokle" />
           </S.LogoContainer>
 
-          {activeProject && (
-            <>
-              <S.Divider type="vertical" />
-              <S.ActiveProjectButton onClick={onClickProjectHandler}>
-                <S.MenuOutlinedIcon />
-                <S.ProjectName>{activeProject.name}</S.ProjectName>
-              </S.ActiveProjectButton>
-              {hasGitRepo ? (
-                <S.BranchSelectContainer>
-                  <BranchSelect />
-                </S.BranchSelectContainer>
-              ) : (
-                <Tooltip
-                  mouseEnterDelay={TOOLTIP_DELAY}
-                  placement="bottomRight"
-                  title={isGitInstalled ? InitializeGitTooltip : InstallGitTooltip}
-                >
-                  <S.InitButton
-                    disabled={!isGitInstalled}
-                    icon={<Icon name="git" />}
-                    loading={isInitializingGitRepo || gitLoading}
-                    type="primary"
-                    size="small"
-                    onClick={initGitRepo}
+          <S.Divider type="vertical" />
+          {!isInQuickClusterMode ? (
+            activeProject && (
+              <>
+                <S.ActiveProjectButton onClick={onClickProjectHandler}>
+                  <S.MenuOutlinedIcon />
+                  <S.ProjectName>{activeProject.name}</S.ProjectName>
+                </S.ActiveProjectButton>
+                {hasGitRepo ? (
+                  <S.BranchSelectContainer>
+                    <BranchSelect />
+                  </S.BranchSelectContainer>
+                ) : (
+                  <Tooltip
+                    mouseEnterDelay={TOOLTIP_DELAY}
+                    placement="bottomRight"
+                    title={isGitInstalled ? InitializeGitTooltip : InstallGitTooltip}
                   >
-                    Initialize Git
-                  </S.InitButton>
-                </Tooltip>
-              )}
-            </>
+                    <S.InitButton
+                      disabled={!isGitInstalled}
+                      icon={<Icon name="git" />}
+                      loading={isInitializingGitRepo || gitLoading}
+                      type="primary"
+                      size="small"
+                      onClick={initGitRepo}
+                    >
+                      Initialize Git
+                    </S.InitButton>
+                  </Tooltip>
+                )}
+              </>
+            )
+          ) : (
+            <S.BackProjectsButton type="primary" size="small" onClick={onClickLogoHandler}>
+              Back to projects
+            </S.BackProjectsButton>
           )}
 
           {showAutosaving && (
