@@ -107,12 +107,9 @@ export type StartPreviewLoaderPayload = {
 export const performResourceContentUpdate = (resource: K8sResource, newText: string, fileMap: FileMapType) => {
   if (isLocalResource(resource)) {
     const updatedFileText = saveResource(resource, newText, fileMap);
-    resource.text = updatedFileText;
-    resource.object = parseYamlDocument(updatedFileText).toJS();
-  } else {
-    resource.text = newText;
-    resource.object = parseYamlDocument(newText).toJS();
+    return {text: updatedFileText, object: parseYamlDocument(updatedFileText).toJS()};
   }
+  return {text: newText, object: parseYamlDocument(newText).toJS()};
 };
 
 // TODO: @monokle/validation - use the shouldIgnoreOptionalUnsatisfiedRefs setting and reprocess all refs
