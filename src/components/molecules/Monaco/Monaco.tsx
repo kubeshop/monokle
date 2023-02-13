@@ -1,7 +1,7 @@
 /* eslint-disable import/order */
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
-import {useMeasure, useUnmount} from 'react-use';
+import {useMeasure} from 'react-use';
 
 import fs from 'fs';
 import log from 'loglevel';
@@ -92,10 +92,6 @@ const Monaco = (props: {
   const dispatch = useAppDispatch();
 
   const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
-
-  useUnmount(() => {
-    console.log('Monaco unmounting...');
-  });
 
   const activeResourceMetaMap = useActiveResourceMetaMap();
   const activeResourceMetaMapRef = useRef(activeResourceMetaMap);
