@@ -1,7 +1,8 @@
-export type DeleteEntityCallback = {
-  isDirectory: boolean;
-  name: string;
-  err: NodeJS.ErrnoException | null;
+import {FileEntry} from './fileEntry';
+
+export type DeleteFileEntryResult = {
+  entry: FileEntry;
+  error?: string;
 };
 
 export type DirectoryOptions = {

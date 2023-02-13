@@ -131,15 +131,10 @@ export const uiSlice = createSlice({
     setTemplateProjectCreate: (state: Draft<UiState>, action: PayloadAction<Project | undefined>) => {
       state.templateExplorer.projectCreate = action.payload;
     },
-    openRenameEntityModal: (
-      state: Draft<UiState>,
-      action: PayloadAction<{absolutePathToEntity: string; osPlatform: string}>
-    ) => {
-      const getBasename = action.payload.osPlatform === 'win32' ? path.win32.basename : path.basename;
-
+    openRenameEntityModal: (state: Draft<UiState>, action: PayloadAction<{absolutePathToEntity: string}>) => {
       state.renameEntityModal = {
         isOpen: true,
-        entityName: getBasename(action.payload.absolutePathToEntity),
+        entityName: path.basename(action.payload.absolutePathToEntity),
         absolutePathToEntity: action.payload.absolutePathToEntity,
       };
     },
