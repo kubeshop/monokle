@@ -200,10 +200,11 @@ const App = () => {
       const nextMajorReleaseVersion = semver.inc(lastSeenReleaseNotesVersion, 'minor');
 
       // check if the current version is the next big release version for showing the modal with release notes
-      if (!semver.valid(lastSeenReleaseNotesVersion) || semver.satisfies(version, `>=${nextMajorReleaseVersion}`)) {
+      if (semver.valid(lastSeenReleaseNotesVersion) && semver.satisfies(version, `>=${nextMajorReleaseVersion}`)) {
         setAppVersion(version);
         setShowReleaseNotes(true);
       }
+
       // if middle release, show silent notification
       else if (semver.satisfies(version, `>${lastSeenReleaseNotesVersion} <${nextMajorReleaseVersion}`)) {
         dispatch(
