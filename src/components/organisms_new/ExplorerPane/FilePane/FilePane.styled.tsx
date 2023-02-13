@@ -7,7 +7,7 @@ import {Colors, FontColors} from '@shared/styles/colors';
 export const FileTreeContainer = styled.div`
   width: 100%;
   height: 100%;
-  padding: 15px 25px 15px 15px;
+  padding: 15px 0px;
 
   & .ant-tree {
     font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
@@ -30,10 +30,6 @@ export const FileTreeContainer = styled.div`
     border-radius: 0 !important;
   }
 
-  & .ant-tree-treenode {
-    background: transparent;
-  }
-
   & .ant-tree-treenode-not-supported:hover::before {
     background: transparent !important;
   }
@@ -46,9 +42,6 @@ export const FileTreeContainer = styled.div`
     border-bottom: 1px solid #434343;
   }
 
-  & .ant-tree-iconEle {
-    flex-shrink: 0;
-  }
   & .ant-tree-node-content-wrapper {
     display: flex;
     overflow: hidden;
