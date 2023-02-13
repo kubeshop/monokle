@@ -69,14 +69,12 @@ export const selectResourceReducer = (
     }
   });
 
-  // This is taken care of by the FileTreePane
-  // We would need to use the main.highlights array only if we want to highl
-  // if (resource.storage === 'local') {
-  //   newHighlights.push({
-  //     type: 'file',
-  //     filePath: resource.origin.filePath,
-  //   });
-  // }
+  if (resource.storage === 'local') {
+    newHighlights.push({
+      type: 'file',
+      filePath: resource.origin.filePath,
+    });
+  }
 
   state.highlights = newHighlights;
 

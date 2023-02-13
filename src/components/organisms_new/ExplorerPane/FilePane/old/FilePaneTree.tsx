@@ -13,7 +13,6 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {
   useCreate,
-  useDelete,
   useDuplicate,
   useFileSelect,
   useFilterByFileOrFolder,
@@ -73,7 +72,6 @@ const FilePaneTree: React.FC<IProps> = props => {
   }, [rootEntry?.filePath, setFolder]);
 
   const {onCreateResource} = useCreate();
-  const {onDelete, processingEntity, setProcessingEntity} = useDelete();
   const {onDuplicate} = useDuplicate();
   const {onFileSelect} = useFileSelect();
   const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
@@ -130,9 +128,9 @@ const FilePaneTree: React.FC<IProps> = props => {
           <TreeItem
             treeKey={String(event.key)}
             title={event.title}
-            processingEntity={processingEntity}
-            setProcessingEntity={setProcessingEntity}
-            onDelete={onDelete}
+            // processingEntity={processingEntity}
+            // setProcessingEntity={setProcessingEntity}
+            // onDelete={onDelete}
             onDuplicate={onDuplicate}
             onRename={onRename}
             onExcludeFromProcessing={onExcludeFromProcessing}
