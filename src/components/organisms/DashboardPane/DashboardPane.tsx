@@ -137,22 +137,25 @@ const DashboardPane = () => {
     [clusterResourceMetaMapRef]
   );
 
+  useEffect(() => {
+    console.log('problems', problems);
+  }, [problems]);
+
   const getErrorCount = useCallback(
     (kind: string) => {
       return Object.values(clusterResourceMetaMapRef.current)
         .filter(resource => resource.kind === kind)
         .reduce((total: number, resource: ResourceMeta) => {
-          const problem = problems.find(p =>
-            p.locations.find(
-              l =>
-                l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
-                l.physicalLocation.artifactLocation.uri === resource.id
-            )
-          );
-          if (problem && problem.level === 'error') {
-            return total + 1;
-          }
-          return total;
+          const problemCount = problems
+            .filter(p => p.level === 'error')
+            .filter(p =>
+              p.locations.find(
+                l =>
+                  l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
+                  l.physicalLocation.artifactLocation.uri === resource.id
+              )
+            );
+          return total + problemCount.length;
         }, 0);
     },
     [clusterResourceMetaMapRef, problems]
@@ -163,17 +166,16 @@ const DashboardPane = () => {
       return Object.values(clusterResourceMetaMapRef.current)
         .filter(resource => resource.kind === kind)
         .reduce((total: number, resource: ResourceMeta) => {
-          const problem = problems.find(p =>
-            p.locations.find(
-              l =>
-                l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
-                l.physicalLocation.artifactLocation.uri === resource.id
-            )
-          );
-          if (problem && problem.level === 'warning') {
-            return total + 1;
-          }
-          return total;
+          const problemCount = problems
+            .filter(p => p.level === 'warning')
+            .filter(p =>
+              p.locations.find(
+                l =>
+                  l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
+                  l.physicalLocation.artifactLocation.uri === resource.id
+              )
+            );
+          return total + problemCount.length;
         }, 0);
     },
     [clusterResourceMetaMapRef, problems]
