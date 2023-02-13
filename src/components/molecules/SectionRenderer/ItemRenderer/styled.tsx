@@ -104,7 +104,7 @@ export const ItemName = styled.span<ItemNameProps>`
 `;
 
 export const PrefixContainer = styled.span`
-  min-width: 20px;
+  min-width: 40px;
 `;
 
 export const SuffixContainer = styled.span`
