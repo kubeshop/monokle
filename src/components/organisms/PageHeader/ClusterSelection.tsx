@@ -289,7 +289,7 @@ const ClusterSelection = () => {
               $isInClusterMode={isInClusterMode}
               $isInPreviewMode={!isPreviewLoading && isInPreviewMode}
               $previewType={preview?.type}
-              loading={isPreviewLoading}
+              loading={isClusterLoading || isPreviewLoading}
               size="small"
               $kubeConfigContextColor={kubeConfigContextColor}
             >
