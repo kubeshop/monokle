@@ -7,7 +7,7 @@ import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {Icon, TitleBar, TitleBarCount} from '@monokle/components';
@@ -23,6 +23,7 @@ import {useSetFolderFromMainThread} from './useSetFolderFromMainThread';
 const FilePane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
+  const dispatch = useAppDispatch();
   const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
