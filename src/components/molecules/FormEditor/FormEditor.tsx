@@ -82,8 +82,6 @@ const FormEditor: React.FC<IProps> = props => {
     [_setFormData, formDataRef]
   );
 
-  useWhatChanged([fileMap, selectedFilePath, selectedResource, formData]);
-
   const onFormUpdate = useCallback(
     (e: any) => {
       setFormData(e.formData, 'onFormUpdate');
