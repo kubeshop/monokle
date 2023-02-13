@@ -11,7 +11,13 @@ import {setAlert} from '@redux/reducers/alert';
 import {getResourceContentMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
-import {joinK8sResource, saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
+import {
+  isResourceSelected,
+  joinK8sResource,
+  saveResource,
+  splitK8sResource,
+  splitK8sResourceMap,
+} from '@redux/services/resource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
@@ -397,10 +403,16 @@ export const mainSlice = createSlice({
       const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
 
       action.payload.resourcePayloads.forEach(resourcePayload => {
+        delete state.resourceMetaMapByStorage.transient[resourcePayload.resourceId];
+        delete state.resourceContentMapByStorage.transient[resourcePayload.resourceId];
+        if (isResourceSelected({id: resourcePayload.resourceId, storage: 'transient'}, state.selection)) {
+          clearSelectionReducer(state);
+        }
+
         const resourceMeta = state.resourceMetaMapByStorage.local[resourcePayload.resourceId];
         const resourceContent = state.resourceContentMapByStorage.local[resourcePayload.resourceId];
         const resource = joinK8sResource(resourceMeta, resourceContent);
-        const relativeFilePath = resourcePayload.resourceFilePath.substr(rootFolder.length);
+        const relativeFilePath = resourcePayload.resourceFilePath.substring(rootFolder.length);
         const resourceFileEntry = state.fileMap[relativeFilePath];
 
         if (resourceFileEntry) {
