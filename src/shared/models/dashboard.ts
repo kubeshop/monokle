@@ -5,6 +5,7 @@ export type DashboardMenu = {
   order?: number;
   resourceCount?: number;
   errorCount?: number;
+  warningCount?: number;
   children?: DashboardMenu[];
 };
 

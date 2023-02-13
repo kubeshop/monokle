@@ -10,15 +10,17 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
 import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
+import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
 import {useSelectorWithRef} from '@utils/hooks';
 
 import {DashboardMenu} from '@shared/models/dashboard';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {CLICKAKBLE_RESOURCE_GROUPS} from '../Dashboard';
-import {ErrorCell, Resource} from '../Dashboard/Tableview/TableCells.styled';
+import {ErrorCell, Resource, Warning} from '../Dashboard/Tableview/TableCells.styled';
 import * as S from './DashboardPane.style';
 
 const DashboardPane = () => {
@@ -30,6 +32,7 @@ const DashboardPane = () => {
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [filterText, setFilterText] = useState<string>('');
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
+  const problems = useValidationSelector(state => problemsSelector(state));
 
   const filteredMenu = useMemo(() => {
     if (!filterText) {
@@ -82,6 +85,7 @@ const DashboardPane = () => {
             children: [],
             resourceCount: getResourceCount(kindHandler.kind),
             errorCount: getErrorCount(kindHandler.kind),
+            warningCount: getWarningCount(kindHandler.kind),
           });
         } else {
           parent.children?.push({
@@ -90,6 +94,7 @@ const DashboardPane = () => {
             children: [],
             resourceCount: getResourceCount(kindHandler.kind),
             errorCount: getErrorCount(kindHandler.kind),
+            warningCount: getWarningCount(kindHandler.kind),
           });
         }
       }
@@ -110,7 +115,7 @@ const DashboardPane = () => {
     dispatch(setDashboardMenuList(tempMenu));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registeredKindHandlers, leftMenu, selectedNamespace]);
+  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMetaMapRef, problems]);
 
   useMount(() => {
     dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
@@ -132,24 +137,46 @@ const DashboardPane = () => {
     [clusterResourceMetaMapRef]
   );
 
-  // TODO: refactor after @monokle/validation integration
   const getErrorCount = useCallback(
     (kind: string) => {
-      // return Object.values(clusterResourceMap)
-      //   .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-      //   .filter(resource => resource.kind === kind)
-      //   .reduce((total: number, resource: K8sResource) => {
-      //     if (resource.issues && resource.issues.errors) {
-      //       total += resource.issues.errors.length;
-      //     }
-      //     if (resource.validation && resource.validation.errors) {
-      //       total += resource.validation.errors.length;
-      //     }
-      //     return total;
-      //   }, 0);
-      return 0;
+      return Object.values(clusterResourceMetaMapRef.current)
+        .filter(resource => resource.kind === kind)
+        .reduce((total: number, resource: ResourceMeta) => {
+          const problem = problems.find(p =>
+            p.locations.find(
+              l =>
+                l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
+                l.physicalLocation.artifactLocation.uri === resource.id
+            )
+          );
+          if (problem && problem.level === 'error') {
+            return total + 1;
+          }
+          return total;
+        }, 0);
     },
-    [clusterResourceMetaMapRef]
+    [clusterResourceMetaMapRef, problems]
+  );
+
+  const getWarningCount = useCallback(
+    (kind: string) => {
+      return Object.values(clusterResourceMetaMapRef.current)
+        .filter(resource => resource.kind === kind)
+        .reduce((total: number, resource: ResourceMeta) => {
+          const problem = problems.find(p =>
+            p.locations.find(
+              l =>
+                l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
+                l.physicalLocation.artifactLocation.uri === resource.id
+            )
+          );
+          if (problem && problem.level === 'warning') {
+            return total + 1;
+          }
+          return total;
+        }, 0);
+    },
+    [clusterResourceMetaMapRef, problems]
   );
 
   return (
@@ -202,6 +229,7 @@ const DashboardPane = () => {
                   <span style={{marginRight: '4px'}}>{child.label}</span>
                   {child.resourceCount ? <Resource>{child.resourceCount}</Resource> : null}
                   {child.errorCount ? <ErrorCell>{child.errorCount}</ErrorCell> : null}
+                  {child.warningCount ? <Warning style={{marginLeft: '8px'}}>{child.warningCount}</Warning> : null}
                 </S.SubSection>
               ) : null
             )}
