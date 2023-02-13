@@ -145,45 +145,42 @@ const NewResourceWizard = () => {
   const [resourceKindOptions, setResourceKindOptions] =
     useState<Record<string, ResourceKindHandler[]>>(kindsByApiVersion);
 
-  const generateExportFileName = useCallback(
-    () => async () => {
-      if (rootFolderEntryRef.current && selectedFolderRef.current.startsWith(rootFolderEntryRef.current.filePath)) {
-        const currentFolder = selectedFolderRef.current.split(rootFolderEntryRef.current.filePath).pop();
+  const generateExportFileName = useCallback(async () => {
+    if (rootFolderEntryRef.current && selectedFolderRef.current.startsWith(rootFolderEntryRef.current.filePath)) {
+      const currentFolder = selectedFolderRef.current.split(rootFolderEntryRef.current.filePath).pop();
 
-        if (currentFolder) {
-          setSelectedFolder(currentFolder.slice(1));
-        } else {
-          setSelectedFolder(ROOT_FILE_ENTRY);
-        }
-        return;
-      }
-
-      let selectedFolderResources;
-      if (selectedFolderRef.current === ROOT_FILE_ENTRY) {
-        selectedFolderResources = Object.values(localResourceMetaMapRef.current).filter(
-          resource => resource.origin.filePath.split(path.sep).length === 2
-        );
+      if (currentFolder) {
+        setSelectedFolder(currentFolder.slice(1));
       } else {
-        selectedFolderResources = Object.values(localResourceMetaMapRef.current).filter(
-          resource =>
-            resource.origin.filePath.split(path.sep).length > 2 &&
-            getDirname(resource.origin.filePath).endsWith(selectedFolderRef.current)
-        );
+        setSelectedFolder(ROOT_FILE_ENTRY);
       }
-      const hasNameClash = selectedFolderResources.some(resource => resource.name === form.getFieldValue('name'));
+      return;
+    }
 
-      let fullFileName = generateFullFileName(
-        form.getFieldValue('name'),
-        form.getFieldValue('kind'),
-        selectedFolderRef.current,
-        fileMapRef.current,
-        0,
-        hasNameClash
+    let selectedFolderResources;
+    if (selectedFolderRef.current === ROOT_FILE_ENTRY) {
+      selectedFolderResources = Object.values(localResourceMetaMapRef.current).filter(
+        resource => resource.origin.filePath.split(path.sep).length === 2
       );
-      setExportFileName(fullFileName);
-    },
-    [form, localResourceMetaMapRef, selectedFolderRef, rootFolderEntryRef, fileMapRef, setSelectedFolder, getDirname]
-  );
+    } else {
+      selectedFolderResources = Object.values(localResourceMetaMapRef.current).filter(
+        resource =>
+          resource.origin.filePath.split(path.sep).length > 2 &&
+          getDirname(resource.origin.filePath).endsWith(selectedFolderRef.current)
+      );
+    }
+    const hasNameClash = selectedFolderResources.some(resource => resource.name === form.getFieldValue('name'));
+
+    let fullFileName = generateFullFileName(
+      form.getFieldValue('name'),
+      form.getFieldValue('kind'),
+      selectedFolderRef.current,
+      fileMapRef.current,
+      0,
+      hasNameClash
+    );
+    setExportFileName(fullFileName);
+  }, [form, localResourceMetaMapRef, selectedFolderRef, rootFolderEntryRef, fileMapRef, setSelectedFolder, getDirname]);
 
   useEffect(() => {
     const visible = newResourceWizardState.isOpen;

@@ -24,14 +24,18 @@ const NewPaneManagerLeftMenu: React.FC = () => {
 
   return (
     <ActivityBar
-      style={{backgroundColor: Colors.black100}}
+      style={{backgroundColor: isActive ? Colors.black100 : Colors.grey10}}
       activities={activities}
       extraActivities={extraActivities}
       isActive={isActive}
       value={leftMenuSelection}
       extraValue={leftMenuBottomSelection}
       onChange={activityName => {
-        if (activityName === leftMenuSelection && leftActive) {
+        if (
+          !['compare', 'settings', 'dashboard'].includes(activityName) &&
+          activityName === leftMenuSelection &&
+          leftActive
+        ) {
           dispatch(setLeftMenuIsActive(false));
           return;
         }

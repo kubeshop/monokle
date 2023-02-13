@@ -2,6 +2,8 @@ import React, {useMemo} from 'react';
 
 import {Popover} from 'antd';
 
+import {size} from 'lodash';
+
 import {Icon} from '@monokle/components';
 import {isIncomingRef, isOutgoingRef, isUnsatisfiedRef} from '@monokle/validation';
 import {ResourceMeta} from '@shared/models/k8sResource';
@@ -45,11 +47,7 @@ const ResourceRefsIconPopover = ({
 
   const incomingColor = useMemo(() => (isSelected ? Colors.blackPure : Colors.blue10), [isSelected]);
 
-  if (!resourceRefs || resourceRefs.length === 0) {
-    return <span style={{minWidth: '30px'}} />;
-  }
-
-  if (isDisabled) {
+  if (isDisabled || !resourceRefs || !size(resourceRefs)) {
     return null;
   }
 

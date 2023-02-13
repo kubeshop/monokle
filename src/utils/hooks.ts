@@ -63,9 +63,9 @@ export function useWindowSize(): Size {
 export const useStateWithRef = <T>(initialState: T): [T, (arg1: T) => void, MutableRefObject<T>] => {
   const [state, _setState] = React.useState(initialState);
   const ref = React.useRef(state);
-  const setState = React.useCallback((newState: any) => {
+  const setState = React.useCallback((newState: T) => {
     if (typeof newState === 'function') {
-      _setState((prevState: any) => {
+      _setState((prevState: T) => {
         const computedState = newState(prevState);
         ref.current = computedState;
         return computedState;

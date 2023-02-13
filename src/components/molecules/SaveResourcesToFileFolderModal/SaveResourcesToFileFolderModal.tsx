@@ -24,7 +24,7 @@ import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -113,8 +113,8 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
   const isVisible = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.isOpen);
   const resourcesIdentifiers = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.resourcesIdentifiers);
 
-  const [, resourceMetaMapByStorageRef] = useSelectorWithRef(state => state.main.resourceMetaMapByStorage);
-  const [, resourceContentMapByStorageRef] = useSelectorWithRef(state => state.main.resourceContentMapByStorage);
+  const resourceMetaMapByStorageRef = useRefSelector(state => state.main.resourceMetaMapByStorage);
+  const resourceContentMapByStorageRef = useRefSelector(state => state.main.resourceContentMapByStorage);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [savingDestination, setSavingDestination] = useState<'saveToFolder' | 'appendToFile'>('saveToFolder');
@@ -265,7 +265,7 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!isEmpty(resourcesIdentifiers) || !selectedFolder || savingDestination === 'appendToFile') {
+    if (isEmpty(resourcesIdentifiers) || !selectedFolder || savingDestination === 'appendToFile') {
       return;
     }
 

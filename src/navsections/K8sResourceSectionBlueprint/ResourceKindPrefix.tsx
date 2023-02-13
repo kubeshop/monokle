@@ -119,6 +119,8 @@ export default memo(Prefix, isEqual);
 const Container = styled.span`
   display: flex;
   align-items: center;
+  gap: 2px;
+
   & .ant-popover-inner-content {
     padding: 0 !important;
   }

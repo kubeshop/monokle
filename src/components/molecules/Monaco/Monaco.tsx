@@ -235,7 +235,6 @@ const Monaco = (props: {
   );
 
   const debouncedSaveContent = useDebouncedCodeSave(
-    editorRef,
     originalCodeRef,
     activeResourceMetaMapRef,
     selectedResourceIdRef,
@@ -285,7 +284,7 @@ const Monaco = (props: {
       }
 
       if (originalCodeRef.current !== undefined && originalCodeRef.current !== newValue) {
-        debouncedSaveContent.current(newValue);
+        debouncedSaveContent(newValue);
       }
     },
     [autosavingStatusRef, debouncedSaveContent, dispatch, setCode]

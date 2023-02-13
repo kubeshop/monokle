@@ -2,13 +2,14 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
-import {highlightItem, openNewResourceWizard, setLeftMenuSelection} from '@redux/reducers/ui';
+import {highlightItem, openNewResourceWizard, openTemplateExplorer, setLeftMenuSelection} from '@redux/reducers/ui';
 import {activeResourceCountSelector} from '@redux/selectors/resourceMapSelectors';
+import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {ResourceFilterType} from '@shared/models/appState';
 import {HighlightItems} from '@shared/models/ui';
 import {Colors} from '@shared/styles/colors';
-import {kubeConfigPathValidSelector} from '@shared/utils/selectors';
+import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 const StyledContainer = styled.div`
   margin-top: 12px;
@@ -29,9 +30,10 @@ const StyledLink = styled.div`
 
 function K8sResourceSectionEmptyDisplay() {
   const dispatch = useAppDispatch();
+  const {lastNamespaceLoaded} = useAppSelector(state => state.main.clusterConnectionOptions);
   const hasAnyActiveResources = useAppSelector(state => activeResourceCountSelector(state) > 0);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
-  // const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
 
   function resetFilters() {
     const emptyFilter: ResourceFilterType = {annotations: {}, labels: {}};
@@ -43,13 +45,11 @@ function K8sResourceSectionEmptyDisplay() {
 
     setTimeout(() => {
       if (itemToHighlight === HighlightItems.BROWSE_TEMPLATES) {
-        // TODO: Browse templates with new template explorer
-        // dispatch(setLeftMenuSelection('templates'));
+        dispatch(openTemplateExplorer());
       } else if (itemToHighlight === HighlightItems.CREATE_RESOURCE) {
         dispatch(openNewResourceWizard());
       } else if (itemToHighlight === HighlightItems.CONNECT_TO_CLUSTER) {
-        // TODO: load the cluster
-        // startPreview(kubeConfigContext, 'cluster', dispatch);
+        dispatch(startClusterConnection({context: kubeConfigContext, namespace: lastNamespaceLoaded || 'default'}));
       }
     }, 1000);
 

@@ -7,8 +7,8 @@ export const useRename = () => {
   const dispatch = useAppDispatch();
 
   const onRename = useCallback(
-    (absolutePathToEntity: string, osPlatform: string) => {
-      dispatch(openRenameEntityModal({absolutePathToEntity, osPlatform}));
+    (absolutePathToEntity: string) => {
+      dispatch(openRenameEntityModal({absolutePathToEntity}));
     },
     [dispatch]
   );

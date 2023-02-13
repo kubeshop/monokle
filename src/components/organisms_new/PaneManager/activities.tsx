@@ -1,9 +1,12 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import {SettingOutlined} from '@ant-design/icons';
 
+import {size} from 'lodash';
+
 import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip} from '@constants/tooltips';
 
 import {useAppSelector} from '@redux/hooks';
+import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
 import {BottomPaneManager, DashboardPane, GitPane} from '@organisms';
 
@@ -38,9 +41,12 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     type: 'panel',
     name: 'validation',
     tooltip: 'View validation errors',
-    icon: () => <Icon name="validation" style={{fontSize: '18px', marginTop: 4}} />,
+    icon: () => <Icon name="validation" style={{fontSize: '18px'}} />,
     component: <ValidationPane />,
-    useBadge: () => undefined,
+    useBadge: () => {
+      const problemsCount = useValidationSelector(state => size(problemsSelector(state)));
+      return {count: problemsCount, size: 'small'};
+    },
     isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
   },
   {
