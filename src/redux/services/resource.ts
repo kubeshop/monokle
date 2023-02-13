@@ -297,6 +297,26 @@ function extractNamespace(content: any) {
     : undefined;
 }
 
+export function extractResourceMeta<Storage extends ResourceStorage>(
+  resourceObject: any,
+  storage: Storage,
+  origin: OriginFromStorage<Storage>,
+  id?: string
+): ResourceMeta<Storage> {
+  return {
+    name: createResourceName(resourceObject, isLocalOrigin(origin) ? origin.filePath : undefined),
+    storage,
+    origin,
+    id: id ?? ((resourceObject.metadata && resourceObject.metadata.uid) || uuidv4()),
+    kind: resourceObject.kind,
+    apiVersion: resourceObject.apiVersion,
+    isClusterScoped: getResourceKindHandler(resourceObject.kind)?.isNamespaced || false,
+    labels: resourceObject.metadata?.labels || {},
+    templateLabels: resourceObject.spec?.template?.metadata?.labels || {},
+    annotations: resourceObject.metadata?.annotations || {},
+  };
+}
+
 /**
  * Extracts all resources from the specified text content (must be yaml)
  */
