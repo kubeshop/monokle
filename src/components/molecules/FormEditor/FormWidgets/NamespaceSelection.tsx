@@ -5,7 +5,6 @@ import {Select} from 'antd';
 import {uniq} from 'lodash';
 
 import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
-import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
@@ -19,7 +18,6 @@ const EMPTY_VALUE = 'NONE';
 export const NamespaceSelection = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
   const resourceMetaMap = useResourceMetaMap('local');
-  const selectedResource = useSelectedResource();
   const [namespaces, setNamespaces] = useState<(string | undefined)[]>([]);
   const [inputValue, setInputValue] = useState<string>();
   const [clusterNamespaces] = useTargetClusterNamespaces();
@@ -31,29 +29,13 @@ export const NamespaceSelection = (params: any) => {
         setNamespaces([...namespaces, inputValue]);
       }
       setInputValue('');
+    }
+    if (providedValue === EMPTY_VALUE) {
+      onChange(undefined);
     } else {
       onChange(providedValue);
     }
   };
-
-  useEffect(() => {
-    setInputValue('');
-    if (!value) {
-      onChange(EMPTY_VALUE);
-    } else {
-      onChange(value);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResource, value]);
-
-  useEffect(() => {
-    if (value === EMPTY_VALUE) {
-      onChange(undefined);
-    } else {
-      onChange(value);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
 
   useEffect(() => {
     if (resourceMetaMap) {
