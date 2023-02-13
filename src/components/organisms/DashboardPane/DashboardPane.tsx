@@ -84,8 +84,8 @@ const DashboardPane = () => {
             label: kindHandler.kind,
             children: [],
             resourceCount: getResourceCount(kindHandler.kind),
-            errorCount: getErrorCount(kindHandler.kind),
-            warningCount: getWarningCount(kindHandler.kind),
+            errorCount: getProblemCount(kindHandler.kind, 'error'),
+            warningCount: getProblemCount(kindHandler.kind, 'warning'),
           });
         } else {
           parent.children?.push({
@@ -93,8 +93,8 @@ const DashboardPane = () => {
             label: kindHandler.kind,
             children: [],
             resourceCount: getResourceCount(kindHandler.kind),
-            errorCount: getErrorCount(kindHandler.kind),
-            warningCount: getWarningCount(kindHandler.kind),
+            errorCount: getProblemCount(kindHandler.kind, 'error'),
+            warningCount: getProblemCount(kindHandler.kind, 'warning'),
           });
         }
       }
@@ -137,33 +137,13 @@ const DashboardPane = () => {
     [clusterResourceMetaMapRef]
   );
 
-  const getErrorCount = useCallback(
-    (kind: string) => {
+  const getProblemCount = useCallback(
+    (kind: string, level: 'error' | 'warning') => {
       return Object.values(clusterResourceMetaMapRef.current)
         .filter(resource => resource.kind === kind)
         .reduce((total: number, resource: ResourceMeta) => {
           const problemCount = problems
-            .filter(p => p.level === 'error')
-            .filter(p =>
-              p.locations.find(
-                l =>
-                  l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
-                  l.physicalLocation.artifactLocation.uri === resource.id
-              )
-            );
-          return total + problemCount.length;
-        }, 0);
-    },
-    [clusterResourceMetaMapRef, problems]
-  );
-
-  const getWarningCount = useCallback(
-    (kind: string) => {
-      return Object.values(clusterResourceMetaMapRef.current)
-        .filter(resource => resource.kind === kind)
-        .reduce((total: number, resource: ResourceMeta) => {
-          const problemCount = problems
-            .filter(p => p.level === 'warning')
+            .filter(p => p.level === level)
             .filter(p =>
               p.locations.find(
                 l =>
