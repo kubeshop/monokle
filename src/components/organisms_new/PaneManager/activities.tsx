@@ -12,6 +12,7 @@ import {BottomPaneManager, DashboardPane, GitPane} from '@organisms';
 
 import {ActivityType, Icon} from '@monokle/components';
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@shared/models/ui';
+import {activeProjectSelector} from '@shared/utils';
 
 import CompareSyncPane from '../CompareSyncPane';
 import ExplorerPane from '../ExplorerPane';
@@ -26,7 +27,7 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     icon: () => <Icon name="document" style={{fontSize: '18px', marginTop: 4}} />,
     component: <ExplorerPane />,
     useBadge: () => undefined,
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
+    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
   },
   {
     type: 'fullscreen',
@@ -35,7 +36,7 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     icon: () => <Icon name="compare" style={{fontSize: '16px', marginTop: 4}} />,
     component: <CompareSyncPane />,
     useBadge: () => undefined,
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
+    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
   },
   {
     type: 'panel',
@@ -47,7 +48,7 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
       const problemsCount = useValidationSelector(state => size(problemsSelector(state)));
       return {count: problemsCount, size: 'small'};
     },
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
+    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
   },
   {
     type: 'panel',
@@ -60,7 +61,7 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
 
       return {count: changedFiles.length, size: 'small'};
     },
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
+    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
   },
   {
     type: 'panel',
@@ -88,6 +89,6 @@ export const extraActivities: ActivityType<LeftMenuBottomSelectionType>[] = [
     icon: () => <Icon name="terminal" style={{fontSize: 16}} />,
     component: <BottomPaneManager />,
     useBadge: () => undefined,
-    isVisible: () => useAppSelector(state => Boolean(!state.ui.isInQuickClusterMode)),
+    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
   },
 ];
