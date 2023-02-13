@@ -60,7 +60,6 @@ interface IProps {
 
 const FormEditor: React.FC<IProps> = props => {
   const {formSchema, formUiSchema} = props;
-
   const dispatch = useAppDispatch();
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
   const fileMap = useAppSelector(state => state.main.fileMap);
@@ -193,7 +192,7 @@ const FormEditor: React.FC<IProps> = props => {
     } else {
       setSchema(formSchema);
     }
-  }, [formSchema, settings]);
+  }, [setSchema, formSchema, settings?.createDefaultObjects, settings?.setDefaultPrimitiveValues]);
 
   const isReadOnlyMode = useMemo(
     () => isInPreviewMode || (isInClusterMode && !settings.allowEditInClusterMode),
