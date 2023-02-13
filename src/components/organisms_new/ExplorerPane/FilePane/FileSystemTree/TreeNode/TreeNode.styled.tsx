@@ -23,6 +23,7 @@ export const PreviewButton = styled(Button)<{$isItemSelected: boolean}>`
 `;
 
 export const PreviewIcon = styled(EyeOutlined)<{$isSelected: boolean}>`
+  margin-left: 5px;
   color: ${props => (props.$isSelected ? Colors.blackPure : Colors.grey7)};
 `;
 

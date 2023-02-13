@@ -245,6 +245,11 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     const newMenuItems: AntdMenuItem[] = [];
 
     newMenuItems.push({
+      type: 'divider',
+      key: 'divider-1',
+    });
+
+    newMenuItems.push({
       key: 'update_scanning',
       label: `${fileEntry.isExcluded ? 'Remove from' : 'Add to'} Files: Exclude`,
       onClick: (e: any) => {

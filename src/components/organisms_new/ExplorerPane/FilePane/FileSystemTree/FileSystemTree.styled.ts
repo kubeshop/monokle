@@ -31,8 +31,7 @@ export const TreeDirectoryTree = styled(Tree.DirectoryTree)<{$isHighlightSelecti
   & .ant-tree-treenode::selection {
     background: ${props => (props.$isHighlightSelection ? Colors.highlightColor : Colors.selectionColor)} !important;
   }
-
-  & .ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper .ant-tree-node-selected {
+  & .ant-tree-node-selected {
     color: ${props => (props.$isHighlightSelection ? Colors.cyan7 : Colors.blackPure)} !important;
     font-weight: bold;
   }
