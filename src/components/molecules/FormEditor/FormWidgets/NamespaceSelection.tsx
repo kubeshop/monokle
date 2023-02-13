@@ -29,8 +29,7 @@ export const NamespaceSelection = (params: any) => {
         setNamespaces([...namespaces, inputValue]);
       }
       setInputValue('');
-    }
-    if (providedValue === EMPTY_VALUE) {
+    } else if (providedValue === EMPTY_VALUE) {
       onChange(undefined);
     } else {
       onChange(providedValue);
