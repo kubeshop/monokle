@@ -122,7 +122,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
             title="Files"
             actions={
               isActive ? (
-                <S.TitleBarActions>
+                <S.TitleBarActions onClick={e => e.stopPropagation()}>
                   {isScanExcludesUpdated === 'outdated' && (
                     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerChanged}>
                       <ExclamationCircleOutlined />
@@ -131,7 +131,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
                     <Button
                       size="small"
-                      onClick={() => setRootFolder(rootEntry.filePath)}
+                      onClick={() => dispatch(setRootFolder(rootEntry.filePath))}
                       icon={<ReloadOutlined />}
                       type="link"
                       disabled={isButtonDisabled}

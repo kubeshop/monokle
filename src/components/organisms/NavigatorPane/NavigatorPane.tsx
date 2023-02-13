@@ -1,4 +1,4 @@
-import {memo, useCallback} from 'react';
+import {memo, useCallback, useMemo} from 'react';
 
 import {Dropdown, Tooltip} from 'antd';
 
@@ -44,6 +44,11 @@ const NavPane: React.FC = () => {
     dispatch(toggleResourceFilters());
   }, [dispatch]);
 
+  const isHighlighted = useMemo(
+    () => Boolean(highlightedItems.createResource || highlightedItems.browseTemplates),
+    [highlightedItems.browseTemplates, highlightedItems.createResource]
+  );
+
   return (
     <S.NavigatorPaneContainer>
       {checkedResourceIdentifiers.length && !isPreviewLoading ? (
@@ -66,8 +71,8 @@ const NavPane: React.FC = () => {
                     <S.PlusButton
                       id="create-resource-button"
                       $disabled={!isFolderOpen || isInPreviewMode}
-                      $highlighted={highlightedItems.createResource}
-                      className={highlightedItems.createResource ? 'animated-highlight' : ''}
+                      $highlighted={isHighlighted}
+                      className={isHighlighted ? 'animated-highlight' : ''}
                       disabled={!isFolderOpen || isInPreviewMode}
                       icon={<PlusOutlined />}
                       size="small"

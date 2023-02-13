@@ -244,6 +244,10 @@ const ResourceFilter = ({active, onToggle}: Props) => {
     setWasLocalUpdate(false);
   }, [filtersMap]);
 
+  if (!hasAnyActiveResources) {
+    return null;
+  }
+
   return (
     <S.Container>
       <Filter
