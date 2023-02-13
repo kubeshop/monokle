@@ -1,7 +1,7 @@
 /* eslint-disable import/order */
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
-import {useMeasure} from 'react-use';
+import {useMeasure, useUnmount} from 'react-use';
 
 import fs from 'fs';
 import log from 'loglevel';
@@ -92,6 +92,10 @@ const Monaco = (props: {
   const dispatch = useAppDispatch();
 
   const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+
+  useUnmount(() => {
+    console.log('Monaco unmounting...');
+  });
 
   const activeResourceMetaMap = useActiveResourceMetaMap();
   const activeResourceMetaMapRef = useRef(activeResourceMetaMap);
@@ -197,7 +201,7 @@ const Monaco = (props: {
   };
 
   useCodeIntel({
-    editor: editorRef.current,
+    editorRef,
     selectedResource:
       selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
     code,
@@ -215,6 +219,7 @@ const Monaco = (props: {
     helmTemplatesMap,
     isDirty: isDirtyRef.current,
     activeResourceStorage: activeResourceStorageRef.current,
+    selection,
   });
 
   const {registerStaticActions} = useEditorKeybindings(
