@@ -16,39 +16,28 @@ const EMPTY_VALUE = 'NONE';
 export const ApiGroupSelection = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
   const [apiGroups, setApiGroups] = useState<(string | undefined)[]>([]);
-  const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
 
   const handleChange = (providedValue: string) => {
     if (providedValue === NEW_ITEM) {
-      setSelectValue(inputValue);
+      onChange(inputValue);
       if (!apiGroups.includes(inputValue)) {
         setApiGroups([...apiGroups, inputValue]);
       }
       setInputValue('');
     } else {
-      setSelectValue(providedValue);
+      onChange(providedValue);
     }
   };
 
   useEffect(() => {
-    setInputValue('');
-    if (!value) {
-      setSelectValue(EMPTY_VALUE);
+    if (value === EMPTY_VALUE) {
+      onChange(undefined);
     } else {
-      setSelectValue(value);
+      onChange(value);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
-
-  useEffect(() => {
-    if (selectValue === EMPTY_VALUE) {
-      onChange(undefined);
-    } else {
-      onChange(selectValue);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectValue]);
 
   useEffect(() => {
     setApiGroups(
@@ -64,7 +53,7 @@ export const ApiGroupSelection = (params: any) => {
 
   return (
     <S.SelectStyled
-      value={selectValue}
+      value={value}
       showSearch
       optionFilterProp="children"
       onChange={handleChange}

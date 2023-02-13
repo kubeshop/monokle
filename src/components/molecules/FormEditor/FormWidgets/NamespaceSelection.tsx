@@ -5,7 +5,6 @@ import {Select} from 'antd';
 import {uniq} from 'lodash';
 
 import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
-import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
@@ -19,42 +18,24 @@ const EMPTY_VALUE = 'NONE';
 export const NamespaceSelection = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
   const resourceMetaMap = useResourceMetaMap('local');
-  const selectedResource = useSelectedResource();
   const [namespaces, setNamespaces] = useState<(string | undefined)[]>([]);
-  const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
   const [clusterNamespaces] = useTargetClusterNamespaces();
 
   const handleChange = (providedValue: string) => {
     if (providedValue === NEW_ITEM) {
-      setSelectValue(inputValue);
+      onChange(inputValue);
       if (!namespaces.includes(inputValue)) {
         setNamespaces([...namespaces, inputValue]);
       }
       setInputValue('');
-    } else {
-      setSelectValue(providedValue);
     }
-  };
-
-  useEffect(() => {
-    setInputValue('');
-    if (!value) {
-      setSelectValue(EMPTY_VALUE);
-    } else {
-      setSelectValue(value);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResource, value]);
-
-  useEffect(() => {
-    if (selectValue === EMPTY_VALUE) {
+    if (providedValue === EMPTY_VALUE) {
       onChange(undefined);
     } else {
-      onChange(selectValue);
+      onChange(providedValue);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectValue]);
+  };
 
   useEffect(() => {
     if (resourceMetaMap) {
@@ -70,7 +51,7 @@ export const NamespaceSelection = (params: any) => {
 
   return (
     <S.SelectStyled
-      value={selectValue}
+      value={value}
       showSearch
       optionFilterProp="children"
       onChange={handleChange}
