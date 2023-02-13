@@ -11,6 +11,7 @@ import validator from '@rjsf/validator-ajv8';
 import fs from 'fs';
 import {isEqual} from 'lodash';
 import log from 'loglevel';
+import {createSelector} from 'reselect';
 import {stringify} from 'yaml';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
@@ -44,6 +45,13 @@ import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
 
 const Form = withTheme(AntDTheme);
 
+const createDefaultObjectsSelector = createSelector(settingsSelector, settings => settings.createDefaultObjects);
+const setDefaultPrimitiveValuesSelector = createSelector(
+  settingsSelector,
+  settings => settings.setDefaultPrimitiveValues
+);
+const allowEditInClusterModeSelector = createSelector(settingsSelector, settings => settings.allowEditInClusterMode);
+
 const templates: Partial<TemplatesType> = {
   ArrayFieldTemplate: FormArrayFieldTemplate,
   ObjectFieldTemplate: FormObjectFieldTemplate,
@@ -67,8 +75,9 @@ const FormEditor: React.FC<IProps> = props => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const selectedResource = useSelectedResource();
-  const settings = useAppSelector(settingsSelector);
-
+  const createDefaultObjects = useAppSelector(createDefaultObjectsSelector);
+  const setDefaultPrimitiveValues = useAppSelector(setDefaultPrimitiveValuesSelector);
+  const allowEditInClusterMode = useAppSelector(allowEditInClusterModeSelector);
   const [formData, _setFormData, formDataRef] = useStateWithRef<any>(undefined);
   const isResourceUpdatedRef = useRef(false);
   const [schema, setSchema] = useState<any>({});
@@ -106,7 +115,7 @@ const FormEditor: React.FC<IProps> = props => {
     return false;
   }, [fileMap, formData, selectedFilePath, selectedResource?.text]);
 
-  useWhatChanged([fileMap, selectedFilePath, selectedResource, settings, formData, changed]);
+  useWhatChanged([fileMap, selectedFilePath, selectedResource, formData, changed]);
 
   const onFormUpdate = useCallback(
     (e: any) => {
@@ -187,16 +196,16 @@ const FormEditor: React.FC<IProps> = props => {
   }, [selectedResource, selectedFilePath, fileMap, setFormData]);
 
   useEffect(() => {
-    if (!settings.createDefaultObjects || !settings.setDefaultPrimitiveValues) {
-      setSchema(removeSchemaDefaults(formSchema, !settings.createDefaultObjects, !settings.setDefaultPrimitiveValues));
+    if (!createDefaultObjects || !setDefaultPrimitiveValues) {
+      setSchema(removeSchemaDefaults(formSchema, !createDefaultObjects, !setDefaultPrimitiveValues));
     } else {
       setSchema(formSchema);
     }
-  }, [setSchema, formSchema, settings?.createDefaultObjects, settings?.setDefaultPrimitiveValues]);
+  }, [createDefaultObjects, setDefaultPrimitiveValues, formSchema]);
 
   const isReadOnlyMode = useMemo(
-    () => isInPreviewMode || (isInClusterMode && !settings.allowEditInClusterMode),
-    [isInClusterMode, isInPreviewMode, settings.allowEditInClusterMode]
+    () => isInPreviewMode || (isInClusterMode && !allowEditInClusterMode),
+    [isInClusterMode, isInPreviewMode, allowEditInClusterMode]
   );
 
   if (!selectedResource && selectedFilePath) {
