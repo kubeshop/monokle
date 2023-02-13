@@ -228,6 +228,9 @@ const initialUiState: UiState = {
   templateExplorer: {
     isVisible: false,
   },
+  welcomePopup: {
+    isVisible: false,
+  },
 };
 
 const initialNavigatorState: NavigatorState = {

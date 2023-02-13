@@ -242,6 +242,12 @@ export const uiSlice = createSlice({
         );
       }
     },
+    closeWelcomePopup: (state: Draft<UiState>) => {
+      state.welcomePopup.isVisible = false;
+    },
+    openWelcomePopup: (state: Draft<UiState>) => {
+      state.welcomePopup.isVisible = true;
+    },
     setExpandedFolders: (state: Draft<UiState>, action: PayloadAction<React.Key[]>) => {
       state.leftMenu.expandedFolders = action.payload;
     },
@@ -375,6 +381,7 @@ export const {
   closeSaveEditCommandModal,
   closeSaveResourcesToFileFolderModal,
   closeTemplateExplorer,
+  closeWelcomePopup,
   collapseNavSections,
   expandNavSections,
   handleWalkthroughStep,
@@ -394,6 +401,7 @@ export const {
   openSaveEditCommandModal,
   openSaveResourcesToFileFolderModal,
   openTemplateExplorer,
+  openWelcomePopup,
   resetLayout,
   setActiveSettingsPanel,
   setExpandedFolders,

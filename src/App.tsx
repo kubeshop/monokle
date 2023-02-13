@@ -23,6 +23,7 @@ import {
   closeFolderExplorer,
   closeReleaseNotesDrawer,
   handleWalkthroughStep,
+  openWelcomePopup,
   toggleNotifications,
 } from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
@@ -199,11 +200,19 @@ const App = () => {
 
       const nextMajorReleaseVersion = semver.inc(lastSeenReleaseNotesVersion, 'minor');
 
-      // check if the current version is the next big release version for showing the modal with release notes
-      if (!semver.valid(lastSeenReleaseNotesVersion) || semver.satisfies(version, `>=${nextMajorReleaseVersion}`)) {
+      // new user
+      if (!semver.valid(lastSeenReleaseNotesVersion)) {
+        dispatch(openWelcomePopup());
+        electronStore.set('appConfig.lastSeenReleaseNotesVersion', version);
+      } else if (
+        // check if the current version is the next big release version for showing the modal with release notes
+        semver.valid(lastSeenReleaseNotesVersion) &&
+        semver.satisfies(version, `>=${nextMajorReleaseVersion}`)
+      ) {
         setAppVersion(version);
         setShowReleaseNotes(true);
       }
+
       // if middle release, show silent notification
       else if (semver.satisfies(version, `>${lastSeenReleaseNotesVersion} <${nextMajorReleaseVersion}`)) {
         dispatch(

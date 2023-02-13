@@ -179,6 +179,9 @@ type UiState = {
     projectCreate?: Project;
   };
   isInQuickClusterMode?: boolean;
+  welcomePopup: {
+    isVisible: boolean;
+  };
 };
 
 type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {});
