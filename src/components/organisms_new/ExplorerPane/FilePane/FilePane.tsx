@@ -26,11 +26,12 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
   const dispatch = useAppDispatch();
-  const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const rootEntry = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
+
+  const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
 
   const filesOnly = useMemo(() => Object.values(fileMap).filter(f => !f.children), [fileMap]);
   const isButtonDisabled = useMemo(() => !rootEntry, [rootEntry]);

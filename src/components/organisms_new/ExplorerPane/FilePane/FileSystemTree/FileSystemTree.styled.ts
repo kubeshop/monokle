@@ -11,32 +11,40 @@ export const TreeContainer = styled.div`
 
 export const TreeDirectoryTree = styled(Tree.DirectoryTree)<{$isHighlightSelection: boolean}>`
   margin-top: 10px;
+  opacity: ${props => (props.disabled ? '70%' : '100%')};
+
   .ant-tree-switcher svg {
     color: ${props => (props.disabled ? `${Colors.grey800}` : 'inherit')} !important;
   }
 
-  opacity: ${props => (props.disabled ? '70%' : '100%')};
+  .ant-tree-treenode {
+    padding: 0px 12px 1px 24px;
 
-  & .ant-tree-treenode-selected {
-    vertical-align: center;
-    margin-left: 0px !important;
-    border-left: 8px hidden transparent;
-    padding-bottom: 0px;
-    background: ${props => (props.$isHighlightSelection ? Colors.highlightColor : Colors.selectionColor)} !important;
-    color: ${props => (props.$isHighlightSelection ? Colors.cyan7 : Colors.blackPure)} !important;
+    &::before {
+      bottom: 0px !important;
+    }
+
+    &::selection {
+      background: ${props => (props.$isHighlightSelection ? Colors.highlightColor : Colors.selectionColor)} !important;
+    }
+
+    &-selected {
+      vertical-align: center;
+      margin-left: 0px !important;
+      border-left: 8px hidden transparent;
+      padding-bottom: 0px;
+      background: ${props => (props.$isHighlightSelection ? Colors.highlightColor : Colors.selectionColor)} !important;
+      color: ${props => (props.$isHighlightSelection ? Colors.cyan7 : Colors.blackPure)} !important;
+
+      &::before {
+        background: ${props =>
+          props.$isHighlightSelection ? Colors.highlightColor : Colors.selectionColor} !important;
+      }
+    }
   }
-  & .ant-tree-treenode-selected::before {
-    background: ${props => (props.$isHighlightSelection ? Colors.highlightColor : Colors.selectionColor)} !important;
-  }
-  & .ant-tree-treenode::selection {
-    background: ${props => (props.$isHighlightSelection ? Colors.highlightColor : Colors.selectionColor)} !important;
-  }
+
   & .ant-tree-node-selected {
     color: ${props => (props.$isHighlightSelection ? Colors.cyan7 : Colors.blackPure)} !important;
     font-weight: bold;
-  }
-
-  & .ant-tree-treenode::before {
-    bottom: 0px !important;
   }
 `;
