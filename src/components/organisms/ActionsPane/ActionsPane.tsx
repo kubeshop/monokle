@@ -8,8 +8,6 @@ import {Tooltip} from 'antd';
 
 import {BookOutlined} from '@ant-design/icons';
 
-import {createSelector} from 'reselect';
-
 import {DEFAULT_PANE_TITLE_HEIGHT, HELM_CHART_HELP_URL, KUSTOMIZE_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 import {
@@ -73,8 +71,6 @@ import {openExternalResourceKindDocumentation} from '@shared/utils/shell';
 import * as S from './ActionsPane.styled';
 import ActionsPaneHeader from './ActionsPaneHeader';
 
-const hideEditorPlaceholderSelector = createSelector(settingsSelector, settings => settings.hideEditorPlaceholder);
-
 // TODO: we should also check if the selectedFile entry has only one resource and if so, to set the selectedResource to be that for this component
 const ActionsPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -111,7 +107,7 @@ const ActionsPane: React.FC = () => {
   const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>(true);
   const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
   const [schemaForSelectedPath, setSchemaForSelectedPath] = useState<any>();
-  const hideEditorPlaceholder = useAppSelector(hideEditorPlaceholderSelector);
+  const settings = useAppSelector(settingsSelector);
 
   const {diffSelectedResource} = useDiff();
   const height = usePaneHeight();
@@ -460,7 +456,7 @@ const ActionsPane: React.FC = () => {
           }
         />
       ) : (
-        !hideEditorPlaceholder && (isFolderLoading ? <S.Skeleton active /> : <MonacoPlaceholder />)
+        !settings.hideEditorPlaceholder && (isFolderLoading ? <S.Skeleton active /> : <MonacoPlaceholder />)
       )}
 
       {isApplyModalVisible && (
