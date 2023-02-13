@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-import {Badge, Dropdown, Tooltip} from 'antd';
+import {Badge, Dropdown, Popover, Tooltip} from 'antd';
 
 import {BellOutlined, EllipsisOutlined} from '@ant-design/icons';
 
@@ -10,18 +10,21 @@ import {NotificationsTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setShowStartPageLearn, toggleNotifications} from '@redux/reducers/ui';
 
+import {WelcomePopupContent} from '@molecules';
+
 import {IconButton} from '@atoms';
 
 import {useHelpMenuItems} from '@hooks/menuItemsHooks';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
-import * as S from './StatePageHeader.styled';
+import * as S from './StartPageHeader.styled';
 
 const StartPageHeader: React.FC = () => {
   const dispatch = useAppDispatch();
   const isStartPageLearnVisible = useAppSelector(state => state.ui.startPageLearn.isVisible);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
+  const isWelcomePopupVisible = useAppSelector(state => state.ui.welcomePopup.isVisible);
 
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
 
@@ -36,15 +39,23 @@ const StartPageHeader: React.FC = () => {
       {/* <SearchInput style={{width: '340px'}} /> */}
 
       <S.ActionsContainer>
-        <S.LearnButton
-          $isActive={isStartPageLearnVisible}
-          type="text"
-          onClick={() => {
-            dispatch(setShowStartPageLearn(true));
-          }}
+        <Popover
+          zIndex={100}
+          content={<WelcomePopupContent />}
+          overlayClassName="welcome-popup"
+          open={isWelcomePopupVisible}
+          placement="leftTop"
         >
-          Learn
-        </S.LearnButton>
+          <S.LearnButton
+            $isActive={isStartPageLearnVisible}
+            type="text"
+            onClick={() => {
+              dispatch(setShowStartPageLearn(true));
+            }}
+          >
+            Learn
+          </S.LearnButton>
+        </Popover>
 
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
           <Badge count={unseenNotificationsCount} size="small">
