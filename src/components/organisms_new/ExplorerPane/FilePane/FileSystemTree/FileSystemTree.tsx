@@ -1,9 +1,10 @@
-import {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {memo, useEffect, useLayoutEffect, useRef} from 'react';
 import {useMeasure} from 'react-use';
 
 import {DataNode} from 'antd/lib/tree';
 
 import fastDeepEqual from 'fast-deep-equal';
+import {isString} from 'lodash';
 import path from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -20,14 +21,22 @@ import {isDefined} from '@shared/utils/filter';
 import * as S from './FileSystemTree.styled';
 import FileSystemTreeNode from './TreeNode';
 
-const FileSystemTree: React.FC = () => {
+type Props = {
+  expandedFolders: string[];
+  onExpandFolders: (expandedFolders: string[]) => void;
+};
+
+const FileSystemTree: React.FC<Props> = props => {
+  const {expandedFolders, onExpandFolders} = props;
+
   const dispatch = useAppDispatch();
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const firstHighlightedFile = useAppSelector(state => state.main.highlights.find(isFileSelection));
-  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-  const expandedKeysRef = useRef(expandedKeys);
-  expandedKeysRef.current = expandedKeys;
+  const expandedFoldersRef = useRef(expandedFolders);
+  expandedFoldersRef.current = expandedFolders;
+  const onExpandFoldersRef = useRef(onExpandFolders);
+  onExpandFoldersRef.current = onExpandFolders;
   const treeRef = useRef<any>(null);
 
   const treeData = useAppSelector(state => {
@@ -49,7 +58,7 @@ const FileSystemTree: React.FC = () => {
     }
 
     const parentFolderPaths = getAllParentFolderPaths(firstHighlightedFile.filePath);
-    setExpandedKeys([...new Set([...expandedKeysRef.current, ...parentFolderPaths])]);
+    onExpandFoldersRef.current([...new Set([...expandedFoldersRef.current, ...parentFolderPaths])]);
   }, [firstHighlightedFile]);
 
   useLayoutEffect(() => {
@@ -64,8 +73,8 @@ const FileSystemTree: React.FC = () => {
       <S.TreeDirectoryTree
         $isHighlightSelection={Boolean(firstHighlightedFile)}
         ref={treeRef}
-        expandedKeys={expandedKeys}
-        onExpand={keys => setExpandedKeys(keys)}
+        expandedKeys={expandedFolders}
+        onExpand={keys => onExpandFoldersRef.current(keys.filter(isString))}
         treeData={treeData}
         height={containerHeight}
         titleRender={node => <FileSystemTreeNode node={node} />}
@@ -124,4 +133,4 @@ function createFolderTree(folderPath: string, fileMap: FileMapType) {
   return treeNode;
 }
 
-export default FileSystemTree;
+export default memo(FileSystemTree);
