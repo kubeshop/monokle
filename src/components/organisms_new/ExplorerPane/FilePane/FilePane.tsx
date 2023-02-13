@@ -1,4 +1,4 @@
-import {memo, useMemo} from 'react';
+import {memo, useMemo, useState} from 'react';
 
 import {Button, CollapsePanelProps, Tooltip} from 'antd';
 
@@ -9,6 +9,8 @@ import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolde
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+
+import {useRefSelector} from '@utils/hooks';
 
 import {Icon, TitleBar, TitleBarCount} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -24,15 +26,21 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
   const dispatch = useAppDispatch();
-  const expandedFolders = useAppSelector(state => state.ui.leftMenu.expandedFolders);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const rootEntry = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
 
+  const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
+
   const filesOnly = useMemo(() => Object.values(fileMap).filter(f => !f.children), [fileMap]);
   const isButtonDisabled = useMemo(() => !rootEntry, [rootEntry]);
   const isCollapsed = useMemo(() => expandedFolders.length === 0 || expandedFolders.length === 1, [expandedFolders]);
+  const allFolderKeysRef = useRefSelector(state =>
+    Object.values(state.main.fileMap)
+      .filter(f => f.children && f.filePath !== f.rootFolderPath)
+      .map(f => f.filePath)
+  );
 
   useSetFolderFromMainThread();
 
@@ -69,7 +77,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
                   >
                     <Button
                       icon={<Icon name="collapse" />}
-                      // onClick={() => dispatch(setExpandedFolders(isCollapsed ? allTreeKeys : tree ? [tree.key] : []))}
+                      onClick={() => setExpandedFolders(isCollapsed ? allFolderKeysRef.current : [])}
                       type="link"
                       size="small"
                       disabled={isButtonDisabled}
@@ -97,7 +105,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
         {isFolderLoading ? (
           <S.Skeleton active />
         ) : rootEntry ? (
-          <FileSystemTree />
+          <FileSystemTree expandedFolders={expandedFolders} onExpandFolders={setExpandedFolders} />
         ) : (
           <S.NoFilesContainer>
             Get started by selecting a folder containing manifests, kustomizations or Helm Charts.
