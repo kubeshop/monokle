@@ -656,8 +656,6 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
       state.resourceMetaMapByStorage.local[meta.id] = meta;
       state.resourceContentMapByStorage.local[meta.id] = content;
     });
-
-    // TODO: after adding a file, the validation listener should reprocess the resources
   }
 
   return fileEntry;
@@ -729,8 +727,6 @@ export function addPath(
       parentEntry.children.push(fileEntry.name);
       parentEntry.children.sort();
     }
-
-    // TODO: reprocess kustomization since the added fileEntry might be included by a kustomization
 
     return fileEntry;
   }
