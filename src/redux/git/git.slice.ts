@@ -46,6 +46,7 @@ export const gitSlice = createSlice({
 
     setCurrentBranch: (state: Draft<GitSliceState>, action: PayloadAction<string>) => {
       if (state.repo) {
+        state.loading = true;
         state.repo.currentBranch = action.payload;
       }
     },
