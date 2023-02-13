@@ -1,6 +1,8 @@
-import log from 'loglevel';
+import {RESOURCE_PARSER} from '@redux/parsing/resourceParser';
 
-import {MonokleValidator, ResourceParser, SchemaLoader, createDefaultMonokleValidator} from '@monokle/validation';
+import {createWorkerEventPromise} from '@utils/worker';
+
+import {MonokleValidator, SchemaLoader, createDefaultMonokleValidator} from '@monokle/validation';
 
 import {
   LoadValidationMessage,
@@ -9,33 +11,17 @@ import {
   RegisterCustomSchemaMessageType,
   RunValidationMessage,
   RunValidationMessageType,
-  matchWorkerEvent,
 } from './validation.worker.types';
 
-export const RESOURCE_PARSER = new ResourceParser();
 export const SCHEMA_LOADER = new SchemaLoader();
 
-// TODO: add a promise timeout
-const createWorkerEventPromise = <Output extends any>(args: {worker: Worker; type: string; input: any}) => {
-  const {worker, type, input} = args;
-  worker.postMessage({type, input});
-  return new Promise<Output>(resolve => {
-    worker.onmessage = event => {
-      if (!matchWorkerEvent(event, type)) {
-        return;
-      }
-      log.info('[WORKER_EVENT_FULFILLED]', event);
-      resolve(event.data.output);
-    };
-  });
-};
 class ValidationWorker {
   #worker: Worker;
   #validator: MonokleValidator;
 
   constructor() {
     this.#worker = new Worker(new URL('./validation.worker', import.meta.url));
-    this.#validator = createDefaultMonokleValidator(RESOURCE_PARSER, SCHEMA_LOADER);
+    this.#validator = createDefaultMonokleValidator(RESOURCE_PARSER.getParser(), SCHEMA_LOADER);
   }
 
   get metadata() {
