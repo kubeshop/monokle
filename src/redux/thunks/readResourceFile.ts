@@ -8,7 +8,7 @@ import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
 
-export const readResourceFile = createAsyncThunk<string | undefined, string, {dispatch: AppDispatch; state: RootState}>(
+export const readFileThunk = createAsyncThunk<string | undefined, string, {dispatch: AppDispatch; state: RootState}>(
   'main/readResourceFile',
   async (selectedFilePath, thunkAPI) => {
     const fileMap = thunkAPI.getState().main.fileMap;

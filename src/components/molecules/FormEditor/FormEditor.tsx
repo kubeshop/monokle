@@ -25,8 +25,8 @@ import {
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
-import {readResourceFile} from '@redux/thunks/readResourceFile';
-import {saveResourceChanges} from '@redux/thunks/saveResourceChanges';
+import {readFileThunk} from '@redux/thunks/readResourceFile';
+import {saveFormEditorResource} from '@redux/thunks/saveFormEditorResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
@@ -35,7 +35,6 @@ import {useStateWithRef} from '@utils/hooks';
 import {parseYamlDocument} from '@utils/yaml';
 
 import {trackEvent} from '@shared/utils/telemetry';
-import {useWhatChanged} from '@simbathesailor/use-what-changed';
 
 import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';
 import * as S from './FormEditor.styled';
@@ -115,7 +114,7 @@ const FormEditor: React.FC<IProps> = props => {
         }
         dispatch(setAutosavingStatus(false));
       } else if (selectedFilePath) {
-        dispatch(saveResourceChanges(formString));
+        dispatch(saveFormEditorResource(formString));
       }
     },
     DEFAULT_EDITOR_DEBOUNCE,
@@ -130,7 +129,7 @@ const FormEditor: React.FC<IProps> = props => {
           setFormData(selectedResource.object, 'useEffect selectedResource');
         } else if (selectedFilePath) {
           try {
-            const fileContent = await dispatch(readResourceFile(selectedFilePath)).unwrap();
+            const fileContent = await dispatch(readFileThunk(selectedFilePath)).unwrap();
             if (fileContent) {
               setFormData(parseYamlDocument(fileContent).toJS(), 'useEffect selectedFilePath');
             }

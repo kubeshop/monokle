@@ -11,7 +11,7 @@ import {mergeManifests} from '@redux/services/manifest-utils';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
 
-export const saveResourceChanges = createAsyncThunk<void, string, {dispatch: AppDispatch; state: RootState}>(
+export const saveFormEditorResource = createAsyncThunk<void, string, {dispatch: AppDispatch; state: RootState}>(
   'main/saveResourceFileChanges',
   async (formString, thunkAPI) => {
     const fileMap = thunkAPI.getState().main.fileMap;
