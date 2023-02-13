@@ -137,10 +137,6 @@ const DashboardPane = () => {
     [clusterResourceMetaMapRef]
   );
 
-  useEffect(() => {
-    console.log('problems', problems);
-  }, [problems]);
-
   const getErrorCount = useCallback(
     (kind: string) => {
       return Object.values(clusterResourceMetaMapRef.current)
