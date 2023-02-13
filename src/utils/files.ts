@@ -64,6 +64,7 @@ export async function deleteFileEntry(entry: FileEntry): Promise<DeleteFileEntry
   if (path.isAbsolute(absolutePath)) {
     try {
       await rm(absolutePath, {recursive: true, force: true});
+      return {entry};
     } catch {
       return {entry, error: 'Failed to remove path.'};
     }

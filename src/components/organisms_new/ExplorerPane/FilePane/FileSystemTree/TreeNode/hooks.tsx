@@ -43,19 +43,24 @@ export const useCanPreview = (fileEntry?: FileEntry, isDisabled?: boolean) => {
   }, [fileEntry, isDisabled, localResourceMetaMapRef, helmValuesMapRef]);
 };
 
-export const useDelete = (fileEntry?: FileEntry) => {
+export const useDelete = () => {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
-  const deleteEntry = useCallback(async () => {
-    if (!fileEntry) {
-      return;
-    }
-    setIsLoading(true);
-    const result = await deleteFileEntry(fileEntry);
-    dispatchDeleteAlert(dispatch, result);
-    setIsLoading(false);
-  }, [fileEntry, dispatch]);
+  const deleteEntry = useCallback(
+    async (fileEntry?: FileEntry) => {
+      if (!fileEntry) {
+        return;
+      }
+      setIsLoading(true);
+      setImmediate(async () => {
+        const result = await deleteFileEntry(fileEntry);
+        dispatchDeleteAlert(dispatch, result);
+        setIsLoading(false);
+      });
+    },
+    [dispatch]
+  );
 
   return {
     deleteEntry,
@@ -216,7 +221,8 @@ export const useFileScanning = (onConfirm: () => void) => {
   return {addEntryToScanExcludes, removeEntryFromScanExcludes};
 };
 
-export const useCommonMenuItems = (fileEntry?: FileEntry) => {
+export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void}, fileEntry?: FileEntry) => {
+  const {deleteEntry} = props;
   const dispatch = useAppDispatch();
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
@@ -241,7 +247,8 @@ export const useCommonMenuItems = (fileEntry?: FileEntry) => {
     newMenuItems.push({
       key: 'update_scanning',
       label: `${fileEntry.isExcluded ? 'Remove from' : 'Add to'} Files: Exclude`,
-      onClick: () => {
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
         if (fileEntry.isExcluded) {
           removeEntryFromScanExcludes(fileEntry.filePath);
         } else {
@@ -271,8 +278,19 @@ export const useCommonMenuItems = (fileEntry?: FileEntry) => {
     newMenuItems.push({
       key: 'rename',
       label: 'Rename',
-      onClick: () => {
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
         renameFileEntry(fileEntry);
+      },
+    });
+
+    newMenuItems.push({
+      key: 'delete',
+      label: 'Delete',
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        console.log('deleting file');
+        deleteEntry(fileEntry);
       },
     });
 
@@ -280,7 +298,10 @@ export const useCommonMenuItems = (fileEntry?: FileEntry) => {
       key: 'open-in-github',
       label: 'Open on GitHub',
       disabled: !canOpenOnGithub,
-      onClick: openOnGithub,
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        openOnGithub();
+      },
     });
 
     newMenuItems.push({
@@ -301,15 +322,19 @@ export const useCommonMenuItems = (fileEntry?: FileEntry) => {
     openOnGithub,
     canOpenOnGithub,
     renameFileEntry,
+    deleteEntry,
   ]);
 
   return menuItems;
 };
 
-export const useFileMenuItems = (stateArgs: {canBePreviewed: boolean}, fileEntry?: FileEntry) => {
-  const {canBePreviewed} = stateArgs;
+export const useFileMenuItems = (
+  props: {deleteEntry: (e: FileEntry) => void; canBePreviewed: boolean},
+  fileEntry?: FileEntry
+) => {
+  const {deleteEntry, canBePreviewed} = props;
   const dispatch = useAppDispatch();
-  const commonMenuItems = useCommonMenuItems(fileEntry);
+  const commonMenuItems = useCommonMenuItems({deleteEntry}, fileEntry);
   const localResourceMetaMapRef = useResourceMetaMapRef('local');
   const createNewResource = useCreateResource();
 
@@ -393,12 +418,12 @@ export const useFileMenuItems = (stateArgs: {canBePreviewed: boolean}, fileEntry
 };
 
 export const useFolderMenuItems = (
-  stateArgs: {isInClusterMode: boolean; isInPreviewMode: boolean},
+  stateArgs: {deleteEntry: (e: FileEntry) => void; isInClusterMode: boolean; isInPreviewMode: boolean},
   fileEntry?: FileEntry
 ) => {
-  const {isInClusterMode, isInPreviewMode} = stateArgs;
+  const {deleteEntry, isInClusterMode, isInPreviewMode} = stateArgs;
   const dispatch = useAppDispatch();
-  const commonMenuItems = useCommonMenuItems(fileEntry);
+  const commonMenuItems = useCommonMenuItems({deleteEntry}, fileEntry);
   const createNewResource = useCreateResource();
 
   const menuItems = useMemo(() => {

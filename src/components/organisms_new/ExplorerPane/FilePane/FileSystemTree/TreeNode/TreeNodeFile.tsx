@@ -40,7 +40,7 @@ const TreeNodeFile: React.FC<Props> = props => {
 
   const contextMenuButtonRef = useRef<HTMLDivElement>(null);
 
-  const menuItems = useFileMenuItems({canBePreviewed}, fileEntry);
+  const menuItems = useFileMenuItems({deleteEntry, canBePreviewed}, fileEntry);
 
   const onContextMenu = useCallback(() => {
     if (isDisabled || !contextMenuButtonRef.current) {
@@ -98,7 +98,7 @@ const TreeNodeFile: React.FC<Props> = props => {
       )}
 
       {isHovered && (
-        <S.ActionButtonsContainer>
+        <S.ActionButtonsContainer onClick={e => e.stopPropagation()}>
           {canBePreviewed && (
             <S.PreviewButton
               type="text"
