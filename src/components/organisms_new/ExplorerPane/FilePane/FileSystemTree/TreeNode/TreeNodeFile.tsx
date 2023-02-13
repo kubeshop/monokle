@@ -1,4 +1,5 @@
-import {useCallback, useRef, useState} from 'react';
+import {useCallback, useRef} from 'react';
+import {useMeasure} from 'react-use';
 
 import {Tooltip} from 'antd';
 
@@ -27,7 +28,6 @@ const TreeNodeFile: React.FC<Props> = props => {
   const fileEntry: FileEntry | undefined = useAppSelector(state => state.main.fileMap[filePath]);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
-  const [isHovered, setIsHovered] = useState(false);
   const isSelected = useAppSelector(
     state => state.main.selection?.type === 'file' && state.main.selection.filePath === filePath
   );
@@ -39,6 +39,7 @@ const TreeNodeFile: React.FC<Props> = props => {
   const {deleteEntry, isDeleteLoading} = useDelete();
 
   const contextMenuButtonRef = useRef<HTMLDivElement>(null);
+  const [actionButtonsRef, {width: actionButtonsWidth}] = useMeasure<HTMLDivElement>();
 
   const menuItems = useFileMenuItems({deleteEntry, canBePreviewed}, fileEntry);
 
@@ -54,12 +55,7 @@ const TreeNodeFile: React.FC<Props> = props => {
   }
 
   return (
-    <S.NodeContainer
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onContextMenu={onContextMenu}
-      $isDisabled={isDisabled}
-    >
+    <S.NodeContainer onContextMenu={onContextMenu} $isDisabled={isDisabled} $actionButtonsWidth={actionButtonsWidth}>
       <S.TitleContainer>
         <S.TitleText>
           <Tooltip
@@ -97,27 +93,25 @@ const TreeNodeFile: React.FC<Props> = props => {
         </S.SpinnerContainer>
       )}
 
-      {isHovered && (
-        <S.ActionButtonsContainer onClick={e => e.stopPropagation()}>
-          {canBePreviewed && (
-            <S.PreviewButton
-              type="text"
-              size="small"
-              disabled={isInPreviewMode || isInClusterMode}
-              $isItemSelected={isSelected}
-            >
-              Preview
-            </S.PreviewButton>
-          )}
-          {!isDisabled && (
-            <ContextMenu items={menuItems}>
-              <div ref={contextMenuButtonRef}>
-                <Dots color={isSelected ? Colors.blackPure : undefined} />
-              </div>
-            </ContextMenu>
-          )}
-        </S.ActionButtonsContainer>
-      )}
+      <S.ActionButtonsContainer ref={actionButtonsRef} onClick={e => e.stopPropagation()}>
+        {canBePreviewed && (
+          <S.PreviewButton
+            type="text"
+            size="small"
+            disabled={isInPreviewMode || isInClusterMode}
+            $isItemSelected={isSelected}
+          >
+            Preview
+          </S.PreviewButton>
+        )}
+        {!isDisabled && (
+          <ContextMenu items={menuItems}>
+            <div ref={contextMenuButtonRef}>
+              <Dots color={isSelected ? Colors.blackPure : undefined} />
+            </div>
+          </ContextMenu>
+        )}
+      </S.ActionButtonsContainer>
     </S.NodeContainer>
   );
 };

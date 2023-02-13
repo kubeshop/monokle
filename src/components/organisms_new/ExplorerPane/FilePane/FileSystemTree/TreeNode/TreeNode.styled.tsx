@@ -7,19 +7,21 @@ import styled from 'styled-components';
 import {Colors} from '@shared/styles/colors';
 
 export const ActionButtonsContainer = styled.div`
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: flex-end;
   flex-direction: row;
   height: 100%;
+  position: absolute;
+  right: 0;
 `;
 
 export const PreviewButton = styled(Button)<{$isItemSelected: boolean}>`
   font-weight: 500;
-  font-size: 12px;
+  font-size: 11px;
   color: ${props => (props.$isItemSelected ? Colors.blackPure : Colors.blue6)}!important;
   margin-left: 5px;
-  margin-right: 15px;
+  margin-right: 10px;
 `;
 
 export const PreviewIcon = styled(EyeOutlined)<{$isSelected: boolean}>`
@@ -48,28 +50,34 @@ export const SpinnerContainer = styled.div`
 
 export const TitleContainer = styled.div`
   display: flex;
-  justify-content: space-around;
   align-items: center;
-  max-width: 80%;
+  max-width: 100%;
 `;
 
 export const TitleText = styled.span`
-  flex: 1;
   overflow: hidden;
   position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
-export const NodeContainer = styled.div<{$isDisabled: boolean}>`
+export const NodeContainer = styled.div<{$actionButtonsWidth?: number; $isDisabled: boolean}>`
+  position: relative;
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: ${({$isDisabled}) => ($isDisabled ? 'default' : 'inherit')};
-
   height: 100%;
 
-  & .ant-dropdown-trigger {
-    height: inherit;
-    margin-right: 10px;
+  &:hover {
+    ${ActionButtonsContainer} {
+      display: flex;
+    }
+
+    ${TitleContainer} {
+      max-width: ${({$actionButtonsWidth}) => `calc(100% - ${$actionButtonsWidth}px)`};
+      width: ${({$actionButtonsWidth}) => `calc(100% - ${$actionButtonsWidth}px)`};
+    }
   }
 `;

@@ -18,8 +18,7 @@ export const TreeDirectoryTree = styled(Tree.DirectoryTree)<{$isHighlightSelecti
   }
 
   .ant-tree-treenode {
-    padding-left: 12px;
-    padding-right: 24px;
+    padding: 0px 12px 1px 24px;
 
     &::before {
       bottom: 0px !important;
