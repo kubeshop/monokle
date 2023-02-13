@@ -1,4 +1,4 @@
-import {Layout, Button as RawButton, Divider as RawDivider, Row as RawRow} from 'antd';
+import {Button, Layout, Button as RawButton, Divider as RawDivider, Row as RawRow} from 'antd';
 
 import {
   BellOutlined as RawBellOutlined,
@@ -169,4 +169,13 @@ export const MenuOutlinedIcon = styled(RawMenuOutlined)`
   svg {
     transition: all ${AnimationDurations.slow} ease-in;
   }
+`;
+
+export const BackProjectsButton = styled(Button)`
+  font-size: 12px;
+  color: #ffffff;
+  line-height: 20px;
+  font-weight: 400;
+  padding-left: 16px;
+  padding-right: 16px;
 `;

@@ -186,9 +186,9 @@ const PageHeader = () => {
             <S.Logo id="monokle-logo-header" onClick={onClickLogoHandler} src={MonokleKubeshopLogo} alt="Monokle" />
           </S.LogoContainer>
 
-          {activeProject && (
+          <S.Divider type="vertical" />
+          {activeProject ? (
             <>
-              <S.Divider type="vertical" />
               <S.ActiveProjectButton onClick={onClickProjectHandler}>
                 <S.MenuOutlinedIcon />
                 <S.ProjectName>{activeProject.name}</S.ProjectName>
@@ -216,6 +216,10 @@ const PageHeader = () => {
                 </Tooltip>
               )}
             </>
+          ) : (
+            <S.BackProjectsButton type="primary" size="small" onClick={onClickLogoHandler}>
+              Back to projects
+            </S.BackProjectsButton>
           )}
 
           {showAutosaving && (
