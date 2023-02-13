@@ -1,4 +1,4 @@
-import {useEffect, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 import {monaco} from 'react-monaco-editor';
 
 import {debounce} from 'lodash';
@@ -19,11 +19,12 @@ import {
   ResourceFilterType,
 } from '@shared/models/appState';
 import {K8sResource, ResourceIdentifier, ResourceMetaMap, ResourceStorage} from '@shared/models/k8sResource';
+import {AppSelection} from '@shared/models/selection';
 
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 
 interface CodeIntelProps {
-  editor: monaco.editor.IStandaloneCodeEditor | null;
+  editorRef: React.RefObject<monaco.editor.IStandaloneCodeEditor | null>;
   isDirty: boolean;
   selectedResource: K8sResource | undefined;
   code: string | undefined;
@@ -40,11 +41,12 @@ interface CodeIntelProps {
   helmValuesMap?: HelmValuesMapType;
   helmTemplatesMap?: HelmTemplatesMapType;
   activeResourceStorage: ResourceStorage;
+  selection?: AppSelection;
 }
 
 function useCodeIntel(props: CodeIntelProps) {
   const {
-    editor,
+    editorRef,
     selectedResource,
     code,
     imagesList,
@@ -61,6 +63,7 @@ function useCodeIntel(props: CodeIntelProps) {
     helmTemplatesMap,
     isDirty,
     activeResourceStorage,
+    selection,
   } = props;
 
   const idsOfDecorationsRef = useRef<string[]>([]);
@@ -70,17 +73,17 @@ function useCodeIntel(props: CodeIntelProps) {
   const dispatch = useAppDispatch();
   const lastChangedLine = useAppSelector(state => state.main.lastChangedLine);
 
-  const clearCodeIntel = () => {
-    if (editor) {
-      clearDecorations(editor, idsOfDecorationsRef.current);
+  const clearCodeIntel = useCallback(() => {
+    if (editorRef.current) {
+      clearDecorations(editorRef.current, idsOfDecorationsRef.current);
       idsOfDecorationsRef.current = [];
     }
     disposablesRef.current.forEach(disposable => disposable.dispose());
     disposablesRef.current = [];
-  };
+  }, [editorRef]);
 
-  const applyCodeIntel = () => {
-    if (!editor) {
+  const applyCodeIntel = useCallback(() => {
+    if (!editorRef.current) {
       return;
     }
 
@@ -103,10 +106,10 @@ function useCodeIntel(props: CodeIntelProps) {
           selectFilePath,
           code,
           lastChangedLine,
-          setEditorSelection: ({selection}) => {
+          setEditorSelection: ({selection: monacoSelection}) => {
             dispatch(
               setMonacoEditor({
-                selection,
+                selection: monacoSelection,
               })
             );
           },
@@ -116,7 +119,7 @@ function useCodeIntel(props: CodeIntelProps) {
           filterResources,
           selectImageHandler,
           resourceMetaMap,
-          model: editor.getModel(),
+          model: editorRef.current.getModel(),
           activeResourceStorage,
         })
         .then(data => {
@@ -125,35 +128,62 @@ function useCodeIntel(props: CodeIntelProps) {
           }
           const {newDecorations, newDisposables, newMarkers} = data;
 
-          if (newDecorations) {
-            idsOfDecorationsRef.current = setDecorations(editor, newDecorations);
+          if (newDecorations && editorRef.current) {
+            idsOfDecorationsRef.current = setDecorations(editorRef.current, newDecorations);
           }
           if (newDisposables) {
             disposablesRef.current = newDisposables;
           }
 
-          const model = editor.getModel();
-          if (model && newMarkers) {
-            setMarkers(model, newMarkers);
+          if (editorRef.current) {
+            const model = editorRef.current.getModel();
+            if (model && newMarkers) {
+              setMarkers(model, newMarkers);
+            }
           }
         });
     }
-  };
+  }, [
+    activeResourceStorage,
+    code,
+    currentFile,
+    dispatch,
+    editorRef,
+    fileMap,
+    filterResources,
+    helmChartMap,
+    helmTemplatesMap,
+    lastChangedLine,
+    resourceMetaMap,
+    selectFilePath,
+    selectImageHandler,
+    selectResource,
+    selectedResource,
+    createResource,
+    helmValuesMap,
+  ]);
 
-  const debouncedUpdate = debounce(() => {
-    clearCodeIntel();
-    applyCodeIntel();
-  }, 100);
+  const applyCodeIntelRef = useRef(applyCodeIntel);
+  applyCodeIntelRef.current = applyCodeIntel;
+
+  const debouncedUpdate = useRef(
+    debounce(() => {
+      applyCodeIntelRef.current();
+    }, 500)
+  );
 
   useEffect(() => {
-    debouncedUpdate();
+    clearCodeIntel();
+  }, [selection, clearCodeIntel]);
+
+  useEffect(() => {
+    debouncedUpdate.current();
 
     return () => {
-      debouncedUpdate.cancel();
-      clearCodeIntel();
+      debouncedUpdate.current.cancel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, selectedResource, resourceMetaMap, editor, imagesList, helmTemplatesMap, helmValuesMap]);
+  }, [code, selectedResource, resourceMetaMap, editorRef, imagesList, helmTemplatesMap, helmValuesMap]);
 
   // useEffect(() => {
   //   if (completionDisposableRef.current && completionDisposableRef.current.dispose) {

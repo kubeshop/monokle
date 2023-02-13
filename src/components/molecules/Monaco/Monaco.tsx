@@ -197,7 +197,7 @@ const Monaco = (props: {
   };
 
   useCodeIntel({
-    editor: editorRef.current,
+    editorRef,
     selectedResource:
       selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
     code,
@@ -215,6 +215,7 @@ const Monaco = (props: {
     helmTemplatesMap,
     isDirty: isDirtyRef.current,
     activeResourceStorage: activeResourceStorageRef.current,
+    selection,
   });
 
   const {registerStaticActions} = useEditorKeybindings(
