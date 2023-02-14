@@ -81,7 +81,7 @@ const Prefix = (props: ItemCustomComponentProps) => {
       <ValidationPopover
         disabled={itemInstance.isDisabled}
         level={level}
-        results={[...warnings, ...errors]}
+        results={[...errors, ...warnings]}
         onMessageClickHandler={onMessageClickHandler}
         popoverIconStyle={{transform: 'translateY(-2px)'}}
       />
