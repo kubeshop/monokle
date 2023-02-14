@@ -1,8 +1,10 @@
+import log from 'loglevel';
+
 import {RESOURCE_PARSER} from '@redux/parsing/resourceParser';
 
 import {createWorkerEventPromise} from '@utils/worker';
 
-import {MonokleValidator, SchemaLoader, createDefaultMonokleValidator} from '@monokle/validation';
+import {CustomSchema, MonokleValidator, SchemaLoader, createDefaultMonokleValidator} from '@monokle/validation';
 
 import {
   LoadValidationMessage,
@@ -49,8 +51,16 @@ class ValidationWorker {
     });
   }
 
+  async bulkRegisterCustomSchemas(schemas: CustomSchema[]) {
+    await Promise.all(schemas.map(schema => this.registerCustomSchema(schema)));
+  }
+
   async registerCustomSchema(input: RegisterCustomSchemaMessage['input']) {
-    await this.#validator.registerCustomSchema(input.schema);
+    try {
+      await this.#validator.registerCustomSchema(input.schema);
+    } catch {
+      log.warn(`Failed to register custom schema for ${input.schema.apiVersion}/${input.schema.kind}`);
+    }
     return createWorkerEventPromise<RegisterCustomSchemaMessage['output']>({
       type: RegisterCustomSchemaMessageType,
       worker: this.#worker,

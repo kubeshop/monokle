@@ -6,6 +6,8 @@ import {ResourceParser, SchemaLoader, createDefaultMonokleValidator} from '@mono
 import {
   LoadValidationMessage,
   LoadValidationMessageType,
+  RegisterCustomSchemaMessage,
+  RegisterCustomSchemaMessageType,
   RunValidationMessage,
   RunValidationMessageType,
 } from './validation.worker.types';
@@ -40,6 +42,17 @@ onmessage = async event => {
     const {input} = data as RunValidationMessage;
     const response = await VALIDATOR.validate({resources: input.resources, incremental: input.incremental});
     return {response};
+  });
+
+  handleEvent<RegisterCustomSchemaMessage>(event, RegisterCustomSchemaMessageType, async () => {
+    const {input} = data as RegisterCustomSchemaMessage;
+    try {
+      await VALIDATOR.registerCustomSchema(input.schema);
+    } catch {
+      // we cannot use loglevel here because this is a worker
+      // eslint-disable-next-line no-console
+      console.warn(`Failed to register custom schema for ${input.schema.apiVersion}/${input.schema.kind}`);
+    }
   });
 };
 

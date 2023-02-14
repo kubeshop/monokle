@@ -39,6 +39,8 @@ export const ApiGroupSelection = (params: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
+  // TODO: 2.0+ this is not reactive, it will only be called once
+  // we need to get the registered kinds from the state and populate an array of kind handlers
   useEffect(() => {
     setApiGroups(
       uniq(
