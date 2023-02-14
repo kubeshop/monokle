@@ -19,6 +19,7 @@ export const CompareSyncPaneContainer = styled.div`
 `;
 
 export const Content = styled.div<{$hasSideSelected: boolean}>`
+  padding-top: 8px;
   position: relative;
   overflow-y: auto;
   overflow-x: hidden;
