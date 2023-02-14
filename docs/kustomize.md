@@ -13,24 +13,25 @@ All examples below are from the [Argo Rollouts Manifest Folder](https://github.c
 
 In Settings, set the defaults for working with Kustomize in Monokle Desktop:
 
-![Kustomize Settings](img/kustomize-settings-1.11.png)
+![Kustomize Settings](img/kustomize-settings-2.0.png)
 
 Use the drop-down selector to select how to invoke Kustomize when previewing or applying kustomization files:
 
-![Invoke Kustomize](img/invoke-kustomize-setting-1.11.png)
+![Invoke Kustomize](img/invoke-kustomize-setting-2.0.png)
 
 Tick the check box to enable Helm-related functionality when invoking Kustomize.
 
 ## **Kustomize Navigation**
 
-When selecting a folder containing kustomization.yaml files, these files will automatically be displayed in a **Kustomizations** section 
-on top of the Navigator:
+To work with a project's kustomization.yaml files, click **Kustomize**:
 
-![Kustomize Navigation](img/kustomize-navigation-1.11.png)
+![Kustomize Navigation](img/kustomize-navigation-2.0.png)
+
+![Kustomize Files](img/kustomize-files-2.0.png)
 
 In the screenshot:
 
-- The Kustomizations section shows all kustomization.yaml files - named after the folder they are in relative to the selected root folder.
+- The Kustomize section shows all kustomization.yaml files - named after the folder they are in relative to the selected root folder.
 - The "base" kustomization.yaml has been selected
     - The corresponding kustomization.yaml file has been highlighted to the left.
     - All "downstream" kustomizations and included resources are highlighted in the Navigator, helping you understand the "scope" of the selected kustomization.
@@ -38,15 +39,15 @@ In the screenshot:
 
 Just as with K8s resources, hovering over the link-icon to the right of the kustomization name shows its outgoing links:
 
-![Kustomize Outgoing Links](img/kustomize-outgoing-links-1.11.png)
+![Kustomize Outgoing Links](img/kustomize-outgoing-links-2.0.png)
 
 Here we can see the 10 resources included by the selected kustomization.
 
 Hovering the link-icon to the left of the kustomization name shows its incoming links:
 
-![Kustomize Incoming Links](img/kustomize-incoming-links-1.4.0.png)  
+![Kustomize Incoming Links](img/kustomize-incoming-links-2.0.png)  
 
-Here we see two "upstream" kustomizations that include the selected kustomization in their configuration.
+Here we see one "upstream" kustomization that include the selected kustomization in its configuration.
 
 ## **Kustomize Preview**
 
@@ -55,14 +56,14 @@ Preview functionality helps you understand what resources would be installed in 
 
 Hovering over a kustomization reveals a **Preview** action to the right:
 
-![Kustomize Preview Action](img/kustomize-preview-action-1.11.png)
+![Kustomize Preview Action](img/kustomize-preview-action-2.0.png)
 
 Selecting this action will run kustomize on the selected file with the **-k** option and replace the contents of the Navigator with the 
 generated resources.  
 
 For example previewing the "base" kustomization above will result in the following:
 
-![Kustomize Preview](img/kustomize-preview-1.11.png)
+![Kustomize Preview](img/kustomize-preview-2.0.png)
 
 Monokle Desktop is now in **Preview Mode** (as indicated by the header at the top):
 
@@ -76,11 +77,11 @@ Monokle Desktop is now in **Preview Mode** (as indicated by the header at the to
 In the screenshot we can see that the selected kustomization resulted in 14 resources that contain references to the image
 specified in the kustomization configuration:
 
-![Kustomize Preview Content](img/kustomize-preview-content-1.11.png)
+![Kustomize Preview Content](img/kustomize-preview-content-2.0.png)
 
 ## **Editing of Kustomizations During Preview**
 
-When previewing a kustomization, it is possible to edit the previewed kustomization.yaml file and recreate the preview, allowing 
+When previewing a kustomization, it is possible to edit the previewed kustomization.yaml file and **reload** the preview, allowing 
 you to quickly assess the impact of any changes on the generated files, instead of having to exit and recreate the preview to make a change.
  
-![Edit kustomization during Preview](img/kusk-preview-reload-1.11.png)
+![Edit kustomization during Preview](img/kusk-preview-reload-2.0.png)

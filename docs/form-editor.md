@@ -4,7 +4,7 @@
 
 Monokle Desktop shows form editors for diverse Kubernetes resources which allows you to interactively change the specification of your resources using visual controls/inputs.
 
-![Form Editor](img/form-editor-1.11.png)
+![Form Editor](img/form-editor-2.0.png)
 
 For example in the case of a ConfigMap Kubernetes resource, clicking on the **Form** tab at the top of the Editor, opens the form fields editor for key ConfigMap properties, allowing you to edit/discover all available properties without having to learn or lookup the corresponding YAML/resource documentation. Any changes made and saved (with the Save button on the top right)
 are written back to the underlying YAML. 
@@ -21,9 +21,9 @@ The configuration file you are editing can be visible even when you are using te
 
 Click on the side-by-side icon at the top right of the editor to open a side-by-side view showing the source code on the left and the form editor on the right, providing instant visibility of the changed files while updating the state. 
 
-![Side by Side Editor Icon](img/side-by-side-editor-icon-1.11.png)
+![Side by Side Editor Icon](img/side-by-side-editor-icon-2.0.png)
 
-![Side by Side Editor](img/side-by-side-editor-1.11.png)
+![Side by Side Editor](img/side-by-side-editor-2.0.png)
 
 
 

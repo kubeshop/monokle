@@ -16,9 +16,9 @@ Right-clicking in the editor shows a list of available commands. Pressing F1 ope
 When editing resources (not files), the editor is schema-aware for all native Kubernetes resources, which provides
 auto-complete (Ctrl-Space) and context-sensitive hover documentation.
 
-![Source Editor Auto Complete](img/source-editor-auto-complete-1.11.png)
+![Source Editor Auto Complete](img/source-editor-auto-complete-2.0.png)
 
-![Source Editor Context Hover](img/source-editor-context-hover-1.11.png)
+![Source Editor Context Hover](img/source-editor-context-hover-2.0.png)
 
 When editing a resource, click on the document icon at the top right of the Editor pane to open the corresponding Kubernetes documentation in a browser window:
 
@@ -48,18 +48,18 @@ Select multiple resources by clicking the checkbox to the left of the resource n
 
 While using Monokle Desktop, you can directly add new K8s resources. Once you have browsed and added your project folder, click on the **New Resource** button at the top of the navigator to launch the **Add New Resource** dialog.
 
-![Add Resource](img/add-resource-1.9.png)
+![Add Resource](img/add-resource-from-scratch-2.0.png)
 
 
 While creating a resource, it is possible to select an existing resource as a template from the drop-down menu. 
 
-![Resource template](img/template-1.9.png)
+![Resource template](img/template-2.0.png)
 
 ## **Edit Resources in a Cluster**
 
 You can easily view and edit resources from clusters. After making changes in a resource, you can quickly deploy them back to the cluster.
 
-![Resource cluster](img/deploy-to-cluster-1.5.0.png)
+![Resource cluster](img/deploy-to-cluster-2.0.png)
 
 ## **Editing Files**
 
@@ -82,29 +82,29 @@ on how to use the Form Editor for ConfigMaps.**-->
 
 Click the ellipsis to the right of a resource name to see the options available:
 
-![Resource Options](img/navigator-resource-options-1.11.png)
+![Resource Options](img/navigator-resource-options-2.0.png)
 
 Unknown Resources will display in the Navigator but only have the **Rename** and **Delete** options:
 
-![Unknown Resource Options](img/navigator-unknown-resource-options-1.11.png)
+![Unknown Resource Options](img/navigator-unknown-resource-options-2.0.png)
 
 ### **Rename a Resource**
 
 You can rename resources and update all the references associated with that resource to ensure the integrity of that link.
 
-![Rename Resource](img/rename-1.11.png)
+![Rename Resource](img/rename-2.0.png)
 
 ### **Clone a Resource**
 
 You can use the Clone action to create a new resource by using existing resources as a template. 
 
-![Clone Resource](img/clone.png)
+![Clone Resource](img/clone-2.0.png)
 
 ### **Delete a Resource**
 
 You can use the Delete action in the cluster mode to delete the resource from the actual cluster. 
 
-![Delete Resource](img/delete.png)
+![Delete Resource](img/delete-2.0.png)
 
 ## **Secret Resources**
 

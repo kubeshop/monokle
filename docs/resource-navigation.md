@@ -6,7 +6,7 @@ The Navigator shows all resources found in the current project. Resources are gr
 on their usage in Kubernetes. Selecting a resource automatically highlights both the file containing that resource and
 any other resourced linked to the selected one:
 
-![Resource Navigation](img/resource-navigation-1-1.11.png)
+![Resource Navigation](img/resource-navigation-2.0.png)
 
 In this screenshot: 
 
@@ -59,21 +59,23 @@ Resource filters allow you to filter the resources based on various properties s
 
 Click on the filter button on the top of the navigator to launch the dialog for configuration.
 
-![Resource Filtering](img/resource-filtering-1.11.png)
+![Resource Filtering Button](img/resource-filtering-button-2.0.png)
+
+![Resource Filtering](img/resource-filtering-2.0.png)
 
 Users can also add or remove filters by highlighting and hovering over labels, annotations or other metadata properties in the code editor:
 
 ![Filter from Editor](img/filter-from-editor-1.9.png)
 
-The **Quick Filter** popup is available with the **Cmd+P** keyboard shortcut:
+<!---The **Quick Filter** popup is available with the **Cmd+P** keyboard shortcut:
 
-![Quick Filter](img/quick-filter-popup-1.11.png)
+![Quick Filter](img/quick-filter-popup-1.11.png) -->
 
-## **Reload Folder On Startup**
+<!---## **Reload Folder On Startup**
 
 You can choose to reload the last reviewed folder while launching  Desktop. For this purpose, you will have to navigate to the Settings and simply tick the Automatically Load Last Folder checkbox.
 
-![Reload](img/reload.png)
+![Reload](img/reload.png)-->
 
 ## **Navigation History**
 
@@ -86,7 +88,7 @@ You can easily navigate back and forth between the selected resources with the h
 
 In the resource navigator, clicking on the section name will expand or collapse individual sections.
 
-![Expand](img/expand-1.9.gif)
+![Expand](img/expand-2.0.gif)
 
 ## **Recent Projects**
 

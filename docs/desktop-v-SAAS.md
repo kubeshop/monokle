@@ -19,7 +19,7 @@ Monokle Cloud focuses on configuration visibility and policy enforcing. It helps
 
 To access Monokle in the cloud, please visit https://app.monokle.com/ to get started.
 
-![Monokle Cloud Start Screen](img/monokle-cloud-start-screen.png)
+![Monokle Cloud Start Screen](img/monokle-cloud-start-screen-1.0.png)
 
 
 ## **Comparing Version Functionality**
