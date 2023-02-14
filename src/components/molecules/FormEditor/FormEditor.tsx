@@ -70,7 +70,7 @@ const FormEditor: React.FC<IProps> = props => {
   const settings = useAppSelector(settingsSelector);
 
   const setFormData = useCallback(
-    (newFormData: any, fromWhere: string) => {
+    (newFormData: any) => {
       if (isEqual(formDataRef.current, newFormData)) {
         return;
       }
@@ -82,7 +82,7 @@ const FormEditor: React.FC<IProps> = props => {
 
   const onFormUpdate = useCallback(
     (e: any) => {
-      setFormData(e.formData, 'onFormUpdate');
+      setFormData(e.formData);
     },
     [setFormData]
   );
@@ -113,12 +113,12 @@ const FormEditor: React.FC<IProps> = props => {
   useEffect(() => {
     const loadResourceFile = async () => {
       if (selectedResource) {
-        setFormData(selectedResource.object, 'useEffect selectedResource');
+        setFormData(selectedResource.object);
       } else if (selectedFilePath) {
         try {
           const fileContent = await dispatch(readFileThunk(selectedFilePath)).unwrap();
           if (fileContent) {
-            setFormData(parseYamlDocument(fileContent).toJS(), 'useEffect selectedFilePath');
+            setFormData(parseYamlDocument(fileContent).toJS());
           }
         } catch (e) {
           log.error(`Failed to read file [${selectedFilePath}]`, e);
