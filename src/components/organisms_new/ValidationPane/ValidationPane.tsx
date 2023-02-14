@@ -1,3 +1,5 @@
+import {useMeasure} from 'react-use';
+
 import {Image, Skeleton} from 'antd';
 import Link from 'antd/lib/typography/Link';
 
@@ -21,6 +23,8 @@ const ValidationPane: React.FC = () => {
   const newProblemsIntroducedType = useValidationSelector(state => state.validationOverview.newProblemsIntroducedType);
   const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem?.problem);
 
+  const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
+
   const {height} = useMainPaneDimensions();
 
   if (!lastResponse) {
@@ -29,26 +33,28 @@ const ValidationPane: React.FC = () => {
 
   return (
     <S.ValidationPaneContainer>
-      <TitleBar
-        title="Validation Overview"
-        description={
-          <S.DescriptionContainer>
-            <Image src={ValidationFigure} width={95} />
-            <div>
-              Fix your resources according to your validation setup. Manage your validation policy, turn rules on or
-              off, and more in the <Link onClick={() => dispatch(setLeftMenuSelection('settings'))}>settings</Link>{' '}
-              section, located in the left menu.
-            </div>
-          </S.DescriptionContainer>
-        }
-      />
+      <div ref={titleBarRef}>
+        <TitleBar
+          title="Validation Overview"
+          description={
+            <S.DescriptionContainer>
+              <Image src={ValidationFigure} width={95} />
+              <div>
+                Fix your resources according to your validation setup. Manage your validation policy, turn rules on or
+                off, and more in the <Link onClick={() => dispatch(setLeftMenuSelection('settings'))}>settings</Link>{' '}
+                section, located in the left menu.
+              </div>
+            </S.DescriptionContainer>
+          }
+        />
+      </div>
 
       {status === 'loading' ? (
         <Skeleton active style={{marginTop: '15px'}} />
       ) : (
         <ValidationOverview
           containerStyle={{marginTop: '20px'}}
-          height={height - 197}
+          height={height - titleBarHeight - 40}
           newProblemsIntroducedType={newProblemsIntroducedType}
           selectedProblem={selectedProblem}
           validationResponse={lastResponse}
