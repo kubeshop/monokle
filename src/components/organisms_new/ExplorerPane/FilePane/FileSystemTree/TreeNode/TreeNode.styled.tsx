@@ -54,11 +54,12 @@ export const TitleContainer = styled.div`
   max-width: 100%;
 `;
 
-export const TitleText = styled.span`
+export const TitleText = styled.span<{$isSelected?: boolean}>`
   overflow: hidden;
   position: relative;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: ${props => (props.$isSelected ? Colors.blackPure : Colors.blue10)};
 `;
 
 export const NodeContainer = styled.div<{$actionButtonsWidth?: number; $isDisabled: boolean}>`

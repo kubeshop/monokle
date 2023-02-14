@@ -31,9 +31,6 @@ const TreeNodeFile: React.FC<Props> = props => {
   const isSelected = useAppSelector(
     state => state.main.selection?.type === 'file' && state.main.selection.filePath === filePath
   );
-  const isHighlighted = useAppSelector(state =>
-    state.main.highlights.some(h => h.type === 'file' && h.filePath === filePath)
-  );
   const isDisabled = useIsDisabled(fileEntry);
   const canBePreviewed = useCanPreview(fileEntry, isDisabled);
   const {deleteEntry, isDeleteLoading} = useDelete();
@@ -57,7 +54,7 @@ const TreeNodeFile: React.FC<Props> = props => {
   return (
     <S.NodeContainer onContextMenu={onContextMenu} $isDisabled={isDisabled} $actionButtonsWidth={actionButtonsWidth}>
       <S.TitleContainer>
-        <S.TitleText>
+        <S.TitleText $isSelected={isSelected}>
           <Tooltip
             overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
             mouseEnterDelay={TOOLTIP_DELAY}
@@ -68,19 +65,7 @@ const TreeNodeFile: React.FC<Props> = props => {
             }
             placement="bottom"
           >
-            <span
-              className={
-                isHighlighted
-                  ? 'highlighted-node'
-                  : fileEntry.isExcluded
-                  ? 'excluded-file-entry-name'
-                  : fileEntry.isSupported
-                  ? 'file-entry-name'
-                  : 'not-supported-file-entry-name'
-              }
-            >
-              {fileEntry.name}
-            </span>
+            {fileEntry.name}
           </Tooltip>
         </S.TitleText>
 

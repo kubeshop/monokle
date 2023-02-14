@@ -90,7 +90,10 @@ const FileSystemTree: React.FC<Props> = props => {
         virtual
         onClick={(mouseEvent, nodeEvent) => {
           mouseEvent.preventDefault();
-          if (typeof nodeEvent.key === 'string') {
+          if (nodeEvent.selectable === false) {
+            return;
+          }
+          if (typeof nodeEvent.key === 'string' && !nodeEvent.disabled) {
             dispatch(selectFile({filePath: nodeEvent.key}));
           }
         }}
@@ -145,7 +148,7 @@ function createFolderTree(folderPath: string, fileMap: FileMapType, fileExplorer
     key: folderEntry.filePath,
     title: path.basename(folderEntry.filePath),
     children,
-    disabled: isFileEntryDisabled(folderEntry),
+    selectable: false,
   };
 
   return treeNode;
