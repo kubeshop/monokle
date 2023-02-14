@@ -47,7 +47,7 @@ const ProblemPane: React.FC = () => {
   }
 
   return (
-    <S.ProblemPaneContainer ref={containerRef}>
+    <S.ProblemPaneContainer ref={containerRef} key={sarifValue}>
       <TitleBar title="Editor" type="secondary" />
 
       <MonacoEditor

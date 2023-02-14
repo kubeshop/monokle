@@ -61,42 +61,31 @@ const FormEditor: React.FC<IProps> = props => {
   const {formSchema, formUiSchema} = props;
   const dispatch = useAppDispatch();
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
-  const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const selectedResource = useSelectedResource();
   const [formData, _setFormData, formDataRef] = useStateWithRef<any>(undefined);
   const [schema, setSchema] = useState<any>({});
-  const resourceLoadedRef = React.useRef(false);
   const settings = useAppSelector(settingsSelector);
 
   const setFormData = useCallback(
-    (newFormData: any, fromWhere: string) => {
+    (newFormData: any) => {
       if (isEqual(formDataRef.current, newFormData)) {
         return;
       }
       _setFormData(newFormData);
+      dispatch(setAutosavingStatus(true));
     },
-    [_setFormData, formDataRef]
+    [_setFormData, formDataRef, dispatch]
   );
 
   const onFormUpdate = useCallback(
     (e: any) => {
-      setFormData(e.formData, 'onFormUpdate');
+      setFormData(e.formData);
     },
     [setFormData]
   );
-
-  useEffect(() => {
-    if (!formData || isEqual(formDataRef.current, formData)) {
-      return;
-    }
-
-    if (!autosavingStatus) {
-      dispatch(setAutosavingStatus(true));
-    }
-  }, [autosavingStatus, dispatch, formData, formDataRef]);
 
   useDebounce(
     () => {
@@ -123,19 +112,16 @@ const FormEditor: React.FC<IProps> = props => {
 
   useEffect(() => {
     const loadResourceFile = async () => {
-      if (!resourceLoadedRef.current) {
-        resourceLoadedRef.current = true;
-        if (selectedResource) {
-          setFormData(selectedResource.object, 'useEffect selectedResource');
-        } else if (selectedFilePath) {
-          try {
-            const fileContent = await dispatch(readFileThunk(selectedFilePath)).unwrap();
-            if (fileContent) {
-              setFormData(parseYamlDocument(fileContent).toJS(), 'useEffect selectedFilePath');
-            }
-          } catch (e) {
-            log.error(`Failed to read file [${selectedFilePath}]`, e);
+      if (selectedResource) {
+        setFormData(selectedResource.object);
+      } else if (selectedFilePath) {
+        try {
+          const fileContent = await dispatch(readFileThunk(selectedFilePath)).unwrap();
+          if (fileContent) {
+            setFormData(parseYamlDocument(fileContent).toJS());
           }
+        } catch (e) {
+          log.error(`Failed to read file [${selectedFilePath}]`, e);
         }
       }
     };
@@ -146,7 +132,7 @@ const FormEditor: React.FC<IProps> = props => {
         trackEvent('edit/form_editor', {resourceKind: selectedResource?.kind});
       }
     };
-  });
+  }, [dispatch, selectedResource, selectedFilePath, setFormData]);
 
   useEffect(() => {
     if (!settings.createDefaultObjects || !settings.setDefaultPrimitiveValues) {

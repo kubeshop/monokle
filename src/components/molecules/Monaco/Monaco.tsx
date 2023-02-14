@@ -299,7 +299,7 @@ const Monaco = (props: {
 
   useEffect(() => {
     let newCode = '';
-    const rootFilePath = fileMapRef.current?.[ROOT_FILE_ENTRY].filePath;
+    const rootFilePath = fileMapRef.current?.[ROOT_FILE_ENTRY]?.filePath;
     if (selectedResource?.id) {
       const resourceContent =
         selectedResource.storage === 'transient'

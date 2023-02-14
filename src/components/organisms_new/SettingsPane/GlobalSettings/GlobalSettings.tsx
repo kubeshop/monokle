@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {Button, Checkbox, Form, Input, Tooltip} from 'antd';
+import {Button, Checkbox, Form, Input, Select, Tooltip} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
@@ -15,6 +15,7 @@ import {
   toggleErrorReporting,
   toggleEventTracking,
   updateClusterSelectorVisibilty,
+  updateFileExplorerSortOrder,
   updateLoadLastProjectOnStartup,
 } from '@redux/reducers/appConfig';
 
@@ -30,6 +31,7 @@ export const GlobalSettings = () => {
   const dispatch = useAppDispatch();
   const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
+  const fileExplorerSortOrder = useAppSelector(state => state.config.fileExplorerSortOrder);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
@@ -114,6 +116,26 @@ export const GlobalSettings = () => {
             </Form.Item>
           </>
         </Form>
+
+        <S.Div>
+          <S.Heading>File explorer sorting order</S.Heading>
+          <Select
+            style={{width: '100%'}}
+            value={fileExplorerSortOrder}
+            onChange={value => dispatch(updateFileExplorerSortOrder(value))}
+          >
+            <Select.Option value="folders" key="folders">
+              Folders first
+            </Select.Option>
+            <Select.Option value="files" key="files">
+              Files first
+            </Select.Option>
+            <Select.Option value="mixed" key="mixed">
+              Mixed
+            </Select.Option>
+          </Select>
+        </S.Div>
+
         <S.Div>
           <S.Span>On Startup</S.Span>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
@@ -122,6 +144,7 @@ export const GlobalSettings = () => {
             </Checkbox>
           </Tooltip>
         </S.Div>
+
         <S.Div style={{marginTop: 16}}>
           <Checkbox checked={isClusterSelectorVisible} onChange={handleChangeClusterSelectorVisibilty}>
             Show Cluster Selector

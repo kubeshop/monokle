@@ -30,7 +30,5 @@ export interface RegisterCustomSchemaMessage extends WorkerMessage {
   input: {
     schema: CustomSchema;
   };
-  output: {
-    response: void;
-  };
+  output: void;
 }
