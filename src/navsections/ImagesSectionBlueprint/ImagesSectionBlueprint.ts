@@ -1,5 +1,4 @@
 import {selectImage} from '@redux/reducers/main';
-import {selectedImageSelector} from '@redux/selectors';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ImagesListType} from '@shared/models/appState';
@@ -17,7 +16,7 @@ export type ImagesScopeType = {
   isFolderLoading: boolean;
   imagesList: ImagesListType;
   imagesSearchedValue: string | undefined;
-  selectedImage?: ImageType | null;
+  selectedImageId?: string;
   selectedK8sResourceId: string | undefined;
 };
 
@@ -47,7 +46,7 @@ const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
     isFolderLoading: state.ui.isFolderLoading,
     imagesList: state.main.imagesList,
     imagesSearchedValue: state.main.imagesSearchedValue,
-    selectedImage: selectedImageSelector(state),
+    selectedImageId: state.main.selection?.type === 'image' ? state.main.selection.imageId : undefined,
     selectedK8sResourceId:
       state.main.selection?.type === 'resource' ? state.main.selection.resourceIdentifier.id : undefined,
   }),
@@ -66,13 +65,10 @@ const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
     disableHoverStyle: true,
   },
   itemBlueprint: {
-    getName: rawItem => `${rawItem.name}:${rawItem.tag}`,
-    getInstanceId: rawItem => `${rawItem.name}:${rawItem.tag}`,
+    getName: rawItem => rawItem.id,
+    getInstanceId: rawItem => rawItem.id,
     builder: {
-      isSelected: (rawItem, scope) =>
-        scope.selectedImage
-          ? rawItem.name === scope.selectedImage.name && rawItem.tag === scope.selectedImage.tag
-          : false,
+      isSelected: (rawItem, scope) => (scope.selectedImageId ? scope.selectedImageId === rawItem.id : false),
       isHighlighted: (rawItem, scope) => {
         const {resourcesIds} = rawItem;
         const {selectedK8sResourceId} = scope;
