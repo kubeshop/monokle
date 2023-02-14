@@ -19,13 +19,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reducers/main';
-import {
-  closeFolderExplorer,
-  closeReleaseNotesDrawer,
-  handleWalkthroughStep,
-  openWelcomePopup,
-  toggleNotifications,
-} from '@redux/reducers/ui';
+import {closeFolderExplorer, closeReleaseNotesDrawer, openWelcomePopup, toggleNotifications} from '@redux/reducers/ui';
 import {isInClusterModeSelector} from '@redux/selectors';
 import {loadValidation} from '@redux/validation/validation.thunks';
 
@@ -47,7 +41,6 @@ import {StartupFlag} from '@utils/startupFlag';
 
 import {AlertEnum, ExtraContentType} from '@shared/models/alert';
 import {NewVersionCode, Project} from '@shared/models/config';
-import {StepEnum} from '@shared/models/walkthrough';
 import {Size} from '@shared/models/window';
 import electronStore from '@shared/utils/electronStore';
 import {setMainProcessEnv} from '@shared/utils/env';
@@ -253,13 +246,8 @@ const App = () => {
 
   const onCloseReleaseNotes = useCallback(() => {
     setShowReleaseNotes(false);
-    if (!electronStore.get('appConfig.lastSeenReleaseNotesVersion')) {
-      dispatch(handleWalkthroughStep({step: StepEnum.Next, collection: 'novice'}));
-    } else {
-      dispatch(handleWalkthroughStep({step: StepEnum.Next, collection: 'release'}));
-    }
     electronStore.set('appConfig.lastSeenReleaseNotesVersion', appVersion);
-  }, [appVersion, dispatch]);
+  }, [appVersion]);
 
   // called from main thread because thunks cannot be dispatched by main
   const onOpenProjectFolderFromMainThread = useCallback((_: any, project: Project) => {
