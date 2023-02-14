@@ -9,6 +9,8 @@ import {AppSelection} from '@shared/models/selection';
 import {createSliceReducers} from '@shared/utils/redux';
 
 export const selectFileReducer = (state: AppState, payload: {filePath: string; isVirtualSelection?: boolean}) => {
+  clearSelectionAndHighlights(state);
+
   const filePath = payload.filePath;
   if (filePath.length > 0) {
     highlightResourcesFromFile({filePath, state});
@@ -26,6 +28,8 @@ export const selectResourceReducer = (
   state: AppState,
   payload: {resourceIdentifier: ResourceIdentifier; isVirtualSelection?: boolean}
 ) => {
+  clearSelectionAndHighlights(state);
+
   const identifier = payload.resourceIdentifier;
   const resourceMetaMap = state.resourceMetaMapByStorage[identifier.storage];
   const resource = resourceMetaMap[identifier.id];
@@ -113,32 +117,32 @@ export const selectionReducers = createSliceReducers('main', {
     state: Draft<AppState>,
     action: PayloadAction<{valuesFileId: string; isVirtualSelection?: boolean}>
   ) => {
+    clearSelectionAndHighlights(state);
     const valuesFileId = action.payload.valuesFileId;
     state.selection = {
       type: 'helm.values.file',
       valuesFileId,
     };
-    state.highlights = [];
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
   },
   selectPreviewConfiguration: (
     state: Draft<AppState>,
     action: PayloadAction<{previewConfigurationId: string; isVirtualSelection?: boolean}>
   ) => {
+    clearSelectionAndHighlights(state);
     const previewConfigurationId = action.payload.previewConfigurationId;
     state.selection = {
       type: 'preview.configuration',
       previewConfigurationId,
     };
-    state.highlights = [];
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
   },
   selectImage: (state: Draft<AppState>, action: PayloadAction<{imageId: string; isVirtualSelection?: boolean}>) => {
+    clearSelectionAndHighlights(state);
     state.selection = {
       type: 'image',
       imageId: action.payload.imageId,
     };
-    state.highlights = [];
     const image = state.imagesList.find(img => img.id === action.payload.imageId);
     if (image) {
       highlightResourcesUsingImage(image, state);
@@ -166,8 +170,6 @@ function updateSelectionHistory(selection: AppSelection, isVirtualSelection: boo
 }
 
 export function highlightResourcesUsingImage(image: ImageType, state: AppState) {
-  clearSelectionAndHighlights(state);
-
   const highlights: AppSelection[] = [];
 
   // TODO: 2.0+ below is a quick solution to get the active resource storage
