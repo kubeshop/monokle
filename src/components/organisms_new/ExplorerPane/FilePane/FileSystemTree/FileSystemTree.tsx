@@ -15,6 +15,7 @@ import {getAllParentFolderPaths, isFileEntryDisabled} from '@utils/files';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
+import {FileExplorerSortOrder} from '@shared/models/config';
 import {isFileSelection} from '@shared/models/selection';
 import {isDefined} from '@shared/utils/filter';
 
@@ -30,9 +31,11 @@ const FileSystemTree: React.FC<Props> = props => {
   const {expandedFolders, onExpandFolders} = props;
 
   const dispatch = useAppDispatch();
-  const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const firstHighlightedFile = useAppSelector(state => state.main.highlights.find(isFileSelection));
+
+  const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
+
   const expandedFoldersRef = useRef(expandedFolders);
   expandedFoldersRef.current = expandedFolders;
   const onExpandFoldersRef = useRef(onExpandFolders);
@@ -43,13 +46,14 @@ const FileSystemTree: React.FC<Props> = props => {
     const rootEntry = state.main.fileMap[ROOT_FILE_ENTRY];
 
     const rootFileNodes = createFileNodes(path.sep, state.main.fileMap);
+    const rootFolderNodes =
+      rootEntry?.children
+        ?.map(folderPath =>
+          createFolderTree(`${path.sep}${folderPath}`, state.main.fileMap, state.config.fileExplorerSortOrder)
+        )
+        .filter(isDefined) || [];
 
-    return [
-      ...(rootEntry?.children
-        ?.map(folderPath => createFolderTree(`${path.sep}${folderPath}`, state.main.fileMap))
-        .filter(isDefined) || []),
-      ...rootFileNodes,
-    ];
+    return sortNodes(rootFolderNodes, rootFileNodes, state.config.fileExplorerSortOrder);
   }, fastDeepEqual);
 
   useEffect(() => {
@@ -95,6 +99,18 @@ const FileSystemTree: React.FC<Props> = props => {
   );
 };
 
+const sortNodes = (folderNodes: DataNode[], fileNodes: DataNode[], fileExplorerSortOrder: FileExplorerSortOrder) => {
+  if (fileExplorerSortOrder === 'folders') {
+    return [...folderNodes, ...fileNodes];
+  }
+
+  if (fileExplorerSortOrder === 'files') {
+    return [...fileNodes, ...folderNodes];
+  }
+
+  return [...folderNodes, ...fileNodes].sort((a, b) => a.key.toLocaleString().localeCompare(b.key.toLocaleString()));
+};
+
 function createFileNodes(folderPath: string, fileMap: FileMapType) {
   const fileEntries = Object.values(fileMap).filter(entry => {
     const entryFolderPath = path.dirname(entry.filePath);
@@ -111,25 +127,27 @@ function createFileNodes(folderPath: string, fileMap: FileMapType) {
   return fileNodes;
 }
 
-function createFolderTree(folderPath: string, fileMap: FileMapType) {
+function createFolderTree(folderPath: string, fileMap: FileMapType, fileExplorerSortOrder: FileExplorerSortOrder) {
   const folderEntry = fileMap[folderPath];
   if (!folderEntry || !isDefined(folderEntry.children)) {
     return undefined;
   }
 
   const fileNodes = createFileNodes(folderPath, fileMap);
+  const folderNodes =
+    folderEntry.children
+      ?.map(childPath => createFolderTree(path.join(folderPath, childPath), fileMap, fileExplorerSortOrder))
+      .filter(isDefined) || [];
+
+  let children: DataNode[] = sortNodes(folderNodes, fileNodes, fileExplorerSortOrder);
 
   const treeNode: DataNode = {
     key: folderEntry.filePath,
     title: path.basename(folderEntry.filePath),
-    children: [
-      ...(folderEntry.children
-        ?.map(childPath => createFolderTree(path.join(folderPath, childPath), fileMap))
-        .filter(isDefined) || []),
-      ...fileNodes,
-    ],
+    children,
     disabled: isFileEntryDisabled(folderEntry),
   };
+
   return treeNode;
 }
 
