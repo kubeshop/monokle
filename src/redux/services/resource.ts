@@ -339,9 +339,7 @@ export function extractK8sResources<
         }
 
         log.warn(
-          `Ignoring document ${docIndex} in ${JSON.stringify(origin)} origin due to ${doc.errors.length} error(s)`,
-          documents[docIndex],
-          splitDocs && docIndex < splitDocs.length ? splitDocs[docIndex] : ''
+          `Ignoring document ${docIndex} in ${JSON.stringify(origin)} origin due to ${doc.errors.length} error(s)`
         );
       } else {
         if (doc.warnings.length > 0) {

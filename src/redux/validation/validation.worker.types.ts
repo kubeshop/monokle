@@ -5,7 +5,6 @@ import {Config, CustomSchema, Incremental, Resource, ValidationResponse} from '@
 export const LoadValidationMessageType = 'loadValidation' as const;
 export const RunValidationMessageType = 'runValidation' as const;
 export const RegisterCustomSchemaMessageType = 'registerCustomSchema' as const;
-export const BulkRegisterCustomSchemaMessageType = 'bulkRegisterCustomSchema' as const;
 
 export interface LoadValidationMessage extends WorkerMessage {
   type: typeof LoadValidationMessageType;
@@ -30,14 +29,6 @@ export interface RegisterCustomSchemaMessage extends WorkerMessage {
   type: typeof RegisterCustomSchemaMessageType;
   input: {
     schema: CustomSchema;
-  };
-  output: void;
-}
-
-export interface BulkRegisterCustomSchemaMessage extends WorkerMessage {
-  type: typeof BulkRegisterCustomSchemaMessageType;
-  input: {
-    schemas: CustomSchema[];
   };
   output: void;
 }
