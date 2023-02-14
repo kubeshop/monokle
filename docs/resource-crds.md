@@ -9,7 +9,7 @@ The Kubernetes API serves and handles the storage of your custom resource.
 
 Monokle Desktop uses CRDs to recognize the Custom Resources that you're creating. All CRDs that registered in Monokle and installed on the cluster are visible on Cluster Definition section on Cluster Dashboard 
 
-![CRD](img/crd-screen.png)
+![CRD](img/crd-screen-2.0.png)
 
 By default, any Custom Resource that does not have a CRD registered in Monokle Desktop, will show up in the Navigator under the "Unknown Resources" section.  
 
