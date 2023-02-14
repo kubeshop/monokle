@@ -83,39 +83,21 @@ const DashboardPane = () => {
             key: `${kindHandler.clusterApiVersion}-${kindHandler.kind}`,
             label: kindHandler.kind,
             children: [],
-            resourceCount: getResourceCount(kindHandler.kind),
-            errorCount: getProblemCount(kindHandler.kind, 'error'),
-            warningCount: getProblemCount(kindHandler.kind, 'warning'),
           });
         } else {
           parent.children?.push({
             key: `${kindHandler.clusterApiVersion}-${kindHandler.kind}`,
             label: kindHandler.kind,
             children: [],
-            resourceCount: getResourceCount(kindHandler.kind),
-            errorCount: getProblemCount(kindHandler.kind, 'error'),
-            warningCount: getProblemCount(kindHandler.kind, 'warning'),
           });
         }
       }
     });
 
-    tempMenu = tempMenu.map((menuItem: DashboardMenu) => ({
-      ...menuItem,
-      resourceCount: menuItem.children?.reduce(
-        (total: number, m: DashboardMenu) => total + (m.resourceCount ? m.resourceCount : 0),
-        0
-      ),
-      errorCount: menuItem.children?.reduce(
-        (total: number, m: DashboardMenu) => total + (m.errorCount ? m.errorCount : 0),
-        0
-      ),
-    }));
-
     dispatch(setDashboardMenuList(tempMenu));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMetaMapRef, problems]);
+  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMetaMapRef]);
 
   useMount(() => {
     dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
@@ -197,20 +179,23 @@ const DashboardPane = () => {
               <span>{parent.label}</span>
             </S.MainSection>
 
-            {parent.children?.map((child: DashboardMenu) =>
-              child.resourceCount ? (
+            {parent.children?.map((child: DashboardMenu) => {
+              const resourceCount = getResourceCount(child.label);
+              const errorCount = getProblemCount(child.label, 'error');
+              const warningCount = getProblemCount(child.label, 'warning');
+              return resourceCount ? (
                 <S.SubSection
                   key={child.key}
                   $active={activeMenu.key === child.key}
                   onClick={() => setActiveMenu(child)}
                 >
                   <span style={{marginRight: '4px'}}>{child.label}</span>
-                  {child.resourceCount ? <Resource>{child.resourceCount}</Resource> : null}
-                  {child.errorCount ? <ErrorCell>{child.errorCount}</ErrorCell> : null}
-                  {child.warningCount ? <Warning style={{marginLeft: '8px'}}>{child.warningCount}</Warning> : null}
+                  {resourceCount ? <Resource>{resourceCount}</Resource> : null}
+                  {errorCount ? <ErrorCell>{errorCount}</ErrorCell> : null}
+                  {warningCount ? <Warning style={{marginLeft: '8px'}}>{warningCount}</Warning> : null}
                 </S.SubSection>
-              ) : null
-            )}
+              ) : null;
+            })}
           </div>
         ) : null
       )}
