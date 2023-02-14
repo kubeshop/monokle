@@ -78,8 +78,6 @@ export const selectResourceReducer = (
 
   state.highlights = newHighlights;
 
-  // TODO: highlight resources from resource.refs
-
   updateSelectionHistory(state.selection, Boolean(payload.isVirtualSelection), state);
 };
 
