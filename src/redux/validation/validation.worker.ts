@@ -4,8 +4,12 @@ import {WorkerMessage, matchWorkerEvent} from '@utils/worker';
 import {ResourceParser, SchemaLoader, createDefaultMonokleValidator} from '@monokle/validation';
 
 import {
+  BulkRegisterCustomSchemaMessage,
+  BulkRegisterCustomSchemaMessageType,
   LoadValidationMessage,
   LoadValidationMessageType,
+  RegisterCustomSchemaMessage,
+  RegisterCustomSchemaMessageType,
   RunValidationMessage,
   RunValidationMessageType,
 } from './validation.worker.types';
@@ -40,6 +44,16 @@ onmessage = async event => {
     const {input} = data as RunValidationMessage;
     const response = await VALIDATOR.validate({resources: input.resources, incremental: input.incremental});
     return {response};
+  });
+
+  handleEvent<RegisterCustomSchemaMessage>(event, RegisterCustomSchemaMessageType, async () => {
+    const {input} = data as RegisterCustomSchemaMessage;
+    await VALIDATOR.registerCustomSchema(input.schema);
+  });
+
+  handleEvent<BulkRegisterCustomSchemaMessage>(event, BulkRegisterCustomSchemaMessageType, async () => {
+    const {input} = data as BulkRegisterCustomSchemaMessage;
+    await Promise.all(input.schemas.map(schema => VALIDATOR.registerCustomSchema(schema)));
   });
 };
 

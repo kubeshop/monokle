@@ -5,6 +5,7 @@ import {createWorkerEventPromise} from '@utils/worker';
 import {MonokleValidator, SchemaLoader, createDefaultMonokleValidator} from '@monokle/validation';
 
 import {
+  BulkRegisterCustomSchemaMessage,
   LoadValidationMessage,
   LoadValidationMessageType,
   RegisterCustomSchemaMessage,
@@ -44,6 +45,15 @@ class ValidationWorker {
   runValidation(input: RunValidationMessage['input']) {
     return createWorkerEventPromise<RunValidationMessage['output']>({
       type: RunValidationMessageType,
+      worker: this.#worker,
+      input,
+    });
+  }
+
+  async bulkRegisterCustomSchemas(input: BulkRegisterCustomSchemaMessage['input']) {
+    await Promise.all(input.schemas.map(schema => this.#validator.registerCustomSchema(schema)));
+    return createWorkerEventPromise<BulkRegisterCustomSchemaMessage['output']>({
+      type: RegisterCustomSchemaMessageType,
       worker: this.#worker,
       input,
     });
