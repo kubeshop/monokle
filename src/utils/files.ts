@@ -4,6 +4,8 @@ import log from 'loglevel';
 import path from 'path';
 import textExtensions from 'text-extensions';
 
+import {ADDITIONAL_SUPPORTED_FILES} from '@constants/constants';
+
 import {setAlert} from '@redux/reducers/alert';
 
 import {AlertEnum} from '@shared/models/alert';
@@ -205,15 +207,18 @@ export const isFileEntryDisabled = (fileEntry?: FileEntry) => {
   if (!fileEntry) {
     return true;
   }
-  const isFolder = isDefined(fileEntry?.children);
-  const fileExtension = path.extname(fileEntry?.filePath);
-  const hasTextExtension = textExtensions.some(supportedExtension => supportedExtension === fileExtension);
+  const isFolder = isDefined(fileEntry.children);
+  const fileName = path.basename(fileEntry.filePath);
+  const fileExtension = path.extname(fileName);
+  const isSupported =
+    textExtensions.some(supportedExtension => supportedExtension === fileExtension.slice(1)) ||
+    ADDITIONAL_SUPPORTED_FILES.some(supportedExtension => supportedExtension === fileName);
 
-  if (!isFolder && !fileEntry.isSupported && !hasTextExtension) {
-    return true;
+  if (isFolder) {
+    return false;
   }
 
-  return false;
+  return !isSupported;
 };
 
 const getParentFolderPath = (relativePath: string): string | undefined => {
