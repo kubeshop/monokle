@@ -253,6 +253,7 @@ const PageHeader = () => {
             </Badge>
           </Tooltip>
           <Dropdown
+            trigger={['click']}
             menu={{
               items: helpMenuItems,
               onClick: () => {

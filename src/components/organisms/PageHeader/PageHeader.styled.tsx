@@ -45,7 +45,9 @@ export const EllipsisOutlined = styled(RawEllipsisOutlined)`
   color: ${Colors.blue6};
   font-size: 1rem;
   cursor: pointer;
-  margin-left: 1.5rem;
+  margin-left: 1.2rem;
+  margin-right: 0.6rem;
+  padding: 4px;
 `;
 
 export const Header = styled(Layout.Header)`

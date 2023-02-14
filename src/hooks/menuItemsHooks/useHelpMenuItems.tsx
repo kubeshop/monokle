@@ -102,7 +102,7 @@ export function useHelpMenuItems() {
 }
 
 const renderMenuItem = (label: string, icon: JSX.Element, border?: boolean) => (
-  <MenuItem $border={border}>
+  <MenuItem style={{cursor: 'default'}} $border={border}>
     {icon && <MenuItemIcon>{icon}</MenuItemIcon>}
     <MenuItemLabel>{label}</MenuItemLabel>
   </MenuItem>
@@ -114,7 +114,7 @@ const HelpLink = styled(Button)`
   color: ${Colors.grey9};
 `;
 
-const MenuItem = styled.div<{$border?: boolean}>`
+const MenuItem = styled.div<{$border?: boolean; $disabled?: boolean}>`
   background-color: transparent;
   color: ${Colors.grey9};
   font-weight: 700;
@@ -122,13 +122,17 @@ const MenuItem = styled.div<{$border?: boolean}>`
   height: 40px;
   display: flex;
   align-items: center;
-  cursor: pointer;
+  cursor: ${props => (props.$disabled ? 'default' : 'pointer')};
   padding: 0px 12px;
   transition: all ${AnimationDurations.fast} ease-in;
 
+  ${props =>
+    !props.$disabled &&
+    `
   &:hover {
     opacity: 0.8;
   }
+  `}
 
   ${({$border}) => {
     if ($border) {
