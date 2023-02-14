@@ -54,7 +54,7 @@ const TreeNodeFile: React.FC<Props> = props => {
   return (
     <S.NodeContainer onContextMenu={onContextMenu} $isDisabled={isDisabled} $actionButtonsWidth={actionButtonsWidth}>
       <S.TitleContainer>
-        <S.TitleText>
+        <S.TitleText $isSelected={isSelected}>
           <Tooltip
             overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
             mouseEnterDelay={TOOLTIP_DELAY}
@@ -65,7 +65,7 @@ const TreeNodeFile: React.FC<Props> = props => {
             }
             placement="bottom"
           >
-            <span>{fileEntry.name}</span>
+            {fileEntry.name}
           </Tooltip>
         </S.TitleText>
 
