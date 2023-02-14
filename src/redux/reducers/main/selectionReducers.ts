@@ -4,7 +4,7 @@ import {highlightResourcesFromFile} from '@redux/services/fileEntry';
 
 import {AppState} from '@shared/models/appState';
 import {ImageType} from '@shared/models/image';
-import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
 import {createSliceReducers} from '@shared/utils/redux';
 
@@ -78,8 +78,6 @@ export const selectResourceReducer = (
 
   state.highlights = newHighlights;
 
-  // TODO: highlight resources from resource.refs
-
   updateSelectionHistory(state.selection, Boolean(payload.isVirtualSelection), state);
 };
 
@@ -141,8 +139,10 @@ export const selectionReducers = createSliceReducers('main', {
       imageId: action.payload.imageId,
     };
     state.highlights = [];
-    // TODO: fix highlighting of resources from image
-    // highlightResourcesUsingImage(action.payload.image, state);
+    const image = state.imagesList.find(img => img.id === action.payload.imageId);
+    if (image) {
+      highlightResourcesUsingImage(image, state);
+    }
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
   },
   clearSelection: (state: Draft<AppState>) => {
@@ -170,12 +170,22 @@ export function highlightResourcesUsingImage(image: ImageType, state: AppState) 
 
   const highlights: AppSelection[] = [];
 
+  // TODO: 2.0+ below is a quick solution to get the active resource storage
+  // since images are filtered by the current active resource storage, this should be fine for now
+  let activeStorage: ResourceStorage = 'local';
+  if (state.clusterConnection) {
+    activeStorage = 'cluster';
+  }
+  if (state.preview) {
+    activeStorage = 'preview';
+  }
+
   image.resourcesIds.forEach(resourceId => {
     highlights.push({
       type: 'resource',
       resourceIdentifier: {
         id: resourceId,
-        storage: 'local', // TODO: images will have to identify resources using identifiers
+        storage: activeStorage,
       },
     });
   });
