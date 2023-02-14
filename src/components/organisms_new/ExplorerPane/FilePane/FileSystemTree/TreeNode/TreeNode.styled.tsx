@@ -54,13 +54,13 @@ export const TitleContainer = styled.div`
   max-width: 100%;
 `;
 
-export const TitleText = styled.span<{$isSelected?: boolean}>`
-  overflow: hidden;
-  position: relative;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: ${props => (props.$isSelected ? Colors.blackPure : Colors.blue10)};
-`;
+export const TitleText = styled.span<{$isSelected?: boolean; $isHighlighted?: boolean}>(props => ({
+  overflow: 'hidden',
+  position: 'relative',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  color: props.$isSelected ? Colors.blackPure : props.$isHighlighted ? Colors.cyan7 : Colors.blue10,
+}));
 
 export const NodeContainer = styled.div<{$actionButtonsWidth?: number; $isDisabled: boolean}>`
   position: relative;

@@ -25,7 +25,6 @@ import {
   RightMenuSelectionType,
   UiState,
 } from '@shared/models/ui';
-import {WalkthroughCollection} from '@shared/models/walkthrough';
 import electronStore from '@shared/utils/electronStore';
 
 export const uiSlice = createSlice({
@@ -323,22 +322,11 @@ export const uiSlice = createSlice({
     closeAboutModal: (state: Draft<UiState>) => {
       state.isAboutModalOpen = false;
     },
-    cancelWalkthrough: (state: Draft<UiState>, action: PayloadAction<WalkthroughCollection>) => {
-      const collection = action.payload;
-      state.walkThrough[collection].currentStep = -1;
-    },
     setShowStartPageLearn: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.startPageLearn.isVisible = action.payload;
     },
     setStartPageLearnTopic: (state: Draft<UiState>, action: PayloadAction<LearnTopicType | undefined>) => {
       state.startPageLearn.learnTopic = action.payload;
-    },
-    handleWalkthroughStep: (
-      state: Draft<UiState>,
-      action: PayloadAction<{step: number; collection: WalkthroughCollection}>
-    ) => {
-      const {step, collection} = action.payload;
-      state.walkThrough[collection].currentStep += step;
     },
     setIsInQuickClusterMode: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.isInQuickClusterMode = action.payload;
@@ -365,7 +353,6 @@ export const uiSlice = createSlice({
 });
 
 export const {
-  cancelWalkthrough,
   closeAboutModal,
   closeCreateFileFolderModal,
   closeCreateProjectModal,
@@ -384,7 +371,6 @@ export const {
   closeWelcomePopup,
   collapseNavSections,
   expandNavSections,
-  handleWalkthroughStep,
   highlightItem,
   openAboutModal,
   openCreateFileFolderModal,
