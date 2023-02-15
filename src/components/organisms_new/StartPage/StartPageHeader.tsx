@@ -1,8 +1,10 @@
 import {useState} from 'react';
 
-import {AutoComplete, Badge, Dropdown, Popover, Tooltip} from 'antd';
+import {AutoComplete, Badge, Dropdown, Popover, Tooltip, Typography} from 'antd';
 
 import {BellOutlined, EllipsisOutlined} from '@ant-design/icons';
+
+import _ from 'lodash';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {NotificationsTooltip} from '@constants/tooltips';
@@ -28,7 +30,8 @@ const StartPageHeader: React.FC = () => {
   const isStartPageLearnVisible = useAppSelector(state => state.ui.startPageLearn.isVisible);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const isWelcomePopupVisible = useAppSelector(state => state.ui.welcomePopup.isVisible);
-  const projects = useAppSelector(state => state.config.projects);
+  const projects = useAppSelector(state => _.sortBy(state.config.projects, p => !p.isGitRepo));
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
   const [searchProject, setSearchProject] = useState('');
@@ -53,19 +56,36 @@ const StartPageHeader: React.FC = () => {
         <S.Logo id="monokle-logo-header" src={MonokleKubeshopLogo} alt="Monokle" />
       </S.LogoContainer>
 
-      <AutoComplete
-        style={{width: '340px'}}
-        options={projects.map(p => ({value: p.name, label: p.name}))}
-        open={openProjectList}
-        searchValue={searchProject}
-        filterOption={(inputValue, option) => Boolean(option?.value?.startsWith(inputValue))}
-        onFocus={() => setOpenProjectList(true)}
-        onBlur={() => setOpenProjectList(false)}
-        onSelect={onSelectProjectHandler}
-      >
-        <SearchInput onChange={onSearchProjectChangeHandler} value={searchProject} />
-      </AutoComplete>
-
+      <S.SearchContainer>
+        <AutoComplete
+          style={{width: '340px'}}
+          options={projects.map(p => ({
+            className: p.rootFolder === selectedProjectRootFolder ? 'selected-menu-item' : '',
+            value: p.name,
+            label: (
+              <S.SearchItemLabel>
+                <Typography.Text>{p.isGitRepo ? 'Repository' : 'Project'}</Typography.Text>
+                <Typography.Text>{p.name}</Typography.Text>
+              </S.SearchItemLabel>
+            ),
+          }))}
+          open={openProjectList}
+          searchValue={searchProject}
+          filterOption={(inputValue, option) => Boolean(option?.value?.startsWith(inputValue))}
+          onFocus={() => setOpenProjectList(true)}
+          onBlur={() => setOpenProjectList(false)}
+          onSelect={onSelectProjectHandler}
+          notFoundContent="Nothing found"
+          getPopupContainer={() => document.getElementById('projectsList')!}
+        >
+          <SearchInput
+            onChange={onSearchProjectChangeHandler}
+            value={searchProject}
+            placeholder="Find repositories & projects"
+          />
+        </AutoComplete>
+        <div id="projectsList" />
+      </S.SearchContainer>
       <S.ActionsContainer>
         <Popover
           zIndex={100}
