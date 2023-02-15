@@ -34,7 +34,6 @@ const StartPageHeader: React.FC = () => {
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
-  const [searchProject, setSearchProject] = useState('');
 
   const helpMenuItems = useHelpMenuItems();
 
@@ -52,10 +51,6 @@ const StartPageHeader: React.FC = () => {
       })),
     [projects, selectedProjectRootFolder]
   );
-
-  const onSearchProjectChangeHandler = (value: string) => {
-    setSearchProject(value);
-  };
 
   const onSelectProjectHandler = (value: string) => {
     const targetProject = projects.find(p => p.name === value);
@@ -79,8 +74,6 @@ const StartPageHeader: React.FC = () => {
           notFoundContent="Nothing found"
           getPopupContainer={() => document.getElementById('projectsList')!}
           showAction={['focus']}
-          onSearch={onSearchProjectChangeHandler}
-          value={searchProject}
         >
           <SearchInput placeholder="Find repositories & projects" />
         </AutoComplete>
