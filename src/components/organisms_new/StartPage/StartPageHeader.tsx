@@ -74,7 +74,6 @@ const StartPageHeader: React.FC = () => {
         <AutoComplete
           style={{width: '340px'}}
           options={ProjectOptions}
-          searchValue={searchProject}
           filterOption={(inputValue, option) => Boolean(option?.value?.startsWith(inputValue))}
           onSelect={onSelectProjectHandler}
           notFoundContent="Nothing found"
