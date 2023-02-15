@@ -112,6 +112,7 @@ const StartPageHeader: React.FC = () => {
         </Tooltip>
 
         <Dropdown
+          trigger={['click']}
           menu={{
             items: helpMenuItems,
             onClick: () => {
