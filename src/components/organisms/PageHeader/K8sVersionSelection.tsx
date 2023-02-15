@@ -59,6 +59,7 @@ export const K8sVersionSelection = () => {
   return (
     <S.Container>
       <Dropdown
+        trigger={['click']}
         arrow
         menu={{items: menuItems}}
         placement="bottomLeft"

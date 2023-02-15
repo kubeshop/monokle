@@ -2,8 +2,6 @@ import {useCallback, useMemo, useRef, useState} from 'react';
 
 import {useAppDispatch} from '@redux/hooks';
 
-import {Walkthrough} from '@molecules';
-
 import navSectionMap from '@src/navsections/sectionBlueprintMap';
 
 import {SectionCustomComponent, SectionInstance} from '@shared/models/navigator';
@@ -109,22 +107,20 @@ function SectionHeader(props: SectionHeaderProps) {
               <NamePrefix.Component sectionInstance={sectionInstance} onClick={toggleCollapse} />
             )}
             {name === 'K8s Resources' ? (
-              <Walkthrough placement="rightTop" step="resource" collection="novice">
-                <S.Name
-                  $isSelected={sectionInstance.isSelected && isCollapsed}
-                  $isHighlighted={sectionInstance.isSelected && isCollapsed}
-                  $isCheckable={Boolean(sectionInstance.checkable)}
-                  $nameColor={sectionBlueprintRef.current?.customization?.nameColor}
-                  $nameSize={sectionBlueprintRef.current?.customization?.nameSize}
-                  $nameWeight={sectionBlueprintRef.current?.customization?.nameWeight}
-                  $nameVerticalPadding={sectionBlueprintRef.current?.customization?.nameVerticalPadding}
-                  $nameHorizontalPadding={sectionBlueprintRef.current?.customization?.nameHorizontalPadding}
-                  $level={level}
-                  onClick={toggleCollapse}
-                >
-                  {name}
-                </S.Name>
-              </Walkthrough>
+              <S.Name
+                $isSelected={sectionInstance.isSelected && isCollapsed}
+                $isHighlighted={sectionInstance.isSelected && isCollapsed}
+                $isCheckable={Boolean(sectionInstance.checkable)}
+                $nameColor={sectionBlueprintRef.current?.customization?.nameColor}
+                $nameSize={sectionBlueprintRef.current?.customization?.nameSize}
+                $nameWeight={sectionBlueprintRef.current?.customization?.nameWeight}
+                $nameVerticalPadding={sectionBlueprintRef.current?.customization?.nameVerticalPadding}
+                $nameHorizontalPadding={sectionBlueprintRef.current?.customization?.nameHorizontalPadding}
+                $level={level}
+                onClick={toggleCollapse}
+              >
+                {name}
+              </S.Name>
             ) : (
               <S.Name
                 $isSelected={sectionInstance.isSelected && isCollapsed}

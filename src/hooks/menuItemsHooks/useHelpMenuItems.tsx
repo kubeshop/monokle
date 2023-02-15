@@ -10,16 +10,9 @@ import styled from 'styled-components';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {FeedbackTooltip} from '@constants/tooltips';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  cancelWalkthrough,
-  handleWalkthroughStep,
-  openAboutModal,
-  openKeyboardShortcutsModal,
-  openReleaseNotesDrawer,
-} from '@redux/reducers/ui';
+import {useAppDispatch} from '@redux/hooks';
+import {openAboutModal, openKeyboardShortcutsModal, openReleaseNotesDrawer} from '@redux/reducers/ui';
 
-import {StepEnum} from '@shared/models/walkthrough';
 import {AnimationDurations} from '@shared/styles';
 import {Colors} from '@shared/styles/colors';
 import {openDiscord, openDocumentation, openFeedback, openGitHub} from '@shared/utils/shell';
@@ -28,7 +21,6 @@ import {useAppVersion} from '../useAppVersion';
 
 export function useHelpMenuItems() {
   const dispatch = useAppDispatch();
-  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
 
   const appVersion = useAppVersion();
 
@@ -60,18 +52,6 @@ export function useHelpMenuItems() {
               <HelpLink type="link" size="small" onClick={() => dispatch(openReleaseNotesDrawer())}>
                 New in {parsedAppVersion || 'this version'}
               </HelpLink>
-              {!isInQuickClusterMode && (
-                <HelpLink
-                  type="link"
-                  size="small"
-                  onClick={() => {
-                    dispatch(cancelWalkthrough('novice'));
-                    dispatch(handleWalkthroughStep({step: StepEnum.Next, collection: 'novice'}));
-                  }}
-                >
-                  Re-play Quick Guide
-                </HelpLink>
-              )}
               <HelpLink type="link" size="small" onClick={() => openGitHub()}>
                 Github
               </HelpLink>
@@ -95,7 +75,7 @@ export function useHelpMenuItems() {
         onClick: () => openFeedback(),
       },
     ],
-    [dispatch, parsedAppVersion, isInQuickClusterMode]
+    [dispatch, parsedAppVersion]
   );
 
   return items;

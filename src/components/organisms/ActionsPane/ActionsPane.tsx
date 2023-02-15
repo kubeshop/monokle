@@ -47,7 +47,6 @@ import {
   ModalConfirmWithNamespaceSelect,
   Monaco,
   PreviewConfigurationDetails,
-  Walkthrough,
 } from '@molecules';
 
 import {TabHeader} from '@atoms';
@@ -298,11 +297,7 @@ const ActionsPane: React.FC = () => {
     () => [
       {
         key: 'source',
-        label: (
-          <Walkthrough placement="leftTop" step="syntax" collection="novice">
-            <TabHeader>Source</TabHeader>
-          </Walkthrough>
-        ),
+        label: <TabHeader>Source</TabHeader>,
         children: (
           <>
             {isFolderLoading || isPreviewLoading || isClusterModeLoading ? (

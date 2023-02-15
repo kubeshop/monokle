@@ -161,14 +161,6 @@ type UiState = {
     connectToCluster: boolean;
   };
   activeSettingsPanel?: SettingsPanel;
-  walkThrough: {
-    novice: {
-      currentStep: number;
-    };
-    release: {
-      currentStep: number;
-    };
-  };
   startPageLearn: {
     isVisible: boolean;
     learnTopic?: LearnTopicType;
