@@ -1,0 +1,111 @@
+<svg width="177" height="117" viewBox="0 0 177 117" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path
+    d="M79.2077 88.4939L85.7118 88.1239"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M89.9811 87.6263L96.3843 86.5505"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M99.8906 85.7871L106.11 83.879"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M109.713 82.6421L115.762 80.2334"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M119.138 78.5115L124.907 75.4701"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M128.269 73.4165L133.462 69.4627"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M136.379 67.3183L141.157 62.8683"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M143.861 60.2967L148.113 55.3555"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M150.547 52.3726L154.356 47.0668"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M156.42 43.7616L159.597 38.0801"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M161.154 34.7261L163.668 28.6899"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M164.865 25.0976L166.668 18.8066"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M167.597 14.3925L168.904 8"
+    stroke="#D89614"
+    stroke-miterlimit="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M177 7.84499C177 12.1777 173.509 15.69 169.203 15.69C164.896 15.69 161.405 12.1777 161.405 7.84499C161.405 3.51232 164.896 -1.53529e-07 169.203 -3.42915e-07C173.509 -5.32302e-07 177 3.51232 177 7.84499Z"
+    fill="#D89614"
+  />
+  <circle cx="27.7358" cy="88.7358" r="27.7358" fill="white" fill-opacity="0.07" />
+  <path
+    d="M11.5462 81.359L24.2727 74.0113L36.9993 81.359V96.0544L24.2727 103.402L11.5462 96.0544V81.359Z"
+    fill="#F3AC21"
+    fill-opacity="0.2"
+    stroke="#7D7D7D"
+  />
+  <path
+    d="M47.2473 74.8658L48.9007 73.9112L49.1507 74.3443L49.7273 74.0113L50.304 74.3443L50.554 73.9112L52.2073 74.8658L51.9573 75.2988L53.6106 76.2534L53.8606 75.8203L55.5139 76.7749L55.2639 77.2079L56.9173 78.1624L57.1673 77.7294L58.8206 78.684L58.5706 79.117L60.2239 80.0715L60.4739 79.6385L62.1272 80.5931L61.8772 81.0261L62.4539 81.359V82.0249H62.9539V83.934H62.4539V85.8431H62.9539V87.7522H62.4539V89.6612H62.9539V91.5703H62.4539V93.4794H62.9539V95.3885H62.4539V96.0544L61.8772 96.3873L62.1272 96.8203L60.4739 97.7749L60.2239 97.3419L58.5706 98.2964L58.8206 98.7294L57.1673 99.684L56.9173 99.251L55.2639 100.206L55.5139 100.639L53.8606 101.593L53.6106 101.16L51.9573 102.115L52.2073 102.548L50.554 103.502L50.304 103.069L49.7273 103.402L49.1507 103.069L48.9007 103.502L47.2473 102.548L47.4973 102.115L45.844 101.16L45.594 101.593L43.9407 100.639L44.1907 100.206L42.5374 99.251L42.2874 99.684L40.6341 98.7294L40.8841 98.2964L39.2307 97.3419L38.9807 97.7749L37.3274 96.8203L37.5774 96.3873L37.0007 96.0544V95.3885H36.5007V93.4794H37.0007V91.5703H36.5007V89.6612H37.0007V87.7522H36.5007V85.8431H37.0007V83.934H36.5007V82.0249H37.0007V81.359L37.5774 81.0261L37.3274 80.5931L38.9807 79.6385L39.2307 80.0715L40.8841 79.117L40.6341 78.684L42.2874 77.7294L42.5374 78.1624L44.1907 77.2079L43.9407 76.7749L45.594 75.8203L45.844 76.2534L47.4973 75.2988L47.2473 74.8658Z"
+    fill="#F3AC21"
+    fill-opacity="0.2"
+    stroke="#7D7D7D"
+    stroke-dasharray="2 2"
+  />
+</svg>

@@ -1,12 +1,27 @@
 import styled from 'styled-components';
 
+import {Colors} from '@shared/styles/colors';
+
 export const Container = styled.div`
-  width: 100%;
-  height: 100%;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 145px;
+  padding-top: 20px;
 `;
 
 export const Image = styled.img<{$right?: number}>`
-  position: absolute;
-  right: ${({$right = 108}) => `${$right}px`};
-  top: 45px;
+  width: 180px;
+  min-width: 180px;
+`;
+
+export const Text = styled.div`
+  align-self: flex-end;
+  max-width: 150px;
+  padding-bottom: 6px;
+
+  & span {
+    color: ${Colors.cyan8};
+  }
 `;
