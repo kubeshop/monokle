@@ -35,7 +35,7 @@ export const Logo = styled.img`
 `;
 
 export const LogoContainer = styled.div`
-  /* border-right: ${AppBorders.sectionDivider}; */
+  border-right: ${AppBorders.sectionDivider};
   width: 50px;
 `;
 
@@ -44,4 +44,22 @@ export const StartPageHeaderContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
+`;
+
+export const SearchItemLabel = styled.div.attrs({className: 'search-item-label'})`
+  display: flex;
+  & :first-child {
+    width: 100px;
+    color: ${Colors.grey7};
+  }
+`;
+
+export const SearchContainer = styled.div`
+  .selected-menu-item {
+    background-color: ${Colors.blue7};
+  }
+
+  .selected-menu-item .search-item-label :first-child {
+    color: ${Colors.whitePure};
+  }
 `;
