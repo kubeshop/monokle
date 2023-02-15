@@ -1,4 +1,4 @@
-import {useCallback, useRef} from 'react';
+import {useCallback, useRef, useState} from 'react';
 import {useMeasure} from 'react-use';
 
 import {Tooltip} from 'antd';
@@ -35,6 +35,8 @@ const TreeNodeFile: React.FC<Props> = props => {
   const canBePreviewed = useCanPreview(fileEntry, isDisabled);
   const {deleteEntry, isDeleteLoading} = useDelete();
 
+  const [isHovered, setIsHovered] = useState(false);
+
   const contextMenuButtonRef = useRef<HTMLDivElement>(null);
   const [actionButtonsRef, {width: actionButtonsWidth}] = useMeasure<HTMLDivElement>();
 
@@ -52,8 +54,13 @@ const TreeNodeFile: React.FC<Props> = props => {
   }
 
   return (
-    <S.NodeContainer onContextMenu={onContextMenu} $isDisabled={isDisabled} $actionButtonsWidth={actionButtonsWidth}>
-      <S.TitleContainer>
+    <S.NodeContainer
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onContextMenu={onContextMenu}
+      $isDisabled={isDisabled}
+    >
+      <S.TitleContainer $actionButtonsWidth={actionButtonsWidth} $isHovered={isHovered}>
         <S.TitleText $isSelected={isSelected}>
           <Tooltip
             overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
@@ -78,25 +85,27 @@ const TreeNodeFile: React.FC<Props> = props => {
         </S.SpinnerContainer>
       )}
 
-      <S.ActionButtonsContainer ref={actionButtonsRef} onClick={e => e.stopPropagation()}>
-        {canBePreviewed && (
-          <S.PreviewButton
-            type="text"
-            size="small"
-            disabled={isInPreviewMode || isInClusterMode}
-            $isItemSelected={isSelected}
-          >
-            Preview
-          </S.PreviewButton>
-        )}
-        {!isDisabled && (
-          <ContextMenu items={menuItems}>
-            <div ref={contextMenuButtonRef}>
-              <Dots color={isSelected ? Colors.blackPure : undefined} />
-            </div>
-          </ContextMenu>
-        )}
-      </S.ActionButtonsContainer>
+      {isHovered && (
+        <S.ActionButtonsContainer ref={actionButtonsRef} onClick={e => e.stopPropagation()}>
+          {canBePreviewed && (
+            <S.PreviewButton
+              type="text"
+              size="small"
+              disabled={isInPreviewMode || isInClusterMode}
+              $isItemSelected={isSelected}
+            >
+              Preview
+            </S.PreviewButton>
+          )}
+          {!isDisabled && (
+            <ContextMenu items={menuItems}>
+              <div ref={contextMenuButtonRef}>
+                <Dots color={isSelected ? Colors.blackPure : undefined} />
+              </div>
+            </ContextMenu>
+          )}
+        </S.ActionButtonsContainer>
+      )}
     </S.NodeContainer>
   );
 };

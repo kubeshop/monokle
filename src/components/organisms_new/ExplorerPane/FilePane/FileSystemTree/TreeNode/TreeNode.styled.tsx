@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import {Colors} from '@shared/styles/colors';
 
 export const ActionButtonsContainer = styled.div`
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: flex-end;
   flex-direction: row;
@@ -48,10 +48,11 @@ export const SpinnerContainer = styled.div`
   }
 `;
 
-export const TitleContainer = styled.div`
+export const TitleContainer = styled.div<{$actionButtonsWidth: number; $isHovered: boolean}>`
   display: flex;
   align-items: center;
-  max-width: 100%;
+  max-width: ${({$actionButtonsWidth, $isHovered}) => ($isHovered ? `calc(100% - ${$actionButtonsWidth}px)` : '100%')};
+  width: ${({$actionButtonsWidth, $isHovered}) => ($isHovered ? `calc(100% - ${$actionButtonsWidth}px)` : '100%')};
 `;
 
 export const TitleText = styled.span<{$isSelected?: boolean; $isHighlighted?: boolean}>(props => ({
@@ -62,7 +63,7 @@ export const TitleText = styled.span<{$isSelected?: boolean; $isHighlighted?: bo
   color: props.$isSelected ? Colors.blackPure : props.$isHighlighted ? Colors.cyan7 : Colors.blue10,
 }));
 
-export const NodeContainer = styled.div<{$actionButtonsWidth?: number; $isDisabled: boolean}>`
+export const NodeContainer = styled.div<{$isDisabled: boolean}>`
   position: relative;
   width: 100%;
   display: flex;
@@ -70,15 +71,4 @@ export const NodeContainer = styled.div<{$actionButtonsWidth?: number; $isDisabl
   align-items: center;
   cursor: ${({$isDisabled}) => ($isDisabled ? 'default' : 'inherit')};
   height: 100%;
-
-  &:hover {
-    ${ActionButtonsContainer} {
-      display: flex;
-    }
-
-    ${TitleContainer} {
-      max-width: ${({$actionButtonsWidth}) => `calc(100% - ${$actionButtonsWidth}px)`};
-      width: ${({$actionButtonsWidth}) => `calc(100% - ${$actionButtonsWidth}px)`};
-    }
-  }
 `;

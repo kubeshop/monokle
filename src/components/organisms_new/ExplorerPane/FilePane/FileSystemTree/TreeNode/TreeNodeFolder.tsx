@@ -1,4 +1,5 @@
 import {useCallback, useRef, useState} from 'react';
+import {useMeasure} from 'react-use';
 
 import {Tooltip} from 'antd';
 
@@ -34,6 +35,8 @@ const TreeNodeFolder: React.FC<Props> = props => {
 
   const menuItems = useFolderMenuItems({deleteEntry, isInClusterMode, isInPreviewMode}, folderEntry);
   const contextMenuButtonRef = useRef<HTMLDivElement>(null);
+  const [actionButtonsRef, {width: actionButtonsWidth}] = useMeasure<HTMLDivElement>();
+
   const onContextMenu = useCallback(() => {
     if (isDisabled || !contextMenuButtonRef.current) {
       return;
@@ -52,7 +55,7 @@ const TreeNodeFolder: React.FC<Props> = props => {
       onMouseLeave={() => setIsHovered(false)}
       onContextMenu={onContextMenu}
     >
-      <S.TitleContainer>
+      <S.TitleContainer $actionButtonsWidth={actionButtonsWidth} $isHovered={isHovered}>
         <S.TitleText>
           <Tooltip
             overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
@@ -76,7 +79,7 @@ const TreeNodeFolder: React.FC<Props> = props => {
       )}
 
       {isHovered && (
-        <S.ActionButtonsContainer onClick={e => e.stopPropagation()}>
+        <S.ActionButtonsContainer ref={actionButtonsRef} onClick={e => e.stopPropagation()}>
           <ContextMenu items={menuItems}>
             <div ref={contextMenuButtonRef}>
               <Dots />
