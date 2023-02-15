@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import {AutoComplete, Badge, Dropdown, Popover, Tooltip, Typography} from 'antd';
 
@@ -39,6 +39,21 @@ const StartPageHeader: React.FC = () => {
 
   const helpMenuItems = useHelpMenuItems();
 
+  const ProjectOptions = useMemo(
+    () =>
+      projects.map(p => ({
+        className: p.rootFolder === selectedProjectRootFolder ? 'selected-menu-item' : '',
+        value: p.name,
+        label: (
+          <S.SearchItemLabel>
+            <Typography.Text>{p.isGitRepo ? 'Repository' : 'Project'}</Typography.Text>
+            <Typography.Text>{p.name}</Typography.Text>
+          </S.SearchItemLabel>
+        ),
+      })),
+    [projects, selectedProjectRootFolder]
+  );
+
   const onSearchProjectChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchProject(e.target.value);
   };
@@ -50,6 +65,10 @@ const StartPageHeader: React.FC = () => {
     }
   };
 
+  const projectDropdownRender = (menu: React.ReactNode) => {
+    return <div>{menu}</div>;
+  };
+
   return (
     <S.StartPageHeaderContainer>
       <S.LogoContainer>
@@ -59,16 +78,7 @@ const StartPageHeader: React.FC = () => {
       <S.SearchContainer>
         <AutoComplete
           style={{width: '340px'}}
-          options={projects.map(p => ({
-            className: p.rootFolder === selectedProjectRootFolder ? 'selected-menu-item' : '',
-            value: p.name,
-            label: (
-              <S.SearchItemLabel>
-                <Typography.Text>{p.isGitRepo ? 'Repository' : 'Project'}</Typography.Text>
-                <Typography.Text>{p.name}</Typography.Text>
-              </S.SearchItemLabel>
-            ),
-          }))}
+          options={ProjectOptions}
           open={openProjectList}
           searchValue={searchProject}
           filterOption={(inputValue, option) => Boolean(option?.value?.startsWith(inputValue))}
@@ -76,6 +86,7 @@ const StartPageHeader: React.FC = () => {
           onBlur={() => setOpenProjectList(false)}
           onSelect={onSelectProjectHandler}
           notFoundContent="Nothing found"
+          dropdownRender={projectDropdownRender}
           getPopupContainer={() => document.getElementById('projectsList')!}
         >
           <SearchInput
