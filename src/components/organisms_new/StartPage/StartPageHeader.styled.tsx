@@ -35,7 +35,7 @@ export const Logo = styled.img`
 `;
 
 export const LogoContainer = styled.div`
-  /* border-right: ${AppBorders.sectionDivider}; */
+  border-right: ${AppBorders.sectionDivider};
   width: 50px;
 `;
 
