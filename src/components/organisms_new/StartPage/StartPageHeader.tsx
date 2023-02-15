@@ -30,12 +30,11 @@ const StartPageHeader: React.FC = () => {
   const isStartPageLearnVisible = useAppSelector(state => state.ui.startPageLearn.isVisible);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const isWelcomePopupVisible = useAppSelector(state => state.ui.welcomePopup.isVisible);
-  const projects = useAppSelector(state => _.sortBy(state.config.projects, p => !p.isGitRepo));
+  const projects = useAppSelector(state => _.sortBy(state.config.projects, p => p?.name?.toLowerCase()));
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
   const [searchProject, setSearchProject] = useState('');
-  const [openProjectList, setOpenProjectList] = useState(false);
 
   const helpMenuItems = useHelpMenuItems();
 
@@ -46,7 +45,7 @@ const StartPageHeader: React.FC = () => {
         value: p.name,
         label: (
           <S.SearchItemLabel>
-            <Typography.Text>{p.isGitRepo ? 'Repository' : 'Project'}</Typography.Text>
+            <Typography.Text>Project</Typography.Text>
             <Typography.Text>{p.name}</Typography.Text>
           </S.SearchItemLabel>
         ),
@@ -54,8 +53,8 @@ const StartPageHeader: React.FC = () => {
     [projects, selectedProjectRootFolder]
   );
 
-  const onSearchProjectChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchProject(e.target.value);
+  const onSearchProjectChangeHandler = (value: string) => {
+    setSearchProject(value);
   };
 
   const onSelectProjectHandler = (value: string) => {
@@ -63,10 +62,6 @@ const StartPageHeader: React.FC = () => {
     if (targetProject) {
       dispatch(setOpenProject(targetProject.rootFolder));
     }
-  };
-
-  const projectDropdownRender = (menu: React.ReactNode) => {
-    return <div>{menu}</div>;
   };
 
   return (
@@ -79,21 +74,16 @@ const StartPageHeader: React.FC = () => {
         <AutoComplete
           style={{width: '340px'}}
           options={ProjectOptions}
-          open={openProjectList}
           searchValue={searchProject}
           filterOption={(inputValue, option) => Boolean(option?.value?.startsWith(inputValue))}
-          onFocus={() => setOpenProjectList(true)}
-          onBlur={() => setOpenProjectList(false)}
           onSelect={onSelectProjectHandler}
           notFoundContent="Nothing found"
-          dropdownRender={projectDropdownRender}
           getPopupContainer={() => document.getElementById('projectsList')!}
+          showAction={['focus']}
+          onSearch={onSearchProjectChangeHandler}
+          value={searchProject}
         >
-          <SearchInput
-            onChange={onSearchProjectChangeHandler}
-            value={searchProject}
-            placeholder="Find repositories & projects"
-          />
+          <SearchInput placeholder="Find repositories & projects" />
         </AutoComplete>
         <div id="projectsList" />
       </S.SearchContainer>
