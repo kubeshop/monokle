@@ -52,6 +52,7 @@ export const NewPreviewConfigurationTooltip = 'Create a new Preview Configuratio
 export const NewProjectFromFolderTooltip = 'New project from existing folder';
 export const NewProjectFromGitTooltip = 'New project from Git repository';
 export const NewProjectFromTemplateTooltip = 'New Project from Template';
+export const NewResourceTooltip = 'Create new resource';
 export const NotificationsTooltip = 'Show latest notifications';
 export const OpenExternalDocumentationTooltip = 'Open documentation for this resource type in external browser';
 export const OpenHelmChartDocumentationTooltip = 'Open documentation for Helm Charts in external browser';
@@ -85,7 +86,7 @@ export const FileExplorerTabTooltip = () => <HotkeyLabel text="View File Explore
 export const InstallValuesFileTooltip = () => (
   <HotkeyLabel text="Install Helm Chart using this values file in your selected cluster" name="APPLY_SELECTION" />
 );
-export const NewResourceTooltip = () => <HotkeyLabel text="Create new resource" name="CREATE_NEW_RESOURCE" />;
+
 export const QuickFilterTooltip = () => <HotkeyLabel text="Filter results" name="OPEN_QUICK_SEARCH" />;
 export const ReloadFolderTooltip = () => (
   <HotkeyLabel text="Reload manifests from the currently selected folder" name="REFRESH_FOLDER" />

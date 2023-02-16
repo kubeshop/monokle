@@ -136,8 +136,10 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
                 isDisabled={itemInstance.isDisabled}
                 onClick={onClick}
               >
-                {itemInstance.name}
-                {itemInstance.isDirty && <span>*</span>}
+                <span>
+                  {itemInstance.name}
+                  {itemInstance.isDirty && <span>*</span>}
+                </span>
               </S.ItemName>
             )}
 
