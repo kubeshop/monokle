@@ -510,7 +510,7 @@ export const mainSlice = createSlice({
       });
     });
 
-    // TODO: how do we make this work with the new resource storage?
+    // TODO: 2.0+ how do we make this work with the new resource storage?
     // builder.addCase(transferResource.fulfilled, (state, action) => {
     //   const {side, delta} = action.payload;
 
