@@ -85,6 +85,7 @@ export const updateResource = createAsyncThunk<
           resourceMeta.origin,
           resourceMeta.id
         );
+
         if (!fastDeepEqual(resourceMeta, updatedResourceMeta)) {
           // @ts-ignore-next-line
           mainState.resourceMetaMapByStorage[resourceMeta.storage][resourceMeta.id] = updatedResourceMeta;
