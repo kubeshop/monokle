@@ -2,7 +2,7 @@ import {useMemo} from 'react';
 
 import {MenuProps} from 'antd';
 
-import {FolderAddOutlined as RawFolderAddOutlined} from '@ant-design/icons';
+import {FileAddOutlined as RawFileAddOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -22,8 +22,8 @@ export function useNewResourceMenuItems() {
         key: 'from-scratch',
         label: (
           <MenuItem>
-            <FolderAddOutlined />
-            New from scratch
+            <FileAddOutlined />
+            New from model
           </MenuItem>
         ),
 
@@ -34,7 +34,7 @@ export function useNewResourceMenuItems() {
         label: (
           <MenuItem>
             <img src={TemplateSmallWhiteSvg} />
-            New from template
+            New from advanced template
           </MenuItem>
         ),
         onClick: () => dispatch(openTemplateExplorer()),
@@ -48,7 +48,7 @@ export function useNewResourceMenuItems() {
 
 // Styled Components
 
-const FolderAddOutlined = styled(RawFolderAddOutlined)`
+const FileAddOutlined = styled(RawFileAddOutlined)`
   font-size: 16px;
 `;
 
