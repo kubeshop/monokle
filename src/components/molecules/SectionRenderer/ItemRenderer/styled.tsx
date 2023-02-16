@@ -72,25 +72,10 @@ type ItemNameProps = {
 };
 
 export const ItemName = styled.div<ItemNameProps>`
-  width: 100%;
-  position: relative;
   padding: 2px 0;
   font-size: 12px;
   min-width: 0;
-
-  &:before {
-    content: '&nbsp;';
-    visibility: hidden;
-  }
-
-  & span {
-    position: absolute;
-    left: 0;
-    right: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  flex-grow: 1;
 
   ${props => {
     if (props.isSelected) {

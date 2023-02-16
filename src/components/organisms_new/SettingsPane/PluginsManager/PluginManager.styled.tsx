@@ -29,7 +29,9 @@ export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`
 
 export const PluginsContainer = styled.div`
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+  gap: 20px;
 `;
 
 export const PluginColumnContainer = styled.div`
