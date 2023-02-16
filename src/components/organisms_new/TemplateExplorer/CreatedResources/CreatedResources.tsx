@@ -1,4 +1,6 @@
-import {Tag} from 'antd';
+import {useState} from 'react';
+
+import {Button, Tag} from 'antd';
 import Link from 'antd/lib/typography/Link';
 
 import {SelectOutlined} from '@ant-design/icons';
@@ -13,6 +15,7 @@ import {TitleBar} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
 
 import * as S from './CreatedResources.styled';
+import SaveToFolderModal from './SaveToFolderModal';
 
 type IProps = {
   createdResources: K8sResource[];
@@ -24,14 +27,28 @@ const CreatedResources: React.FC<IProps> = props => {
 
   const dispatch = useAppDispatch();
   const projectCreateData = useAppSelector(state => state.ui.templateExplorer.projectCreate);
+  const [isSaveToFolderOpen, setIsSaveToFolderOpen] = useState(false);
 
   const onSelectResourceHandler = (resource: K8sResource) => {
     dispatch(selectResource({resourceIdentifier: resource}));
     dispatch(closeTemplateExplorer());
   };
 
+  const onClickSaveToFolder = () => {
+    setIsSaveToFolderOpen(true);
+  };
+
+  const onSaveToFolderModalClose = () => {
+    setIsSaveToFolderOpen(false);
+  };
+
   return (
     <>
+      <SaveToFolderModal
+        isVisible={isSaveToFolderOpen}
+        resources={createdResources}
+        onClose={onSaveToFolderModalClose}
+      />
       {isEmpty(createdResources) ? (
         <S.CreatedResourceLabel>
           Processed the template successfully but the output did not create any valid resources.
@@ -70,6 +87,9 @@ const CreatedResources: React.FC<IProps> = props => {
               );
             })}
           </ul>
+          <Button type="ghost" onClick={onClickSaveToFolder}>
+            Save resources to folder
+          </Button>
         </>
       )}
 
