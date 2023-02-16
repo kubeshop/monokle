@@ -1,0 +1,9 @@
+{
+  "title": "Monokle 2.0",
+  "learnMoreUrl": "https://kubeshop.io/blog/monokle-2-0-release",
+  "about": {
+    "when": "Feb 2023",
+    "title": "In this release, we bring you:",
+    "features": ["UI redesign", "Expanded validation", "Performance improvements"]
+  }
+}
