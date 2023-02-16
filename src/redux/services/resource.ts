@@ -308,6 +308,7 @@ export function extractResourceMeta<Storage extends ResourceStorage>(
     storage,
     origin,
     id: id ?? ((resourceObject.metadata && resourceObject.metadata.uid) || uuidv4()),
+    namespace: resourceObject.metadata?.namespace || undefined,
     kind: resourceObject.kind,
     apiVersion: resourceObject.apiVersion,
     isClusterScoped: getResourceKindHandler(resourceObject.kind)?.isNamespaced || false,
