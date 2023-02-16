@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import {ipcRenderer} from 'electron';
 
-import asyncLib from 'async';
 import fs from 'fs';
 import log from 'loglevel';
 
@@ -14,8 +13,9 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sObject, isK8sObject} from '@shared/models/k8s';
 import {K8sResource} from '@shared/models/k8sResource';
 import {AnyPlugin} from '@shared/models/plugin';
-import {InterpolateTemplateOptions, TemplateManifest, TemplatePack, VanillaTemplate} from '@shared/models/template';
+import {InterpolateTemplateOptions, TemplatePack, VanillaTemplate} from '@shared/models/template';
 import electronStore from '@shared/utils/electronStore';
+import {isDefined} from '@shared/utils/filter';
 
 import {extractObjectsFromYaml} from './manifest-utils';
 import {createMultipleTransientResources} from './transientResource';
@@ -108,29 +108,27 @@ export const createTransientResourcesFromVanillaTemplate = async (
   formsData: any[],
   dispatch: AppDispatch
 ) => {
-  const resourceTextList: (string | undefined)[] = await asyncLib.map(
-    template.manifests,
-    async (manifest: TemplateManifest) => {
-      try {
-        const manifestText = await fs.promises.readFile(manifest.filePath, 'utf8');
-        const interpolatedTemplateText = await interpolateTemplate(manifestText, formsData);
-        return interpolatedTemplateText;
-      } catch (e) {
-        if (e instanceof Error) {
-          log.warn(`[createTransientResourcesFromVanillaTemplate]: ${e.message}`);
-          return undefined;
-        }
+  const resourceTextList: string[] = [];
+
+  for (let i = 0; i < template.manifests.length; i += 1) {
+    const manifest = template.manifests[i];
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const manifestText = await fs.promises.readFile(manifest.filePath, 'utf8');
+      // eslint-disable-next-line no-await-in-loop
+      const interpolatedTemplateText = await interpolateTemplate(manifestText, formsData);
+      resourceTextList.push(interpolatedTemplateText);
+    } catch (e) {
+      if (e instanceof Error) {
+        log.warn(`[createTransientResourcesFromVanillaTemplate]: ${e.message}`);
       }
     }
-  );
+  }
 
-  let objects: K8sObject[] = [];
-
-  resourceTextList
-    .filter((text): text is string => typeof text === 'string')
-    .forEach(resourceText => {
-      objects = [...objects, ...extractObjectsFromYaml(resourceText)];
-    });
+  const objects: K8sObject[] = resourceTextList
+    .filter(isDefined)
+    .map(resourceText => extractObjectsFromYaml(resourceText))
+    .flat();
 
   const inputs = objects
     .filter(obj => isK8sObject(obj))
