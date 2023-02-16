@@ -2,12 +2,13 @@ import {memo, useMemo, useState} from 'react';
 
 import {Button, CollapsePanelProps, Tooltip} from 'antd';
 
-import {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined, FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openCreateFileFolderModal} from '@redux/reducers/ui';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {useRefSelector} from '@utils/hooks';
@@ -62,6 +63,21 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
                       <ExclamationCircleOutlined />
                     </Tooltip>
                   )}
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY}>
+                    <Button
+                      size="small"
+                      onClick={() => {
+                        dispatch(
+                          openCreateFileFolderModal({
+                            rootDir: rootEntry.filePath,
+                            type: 'folder',
+                          })
+                        );
+                      }}
+                      icon={<FolderAddOutlined />}
+                      type="link"
+                    />
+                  </Tooltip>
                   <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
                     <Button
                       size="small"
