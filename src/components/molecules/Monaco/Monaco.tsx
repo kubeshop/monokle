@@ -298,6 +298,7 @@ const Monaco = (props: {
   }, [code]);
 
   useEffect(() => {
+    editorRef.current?.getModel()?.dispose();
     let newCode = '';
     const rootFilePath = fileMapRef.current?.[ROOT_FILE_ENTRY]?.filePath;
     if (selectedResource?.id) {
