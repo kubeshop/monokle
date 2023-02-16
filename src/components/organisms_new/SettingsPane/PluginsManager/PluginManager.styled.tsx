@@ -30,6 +30,7 @@ export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`
 export const PluginsContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  gap: 30px;
 `;
 
 export const PluginColumnContainer = styled.div`
