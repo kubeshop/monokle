@@ -1,4 +1,4 @@
-Welcome to the Monokle troubleshooting guide for cluster connections. 
+# Welcome to the Monokle Troubleshooting Guide for Cluster Connections. 
 
 This page will provide you with two methods to help resolve any issues you may be experiencing when attempting to connect to your Kubernetes clusters through the Monokle app.  
 The first method involves using the in-app proxy setting, while the second method involves manually configuring a proxy using the kubectl command.  

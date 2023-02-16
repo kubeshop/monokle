@@ -1,16 +1,14 @@
 # Cluster Mode
 
-The new Cluster Mode in Monokle 1.13 provides real-time insights into the state of your clusters. Once connected to a cluster, the icon to open Cluster Mode is in the left panel:
-
-![Cluster Mode](img/cluster-mode-icon-1.13.png)
+The Cluster Mode in Monokle Desktop provides real-time insights into the state of your clusters. 
 
 The initial overview provides general information about its state and contained resources:
 
-![Cluster Mode Overview](img/cluster-mode-overview-1.13.png)
+![Cluster Mode Overview](img/cluster-preview2-2.0.png)
 
 The navigation on the left makes it easy to select types of resources and see their individual state and properties:
 
-![Cluster Mode Navigation](img/cluster-mode-navigation-1.13.png)
+![Cluster Mode Navigation](img/cluster-mode-navigation-2.0.png)
 
 And the YAML for each resource can be easily viewed, modified and applied back to your cluster for quick fixes:
 

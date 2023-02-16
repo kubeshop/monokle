@@ -49,16 +49,16 @@ Here is how you can reference a template module:
 
 Open the Plugins manager from the top right icon:
 
-![Open Plugin Manager](img/open-plugin-manager-1.11.png)
+![Open Plugin Manager](img/open-plugin-manager-2.0.png)
 
 
 1. Click on the **+ Install** button:
 
-![Add New Plugin](img/add-new-plugin-1.11.png)
+![Add New Plugin](img/add-new-plugin-2.0.png)
 
 2. A modal will appear asking for the Plugin URL:
 
-![Add Plugin Modal](img/add-plugin-modal-1.6.0.png)
+![Add Plugin Modal](img/add-plugin-modal-2.0.png)
 
 
 - The URL must be a valid GitHub repository url in the format https://github.com/[user]/[repository].
