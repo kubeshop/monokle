@@ -11,6 +11,7 @@ import {closeTemplateExplorer, setSelectedTemplatePath} from '@redux/reducers/ui
 
 import {TitleBar} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
+import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './CreatedResources.styled';
 
@@ -23,6 +24,7 @@ const CreatedResources: React.FC<IProps> = props => {
   const {createdResources, resultMessage} = props;
 
   const dispatch = useAppDispatch();
+  const activeProject = useAppSelector(activeProjectSelector);
   const projectCreateData = useAppSelector(state => state.ui.templateExplorer.projectCreate);
 
   const onSelectResourceHandler = (resource: K8sResource) => {
@@ -64,7 +66,7 @@ const CreatedResources: React.FC<IProps> = props => {
                   <S.CreatedResourceName>{resource.name}*</S.CreatedResourceName>
                   <S.CreatedResourceKind>{resource.kind}</S.CreatedResourceKind>
                   <Link>
-                    <SelectOutlined onClick={() => onSelectResourceHandler(resource)} />
+                    <SelectOutlined disabled={!activeProject} onClick={() => onSelectResourceHandler(resource)} />
                   </Link>
                 </li>
               );

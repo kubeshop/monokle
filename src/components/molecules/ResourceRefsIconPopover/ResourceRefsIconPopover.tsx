@@ -48,7 +48,7 @@ const ResourceRefsIconPopover = ({
   const incomingColor = useMemo(() => (isSelected ? Colors.blackPure : Colors.blue10), [isSelected]);
 
   if (isDisabled || !resourceRefs || !size(resourceRefs)) {
-    return null;
+    return <span style={{width: '30px'}} />;
   }
 
   return (
