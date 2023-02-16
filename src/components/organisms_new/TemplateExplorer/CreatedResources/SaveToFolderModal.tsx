@@ -37,7 +37,9 @@ const SaveToFolderModal: React.FC<Props> = props => {
       return;
     }
     const folder =
-      selectedFolderRef.current === ROOT_FILE_ENTRY ? rootFolderPathRef.current : selectedFolderRef.current;
+      selectedFolderRef.current === ROOT_FILE_ENTRY
+        ? rootFolderPathRef.current
+        : path.join(rootFolderPathRef.current, selectedFolderRef.current);
     setIsLoading(true);
     const pendingSave = dispatch(
       saveTransientResources({
