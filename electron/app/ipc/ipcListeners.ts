@@ -383,7 +383,7 @@ ipcMain.on('pod.terminal.close', () => {
 });
 
 ipcMain.on('pod.terminal.init', (event, args) => {
-  const {previewKubeConfigPath, podNamespace, podName, containerName, webContentsId} = args;
+  const { podNamespace, podName, containerName, webContentsId} = args;
   if (!webContentsId) {
     return;
   }
@@ -405,7 +405,7 @@ ipcMain.on('pod.terminal.init', (event, args) => {
     podNamespace,
     podName,
     containerName,
-    ['/bin/sh', '-c', 'clear; (bash || ash || sh)'],
+    ['/bin/sh'],
     outputStream,
     outputStream,
     commandStream,
