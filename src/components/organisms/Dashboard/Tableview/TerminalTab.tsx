@@ -20,7 +20,7 @@ export const TerminalTab = ({resourceId}: {resourceId: string}) => {
   const resource = useResource({id: resourceId, storage: 'cluster'});
 
   useEffect(() => {
-    if (webContentsId && resource && clusterConnection) {
+    if (webContentsId && resource && clusterConnection && !terminalRef.current) {
       ipcRenderer.send('pod.terminal.init', {
         previewKubeConfigPath: clusterConnection.context,
         podNamespace: resource.namespace,
