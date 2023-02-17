@@ -1,3 +1,5 @@
+# Troubleshooting Connections
+
 Welcome to the Monokle troubleshooting guide for cluster connections. 
 
 This page will provide you with two methods to help resolve any issues you may be experiencing when attempting to connect to your Kubernetes clusters through the Monokle app.  
