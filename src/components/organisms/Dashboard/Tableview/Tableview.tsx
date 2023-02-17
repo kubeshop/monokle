@@ -20,6 +20,7 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
   const [filteredDataSource, setFilteredDataSource] = useState(dataSource);
   const [filterText, setFilterText] = useState<string>('');
   const selectedResourceId = useAppSelector((state: RootState) => state.dashboard.tableDrawer.selectedResourceId);
+  const clusterConnectionOptions = useAppSelector(state => state.main.clusterConnectionOptions);
 
   useEffect(() => {
     if (!filterText) {
@@ -30,6 +31,11 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
       dataSource.filter(s => s.name.toLowerCase().trim().includes(filterText.toLocaleLowerCase().trim()))
     );
   }, [dataSource, filterText]);
+
+  useEffect(() => {
+    dispatch(setDashboardSelectedResourceId());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clusterConnectionOptions]);
 
   return (
     <S.Container>
