@@ -87,7 +87,7 @@ The Current Project Settings tab contains the the setting that can be modified f
 
 ## **Global Settings**
 
-![Global Project Settings](img/global-project-settings-2.0.gif)
+<!-- ![Global Project Settings](img/global-project-settings-2.0.gif) -->
 
 Click the Monokle icon in the top left corner to return to the Monokle home page and click on settings.
 
