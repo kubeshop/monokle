@@ -68,6 +68,14 @@ export const TerminalTab = ({resourceId}: {resourceId: string}) => {
       }
     });
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      addonRef.current?.fit();
+      terminalRef.current?.focus();
+    }, 250);
+  }, []);
+
   return (
     <S.TerminalPaneContainer>
       <S.TerminalContainer ref={terminalContainerRef} />
