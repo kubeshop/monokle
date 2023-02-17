@@ -75,14 +75,16 @@ const ResourceKindContextMenuWrapper = (props: ItemCustomComponentProps) => {
       return;
     }
 
-    let terminalCommand = `${osPlatform !== 'win32' ? 'exec ' : ''}kubectl exec -i -t -n `;
-    terminalCommand += `${resource.namespace || 'default'} ${resource.name}`;
+    let terminalCommand = 'kubectl exec -it -n ';
+    terminalCommand += `${resource.namespace || 'default'} ${resource.name} `;
 
     const container = resource.object.spec?.containers?.[0];
 
     if (container) {
-      terminalCommand += ` -c ${container.name} -- sh -c "clear; (bash || ash || sh)"`;
+      terminalCommand += `-c ${container.name} `;
     }
+
+    terminalCommand += `-- ${osPlatform === 'win32' ? '/bin/sh' : '/bin/bash'}`;
 
     return terminalCommand;
   }, [osPlatform, resource]);
