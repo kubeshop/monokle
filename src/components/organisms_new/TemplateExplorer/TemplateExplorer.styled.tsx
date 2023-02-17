@@ -20,6 +20,7 @@ export const EmptyText = styled.div`
 
 export const LeftContainer = styled.div`
   background-color: #1d1d1d;
+  overflow-y: hidden;
 `;
 
 export const Modal = styled(RawModal)`
@@ -40,6 +41,7 @@ export const Modal = styled(RawModal)`
     padding: 0px;
     display: grid;
     grid-template-columns: 2fr 3fr;
+    grid-template-rows: 1fr;
     height: 100%;
   }
 `;
@@ -61,8 +63,8 @@ export const RightContainer = styled.div`
   padding: 25px;
 `;
 
-export const TemplatesCollapse = styled(Collapse)`
-  max-height: calc(100% - 200px);
+export const TemplatesCollapse = styled(Collapse)<{$topHeight: number}>`
+  max-height: ${({$topHeight}) => `calc(100% - ${$topHeight + 50}px)`};
   overflow-y: auto;
 
   .ant-collapse-header {
@@ -70,7 +72,7 @@ export const TemplatesCollapse = styled(Collapse)`
   }
 
   .ant-collapse-item:last-child {
-    margin-bottom: 25px;
+    padding-bottom: 10px;
   }
 
   .ant-collapse-content-box {
