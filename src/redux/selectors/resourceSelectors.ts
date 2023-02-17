@@ -71,18 +71,6 @@ export const useSelectedResourceRef = (): React.MutableRefObject<K8sResource | u
   return useResourceRef(resourceIdentifier);
 };
 
-export const createResourceContentSelector = <Storage extends ResourceStorage>(storage: Storage) => {
-  return createDeepEqualSelector(
-    [
-      (state: RootState) => state.main.resourceContentMapByStorage[storage],
-      (state: RootState, resourceId: string) => resourceId,
-    ],
-    (resourceContentMap, resourceId): ResourceContent<Storage> | undefined => {
-      return resourceContentMap[resourceId];
-    }
-  );
-};
-
 export const createResourceMetaSelector = <Storage extends ResourceStorage>(storage: Storage) => {
   return createDeepEqualSelector(
     [
@@ -130,6 +118,18 @@ export const useSelectedResourceMetaRef = (): React.MutableRefObject<ResourceMet
     state.main.selection?.type === 'resource' ? state.main.selection?.resourceIdentifier : undefined
   );
   return useResourceMetaRef(resourceIdentifier);
+};
+
+export const createResourceContentSelector = <Storage extends ResourceStorage>(storage: Storage) => {
+  return createDeepEqualSelector(
+    [
+      (state: RootState) => state.main.resourceContentMapByStorage[storage],
+      (state: RootState, resourceId: string) => resourceId,
+    ],
+    (resourceContentMap, resourceId): ResourceContent<Storage> | undefined => {
+      return resourceContentMap[resourceId];
+    }
+  );
 };
 
 export const useResourceContent = <Storage extends ResourceStorage>(
