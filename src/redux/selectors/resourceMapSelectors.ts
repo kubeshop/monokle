@@ -1,7 +1,5 @@
-import {useMemo} from 'react';
-
 import {keyBy} from 'lodash';
-import {createSelector} from 'reselect';
+import {Selector, createSelector} from 'reselect';
 
 import {useAppSelector} from '@redux/hooks';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -27,7 +25,9 @@ import {knownResourceKindsSelector} from './resourceKindSelectors';
 import {createDeepEqualSelector} from './utils';
 
 // TODO: do the same thing for resource maps as I did for resource selectors
-export const createResourceMapSelector = <Storage extends ResourceStorage>(storage: Storage) => {
+export const createResourceMapSelector = <Storage extends ResourceStorage>(
+  storage: Storage
+): Selector<RootState, ResourceMetaMap<Storage>> => {
   return createDeepEqualSelector(
     [
       (state: RootState) => state.main.resourceMetaMapByStorage[storage],
@@ -39,101 +39,128 @@ export const createResourceMapSelector = <Storage extends ResourceStorage>(stora
   );
 };
 
+const localResourceMapSelector = createResourceMapSelector('local');
+const clusterResourceMapSelector = createResourceMapSelector('cluster');
+const previewResourceMapSelector = createResourceMapSelector('preview');
+const transientResourceMapSelector = createResourceMapSelector('transient');
+
+const getResourceMapSelector = <Storage extends ResourceStorage>(
+  storage: Storage
+): Selector<RootState, ResourceMap<Storage>> => {
+  if (storage === 'cluster') return clusterResourceMapSelector as Selector<RootState, ResourceMap<typeof storage>>;
+  if (storage === 'preview') return previewResourceMapSelector as Selector<RootState, ResourceMap<typeof storage>>;
+  if (storage === 'transient') return transientResourceMapSelector as Selector<RootState, ResourceMap<typeof storage>>;
+  if (storage === 'local') return localResourceMapSelector as Selector<RootState, ResourceMap<typeof storage>>;
+  throw new Error(`Unknown resource storage: ${storage}`);
+};
+
 export const useResourceMap = <Storage extends ResourceStorage>(storage: Storage): ResourceMap<Storage> => {
-  const resourceMapSelector = useMemo(() => createResourceMapSelector(storage), [storage]);
-  return useAppSelector(state => resourceMapSelector(state));
+  return useAppSelector(getResourceMapSelector(storage));
 };
 
 export const useActiveResourceMap = (): ResourceMap<ResourceStorage> => {
   const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
-  const activeResourceMapSelector = useMemo(
-    () => createResourceMapSelector(activeResourceStorage),
-    [activeResourceStorage]
-  );
-  return useAppSelector(activeResourceMapSelector);
+  return useAppSelector(getResourceMapSelector(activeResourceStorage));
 };
 
 export const useActiveResourceMapRef = (): React.MutableRefObject<ResourceMap<ResourceStorage>> => {
   const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
-  const activeResourceMapSelector = useMemo(
-    () => createResourceMapSelector(activeResourceStorage),
-    [activeResourceStorage]
-  );
-  return useRefSelector(activeResourceMapSelector);
+  return useRefSelector(getResourceMapSelector(activeResourceStorage));
 };
 
-export const createResourceMetaMapSelector = <Storage extends ResourceStorage>(storage: Storage) => {
+export const createResourceMetaMapSelector = <Storage extends ResourceStorage>(
+  storage: Storage
+): Selector<RootState, ResourceMetaMap<Storage>> => {
   return createSelector(
     (state: RootState) => state.main.resourceMetaMapByStorage[storage],
     (resourceMetaMap): ResourceMetaMap<Storage> => resourceMetaMap
   );
 };
 
+const localResourceMetaMapSelector = createResourceMetaMapSelector('local');
+const clusterResourceMetaMapSelector = createResourceMetaMapSelector('cluster');
+const previewResourceMetaMapSelector = createResourceMetaMapSelector('preview');
+const transientResourceMetaMapSelector = createResourceMetaMapSelector('transient');
+
+const getResourceMetaMapSelector = <Storage extends ResourceStorage>(
+  storage: Storage
+): Selector<RootState, ResourceMetaMap<Storage>> => {
+  if (storage === 'cluster')
+    return clusterResourceMetaMapSelector as Selector<RootState, ResourceMetaMap<typeof storage>>;
+  if (storage === 'preview')
+    return previewResourceMetaMapSelector as Selector<RootState, ResourceMetaMap<typeof storage>>;
+  if (storage === 'transient')
+    return transientResourceMetaMapSelector as Selector<RootState, ResourceMetaMap<typeof storage>>;
+  if (storage === 'local') return localResourceMetaMapSelector as Selector<RootState, ResourceMetaMap<typeof storage>>;
+  throw new Error(`Unknown resource storage: ${storage}`);
+};
+
 export const useResourceMetaMap = <Storage extends ResourceStorage>(storage: Storage): ResourceMetaMap<Storage> => {
-  const resourceMetaMapSelector = useMemo(() => createResourceMetaMapSelector(storage), [storage]);
-  return useAppSelector(resourceMetaMapSelector);
+  return useAppSelector(getResourceMetaMapSelector(storage));
 };
 
 export const useResourceMetaMapRef = <Storage extends ResourceStorage>(storage: Storage) => {
-  const resourceMetaMapSelector = useMemo(() => createResourceMetaMapSelector(storage), [storage]);
-  return useRefSelector(resourceMetaMapSelector);
+  return useRefSelector(getResourceMetaMapSelector(storage));
 };
 
 export const useActiveResourceMetaMap = () => {
   const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
-  const activeResourceMetaMapSelector = useMemo(
-    () => createResourceMetaMapSelector(activeResourceStorage),
-    [activeResourceStorage]
-  );
-  return useAppSelector(activeResourceMetaMapSelector);
+  return useAppSelector(getResourceMetaMapSelector(activeResourceStorage));
 };
 
 export const useActiveResourceMetaMapRef = () => {
   const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
-  const activeResourceMetaMapSelector = useMemo(
-    () => createResourceMetaMapSelector(activeResourceStorage),
-    [activeResourceStorage]
-  );
-  return useRefSelector(activeResourceMetaMapSelector);
+  return useRefSelector(getResourceMetaMapSelector(activeResourceStorage));
 };
 
-export const createResourceContentMapSelector = <Storage extends ResourceStorage>(storage: Storage) => {
+export const createResourceContentMapSelector = <Storage extends ResourceStorage>(
+  storage: Storage
+): Selector<RootState, ResourceContentMap<Storage>> => {
   return createSelector(
     (state: RootState) => state.main.resourceContentMapByStorage[storage],
     (resourceContentMap): ResourceContentMap<Storage> => resourceContentMap
   );
 };
 
+const localResourceContentMapSelector = createResourceContentMapSelector('local');
+const clusterResourceContentMapSelector = createResourceContentMapSelector('cluster');
+const previewResourceContentMapSelector = createResourceContentMapSelector('preview');
+const transientResourceContentMapSelector = createResourceContentMapSelector('transient');
+
+const getResourceContentMapSelector = <Storage extends ResourceStorage>(
+  storage: Storage
+): Selector<RootState, ResourceContentMap<Storage>> => {
+  if (storage === 'cluster')
+    return clusterResourceContentMapSelector as Selector<RootState, ResourceContentMap<typeof storage>>;
+  if (storage === 'preview')
+    return previewResourceContentMapSelector as Selector<RootState, ResourceContentMap<typeof storage>>;
+  if (storage === 'transient')
+    return transientResourceContentMapSelector as Selector<RootState, ResourceContentMap<typeof storage>>;
+  if (storage === 'local')
+    return localResourceContentMapSelector as Selector<RootState, ResourceContentMap<typeof storage>>;
+  throw new Error(`Unknown resource storage: ${storage}`);
+};
+
 export const useResourceContentMap = <Storage extends ResourceStorage>(
   storage: Storage
 ): ResourceContentMap<Storage> => {
-  const resourceContentMapSelector = useMemo(() => createResourceContentMapSelector(storage), [storage]);
-  return useAppSelector(resourceContentMapSelector);
+  return useAppSelector(getResourceContentMapSelector(storage));
 };
 
 export const useResourceContentMapRef = <Storage extends ResourceStorage>(
   storage: Storage
 ): React.MutableRefObject<ResourceContentMap<Storage>> => {
-  const resourceContentMapSelector = useMemo(() => createResourceContentMapSelector(storage), [storage]);
-  return useRefSelector(resourceContentMapSelector);
+  return useRefSelector(getResourceContentMapSelector(storage));
 };
 
 export const useActiveResourceContentMap = () => {
   const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
-  const activeResourceContentMapSelector = useMemo(
-    () => createResourceContentMapSelector(activeResourceStorage),
-    [activeResourceStorage]
-  );
-  return useAppSelector(activeResourceContentMapSelector);
+  return useAppSelector(getResourceContentMapSelector(activeResourceStorage));
 };
 
 export const useActiveResourceContentMapRef = () => {
   const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
-  const activeResourceContentMapSelector = useMemo(
-    () => createResourceContentMapSelector(activeResourceStorage),
-    [activeResourceStorage]
-  );
-  return useRefSelector(activeResourceContentMapSelector);
+  return useRefSelector(getResourceContentMapSelector(activeResourceStorage));
 };
 
 export const activeResourceStorageSelector = createSelector(
