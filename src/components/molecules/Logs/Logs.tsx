@@ -8,7 +8,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {useAppSelector} from '@redux/hooks';
 import {kubeConfigPathSelector} from '@redux/selectors';
-import {selectedResourceSelector} from '@redux/selectors/resourceSelectors';
+import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 
 import {createKubeClient} from '@shared/utils/kubeclient';
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
@@ -30,7 +30,7 @@ const logOptions = {
 const Logs = () => {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const selectedResource = useAppSelector(selectedResourceSelector);
+  const selectedResource = useSelectedResource();
   const [logs, setLogs] = useState<LogLineType[]>([]);
 
   useEffect(() => {

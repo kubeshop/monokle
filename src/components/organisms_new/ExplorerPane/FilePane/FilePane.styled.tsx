@@ -7,7 +7,8 @@ import {Colors, FontColors} from '@shared/styles/colors';
 export const FileTreeContainer = styled.div`
   width: 100%;
   height: 100%;
-  padding: 15px 25px 15px 15px;
+  padding: 15px 0px;
+  padding-top: 0px;
 
   & .ant-tree {
     font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
@@ -30,10 +31,6 @@ export const FileTreeContainer = styled.div`
     border-radius: 0 !important;
   }
 
-  & .ant-tree-treenode {
-    background: transparent;
-  }
-
   & .ant-tree-treenode-not-supported:hover::before {
     background: transparent !important;
   }
@@ -46,49 +43,6 @@ export const FileTreeContainer = styled.div`
     border-bottom: 1px solid #434343;
   }
 
-  & .ant-tree-treenode-selected {
-    vertical-align: center;
-    margin-left: 0px !important;
-    border-left: 8px hidden transparent;
-    padding-left: 8px;
-    padding-bottom: 0px;
-    background: ${Colors.selectionColor} !important;
-  }
-  & .ant-tree-treenode-selected::before {
-    background: ${Colors.selectionColor} !important;
-  }
-  & .ant-tree-treenode::before {
-    bottom: 0px !important;
-  }
-  & .file-entry-name {
-    color: ${Colors.blue10};
-  }
-  & .ant-tree-treenode-selected .file-entry-name {
-    color: ${Colors.blackPure} !important;
-  }
-  & .ant-tree-treenode-selected .ant-tree-switcher {
-    color: ${Colors.blackPure} !important;
-  }
-  & .ant-tree-treenode-selected .file-entry-nr-of-resources {
-    color: ${Colors.blackPure} !important;
-  }
-  & .ant-tree-treenode::selection {
-    background: ${Colors.selectionColor} !important;
-  }
-  & .filter-node {
-    font-weight: bold;
-    background: ${Colors.highlightColor};
-  }
-  & .filter-node .file-entry-name {
-    color: ${FontColors.resourceRowHighlight} !important;
-  }
-  .ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper.ant-tree-node-selected {
-    color: ${Colors.blackPure} !important;
-    font-weight: bold;
-  }
-  & .ant-tree-iconEle {
-    flex-shrink: 0;
-  }
   & .ant-tree-node-content-wrapper {
     display: flex;
     overflow: hidden;

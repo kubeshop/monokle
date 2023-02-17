@@ -16,7 +16,8 @@ export const ButtonsContainer = styled.div`
   padding: 8px;
   padding-bottom: 12px;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`
@@ -28,7 +29,9 @@ export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`
 
 export const PluginsContainer = styled.div`
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+  gap: 20px;
 `;
 
 export const PluginColumnContainer = styled.div`

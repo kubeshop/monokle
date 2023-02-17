@@ -10,6 +10,8 @@ import {NotificationMarkdown} from '@molecules';
 
 import {useCopyToClipboard} from '@hooks/useCopyToClipboard';
 
+import {enhanceErrorMessage} from '@utils/notification';
+
 import {AlertEnum, AlertType} from '@shared/models/alert';
 
 import * as S from './Notification.styled';
@@ -62,7 +64,10 @@ const Notification: React.FC<NotificationProps> = props => {
         <S.MessageBodyContainer>
           <S.TitleSpan>{title}</S.TitleSpan>
           <S.MessageSpan>
-            <NotificationMarkdown notification={notification} type={notificationType} />
+            <NotificationMarkdown
+              notification={{...notification, message: enhanceErrorMessage(notification.message)}}
+              type={notificationType}
+            />
           </S.MessageSpan>
         </S.MessageBodyContainer>
       </S.MessageContainer>

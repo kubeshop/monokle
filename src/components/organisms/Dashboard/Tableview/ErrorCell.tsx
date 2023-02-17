@@ -17,7 +17,7 @@ const ErrorCell: React.FC<IProps> = props => {
     return <span style={{padding: '2px 4px'}}>-</span>;
   }
 
-  return <ValidationPopover level={level} results={[...warnings, ...errors]} onMessageClickHandler={undefined} />;
+  return <ValidationPopover level={level} results={[...errors, ...warnings]} onMessageClickHandler={undefined} />;
 };
 
 export default ErrorCell;

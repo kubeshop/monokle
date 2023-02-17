@@ -40,7 +40,9 @@ export const CellAge = {
   dataIndex: 'object',
   key: 'age',
   width: '120px',
-  render: ({metadata: {creationTimestamp}}: any) => <div>{timeAgo(creationTimestamp)}</div>,
+  render: (object: any) => (
+    <div>{object.metadata?.creationTimestamp ? timeAgo(object.metadata.creationTimestamp) : ''}</div>
+  ),
   sorter: (a: K8sResource, b: K8sResource) =>
     DateTime.fromISO(a.object.metadata?.creationTimestamp).toMillis() -
     DateTime.fromISO(b.object.metadata?.creationTimestamp).toMillis(),

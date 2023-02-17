@@ -214,18 +214,13 @@ const initialUiState: UiState = {
     browseTemplates: false,
     connectToCluster: false,
   },
-  walkThrough: {
-    novice: {
-      currentStep: -1,
-    },
-    release: {
-      currentStep: -1,
-    },
-  },
   startPageLearn: {
     isVisible: false,
   },
   templateExplorer: {
+    isVisible: false,
+  },
+  welcomePopup: {
     isVisible: false,
   },
 };

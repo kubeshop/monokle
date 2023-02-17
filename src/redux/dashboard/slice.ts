@@ -1,5 +1,7 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
+import {startClusterConnection} from '@redux/thunks/cluster';
+
 import {DashboardMenu, DashboardState} from '@shared/models/dashboard';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -22,6 +24,11 @@ export const dashboardSlice = createSlice({
       state.ui.activeTab = action.payload;
       trackEvent('dashboard/selectTab', {tab: action.payload});
     },
+  },
+  extraReducers: builder => {
+    builder.addCase(startClusterConnection.fulfilled, state => {
+      state.tableDrawer.selectedResourceId = undefined;
+    });
   },
 });
 

@@ -71,13 +71,12 @@ type ItemNameProps = {
   level: number;
 };
 
-export const ItemName = styled.span<ItemNameProps>`
+export const ItemName = styled.div<ItemNameProps>`
   padding: 2px 0;
   font-size: 12px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   min-width: 0;
+  flex-grow: 1;
+
   ${props => {
     if (props.isSelected) {
       return `font-weight: 700;`;
@@ -104,7 +103,7 @@ export const ItemName = styled.span<ItemNameProps>`
 `;
 
 export const PrefixContainer = styled.span`
-  min-width: 20px;
+  min-width: 40px;
 `;
 
 export const SuffixContainer = styled.span`

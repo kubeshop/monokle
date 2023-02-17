@@ -10,7 +10,7 @@ export const ActionsRow = styled(Row)`
 `;
 
 export const CompareSyncPaneContainer = styled.div`
-  padding: 0 6px 6px 6px;
+  padding: 10px;
   background-color: ${Colors.grey10};
   height: 100%;
   width: 100%;
@@ -19,6 +19,7 @@ export const CompareSyncPaneContainer = styled.div`
 `;
 
 export const Content = styled.div<{$hasSideSelected: boolean}>`
+  padding-top: 8px;
   position: relative;
   overflow-y: auto;
   overflow-x: hidden;

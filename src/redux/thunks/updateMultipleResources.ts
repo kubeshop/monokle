@@ -1,9 +1,11 @@
 import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
 
+import fastDeepEqual from 'fast-deep-equal';
 import log from 'loglevel';
 
 import {UpdateMultipleResourcesPayload, performResourceContentUpdate} from '@redux/reducers/main';
-import {resourceSelector} from '@redux/selectors/resourceSelectors';
+import {getResourceFromState} from '@redux/selectors/resourceGetters';
+import {extractResourceMeta} from '@redux/services/resource';
 
 import {AppState} from '@shared/models/appState';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
@@ -18,10 +20,21 @@ export const updateMultipleResources = createAsyncThunk<
   const nextMainState = createNextState(state.main, mainState => {
     try {
       payload.forEach(({resourceIdentifier, content}) => {
-        const resource = resourceSelector(state, resourceIdentifier);
+        const resource = getResourceFromState(state, resourceIdentifier);
 
         if (resource) {
-          performResourceContentUpdate(resource, content, mainState.fileMap);
+          const {text, object} = performResourceContentUpdate(resource, content, mainState.fileMap);
+          const updatedResourceMeta = extractResourceMeta(object, resource.storage, resource.origin, resource.id);
+          if (!fastDeepEqual(resource, updatedResourceMeta)) {
+            // @ts-ignore-next-line
+            mainState.resourceMetaMapByStorage[resource.storage][resource.id] = updatedResourceMeta;
+          }
+          if (resource.text !== text) {
+            mainState.resourceContentMapByStorage[resource.storage][resource.id].text = text;
+          }
+          if (!fastDeepEqual(resource.object, object)) {
+            mainState.resourceContentMapByStorage[resource.storage][resource.id].object = object;
+          }
         }
       });
     } catch (e) {

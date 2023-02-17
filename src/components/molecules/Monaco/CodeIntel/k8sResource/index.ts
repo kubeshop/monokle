@@ -3,10 +3,9 @@ import {monaco} from 'react-monaco-editor';
 import {CodeIntelApply} from '@molecules/Monaco/CodeIntel/types';
 import {processSymbols} from '@molecules/Monaco/symbolProcessing';
 
-import applyErrorIntel from './applyErrorIntel';
 import applyLineDecorationIntel from './applyLineDecorationIntel';
-import applyPolicyIntel from './applyPolicyIntel';
 import applyRefIntel from './applyRefIntel';
+import applyValidationIntel from './applyValidationIntel';
 
 export const resourceCodeIntel: CodeIntelApply = {
   name: 'resource',
@@ -55,13 +54,10 @@ export const resourceCodeIntel: CodeIntelApply = {
     disposables.push(...refIntel.disposables);
     decorations.push(...refIntel.decorations);
 
-    const errorIntel = applyErrorIntel(resource);
-    decorations.push(...errorIntel.decorations);
-
     const lineDecorationIntel = applyLineDecorationIntel(lastChangedLine);
     decorations.push(...lineDecorationIntel.decorations);
 
-    const policyIntel = applyPolicyIntel(resource);
+    const policyIntel = applyValidationIntel(resource);
     decorations.push(...policyIntel.decorations);
     markers.push(...policyIntel.markers);
 

@@ -3,6 +3,7 @@ import * as k8s from '@kubernetes/client-node';
 import {BrowserWindow, app, ipcMain} from 'electron';
 
 import asyncLib from 'async';
+import {spawn} from 'child_process';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
 import * as path from 'path';
@@ -80,11 +81,18 @@ const killTerminal = (id: string) => {
     return;
   }
 
-  try {
-    ptyProcess.kill();
-    process.kill(ptyProcess.pid);
-  } catch (e) {
-    log.error(e);
+  if (process.platform === 'win32') {
+    try {
+      spawn('taskkill', ['/pid', ptyProcess.pid.toString(), '/f', '/t']);
+    } catch (e) {
+      log.error(e);
+    }
+  } else {
+    try {
+      ptyProcess.kill();
+    } catch (e) {
+      log.error(e);
+    }
   }
 
   delete ptyProcessMap[id];

@@ -11,7 +11,7 @@ import {formSlice} from './forms';
 import {gitSlice} from './git';
 import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
-import {configSlice, crdsPathChangedListener} from './reducers/appConfig';
+import {configSlice, crdsPathChangedListener, k8sVersionSchemaListener} from './reducers/appConfig';
 import {extensionSlice} from './reducers/extension';
 import {mainSlice} from './reducers/main';
 import {imageListParserListener} from './reducers/main/mainListeners';
@@ -40,6 +40,7 @@ combineListeners([
   compareListeners.compareListener,
   compareListeners.filterListener,
   removedTerminalListener,
+  k8sVersionSchemaListener,
   crdsPathChangedListener,
   ...validationListeners,
   imageListParserListener,
@@ -73,7 +74,10 @@ const rootReducer: typeof appReducer = (state, action) => {
 const store = configureStore({
   reducer: rootReducer,
   middleware: getDefaultMiddleware =>
-    getDefaultMiddleware()
+    getDefaultMiddleware({
+      serializableCheck: false,
+      immutableCheck: false,
+    })
       .prepend(listenerMiddleware.middleware)
       .concat(middlewares)
       .concat(sectionBlueprintMiddleware),

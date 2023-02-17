@@ -9,8 +9,8 @@ import {DateTime} from 'luxon';
 import {Merge} from 'type-fest';
 
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useAppDispatch} from '@redux/hooks';
+import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
 
 import {useStateWithRef} from '@utils/hooks';
 import {timeAgo} from '@utils/timeAgo';
@@ -23,7 +23,7 @@ import * as S from './Activity.styled';
 
 export const Activity = ({paused}: {paused?: boolean}) => {
   const dispatch = useAppDispatch();
-  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
+  const clusterResourceMap = useResourceMap('cluster');
   const [isToLatestVisible, setIsToLatestVisible] = useState<boolean>(false);
   const [isToOldestVisible, setIsToOldestVisible] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);

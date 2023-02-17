@@ -54,51 +54,6 @@ export function extractFormSchema(editorSchema: any) {
   return schema;
 }
 
-// function extractNamespaceMatchers(refMapper: any) {
-//   switch (refMapper.source?.namespaceRef) {
-//     case 'Implicit':
-//       refMapper.source.siblingMatchers = {
-//         namespace: implicitNamespaceMatcher,
-//       };
-//       break;
-//     case 'Explicit':
-//       refMapper.source.siblingMatchers = {
-//         namespace: explicitNamespaceMatcher,
-//       };
-//       break;
-//     case 'OptionalExplicit':
-//       refMapper.source.siblingMatchers = {
-//         namespace: optionalExplicitNamespaceMatcher,
-//       };
-//       break;
-//     default:
-//   }
-// }
-
-function extractSiblingMatchers(refMapper: any) {
-  if (!refMapper.source.siblingMatchers) {
-    refMapper.source.siblingMatchers = {};
-  }
-
-  // refMapper.source.matchers.forEach((m: any) => {
-  //   switch (m) {
-  //     case 'kindMatcher':
-  //       refMapper.source.siblingMatchers['kind'] = targetKindMatcher;
-  //       break;
-  //     case 'groupMatcher':
-  //       refMapper.source.siblingMatchers['group'] = targetGroupMatcher;
-
-  //       // groupMatcher supports a defaultGroup configuration property - copy if specified
-  //       if (refMapper.source.matcherProperties && refMapper.source.matcherProperties['groupMatcher']) {
-  //         refMapper.source.matcherProperties['group'] = refMapper.source.matcherProperties['groupMatcher'];
-  //       }
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // });
-}
-
 export function extractKindHandler(crd: any, handlerPath?: string) {
   if (!crd?.spec) {
     return;
@@ -114,7 +69,6 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
     let editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
     let kindHandler: ResourceKindHandler | undefined;
     let helpLink: string | undefined;
-    let refMappers: any[] = [];
     let subsectionName = spec.group;
     let kindSectionName = spec.names.plural;
 
@@ -128,28 +82,6 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
             helpLink = handler.helpLink;
             subsectionName = handler.sectionName || subsectionName;
             kindSectionName = handler.kindSectionName || kindSectionName;
-
-            if (handler.refMappers) {
-              handler.refMappers.forEach((refMapper: any) => {
-                // if (refMapper.source?.namespaceRef) {
-                //   extractNamespaceMatchers(refMapper);
-                // }
-
-                if (refMapper.source?.matchers) {
-                  extractSiblingMatchers(refMapper);
-                }
-
-                refMappers.push(refMapper);
-              });
-            }
-
-            // TODO: this is probably a missing feature in @monokle/validation so it will be commented out for now
-            // if (handler.podSelectors) {
-            //   handler.podSelectors.forEach((selector: string[]) => {
-            //     refMappers.push(...createPodSelectorOutgoingRefMappers(selector));
-            //   });
-            // }
-
             if (handler.editorSchema) {
               editorSchema = handler.editorSchema;
             }

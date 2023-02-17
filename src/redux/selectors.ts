@@ -10,7 +10,8 @@ import {isFileSelection, isPreviewConfigurationSelection} from '@shared/models/s
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
 
-import {localResourceMetaMapSelector} from './selectors/resourceMapSelectors';
+import {getResourceMetaMapFromState} from './selectors/resourceMapGetters';
+import {createDeepEqualSelector} from './selectors/utils';
 import {isKustomizationResource} from './services/kustomize';
 import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
 
@@ -159,9 +160,7 @@ export const isInPreviewModeSelectorNew = createSelector(
   }
 );
 
-// TODO: is this recomputin each time the state.config changes?
-// should we use the deep euqality check?
-export const currentConfigSelector = createSelector(
+export const currentConfigSelector = createDeepEqualSelector(
   (state: RootState) => state.config,
   config => {
     const applicationConfig: ProjectConfig = populateProjectConfig(config);
@@ -170,20 +169,20 @@ export const currentConfigSelector = createSelector(
   }
 );
 
-export const settingsSelector = createSelector(currentConfigSelector, currentConfig => {
+export const settingsSelector = createDeepEqualSelector(currentConfigSelector, currentConfig => {
   return currentConfig.settings || {};
 });
 
-export const scanExcludesSelector = createSelector(currentConfigSelector, currentConfig => {
+export const scanExcludesSelector = createDeepEqualSelector(currentConfigSelector, currentConfig => {
   return currentConfig.scanExcludes || [];
 });
 
-export const fileIncludesSelector = createSelector(currentConfigSelector, currentConfig => {
+export const fileIncludesSelector = createDeepEqualSelector(currentConfigSelector, currentConfig => {
   currentConfig.fileIncludes || [];
 });
 
 export const kustomizationResourcesSelectors = createSelector(
-  (state: RootState) => localResourceMetaMapSelector(state),
+  (state: RootState) => getResourceMetaMapFromState(state, 'local'),
   localResourceMetaMap => {
     return Object.values(localResourceMetaMap)
       .filter(i => isKustomizationResource(i))

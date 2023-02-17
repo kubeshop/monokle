@@ -1,9 +1,9 @@
-import {useCallback} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
-import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useResourceContentMapRef, useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 
-import {useMainPaneDimensions, useSelectorWithRef} from '@utils/hooks';
+import {useMainPaneDimensions} from '@utils/hooks';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
@@ -57,15 +57,23 @@ import {Tableview} from './Tableview/Tableview';
 const Dashboard: React.FC = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
-  const [, clusterResourceMapRef] = useSelectorWithRef(clusterResourceMapSelector);
+  const clusterResourceContentMapRef = useResourceContentMapRef('cluster');
+  const clusterResourceMetaMapRef = useResourceMetaMapRef('cluster');
   const {height} = useMainPaneDimensions();
 
   const filterResources = useCallback(() => {
-    return Object.values(clusterResourceMapRef.current).filter(
-      resource =>
-        activeMenu.key.replace(`${resource.apiVersion}-`, '') === resource.kind && resource.kind === activeMenu.label
-    );
-  }, [activeMenu, clusterResourceMapRef]);
+    return Object.values(clusterResourceContentMapRef.current)
+      .map(r => ({...r, ...clusterResourceMetaMapRef.current[r.id]}))
+      .filter(
+        resource =>
+          activeMenu.key.replace(`${resource.object.apiVersion}-`, '') === resource.object.kind &&
+          resource.object.kind === activeMenu.label
+      );
+  }, [activeMenu, clusterResourceContentMapRef, clusterResourceMetaMapRef]);
+
+  const filteredResources = useMemo(() => {
+    return filterResources();
+  }, [filterResources]);
 
   const getContent = useCallback(() => {
     if (activeMenu.key === 'Overview') {
@@ -92,7 +100,7 @@ const Dashboard: React.FC = () => {
     if (activeMenu.key !== 'Overview') {
       return (
         <Tableview
-          dataSource={filterResources()}
+          dataSource={filteredResources}
           columns={resourceKindColumns[activeMenu.label] || resourceKindColumns['ANY']}
         />
       );

@@ -136,47 +136,6 @@ export const getResourceKindHandler = (resourceKind: string): ResourceKindHandle
   return HandlerByResourceKind[resourceKind];
 };
 
-// TODO: 2.0+ getIncomingRefMappers and getDependentResourceKinds should probably come from the validation package
-// const incomingRefMappersCache = new Map<string, RefMapper[]>();
-
-// /**
-//  * Gets all incoming refMappers for the specified resource kind
-//  */
-
-// export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
-//   if (!incomingRefMappersCache.has(resourceKind)) {
-//     incomingRefMappersCache.set(
-//       resourceKind,
-//       ResourceKindHandlers.map(
-//         resourceKindHandler =>
-//           resourceKindHandler.outgoingRefMappers?.filter(outgoingRefMapper =>
-//             refMapperMatchesKind(outgoingRefMapper, resourceKind)
-//           ) || []
-//       ).flat()
-//     );
-//   }
-//   return incomingRefMappersCache.get(resourceKind) || [];
-// };
-
-// /**
-//  * Finds all resource kinds that depend on the specified resource kind(s) via refMappers
-//  */
-
-// export const getDependentResourceKinds = (resourceKinds: string[]) => {
-//   const dependentResourceKinds: string[] = [];
-//   ResourceKindHandlers.forEach(kindHandler => {
-//     if (!kindHandler.outgoingRefMappers || kindHandler.outgoingRefMappers.length === 0) {
-//       return;
-//     }
-//     kindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
-//       if (resourceKinds.some(kind => refMapperMatchesKind(outgoingRefMapper, kind))) {
-//         dependentResourceKinds.push(kindHandler.kind);
-//       }
-//     });
-//   });
-//   return [...new Set(dependentResourceKinds)];
-// };
-
 /**
  * Read bundled kindhandlers and emit event to notify when finished (used in tests)
  */

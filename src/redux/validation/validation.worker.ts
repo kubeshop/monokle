@@ -1,18 +1,20 @@
 /// <reference lib="webworker" />
+import {WorkerMessage, matchWorkerEvent} from '@utils/worker';
+
 import {ResourceParser, SchemaLoader, createDefaultMonokleValidator} from '@monokle/validation';
 
 import {
   LoadValidationMessage,
   LoadValidationMessageType,
+  RegisterCustomSchemaMessage,
+  RegisterCustomSchemaMessageType,
   RunValidationMessage,
   RunValidationMessageType,
-  WorkerMessage,
-  matchWorkerEvent,
 } from './validation.worker.types';
 
-export const RESOURCE_PARSER = new ResourceParser();
-export const SCHEMA_LOADER = new SchemaLoader();
-export const VALIDATOR = createDefaultMonokleValidator(RESOURCE_PARSER, SCHEMA_LOADER);
+const RESOURCE_PARSER = new ResourceParser();
+const SCHEMA_LOADER = new SchemaLoader();
+const VALIDATOR = createDefaultMonokleValidator(RESOURCE_PARSER, SCHEMA_LOADER);
 
 const handleEvent = <Message extends WorkerMessage>(
   event: MessageEvent,
@@ -38,8 +40,19 @@ onmessage = async event => {
 
   handleEvent<RunValidationMessage>(event, RunValidationMessageType, async () => {
     const {input} = data as RunValidationMessage;
-    const response = await VALIDATOR.validate({resources: input.resources});
+    const response = await VALIDATOR.validate({resources: input.resources, incremental: input.incremental});
     return {response};
+  });
+
+  handleEvent<RegisterCustomSchemaMessage>(event, RegisterCustomSchemaMessageType, async () => {
+    const {input} = data as RegisterCustomSchemaMessage;
+    try {
+      await VALIDATOR.registerCustomSchema(input.schema);
+    } catch {
+      // we cannot use loglevel here because this is a worker
+      // eslint-disable-next-line no-console
+      console.warn(`Failed to register custom schema for ${input.schema.apiVersion}/${input.schema.kind}`);
+    }
   });
 };
 

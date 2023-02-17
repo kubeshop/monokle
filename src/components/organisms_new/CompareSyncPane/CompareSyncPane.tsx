@@ -13,7 +13,8 @@ import CompareModalComparing from './CompareModalComparing';
 import CompareModalSelecting from './CompareModalSelecting';
 import * as S from './CompareSyncPane.styled';
 import InspectionActionBar from './InspectionActionBar';
-import TransferButton from './TransferButton';
+
+// import TransferButton from './TransferButton';
 
 const CompareSyncPane: React.FC = () => {
   const inspection = useAppSelector(state => state.compare.current.inspect);
@@ -40,6 +41,8 @@ const CompareSyncPane: React.FC = () => {
         {status === 'selecting' ? <CompareModalSelecting /> : <CompareModalComparing />}
       </S.Content>
 
+      {/*
+      TODO: 2.0+ re-enable transfer button after fixing transferResource.fulfilled
       {!inspection || inspection?.type === 'diff' ? (
         <S.ActionsRow>
           <Col span={10}>
@@ -50,7 +53,7 @@ const CompareSyncPane: React.FC = () => {
             <TransferButton side="right" />
           </Col>
         </S.ActionsRow>
-      ) : null}
+      ) : null} */}
     </S.CompareSyncPaneContainer>
   );
 };

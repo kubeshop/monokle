@@ -18,4 +18,4 @@ export {default as ResourceRefsIconPopover} from './ResourceRefsIconPopover';
 export {default as SaveResourcesToFileFolderModal} from './SaveResourcesToFileFolderModal';
 export {default as SectionRenderer} from './SectionRenderer';
 export {default as TemplateFormRenderer} from './TemplateFormRenderer';
-export {default as Walkthrough} from './Walkthrough';
+export {default as WelcomePopupContent} from './WelcomePopupContent';

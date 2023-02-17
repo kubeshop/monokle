@@ -6,7 +6,7 @@ import {ApplyFileTooltip, ApplyTooltip, InstallValuesFileTooltip, KubeConfigNoVa
 import {useAppSelector} from '@redux/hooks';
 import {selectedFilePathSelector} from '@redux/selectors';
 import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
-import {selectedResourceMetaSelector} from '@redux/selectors/resourceSelectors';
+import {useSelectedResourceMeta} from '@redux/selectors/resourceSelectors';
 import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
@@ -17,7 +17,7 @@ export const useInstallDeploy = (resourceMeta?: ResourceMeta) => {
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
-  const selectedResourceMeta = useAppSelector(selectedResourceMetaSelector);
+  const selectedResourceMeta = useSelectedResourceMeta();
 
   const currentResourceMeta = resourceMeta || selectedResourceMeta;
 

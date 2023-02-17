@@ -6,7 +6,7 @@
 <p align="center">
   <a href="https://monokle.io">Website</a> |
   <a href="https://kubeshop.github.io/monokle/">Documentation</a> |
-  <a href="(https://discord.com/invite/6zupCZFQbe">Discord</a> |
+  <a href="https://discord.com/invite/6zupCZFQbe">Discord</a> |
   <a href="https://monokle.io/blog">Blog</a>
 </p>
 

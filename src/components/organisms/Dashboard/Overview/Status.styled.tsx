@@ -3,13 +3,10 @@ import styled from 'styled-components';
 import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: repeat(2, 56px);
   width: 100%;
-  height: 100%;
-  padding: 0 24px;
+  padding: 0 16px;
 `;
 
 export const InnerContainer = styled.div`

@@ -8,28 +8,31 @@ import navSectionNames from '@constants/navSectionNames';
 import {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
-import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
+import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
 import {useSelectorWithRef} from '@utils/hooks';
 
 import {DashboardMenu} from '@shared/models/dashboard';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {CLICKAKBLE_RESOURCE_GROUPS} from '../Dashboard';
-import {ErrorCell, Resource} from '../Dashboard/Tableview/TableCells.styled';
+import {ErrorCell, Resource, Warning} from '../Dashboard/Tableview/TableCells.styled';
 import * as S from './DashboardPane.style';
 
 const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const [menuList, menuListRef] = useSelectorWithRef(state => state.dashboard.ui.menuList);
-  const [, clusterResourceMapRef] = useSelectorWithRef(clusterResourceMapSelector);
+  const clusterResourceMetaMapRef = useResourceMetaMapRef('cluster');
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [filterText, setFilterText] = useState<string>('');
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
+  const problems = useValidationSelector(state => problemsSelector(state));
 
   const filteredMenu = useMemo(() => {
     if (!filterText) {
@@ -80,37 +83,21 @@ const DashboardPane = () => {
             key: `${kindHandler.clusterApiVersion}-${kindHandler.kind}`,
             label: kindHandler.kind,
             children: [],
-            resourceCount: getResourceCount(kindHandler.kind),
-            errorCount: getErrorCount(kindHandler.kind),
           });
         } else {
           parent.children?.push({
             key: `${kindHandler.clusterApiVersion}-${kindHandler.kind}`,
             label: kindHandler.kind,
             children: [],
-            resourceCount: getResourceCount(kindHandler.kind),
-            errorCount: getErrorCount(kindHandler.kind),
           });
         }
       }
     });
 
-    tempMenu = tempMenu.map((menuItem: DashboardMenu) => ({
-      ...menuItem,
-      resourceCount: menuItem.children?.reduce(
-        (total: number, m: DashboardMenu) => total + (m.resourceCount ? m.resourceCount : 0),
-        0
-      ),
-      errorCount: menuItem.children?.reduce(
-        (total: number, m: DashboardMenu) => total + (m.errorCount ? m.errorCount : 0),
-        0
-      ),
-    }));
-
     dispatch(setDashboardMenuList(tempMenu));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMapRef]);
+  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMetaMapRef]);
 
   useMount(() => {
     dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
@@ -127,29 +114,29 @@ const DashboardPane = () => {
 
   const getResourceCount = useCallback(
     (kind: string) => {
-      return Object.values(clusterResourceMapRef.current).filter(r => r.kind === kind).length;
+      return Object.values(clusterResourceMetaMapRef.current).filter(r => r.kind === kind).length;
     },
-    [clusterResourceMapRef]
+    [clusterResourceMetaMapRef]
   );
 
-  // TODO: refactor after @monokle/validation integration
-  const getErrorCount = useCallback(
-    (kind: string) => {
-      // return Object.values(clusterResourceMap)
-      //   .filter((resource: K8sResource) => resource.filePath.startsWith('preview://'))
-      //   .filter(resource => resource.kind === kind)
-      //   .reduce((total: number, resource: K8sResource) => {
-      //     if (resource.issues && resource.issues.errors) {
-      //       total += resource.issues.errors.length;
-      //     }
-      //     if (resource.validation && resource.validation.errors) {
-      //       total += resource.validation.errors.length;
-      //     }
-      //     return total;
-      //   }, 0);
-      return 0;
+  const getProblemCount = useCallback(
+    (kind: string, level: 'error' | 'warning') => {
+      return Object.values(clusterResourceMetaMapRef.current)
+        .filter(resource => resource.kind === kind)
+        .reduce((total: number, resource: ResourceMeta) => {
+          const problemCount = problems
+            .filter(p => p.level === level)
+            .filter(p =>
+              p.locations.find(
+                l =>
+                  l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
+                  l.physicalLocation.artifactLocation.uri === resource.id
+              )
+            );
+          return total + problemCount.length;
+        }, 0);
     },
-    [clusterResourceMapRef]
+    [clusterResourceMetaMapRef, problems]
   );
 
   return (
@@ -192,19 +179,23 @@ const DashboardPane = () => {
               <span>{parent.label}</span>
             </S.MainSection>
 
-            {parent.children?.map((child: DashboardMenu) =>
-              child.resourceCount ? (
+            {parent.children?.map((child: DashboardMenu) => {
+              const resourceCount = getResourceCount(child.label);
+              const errorCount = getProblemCount(child.label, 'error');
+              const warningCount = getProblemCount(child.label, 'warning');
+              return resourceCount ? (
                 <S.SubSection
                   key={child.key}
                   $active={activeMenu.key === child.key}
                   onClick={() => setActiveMenu(child)}
                 >
                   <span style={{marginRight: '4px'}}>{child.label}</span>
-                  {child.resourceCount ? <Resource>{child.resourceCount}</Resource> : null}
-                  {child.errorCount ? <ErrorCell>{child.errorCount}</ErrorCell> : null}
+                  {resourceCount ? <Resource>{resourceCount}</Resource> : null}
+                  {errorCount ? <ErrorCell>{errorCount}</ErrorCell> : null}
+                  {warningCount ? <Warning style={{marginLeft: '8px'}}>{warningCount}</Warning> : null}
                 </S.SubSection>
-              ) : null
-            )}
+              ) : null;
+            })}
           </div>
         ) : null
       )}

@@ -161,14 +161,6 @@ type UiState = {
     connectToCluster: boolean;
   };
   activeSettingsPanel?: SettingsPanel;
-  walkThrough: {
-    novice: {
-      currentStep: number;
-    };
-    release: {
-      currentStep: number;
-    };
-  };
   startPageLearn: {
     isVisible: boolean;
     learnTopic?: LearnTopicType;
@@ -179,6 +171,9 @@ type UiState = {
     projectCreate?: Project;
   };
   isInQuickClusterMode?: boolean;
+  welcomePopup: {
+    isVisible: boolean;
+  };
 };
 
 type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {});

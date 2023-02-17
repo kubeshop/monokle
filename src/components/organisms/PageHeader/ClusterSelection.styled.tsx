@@ -122,7 +122,7 @@ export const ExitButton = styled(
   )
 )`
   margin: 0 0 0 10px;
-  color: ${props => (props.$isInClusterMode && Colors.grey11) || Colors.whitePure};
+  color: ${props => (props.$isInClusterMode || props.$isInPreviewMode ? Colors.grey11 : Colors.whitePure)};
   background-color: ${props =>
     getPreviewTheme(
       Colors.grey11,

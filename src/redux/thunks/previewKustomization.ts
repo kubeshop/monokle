@@ -31,6 +31,7 @@ export const previewKustomization = createAsyncThunk<
   string,
   {dispatch: AppDispatch; state: RootState}
 >('main/previewKustomization', async (resourceId, thunkAPI) => {
+  trackEvent('preview/kustomize/start');
   const startTime = new Date().getTime();
   const state = thunkAPI.getState().main;
   const projectConfig = currentConfigSelector(thunkAPI.getState());
@@ -58,7 +59,7 @@ export const previewKustomization = createAsyncThunk<
 
   const endTime = new Date().getTime();
 
-  trackEvent('preview/kustomize', {executionTime: endTime - startTime});
+  trackEvent('preview/kustomize/end', {executionTime: endTime - startTime});
 
   if (!result.stdout) {
     log.warn("Couldn't find any resources in the preview output");

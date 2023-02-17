@@ -12,7 +12,7 @@ import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/make
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {currentConfigSelector, isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/selectors';
-import {localResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -56,7 +56,7 @@ const ResourceDiff = (props: {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const projectConfig = useAppSelector(currentConfigSelector);
-  const localResourceMap = useAppSelector(localResourceMapSelector);
+  const localResourceMap = useResourceMap('local');
   const userDataDir = useAppSelector(state => state.config.userDataDir);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
 

@@ -52,14 +52,14 @@ export const ErrorCell = styled.div`
   background-color: ${Colors.red7};
   font-weight: 700;
   font-size: 10px;
-  border-radius: 100%;
-  width: 18px;
+  border-radius: 8px;
+  width: auto;
   height: 18px;
   display: flex;
   justify-content: center;
   align-items: center;
   letter-spacing: -1px;
-  padding: 0 2px 0 0;
+  padding: 0 4px 0 2px;
 `;
 
 export const Warning = styled.span`
@@ -67,14 +67,14 @@ export const Warning = styled.span`
   background-color: ${Colors.yellow12};
   font-weight: 700;
   font-size: 10px;
-  border-radius: 100%;
-  width: 18px;
+  border-radius: 8px;
+  width: auto;
   height: 18px;
   display: flex;
   justify-content: center;
   align-items: center;
   letter-spacing: -1px;
-  padding: 0 2px 0 0;
+  padding: 0 4px 0 2px;
 `;
 
 export const Resource = styled.span`

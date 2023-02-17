@@ -19,13 +19,13 @@ export const SelectColor = styled.div<{$isMainSelector?: boolean}>`
       return `
         .ant-select-selection-placeholder {
         color: white;
-        font-size: 16px;
-        font-weight: 700;
+        font-size: 14px;
+        font-weight: 300;
         }
-        
+
         .ant-select-selection-item {
-          font-size: 16px;
-          font-weight: 700;
+          font-size: 14px;
+          font-weight: 600;
           color: ${Colors.whitePure};
         }
     `;

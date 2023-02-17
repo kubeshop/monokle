@@ -2,17 +2,17 @@ import {useCallback} from 'react';
 
 import styled from 'styled-components';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {useAppDispatch} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {activeResourceMetaMapSelector, activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
-import {resourceMetaSelector, selectedResourceSelector} from '@redux/selectors/resourceSelectors';
+import {activeResourceStorageSelector, useActiveResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMeta, useSelectedResourceRef} from '@redux/selectors/resourceSelectors';
 
 import {ResourceRefsIconPopover} from '@molecules';
 
 import {useValidationLevel} from '@hooks/useValidationLevel';
 
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 
 import {ValidationPopover} from '@monokle/components';
 import {ValidationResult, getResourceId, getResourceLocation} from '@monokle/validation';
@@ -24,12 +24,11 @@ const Prefix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
-  const [, activeResourceMetaMapRef] = useSelectorWithRef(activeResourceMetaMapSelector);
-  const [, activeResourceStorageRef] = useSelectorWithRef(activeResourceStorageSelector);
-  const [, selectedResourceRef] = useSelectorWithRef(selectedResourceSelector);
-  const resourceMeta = useAppSelector(state =>
-    resourceMetaSelector(state, {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage})
-  );
+  const activeResourceMetaMapRef = useActiveResourceMetaMapRef();
+  const activeResourceStorageRef = useRefSelector(activeResourceStorageSelector);
+  const selectedResourceRef = useSelectedResourceRef();
+
+  const resourceMeta = useResourceMeta({id: itemInstance.id, storage: itemInstance.meta?.resourceStorage});
 
   const {level, errors, warnings} = useValidationLevel(itemInstance.id);
 
@@ -70,7 +69,7 @@ const Prefix = (props: ItemCustomComponentProps) => {
       <ValidationPopover
         disabled={itemInstance.isDisabled}
         level={level}
-        results={[...warnings, ...errors]}
+        results={[...errors, ...warnings]}
         onMessageClickHandler={onMessageClickHandler}
         popoverIconStyle={{transform: 'translateY(-2px)'}}
       />
@@ -92,6 +91,8 @@ export default Prefix;
 const Container = styled.span`
   display: flex;
   align-items: center;
+  gap: 2px;
+
   & .ant-popover-inner-content {
     padding: 0 !important;
   }

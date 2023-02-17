@@ -5,7 +5,7 @@ import {Button, Col, Modal, Row} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLastChangedLine} from '@redux/reducers/main';
-import {selectedResourceMetaSelector} from '@redux/selectors/resourceSelectors';
+import {useSelectedResourceMeta} from '@redux/selectors/resourceSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getResourceSchema} from '@redux/services/schema';
 
@@ -26,7 +26,7 @@ type Props = {
 export const FormEditorModal: React.FC<Props> = ({visible, onClose}) => {
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
-  const selectedResourceMeta = useAppSelector(selectedResourceMetaSelector);
+  const selectedResourceMeta = useSelectedResourceMeta();
   const sizeProps = useModalSize();
   const dispatch = useAppDispatch();
 

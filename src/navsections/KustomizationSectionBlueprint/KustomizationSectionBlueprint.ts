@@ -1,6 +1,6 @@
 import {selectResource} from '@redux/reducers/main';
 import {isInClusterModeSelector} from '@redux/selectors';
-import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {isKustomizationPreviewed, isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
@@ -16,7 +16,6 @@ import {AppSelection} from '@shared/models/selection';
 import {KUSTOMIZE_PATCH_SECTION_NAME} from '../KustomizePatchSectionBlueprint';
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import KustomizationContextMenu from './KustomizationContextMenu';
-import KustomizationContextMenuWrapper from './KustomizationContextMenuWrapper';
 import KustomizationPrefix from './KustomizationPrefix';
 import KustomizationQuickAction from './KustomizationQuickAction';
 import KustomizationSectionEmptyDisplay from './KustomizationSectionEmptyDisplay';
@@ -44,7 +43,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<ResourceMeta<'local'>, Kus
   containerElementId: 'kustomize-sections-container',
   getScope: state => {
     return {
-      localResourceMetaMap: localResourceMetaMapSelector(state),
+      localResourceMetaMap: getResourceMetaMapFromState(state, 'local'),
       resourceFilters: state.main.resourceFilter,
       isInClusterMode: isInClusterModeSelector(state),
       isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
@@ -112,7 +111,6 @@ const KustomizationSectionBlueprint: SectionBlueprint<ResourceMeta<'local'>, Kus
     customization: {
       prefix: {component: KustomizationPrefix},
       suffix: {component: KustomizationSuffix},
-      contextMenuWrapper: {component: KustomizationContextMenuWrapper, options: {isVisibleOnHover: false}},
       contextMenu: {component: KustomizationContextMenu, options: {isVisibleOnHover: true}},
       quickAction: {component: KustomizationQuickAction, options: {isVisibleOnHover: true}},
     },

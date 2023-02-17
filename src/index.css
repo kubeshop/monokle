@@ -474,3 +474,21 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 .walkthrough-modal .ant-modal-content .ant-modal-body {
   background-color: currentColor !important;
 }
+
+.welcome-popup .ant-popover-inner {
+  background: #dbdbdb;
+  padding: 30px;
+  position: relative;
+}
+
+.welcome-popup .ant-popover-inner-content {
+  padding: 0px;
+}
+
+.welcome-popup .ant-popover-arrow {
+  top: 8px;
+}
+
+.welcome-popup .ant-popover-arrow-content::before {
+  background: #dbdbdb !important;
+}

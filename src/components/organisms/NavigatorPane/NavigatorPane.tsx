@@ -1,11 +1,10 @@
-import {memo, useCallback} from 'react';
-import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
+import {memo, useCallback, useMemo} from 'react';
 
 import {Dropdown, Tooltip} from 'antd';
 
 import {PlusOutlined} from '@ant-design/icons';
 
-import {GUTTER_SPLIT_VIEW_PANE_WIDTH, TOOLTIP_DELAY} from '@constants/constants';
+import {TOOLTIP_DELAY} from '@constants/constants';
 import {NewResourceTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -22,7 +21,7 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
 import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
 
-import {TitleBar} from '@monokle/components';
+import {ResizableRowsPanel, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 
 import * as S from './NavigatorPane.styled';
@@ -44,6 +43,11 @@ const NavPane: React.FC = () => {
   const resourceFilterButtonHandler = useCallback(() => {
     dispatch(toggleResourceFilters());
   }, [dispatch]);
+
+  const isHighlighted = useMemo(
+    () => Boolean(highlightedItems.createResource || highlightedItems.browseTemplates),
+    [highlightedItems.browseTemplates, highlightedItems.createResource]
+  );
 
   return (
     <S.NavigatorPaneContainer>
@@ -67,8 +71,8 @@ const NavPane: React.FC = () => {
                     <S.PlusButton
                       id="create-resource-button"
                       $disabled={!isFolderOpen || isInPreviewMode}
-                      $highlighted={highlightedItems.createResource}
-                      className={highlightedItems.createResource ? 'animated-highlight' : ''}
+                      $highlighted={isHighlighted}
+                      className={isHighlighted ? 'animated-highlight' : ''}
                       disabled={!isFolderOpen || isInPreviewMode}
                       icon={<PlusOutlined />}
                       size="small"
@@ -81,18 +85,21 @@ const NavPane: React.FC = () => {
           />
         </TitleBarWrapper>
       )}
-      <ResourceFilter active={isResourceFiltersOpen} onToggle={resourceFilterButtonHandler} />
 
-      <ReflexContainer orientation="horizontal" style={{height: height - 40, marginTop: 8}}>
-        {isResourceFiltersOpen && <ReflexSplitter />}
-
-        <ReflexElement minSize={GUTTER_SPLIT_VIEW_PANE_WIDTH}>
+      <ResizableRowsPanel
+        layout={{top: isResourceFiltersOpen ? 0.34 : 0.055}}
+        splitterStyle={{display: isResourceFiltersOpen ? 'block' : 'none'}}
+        top={<ResourceFilter active={isResourceFiltersOpen} onToggle={resourceFilterButtonHandler} />}
+        bottom={
           <S.List id="navigator-sections-container">
             <SectionRenderer sectionId={K8sResourceSectionBlueprint.id} level={0} isLastSection={false} />
             <SectionRenderer sectionId={UnknownResourceSectionBlueprint.id} level={0} isLastSection={false} />
           </S.List>
-        </ReflexElement>
-      </ReflexContainer>
+        }
+        height={height - 40}
+        bottomPaneMaxSize={isResourceFiltersOpen ? height - 400 : height - 100}
+        bottomPaneMinSize={500}
+      />
     </S.NavigatorPaneContainer>
   );
 };

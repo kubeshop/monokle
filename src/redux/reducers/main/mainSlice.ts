@@ -6,11 +6,12 @@ import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
 import initialState from '@redux/initialState';
+import {processResourceRefs} from '@redux/parsing/parser.thunks';
 import {setAlert} from '@redux/reducers/alert';
-import {resourceContentMapSelector, resourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {getResourceContentMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
-import {joinK8sResource, saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
+import {isResourceSelected, saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
@@ -21,7 +22,6 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
-import {processResourceRefs} from '@redux/validation/validation.thunks';
 
 import {parseYamlDocument} from '@utils/yaml';
 
@@ -40,8 +40,10 @@ import {HelmChart} from '@shared/models/helm';
 import {ValidationIntegration} from '@shared/models/integrations';
 import {
   K8sResource,
+  ResourceContent,
   ResourceContentMap,
   ResourceIdentifier,
+  ResourceMeta,
   ResourceMetaMap,
   isClusterResource,
   isLocalResource,
@@ -55,7 +57,7 @@ import {trackEvent} from '@shared/utils/telemetry';
 import {filterReducers} from './filterReducers';
 import {imageReducers} from './imageReducers';
 import {clearPreviewReducer, previewExtraReducers, previewReducers} from './previewReducers';
-import {clearSelectionReducer, selectionReducers} from './selectionReducers';
+import {clearSelectionReducer, selectResourceReducer, selectionReducers} from './selectionReducers';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
@@ -107,12 +109,9 @@ export type StartPreviewLoaderPayload = {
 export const performResourceContentUpdate = (resource: K8sResource, newText: string, fileMap: FileMapType) => {
   if (isLocalResource(resource)) {
     const updatedFileText = saveResource(resource, newText, fileMap);
-    resource.text = updatedFileText;
-    resource.object = parseYamlDocument(updatedFileText).toJS();
-  } else {
-    resource.text = newText;
-    resource.object = parseYamlDocument(newText).toJS();
+    return {text: updatedFileText, object: parseYamlDocument(updatedFileText).toJS()};
   }
+  return {text: newText, object: parseYamlDocument(newText).toJS()};
 };
 
 // TODO: @monokle/validation - use the shouldIgnoreOptionalUnsatisfiedRefs setting and reprocess all refs
@@ -397,10 +396,9 @@ export const mainSlice = createSlice({
       const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
 
       action.payload.resourcePayloads.forEach(resourcePayload => {
-        const resourceMeta = state.resourceMetaMapByStorage.local[resourcePayload.resourceId];
-        const resourceContent = state.resourceContentMapByStorage.local[resourcePayload.resourceId];
-        const resource = joinK8sResource(resourceMeta, resourceContent);
-        const relativeFilePath = resourcePayload.resourceFilePath.substr(rootFolder.length);
+        const resourceMeta = state.resourceMetaMapByStorage.transient[resourcePayload.resourceId];
+        const resourceContent = state.resourceContentMapByStorage.transient[resourcePayload.resourceId];
+        const relativeFilePath = resourcePayload.resourceFilePath.substring(rootFolder.length);
         const resourceFileEntry = state.fileMap[relativeFilePath];
 
         if (resourceFileEntry) {
@@ -442,18 +440,35 @@ export const mainSlice = createSlice({
           }
         }
 
-        if (resource) {
-          resource.origin = {
-            filePath: relativeFilePath,
-            fileOffset: 0, // TODO: get the correct offset
+        if (resourceMeta && resourceContent) {
+          const newResourceMeta: ResourceMeta<'local'> = {
+            ...resourceMeta,
+            storage: 'local',
+            origin: {
+              filePath: relativeFilePath,
+              fileOffset: 0, // TODO: get the correct offset
+            },
+            range: resourcePayload.resourceRange,
           };
-          resource.range = resourcePayload.resourceRange;
+
+          const newResourceContent: ResourceContent<'local'> = {
+            ...resourceContent,
+            storage: 'local',
+          };
 
           if (state.selection?.type === 'file' && state.selection.filePath === relativeFilePath) {
             state.highlights.push({
               type: 'resource',
-              resourceIdentifier: resource,
+              resourceIdentifier: resourceMeta,
             });
+          }
+
+          delete state.resourceMetaMapByStorage.transient[resourceMeta.id];
+          delete state.resourceContentMapByStorage.transient[resourceMeta.id];
+          state.resourceMetaMapByStorage.local[newResourceMeta.id] = newResourceMeta;
+          state.resourceContentMapByStorage.local[newResourceMeta.id] = newResourceContent;
+          if (isResourceSelected({id: resourceMeta.id, storage: 'transient'}, state.selection)) {
+            selectResourceReducer(state, {resourceIdentifier: newResourceMeta});
           }
         }
       });
@@ -483,11 +498,10 @@ export const mainSlice = createSlice({
       return action.payload.nextMainState;
     });
 
-    // TODO: does this work properly?
     builder.addCase(processResourceRefs.fulfilled, (state, action) => {
       action.payload.forEach((resource: K8sResource) => {
-        const resourceMetaMap = resourceMetaMapSelector({main: state} as RootState, resource.storage);
-        const resourceContentMap = resourceContentMapSelector({main: state} as RootState, resource.storage);
+        const resourceMetaMap = getResourceMetaMapFromState({main: state} as RootState, resource.storage);
+        const resourceContentMap = getResourceContentMapFromState({main: state} as RootState, resource.storage);
         const {meta, content} = splitK8sResource(resource);
         if (resourceMetaMap && resourceContentMap) {
           resourceMetaMap[resource.id] = meta;
@@ -496,7 +510,7 @@ export const mainSlice = createSlice({
       });
     });
 
-    // TODO: how do we make this work with the new resource storage?
+    // TODO: 2.0+ how do we make this work with the new resource storage?
     // builder.addCase(transferResource.fulfilled, (state, action) => {
     //   const {side, delta} = action.payload;
 

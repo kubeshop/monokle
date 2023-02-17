@@ -4,8 +4,7 @@ import {Select} from 'antd';
 
 import {uniq} from 'lodash';
 
-import {useAppSelector} from '@redux/hooks';
-import {localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 
 import * as S from './styled';
 
@@ -20,40 +19,39 @@ ResourceSelection.defaultProps = {
 
 export function ResourceSelection(props: any) {
   const {value, onChange, disabled, options, readonly} = props;
-  const resourceMetaMap = useAppSelector(localResourceMetaMapSelector);
+  const resourceMetaMap = useResourceMetaMap('local');
   const [resourceNames, setResourceNames] = useState<(string | undefined)[]>([]);
-  const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
 
   const handleChange = (providedValue: string) => {
     if (providedValue === NEW_ITEM) {
-      setSelectValue(inputValue);
+      onChange(inputValue);
       if (!resourceNames.includes(inputValue)) {
         setResourceNames([...resourceNames, inputValue]);
       }
       setInputValue('');
     } else {
-      setSelectValue(providedValue);
+      onChange(providedValue);
     }
   };
 
   useEffect(() => {
     if (!value) {
-      setSelectValue(EMPTY_VALUE);
+      onChange(EMPTY_VALUE);
     } else {
-      setSelectValue(value);
+      onChange(value);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   useEffect(() => {
-    if (selectValue === EMPTY_VALUE) {
+    if (value === EMPTY_VALUE) {
       onChange(undefined);
     } else {
-      onChange(selectValue);
+      onChange(value);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectValue]);
+  }, [value]);
 
   useEffect(() => {
     if (resourceMetaMap) {
@@ -72,7 +70,7 @@ export function ResourceSelection(props: any) {
 
   return (
     <S.SelectStyled
-      value={selectValue}
+      value={value}
       showSearch
       onSearch={(e: string) => setInputValue(e)}
       optionFilterProp="children"

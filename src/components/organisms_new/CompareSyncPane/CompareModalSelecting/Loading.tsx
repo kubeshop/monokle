@@ -29,7 +29,6 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   gap: 8px;
-  background-color: ${Colors.black100};
 
   .ant-typography {
     width: 364px;

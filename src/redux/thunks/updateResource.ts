@@ -1,12 +1,18 @@
 import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 
+import fastDeepEqual from 'fast-deep-equal';
 import log from 'loglevel';
 
 import {performResourceContentUpdate} from '@redux/reducers/main';
 import {selectResourceReducer} from '@redux/reducers/main/selectionReducers';
-import {resourceSelector} from '@redux/selectors/resourceSelectors';
+import {
+  getResourceContentFromState,
+  getResourceFromState,
+  getResourceMetaFromState,
+} from '@redux/selectors/resourceGetters';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {getLineChanged} from '@redux/services/manifest-utils';
+import {extractResourceMeta} from '@redux/services/resource';
 
 import {AppState} from '@shared/models/appState';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
@@ -27,40 +33,68 @@ export const updateResource = createAsyncThunk<
 >('main/updateResource', async (payload, thunkAPI) => {
   const state: RootState = thunkAPI.getState();
 
-  const {resourceIdentifier, text, preventSelectionAndHighlightsUpdate, isUpdateFromForm} = payload;
+  const {resourceIdentifier, text: updatedText, preventSelectionAndHighlightsUpdate, isUpdateFromForm} = payload;
 
   let error: any;
 
   const nextMainState = createNextState(state.main, mainState => {
     try {
-      const resource = resourceSelector(state, resourceIdentifier);
-
+      const nonMutableResource = getResourceFromState(state, resourceIdentifier);
+      const resourceMeta = getResourceMetaFromState(state, resourceIdentifier);
+      const resourceContent = getResourceContentFromState(state, resourceIdentifier);
       const fileMap = mainState.fileMap;
 
-      if (!resource) {
+      let finalText: string | undefined;
+      let finalObject: any | undefined;
+
+      if (!nonMutableResource || !resourceMeta || !resourceContent) {
         log.warn('Failed to find updated resource.', resourceIdentifier.id, resourceIdentifier.storage);
         return;
       }
 
       // check if this was a kustomization resource updated during a kustomize preview
       if (
-        (isKustomizationResource(resource) || isKustomizationPatch(resource)) &&
+        (isKustomizationResource(resourceMeta) || isKustomizationPatch(resourceMeta)) &&
         mainState.preview?.type === 'kustomize' &&
-        mainState.preview.kustomizationId === resource.id
+        mainState.preview.kustomizationId === resourceMeta.id
       ) {
-        performResourceContentUpdate(resource, text, fileMap);
+        const {text, object} = performResourceContentUpdate(nonMutableResource, updatedText, fileMap);
+        finalText = text;
+        finalObject = object;
       } else {
-        const prevContent = resource.text;
-        const newContent = text;
+        const prevContent = resourceContent.text;
+        const newContent = updatedText;
         if (isUpdateFromForm) {
           const lineChanged = getLineChanged(prevContent, newContent);
           mainState.lastChangedLine = lineChanged;
         }
 
-        performResourceContentUpdate(resource, text, fileMap);
+        const {text, object} = performResourceContentUpdate(nonMutableResource, updatedText, fileMap);
+        finalText = text;
+        finalObject = object;
 
         if (!preventSelectionAndHighlightsUpdate) {
-          selectResourceReducer(mainState, {resourceIdentifier: resource});
+          selectResourceReducer(mainState, {resourceIdentifier: resourceMeta});
+        }
+      }
+
+      if (finalText && finalObject) {
+        const updatedResourceMeta = extractResourceMeta(
+          finalObject,
+          resourceMeta.storage,
+          resourceMeta.origin,
+          resourceMeta.id
+        );
+
+        if (!fastDeepEqual(resourceMeta, updatedResourceMeta)) {
+          // @ts-ignore-next-line
+          mainState.resourceMetaMapByStorage[resourceMeta.storage][resourceMeta.id] = updatedResourceMeta;
+        }
+        if (resourceContent.text !== finalText) {
+          mainState.resourceContentMapByStorage[resourceMeta.storage][resourceMeta.id].text = finalText;
+        }
+        if (!fastDeepEqual(resourceContent.object, finalObject)) {
+          mainState.resourceContentMapByStorage[resourceMeta.storage][resourceMeta.id].object = finalObject;
         }
       }
 

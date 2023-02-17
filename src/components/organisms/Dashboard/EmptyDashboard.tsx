@@ -1,8 +1,7 @@
 import {useAppSelector} from '@redux/hooks';
 import {kubeConfigPathValidSelector} from '@redux/selectors';
 
-import ConnectClusterDashboard from '@assets/ConnectClusterDashboard.svg';
-import LoadClusterDashboard from '@assets/LoadClusterDashboard.svg';
+import ClusterIndication from '@assets/ClusterIndication.svg';
 
 import * as S from './EmptyDashboard.styled';
 
@@ -11,10 +10,17 @@ export const EmptyDashboard = () => {
 
   return (
     <S.Container>
-      <S.Image
-        $right={isKubeConfigPathValid ? 108 : 132}
-        src={isKubeConfigPathValid ? LoadClusterDashboard : ConnectClusterDashboard}
-      />
+      <S.Text>
+        {!isKubeConfigPathValid ? (
+          'Start by connecting your cluster.'
+        ) : (
+          <>
+            Click on <span>Connect</span> to preview your cluster.
+          </>
+        )}
+      </S.Text>
+
+      <S.Image alt="Cluster Indication" src={ClusterIndication} />
     </S.Container>
   );
 };

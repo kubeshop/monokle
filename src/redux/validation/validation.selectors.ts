@@ -8,7 +8,7 @@ import {RuleLevel, ValidationResult, getFileId, getResourceId} from '@monokle/va
 import {RootState} from '@shared/models/rootState';
 import {ValidationState} from '@shared/models/validation';
 
-import {VALIDATOR} from './validation.services';
+import {VALIDATOR} from './validator';
 
 export const useValidationSelector: TypedUseSelectorHook<ValidationState> = selector =>
   useAppSelector(state => selector(state.validation));

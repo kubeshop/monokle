@@ -44,6 +44,8 @@ export const runPreviewConfiguration = createAsyncThunk<
 
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
 
+  trackEvent('preview/helm_config/start');
+
   let previewConfiguration: HelmPreviewConfiguration | null | undefined;
   if (previewConfigurationMap) {
     previewConfiguration = previewConfigurationMap[previewConfigurationId];
@@ -125,7 +127,7 @@ export const runPreviewConfiguration = createAsyncThunk<
 
   const endTime = new Date().getTime();
 
-  trackEvent('preview/helm_preview_configuration', {executionTime: endTime - startTime});
+  trackEvent('preview/helm_config/end', {executionTime: endTime - startTime});
 
   if (result.stdout) {
     const preview: HelmConfigPreview = {type: 'helm-config', configId: previewConfiguration.id};

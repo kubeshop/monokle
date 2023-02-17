@@ -3,8 +3,7 @@ import {useInterval} from 'react-use';
 
 import {Tooltip} from 'antd';
 
-import {useAppSelector} from '@redux/hooks';
-import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {NodeMetric, getClusterUtilization} from '@redux/services/clusterDashboard';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
@@ -20,7 +19,7 @@ import {Colors} from '@shared/styles/colors';
 import * as S from './Utilization.styled';
 
 export const Utilization = () => {
-  const clusterResourceMap = useAppSelector(clusterResourceMapSelector);
+  const clusterResourceMap = useResourceMap('cluster');
   const [averageCpuUsage, setAverageCpuUsage] = useState(0);
   const [totalCpu, setTotalCpu] = useState(0);
   const [averageMemoryUsage, setAverageMemoryUsage] = useState(0);

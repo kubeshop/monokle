@@ -25,7 +25,6 @@ import {
   RightMenuSelectionType,
   UiState,
 } from '@shared/models/ui';
-import {WalkthroughCollection} from '@shared/models/walkthrough';
 import electronStore from '@shared/utils/electronStore';
 
 export const uiSlice = createSlice({
@@ -131,15 +130,10 @@ export const uiSlice = createSlice({
     setTemplateProjectCreate: (state: Draft<UiState>, action: PayloadAction<Project | undefined>) => {
       state.templateExplorer.projectCreate = action.payload;
     },
-    openRenameEntityModal: (
-      state: Draft<UiState>,
-      action: PayloadAction<{absolutePathToEntity: string; osPlatform: string}>
-    ) => {
-      const getBasename = action.payload.osPlatform === 'win32' ? path.win32.basename : path.basename;
-
+    openRenameEntityModal: (state: Draft<UiState>, action: PayloadAction<{absolutePathToEntity: string}>) => {
       state.renameEntityModal = {
         isOpen: true,
-        entityName: getBasename(action.payload.absolutePathToEntity),
+        entityName: path.basename(action.payload.absolutePathToEntity),
         absolutePathToEntity: action.payload.absolutePathToEntity,
       };
     },
@@ -247,6 +241,12 @@ export const uiSlice = createSlice({
         );
       }
     },
+    closeWelcomePopup: (state: Draft<UiState>) => {
+      state.welcomePopup.isVisible = false;
+    },
+    openWelcomePopup: (state: Draft<UiState>) => {
+      state.welcomePopup.isVisible = true;
+    },
     setExpandedFolders: (state: Draft<UiState>, action: PayloadAction<React.Key[]>) => {
       state.leftMenu.expandedFolders = action.payload;
     },
@@ -322,22 +322,11 @@ export const uiSlice = createSlice({
     closeAboutModal: (state: Draft<UiState>) => {
       state.isAboutModalOpen = false;
     },
-    cancelWalkthrough: (state: Draft<UiState>, action: PayloadAction<WalkthroughCollection>) => {
-      const collection = action.payload;
-      state.walkThrough[collection].currentStep = -1;
-    },
     setShowStartPageLearn: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.startPageLearn.isVisible = action.payload;
     },
     setStartPageLearnTopic: (state: Draft<UiState>, action: PayloadAction<LearnTopicType | undefined>) => {
       state.startPageLearn.learnTopic = action.payload;
-    },
-    handleWalkthroughStep: (
-      state: Draft<UiState>,
-      action: PayloadAction<{step: number; collection: WalkthroughCollection}>
-    ) => {
-      const {step, collection} = action.payload;
-      state.walkThrough[collection].currentStep += step;
     },
     setIsInQuickClusterMode: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.isInQuickClusterMode = action.payload;
@@ -364,7 +353,6 @@ export const uiSlice = createSlice({
 });
 
 export const {
-  cancelWalkthrough,
   closeAboutModal,
   closeCreateFileFolderModal,
   closeCreateProjectModal,
@@ -380,9 +368,9 @@ export const {
   closeSaveEditCommandModal,
   closeSaveResourcesToFileFolderModal,
   closeTemplateExplorer,
+  closeWelcomePopup,
   collapseNavSections,
   expandNavSections,
-  handleWalkthroughStep,
   highlightItem,
   openAboutModal,
   openCreateFileFolderModal,
@@ -399,6 +387,7 @@ export const {
   openSaveEditCommandModal,
   openSaveResourcesToFileFolderModal,
   openTemplateExplorer,
+  openWelcomePopup,
   resetLayout,
   setActiveSettingsPanel,
   setExpandedFolders,

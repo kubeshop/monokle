@@ -11,7 +11,7 @@ import {updateK8sVersion, updateProjectK8sVersion} from '@redux/reducers/appConf
 import {addMultipleResources, addResource, clearPreview, clearPreviewAndSelectionHistory} from '@redux/reducers/main';
 import {setIsInQuickClusterMode} from '@redux/reducers/ui';
 import {currentConfigSelector} from '@redux/selectors';
-import {clusterResourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {previewSavedCommand} from '@redux/services/previewCommand';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
@@ -32,7 +32,7 @@ import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
 import {isDefined} from '@shared/utils/filter';
 import {activeProjectSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
 
-import {setConfigK8sSchemaVersion, toggleRule, toggleValidation} from './validation.slice';
+import {changeRuleLevel, setConfigK8sSchemaVersion, toggleRule, toggleValidation} from './validation.slice';
 import {loadValidation, validateResources} from './validation.thunks';
 
 const loadListener: AppListenerFn = listen => {
@@ -42,7 +42,8 @@ const loadListener: AppListenerFn = listen => {
       setRootFolder.fulfilled,
       updateProjectK8sVersion,
       toggleRule,
-      toggleValidation
+      toggleValidation,
+      changeRuleLevel
     ),
     async effect(_action, {dispatch, delay, signal, cancelActiveListeners}) {
       if (isAnyOf(setIsInQuickClusterMode)(_action)) {
@@ -173,7 +174,7 @@ const clusterK8sSchemaVersionListener: AppListenerFn = listen => {
       const state = getState();
 
       const activeProject = activeProjectSelector(state);
-      const clusterResourceMap = clusterResourceMapSelector(state);
+      const clusterResourceMap = getResourceMapFromState(state, 'cluster');
       const currentContext = kubeConfigContextSelector(state);
       const localSchemaVersion = currentConfigSelector(getState()).k8sVersion;
       const userDataDir = String(state.config.userDataDir);

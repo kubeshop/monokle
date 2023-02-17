@@ -1,4 +1,5 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
+import {useStore} from 'react-redux';
 
 import {Checkbox, Form, Input, Modal} from 'antd';
 
@@ -6,11 +7,12 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeRenameResourceModal} from '@redux/reducers/ui';
-import {resourceMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {isResourceSelected} from '@redux/services/resource';
 import {renameResource} from '@redux/thunks/renameResource';
 
 import {K8sResource} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
 
 const CheckboxContainer = styled.div`
   margin-top: 10px;
@@ -22,9 +24,8 @@ const RenameResourceModel: React.FC = () => {
     state => state.ui.renameResourceModal || {isOpen: undefined, resourceIdentifier: undefined}
   );
 
-  const resourceMap = useAppSelector(state =>
-    resourceIdentifier ? resourceMapSelector(state, resourceIdentifier.storage) : undefined
-  );
+  const store = useStore();
+
   const isThisResourceSelected = useAppSelector(state =>
     resourceIdentifier ? isResourceSelected(resourceIdentifier, state.main.selection) : undefined
   );
@@ -32,6 +33,14 @@ const RenameResourceModel: React.FC = () => {
   const [resource, setResource] = useState<K8sResource>();
   const [shouldUpdateRefs, setShouldUpdateRefs] = useState<boolean>(false);
   const [isButtonDisabled, setButtonDisabled] = useState<boolean>(false);
+
+  const resourceMap = useMemo(
+    () =>
+      resourceIdentifier
+        ? getResourceMapFromState(store.getState() as RootState, resourceIdentifier.storage)
+        : undefined,
+    [resourceIdentifier, store]
+  );
 
   const [form] = Form.useForm();
   const inputNameRef = useRef<any>();
@@ -52,12 +61,12 @@ const RenameResourceModel: React.FC = () => {
     inputNameRef?.current?.focus();
   }, [resourceIdentifier, isOpen, resourceMap]);
 
-  if (!resource || !resourceIdentifier || !resourceMap) {
+  if (!resource || !resourceIdentifier) {
     return null;
   }
 
   const handleOk = () => {
-    if (!newResourceName || resource.name === newResourceName) {
+    if (!newResourceName || resource.name === newResourceName || !resourceMap) {
       return;
     }
     renameResource(resource, newResourceName, shouldUpdateRefs, resourceMap, dispatch, isThisResourceSelected);

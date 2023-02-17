@@ -14,7 +14,7 @@ import path from 'path';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
-import {localResourceContentMapSelector, localResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {useResourceContentMapRef, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {joinK8sResource} from '@redux/services/resource';
 import {getResourceKindSchema} from '@redux/services/schema';
 import {createTransientResource} from '@redux/services/transientResource';
@@ -78,8 +78,10 @@ const NewResourceWizard = () => {
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
   const resourceFilterNamespaces = useAppSelector(state => state.main.resourceFilter.namespaces);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
-  const [localResourceMetaMap, localResourceMetaMapRef] = useSelectorWithRef(localResourceMetaMapSelector);
-  const [, localResourceContentMapRef] = useSelectorWithRef(localResourceContentMapSelector);
+  const localResourceMetaMap = useResourceMetaMap('local');
+  const localResourceMetaMapRef = useRef(localResourceMetaMap);
+  localResourceMetaMapRef.current = localResourceMetaMap;
+  const localResourceContentMapRef = useResourceContentMapRef('local');
   const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
   const [rootFolderEntry, rootFolderEntryRef] = useSelectorWithRef(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const [, userDataDirRef] = useSelectorWithRef(state => state.config.userDataDir);
@@ -143,45 +145,42 @@ const NewResourceWizard = () => {
   const [resourceKindOptions, setResourceKindOptions] =
     useState<Record<string, ResourceKindHandler[]>>(kindsByApiVersion);
 
-  const generateExportFileName = useCallback(
-    () => async () => {
-      if (rootFolderEntryRef.current && selectedFolderRef.current.startsWith(rootFolderEntryRef.current.filePath)) {
-        const currentFolder = selectedFolderRef.current.split(rootFolderEntryRef.current.filePath).pop();
+  const generateExportFileName = useCallback(async () => {
+    if (rootFolderEntryRef.current && selectedFolderRef.current.startsWith(rootFolderEntryRef.current.filePath)) {
+      const currentFolder = selectedFolderRef.current.split(rootFolderEntryRef.current.filePath).pop();
 
-        if (currentFolder) {
-          setSelectedFolder(currentFolder.slice(1));
-        } else {
-          setSelectedFolder(ROOT_FILE_ENTRY);
-        }
-        return;
-      }
-
-      let selectedFolderResources;
-      if (selectedFolderRef.current === ROOT_FILE_ENTRY) {
-        selectedFolderResources = Object.values(localResourceMetaMapRef.current).filter(
-          resource => resource.origin.filePath.split(path.sep).length === 2
-        );
+      if (currentFolder) {
+        setSelectedFolder(currentFolder.slice(1));
       } else {
-        selectedFolderResources = Object.values(localResourceMetaMapRef.current).filter(
-          resource =>
-            resource.origin.filePath.split(path.sep).length > 2 &&
-            getDirname(resource.origin.filePath).endsWith(selectedFolderRef.current)
-        );
+        setSelectedFolder(ROOT_FILE_ENTRY);
       }
-      const hasNameClash = selectedFolderResources.some(resource => resource.name === form.getFieldValue('name'));
+      return;
+    }
 
-      let fullFileName = generateFullFileName(
-        form.getFieldValue('name'),
-        form.getFieldValue('kind'),
-        selectedFolderRef.current,
-        fileMapRef.current,
-        0,
-        hasNameClash
+    let selectedFolderResources;
+    if (selectedFolderRef.current === ROOT_FILE_ENTRY) {
+      selectedFolderResources = Object.values(localResourceMetaMapRef.current).filter(
+        resource => resource.origin.filePath.split(path.sep).length === 2
       );
-      setExportFileName(fullFileName);
-    },
-    [form, localResourceMetaMapRef, selectedFolderRef, rootFolderEntryRef, fileMapRef, setSelectedFolder, getDirname]
-  );
+    } else {
+      selectedFolderResources = Object.values(localResourceMetaMapRef.current).filter(
+        resource =>
+          resource.origin.filePath.split(path.sep).length > 2 &&
+          getDirname(resource.origin.filePath).endsWith(selectedFolderRef.current)
+      );
+    }
+    const hasNameClash = selectedFolderResources.some(resource => resource.name === form.getFieldValue('name'));
+
+    let fullFileName = generateFullFileName(
+      form.getFieldValue('name'),
+      form.getFieldValue('kind'),
+      selectedFolderRef.current,
+      fileMapRef.current,
+      0,
+      hasNameClash
+    );
+    setExportFileName(fullFileName);
+  }, [form, localResourceMetaMapRef, selectedFolderRef, rootFolderEntryRef, fileMapRef, setSelectedFolder, getDirname]);
 
   useEffect(() => {
     const visible = newResourceWizardState.isOpen;
