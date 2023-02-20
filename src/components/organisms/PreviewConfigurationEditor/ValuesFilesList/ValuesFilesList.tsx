@@ -75,7 +75,7 @@ function ValuesFilesList(props: ValuesFilesListProps) {
     }
     if (active.id !== over.id) {
       const dropIndex = orderedItems.findIndex(i => i.id === over.id);
-      moveItem(active.id, dropIndex);
+      moveItem(active.id.toString(), dropIndex);
     }
   };
 
