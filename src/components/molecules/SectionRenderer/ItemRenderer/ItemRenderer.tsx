@@ -136,7 +136,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
                 isDisabled={itemInstance.isDisabled}
                 onClick={onClick}
               >
-                {itemInstance.name} ${itemInstance.isDirty ? '*' : ''}
+                {`${itemInstance.name} ${itemInstance.isDirty ? '*' : ''}`}
               </S.ItemName>
             )}
 
