@@ -13,17 +13,11 @@ import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import restartDeployment from '@redux/services/restartDeployment';
 import {startClusterConnection} from '@redux/thunks/cluster';
 
-import {SecondaryButton} from '@atoms';
+import {PrimaryButton} from '@atoms';
 
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
-type IProps = {
-  isDropdownActive?: boolean;
-};
-
-const Restart: React.FC<IProps> = props => {
-  const {isDropdownActive = false} = props;
-
+const Restart: React.FC = () => {
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(kubeConfigContextSelector);
   const currentResource = useSelectedResource();
@@ -51,15 +45,9 @@ const Restart: React.FC<IProps> = props => {
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RestartTooltip} placement="bottomLeft">
-      <SecondaryButton
-        $disableHover={isDropdownActive}
-        type={isDropdownActive ? 'link' : 'default'}
-        size="small"
-        onClick={handleClick}
-        disabled={!isBtnEnabled}
-      >
+      <PrimaryButton type="link" size="small" onClick={handleClick} disabled={!isBtnEnabled}>
         Restart
-      </SecondaryButton>
+      </PrimaryButton>
     </Tooltip>
   );
 };
