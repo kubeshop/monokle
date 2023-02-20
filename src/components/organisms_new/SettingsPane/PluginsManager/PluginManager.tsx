@@ -14,8 +14,9 @@ import {PluginManagerReloadTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {checkForExtensionsUpdates} from '@redux/services/extension';
 
+import {SecondaryButton} from '@atoms';
+
 import {DEFAULT_TEMPLATES_PLUGIN_URL} from '@shared/constants/urls';
-import {Colors} from '@shared/styles';
 
 import PluginInformation from './PluginInformation';
 import PluginInstallModal from './PluginInstallModal';
@@ -63,16 +64,9 @@ export const PluginManager: React.FC = () => {
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
 
       <S.ButtonsContainer>
-        <Button
-          onClick={onClickInstallPlugin}
-          type="primary"
-          ghost
-          size="small"
-          icon={<PlusOutlined />}
-          style={{marginLeft: 8, background: Colors.grey10}}
-        >
+        <SecondaryButton onClick={onClickInstallPlugin} size="small" icon={<PlusOutlined />} style={{marginLeft: 8}}>
           Install
-        </Button>
+        </SecondaryButton>
 
         <div>
           <S.QuestionCircleOutlined onClick={openHelpUrl} />
@@ -88,6 +82,7 @@ export const PluginManager: React.FC = () => {
           </Tooltip>
         </div>
       </S.ButtonsContainer>
+
       <S.Container>
         {sortedPluginEntries.length === 0 ? (
           <>
