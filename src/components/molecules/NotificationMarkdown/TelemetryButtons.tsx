@@ -34,7 +34,13 @@ export const TelemetryButtons = ({notificationId}: {notificationId?: string}) =>
     store.dispatch(toggleNotifications());
     store.dispatch(toggleEventTracking(true));
     store.dispatch(toggleErrorReporting(true));
-    store.dispatch(setAlert({type: AlertEnum.Success, title: 'Telemetry settings have been updated', message: ''}));
+    store.dispatch(
+      setAlert({
+        type: AlertEnum.Success,
+        title: 'Telemetry settings have been updated',
+        message: 'The telemetry settings have been deactivated.',
+      })
+    );
   };
 
   const handleOk = () => {
