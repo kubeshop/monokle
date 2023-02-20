@@ -32,9 +32,9 @@ Here are some of the scenarios where Compare & Sync can help you:
 To use Compare & Sync follow these steps:  
 
 - Browse to a folder containing manifests/Kustomizations/Helm charts.  
-- Press the **Compare & Sync** button at the top of the Resource Navigator:  
+- Press the **Compare Resources** button in the menu on the left:  
 
-![Compare & Sync](img/cluster-compare-button-1.11.png)
+![Compare & Sync](img/cluster-compare-button-2.0.png)
 
 In the image below you can see an overview of the Compare & Sync modal with each section highlighted in a color that will be explained:  
 
