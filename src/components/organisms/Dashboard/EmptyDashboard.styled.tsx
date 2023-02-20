@@ -18,8 +18,7 @@ export const Image = styled.img<{$right?: number}>`
 
 export const Text = styled.div`
   align-self: flex-end;
-  max-width: 150px;
-  padding-bottom: 6px;
+  max-width: 200px;
 
   & span {
     color: ${Colors.cyan8};

@@ -15,7 +15,7 @@ export const EmptyDashboard = () => {
           'Start by connecting your cluster.'
         ) : (
           <>
-            Click on <span>Connect</span> to preview your cluster.
+            Click on <span>Connect</span> to load the resources from your cluster and watch for changes.
           </>
         )}
       </S.Text>
