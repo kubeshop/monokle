@@ -61,6 +61,9 @@ export const PaddingWrapper = styled.div`
 
 export const RightContainer = styled.div`
   padding: 25px;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
 `;
 
 export const TemplatesCollapse = styled(Collapse)<{$topHeight: number}>`
