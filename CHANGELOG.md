@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/kubeshop/monokle/compare/v1.13.5-nightly-2023-02-17.0...v2.0.0) (2023-02-17)
+
+
+### Bug Fixes
+
+* getAbsoluteResourceFolder ([0843cec](https://github.com/kubeshop/monokle/commit/0843cec3154bcfb86266215f6420d03b2b5eee0f))
+* handle namespaces change gracefuly for cluster dashboard ([2961471](https://github.com/kubeshop/monokle/commit/2961471cba5e3897863077ded70f56de679aef64))
+* init only if terminal ref doesn't exist ([2ea907f](https://github.com/kubeshop/monokle/commit/2ea907fcadeb05f2b0439799b0bc40f779cbf685))
+* memoisation of resource maps selectors ([88b6fcf](https://github.com/kubeshop/monokle/commit/88b6fcf178d09c9da9ec1dbb680501039e8d02db))
+* open shell in pod ([291dee1](https://github.com/kubeshop/monokle/commit/291dee123f26fbe8109236214cf6f57f3d52a97e))
+* remove command ([1d1b642](https://github.com/kubeshop/monokle/commit/1d1b6423fd493d27c9a7be8cefb73665f86fa786))
+* scrollbar for template explorer ([425db38](https://github.com/kubeshop/monokle/commit/425db388561b1a760f2ff59dbf3e66787bb482bf))
+* shell height ([04262b5](https://github.com/kubeshop/monokle/commit/04262b5e7e1b4f7e97dbafec986811f4006011cc))
+
 ### [1.13.4](https://github.com/kubeshop/monokle/compare/v1.13.4-nightly-2023-01-27.0...v1.13.4) (2023-01-27)
 
 

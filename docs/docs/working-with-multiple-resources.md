@@ -1,4 +1,4 @@
-## **Working with Multiple Resources**
+# Working with Multiple Resources
 
 In the Navigator, hover over a local resource to display a check box to select one or more resources:
 
