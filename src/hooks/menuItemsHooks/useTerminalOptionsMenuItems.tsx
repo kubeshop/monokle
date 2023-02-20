@@ -26,13 +26,15 @@ export function useTerminalOptionsMenuItems() {
     []
   );
 
-  const updateSettingsHandler = useCallback(() => {
-    form.validateFields().then(values => {
-      const fontSize = parseInt(values.fontSize, 10);
-
-      debouncedSettingsUpdate({...values, fontSize});
-    });
-  }, [debouncedSettingsUpdate, form]);
+  const updateSettingsHandler = useCallback(
+    (changedValues: any, values: any) => {
+      if (changedValues.fontSize && (changedValues.fontSize < 6 || changedValues.fontSize > 72)) {
+        return;
+      }
+      debouncedSettingsUpdate(values);
+    },
+    [debouncedSettingsUpdate]
+  );
 
   const items = useMemo(
     () => [
@@ -40,7 +42,7 @@ export function useTerminalOptionsMenuItems() {
         key: 'options',
         label: (
           <TerminalOptionsContainer>
-            <Form initialValues={settings} form={form} layout="vertical" onChange={updateSettingsHandler}>
+            <Form initialValues={settings} form={form} layout="vertical" onValuesChange={updateSettingsHandler}>
               <Form.Item name="defaultShell" label="Default shell type">
                 <Radio.Group>
                   {Object.entries(shellsMap).map(([shell, shellObject]) => (
@@ -56,31 +58,9 @@ export function useTerminalOptionsMenuItems() {
               <Form.Item
                 name="fontSize"
                 label="Font size"
-                rules={[
-                  ({getFieldValue}) => ({
-                    validator: () => {
-                      return new Promise((resolve: (value?: any) => void, reject) => {
-                        const fontSize = parseInt(getFieldValue('fontSize'), 10);
-
-                        if (!fontSize) {
-                          reject(new Error('Value must be a number'));
-                        }
-
-                        if (fontSize < 6) {
-                          reject(new Error('Value must be greater than or equal to 6'));
-                        }
-
-                        if (fontSize > 100) {
-                          reject(new Error('Value must be less than or equal to 100'));
-                        }
-
-                        resolve();
-                      });
-                    },
-                  }),
-                ]}
+                rules={[{type: 'number', min: 6, max: 72, message: 'Font size must be between 6 and 72'}]}
               >
-                <InputNumber placeholder="Enter font size" />
+                <InputNumber placeholder="Enter font size" type="number" />
               </Form.Item>
             </Form>
           </TerminalOptionsContainer>
