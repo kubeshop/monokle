@@ -31,6 +31,7 @@ const TemplateExplorer: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
 
   const [rightContainerRef, {width: rigthContainerWidth}] = useMeasure<HTMLDivElement>();
+  const [leftContainerTopRef, {height: leftContainerTopHeight}] = useMeasure<HTMLDivElement>();
 
   const filteredPluginMap = useFilteredPluginMap(searchValue);
 
@@ -59,7 +60,7 @@ const TemplateExplorer: React.FC = () => {
   return (
     <S.Modal open={isOpen} width="90%" title="Create resources from a template" footer={null} onCancel={onCloseHandler}>
       <S.LeftContainer>
-        <S.PaddingWrapper>
+        <S.PaddingWrapper ref={leftContainerTopRef}>
           <TitleBar title="Templates" description={<TitleBarDescription />} />
 
           <SearchInput onChange={debouncedSetSearchValue} />
@@ -67,6 +68,7 @@ const TemplateExplorer: React.FC = () => {
 
         {!isEmpty(filteredPluginMap) ? (
           <S.TemplatesCollapse
+            $topHeight={leftContainerTopHeight}
             activeKey={activeKeys}
             ghost
             onChange={keys => {

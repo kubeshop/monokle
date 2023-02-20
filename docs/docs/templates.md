@@ -241,11 +241,17 @@ Note: A plugin can contain one or multiple templates.
 
 Monokle Desktop includes a default set of templates which are installed automatically when starting Monokle Desktop for the first time and available in the Templates Explorer when working with your Monokle Desktop projects.
 
-Click on the View Templates icon to view the included templates:
+Access the currently available templates by choosing **Start from a template** from the Monokle home screen:
 
-![View Templates](img/view-template-icon-1.11.png)
+![View Templates](img/start-with-template-2.0.png)
 
-![Default Templates](img/default-templates-1.11.gif)
+Give the project a name and click **Select a template**:
+
+![Select Template](img/select-template-2.0.png)
+
+The list of Monokle Default Templates appears:
+
+![Default Templates](img/default-templates-2.0.png)
 
 Check out the [Monokle Desktop Default Templates Plugin](https://github.com/kubeshop/monokle-default-templates-plugin) repository to
 see which templates are included and their corresponding schemas and manifests.
