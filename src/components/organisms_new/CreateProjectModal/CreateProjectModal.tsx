@@ -74,17 +74,7 @@ const CreateProjectModal: React.FC = () => {
       ? path.join(pickedPath.current, nameValue.toLowerCase().replaceAll(' ', '-'))
       : pickedPath.current;
 
-    if (existsSync(projectPath)) {
-      createProjectForm.setFields([
-        {
-          name: 'rootFolder',
-          value: projectPath,
-          errors: !nameValue ? [] : ['Path exists!'],
-        },
-      ]);
-    } else {
-      createProjectForm.setFieldsValue({rootFolder: projectPath});
-    }
+    createProjectForm.setFieldsValue({rootFolder: projectPath});
   };
 
   if (!uiState.isOpen) {
@@ -133,10 +123,23 @@ const CreateProjectModal: React.FC = () => {
               name="rootFolder"
               noStyle
               rules={[
-                {
-                  required: true,
-                  message: 'Please provide your project path!',
-                },
+                ({getFieldValue}) => ({
+                  validator: () => {
+                    return new Promise((resolve: (value?: any) => void, reject) => {
+                      const rootFolder: string = getFieldValue('rootFolder').toLowerCase();
+
+                      if (!rootFolder) {
+                        reject(new Error('Please provide your project path!'));
+                      }
+
+                      if (existsSync(rootFolder)) {
+                        reject(new Error('Path exists!'));
+                      }
+
+                      resolve();
+                    });
+                  },
+                }),
               ]}
             >
               <Input style={{width: 'calc(100% - 100px)'}} />
