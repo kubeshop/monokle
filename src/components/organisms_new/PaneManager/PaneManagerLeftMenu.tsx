@@ -6,6 +6,7 @@ import {setLeftBottomMenuSelection, setLeftMenuIsActive, setLeftMenuSelection} f
 import {ActivityBar} from '@monokle/components';
 import {Colors} from '@shared/styles';
 import {activeProjectSelector} from '@shared/utils/selectors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {activities, extraActivities} from './activities';
 
@@ -45,6 +46,7 @@ const NewPaneManagerLeftMenu: React.FC = () => {
         }
 
         dispatch(setLeftMenuSelection(activityName));
+        trackEvent('left-menu/select-option', {option: activityName});
       }}
       onChangeExtra={activityName => {
         if (leftMenuBottomSelection === activityName) {
@@ -53,6 +55,7 @@ const NewPaneManagerLeftMenu: React.FC = () => {
         }
 
         dispatch(setLeftBottomMenuSelection(activityName));
+        trackEvent('bottom-left-menu/select-option', {option: activityName});
       }}
     />
   );
