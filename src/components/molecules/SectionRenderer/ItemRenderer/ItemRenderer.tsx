@@ -7,7 +7,6 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {ScrollIntoView} from '@atoms';
 import {ScrollContainerRef} from '@atoms/ScrollIntoView';
 
-import {TextEllipsis} from '@monokle/components';
 import {ItemBlueprint, ItemCustomComponentProps} from '@shared/models/navigator';
 
 import {useItemCustomization} from './useItemCustomization';
@@ -137,7 +136,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
                 isDisabled={itemInstance.isDisabled}
                 onClick={onClick}
               >
-                <TextEllipsis text={`${itemInstance.name} ${itemInstance.isDirty ? '*' : ''}`} />
+                {itemInstance.name} ${itemInstance.isDirty ? '*' : ''}
               </S.ItemName>
             )}
 

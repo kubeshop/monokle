@@ -132,4 +132,7 @@ const Tag = styled(RawTag)<{$isSelected: boolean}>`
   font-weight: ${props => (props.$isSelected ? 700 : undefined)};
   font-size: 12px;
   padding: 0 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;

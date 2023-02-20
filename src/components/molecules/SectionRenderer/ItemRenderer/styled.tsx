@@ -24,6 +24,10 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   align-items: center;
   width: 100%;
   user-select: none;
+  > {
+    min-width: 0;
+  }
+
   ${props => {
     const defaultIndentation = props.$isSectionCheckable ? 32 : 26;
     return `padding-left: ${defaultIndentation + props.$indentation}px;`;
@@ -76,6 +80,9 @@ export const ItemName = styled.div<ItemNameProps>`
   font-size: 12px;
   min-width: 0;
   flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   ${props => {
     if (props.isSelected) {
