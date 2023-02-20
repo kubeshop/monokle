@@ -6,6 +6,7 @@ import {getSegmentClient} from '@shared/utils/segment';
 import {isRendererThread} from '@shared/utils/thread';
 
 import {PreviewType} from './preview';
+import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from './ui';
 
 const machineId: string = machineIdSync();
 
@@ -75,12 +76,12 @@ export type EventMap = {
   'dashboard/selectKind': {kind: string};
   'dashboard/selectTab': {tab: string};
   'dashboard/changeNamespace': undefined;
-  'top-menu/new-project': {type: string};
-  CLUSTER_COMPARE: any; // TODO: remove this event in 2.0, keeping to make merging easier
+  'left-menu/select-option': {option: LeftMenuSelectionType};
+  'bottom-left-menu/select-option': {option: LeftMenuBottomSelectionType};
+  'accordion/select-panel': {panelKey: string};
 };
 export const APP_INSTALLED = 'APP_INSTALLED';
 export const APP_SESSION = 'APP_SESSION';
 export const APP_UPDATED = 'APP_UPDATED';
 export const APP_DOWNGRADED = 'APP_DOWNGRADED';
 export const DISABLED_TELEMETRY = 'DISABLED_TELEMETRY';
-export const CLUSTER_COMPARE = 'CLUSTER_COMPARE';

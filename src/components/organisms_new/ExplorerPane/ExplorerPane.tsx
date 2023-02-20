@@ -2,6 +2,8 @@ import {Collapse as RawCollapse} from 'antd';
 
 import styled from 'styled-components';
 
+import {trackEvent} from '@shared/utils/telemetry';
+
 import FilePane from './FilePane';
 import HelmPane from './HelmPane';
 import ImagesPane from './ImagesPane';
@@ -9,7 +11,14 @@ import KustomizePane from './KustomizePane';
 
 const ExplorerPane: React.FC = () => {
   return (
-    <Collapse accordion ghost defaultActiveKey="files">
+    <Collapse
+      accordion
+      ghost
+      defaultActiveKey="files"
+      onChange={key => {
+        trackEvent('accordion/select-panel', {panelKey: key as string});
+      }}
+    >
       <FilePane key="files" />
       <KustomizePane key="kustomize" />
       <HelmPane key="helm" />
