@@ -243,8 +243,8 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
                           <S.DropdownActionContainer>
                             {isInClusterMode && selectedResourceMeta?.kind === 'Deployment' && (
                               <>
-                                <Scale isDropdownActive />
-                                <Restart isDropdownActive />
+                                <Scale />
+                                <Restart />
                               </>
                             )}
                             <InstallDeploy applySelection={applySelection} />

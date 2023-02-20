@@ -12,17 +12,11 @@ import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import scaleDeployment from '@redux/services/scaleDeployment';
 import {startClusterConnection} from '@redux/thunks/cluster';
 
-import {SecondaryButton} from '@atoms';
+import {PrimaryButton} from '@atoms';
 
 import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
-type IProps = {
-  isDropdownActive?: boolean;
-};
-
-const Scale: React.FC<IProps> = props => {
-  const {isDropdownActive = false} = props;
-
+const Scale: React.FC = () => {
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(kubeConfigContextSelector);
   const currentResource = useSelectedResource();
@@ -60,17 +54,17 @@ const Scale: React.FC<IProps> = props => {
   return (
     <>
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ScaleTooltip} placement="bottomLeft">
-        <SecondaryButton
-          $disableHover={isDropdownActive}
+        <PrimaryButton
           loading={Boolean(scaling)}
-          type={isDropdownActive ? 'link' : 'default'}
+          type="link"
           size="small"
           onClick={() => dispatch(openScaleModal())}
           disabled={!isBtnEnabled}
         >
           Scale
-        </SecondaryButton>
+        </PrimaryButton>
       </Tooltip>
+
       <Modal title="Set number of replicas" open={isScaleModalOpen} onOk={handleScaleOk} onCancel={handleCancel}>
         <Row style={{alignItems: 'center'}}>
           <Col span={8}>
