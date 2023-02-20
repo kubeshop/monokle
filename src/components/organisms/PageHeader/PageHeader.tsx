@@ -130,6 +130,14 @@ const PageHeader = () => {
 
   const onClickProjectHandler = () => {
     dispatch(toggleStartProjectPane());
+
+    if (isInQuickClusterMode) {
+      dispatch(setIsInQuickClusterMode(false));
+    }
+
+    if (isInClusterMode) {
+      stopPreview(dispatch);
+    }
   };
 
   useEffect(() => {
