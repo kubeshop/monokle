@@ -62,7 +62,7 @@ const CommitModal: React.FC<IProps> = props => {
 
       commitHandler();
     },
-    {enableOnTags: ['TEXTAREA']},
+    {enableOnFormTags: ['TEXTAREA']},
     [isFocused]
   );
 

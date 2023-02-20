@@ -193,7 +193,7 @@ const HotKeysHandler = () => {
         dispatch(setLeftBottomMenuSelection('terminal'));
       }
     },
-    {enableOnTags: ['TEXTAREA']},
+    {enableOnFormTags: ['TEXTAREA']},
     [uiState.leftMenu.bottomSelection]
   );
 
