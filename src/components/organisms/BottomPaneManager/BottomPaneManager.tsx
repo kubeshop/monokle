@@ -34,7 +34,7 @@ const BottomPaneManager: React.FC = () => {
   const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
 
   const [terminalToKill, setTerminalToKill] = useState<string>('');
-
+  const [openTerminalOptions, setOpenTerminalOptions] = useState<boolean>(false);
   const [bottomPaneManagerRef, {height}] = useMeasure<HTMLDivElement>();
   const [tabsContainerRef, {height: tabsContainerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -151,7 +151,14 @@ const BottomPaneManager: React.FC = () => {
           <Dropdown
             mouseEnterDelay={0.5}
             placement="bottomRight"
-            menu={{items: terminalOptionsMenuItems, className: 'terminal-options-menu'}}
+            menu={{
+              items: terminalOptionsMenuItems,
+              className: 'terminal-options-menu',
+              onBlur: () => setOpenTerminalOptions(false),
+            }}
+            open={openTerminalOptions}
+            trigger={['hover']}
+            onOpenChange={() => setOpenTerminalOptions(true)}
           >
             <S.EllipsisOutlined />
           </Dropdown>
