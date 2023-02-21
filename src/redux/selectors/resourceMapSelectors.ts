@@ -194,7 +194,11 @@ export const filteredResourceSelector = createDeepEqualSelector(
     (state: RootState) => state.main.resourceMetaMapByStorage,
   ],
   (filter, activeResourceStorage, resourceMetaMapByStorage) => {
-    const activeResourceMetaMap = resourceMetaMapByStorage[activeResourceStorage];
+    const activeResourceMetaMap = {
+      ...resourceMetaMapByStorage[activeResourceStorage],
+      ...resourceMetaMapByStorage.transient,
+    };
+
     return Object.values(activeResourceMetaMap).filter(resource => isResourcePassingFilter(resource, filter));
   }
 );
