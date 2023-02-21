@@ -5,7 +5,7 @@ import {ItemType as AntdMenuItem} from 'antd/lib/menu/hooks/useItems';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
-import {basename, dirname, join} from 'path';
+import {basename, dirname, join, sep} from 'path';
 
 import {scanExcludesSelector, updateProjectConfig} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -375,7 +375,23 @@ export const useFileMenuItems = (
       label: 'New File',
       onClick: () => {
         dispatch(
-          openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath), type: 'file'})
+          openCreateFileFolderModal({
+            rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath.split(sep).slice(0, -1).join(sep)),
+            type: 'file',
+          })
+        );
+      },
+    });
+
+    newMenuItems.push({
+      key: 'new-folder',
+      label: 'New Folder',
+      onClick: () => {
+        dispatch(
+          openCreateFileFolderModal({
+            rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath.split(sep).slice(0, -1).join(sep)),
+            type: 'folder',
+          })
         );
       },
     });
@@ -443,6 +459,16 @@ export const useFolderMenuItems = (
       onClick: () => {
         dispatch(
           openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath), type: 'folder'})
+        );
+      },
+    });
+
+    newMenuItems.push({
+      key: 'new-file',
+      label: 'New File',
+      onClick: () => {
+        dispatch(
+          openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath), type: 'file'})
         );
       },
     });

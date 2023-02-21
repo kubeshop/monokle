@@ -17,7 +17,7 @@ import {FileEntry} from '@shared/models/fileEntry';
 import {Colors} from '@shared/styles';
 
 import * as S from './TreeNode.styled';
-import {useCanPreview, useDelete, useFileMenuItems, useIsDisabled} from './hooks';
+import {useCanPreview, useDelete, useFileMenuItems, useIsDisabled, usePreview} from './hooks';
 
 type Props = {
   filePath: string;
@@ -34,6 +34,7 @@ const TreeNodeFile: React.FC<Props> = props => {
   const isDisabled = useIsDisabled(fileEntry);
   const canBePreviewed = useCanPreview(fileEntry, isDisabled);
   const {deleteEntry, isDeleteLoading} = useDelete();
+  const preview = usePreview();
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -93,6 +94,7 @@ const TreeNodeFile: React.FC<Props> = props => {
               size="small"
               disabled={isInPreviewMode || isInClusterMode}
               $isItemSelected={isSelected}
+              onClick={() => preview(fileEntry.filePath)}
             >
               Preview
             </S.PreviewButton>

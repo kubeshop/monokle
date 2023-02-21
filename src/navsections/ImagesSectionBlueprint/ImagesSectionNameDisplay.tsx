@@ -6,6 +6,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setImagesSearchedValue} from '@redux/reducers/main';
 import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
 
+import {SearchInput} from '@monokle/components';
 import {SectionInstance} from '@shared/models/navigator';
 
 import * as S from './ImagesSectionNameDisplay.styled';
@@ -56,7 +57,7 @@ const ImagesSectionNameDisplay: React.FC<IProps> = () => {
     <S.NameDisplayContainer>
       {OutputTag}
 
-      <S.SearchInput placeholder="Search project images" value={value} onChange={e => setValue(e.target.value)} />
+      <SearchInput placeholder="Search project images" value={value} onChange={(e: any) => setValue(e.target.value)} />
     </S.NameDisplayContainer>
   );
 };

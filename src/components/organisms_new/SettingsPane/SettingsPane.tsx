@@ -1,11 +1,13 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo} from 'react';
 
 import {activeProjectSelector} from '@redux/appConfig';
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setActiveSettingsPanel} from '@redux/reducers/ui';
 
 import {TitleBarWrapper} from '@components/atoms';
 
 import {TitleBar} from '@monokle/components';
+import {SettingsPanel} from '@shared/models/config';
 
 import ValidationSettings from '../ValidationSettings';
 import {CurrentProjectSettings} from './CurrentProjectSettings/CurrentProjectSettings';
@@ -15,15 +17,15 @@ import {PluginManager} from './PluginsManager/PluginManager';
 import * as S from './SettingsPane.styled';
 
 const SettingsPane = () => {
+  const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
+  const activeSettingsPanel = useAppSelector(state => state.ui.activeSettingsPanel);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
 
   const isOnStartProjectPage = useMemo(
     () => !activeProject || isStartProjectPaneVisible,
     [activeProject, isStartProjectPaneVisible]
   );
-
-  const [activeTabKey, setActiveTabKey] = useState(!isOnStartProjectPage ? 'validation' : 'global-settings');
 
   const tabItems = useMemo(
     () => [
@@ -85,6 +87,14 @@ const SettingsPane = () => {
     [activeProject, isOnStartProjectPage, isStartProjectPaneVisible]
   );
 
+  useEffect(() => {
+    if (!isOnStartProjectPage) {
+      dispatch(setActiveSettingsPanel(SettingsPanel.ValidationSettings));
+    } else {
+      dispatch(setActiveSettingsPanel(SettingsPanel.GlobalSettings));
+    }
+  }, [dispatch, isOnStartProjectPage]);
+
   return (
     <S.SettingsPaneContainer $isOnStartProjectPage={isOnStartProjectPage}>
       {!isOnStartProjectPage && (
@@ -95,9 +105,9 @@ const SettingsPane = () => {
 
       <S.Tabs
         defaultActiveKey="source"
-        activeKey={activeTabKey}
+        activeKey={activeSettingsPanel}
         items={tabItems}
-        onChange={(k: string) => setActiveTabKey(k)}
+        onChange={(k: string) => dispatch(setActiveSettingsPanel(k as SettingsPanel))}
       />
     </S.SettingsPaneContainer>
   );

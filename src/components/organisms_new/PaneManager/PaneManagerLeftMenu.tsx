@@ -46,7 +46,7 @@ const NewPaneManagerLeftMenu: React.FC = () => {
         }
 
         dispatch(setLeftMenuSelection(activityName));
-        trackEvent('left-menu/select-option', {option: activityName});
+        trackEvent('left-menu/activity-changed', {activity: activityName});
       }}
       onChangeExtra={activityName => {
         if (leftMenuBottomSelection === activityName) {

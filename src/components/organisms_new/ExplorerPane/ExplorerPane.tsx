@@ -16,7 +16,7 @@ const ExplorerPane: React.FC = () => {
       ghost
       defaultActiveKey="files"
       onChange={key => {
-        trackEvent('accordion/select-panel', {panelKey: key as string});
+        trackEvent('left-menu/activity-changed', {activity: 'explorer', section: key as string});
       }}
     >
       <FilePane key="files" />

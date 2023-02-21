@@ -18,7 +18,7 @@ import {
   kubeConfigPathValidSelector,
 } from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {highlightItem, setLeftMenuSelection, toggleStartProjectPane} from '@redux/reducers/ui';
+import {highlightItem, setActiveSettingsPanel, setLeftMenuSelection, toggleStartProjectPane} from '@redux/reducers/ui';
 import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 import {startClusterConnection, stopClusterConnection} from '@redux/thunks/cluster';
@@ -28,6 +28,7 @@ import {ClusterSelectionTable} from '@organisms/PageHeader/ClusterSelectionTable
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
 import {hotkeys} from '@shared/constants/hotkeys';
+import {SettingsPanel} from '@shared/models/config';
 import {HighlightItems} from '@shared/models/ui';
 import {Size} from '@shared/models/window';
 import {defineHotkey} from '@shared/utils/hotkey';
@@ -75,6 +76,15 @@ const ClusterSelection = () => {
   const handleClusterConfigure = () => {
     dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
     dispatch(setLeftMenuSelection('settings'));
+
+    setImmediate(() => {
+      dispatch(
+        setActiveSettingsPanel(
+          activeProject ? SettingsPanel.CurrentProjectSettings : SettingsPanel.DefaultProjectSettings
+        )
+      );
+    });
+
     setTimeout(() => {
       dispatch(highlightItem(null));
     }, 3000);

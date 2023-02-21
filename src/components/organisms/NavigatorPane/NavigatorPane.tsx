@@ -1,4 +1,5 @@
 import {memo, useCallback, useMemo} from 'react';
+import {useMeasure} from 'react-use';
 
 import {Dropdown, Tooltip} from 'antd';
 
@@ -36,6 +37,8 @@ const NavPane: React.FC = () => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
+
+  const [resourceFilterRef, {height: resourceFilterHeight}] = useMeasure<HTMLDivElement>();
 
   const height = usePaneHeight();
   const newResourceMenuItems = useNewResourceMenuItems();
@@ -87,9 +90,13 @@ const NavPane: React.FC = () => {
       )}
 
       <ResizableRowsPanel
-        layout={{top: isResourceFiltersOpen ? 0.34 : 0.055}}
+        layout={{top: isResourceFiltersOpen ? 0.34 : resourceFilterHeight / height + (height < 800 ? 0.014 : 0.004)}}
         splitterStyle={{display: isResourceFiltersOpen ? 'block' : 'none'}}
-        top={<ResourceFilter active={isResourceFiltersOpen} onToggle={resourceFilterButtonHandler} />}
+        top={
+          <div ref={resourceFilterRef}>
+            <ResourceFilter active={isResourceFiltersOpen} onToggle={resourceFilterButtonHandler} />
+          </div>
+        }
         bottom={
           <S.List id="navigator-sections-container">
             <SectionRenderer sectionId={K8sResourceSectionBlueprint.id} level={0} isLastSection={false} />
@@ -97,7 +104,7 @@ const NavPane: React.FC = () => {
           </S.List>
         }
         height={height - 40}
-        bottomPaneMaxSize={isResourceFiltersOpen ? height - 400 : height - 100}
+        bottomPaneMaxSize={isResourceFiltersOpen ? height - (height < 1000 ? 200 : 400) : height - 100}
         bottomPaneMinSize={500}
       />
     </S.NavigatorPaneContainer>
