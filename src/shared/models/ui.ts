@@ -160,7 +160,7 @@ type UiState = {
     browseTemplates: boolean;
     connectToCluster: boolean;
   };
-  activeSettingsPanel?: SettingsPanel;
+  activeSettingsPanel: SettingsPanel;
   startPageLearn: {
     isVisible: boolean;
     learnTopic?: LearnTopicType;

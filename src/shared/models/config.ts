@@ -16,9 +16,11 @@ export enum NewVersionCode {
 }
 
 export enum SettingsPanel {
-  GlobalSettings = '1',
-  DefaultProjectSettings = '2',
-  ActiveProjectSettings = '3',
+  ValidationSettings = 'validation',
+  GlobalSettings = 'global-settings',
+  DefaultProjectSettings = 'default-project-settings',
+  CurrentProjectSettings = 'current-project-settings',
+  PluginsManager = 'plugins-manager',
 }
 
 export enum TextSizes {

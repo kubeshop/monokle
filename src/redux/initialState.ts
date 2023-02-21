@@ -5,7 +5,7 @@ import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
 import {AlertState} from '@shared/models/alert';
 import {AppState} from '@shared/models/appState';
-import {AppConfig, NewVersionCode} from '@shared/models/config';
+import {AppConfig, NewVersionCode, SettingsPanel} from '@shared/models/config';
 import {ExtensionState} from '@shared/models/extension';
 import {NavigatorState} from '@shared/models/navigator';
 import {TerminalState} from '@shared/models/terminal';
@@ -223,6 +223,7 @@ const initialUiState: UiState = {
   welcomePopup: {
     isVisible: false,
   },
+  activeSettingsPanel: SettingsPanel.GlobalSettings,
 };
 
 const initialNavigatorState: NavigatorState = {
