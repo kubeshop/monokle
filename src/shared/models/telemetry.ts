@@ -76,9 +76,8 @@ export type EventMap = {
   'dashboard/selectKind': {kind: string};
   'dashboard/selectTab': {tab: string};
   'dashboard/changeNamespace': undefined;
-  'left-menu/select-option': {option: LeftMenuSelectionType};
+  'left-menu/activity-changed': {activity: LeftMenuSelectionType; section?: string};
   'bottom-left-menu/select-option': {option: LeftMenuBottomSelectionType};
-  'accordion/select-panel': {panelKey: string};
 };
 export const APP_INSTALLED = 'APP_INSTALLED';
 export const APP_SESSION = 'APP_SESSION';
