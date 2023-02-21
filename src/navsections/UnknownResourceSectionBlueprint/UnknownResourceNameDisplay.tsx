@@ -1,8 +1,9 @@
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
+import {kubeConfigContextColorSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew, kubeConfigContextColorSelector} from '@redux/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
 import {unknownResourcesSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {ClusterColors} from '@shared/models/cluster';

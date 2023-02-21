@@ -4,9 +4,8 @@ import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
-import {updateProjectConfig} from '@redux/appConfig';
+import {scanExcludesSelector, updateProjectConfig} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {scanExcludesSelector} from '@redux/selectors';
 
 import {useSelectorWithRef} from '@utils/hooks';
 

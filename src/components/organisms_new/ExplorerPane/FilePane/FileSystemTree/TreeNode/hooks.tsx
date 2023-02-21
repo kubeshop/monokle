@@ -7,11 +7,10 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {basename, dirname, join} from 'path';
 
-import {updateProjectConfig} from '@redux/appConfig';
+import {scanExcludesSelector, updateProjectConfig} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openCreateFileFolderModal, openNewResourceWizard, openRenameEntityModal} from '@redux/reducers/ui';
-import {scanExcludesSelector} from '@redux/selectors';
 import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';

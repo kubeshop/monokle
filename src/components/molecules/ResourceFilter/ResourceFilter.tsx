@@ -8,6 +8,7 @@ import {isEmpty, isEqual, omit, uniqWith} from 'lodash';
 import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES, TOOLTIP_DELAY} from '@constants/constants';
 import {QuickFilterTooltip} from '@constants/tooltips';
 
+import {kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal} from '@redux/reducers/ui';
@@ -28,7 +29,6 @@ import {useWindowSize} from '@utils/hooks';
 import {Filter, FilterButton, FilterField, FilterHeader, KeyValueInput, NewKeyValueInput} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
-import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './ResourceFilter.styled';
 

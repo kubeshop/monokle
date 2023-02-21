@@ -2,6 +2,7 @@ import {useCallback, useMemo} from 'react';
 
 import {DiffTooltip, KubeConfigNoValid} from '@constants/tooltips';
 
+import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
@@ -11,7 +12,6 @@ import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kus
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {ResourceMeta} from '@shared/models/k8sResource';
-import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 export const useDiff = (resourceMeta?: ResourceMeta) => {
   const dispatch = useAppDispatch();

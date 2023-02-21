@@ -2,9 +2,9 @@ import {Modal} from 'antd';
 
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
+import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {SetRootFolderPayload} from '@redux/reducers/main';
-import {currentConfigSelector} from '@redux/selectors';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {createRejectionWithAlert} from '@redux/thunks/utils';

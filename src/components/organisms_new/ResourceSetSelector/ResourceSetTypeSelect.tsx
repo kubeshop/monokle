@@ -4,12 +4,12 @@ import {Select} from 'antd';
 
 import {isEmpty} from 'lodash';
 
+import {kubeConfigPathValidSelector} from '@redux/appConfig';
 import {resourceSetSelected, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {kustomizationsSelector} from '@redux/selectors/resourceSelectors';
 
 import {ResourceSet} from '@shared/models/compare';
-import {kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 import * as S from './ResourceSetSelectColor.styled';
 

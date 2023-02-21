@@ -1,11 +1,11 @@
 import {useMemo, useState} from 'react';
 
+import {activeProjectSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 
 import {TitleBarWrapper} from '@components/atoms';
 
 import {TitleBar} from '@monokle/components';
-import {activeProjectSelector} from '@shared/utils/selectors';
 
 import ValidationSettings from '../ValidationSettings';
 import {CurrentProjectSettings} from './CurrentProjectSettings/CurrentProjectSettings';

@@ -7,15 +7,14 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {RestartTooltip} from '@constants/tooltips';
 
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {isInClusterModeSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {isInClusterModeSelector} from '@redux/selectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import restartDeployment from '@redux/services/restartDeployment';
 import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {PrimaryButton} from '@atoms';
-
-import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 const Restart: React.FC = () => {
   const dispatch = useAppDispatch();

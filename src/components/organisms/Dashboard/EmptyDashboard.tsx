@@ -1,5 +1,5 @@
+import {kubeConfigPathValidSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
-import {kubeConfigPathValidSelector} from '@redux/selectors';
 
 import ClusterIndication from '@assets/ClusterIndication.svg';
 

@@ -1,11 +1,11 @@
 import {useMemo} from 'react';
 
+import {activeProjectSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftBottomMenuSelection, setLeftMenuIsActive, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {ActivityBar} from '@monokle/components';
 import {Colors} from '@shared/styles';
-import {activeProjectSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {activities, extraActivities} from './activities';

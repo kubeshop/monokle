@@ -1,9 +1,8 @@
 import {isEqual} from 'lodash';
 
+import {activeProjectSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setSelectedTemplatePath, setTemplateProjectCreate} from '@redux/reducers/ui';
-
-import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './TemplateCollapseItem.styled';
 

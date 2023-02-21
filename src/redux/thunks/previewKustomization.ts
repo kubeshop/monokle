@@ -4,7 +4,7 @@ import log from 'loglevel';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
-import {currentConfigSelector} from '@redux/selectors';
+import {currentConfigSelector} from '@redux/appConfig';
 import {extractK8sResources, joinK8sResource} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 

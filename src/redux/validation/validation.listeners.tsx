@@ -6,11 +6,16 @@ import {isAnyOf} from '@reduxjs/toolkit';
 
 import {isEmpty, isEqual} from 'lodash';
 
-import {updateK8sVersion, updateProjectK8sVersion} from '@redux/appConfig';
+import {
+  activeProjectSelector,
+  currentConfigSelector,
+  kubeConfigContextSelector,
+  updateK8sVersion,
+  updateProjectK8sVersion,
+} from '@redux/appConfig';
 import {AppListenerFn} from '@redux/listeners/base';
 import {addMultipleResources, addResource, clearPreview, clearPreviewAndSelectionHistory} from '@redux/reducers/main';
 import {setIsInQuickClusterMode} from '@redux/reducers/ui';
-import {currentConfigSelector} from '@redux/selectors';
 import {getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {previewSavedCommand} from '@redux/services/previewCommand';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
@@ -30,7 +35,6 @@ import {doesSchemaExist} from '@utils/index';
 
 import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
 import {isDefined} from '@shared/utils/filter';
-import {activeProjectSelector, kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import {changeRuleLevel, setConfigK8sSchemaVersion, toggleRule, toggleValidation} from './validation.slice';
 import {loadValidation, validateResources} from './validation.thunks';

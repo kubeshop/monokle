@@ -13,6 +13,7 @@ import 'monaco-yaml';
 import path from 'path';
 import {Document, ParsedNode, isMap} from 'yaml';
 
+import {settingsSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   editorHasReloadedSelectedPath,
@@ -28,7 +29,6 @@ import {
   isInPreviewModeSelectorNew,
   selectedFilePathSelector,
   selectedHelmValuesSelector,
-  settingsSelector,
 } from '@redux/selectors';
 import {
   activeResourceStorageSelector,

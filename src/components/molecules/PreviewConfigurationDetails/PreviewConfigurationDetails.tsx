@@ -4,13 +4,13 @@ import {Breadcrumb, Typography} from 'antd';
 
 import {sortBy} from 'lodash';
 
+import {kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 
 import {buildHelmCommand} from '@utils/helm';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {PreviewConfigValuesFileItem} from '@shared/models/config';
-import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './PreviewConfigurationDetails.styled';
 

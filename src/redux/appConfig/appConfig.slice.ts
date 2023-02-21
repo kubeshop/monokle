@@ -9,7 +9,6 @@ import log from 'loglevel';
 import path, {join} from 'path';
 
 import {AppListenerFn} from '@redux/listeners/base';
-import {kubeConfigPathSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {
@@ -53,6 +52,7 @@ import {createKubeClient, getKubeAccess} from '@shared/utils/kubeclient';
 
 import initialState from '../initialState';
 import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from '../reducers/ui';
+import {kubeConfigPathSelector} from './appConfig.selectors';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
   const isGitRepo = await promiseFromIpcRenderer(
@@ -234,9 +234,11 @@ export const configSlice = createSlice({
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
       state.kubeConfig = {...state.kubeConfig, ...action.payload};
-      electronStore.set('appConfig.kubeConfig', state.kubeConfig.path);
 
-      new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
+      if (state.kubeConfig.path) {
+        electronStore.set('appConfig.kubeConfig', state.kubeConfig.path);
+        new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
+      }
     },
     createProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
       const project: Project = action.payload;

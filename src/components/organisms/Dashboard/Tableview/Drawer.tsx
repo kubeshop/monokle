@@ -1,8 +1,8 @@
 import {useEffect, useState} from 'react';
 
+import {currentConfigSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {setActiveTab, setDashboardSelectedResourceId} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {currentConfigSelector} from '@redux/selectors';
 import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {applyResource} from '@redux/thunks/applyResource';
 
@@ -11,7 +11,6 @@ import {Logs, ResourceRefsIconPopover} from '@components/molecules';
 import PodHandler from '@src/kindhandlers/Pod.handler';
 
 import {K8sResource} from '@shared/models/k8sResource';
-import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './Drawer.styled';
 import {EditorTab} from './EditorTab';
