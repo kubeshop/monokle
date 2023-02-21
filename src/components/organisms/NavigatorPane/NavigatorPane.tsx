@@ -87,7 +87,7 @@ const NavPane: React.FC = () => {
       )}
 
       <ResizableRowsPanel
-        layout={{top: isResourceFiltersOpen ? 0.34 : 0.055}}
+        layout={{top: isResourceFiltersOpen ? 0.34 : 0.065}}
         splitterStyle={{display: isResourceFiltersOpen ? 'block' : 'none'}}
         top={<ResourceFilter active={isResourceFiltersOpen} onToggle={resourceFilterButtonHandler} />}
         bottom={
