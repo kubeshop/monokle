@@ -24,8 +24,8 @@ export const activeProjectSelector = createSelector(
 );
 
 export const kubeConfigPathValidSelector = createSelector(
-  (state: RootState) => state.config.kubeConfig.isPathValid,
-  isPathValid => {
-    return Boolean(isPathValid);
+  (state: RootState) => state.config,
+  config => {
+    return Boolean(config.projectConfig?.kubeConfig?.isPathValid) || Boolean(config.kubeConfig.isPathValid);
   }
 );
