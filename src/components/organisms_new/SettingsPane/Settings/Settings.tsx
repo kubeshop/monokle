@@ -62,8 +62,6 @@ export const Settings = ({
   const dispatch = useAppDispatch();
   const [settingsForm] = useForm();
 
-  const resourceRefsProcessingOptions = useAppSelector(state => state.main.resourceRefsProcessingOptions);
-  // const isKubeConfigBrowseSettingsOpen = useAppSelector(state => state.ui.kubeConfigBrowseSettings.isOpen);
   const isScanIncludesUpdated = useAppSelector(state => state.config.isScanIncludesUpdated);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const filePath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]?.filePath);
