@@ -1,4 +1,4 @@
-import {keyBy} from 'lodash';
+import {keyBy, size} from 'lodash';
 import {Selector, createSelector} from 'reselect';
 
 import {useAppSelector} from '@redux/hooks';
@@ -179,7 +179,7 @@ export const activeResourceStorageSelector = createSelector(
 export const activeResourceCountSelector = createSelector(
   [activeResourceStorageSelector, (state: RootState) => state.main.resourceMetaMapByStorage],
   (activeResourceStorage, resourceMetaMapByStorage) =>
-    Object.keys(resourceMetaMapByStorage[activeResourceStorage]).length
+    size(resourceMetaMapByStorage[activeResourceStorage]) + size(resourceMetaMapByStorage['transient'])
 );
 
 export const transientResourceCountSelector = createSelector(
@@ -194,7 +194,11 @@ export const filteredResourceSelector = createDeepEqualSelector(
     (state: RootState) => state.main.resourceMetaMapByStorage,
   ],
   (filter, activeResourceStorage, resourceMetaMapByStorage) => {
-    const activeResourceMetaMap = resourceMetaMapByStorage[activeResourceStorage];
+    const activeResourceMetaMap = {
+      ...resourceMetaMapByStorage[activeResourceStorage],
+      ...resourceMetaMapByStorage.transient,
+    };
+
     return Object.values(activeResourceMetaMap).filter(resource => isResourcePassingFilter(resource, filter));
   }
 );
@@ -252,7 +256,7 @@ export const allResourcesMetaSelector = createDeepEqualSelector(
 export const allResourceKindsSelector = createDeepEqualSelector(
   [knownResourceKindsSelector, allResourcesMetaSelector],
   (knownResourceKinds, allResourceMetas) => {
-    return allResourceMetas.filter(r => !knownResourceKinds.includes(r.kind)).map(r => r.kind);
+    return allResourceMetas.filter(r => knownResourceKinds.includes(r.kind)).map(r => r.kind);
   }
 );
 
