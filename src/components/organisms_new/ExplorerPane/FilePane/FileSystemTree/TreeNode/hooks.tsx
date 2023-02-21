@@ -294,7 +294,6 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
       label: 'Delete',
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
-        console.log('deleting file');
         deleteEntry(fileEntry);
       },
     });
