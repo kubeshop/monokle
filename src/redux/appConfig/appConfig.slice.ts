@@ -394,7 +394,10 @@ export const configSlice = createSlice({
       }
 
       if (action.payload?.config?.kubeConfig && !action.payload.fromConfigFile) {
-        state.kubeConfig.path = action.payload.config.kubeConfig.path;
+        state.projectConfig.kubeConfig = {
+          ...state.projectConfig.kubeConfig,
+          path: action.payload.config.kubeConfig.path,
+        };
       }
 
       new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);

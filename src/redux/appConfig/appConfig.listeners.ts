@@ -6,7 +6,7 @@ import {AppListenerFn} from '@redux/listeners/base';
 
 import {KubeConfigContext} from '@shared/models/config';
 
-import {setKubeConfig} from './appConfig.slice';
+import {setKubeConfig, updateProjectConfig} from './appConfig.slice';
 
 const loadKubeConfigListener: AppListenerFn = listen => {
   listen({
@@ -35,4 +35,31 @@ const loadKubeConfigListener: AppListenerFn = listen => {
   });
 };
 
-export const appConfigListeners = [loadKubeConfigListener];
+const loadKubeConfigProjectListener: AppListenerFn = listen => {
+  listen({
+    actionCreator: updateProjectConfig,
+    async effect(_action, {dispatch, cancelActiveListeners}) {
+      // Cancel any other listeners that are listening to the same action
+      cancelActiveListeners();
+      const configPath = _action.payload.config?.kubeConfig?.path;
+      if (!configPath) {
+        return;
+      }
+      try {
+        const kc = new k8s.KubeConfig();
+        kc.loadFromFile(configPath);
+        dispatch(
+          setKubeConfig({
+            isPathValid: !isEmpty(kc.contexts),
+            contexts: kc.contexts as KubeConfigContext[],
+            currentContext: kc.getCurrentContext(),
+          })
+        );
+      } catch (error) {
+        dispatch(setKubeConfig({isPathValid: false, contexts: []}));
+      }
+    },
+  });
+};
+
+export const appConfigListeners = [loadKubeConfigListener, loadKubeConfigProjectListener];
