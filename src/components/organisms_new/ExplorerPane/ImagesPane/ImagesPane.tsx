@@ -42,7 +42,7 @@ const ImagesPane: React.FC<InjectedPanelProps> = props => {
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
     >
-      <SectionBlueprintList id="images-section-container" $width={containerWidth + 12}>
+      <SectionBlueprintList id="images-section-container" $width={containerWidth + 15}>
         <SectionRenderer sectionId={ImagesSectionBlueprint.id} level={0} isLastSection={false} />
       </SectionBlueprintList>
     </AccordionPanel>

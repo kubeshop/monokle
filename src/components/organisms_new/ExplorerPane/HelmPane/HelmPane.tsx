@@ -42,7 +42,7 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
     >
-      <SectionBlueprintList id="helm-sections-container" $width={containerWidth + 12}>
+      <SectionBlueprintList id="helm-sections-container" $width={containerWidth + 15}>
         <SectionRenderer sectionId={RootHelmChartsSectionBlueprint.id} level={0} isLastSection={false} />
       </SectionBlueprintList>
     </AccordionPanel>
