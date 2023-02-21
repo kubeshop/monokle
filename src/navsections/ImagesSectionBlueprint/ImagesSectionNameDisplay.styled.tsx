@@ -36,7 +36,7 @@ export const NameDisplayContainer = styled.div`
   flex-direction: column;
   gap: 20px;
 
-  padding: 16px 26px;
+  padding: 16px 0px 16px 16px;
   font-size: 12px;
   color: ${Colors.grey9};
 

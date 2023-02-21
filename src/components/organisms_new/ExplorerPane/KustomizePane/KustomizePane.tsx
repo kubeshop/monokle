@@ -1,4 +1,5 @@
 import {memo} from 'react';
+import {useMeasure} from 'react-use';
 
 import {CollapsePanelProps} from 'antd';
 
@@ -6,6 +7,8 @@ import {useAppSelector} from '@redux/hooks';
 import {kustomizationResourcesSelectors} from '@redux/selectors';
 
 import {SectionRenderer} from '@molecules';
+
+import {SectionBlueprintList} from '@atoms';
 
 import KustomizationSectionBlueprint from '@src/navsections/KustomizationSectionBlueprint';
 import KustomizePatchSectionBlueprint from '@src/navsections/KustomizePatchSectionBlueprint';
@@ -15,18 +18,19 @@ import {InjectedPanelProps} from '@shared/models/explorer';
 
 import AccordionPanel from '../AccordionPanel';
 import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
-import * as S from './KustomizePane.styled';
 
 const KustomizePane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
   const kustomizationsResources = useAppSelector(kustomizationResourcesSelectors);
 
+  const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
+
   return (
     <AccordionPanel
       {...props}
       header={
-        <AccordionTitleBarContainer>
+        <AccordionTitleBarContainer ref={containerRef}>
           <TitleBar
             title="Kustomize"
             expandable
@@ -38,10 +42,10 @@ const KustomizePane: React.FC<InjectedPanelProps> = props => {
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
     >
-      <S.List id="kustomize-sections-container">
+      <SectionBlueprintList id="kustomize-sections-container" $width={containerWidth + 15}>
         <SectionRenderer sectionId={KustomizationSectionBlueprint.id} level={0} isLastSection={false} />
         <SectionRenderer sectionId={KustomizePatchSectionBlueprint.id} level={0} isLastSection={false} />
-      </S.List>
+      </SectionBlueprintList>
     </AccordionPanel>
   );
 };
