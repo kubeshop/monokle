@@ -4,8 +4,8 @@ import {Skeleton} from 'antd';
 
 import {Primitive} from 'type-fest';
 
+import {setCreateProject} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCreateProject} from '@redux/reducers/appConfig';
 import {kubeConfigPathSelector} from '@redux/selectors';
 import {createTransientResourcesFromVanillaTemplate} from '@redux/services/templates';
 import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmChart';

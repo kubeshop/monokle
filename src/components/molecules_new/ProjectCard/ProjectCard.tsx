@@ -6,8 +6,8 @@ import {DeleteOutlined, ExclamationCircleOutlined, PushpinFilled, PushpinOutline
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
+import {setDeleteProject, setOpenProject, toggleProjectPin} from '@redux/appConfig';
 import {useAppDispatch} from '@redux/hooks';
-import {setDeleteProject, setOpenProject, toggleProjectPin} from '@redux/reducers/appConfig';
 import {toggleStartProjectPane} from '@redux/reducers/ui';
 
 import {getRelativeDate} from '@utils/index';

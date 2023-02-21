@@ -6,8 +6,8 @@ import {isAnyOf} from '@reduxjs/toolkit';
 
 import {isEmpty, isEqual} from 'lodash';
 
+import {updateK8sVersion, updateProjectK8sVersion} from '@redux/appConfig';
 import {AppListenerFn} from '@redux/listeners/base';
-import {updateK8sVersion, updateProjectK8sVersion} from '@redux/reducers/appConfig';
 import {addMultipleResources, addResource, clearPreview, clearPreviewAndSelectionHistory} from '@redux/reducers/main';
 import {setIsInQuickClusterMode} from '@redux/reducers/ui';
 import {currentConfigSelector} from '@redux/selectors';

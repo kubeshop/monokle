@@ -9,7 +9,6 @@ import _ from 'lodash';
 import {DEFAULT_KUBECONFIG_DEBOUNCE, TOOLTIP_DELAY} from '@constants/constants';
 import {AutoLoadLastProjectTooltip, TelemetryDocumentationUrl} from '@constants/tooltips';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   changeProjectsRootPath,
   toggleErrorReporting,
@@ -17,7 +16,8 @@ import {
   updateClusterSelectorVisibilty,
   updateFileExplorerSortOrder,
   updateLoadLastProjectOnStartup,
-} from '@redux/reducers/appConfig';
+} from '@redux/appConfig';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {FileExplorer} from '@components/atoms';
 

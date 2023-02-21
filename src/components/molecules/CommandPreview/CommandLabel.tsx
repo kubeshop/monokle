@@ -4,9 +4,9 @@ import {Modal} from 'antd';
 
 import {cloneDeep} from 'lodash';
 
+import {updateProjectConfig} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {openSaveEditCommandModal} from '@redux/reducers/ui';
 
 import {AlertEnum} from '@shared/models/alert';

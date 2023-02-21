@@ -2,7 +2,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {cloneDeep} from 'lodash';
 
-import {updateProjectConfig} from '@redux/reducers/appConfig';
+import {updateProjectConfig} from '@redux/appConfig';
 import {clearSelection, selectFile} from '@redux/reducers/main';
 
 import {AppDispatch} from '@shared/models/appDispatch';

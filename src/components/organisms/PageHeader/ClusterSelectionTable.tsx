@@ -7,9 +7,9 @@ import {v4 as uuid} from 'uuid';
 
 import {CLUSTER_AVAILABLE_COLORS, TOOLTIP_DELAY} from '@constants/constants';
 
+import {setCurrentContext, setKubeConfigContextColor, updateClusterNamespaces} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setCurrentContext, setKubeConfigContextColor, updateClusterNamespaces} from '@redux/reducers/appConfig';
 import {kubeConfigContextsSelector} from '@redux/selectors';
 
 import {FilePatternList} from '@atoms';

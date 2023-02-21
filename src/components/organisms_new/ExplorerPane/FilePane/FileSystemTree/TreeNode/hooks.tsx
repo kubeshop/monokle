@@ -7,9 +7,9 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {basename, dirname, join} from 'path';
 
+import {updateProjectConfig} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {openCreateFileFolderModal, openNewResourceWizard, openRenameEntityModal} from '@redux/reducers/ui';
 import {scanExcludesSelector} from '@redux/selectors';
 import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';

@@ -9,8 +9,8 @@ import _ from 'lodash';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {NotificationsTooltip} from '@constants/tooltips';
 
+import {setOpenProject} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setOpenProject} from '@redux/reducers/appConfig';
 import {setShowStartPageLearn, toggleNotifications} from '@redux/reducers/ui';
 
 import {WelcomePopupContent} from '@molecules';

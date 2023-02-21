@@ -1,6 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {setClusterProxyPort} from '@redux/reducers/appConfig';
+import {setClusterProxyPort} from '@redux/appConfig';
 import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 import {stopPreview} from '@redux/services/preview';
 

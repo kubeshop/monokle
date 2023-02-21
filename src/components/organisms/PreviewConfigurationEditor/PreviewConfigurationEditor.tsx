@@ -8,8 +8,8 @@ import {v4 as uuidv4} from 'uuid';
 import {HELM_INSTALL_OPTIONS_DOCS_URL, HELM_TEMPLATE_OPTIONS_DOCS_URL} from '@constants/constants';
 import {helmInstallOptions, helmTemplateOptions} from '@constants/helmOptions';
 
+import {updateProjectConfig} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {closePreviewConfigurationEditor} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
 

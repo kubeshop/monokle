@@ -1,5 +1,5 @@
+import {toggleEditorPlaceholderVisiblity} from '@redux/appConfig';
 import {useAppDispatch} from '@redux/hooks';
-import {toggleEditorPlaceholderVisiblity} from '@redux/reducers/appConfig';
 
 import MonacoPlaceholderImage from '@assets/MonacoPlaceholderImage.svg';
 

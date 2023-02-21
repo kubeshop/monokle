@@ -52,7 +52,7 @@ import electronStore from '@shared/utils/electronStore';
 import {createKubeClient, getKubeAccess} from '@shared/utils/kubeclient';
 
 import initialState from '../initialState';
-import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';
+import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from '../reducers/ui';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
   const isGitRepo = await promiseFromIpcRenderer(
@@ -234,6 +234,8 @@ export const configSlice = createSlice({
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
       state.kubeConfig = {...state.kubeConfig, ...action.payload};
+      electronStore.set('appConfig.kubeConfig', state.kubeConfig.path);
+
       new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
     },
     createProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {

@@ -1,8 +1,8 @@
 import {FSWatcher, watch} from 'chokidar';
 import {sep} from 'path';
 
+import {updateProjectsGitRepo} from '@redux/appConfig';
 import {setBranchCommits, setChangedFiles, setCommits, setRepo} from '@redux/git';
-import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 

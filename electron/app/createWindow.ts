@@ -198,7 +198,7 @@ export const createWindow = (givenPath?: string) => {
       await checkNewVersion(dispatch, true);
     }, NEW_VERSION_CHECK_INTERVAL);
 
-    initKubeconfig(dispatch, userHomeDir);
+    initKubeconfig(dispatch, userHomeDir, utilsElectronStore.get('appConfig.kubeConfig'));
     dispatch({type: 'main/setAppRehydrating', payload: false});
 
     const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);
