@@ -10,6 +10,14 @@ export const gitSlice = createSlice({
   name: 'git',
   initialState: gitInitialState,
   reducers: {
+    addGitBranch: (state: Draft<GitSliceState>, action: PayloadAction<string>) => {
+      if (!state.repo) {
+        return;
+      }
+
+      state.repo.branches.push(action.payload);
+    },
+
     clearRepo: (state: Draft<GitSliceState>) => {
       state.repo = undefined;
     },
@@ -88,6 +96,7 @@ export const gitSlice = createSlice({
 });
 
 export const {
+  addGitBranch,
   clearRepo,
   closeGitCloneModal,
   openGitCloneModal,

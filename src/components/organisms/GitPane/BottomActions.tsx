@@ -7,7 +7,7 @@ import {ArrowDownOutlined, ArrowUpOutlined, DownOutlined} from '@ant-design/icon
 import {GIT_ERROR_MODAL_DESCRIPTION, TOOLTIP_DELAY} from '@constants/constants';
 import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
 
-import {setGitLoading} from '@redux/git';
+import {addGitBranch, setGitLoading} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
@@ -104,15 +104,21 @@ const BottomActions: React.FC = () => {
   );
 
   const publishHandler = useCallback(async () => {
+    if (!gitRepo) {
+      return;
+    }
+
     dispatch(setGitLoading(true));
 
     await promiseFromIpcRenderer('git.publishLocalBranch', 'git.publishLocalBranch.result', {
       localPath: selectedProjectRootFolder,
       branchName: currentBranch || 'main',
     });
+    dispatch(addGitBranch(`origin/${currentBranch}`));
+    dispatch(setAlert({title: 'Branch published successfully', message: '', type: AlertEnum.Success}));
 
     dispatch(setGitLoading(false));
-  }, [currentBranch, dispatch, selectedProjectRootFolder]);
+  }, [currentBranch, dispatch, gitRepo, selectedProjectRootFolder]);
 
   const isBranchOnRemote = useMemo(() => {
     if (!gitRepo) {

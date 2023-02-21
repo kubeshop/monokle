@@ -7,7 +7,7 @@ import {CheckOutlined} from '@ant-design/icons';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {CommitTooltip} from '@constants/tooltips';
 
-import {setCurrentBranch, setRepo} from '@redux/git';
+import {setCurrentBranch, setGitLoading, setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
@@ -53,6 +53,7 @@ const CreateBranchInput: React.FC<IProps> = props => {
     await promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', projectRootFolder).then(result => {
       dispatch(setRepo(result));
       dispatch(setCurrentBranch(result.currentBranch));
+      dispatch(setGitLoading(false));
     });
 
     hideCreateBranchInputHandler();
