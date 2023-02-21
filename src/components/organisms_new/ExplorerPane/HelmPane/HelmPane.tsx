@@ -1,4 +1,5 @@
 import {memo} from 'react';
+import {useMeasure} from 'react-use';
 
 import {CollapsePanelProps} from 'antd';
 
@@ -8,6 +9,8 @@ import {useAppSelector} from '@redux/hooks';
 
 import {SectionRenderer} from '@molecules';
 
+import {SectionBlueprintList} from '@atoms';
+
 import RootHelmChartsSectionBlueprint from '@src/navsections/HelmChartSectionBlueprint';
 
 import {TitleBar, TitleBarCount} from '@monokle/components';
@@ -15,18 +18,19 @@ import {InjectedPanelProps} from '@shared/models/explorer';
 
 import AccordionPanel from '../AccordionPanel';
 import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
-import * as S from './HelmPane.styled';
 
 const HelmPane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
 
+  const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
+
   return (
     <AccordionPanel
       {...props}
       header={
-        <AccordionTitleBarContainer>
+        <AccordionTitleBarContainer ref={containerRef}>
           <TitleBar
             title="Helm"
             expandable
@@ -38,9 +42,9 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
     >
-      <S.List id="helm-sections-container">
+      <SectionBlueprintList id="helm-sections-container" $width={containerWidth + 12}>
         <SectionRenderer sectionId={RootHelmChartsSectionBlueprint.id} level={0} isLastSection={false} />
-      </S.List>
+      </SectionBlueprintList>
     </AccordionPanel>
   );
 };

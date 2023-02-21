@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
-export const List = styled.ol`
+export const SectionBlueprintList = styled.ol<{$width?: number}>`
+  width: ${({$width}) => ($width ? `${$width}px` : '100%')};
   height: 100%;
   list-style-type: none;
   padding: 0;
