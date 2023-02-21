@@ -35,9 +35,8 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
 
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resourceMetaList, defaultClusterNamespace);
-  const [namespaces] = useTargetClusterNamespaces();
 
-  const hasOneNamespaceWithFullAccess = clusterAccess?.length === 1 && clusterAccess[0].hasFullAccess;
+  const [namespaces] = useTargetClusterNamespaces();
 
   const [createNamespaceName, setCreateNamespaceName] = useState<string>();
   const [errorMessage, setErrorMessage] = useState('');
@@ -89,7 +88,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       setSelectedOption('none');
       setSelectedNamespace('default');
       setCreateNamespaceName('');
-    } else if (!namespaces.includes(defaultNamespace) && hasOneNamespaceWithFullAccess) {
+    } else if (!namespaces.includes(defaultNamespace)) {
       setSelectedOption('create');
       setSelectedNamespace('default');
       setCreateNamespaceName(defaultNamespace);
@@ -98,7 +97,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       setSelectedNamespace(defaultNamespace);
       setCreateNamespaceName('');
     }
-  }, [defaultOption, defaultNamespace, namespaces, hasOneNamespaceWithFullAccess, onlyClusterScopedResources]);
+  }, [defaultOption, defaultNamespace, namespaces, onlyClusterScopedResources]);
 
   if (!onlyClusterScopedResources && !selectedOption) {
     return null;
@@ -132,7 +131,6 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
           onChange={e => {
             setSelectedOption(e.target.value);
             setErrorMessage('');
-            setCreateNamespaceName('');
           }}
           value={selectedOption}
         >
