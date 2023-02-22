@@ -53,9 +53,10 @@ const loadKubeConfigProjectListener: AppListenerFn = listen => {
           isPathValid: !isEmpty(kc.contexts),
           contexts: kc.contexts as KubeConfigContext[],
           currentContext: kc.getCurrentContext(),
+          path: configPath,
         };
       } catch (error) {
-        config = {isPathValid: false, contexts: []};
+        config = {isPathValid: false, path: configPath};
       }
       dispatch(loadProjectKubeConfig(config));
     },

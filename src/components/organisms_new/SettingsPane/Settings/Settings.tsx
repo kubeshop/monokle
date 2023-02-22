@@ -33,7 +33,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {FilePatternList} from '@atoms';
 
-import {useFocus} from '@utils/hooks';
+import {useFocus, useStateWithRef} from '@utils/hooks';
 import {doesSchemaExist} from '@utils/index';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -81,10 +81,10 @@ export const Settings = ({
   const userDataDir = useAppSelector(state => state.config.userDataDir);
   const [selectedK8SVersion, setSelectedK8SVersion] = useState<string>(String(config?.k8sVersion));
   const [isSchemaDownloading, setIsSchemaDownloading] = useState<boolean>(false);
-  const [localConfig, setLocalConfig] = useState<ProjectConfig | null | undefined>(config);
+  const [localConfig, setLocalConfig, localConfigRef] = useStateWithRef<ProjectConfig | null | undefined>(config);
 
   const handleConfigChange = () => {
-    if (onConfigChange && !_.isEqual(localConfig, config)) {
+    if (onConfigChange && !_.isEqual(localConfigRef.current, config)) {
       onConfigChange(localConfig);
     }
   };

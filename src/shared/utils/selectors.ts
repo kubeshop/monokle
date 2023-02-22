@@ -1,4 +1,4 @@
-import {size} from 'lodash';
+import {has, size} from 'lodash';
 import {createSelector} from 'reselect';
 
 import {RootState} from '../models/rootState';
@@ -26,6 +26,10 @@ export const activeProjectSelector = createSelector(
 export const kubeConfigPathValidSelector = createSelector(
   (state: RootState) => state.config,
   config => {
-    return Boolean(config.projectConfig?.kubeConfig?.isPathValid) || Boolean(config.kubeConfig.isPathValid);
+    if (has(config, 'projectConfig.kubeConfig.isPathValid')) {
+      return Boolean(config.projectConfig?.kubeConfig?.isPathValid);
+    }
+
+    return Boolean(config.kubeConfig.isPathValid);
   }
 );

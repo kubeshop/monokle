@@ -8,6 +8,7 @@ import {Entries} from 'type-fest';
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
 import initialState from '@redux/initialState';
+import {loadClusterResources} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -348,6 +349,10 @@ export const uiSlice = createSlice({
       })
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;
+      })
+      .addCase(loadClusterResources.fulfilled, state => {
+        state.leftMenu.selection = 'dashboard';
+        state.leftMenu.isActive = true;
       });
   },
 });
