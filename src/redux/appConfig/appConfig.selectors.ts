@@ -1,3 +1,4 @@
+import {isEmpty} from 'lodash';
 import {createSelector} from 'reselect';
 
 import {createDeepEqualSelector} from '@redux/selectors/utils';
@@ -22,25 +23,30 @@ export const kubeConfigContextSelector = createSelector(
 
 export const kubeConfigContextColorSelector = createSelector(
   [
+    (state: RootState) => state.config.projectConfig?.kubeConfig?.currentContext,
     (state: RootState) => state.config.kubeConfig.currentContext,
     (state: RootState) => state.config.kubeConfigContextsColors,
   ],
-  (currentContext, kubeConfigContextsColors) => {
-    if (!currentContext) {
-      return Colors.volcano8;
+  (projectContext, currentContext, kubeConfigContextsColors) => {
+    if (projectContext) {
+      return kubeConfigContextsColors[projectContext] || Colors.volcano8;
     }
 
-    return kubeConfigContextsColors[currentContext] || Colors.volcano8;
+    if (currentContext) {
+      return kubeConfigContextsColors[currentContext] || Colors.volcano8;
+    }
+
+    return Colors.volcano8;
   }
 );
 
 export const kubeConfigContextsSelector = createSelector(
-  (state: RootState) => state.config.kubeConfig.contexts,
-  contexts => {
-    if (contexts) {
-      return contexts;
-    }
-    return [];
+  [
+    (state: RootState) => state.config.projectConfig?.kubeConfig?.contexts,
+    (state: RootState) => state.config.kubeConfig.contexts,
+  ],
+  (projectContexts = [], contexts = []) => {
+    return !isEmpty(projectContexts) ? projectContexts : contexts;
   }
 );
 
@@ -60,13 +66,11 @@ export const currentClusterAccessSelector = createSelector(
 );
 
 export const kubeConfigPathSelector = createSelector(
-  (state: RootState) => state.config.kubeConfig.path,
-  kubeConfigPath => {
-    if (kubeConfigPath) {
-      return kubeConfigPath;
-    }
-    return '';
-  }
+  [
+    (state: RootState) => state.config.projectConfig?.kubeConfig?.path,
+    (state: RootState) => state.config.kubeConfig.path,
+  ],
+  (projectKubeConfigPath, kubeConfigPath) => projectKubeConfigPath || kubeConfigPath || ''
 );
 
 export const currentConfigSelector = createDeepEqualSelector(

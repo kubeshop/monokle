@@ -6,7 +6,7 @@ import {AppListenerFn} from '@redux/listeners/base';
 
 import {KubeConfigContext} from '@shared/models/config';
 
-import {setKubeConfig, updateProjectConfig} from './appConfig.slice';
+import {loadProjectKubeConfig, setKubeConfig, updateProjectConfig} from './appConfig.slice';
 
 const loadKubeConfigListener: AppListenerFn = listen => {
   listen({
@@ -49,14 +49,14 @@ const loadKubeConfigProjectListener: AppListenerFn = listen => {
         const kc = new k8s.KubeConfig();
         kc.loadFromFile(configPath);
         dispatch(
-          setKubeConfig({
+          loadProjectKubeConfig({
             isPathValid: !isEmpty(kc.contexts),
             contexts: kc.contexts as KubeConfigContext[],
             currentContext: kc.getCurrentContext(),
           })
         );
       } catch (error) {
-        dispatch(setKubeConfig({isPathValid: false, contexts: []}));
+        dispatch(loadProjectKubeConfig({isPathValid: false, contexts: []}));
       }
     },
   });

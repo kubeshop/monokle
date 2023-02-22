@@ -312,6 +312,11 @@ export const configSlice = createSlice({
       state.projects = sortProjects(state.projects, Boolean(state.selectedProjectRootFolder));
       electronStore.set('appConfig.projects', state.projects);
     },
+    loadProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
+      if (state.projectConfig?.kubeConfig) {
+        state.projectConfig.kubeConfig = {...state.projectConfig.kubeConfig, ...action.payload};
+      }
+    },
     updateProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
       if (!state.selectedProjectRootFolder) {
         return;
@@ -396,7 +401,7 @@ export const configSlice = createSlice({
       if (action.payload?.config?.kubeConfig && !action.payload.fromConfigFile) {
         state.projectConfig.kubeConfig = {
           ...state.projectConfig.kubeConfig,
-          path: action.payload.config.kubeConfig.path,
+          ...action.payload.config.kubeConfig,
         };
       }
 
@@ -661,6 +666,7 @@ export const {
   updateProjectConfig,
   updateProjectK8sVersion,
   updateProjectKubeConfig,
+  loadProjectKubeConfig,
   updateProjectsGitRepo,
   updateScanExcludes,
   updateTelemetry,
