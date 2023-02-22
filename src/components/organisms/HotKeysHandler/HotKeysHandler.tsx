@@ -4,6 +4,14 @@ import {useStore} from 'react-redux';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
+import {
+  currentConfigSelector,
+  isInClusterModeSelector,
+  kubeConfigContextColorSelector,
+  kubeConfigContextSelector,
+  kubeConfigPathSelector,
+  kubeConfigPathValidSelector,
+} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openResourceDiffModal, resetResourceFilter} from '@redux/reducers/main';
 import {
@@ -15,15 +23,7 @@ import {
   setLeftMenuSelection,
   toggleRightMenu,
 } from '@redux/reducers/ui';
-import {
-  currentConfigSelector,
-  isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
-  kubeConfigContextColorSelector,
-  kubeConfigPathSelector,
-  rootFilePathSelector,
-  selectedFilePathSelector,
-} from '@redux/selectors';
+import {isInPreviewModeSelectorNew, rootFilePathSelector, selectedFilePathSelector} from '@redux/selectors';
 import {getActiveResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
@@ -45,7 +45,6 @@ import {useSelectorWithRef} from '@utils/hooks';
 import {hotkeys} from '@shared/constants/hotkeys';
 import {RootState} from '@shared/models/rootState';
 import {selectFromHistory} from '@shared/utils/selectionHistory';
-import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 const HotKeysHandler = () => {
   const store = useStore();

@@ -8,9 +8,9 @@ import {sep} from 'path';
 
 import {DEFAULT_GIT_REPO_PLACEHOLDER, VALID_URL_REGEX} from '@constants/constants';
 
+import {setCreateProject} from '@redux/appConfig';
 import {closeGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCreateProject} from '@redux/reducers/appConfig';
 
 import {FileExplorer} from '@atoms';
 

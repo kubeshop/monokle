@@ -1,9 +1,12 @@
+import {
+  activeProjectSelector,
+  changeCurrentProjectName,
+  currentConfigSelector,
+  updateProjectConfig,
+} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {changeCurrentProjectName, updateProjectConfig} from '@redux/reducers/appConfig';
-import {currentConfigSelector} from '@redux/selectors';
 
 import {Project, ProjectConfig} from '@shared/models/config';
-import {activeProjectSelector} from '@shared/utils/selectors';
 
 import {Settings} from '../Settings/Settings';
 

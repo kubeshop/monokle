@@ -1,7 +1,7 @@
 import {groupBy} from 'lodash';
 import {createSelector} from 'reselect';
 
-import {selectCurrentKubeConfig} from '@redux/selectors';
+import {selectCurrentKubeConfig} from '@redux/appConfig';
 import {kustomizationsSelector} from '@redux/selectors/resourceSelectors';
 import {canTransfer} from '@redux/services/compare/transferResource';
 import {joinK8sResource} from '@redux/services/resource';

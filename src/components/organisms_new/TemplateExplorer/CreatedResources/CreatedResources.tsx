@@ -7,13 +7,13 @@ import {SelectOutlined} from '@ant-design/icons';
 
 import {isEmpty} from 'lodash';
 
+import {activeProjectSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 import {closeTemplateExplorer, setSelectedTemplatePath} from '@redux/reducers/ui';
 
 import {TitleBar} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
-import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './CreatedResources.styled';
 import SaveToFolderModal from './SaveToFolderModal';

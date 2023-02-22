@@ -8,9 +8,10 @@ import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 

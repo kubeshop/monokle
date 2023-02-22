@@ -8,7 +8,7 @@ import log from 'loglevel';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {currentClusterAccessSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {currentClusterAccessSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
 import {extractK8sResources} from '@redux/services/resource';
 import {createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';

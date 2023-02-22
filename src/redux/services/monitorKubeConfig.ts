@@ -6,13 +6,13 @@ import fs from 'fs';
 import log from 'loglevel';
 import {AnyAction} from 'redux';
 
-import {setAlert} from '@redux/reducers/alert';
 import {
   addNamespaceToContext,
   removeNamespaceFromContext,
   setAccessLoading,
   updateProjectKubeConfig,
-} from '@redux/reducers/appConfig';
+} from '@redux/appConfig';
+import {setAlert} from '@redux/reducers/alert';
 
 import {AlertEnum} from '@shared/models/alert';
 import {KubeConfig, KubeConfigContext} from '@shared/models/config';

@@ -1,5 +1,6 @@
 import {useEffect, useMemo} from 'react';
 
+import {activeProjectSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setActiveSettingsPanel} from '@redux/reducers/ui';
 
@@ -7,7 +8,6 @@ import {TitleBarWrapper} from '@components/atoms';
 
 import {TitleBar} from '@monokle/components';
 import {SettingsPanel} from '@shared/models/config';
-import {activeProjectSelector} from '@shared/utils/selectors';
 
 import ValidationSettings from '../ValidationSettings';
 import {CurrentProjectSettings} from './CurrentProjectSettings/CurrentProjectSettings';

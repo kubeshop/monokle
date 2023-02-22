@@ -1,15 +1,18 @@
 import {Dropdown, Typography} from 'antd';
 
+import {
+  activeProjectSelector,
+  currentConfigSelector,
+  updateK8sVersion,
+  updateProjectK8sVersion,
+} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateK8sVersion, updateProjectK8sVersion} from '@redux/reducers/appConfig';
-import {currentConfigSelector} from '@redux/selectors';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
 import {setConfigK8sSchemaVersion} from '@redux/validation/validation.slice';
 
 import {doesSchemaExist} from '@utils/index';
 
 import {K8S_VERSIONS} from '@shared/constants/k8s';
-import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './K8sVersionSelection.style';
 

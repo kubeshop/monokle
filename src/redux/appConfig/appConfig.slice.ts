@@ -9,7 +9,6 @@ import log from 'loglevel';
 import path, {join} from 'path';
 
 import {AppListenerFn} from '@redux/listeners/base';
-import {kubeConfigPathSelector} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {
@@ -52,7 +51,8 @@ import electronStore from '@shared/utils/electronStore';
 import {createKubeClient, getKubeAccess} from '@shared/utils/kubeclient';
 
 import initialState from '../initialState';
-import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from './ui';
+import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from '../reducers/ui';
+import {kubeConfigPathSelector} from './appConfig.selectors';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
   const isGitRepo = await promiseFromIpcRenderer(
@@ -234,7 +234,11 @@ export const configSlice = createSlice({
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
       state.kubeConfig = {...state.kubeConfig, ...action.payload};
-      new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
+
+      if (state.kubeConfig.path) {
+        electronStore.set('appConfig.kubeConfig', state.kubeConfig.path);
+        new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
+      }
     },
     createProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
       const project: Project = action.payload;
@@ -307,6 +311,11 @@ export const configSlice = createSlice({
 
       state.projects = sortProjects(state.projects, Boolean(state.selectedProjectRootFolder));
       electronStore.set('appConfig.projects', state.projects);
+    },
+    loadProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
+      if (state.projectConfig?.kubeConfig) {
+        state.projectConfig.kubeConfig = {...state.projectConfig.kubeConfig, ...action.payload};
+      }
     },
     updateProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
       if (!state.selectedProjectRootFolder) {
@@ -390,12 +399,18 @@ export const configSlice = createSlice({
       }
 
       if (action.payload?.config?.kubeConfig && !action.payload.fromConfigFile) {
-        state.kubeConfig.path = action.payload.config.kubeConfig.path;
+        state.projectConfig.kubeConfig = {
+          ...state.projectConfig.kubeConfig,
+          ...action.payload.config.kubeConfig,
+        };
       }
 
       new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
 
-      if (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder))) {
+      if (
+        !action.payload.fromConfigFile &&
+        (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder)))
+      ) {
         writeProjectConfigFile(state);
       }
     },
@@ -654,6 +669,7 @@ export const {
   updateProjectConfig,
   updateProjectK8sVersion,
   updateProjectKubeConfig,
+  loadProjectKubeConfig,
   updateProjectsGitRepo,
   updateScanExcludes,
   updateTelemetry,

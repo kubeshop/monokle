@@ -3,6 +3,7 @@ import {useMemo} from 'react';
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 import {ApplyFileTooltip, ApplyTooltip, InstallValuesFileTooltip, KubeConfigNoValid} from '@constants/tooltips';
 
+import {kubeConfigPathValidSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 import {selectedFilePathSelector} from '@redux/selectors';
 import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
@@ -11,7 +12,6 @@ import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
 import {ResourceMeta} from '@shared/models/k8sResource';
-import {kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 export const useInstallDeploy = (resourceMeta?: ResourceMeta) => {
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);

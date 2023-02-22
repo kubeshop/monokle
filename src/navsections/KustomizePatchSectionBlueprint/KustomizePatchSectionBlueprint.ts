@@ -1,5 +1,5 @@
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {selectResource} from '@redux/reducers/main';
-import {isInClusterModeSelector} from '@redux/selectors';
 import {getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 

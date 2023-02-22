@@ -9,15 +9,18 @@ import {LoadingOutlined} from '@ant-design/icons';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterNamespaceTooltip} from '@constants/tooltips';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {highlightItem, setActiveSettingsPanel, setLeftMenuSelection, toggleStartProjectPane} from '@redux/reducers/ui';
 import {
+  activeProjectSelector,
   currentClusterAccessSelector,
   isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
   kubeConfigContextColorSelector,
+  kubeConfigContextSelector,
   kubeConfigPathSelector,
-} from '@redux/selectors';
+  kubeConfigPathValidSelector,
+} from '@redux/appConfig';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {highlightItem, setActiveSettingsPanel, setLeftMenuSelection, toggleStartProjectPane} from '@redux/reducers/ui';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 import {startClusterConnection, stopClusterConnection} from '@redux/thunks/cluster';
 
@@ -30,7 +33,6 @@ import {SettingsPanel} from '@shared/models/config';
 import {HighlightItems} from '@shared/models/ui';
 import {Size} from '@shared/models/window';
 import {defineHotkey} from '@shared/utils/hotkey';
-import {activeProjectSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 import * as S from './ClusterSelection.styled';
 

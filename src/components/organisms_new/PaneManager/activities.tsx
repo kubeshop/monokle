@@ -5,6 +5,7 @@ import {size} from 'lodash';
 
 import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip} from '@constants/tooltips';
 
+import {activeProjectSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
@@ -12,7 +13,6 @@ import {BottomPaneManager, DashboardPane, GitPane} from '@organisms';
 
 import {ActivityType, Icon} from '@monokle/components';
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@shared/models/ui';
-import {activeProjectSelector} from '@shared/utils';
 
 import CompareSyncPane from '../CompareSyncPane';
 import ExplorerPane from '../ExplorerPane';

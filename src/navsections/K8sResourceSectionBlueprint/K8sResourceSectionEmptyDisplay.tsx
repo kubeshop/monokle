@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {highlightItem, openNewResourceWizard, openTemplateExplorer, setLeftMenuSelection} from '@redux/reducers/ui';
@@ -9,7 +10,6 @@ import {startClusterConnection} from '@redux/thunks/cluster';
 import {ResourceFilterType} from '@shared/models/appState';
 import {HighlightItems} from '@shared/models/ui';
 import {Colors} from '@shared/styles/colors';
-import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 const StyledContainer = styled.div`
   margin-top: 12px;

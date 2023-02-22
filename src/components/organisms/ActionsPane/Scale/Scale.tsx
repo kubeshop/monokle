@@ -5,16 +5,14 @@ import {Col, InputNumber, Modal, Row, Tooltip} from 'antd';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ScaleTooltip} from '@constants/tooltips';
 
+import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeScaleModal, openScaleModal} from '@redux/reducers/ui';
-import {isInClusterModeSelector, kubeConfigPathSelector} from '@redux/selectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import scaleDeployment from '@redux/services/scaleDeployment';
 import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {PrimaryButton} from '@atoms';
-
-import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 const Scale: React.FC = () => {
   const dispatch = useAppDispatch();

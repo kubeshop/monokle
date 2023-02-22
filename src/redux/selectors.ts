@@ -2,18 +2,13 @@ import {createSelector} from 'reselect';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppState} from '@shared/models/appState';
-import {HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmValuesFile} from '@shared/models/helm';
 import {RootState} from '@shared/models/rootState';
 import {isFileSelection, isPreviewConfigurationSelection} from '@shared/models/selection';
-import {Colors} from '@shared/styles/colors';
-import {isDefined} from '@shared/utils/filter';
 
 import {getResourceMetaMapFromState} from './selectors/resourceMapGetters';
-import {createDeepEqualSelector} from './selectors/utils';
 import {isKustomizationResource} from './services/kustomize';
-import {mergeConfigs, populateProjectConfig} from './services/projectConfig';
 
 export const rootFolderSelector = createSelector(
   (state: RootState) => state.main.fileMap,
@@ -134,23 +129,6 @@ export const selectHelmValues = (state: AppState, id?: string): HelmValuesFile |
   return state.helmValuesMap[id];
 };
 
-export const selectHelmConfig = (state: RootState, id?: string): HelmPreviewConfiguration | undefined => {
-  if (!id) return undefined;
-  return state.config.projectConfig?.helm?.previewConfigurationMap?.[id] ?? undefined;
-};
-
-export const selectCurrentKubeConfig = createSelector(
-  (state: RootState) => state.config.kubeConfig,
-  kubeConfig => kubeConfig
-);
-
-export const isInClusterModeSelector = createSelector(
-  [selectCurrentKubeConfig, state => state.main.clusterConnection?.context],
-  (kubeConfig, clusterConnectionContext) => {
-    return kubeConfig && isDefined(clusterConnectionContext) && clusterConnectionContext === kubeConfig.currentContext;
-  }
-);
-
 // TODO: rename this after finishing refactoring all places where the old `isInPreviewModeSelector` is used
 // the previous selector returned `true` even if you were in ClusterMode but that's no longer desired
 export const isInPreviewModeSelectorNew = createSelector(
@@ -160,88 +138,11 @@ export const isInPreviewModeSelectorNew = createSelector(
   }
 );
 
-export const currentConfigSelector = createDeepEqualSelector(
-  (state: RootState) => state.config,
-  config => {
-    const applicationConfig: ProjectConfig = populateProjectConfig(config);
-    const projectConfig: ProjectConfig | null | undefined = config.projectConfig;
-    return mergeConfigs(applicationConfig, projectConfig);
-  }
-);
-
-export const settingsSelector = createDeepEqualSelector(currentConfigSelector, currentConfig => {
-  return currentConfig.settings || {};
-});
-
-export const scanExcludesSelector = createDeepEqualSelector(currentConfigSelector, currentConfig => {
-  return currentConfig.scanExcludes || [];
-});
-
-export const fileIncludesSelector = createDeepEqualSelector(currentConfigSelector, currentConfig => {
-  currentConfig.fileIncludes || [];
-});
-
 export const kustomizationResourcesSelectors = createSelector(
   (state: RootState) => getResourceMetaMapFromState(state, 'local'),
   localResourceMetaMap => {
     return Object.values(localResourceMetaMap)
       .filter(i => isKustomizationResource(i))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }
-);
-
-export const kubeConfigContextColorSelector = createSelector(
-  [
-    (state: RootState) => state.config.kubeConfig.currentContext,
-    (state: RootState) => state.config.kubeConfigContextsColors,
-  ],
-  (currentContext, kubeConfigContextsColors) => {
-    if (!currentContext) {
-      return Colors.volcano8;
-    }
-
-    return kubeConfigContextsColors[currentContext] || Colors.volcano8;
-  }
-);
-
-export const kubeConfigContextsSelector = createSelector(
-  (state: RootState) => state.config.kubeConfig.contexts,
-  contexts => {
-    if (contexts) {
-      return contexts;
-    }
-    return [];
-  }
-);
-
-export const currentKubeContextSelector = createSelector(
-  (state: RootState) => state.config.kubeConfig.currentContext,
-  context => context
-);
-
-export const currentClusterAccessSelector = createSelector(
-  [currentKubeContextSelector, (state: RootState) => state.config.clusterAccess],
-  (currentContext, clusterAccess) => {
-    if (!currentContext) {
-      return [];
-    }
-    return clusterAccess?.filter(ca => ca.context === currentContext) || [];
-  }
-);
-
-export const kubeConfigPathSelector = createSelector(
-  (state: RootState) => state.config.kubeConfig.path,
-  kubeConfigPath => {
-    if (kubeConfigPath) {
-      return kubeConfigPath;
-    }
-    return '';
-  }
-);
-
-export const kubeConfigPathValidSelector = createSelector(
-  (state: RootState) => state.config.kubeConfig.isPathValid,
-  isPathValid => {
-    return Boolean(isPathValid);
   }
 );

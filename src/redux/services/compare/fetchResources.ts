@@ -7,7 +7,7 @@ import {v4 as uuid} from 'uuid';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {currentConfigSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {currentConfigSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
 import {buildHelmCommand} from '@utils/helm';

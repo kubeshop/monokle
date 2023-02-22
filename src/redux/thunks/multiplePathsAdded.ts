@@ -3,8 +3,8 @@ import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 
+import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading} from '@redux/git';
-import {currentConfigSelector} from '@redux/selectors';
 import {addPath, getFileEntryForAbsolutePath, reloadFile} from '@redux/services/fileEntry';
 
 import {getFileStats} from '@utils/files';

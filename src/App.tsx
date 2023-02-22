@@ -13,14 +13,20 @@ import semver from 'semver';
 
 import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
+import {
+  activeProjectSelector,
+  isInClusterModeSelector,
+  setCreateProject,
+  setDeleteProject,
+  setLoadingProject,
+  setOpenProject,
+} from '@redux/appConfig';
 import {toggleForm} from '@redux/forms';
 import {setIsGitInstalled} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {setCreateProject, setDeleteProject, setLoadingProject, setOpenProject} from '@redux/reducers/appConfig';
 import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reducers/main';
 import {closeFolderExplorer, closeReleaseNotesDrawer, openWelcomePopup, toggleNotifications} from '@redux/reducers/ui';
-import {isInClusterModeSelector} from '@redux/selectors';
 import {loadValidation} from '@redux/validation/validation.thunks';
 
 import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, UpdateNotice} from '@organisms';
@@ -44,7 +50,6 @@ import {NewVersionCode, Project} from '@shared/models/config';
 import {Size} from '@shared/models/window';
 import electronStore from '@shared/utils/electronStore';
 import {setMainProcessEnv} from '@shared/utils/env';
-import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';

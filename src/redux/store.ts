@@ -4,6 +4,8 @@ import {createLogger} from 'redux-logger';
 
 import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
 
+import {configSlice, crdsPathChangedListener, k8sVersionSchemaListener} from './appConfig';
+import {appConfigListeners} from './appConfig/appConfig.listeners';
 import * as compareListeners from './compare/listeners';
 import {compareSlice} from './compare/slice';
 import {dashboardSlice} from './dashboard';
@@ -11,7 +13,6 @@ import {formSlice} from './forms';
 import {gitSlice} from './git';
 import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
-import {configSlice, crdsPathChangedListener, k8sVersionSchemaListener} from './reducers/appConfig';
 import {extensionSlice} from './reducers/extension';
 import {mainSlice} from './reducers/main';
 import {imageListParserListener} from './reducers/main/mainListeners';
@@ -43,6 +44,7 @@ combineListeners([
   k8sVersionSchemaListener,
   crdsPathChangedListener,
   ...validationListeners,
+  ...appConfigListeners,
   imageListParserListener,
 ]);
 

@@ -7,10 +7,11 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 import path from 'path';
 import styled from 'styled-components';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ContextMenu, Dots} from '@atoms';

@@ -2,9 +2,9 @@ import React, {useCallback, useMemo} from 'react';
 
 import {Skeleton} from 'antd';
 
+import {activeProjectSelector, isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
-import {isInClusterModeSelector} from '@redux/selectors';
 
 import {ActionsPane, BottomPaneManager, Dashboard, GitOpsView, NavigatorPane} from '@organisms';
 import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
@@ -12,7 +12,6 @@ import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
-import {activeProjectSelector} from '@shared/utils/selectors';
 
 import ProblemPane from '../ProblemPane';
 import StartPage from '../StartPage';

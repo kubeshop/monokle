@@ -1,6 +1,5 @@
 import _ from 'lodash';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   setKubeConfig,
   updateApplicationSettings,
@@ -8,7 +7,8 @@ import {
   updateFolderReadsMaxDepth,
   updateK8sVersion,
   updateScanExcludes,
-} from '@redux/reducers/appConfig';
+} from '@redux/appConfig';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
 import {ProjectConfig} from '@shared/models/config';

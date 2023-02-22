@@ -6,12 +6,10 @@ import {PlusOutlined} from '@ant-design/icons';
 
 import {orderBy, size} from 'lodash';
 
+import {activeProjectSelector, sortProjects} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
-import {sortProjects} from '@redux/reducers/appConfig';
 
 import {ProjectCard} from '@components/molecules_new';
-
-import {activeProjectSelector} from '@shared/utils/selectors';
 
 import * as S from './ProjectsList.styled';
 

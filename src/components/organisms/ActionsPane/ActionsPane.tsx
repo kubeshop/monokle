@@ -17,19 +17,19 @@ import {
   OpenKustomizeDocumentationTooltip,
 } from '@constants/tooltips';
 
-import {toggleForm} from '@redux/forms/slice';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openResourceDiffModal} from '@redux/reducers/main';
-import {setMonacoEditor} from '@redux/reducers/ui';
 import {
   currentConfigSelector,
   isInClusterModeSelector,
   kubeConfigContextColorSelector,
+  kubeConfigContextSelector,
   kubeConfigPathSelector,
-  selectedFilePathSelector,
-  selectedHelmValuesSelector,
   settingsSelector,
-} from '@redux/selectors';
+} from '@redux/appConfig';
+import {toggleForm} from '@redux/forms/slice';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openResourceDiffModal} from '@redux/reducers/main';
+import {setMonacoEditor} from '@redux/reducers/ui';
+import {selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
 import {getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
@@ -64,7 +64,6 @@ import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandle
 import {Icon} from '@monokle/components';
 import {HelmChart} from '@shared/models/helm';
 import {RootState} from '@shared/models/rootState';
-import {kubeConfigContextSelector} from '@shared/utils/selectors';
 import {openExternalResourceKindDocumentation} from '@shared/utils/shell';
 
 import * as S from './ActionsPane.styled';

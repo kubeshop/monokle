@@ -6,12 +6,11 @@ import log from 'loglevel';
 import stream from 'stream';
 import {v4 as uuidv4} from 'uuid';
 
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
-import {kubeConfigPathSelector} from '@redux/selectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 
 import {createKubeClient} from '@shared/utils/kubeclient';
-import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 import * as S from './Logs.styled';
 

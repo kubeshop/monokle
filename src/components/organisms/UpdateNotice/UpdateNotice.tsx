@@ -6,8 +6,8 @@ import {Button} from 'antd';
 
 import {CloseOutlined} from '@ant-design/icons';
 
+import {updateNewVersion} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateNewVersion} from '@redux/reducers/appConfig';
 
 import NewUpdate from '@assets/NewUpdate.svg';
 

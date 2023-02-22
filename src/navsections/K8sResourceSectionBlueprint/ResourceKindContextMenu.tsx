@@ -10,6 +10,12 @@ import {v4 as uuidv4} from 'uuid';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
+import {
+  currentConfigSelector,
+  isInClusterModeSelector,
+  kubeConfigContextColorSelector,
+  kubeConfigContextSelector,
+} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
@@ -19,12 +25,7 @@ import {
   openSaveResourcesToFileFolderModal,
   setLeftBottomMenuSelection,
 } from '@redux/reducers/ui';
-import {
-  currentConfigSelector,
-  isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
-  kubeConfigContextColorSelector,
-} from '@redux/selectors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
 import {useActiveResourceMapRef} from '@redux/selectors/resourceMapSelectors';
 import {useResource} from '@redux/selectors/resourceSelectors';
@@ -46,7 +47,6 @@ import {K8sResource, ResourceMap, isLocalResource} from '@shared/models/k8sResou
 import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {Colors} from '@shared/styles/colors';
 import {defineHotkey} from '@shared/utils/hotkey';
-import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;

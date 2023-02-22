@@ -3,7 +3,7 @@ import {KubernetesObject} from '@kubernetes/client-node';
 import {cloneDeep, noop} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
-import {kubeConfigPathSelector} from '@redux/selectors';
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {updateResource} from '@redux/thunks/updateResource';
 import {createNamespace, getNamespace, getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
@@ -18,7 +18,6 @@ import {RootState} from '@shared/models/rootState';
 import {execute} from '@shared/utils/commands';
 import {createKubectlApplyCommand} from '@shared/utils/commands/kubectl';
 import {createKubeClient} from '@shared/utils/kubeclient';
-import {kubeConfigContextSelector} from '@shared/utils/selectors';
 
 type Type = ResourceSet['type'];
 

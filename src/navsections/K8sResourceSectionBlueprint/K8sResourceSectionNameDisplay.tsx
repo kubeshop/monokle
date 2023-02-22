@@ -3,8 +3,9 @@ import {memo} from 'react';
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
+import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew, kubeConfigContextColorSelector} from '@redux/selectors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {activeResourceCountSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {ClusterColors} from '@shared/models/cluster';
