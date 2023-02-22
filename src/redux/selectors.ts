@@ -2,12 +2,10 @@ import {createSelector} from 'reselect';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppState} from '@shared/models/appState';
-import {HelmPreviewConfiguration} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmValuesFile} from '@shared/models/helm';
 import {RootState} from '@shared/models/rootState';
 import {isFileSelection, isPreviewConfigurationSelection} from '@shared/models/selection';
-import {isDefined} from '@shared/utils/filter';
 
 import {getResourceMetaMapFromState} from './selectors/resourceMapGetters';
 import {isKustomizationResource} from './services/kustomize';
@@ -130,23 +128,6 @@ export const selectHelmValues = (state: AppState, id?: string): HelmValuesFile |
   if (!id) return undefined;
   return state.helmValuesMap[id];
 };
-
-export const selectHelmConfig = (state: RootState, id?: string): HelmPreviewConfiguration | undefined => {
-  if (!id) return undefined;
-  return state.config.projectConfig?.helm?.previewConfigurationMap?.[id] ?? undefined;
-};
-
-export const selectCurrentKubeConfig = createSelector(
-  [(state: RootState) => state.config.projectConfig?.kubeConfig, (state: RootState) => state.config.kubeConfig],
-  (projectKubeConfig, kubeConfig) => projectKubeConfig || kubeConfig
-);
-
-export const isInClusterModeSelector = createSelector(
-  [selectCurrentKubeConfig, state => state.main.clusterConnection?.context],
-  (kubeConfig, clusterConnectionContext) => {
-    return kubeConfig && isDefined(clusterConnectionContext) && clusterConnectionContext === kubeConfig.currentContext;
-  }
-);
 
 // TODO: rename this after finishing refactoring all places where the old `isInPreviewModeSelector` is used
 // the previous selector returned `true` even if you were in ClusterMode but that's no longer desired

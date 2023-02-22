@@ -1,7 +1,7 @@
 import {HELM_CHART_SECTION_NAME} from '@constants/constants';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@redux/reducers/main';
-import {isInClusterModeSelector} from '@redux/selectors';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';

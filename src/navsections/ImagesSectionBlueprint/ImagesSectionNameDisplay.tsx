@@ -1,10 +1,10 @@
 import {useMemo, useState} from 'react';
 import {useDebounce} from 'react-use';
 
-import {kubeConfigContextColorSelector} from '@redux/appConfig';
+import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setImagesSearchedValue} from '@redux/reducers/main';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 
 import {SearchInput} from '@monokle/components';
 import {SectionInstance} from '@shared/models/navigator';

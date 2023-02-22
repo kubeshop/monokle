@@ -19,6 +19,7 @@ import {
 
 import {
   currentConfigSelector,
+  isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
@@ -28,7 +29,7 @@ import {toggleForm} from '@redux/forms/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openResourceDiffModal} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
-import {isInClusterModeSelector, selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
+import {selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
 import {getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';

@@ -1,6 +1,6 @@
 import {HELM_CHART_SECTION_NAME} from '@constants/constants';
 
-import {isInClusterModeSelector} from '@redux/selectors';
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';

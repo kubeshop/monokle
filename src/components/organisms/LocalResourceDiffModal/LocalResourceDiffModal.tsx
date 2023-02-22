@@ -20,6 +20,7 @@ import {
 import {
   currentClusterAccessSelector,
   currentConfigSelector,
+  isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
@@ -27,7 +28,6 @@ import {
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal} from '@redux/reducers/main';
-import {isInClusterModeSelector} from '@redux/selectors';
 import {useActiveResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';

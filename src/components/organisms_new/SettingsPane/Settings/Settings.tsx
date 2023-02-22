@@ -26,8 +26,8 @@ import {
   KustomizeCommandTooltip,
 } from '@constants/tooltips';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {isInClusterModeSelector} from '@redux/selectors';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 

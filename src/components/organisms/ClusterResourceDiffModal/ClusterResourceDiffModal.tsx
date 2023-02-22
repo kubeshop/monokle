@@ -11,11 +11,15 @@ import {stringify} from 'yaml';
 
 import {ClusterName, makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {currentConfigSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
+import {
+  currentConfigSelector,
+  isInClusterModeSelector,
+  kubeConfigContextColorSelector,
+  kubeConfigContextSelector,
+} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal} from '@redux/reducers/main';
-import {isInClusterModeSelector} from '@redux/selectors';
 import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';

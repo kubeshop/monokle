@@ -6,6 +6,7 @@ import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/make
 
 import {
   currentConfigSelector,
+  isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
@@ -22,12 +23,7 @@ import {
   setLeftMenuSelection,
   toggleRightMenu,
 } from '@redux/reducers/ui';
-import {
-  isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
-  rootFilePathSelector,
-  selectedFilePathSelector,
-} from '@redux/selectors';
+import {isInPreviewModeSelectorNew, rootFilePathSelector, selectedFilePathSelector} from '@redux/selectors';
 import {getActiveResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';

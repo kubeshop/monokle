@@ -6,6 +6,7 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {v4 as uuidv4} from 'uuid';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {
@@ -14,7 +15,7 @@ import {
   openSaveResourcesToFileFolderModal,
   setLeftBottomMenuSelection,
 } from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
 import {useActiveResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {useResource} from '@redux/selectors/resourceSelectors';

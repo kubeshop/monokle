@@ -8,11 +8,11 @@ import {isEmpty, isEqual, omit, uniqWith} from 'lodash';
 import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES, TOOLTIP_DELAY} from '@constants/constants';
 import {QuickFilterTooltip} from '@constants/tooltips';
 
-import {kubeConfigContextSelector} from '@redux/appConfig';
+import {isInClusterModeSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {
   activeResourceCountSelector,
   allResourceAnnotationsSelector,

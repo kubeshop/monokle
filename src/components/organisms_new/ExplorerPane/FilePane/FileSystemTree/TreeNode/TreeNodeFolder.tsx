@@ -7,8 +7,9 @@ import {join} from 'path';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 
 import {ContextMenu, Dots} from '@components/atoms';
 

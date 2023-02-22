@@ -13,7 +13,7 @@ import 'monaco-yaml';
 import path from 'path';
 import {Document, ParsedNode, isMap} from 'yaml';
 
-import {settingsSelector} from '@redux/appConfig';
+import {isInClusterModeSelector, settingsSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   editorHasReloadedSelectedPath,
@@ -24,12 +24,7 @@ import {
   setAutosavingStatus,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {
-  isInClusterModeSelector,
-  isInPreviewModeSelectorNew,
-  selectedFilePathSelector,
-  selectedHelmValuesSelector,
-} from '@redux/selectors';
+import {isInPreviewModeSelectorNew, selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
 import {
   activeResourceStorageSelector,
   useActiveResourceContentMapRef,

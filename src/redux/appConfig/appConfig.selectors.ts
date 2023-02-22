@@ -4,9 +4,10 @@ import {createSelector} from 'reselect';
 import {createDeepEqualSelector} from '@redux/selectors/utils';
 import {mergeConfigs, populateProjectConfig} from '@redux/services/projectConfig';
 
-import {ProjectConfig} from '@shared/models/config';
+import {HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
 import {RootState} from '@shared/models/rootState';
 import {Colors} from '@shared/styles';
+import {isDefined} from '@shared/utils/filter';
 
 export {activeProjectSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
@@ -92,3 +93,20 @@ export const scanExcludesSelector = createDeepEqualSelector(currentConfigSelecto
 export const fileIncludesSelector = createDeepEqualSelector(currentConfigSelector, currentConfig => {
   currentConfig.fileIncludes || [];
 });
+
+export const selectHelmConfig = (state: RootState, id?: string): HelmPreviewConfiguration | undefined => {
+  if (!id) return undefined;
+  return state.config.projectConfig?.helm?.previewConfigurationMap?.[id] ?? undefined;
+};
+
+export const selectCurrentKubeConfig = createSelector(
+  [(state: RootState) => state.config.projectConfig?.kubeConfig, (state: RootState) => state.config.kubeConfig],
+  (projectKubeConfig, kubeConfig) => projectKubeConfig || kubeConfig
+);
+
+export const isInClusterModeSelector = createSelector(
+  [selectCurrentKubeConfig, state => state.main.clusterConnection?.context],
+  (kubeConfig, clusterConnectionContext) => {
+    return kubeConfig && isDefined(clusterConnectionContext) && clusterConnectionContext === kubeConfig.currentContext;
+  }
+);

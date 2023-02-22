@@ -11,10 +11,11 @@ import {
   SaveTransientResourceTooltip,
 } from '@constants/tooltips';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {isInClusterModeSelector, selectedHelmConfigSelector, selectedImageSelector} from '@redux/selectors';
+import {selectedHelmConfigSelector, selectedImageSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
 
 import {TitleBarWrapper} from '@components/atoms';

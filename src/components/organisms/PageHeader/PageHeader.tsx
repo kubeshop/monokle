@@ -12,12 +12,17 @@ import newGithubIssueUrl from 'new-github-issue-url';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {InitializeGitTooltip, InstallGitTooltip, NotificationsTooltip} from '@constants/tooltips';
 
-import {activeProjectSelector, kubeConfigContextColorSelector, updateProjectsGitRepo} from '@redux/appConfig';
+import {
+  activeProjectSelector,
+  isInClusterModeSelector,
+  kubeConfigContextColorSelector,
+  updateProjectsGitRepo,
+} from '@redux/appConfig';
 import {setCurrentBranch, setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setIsInQuickClusterMode, setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {stopPreview} from '@redux/services/preview';
 import store from '@redux/store';

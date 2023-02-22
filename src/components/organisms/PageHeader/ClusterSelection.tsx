@@ -12,6 +12,7 @@ import {ClusterNamespaceTooltip} from '@constants/tooltips';
 import {
   activeProjectSelector,
   currentClusterAccessSelector,
+  isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
@@ -19,7 +20,7 @@ import {
 } from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {highlightItem, setActiveSettingsPanel, setLeftMenuSelection, toggleStartProjectPane} from '@redux/reducers/ui';
-import {isInClusterModeSelector, isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 import {startClusterConnection, stopClusterConnection} from '@redux/thunks/cluster';
 

@@ -15,6 +15,7 @@ import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
 import {
   activeProjectSelector,
+  isInClusterModeSelector,
   setCreateProject,
   setDeleteProject,
   setLoadingProject,
@@ -26,7 +27,6 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reducers/main';
 import {closeFolderExplorer, closeReleaseNotesDrawer, openWelcomePopup, toggleNotifications} from '@redux/reducers/ui';
-import {isInClusterModeSelector} from '@redux/selectors';
 import {loadValidation} from '@redux/validation/validation.thunks';
 
 import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, UpdateNotice} from '@organisms';
