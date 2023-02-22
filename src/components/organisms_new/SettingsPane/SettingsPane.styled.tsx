@@ -55,7 +55,14 @@ export const ThemeOption = styled.div<{$selected?: boolean}>`
   padding: ${({$selected}) => ($selected ? '3px' : '4px')};
 `;
 
-export const Tabs = styled(RawTabs)`
+export const TabOption = styled.div`
+  font-size: 16px;
+  padding: 4px 0px 6px 0px;
+  margin-top: 5px;
+  color: ${Colors.grey7};
+`;
+
+export const Tabs = styled(RawTabs)<{$isOnStartProjectPage: boolean}>`
   width: 100%;
   height: 100%;
 
@@ -68,31 +75,30 @@ export const Tabs = styled(RawTabs)`
   }
 
   & .ant-tabs-nav {
-    padding: 0px 16px 0px 16px;
+    padding: ${({$isOnStartProjectPage}) => ($isOnStartProjectPage ? '0px 0px 12px 0px' : '0px 16px 12px 16px')};
 
     &::before {
-      border-bottom: 1px solid #363636;
+      border-bottom: none;
     }
-  }
-
-  & .ant-tabs-nav::before {
   }
 
   & .ant-tabs-extra-content {
     display: flex;
     align-items: center;
   }
+
+  & .ant-tabs-ink-bar {
+    background-color: ${Colors.grey9};
+  }
+
+  & .ant-tabs-tab-active ${TabOption} {
+    color: ${Colors.grey9};
+  }
 `;
 
 export const TabItemContainer = styled.div<{$isOnStartProjectPage: boolean}>`
-  padding: 16px;
+  padding: ${({$isOnStartProjectPage}) => ($isOnStartProjectPage ? '16px 0px' : '16px')};
   height: ${({$isOnStartProjectPage}) =>
     !$isOnStartProjectPage ? 'calc(100% - 50px)' : '100%'}; // TODO: No hardcoded height: ;
   overflow-y: auto;
-`;
-
-export const TabOption = styled.div`
-  font-size: 16px;
-  padding: 4px 0px;
-  margin-top: 5px;
 `;

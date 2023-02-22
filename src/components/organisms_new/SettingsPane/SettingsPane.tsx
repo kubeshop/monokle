@@ -104,6 +104,7 @@ const SettingsPane = () => {
       )}
 
       <S.Tabs
+        $isOnStartProjectPage={isOnStartProjectPage}
         defaultActiveKey="source"
         activeKey={activeSettingsPanel}
         items={tabItems}

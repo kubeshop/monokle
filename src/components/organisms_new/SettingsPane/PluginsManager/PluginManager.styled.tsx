@@ -13,7 +13,7 @@ export const NotFoundLabel = styled.span`
 `;
 
 export const ButtonsContainer = styled.div`
-  padding: 8px 0px 12px 0px;
+  padding-bottom: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
