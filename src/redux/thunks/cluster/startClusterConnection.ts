@@ -39,8 +39,9 @@ export const startClusterConnection = createAsyncThunk<
       thunkAPI.dispatch(reloadClusterResources({context, namespace}));
     } else {
       thunkAPI.dispatch(loadClusterResources({context, namespace}));
+      thunkAPI.dispatch(setLeftMenuSelection('dashboard'));
     }
-    thunkAPI.dispatch(setLeftMenuSelection('dashboard'));
+
     return;
   }
 
@@ -49,8 +50,9 @@ export const startClusterConnection = createAsyncThunk<
       thunkAPI.dispatch(reloadClusterResources({context, namespace, port: clusterProxyPort}));
     } else {
       thunkAPI.dispatch(loadClusterResources({context, namespace, port: clusterProxyPort}));
+      thunkAPI.dispatch(setLeftMenuSelection('dashboard'));
     }
-    thunkAPI.dispatch(setLeftMenuSelection('dashboard'));
+
     return;
   }
 
