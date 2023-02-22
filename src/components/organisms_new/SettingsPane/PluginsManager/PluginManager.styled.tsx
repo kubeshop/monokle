@@ -17,6 +17,7 @@ export const ButtonsContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-bottom: 1px solid ${Colors.grey3};
 `;
 
 export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`

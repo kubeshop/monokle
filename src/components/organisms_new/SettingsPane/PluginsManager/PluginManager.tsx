@@ -64,7 +64,7 @@ export const PluginManager: React.FC = () => {
       <PluginInstallModal isVisible={isInstallModalVisible} onClose={onCloseInstallPlugin} />
 
       <S.ButtonsContainer>
-        <SecondaryButton onClick={onClickInstallPlugin} size="small" icon={<PlusOutlined />} style={{marginLeft: 8}}>
+        <SecondaryButton onClick={onClickInstallPlugin} size="small" icon={<PlusOutlined />}>
           Install
         </SecondaryButton>
 
