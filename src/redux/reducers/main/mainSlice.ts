@@ -317,6 +317,11 @@ export const mainSlice = createSlice({
           kubeConfigPath: action.payload.kubeConfigPath,
         };
         state.clusterConnectionOptions.lastNamespaceLoaded = action.payload.namespace;
+
+        if (action.payload.namespace !== '<all>') {
+          state.resourceFilter.namespaces = [action.payload.namespace];
+        }
+
         electronStore.set('appConfig.lastNamespaceLoaded', action.payload.namespace);
       })
       .addCase(loadClusterResources.rejected, state => {
@@ -349,6 +354,11 @@ export const mainSlice = createSlice({
           namespace: action.payload.namespace,
           kubeConfigPath: action.payload.kubeConfigPath,
         };
+
+        if (action.payload.namespace !== '<all>') {
+          state.resourceFilter.namespaces = [action.payload.namespace];
+        }
+
         state.clusterConnectionOptions.lastNamespaceLoaded = action.payload.namespace;
         electronStore.set('appConfig.lastNamespaceLoaded', action.payload.namespace);
       })
