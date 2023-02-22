@@ -1,3 +1,5 @@
+import {useCallback} from 'react';
+
 import {
   activeProjectSelector,
   changeCurrentProjectName,
@@ -16,9 +18,12 @@ export const CurrentProjectSettings = () => {
   const activeProject: Project | undefined = useAppSelector(activeProjectSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
 
-  const changeProjectConfig = (config: ProjectConfig) => {
-    dispatch(updateProjectConfig({config, fromConfigFile: false}));
-  };
+  const changeProjectConfig = useCallback(
+    (config: ProjectConfig) => {
+      dispatch(updateProjectConfig({config, fromConfigFile: false}));
+    },
+    [dispatch]
+  );
 
   const onProjectNameChange = (projectName: string) => {
     if (projectName) {
