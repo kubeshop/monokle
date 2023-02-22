@@ -306,6 +306,7 @@ export const Settings = ({
               />
             )}
           </S.Heading>
+
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KubeconfigPathTooltip}>
             <Input
               ref={inputRef}
@@ -315,6 +316,7 @@ export const Settings = ({
               disabled={isEditingDisabled}
             />
           </Tooltip>
+
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
             {isKubeConfigBrowseSettingsOpen ? (
               <S.Button onClick={openFileSelect} disabled={isEditingDisabled}>
@@ -326,6 +328,7 @@ export const Settings = ({
           </Tooltip>
           <S.HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
         </S.Div>
+
         <S.Div>
           <S.Span>Kubernetes Version</S.Span>
           <div>
@@ -448,10 +451,10 @@ export const Settings = ({
             }}
           />
         </S.Div>
-        <S.Div>
-          <S.Span>Resource links processing</S.Span>
+        {/* <S.Div>
+          <S.Span>Resource links processing</S.Span> */}
 
-          {/*
+        {/*
             // TODO: revisit this after @monokle/validation is integrated
           <Checkbox
             checked={resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs}
@@ -459,7 +462,7 @@ export const Settings = ({
           >
             Ignore optional unsatisfied links
           </Checkbox> */}
-        </S.Div>
+        {/* </S.Div> */}
         <S.Div>
           <S.Span>Form Editor</S.Span>
           <S.Div>

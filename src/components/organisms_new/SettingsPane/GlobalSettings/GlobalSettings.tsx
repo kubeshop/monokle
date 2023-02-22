@@ -136,21 +136,20 @@ export const GlobalSettings = () => {
           </Select>
         </S.Div>
 
-        <S.Div>
-          <S.Span>On Startup</S.Span>
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
-            <Checkbox checked={loadLastProjectOnStartup} onChange={handleChangeLoadLastFolderOnStartup}>
-              Automatically load last project
-            </Checkbox>
-          </Tooltip>
-        </S.Div>
+        <S.Span>On Startup</S.Span>
+        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
+          <Checkbox checked={loadLastProjectOnStartup} onChange={handleChangeLoadLastFolderOnStartup}>
+            Automatically load last project
+          </Checkbox>
+        </Tooltip>
 
-        <S.Div style={{marginTop: 16}}>
+        <S.Div style={{marginTop: '12px'}}>
           <Checkbox checked={isClusterSelectorVisible} onChange={handleChangeClusterSelectorVisibilty}>
             Show Cluster Selector
           </Checkbox>
         </S.Div>
       </div>
+
       <div style={{width: '45%'}}>
         <S.Div>
           <S.TelemetryTitle>Telemetry</S.TelemetryTitle>
@@ -172,6 +171,7 @@ export const GlobalSettings = () => {
           </S.Div>
         </S.Div>
       </div>
+
       <FileExplorer {...fileExplorerProps} />
     </div>
   );
