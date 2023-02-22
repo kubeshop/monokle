@@ -1,6 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {setClusterProxyPort} from '@redux/appConfig';
+import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 import {stopPreview} from '@redux/services/preview';
 
@@ -39,6 +40,7 @@ export const startClusterConnection = createAsyncThunk<
     } else {
       thunkAPI.dispatch(loadClusterResources({context, namespace}));
     }
+    thunkAPI.dispatch(setLeftMenuSelection('dashboard'));
     return;
   }
 
@@ -48,6 +50,7 @@ export const startClusterConnection = createAsyncThunk<
     } else {
       thunkAPI.dispatch(loadClusterResources({context, namespace, port: clusterProxyPort}));
     }
+    thunkAPI.dispatch(setLeftMenuSelection('dashboard'));
     return;
   }
 
