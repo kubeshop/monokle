@@ -1,10 +1,10 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {isEmpty} from 'lodash';
+import {isEmpty, isEqual} from 'lodash';
 
 import {AppListenerFn} from '@redux/listeners/base';
 
-import {KubeConfigContext} from '@shared/models/config';
+import {KubeConfig, KubeConfigContext} from '@shared/models/config';
 
 import {loadProjectKubeConfig, setKubeConfig, updateProjectConfig} from './appConfig.slice';
 
@@ -35,6 +35,8 @@ const loadKubeConfigListener: AppListenerFn = listen => {
   });
 };
 
+let tempConfig: KubeConfig;
+
 const loadKubeConfigProjectListener: AppListenerFn = listen => {
   listen({
     actionCreator: updateProjectConfig,
@@ -45,18 +47,21 @@ const loadKubeConfigProjectListener: AppListenerFn = listen => {
       if (!configPath) {
         return;
       }
+      let config: KubeConfig;
       try {
         const kc = new k8s.KubeConfig();
         kc.loadFromFile(configPath);
-        dispatch(
-          loadProjectKubeConfig({
-            isPathValid: !isEmpty(kc.contexts),
-            contexts: kc.contexts as KubeConfigContext[],
-            currentContext: kc.getCurrentContext(),
-          })
-        );
+        config = {
+          isPathValid: !isEmpty(kc.contexts),
+          contexts: kc.contexts as KubeConfigContext[],
+          currentContext: kc.getCurrentContext(),
+        };
       } catch (error) {
-        dispatch(loadProjectKubeConfig({isPathValid: false, contexts: []}));
+        config = {isPathValid: false, contexts: []};
+      }
+      if (!isEqual(tempConfig, config)) {
+        tempConfig = config;
+        dispatch(loadProjectKubeConfig(config));
       }
     },
   });
