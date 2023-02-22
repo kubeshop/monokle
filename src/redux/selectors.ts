@@ -137,8 +137,8 @@ export const selectHelmConfig = (state: RootState, id?: string): HelmPreviewConf
 };
 
 export const selectCurrentKubeConfig = createSelector(
-  (state: RootState) => state.config.kubeConfig,
-  kubeConfig => kubeConfig
+  [(state: RootState) => state.config.projectConfig?.kubeConfig, (state: RootState) => state.config.kubeConfig],
+  (projectKubeConfig, kubeConfig) => projectKubeConfig || kubeConfig
 );
 
 export const isInClusterModeSelector = createSelector(

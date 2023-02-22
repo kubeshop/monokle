@@ -1,6 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {isEmpty, isEqual} from 'lodash';
+import {isEmpty} from 'lodash';
 
 import {AppListenerFn} from '@redux/listeners/base';
 
@@ -35,8 +35,6 @@ const loadKubeConfigListener: AppListenerFn = listen => {
   });
 };
 
-let tempConfig: KubeConfig;
-
 const loadKubeConfigProjectListener: AppListenerFn = listen => {
   listen({
     actionCreator: updateProjectConfig,
@@ -59,10 +57,7 @@ const loadKubeConfigProjectListener: AppListenerFn = listen => {
       } catch (error) {
         config = {isPathValid: false, contexts: []};
       }
-      if (!isEqual(tempConfig, config)) {
-        tempConfig = config;
-        dispatch(loadProjectKubeConfig(config));
-      }
+      dispatch(loadProjectKubeConfig(config));
     },
   });
 };

@@ -407,7 +407,10 @@ export const configSlice = createSlice({
 
       new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
 
-      if (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder))) {
+      if (
+        !action.payload.fromConfigFile &&
+        (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder)))
+      ) {
         writeProjectConfigFile(state);
       }
     },
