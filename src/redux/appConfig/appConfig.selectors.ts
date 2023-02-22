@@ -11,13 +11,12 @@ import {Colors} from '@shared/styles';
 export {activeProjectSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 export const kubeConfigContextSelector = createSelector(
-  (state: RootState) => state.config,
-  config => {
-    if (config.kubeConfig.currentContext) {
-      return config.kubeConfig.currentContext;
-    }
-
-    return '';
+  [
+    (state: RootState) => state.config.projectConfig?.kubeConfig?.currentContext,
+    (state: RootState) => state.config.kubeConfig.currentContext,
+  ],
+  (projectCurrentContext, currentContext) => {
+    return projectCurrentContext || currentContext || '';
   }
 );
 
