@@ -20,8 +20,8 @@ export const Div = styled.div`
 `;
 
 export const Span = styled.span`
-  font-weight: 500;
-  font-size: 20px;
+  font-weight: 700;
+  font-size: 14px;
   display: block;
   margin-bottom: 6px;
 `;
@@ -72,7 +72,8 @@ export const WarningOutlined = styled(
 `;
 
 export const Heading = styled.h2`
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 700;
   margin-bottom: 7px;
 `;
 

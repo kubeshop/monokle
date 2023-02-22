@@ -31,7 +31,7 @@ export const ContentTitle = styled.div`
 export const MainContainer = styled.div`
   display: grid;
   grid-template-columns: 190px 1fr;
-  grid-column-gap: 50px;
+  grid-column-gap: 60px;
   overflow: hidden;
   height: 100%;
 `;

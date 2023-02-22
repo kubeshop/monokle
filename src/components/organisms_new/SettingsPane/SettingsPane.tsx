@@ -99,11 +99,12 @@ const SettingsPane = () => {
     <S.SettingsPaneContainer $isOnStartProjectPage={isOnStartProjectPage}>
       {!isOnStartProjectPage && (
         <TitleBarWrapper>
-          <TitleBar title="Settings" />
+          <TitleBar title="Project settings" />
         </TitleBarWrapper>
       )}
 
       <S.Tabs
+        $isOnStartProjectPage={isOnStartProjectPage}
         defaultActiveKey="source"
         activeKey={activeSettingsPanel}
         items={tabItems}
