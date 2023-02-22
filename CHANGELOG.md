@@ -24,6 +24,28 @@ All notable changes to this project will be documented in this file. See [standa
 * update selector ([75f0259](https://github.com/kubeshop/monokle/commit/75f0259e6fc2533c8890ca9a0657f487b07a0a95))
 * upgrade node-fetch from 2.6.7 to 2.6.9 ([467cce4](https://github.com/kubeshop/monokle/commit/467cce4bd285b24ec2fe9d9d2bce80d47d7bbcb3))
 
+### [2.0.1](https://github.com/kubeshop/monokle/compare/v2.0.1-nightly-2023-02-22.0...v2.0.1) (2023-02-22)
+
+
+### Bug Fixes
+
+*  looping syncing localState with global state ([6171068](https://github.com/kubeshop/monokle/commit/61710688fec792baac909e6d0820d4784363cc3d))
+* change left menu selection only on connect ([33c9e49](https://github.com/kubeshop/monokle/commit/33c9e493b6fc1e278553528e2d11598bdf494c01))
+* clean console.log ([c20d468](https://github.com/kubeshop/monokle/commit/c20d468a2020482569b7b9c9e492c233ddffa4d6))
+* current context ([dfeef23](https://github.com/kubeshop/monokle/commit/dfeef2356febb320e1b34fa0249ddcb4ac2d860c))
+* kubeConfig selector ([bb5daf5](https://github.com/kubeshop/monokle/commit/bb5daf50964f3fd73db5fb8cef568ad94e2fce32))
+* move config selectors ([74a8bd3](https://github.com/kubeshop/monokle/commit/74a8bd3d1e83439839a873681e8905590eb3e8a3))
+* move config selectors ([3bec8f8](https://github.com/kubeshop/monokle/commit/3bec8f81458128b2577571b7f04d2e67cd44591f))
+* path valid ([1fb3369](https://github.com/kubeshop/monokle/commit/1fb3369fab0c69b1dfff0ca07d115522d9762ab9))
+* prevent file update when it comes from file ([ccaa814](https://github.com/kubeshop/monokle/commit/ccaa8147a7720e7baeff9cccd9c56c7ccc8a82e2))
+* project kubeConfig ([2dc0989](https://github.com/kubeshop/monokle/commit/2dc098945e3df9177666c4469dd6a4728111ac3c))
+* reload kubeConfig when changing config path ([de4974d](https://github.com/kubeshop/monokle/commit/de4974de690b80f0ec16286f0b9ad0cb0054d89b))
+* set left menu selection to dashboard when connecting ([4b73205](https://github.com/kubeshop/monokle/commit/4b7320516035e3b38b81ae0e09b407005c3213e6))
+* start cluster connection ([d2816b5](https://github.com/kubeshop/monokle/commit/d2816b59c01e9feb29f2d738349da18ac1296181))
+* update project kubeConfig ([4b02c65](https://github.com/kubeshop/monokle/commit/4b02c65dae483aa051af885a3a97491973815ec8))
+* update selector ([75f0259](https://github.com/kubeshop/monokle/commit/75f0259e6fc2533c8890ca9a0657f487b07a0a95))
+* upgrade node-fetch from 2.6.7 to 2.6.9 ([467cce4](https://github.com/kubeshop/monokle/commit/467cce4bd285b24ec2fe9d9d2bce80d47d7bbcb3))
+
 ## [2.0.0](https://github.com/kubeshop/monokle/compare/v1.13.5-nightly-2023-02-17.0...v2.0.0) (2023-02-17)
 
 
