@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
-  padding: 24px 4px 24px 4px;
+  padding: 18px 4px 24px 4px;
 `;
 
 export const NotFoundLabel = styled.span`
@@ -13,7 +13,7 @@ export const NotFoundLabel = styled.span`
 `;
 
 export const ButtonsContainer = styled.div`
-  padding-bottom: 12px;
+  padding-bottom: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
