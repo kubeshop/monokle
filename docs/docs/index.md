@@ -23,6 +23,7 @@ For further details on working with Monokle Desktop, read the [Feature Overview]
 
 Check out the following blog posts with Monokle Desktop-related content:
 
+- 2.0 - [Release blog post](https://monokle.io/blog/monokle-2-0-makes-manifest-management-even-easier) - February 22, 2023
 - 1.13 - [Release blog post](https://monokle.io/blog/monokle-1-13-release) - December 7, 2022
 - [Introducing Monokle Cloud](https://monokle.io/blog/introducing-monokle-cloud) - October 24, 2022
 - 1.12 - [Release blog post](https://kubeshop.io/blog/monokle-1-12-0-release) - October 24, 2022
