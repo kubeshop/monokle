@@ -59,6 +59,13 @@ import useDebouncedCodeSave from './useDebouncedCodeSave';
 import useEditorKeybindings from './useEditorKeybindings';
 import useMonacoUiState from './useMonacoUiState';
 
+type IProps = {
+  diffSelectedResource: () => void;
+  applySelection: () => void;
+  height?: number;
+  providedResourceSelection?: ResourceSelection;
+};
+
 window.MonacoEnvironment = {
   getWorker(moduleId, label) {
     switch (label) {
@@ -78,12 +85,8 @@ function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
   return d.errors.length === 0 && isMap(d.contents);
 }
 
-const Monaco = (props: {
-  diffSelectedResource: () => void;
-  applySelection: () => void;
-  providedResourceSelection?: ResourceSelection;
-}) => {
-  const {diffSelectedResource, applySelection, providedResourceSelection} = props;
+const Monaco: React.FC<IProps> = props => {
+  const {diffSelectedResource, applySelection, height, providedResourceSelection} = props;
   const dispatch = useAppDispatch();
 
   const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
@@ -419,10 +422,11 @@ const Monaco = (props: {
   }, [isReadOnlyMode]);
 
   return (
-    <S.MonacoContainer ref={containerRef}>
+    <S.MonacoContainer ref={containerRef} $height={height}>
       <S.HiddenInputContainer>
         <S.HiddenInput ref={hiddenInputRef} type="text" />
       </S.HiddenInputContainer>
+
       <MonacoEditor
         width={containerWidth}
         height={containerHeight}

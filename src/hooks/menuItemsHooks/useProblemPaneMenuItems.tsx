@@ -5,6 +5,8 @@ import {TabsProps} from 'antd';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {Monaco} from '@components/molecules';
+
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {getRuleForResult} from '@monokle/validation';
@@ -38,7 +40,7 @@ export function useProblemPaneMenuItems(width: number, height: number) {
       {
         key: 'editor',
         label: 'Editor',
-        children: <div>Test</div>,
+        children: <Monaco height={height} applySelection={() => {}} diffSelectedResource={() => {}} />,
       },
       {
         key: 'sarif',
