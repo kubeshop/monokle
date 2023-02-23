@@ -121,12 +121,17 @@ const App = () => {
     () => Boolean(targetResourceId) && !isInClusterMode,
     [isInClusterMode, targetResourceId]
   );
-  const isUpdateNoticeVisible = useMemo(
-    () =>
-      (newVersion.code < NewVersionCode.Idle && !newVersion.data?.initial) ||
-      newVersion.code === NewVersionCode.Downloaded,
-    [newVersion]
-  );
+  const isUpdateNoticeVisible = useMemo(() => {
+    if (!appVersion) {
+      return false;
+    }
+
+    return (
+      semver.patch(appVersion) === 0 &&
+      ((newVersion.code < NewVersionCode.Idle && !newVersion.data?.initial) ||
+        newVersion.code === NewVersionCode.Downloaded)
+    );
+  }, [appVersion, newVersion]);
 
   const shouldTriggerTelemetryNotification = useMemo(
     () => disableEventTracking === undefined && disableErrorReporting === undefined,
@@ -192,6 +197,8 @@ const App = () => {
 
   useEffect(() => {
     fetchAppVersion().then(version => {
+      setAppVersion(version);
+
       const lastSeenReleaseNotesVersion = electronStore.get('appConfig.lastSeenReleaseNotesVersion');
 
       const nextMajorReleaseVersion = semver.inc(lastSeenReleaseNotesVersion, 'minor');
@@ -205,7 +212,6 @@ const App = () => {
         semver.valid(lastSeenReleaseNotesVersion) &&
         semver.satisfies(version, `>=${nextMajorReleaseVersion}`)
       ) {
-        setAppVersion(version);
         setShowReleaseNotes(true);
       }
 
