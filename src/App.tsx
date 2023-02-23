@@ -29,11 +29,9 @@ import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reduce
 import {closeFolderExplorer, closeReleaseNotesDrawer, openWelcomePopup, toggleNotifications} from '@redux/reducers/ui';
 import {loadValidation} from '@redux/validation/validation.thunks';
 
-import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, UpdateNotice} from '@organisms';
+import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, PaneManager, UpdateNotice} from '@organisms';
 
 import {FileExplorer} from '@atoms';
-
-import {PaneManager} from '@components/organisms_new';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
@@ -58,7 +56,7 @@ const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
 const CreateFileFolderModal = React.lazy(() => import('@organisms/CreateFileFolderModal'));
-const CreateProjectModal = React.lazy(() => import('@organismsNew/CreateProjectModal'));
+const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
 const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
 const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
 const KeyboardShortcuts = React.lazy(() => import('@organisms/KeyboardShortcuts'));
@@ -73,7 +71,7 @@ const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceMo
 const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
 const SaveEditCommandModal = React.lazy(() => import('@organisms/SaveEditCommandModal'));
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
-const TemplateExplorer = React.lazy(() => import('@organismsNew/TemplateExplorer'));
+const TemplateExplorer = React.lazy(() => import('@organisms/TemplateExplorer'));
 
 const App = () => {
   const dispatch = useAppDispatch();

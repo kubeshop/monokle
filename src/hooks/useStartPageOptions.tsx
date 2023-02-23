@@ -4,9 +4,9 @@ import {PlusOutlined, SendOutlined, SettingOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {LearnPage, NewProject, SettingsPane} from '@organismsNew';
+import {LearnPage, NewProject, SettingsPane} from '@organisms';
 
-import {ProjectsList} from '@moleculesNew';
+import {ProjectsList} from '@molecules';
 
 import {Icon} from '@monokle/components';
 
