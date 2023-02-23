@@ -11,6 +11,8 @@ export {default as NotificationMarkdown} from './NotificationMarkdown';
 export {default as PreviewConfigurationDetails} from './PreviewConfigurationDetails';
 export {default as QuickActionCompare} from './QuickActionCompare';
 export {default as QuickActionPreview} from './QuickActionPreview';
+export {default as ProjectCard} from './ProjectCard';
+export {default as ProjectsList} from './ProjectsList';
 export {default as ResourceDiff} from './ResourceDiff';
 export {default as ResourceFilter} from './ResourceFilter';
 export {default as ResourceNamespaceFilter} from './ResourceNamespaceFilter';

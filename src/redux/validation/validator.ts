@@ -59,7 +59,7 @@ class ValidationWorker {
     try {
       await this.#validator.registerCustomSchema(input.schema);
     } catch {
-      log.warn(`Failed to register custom schema for ${input.schema.apiVersion}/${input.schema.kind}`);
+      log.warn(`Failed to register custom schema for ${input.schema?.apiVersion}/${input.schema?.kind}`);
     }
     return createWorkerEventPromise<RegisterCustomSchemaMessage['output']>({
       type: RegisterCustomSchemaMessageType,
