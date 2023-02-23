@@ -1,12 +1,15 @@
 import {useMemo} from 'react';
-import MonacoEditor, {monaco} from 'react-monaco-editor';
 import {useMeasure} from 'react-use';
+
+import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {useAppSelector} from '@redux/hooks';
 
 import {SelectItemImage} from '@atoms';
 
-import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
+import {useProblemPaneMenuItems} from '@hooks/menuItemsHooks';
+
+import {useMainPaneDimensions} from '@utils/hooks';
 
 import {ProblemInfo, TitleBar} from '@monokle/components';
 import {getRuleForResult} from '@monokle/validation';
@@ -14,19 +17,19 @@ import {openUrlInExternalBrowser} from '@shared/utils';
 
 import * as S from './ProblemPane.styled';
 
-const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
-  readOnly: true,
-  minimap: {
-    enabled: false,
-  },
-  lineNumbers: 'off',
-};
-
 const ProblemPane: React.FC = () => {
   const lastResponse = useAppSelector(state => state.validation.lastResponse);
   const selectedProblem = useAppSelector(state => state.validation.validationOverview.selectedProblem?.problem ?? null);
 
   const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
+  const [problemInfoRef, {height: problemInfoHeight}] = useMeasure<HTMLDivElement>();
+
+  const {height} = useMainPaneDimensions();
+
+  const tabsItems = useProblemPaneMenuItems(
+    containerWidth,
+    height - DEFAULT_PANE_TITLE_HEIGHT - problemInfoHeight - 70
+  );
 
   const rule = useMemo(() => {
     if (!lastResponse || !selectedProblem) {
@@ -50,16 +53,12 @@ const ProblemPane: React.FC = () => {
     <S.ProblemPaneContainer ref={containerRef} key={sarifValue}>
       <TitleBar title="Editor" type="secondary" />
 
-      <MonacoEditor
-        width={containerWidth}
-        theme={KUBESHOP_MONACO_THEME}
-        options={monacoOptions}
-        language="json"
-        value={sarifValue}
-      />
+      <S.Tabs defaultActiveKey="editor" items={tabsItems} />
 
       {selectedProblem && (
-        <ProblemInfo problem={selectedProblem} rule={rule} onHelpURLClick={url => openUrlInExternalBrowser(url)} />
+        <div ref={problemInfoRef}>
+          <ProblemInfo problem={selectedProblem} rule={rule} onHelpURLClick={url => openUrlInExternalBrowser(url)} />
+        </div>
       )}
     </S.ProblemPaneContainer>
   );
