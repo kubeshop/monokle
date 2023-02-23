@@ -1,8 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import React, {useCallback, useMemo} from 'react';
-
-import {Button} from 'antd';
+import {useCallback, useMemo} from 'react';
 
 import {CloseOutlined} from '@ant-design/icons';
 
@@ -13,7 +11,7 @@ import NewUpdate from '@assets/NewUpdate.svg';
 
 import {NewVersionCode} from '@shared/models/config';
 
-import * as S from './styled';
+import * as S from './UpdateNotice.styled';
 
 const UpdateNotice = () => {
   const dispatch = useAppDispatch();
@@ -73,9 +71,9 @@ const UpdateNotice = () => {
   return (
     <S.UpdateNoticeContainer>
       {content()}
-      <Button type="link" onClick={handleClose}>
+      <S.CloseButton type="link" onClick={handleClose}>
         <CloseOutlined />
-      </Button>
+      </S.CloseButton>
     </S.UpdateNoticeContainer>
   );
 };
