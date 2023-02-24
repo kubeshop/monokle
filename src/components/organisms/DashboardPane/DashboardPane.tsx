@@ -5,11 +5,11 @@ import {FundProjectionScreenOutlined} from '@ant-design/icons';
 
 import navSectionNames from '@constants/navSectionNames';
 
+import {currentKubeContextSelector} from '@redux/appConfig';
 import {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
 import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
-import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
 import {useSelectorWithRef} from '@utils/hooks';
@@ -29,6 +29,7 @@ const DashboardPane = () => {
   const [menuList, menuListRef] = useSelectorWithRef(state => state.dashboard.ui.menuList);
   const clusterResourceMetaMapRef = useResourceMetaMapRef('cluster');
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
+  const currentContext = useAppSelector(currentKubeContextSelector);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [filterText, setFilterText] = useState<string>('');
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
@@ -143,7 +144,7 @@ const DashboardPane = () => {
     <S.Container>
       <S.HeaderContainer>
         <S.ClusterName
-          title={new KubeConfigManager().getKubeConfig().currentContext}
+          title={currentContext}
           description={
             <div>
               <S.CheckCircleFilled />
