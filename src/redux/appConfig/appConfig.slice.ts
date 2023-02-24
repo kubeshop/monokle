@@ -1,5 +1,3 @@
-import {ipcRenderer} from 'electron';
-
 import {Draft, PayloadAction, createAsyncThunk, createSlice, isAnyOf} from '@reduxjs/toolkit';
 
 import flatten from 'flat';
@@ -51,7 +49,7 @@ import electronStore from '@shared/utils/electronStore';
 import {createKubeClient, getKubeAccess} from '@shared/utils/kubeclient';
 
 import initialState from '../initialState';
-import {setLeftBottomMenuSelection, setLeftMenuSelection, toggleStartProjectPane} from '../reducers/ui';
+import {setLeftMenuSelection, toggleStartProjectPane} from '../reducers/ui';
 import {kubeConfigPathSelector} from './appConfig.selectors';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
@@ -78,15 +76,6 @@ export const setOpenProject = createAsyncThunk(
   async (projectRootPath: string | null, thunkAPI: any) => {
     const appConfig: AppConfig = thunkAPI.getState().config;
     const appUi: UiState = thunkAPI.getState().ui;
-    const terminalsIds: string[] = Object.keys(thunkAPI.getState().terminal.terminalsMap);
-
-    if (terminalsIds.length) {
-      thunkAPI.dispatch(setLeftBottomMenuSelection(undefined));
-
-      terminalsIds.forEach(terminalId => {
-        ipcRenderer.send('shell.ptyProcessKillAll', {terminalId});
-      });
-    }
 
     if (projectRootPath && appUi.isStartProjectPaneVisible) {
       thunkAPI.dispatch(toggleStartProjectPane());
