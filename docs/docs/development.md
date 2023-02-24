@@ -51,4 +51,4 @@ The output will be located in the `dist` folder.
 
 ## **Help & Support**
 
-Feel free to reach out and ask questions on our [Discord server](https://discord.gg/uNuhy6GDyn).
+Feel free to reach out and ask questions on our [Discord server](https://discord.gg/uNuhy6GDyn)
