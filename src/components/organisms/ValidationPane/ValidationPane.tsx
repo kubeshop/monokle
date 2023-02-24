@@ -8,7 +8,7 @@ import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {useValidationSelector} from '@redux/validation/validation.selectors';
 import {setSelectedProblem} from '@redux/validation/validation.slice';
 
-import {useMainPaneDimensions} from '@utils/hooks';
+import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import ValidationFigure from '@assets/NewValidationFigure.svg';
 
@@ -25,7 +25,7 @@ const ValidationPane: React.FC = () => {
 
   const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
-  const {height} = useMainPaneDimensions();
+  const height = usePaneHeight();
 
   if (!lastResponse) {
     return null;
