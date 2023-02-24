@@ -78,60 +78,64 @@ const NewPaneManager: React.FC = () => {
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
       {isProjectLoading ? (
         <S.Skeleton />
-      ) : (activeProject || isInQuickClusterMode) && !isStartProjectPaneVisible ? (
-        <>
-          <PaneManagerLeftMenu />
-
-          <ResizableRowsPanel
-            layout={{top: topPaneFlex, bottom: layout.bottomPaneHeight / height}}
-            top={
-              currentActivity?.type === 'fullscreen' ? (
-                currentActivity.component
-              ) : !isInClusterMode && currentActivity?.name === 'dashboard' ? (
-                isPreviewLoading ? (
-                  <Skeleton active style={{margin: 20}} />
-                ) : (
-                  <EmptyDashboard />
-                )
-              ) : (
-                <ResizableColumnsPanel
-                  paneCloseIconStyle={{top: 15}}
-                  left={leftMenuActive ? currentActivity?.component : undefined}
-                  center={
-                    !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? <NavigatorPane /> : null
-                  }
-                  right={
-                    currentActivity?.name === 'git' ? (
-                      <GitOpsView />
-                    ) : currentActivity?.name === 'dashboard' ? (
-                      <Dashboard />
-                    ) : currentActivity?.name === 'validation' ? (
-                      <ProblemPane />
-                    ) : (
-                      <ActionsPane />
-                    )
-                  }
-                  layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
-                  width={width}
-                  onStopResize={handleColumnResize}
-                  leftClosable
-                  onCloseLeftPane={() => dispatch(toggleLeftMenu())}
-                />
-              )
-            }
-            bottom={<BottomPaneManager />}
-            splitterStyle={{display: bottomSelection === 'terminal' ? 'block' : 'none'}}
-            bottomElementStyle={{
-              overflow: bottomSelection === 'terminal' ? 'hidden' : 'auto',
-              display: bottomSelection === 'terminal' ? 'block' : 'none',
-            }}
-            onStopResize={handleRowResize}
-            height={height}
-            width={width}
-          />
-        </>
       ) : (
-        <StartPage />
+        <>
+          {(activeProject || isInQuickClusterMode) && !isStartProjectPaneVisible && <PaneManagerLeftMenu />}
+
+          {!isStartProjectPaneVisible ? (
+            <ResizableRowsPanel
+              layout={{top: topPaneFlex, bottom: layout.bottomPaneHeight / height}}
+              top={
+                currentActivity?.type === 'fullscreen' ? (
+                  currentActivity.component
+                ) : !isInClusterMode && currentActivity?.name === 'dashboard' ? (
+                  isPreviewLoading ? (
+                    <Skeleton active style={{margin: 20}} />
+                  ) : (
+                    <EmptyDashboard />
+                  )
+                ) : (
+                  <ResizableColumnsPanel
+                    paneCloseIconStyle={{top: 15}}
+                    left={leftMenuActive ? currentActivity?.component : undefined}
+                    center={
+                      !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? (
+                        <NavigatorPane />
+                      ) : null
+                    }
+                    right={
+                      currentActivity?.name === 'git' ? (
+                        <GitOpsView />
+                      ) : currentActivity?.name === 'dashboard' ? (
+                        <Dashboard />
+                      ) : currentActivity?.name === 'validation' ? (
+                        <ProblemPane />
+                      ) : (
+                        <ActionsPane />
+                      )
+                    }
+                    layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
+                    width={width}
+                    onStopResize={handleColumnResize}
+                    leftClosable
+                    onCloseLeftPane={() => dispatch(toggleLeftMenu())}
+                  />
+                )
+              }
+              bottom={<BottomPaneManager />}
+              splitterStyle={{display: bottomSelection === 'terminal' ? 'block' : 'none'}}
+              bottomElementStyle={{
+                overflow: bottomSelection === 'terminal' ? 'hidden' : 'auto',
+                display: bottomSelection === 'terminal' ? 'block' : 'none',
+              }}
+              onStopResize={handleRowResize}
+              height={height}
+              width={width}
+            />
+          ) : (
+            <StartPage />
+          )}
+        </>
       )}
     </S.PaneManagerContainer>
   );
