@@ -1,12 +1,15 @@
-import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
+import {ipcRenderer} from 'electron';
 
+import {Draft, PayloadAction, createSlice, isAnyOf} from '@reduxjs/toolkit';
+
+import {setOpenProject} from '@redux/appConfig';
 import initialState from '@redux/initialState';
 import {AppListenerFn} from '@redux/listeners/base';
 
 import {ShellsMapType, TerminalSettingsType, TerminalState, TerminalType} from '@shared/models/terminal';
 import electronStore from '@shared/utils/electronStore';
 
-import {setLeftBottomMenuSelection} from './ui';
+import {toggleStartProjectPane} from './ui';
 
 export const terminalSlice = createSlice({
   name: 'terminal',
@@ -66,16 +69,16 @@ export default terminalSlice.reducer;
  * Listeners
  * * * * * * * * * * * * * */
 
-export const removedTerminalListener: AppListenerFn = listen => {
+export const killTerminalProcessesListener: AppListenerFn = listen => {
   listen({
-    type: removeTerminal.type,
+    matcher: isAnyOf(toggleStartProjectPane, setOpenProject.pending),
     effect: async (_action, {dispatch, getState}) => {
-      const terminalsMap = getState().terminal.terminalsMap;
+      const terminalsIds = Object.keys(getState().terminal.terminalsMap);
 
-      if (!Object.keys(terminalsMap).length) {
-        dispatch(setLeftBottomMenuSelection(undefined));
-        dispatch(setSelectedTerminal(undefined));
-      }
+      if (!terminalsIds.length) return;
+
+      ipcRenderer.send('shell.ptyProcessKillAll');
+      dispatch(setSelectedTerminal(undefined));
     },
   });
 };
