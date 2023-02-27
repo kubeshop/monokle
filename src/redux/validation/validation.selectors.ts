@@ -18,8 +18,8 @@ import {ValidationState} from '@shared/models/validation';
 
 import {VALIDATOR} from './validator';
 
-export const useValidationSelector: TypedUseSelectorHook<ValidationState> = selector =>
-  useAppSelector(state => selector(state.validation));
+export const useValidationSelector: TypedUseSelectorHook<ValidationState> = (selector, equalifyFn) =>
+  useAppSelector(state => selector(state.validation), equalifyFn);
 
 /* * * * * * * * * * * * * * * * * *
  * All problems
