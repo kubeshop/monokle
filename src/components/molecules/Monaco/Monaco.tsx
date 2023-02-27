@@ -64,6 +64,7 @@ type IProps = {
   applySelection: () => void;
   height?: number;
   providedResourceSelection?: ResourceSelection;
+  providedFilePath?: string;
 };
 
 window.MonacoEnvironment = {
@@ -86,7 +87,7 @@ function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
 }
 
 const Monaco: React.FC<IProps> = props => {
-  const {diffSelectedResource, applySelection, height, providedResourceSelection} = props;
+  const {diffSelectedResource, applySelection, height, providedResourceSelection, providedFilePath} = props;
   const dispatch = useAppDispatch();
 
   const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
@@ -120,6 +121,10 @@ const Monaco: React.FC<IProps> = props => {
   const localResourceContentMap = useResourceContentMap('local');
   // TODO: 2.0+ as a quick fix for Monaco, we're including the selectedHelmValuesFile in this selector
   const [selectedFilePath, selectedFilePathRef] = useSelectorWithRef(state => {
+    if (providedFilePath) {
+      return providedFilePath;
+    }
+
     const _selectedFilePath = selectedFilePathSelector(state);
     if (_selectedFilePath) {
       return _selectedFilePath;
