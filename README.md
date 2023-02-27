@@ -33,9 +33,9 @@
 </p>
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=wkFWg_S8eUA">
-    <img src="docs/img/monokle-intro-thumbnail.png" alt="Monokle Desktop Overview" />
-    <p align="center">Click on the image or this link to watch the "Intro to Monokle Dekstop" short video (3 mins)</p>
+  <a href="http://youtu.be/y3GLmTsna1M">
+    <img src="https://res.cloudinary.com/duczlt4nw/image/upload/v1677516135/YouTube_Thumbnail_17_hxccnv.png">
+    <p align="center">Click on the image or <a href="http://youtu.be/y3GLmTsna1M">this link</a> to watch the "Intro to Monokle" short video (4 mins)</p>
   </a>
 </p>
 
