@@ -74,6 +74,7 @@ export function useProblemPaneMenuItems(width: number, height: number) {
             diffSelectedResource={() => {}}
             providedResourceSelection={resourceSelection}
             providedFilePath={selectedProblemMonacoData?.filePath}
+            providedRange={selectedProblemMonacoData?.range}
           />
         ),
       },
@@ -92,7 +93,14 @@ export function useProblemPaneMenuItems(width: number, height: number) {
         ),
       },
     ],
-    [height, sarifValue, selectedProblemMonacoData, width]
+    [
+      height,
+      resourceSelection,
+      sarifValue,
+      selectedProblemMonacoData?.filePath,
+      selectedProblemMonacoData?.range,
+      width,
+    ]
   );
 
   return items;

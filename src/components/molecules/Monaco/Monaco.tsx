@@ -51,7 +51,7 @@ import {ResourceFilterType} from '@shared/models/appState';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {isHelmPreview} from '@shared/models/preview';
 import {ResourceSelection, isHelmValuesFileSelection} from '@shared/models/selection';
-import {NewResourceWizardInput} from '@shared/models/ui';
+import {MonacoRange, NewResourceWizardInput} from '@shared/models/ui';
 
 import * as S from './Monaco.styled';
 import useCodeIntel from './useCodeIntel';
@@ -65,6 +65,7 @@ type IProps = {
   height?: number;
   providedResourceSelection?: ResourceSelection;
   providedFilePath?: string;
+  providedRange?: MonacoRange;
 };
 
 window.MonacoEnvironment = {
@@ -87,7 +88,8 @@ function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
 }
 
 const Monaco: React.FC<IProps> = props => {
-  const {diffSelectedResource, applySelection, height, providedResourceSelection, providedFilePath} = props;
+  const {diffSelectedResource, applySelection, height, providedResourceSelection, providedFilePath, providedRange} =
+    props;
   const dispatch = useAppDispatch();
 
   const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
@@ -132,6 +134,7 @@ const Monaco: React.FC<IProps> = props => {
     const _selectedHelmValues = selectedHelmValuesSelector(state);
     return _selectedHelmValues?.filePath;
   });
+
   const lastChangedLine = useAppSelector(state => state.main.lastChangedLine);
   const selection = useAppSelector(state => state.main.selection);
   const settings = useAppSelector(settingsSelector);
@@ -425,6 +428,13 @@ const Monaco: React.FC<IProps> = props => {
     };
     return editorOptions;
   }, [isReadOnlyMode]);
+
+  useEffect(() => {
+    if (!providedRange || !editorRef.current) return;
+
+    editorRef.current.setSelection(providedRange);
+    editorRef.current.revealLineInCenter(providedRange.startLineNumber);
+  }, [providedRange]);
 
   return (
     <S.MonacoContainer ref={containerRef} $height={height}>
