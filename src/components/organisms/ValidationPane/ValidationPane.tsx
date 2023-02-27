@@ -1,4 +1,3 @@
-import {useEffect} from 'react';
 import {useMeasure} from 'react-use';
 
 import {Image, Skeleton} from 'antd';
@@ -10,7 +9,6 @@ import {useValidationSelector} from '@redux/validation/validation.selectors';
 import {setSelectedProblem} from '@redux/validation/validation.slice';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
-import {useSelectWithErrorMark} from '@hooks/useSelectWithErrorMark';
 
 import ValidationFigure from '@assets/NewValidationFigure.svg';
 
@@ -25,22 +23,9 @@ const ValidationPane: React.FC = () => {
   const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem);
   const status = useValidationSelector(state => state.status);
 
-  const {selectFileWithErrorMark, selectResourceWithErrorMark} = useSelectWithErrorMark(selectedProblem);
-
   const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
   const height = usePaneHeight();
-
-  useEffect(() => {
-    if (!selectedProblem) return;
-
-    if (selectedProblem.selectedFrom === 'file') {
-      selectFileWithErrorMark();
-    } else if (selectedProblem.selectedFrom === 'resource') {
-      selectResourceWithErrorMark();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedProblem]);
 
   if (!lastResponse) {
     return null;

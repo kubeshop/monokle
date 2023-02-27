@@ -4,8 +4,16 @@ import {createSelector} from '@reduxjs/toolkit';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {RuleLevel, ValidationResult, getFileId, getResourceId} from '@monokle/validation';
+import {
+  RuleLevel,
+  ValidationResult,
+  getFileId,
+  getFileLocation,
+  getResourceId,
+  getResourceLocation,
+} from '@monokle/validation';
 import {RootState} from '@shared/models/rootState';
+import {MonacoRange} from '@shared/models/ui';
 import {ValidationState} from '@shared/models/validation';
 
 import {VALIDATOR} from './validator';
@@ -187,4 +195,56 @@ export const pluginEnabledSelector = createSelector(
   (state: RootState, id: string) => state.validation.config?.plugins?.[id],
   (_: RootState, id: string) => id,
   (_config, id): boolean => VALIDATOR.getPlugin(id)?.enabled ?? false
+);
+
+export const problemFilePathAndRangeSelector = createSelector(
+  (state: ValidationState) => state.validationOverview.selectedProblem?.problem ?? null,
+  (problem: ValidationResult | null) => {
+    if (!problem) {
+      return {filePath: '', range: undefined};
+    }
+
+    const location = getFileLocation(problem);
+    const filePath = location.physicalLocation?.artifactLocation?.uri ?? '';
+    const region = location.physicalLocation?.region;
+
+    if (!region) {
+      return {filePath, range: undefined};
+    }
+
+    const range: MonacoRange = {
+      endColumn: region.endColumn,
+      endLineNumber: region.endLine,
+      startColumn: region.startColumn,
+      startLineNumber: region.startLine,
+    };
+
+    return {filePath, range};
+  }
+);
+
+export const problemResourceIdAndRangeSelector = createSelector(
+  (state: ValidationState) => state.validationOverview.selectedProblem?.problem ?? null,
+  (problem: ValidationResult | null) => {
+    if (!problem) {
+      return {resourceId: '', range: undefined};
+    }
+
+    const resourceId = getResourceId(problem) ?? '';
+    const location = getResourceLocation(problem);
+    const region = location.physicalLocation?.region;
+
+    if (!region) {
+      return {resourceId, range: undefined};
+    }
+
+    const range: MonacoRange = {
+      endColumn: region.endColumn,
+      endLineNumber: region.endLine,
+      startColumn: region.startColumn,
+      startLineNumber: region.startLine,
+    };
+
+    return {resourceId, range};
+  }
 );
