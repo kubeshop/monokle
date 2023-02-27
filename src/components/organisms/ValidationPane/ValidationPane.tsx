@@ -18,10 +18,10 @@ import * as S from './ValidationPane.styled';
 
 const ValidationPane: React.FC = () => {
   const dispatch = useAppDispatch();
-  const status = useValidationSelector(state => state.status);
   const lastResponse = useValidationSelector(state => state.lastResponse);
   const newProblemsIntroducedType = useValidationSelector(state => state.validationOverview.newProblemsIntroducedType);
-  const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem?.problem);
+  const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem);
+  const status = useValidationSelector(state => state.status);
 
   const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
@@ -56,7 +56,7 @@ const ValidationPane: React.FC = () => {
           containerStyle={{marginTop: '20px'}}
           height={height - titleBarHeight - 40}
           newProblemsIntroducedType={newProblemsIntroducedType}
-          selectedProblem={selectedProblem}
+          selectedProblem={selectedProblem?.problem}
           validationResponse={lastResponse}
           onProblemSelect={problem => dispatch(setSelectedProblem(problem))}
         />

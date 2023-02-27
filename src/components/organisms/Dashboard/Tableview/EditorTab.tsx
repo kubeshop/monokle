@@ -1,6 +1,6 @@
 import {useAppSelector} from '@redux/hooks';
 
-import {Monaco} from '@components/molecules';
+import {Monaco} from '@molecules';
 
 import {ResourceSelection} from '@shared/models/selection';
 
