@@ -12,7 +12,7 @@ export const usePaneHeight = () => {
   const {height} = useMainPaneDimensions();
 
   if (bottomSelection) {
-    return height - bottomPaneHeight;
+    return height - bottomPaneHeight - 1;
   }
 
   return height;
