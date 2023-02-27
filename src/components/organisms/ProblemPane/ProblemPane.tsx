@@ -8,8 +8,7 @@ import {useAppSelector} from '@redux/hooks';
 import {SelectItemImage} from '@atoms';
 
 import {useProblemPaneMenuItems} from '@hooks/menuItemsHooks';
-
-import {useMainPaneDimensions} from '@utils/hooks';
+import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {ProblemInfo, TitleBar} from '@monokle/components';
 import {getRuleForResult} from '@monokle/validation';
@@ -24,7 +23,7 @@ const ProblemPane: React.FC = () => {
   const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
   const [problemInfoRef, {height: problemInfoHeight}] = useMeasure<HTMLDivElement>();
 
-  const {height} = useMainPaneDimensions();
+  const height = usePaneHeight();
 
   const tabsItems = useProblemPaneMenuItems(
     containerWidth,
