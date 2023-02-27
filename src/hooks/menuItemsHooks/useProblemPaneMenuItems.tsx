@@ -3,6 +3,8 @@ import MonacoEditor, {monaco} from 'react-monaco-editor';
 
 import {TabsProps} from 'antd';
 
+import fastDeepEqual from 'fast-deep-equal';
+
 import {useAppSelector} from '@redux/hooks';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
 import {
@@ -42,7 +44,7 @@ export function useProblemPaneMenuItems(width: number, height: number) {
     if (selectedFrom === 'resource') {
       return {...monacoData, ...problemResourceIdAndRangeSelector(state)};
     }
-  });
+  }, fastDeepEqual);
 
   const resourceSelection: ResourceSelection | undefined = useMemo(() => {
     if (!selectedProblemMonacoData?.resourceId) return undefined;
