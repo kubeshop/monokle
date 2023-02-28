@@ -1,4 +1,4 @@
-import {useEffect, useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {activeProjectSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -87,14 +87,6 @@ const SettingsPane = () => {
     [activeProject, isOnStartProjectPage, isStartProjectPaneVisible]
   );
 
-  useEffect(() => {
-    if (!isOnStartProjectPage) {
-      dispatch(setActiveSettingsPanel(SettingsPanel.ValidationSettings));
-    } else {
-      dispatch(setActiveSettingsPanel(SettingsPanel.GlobalSettings));
-    }
-  }, [dispatch, isOnStartProjectPage]);
-
   return (
     <S.SettingsPaneContainer $isOnStartProjectPage={isOnStartProjectPage}>
       {!isOnStartProjectPage && (
@@ -105,7 +97,6 @@ const SettingsPane = () => {
 
       <S.Tabs
         $isOnStartProjectPage={isOnStartProjectPage}
-        defaultActiveKey="source"
         activeKey={activeSettingsPanel}
         items={tabItems}
         onChange={(k: string) => dispatch(setActiveSettingsPanel(k as SettingsPanel))}

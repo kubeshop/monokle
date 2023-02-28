@@ -15,7 +15,7 @@ import WalkThroughModal from './WalkThroughModal';
 
 const LearnPage = () => {
   const dispatch = useAppDispatch();
-  const learnTopic = useAppSelector(state => state.ui.startPageLearn.learnTopic);
+  const learnTopic = useAppSelector(state => state.ui.startPage.learn.learnTopic);
 
   const onLearnCardClickHandler = useCallback(
     (topic: LearnTopicType) => {

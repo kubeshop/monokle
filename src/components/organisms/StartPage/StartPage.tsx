@@ -1,10 +1,11 @@
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   setIsInQuickClusterMode,
   setLeftMenuSelection,
   setShowStartPageLearn,
+  setStartPageMenuOption,
   toggleStartProjectPane,
 } from '@redux/reducers/ui';
 
@@ -14,23 +15,19 @@ import {useStartPageOptions} from '@hooks/useStartPageOptions';
 
 import {useWindowSize} from '@utils/hooks';
 
+import {StartPageMenuOptions} from '@shared/models/ui';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import * as S from './StartPage.styled';
 import StartPageHeader from './StartPageHeader';
 
-type OptionsKeys = 'recent-projects' | 'all-projects' | 'settings' | 'new-project' | 'quick-cluster-mode' | 'learn';
-
 const StartPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const isStartPageLearnVisible = useAppSelector(state => state.ui.startPageLearn.isVisible);
+  const isStartPageLearnVisible = useAppSelector(state => state.ui.startPage.learn.isVisible);
   const projects = useAppSelector(state => state.config.projects);
+  const selectedOption = useAppSelector(state => state.ui.startPage.selectedMenuOption);
 
   const {height} = useWindowSize();
-
-  const [selectedOption, setSelectedOption] = useState<OptionsKeys>(
-    projects.length ? 'recent-projects' : 'new-project'
-  );
 
   const options = useStartPageOptions();
 
@@ -46,8 +43,16 @@ const StartPage: React.FC = () => {
       return;
     }
 
-    setSelectedOption('learn');
-  }, [isStartPageLearnVisible, selectedOption]);
+    dispatch(setStartPageMenuOption('learn'));
+  }, [dispatch, isStartPageLearnVisible, selectedOption]);
+
+  useEffect(() => {
+    if (projects.length && selectedOption !== 'recent-projects') {
+      dispatch(setStartPageMenuOption('recent-projects'));
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <S.StartPageContainer $height={height}>
@@ -65,7 +70,7 @@ const StartPage: React.FC = () => {
                   return;
                 }
 
-                setSelectedOption(key as OptionsKeys);
+                dispatch(setStartPageMenuOption(key as StartPageMenuOptions));
 
                 if (isStartPageLearnVisible) {
                   dispatch(setShowStartPageLearn(false));

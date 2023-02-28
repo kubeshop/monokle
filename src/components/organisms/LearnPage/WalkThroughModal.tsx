@@ -1,3 +1,5 @@
+import {useCallback} from 'react';
+
 import {MenuOutlined, SettingOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
@@ -12,8 +14,9 @@ import {Colors} from '@shared/styles';
 const WalkThroughModal = () => {
   const dispatch = useAppDispatch();
 
-  const topic = useAppSelector(state => state.ui.startPageLearn.learnTopic);
-  const dismissWalkThrough = () => dispatch(setStartPageLearnTopic(undefined));
+  const topic = useAppSelector(state => state.ui.startPage.learn.learnTopic);
+  const dismissWalkThrough = useCallback(() => dispatch(setStartPageLearnTopic(undefined)), [dispatch]);
+
   return (
     <WalkThrough dismissWalkThrough={dismissWalkThrough} topic={String(topic)}>
       {topic === 'explore' && (
