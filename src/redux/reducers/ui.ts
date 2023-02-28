@@ -227,6 +227,12 @@ export const uiSlice = createSlice({
       state.renameResourceModal = undefined;
     },
     toggleStartProjectPane: (state: Draft<UiState>) => {
+      if (!state.isStartProjectPaneVisible) {
+        state.activeSettingsPanel = SettingsPanel.GlobalSettings;
+      } else {
+        state.activeSettingsPanel = SettingsPanel.ValidationSettings;
+      }
+
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
     },
     collapseNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
@@ -351,6 +357,7 @@ export const uiSlice = createSlice({
         const folderKeys = folders.map(folder => (folder.name === ROOT_FILE_ENTRY ? ROOT_FILE_ENTRY : folder.filePath));
         state.leftMenu.expandedFolders = folderKeys;
         state.templateExplorer.projectCreate = undefined;
+        state.activeSettingsPanel = SettingsPanel.ValidationSettings;
       })
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;
