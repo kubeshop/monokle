@@ -22,3 +22,57 @@ export function createHelmTemplateCommand({values, name, chart}: HelmTemplateArg
     env,
   };
 }
+
+export function listHelmRepoCommand(env?: HelmEnv): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['repo', 'list', '-o json'],
+    env,
+  };
+}
+
+export function addHelmRepoCommand({name, url}: {name: string; url: string}, env?: HelmEnv): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['repo', 'add', name, url],
+    env,
+  };
+}
+
+export function updateHelmRepoCommand({repos = []}: {repos?: string[]}, env?: HelmEnv): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['repo', 'update', ...repos],
+    env,
+  };
+}
+
+export function removeHelmRepoCommand({repos}: {repos: string[]}, env?: HelmEnv): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['repo', 'remove', ...repos],
+    env,
+  };
+}
+
+export function indexHelmRepoCommand({dir}: {dir: string}, env?: HelmEnv): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['repo', 'index', dir],
+    env,
+  };
+}
+
+export function searchHelmRepoCommand({q}: {q: string}, env?: HelmEnv): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['search', 'repo', q, '-o json'],
+    env,
+  };
+}
