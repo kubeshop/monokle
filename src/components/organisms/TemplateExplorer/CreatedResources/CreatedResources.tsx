@@ -44,6 +44,11 @@ const CreatedResources: React.FC<IProps> = props => {
     setIsSaveToFolderOpen(false);
   };
 
+  const onDoneClickHandler = () => {
+    dispatch(setSelectedTemplatePath(undefined));
+    dispatch(closeTemplateExplorer());
+  };
+
   return (
     <>
       <SaveToFolderModal
@@ -97,7 +102,7 @@ const CreatedResources: React.FC<IProps> = props => {
 
       <S.TextArea rows={10} value={resultMessage} readOnly />
 
-      <S.DoneButton type="ghost" onClick={() => dispatch(setSelectedTemplatePath(undefined))}>
+      <S.DoneButton type="primary" onClick={onDoneClickHandler}>
         Done
       </S.DoneButton>
     </>
