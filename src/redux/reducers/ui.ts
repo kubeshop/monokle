@@ -346,6 +346,7 @@ export const uiSlice = createSlice({
         const folders = nodes.filter(node => node.children?.length);
         const folderKeys = folders.map(folder => (folder.name === ROOT_FILE_ENTRY ? ROOT_FILE_ENTRY : folder.filePath));
         state.leftMenu.expandedFolders = folderKeys;
+        state.templateExplorer.projectCreate = undefined;
       })
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;
