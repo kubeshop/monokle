@@ -1,6 +1,14 @@
 import {Project, SavedCommand, SettingsPanel} from './config';
 import {ResourceIdentifier} from './k8sResource';
 
+export type StartPageMenuOptions =
+  | 'recent-projects'
+  | 'all-projects'
+  | 'settings'
+  | 'new-project'
+  | 'quick-cluster-mode'
+  | 'learn';
+
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
   CREATE_RESOURCE = 'CREATE_RESOURCE',
@@ -161,9 +169,12 @@ type UiState = {
     connectToCluster: boolean;
   };
   activeSettingsPanel: SettingsPanel;
-  startPageLearn: {
-    isVisible: boolean;
-    learnTopic?: LearnTopicType;
+  startPage: {
+    selectedMenuOption: StartPageMenuOptions;
+    learn: {
+      isVisible: boolean;
+      learnTopic?: LearnTopicType;
+    };
   };
   templateExplorer: {
     isVisible: boolean;

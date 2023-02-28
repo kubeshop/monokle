@@ -24,6 +24,7 @@ import {
   NewResourceWizardInput,
   PaneConfiguration,
   RightMenuSelectionType,
+  StartPageMenuOptions,
   UiState,
 } from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
@@ -324,13 +325,16 @@ export const uiSlice = createSlice({
       state.isAboutModalOpen = false;
     },
     setShowStartPageLearn: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.startPageLearn.isVisible = action.payload;
+      state.startPage.learn.isVisible = action.payload;
     },
     setStartPageLearnTopic: (state: Draft<UiState>, action: PayloadAction<LearnTopicType | undefined>) => {
-      state.startPageLearn.learnTopic = action.payload;
+      state.startPage.learn.learnTopic = action.payload;
     },
     setIsInQuickClusterMode: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.isInQuickClusterMode = action.payload;
+    },
+    setStartPageMenuOption: (state: Draft<UiState>, action: PayloadAction<StartPageMenuOptions>) => {
+      state.startPage.selectedMenuOption = action.payload;
     },
   },
   extraReducers: builder => {
@@ -409,6 +413,7 @@ export const {
   setSelectedTemplatePath,
   setShowStartPageLearn,
   setStartPageLearnTopic,
+  setStartPageMenuOption,
   setTemplateProjectCreate,
   toggleExpandActionsPaneFooter,
   toggleLeftMenu,

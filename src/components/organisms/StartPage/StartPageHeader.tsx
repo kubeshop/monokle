@@ -27,7 +27,7 @@ import * as S from './StartPageHeader.styled';
 
 const StartPageHeader: React.FC = () => {
   const dispatch = useAppDispatch();
-  const isStartPageLearnVisible = useAppSelector(state => state.ui.startPageLearn.isVisible);
+  const isStartPageLearnVisible = useAppSelector(state => state.ui.startPage.learn.isVisible);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const isWelcomePopupVisible = useAppSelector(state => state.ui.welcomePopup.isVisible);
   const projects = useAppSelector(state => _.sortBy(state.config.projects, p => p?.name?.toLowerCase()));
