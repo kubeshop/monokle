@@ -1,6 +1,8 @@
-import {Button, Input} from 'antd';
+import {Input} from 'antd';
 
 import styled from 'styled-components';
+
+import {PrimaryButton} from '@atoms';
 
 import {Colors} from '@shared/styles/colors';
 
@@ -22,7 +24,7 @@ export const Description = styled.div`
   padding: 22px 22px 18px 22px;
 `;
 
-export const DoneButton = styled(Button)`
+export const DoneButton = styled(PrimaryButton)`
   margin-top: 25px;
 `;
 
