@@ -65,6 +65,14 @@ export function useProblemPaneMenuItems(width: number, height: number) {
     return JSON.stringify({...selectedProblem, rule: {...rule}}, null, 2);
   }, [rule, selectedProblem]);
 
+  const providedFilePath = useMemo(() => {
+    if (!selectedProblemMonacoData) return undefined;
+
+    const filePath = selectedProblemMonacoData.filePath;
+
+    return filePath.startsWith(sep) ? filePath : sep + filePath;
+  }, [selectedProblemMonacoData]);
+
   const items: TabsProps['items'] = useMemo(
     () => [
       {
@@ -76,7 +84,7 @@ export function useProblemPaneMenuItems(width: number, height: number) {
             applySelection={() => {}}
             diffSelectedResource={() => {}}
             providedResourceSelection={resourceSelection}
-            providedFilePath={`${sep}${selectedProblemMonacoData?.filePath}`}
+            providedFilePath={providedFilePath}
             providedRange={selectedProblemMonacoData?.range}
           />
         ),
@@ -96,14 +104,7 @@ export function useProblemPaneMenuItems(width: number, height: number) {
         ),
       },
     ],
-    [
-      height,
-      resourceSelection,
-      sarifValue,
-      selectedProblemMonacoData?.filePath,
-      selectedProblemMonacoData?.range,
-      width,
-    ]
+    [height, providedFilePath, resourceSelection, sarifValue, selectedProblemMonacoData?.range, width]
   );
 
   return items;
