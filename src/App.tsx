@@ -56,6 +56,9 @@ const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
 const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
 const CreateFileFolderModal = React.lazy(() => import('@organisms/CreateFileFolderModal'));
+const CreateHelmChartAndKustomizationModal = React.lazy(
+  () => import('@organisms/CreateHelmChartAndKustomizationModal')
+);
 const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
 const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
 const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
@@ -82,6 +85,9 @@ const App = () => {
   const activeProject = useAppSelector(activeProjectSelector);
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
   const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
+  const isCreateHelmChartAndKustomizationModalVisible = useAppSelector(
+    state => state.ui.createHelmChartAndKustomizationModal.isOpen
+  );
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
   const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
   const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
@@ -413,6 +419,7 @@ const App = () => {
           {isAboutModalVisible && <AboutModal />}
           {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
+          {isCreateHelmChartAndKustomizationModalVisible && <CreateHelmChartAndKustomizationModal />}
           {isFormModalVisible && <FormEditorModal visible={isFormModalVisible} onClose={onCloseFormModal} />}
           {isCreateFileFolderModalVisible && <CreateFileFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}

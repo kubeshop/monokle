@@ -4,6 +4,7 @@ export {default as BottomPaneManager} from './BottomPaneManager';
 export {default as ClusterResourceDiffModal} from './ClusterResourceDiffModal';
 export {default as CompareSyncPane} from './CompareSyncPane';
 export {default as CreateFileFolderModal} from './CreateFileFolderModal';
+export {default as CreateHelmChartAndKustomizationModal} from './CreateHelmChartAndKustomizationModal';
 export {default as CreateProjectModal} from './CreateProjectModal';
 export {default as Dashboard} from './Dashboard';
 export {default as DashboardPane} from './DashboardPane';
