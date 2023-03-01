@@ -1,6 +1,6 @@
 import {useMeasure} from 'react-use';
 
-import {Image, Skeleton} from 'antd';
+import {Image} from 'antd';
 import Link from 'antd/lib/typography/Link';
 
 import {useAppDispatch} from '@redux/hooks';
@@ -49,18 +49,16 @@ const ValidationPane: React.FC = () => {
         />
       </div>
 
-      {status === 'loading' ? (
-        <Skeleton active style={{marginTop: '15px'}} />
-      ) : (
-        <ValidationOverview
-          containerStyle={{marginTop: '20px'}}
-          height={height - titleBarHeight - 40}
-          newProblemsIntroducedType={newProblemsIntroducedType}
-          selectedProblem={selectedProblem?.problem}
-          validationResponse={lastResponse}
-          onProblemSelect={problem => dispatch(setSelectedProblem(problem))}
-        />
-      )}
+      <ValidationOverview
+        containerStyle={{marginTop: '20px'}}
+        height={height - titleBarHeight - 40}
+        newProblemsIntroducedType={newProblemsIntroducedType}
+        selectedProblem={selectedProblem?.problem}
+        validationResponse={lastResponse}
+        onProblemSelect={problem => dispatch(setSelectedProblem(problem))}
+        status={status}
+        skeletonStyle={{marginTop: '20px'}}
+      />
     </S.ValidationPaneContainer>
   );
 };
