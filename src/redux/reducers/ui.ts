@@ -349,7 +349,7 @@ export const uiSlice = createSlice({
       state.createHelmChartAndKustomizationModal = {isOpen: true, type: action.payload};
     },
     closeCreateHelmChartAndKustomizationModal: (state: Draft<UiState>) => {
-      state.createHelmChartAndKustomizationModal = {isOpen: true, type: undefined};
+      state.createHelmChartAndKustomizationModal = {isOpen: false, type: undefined};
     },
   },
   extraReducers: builder => {
