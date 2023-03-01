@@ -14,6 +14,23 @@ All notable changes to this project will be documented in this file. See [standa
 ### Bug Fixes
 
 * fixing problems in editor ([6fcaf1a](https://github.com/kubeshop/monokle/commit/6fcaf1a5c9315efe4a09a0c194351dbde3315f8e))
+* github actions ([98efe7a](https://github.com/kubeshop/monokle/commit/98efe7a72c368de17085e1ef9439b161a3b3ae4a))
+* monaco errors & side by side editor ([9354dbe](https://github.com/kubeshop/monokle/commit/9354dbe606e7491572102d5df7f666be74cbf9ff))
+* reset validation state on folder change ([26bce7d](https://github.com/kubeshop/monokle/commit/26bce7dbb668c5fc99da02e0e578630849959742))
+* Validation pane Editor file path ([67002a7](https://github.com/kubeshop/monokle/commit/67002a7c59831bc90b860181d5a4f5e3dd3c6517))
+
+### [2.0.2](https://github.com/kubeshop/monokle/compare/v2.0.2-nightly-2023-03-01.0...v2.0.2) (2023-03-01)
+
+
+### Features
+
+* add Discord link to header ([572dffb](https://github.com/kubeshop/monokle/commit/572dffb6d643be61072d4efbbc80f7254d1b2d2d))
+* add trigger for docs deploy ([3583c66](https://github.com/kubeshop/monokle/commit/3583c660e78407be28cde735136f823986ca0e88))
+
+
+### Bug Fixes
+
+* fixing problems in editor ([6fcaf1a](https://github.com/kubeshop/monokle/commit/6fcaf1a5c9315efe4a09a0c194351dbde3315f8e))
 * monaco errors & side by side editor ([9354dbe](https://github.com/kubeshop/monokle/commit/9354dbe606e7491572102d5df7f666be74cbf9ff))
 * reset validation state on folder change ([26bce7d](https://github.com/kubeshop/monokle/commit/26bce7dbb668c5fc99da02e0e578630849959742))
 * Validation pane Editor file path ([67002a7](https://github.com/kubeshop/monokle/commit/67002a7c59831bc90b860181d5a4f5e3dd3c6517))
