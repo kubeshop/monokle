@@ -63,12 +63,15 @@ const config = {
       navbar: {
         logo: {
           alt: 'Monokle',
-          src: 'img/MonokleLogoDark.svg',
+          src: 'img/NewMonokleLogoDark.svg',
           href: '/',
         },
-        title: 'Monokle',
-
         items: [
+          {
+            href: 'https://discord.gg/6zupCZFQbe',
+            label: 'Discord',
+            position: 'left',
+          },
           {
             type: 'html',
             position: 'right',
