@@ -3,7 +3,7 @@ name: mkdocs
 on:
   push:
     branches:
-      - erdikose/feat/deploy-docs
+      - main
     paths:
       - 'docs/**'
 
