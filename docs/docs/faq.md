@@ -30,7 +30,7 @@ Yes, Monokle Desktop allows you to navigate and preview the output of a Helm cha
 
 ## **6. Can I work on multiple projects simultaneously?**
 
-You can launch multiple project windows using the [New Monokle Desktop Windows](../overview/#multiple-windows) option. It allows
+You can launch multiple project windows using the [New Monokle Desktop Windows](./overview/#multiple-windows) option. It allows
 you to work on multiple folders or clusters simultaneously; thus visual navigation for the multiple pages becomes simpler
 and faster.
 
