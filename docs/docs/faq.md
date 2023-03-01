@@ -51,4 +51,3 @@ The source editor provides an autocomplete option for only native Kubernetes res
 ## **10. How to save changes in the editor?**
 
 The source editor automatically saves the current changes in your resource manifests as long as they are valid YAML files.
-
