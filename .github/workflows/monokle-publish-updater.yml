@@ -72,7 +72,7 @@ jobs:
           npm install
 
       - name: Install dmg-license
-        run: npm i dmg-license
+        run: npm install dmg-license
 
       # - name: Verify Dependencies
       #   run: |
