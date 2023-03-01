@@ -1,11 +1,14 @@
 import {memo} from 'react';
 import {useMeasure} from 'react-use';
 
-import {CollapsePanelProps} from 'antd';
+import {Button, CollapsePanelProps} from 'antd';
+
+import {PlusOutlined} from '@ant-design/icons';
 
 import {size} from 'lodash';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openCreateHelmChartAndKustomizationModal} from '@redux/reducers/ui';
 
 import {SectionRenderer} from '@molecules';
 
@@ -22,6 +25,7 @@ import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarCon
 const HelmPane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
+  const dispatch = useAppDispatch();
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
 
   const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
@@ -35,7 +39,22 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
             title="Helm"
             expandable
             isOpen={Boolean(isActive)}
-            actions={<TitleBarCount count={size(helmChartMap)} isActive={Boolean(isActive)} />}
+            actions={
+              <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                <TitleBarCount count={size(helmChartMap)} isActive={Boolean(isActive)} />
+                {isActive && (
+                  <Button
+                    onClick={e => {
+                      e.stopPropagation();
+                      dispatch(openCreateHelmChartAndKustomizationModal('helm'));
+                    }}
+                    size="small"
+                    type="text"
+                    icon={<PlusOutlined />}
+                  />
+                )}
+              </div>
+            }
           />
         </AccordionTitleBarContainer>
       }

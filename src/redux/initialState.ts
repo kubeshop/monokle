@@ -227,6 +227,9 @@ const initialUiState: UiState = {
     isVisible: false,
   },
   activeSettingsPanel: SettingsPanel.GlobalSettings,
+  createHelmChartAndKustomizationModal: {
+    isOpen: false,
+  },
 };
 
 const initialNavigatorState: NavigatorState = {

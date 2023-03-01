@@ -342,6 +342,15 @@ export const uiSlice = createSlice({
     setStartPageMenuOption: (state: Draft<UiState>, action: PayloadAction<StartPageMenuOptions>) => {
       state.startPage.selectedMenuOption = action.payload;
     },
+    openCreateHelmChartAndKustomizationModal: (
+      state: Draft<UiState>,
+      action: PayloadAction<'helm' | 'kustomization'>
+    ) => {
+      state.createHelmChartAndKustomizationModal = {isOpen: true, type: action.payload};
+    },
+    closeCreateHelmChartAndKustomizationModal: (state: Draft<UiState>) => {
+      state.createHelmChartAndKustomizationModal = {isOpen: true, type: undefined};
+    },
   },
   extraReducers: builder => {
     builder
@@ -372,6 +381,7 @@ export const uiSlice = createSlice({
 export const {
   closeAboutModal,
   closeCreateFileFolderModal,
+  closeCreateHelmChartAndKustomizationModal,
   closeCreateProjectModal,
   closeFiltersPresetModal,
   closeFolderExplorer,
@@ -391,6 +401,7 @@ export const {
   highlightItem,
   openAboutModal,
   openCreateFileFolderModal,
+  openCreateHelmChartAndKustomizationModal,
   openCreateProjectModal,
   openFiltersPresetModal,
   openFolderExplorer,

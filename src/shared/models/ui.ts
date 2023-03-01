@@ -185,6 +185,10 @@ type UiState = {
   welcomePopup: {
     isVisible: boolean;
   };
+  createHelmChartAndKustomizationModal: {
+    isOpen: boolean;
+    type?: 'kustomization' | 'helm';
+  };
 };
 
 type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {});
