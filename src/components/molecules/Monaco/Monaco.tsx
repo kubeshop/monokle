@@ -304,7 +304,13 @@ const Monaco: React.FC<IProps> = props => {
   }, [code]);
 
   useEffect(() => {
-    editorRef.current?.getModel()?.dispose();
+    if (selectedResource?.text && codeRef.current !== selectedResource.text) {
+      setCode(selectedResource.text);
+      originalCodeRef.current = selectedResource.text;
+    }
+  }, [selectedResource?.text, setCode, codeRef]);
+
+  useEffect(() => {
     let newCode = '';
     const rootFilePath = fileMapRef.current?.[ROOT_FILE_ENTRY]?.filePath;
     if (selectedResource?.id) {
@@ -318,9 +324,7 @@ const Monaco: React.FC<IProps> = props => {
         }
         newCode = resourceContent.text;
         monaco.editor?.getModels()?.forEach(model => {
-          if (!model.isAttachedToEditor()) {
-            model.dispose();
-          }
+          model.dispose();
         });
         editorRef.current?.setModel(monaco.editor.createModel(newCode, 'yaml'));
       }
@@ -330,9 +334,7 @@ const Monaco: React.FC<IProps> = props => {
       if (fileStats && fileStats.isFile()) {
         newCode = fs.readFileSync(filePath, 'utf8');
         monaco.editor?.getModels()?.forEach(model => {
-          if (!model.isAttachedToEditor()) {
-            model.dispose();
-          }
+          model.dispose();
         });
 
         // monaco has no language registered for tpl extension so use yaml instead (as these could be Helm templates)
