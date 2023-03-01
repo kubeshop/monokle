@@ -24,7 +24,6 @@ const debouncedCodeSave = debounce(
     // is a file and no resource selected?
     if (selectedPath && !resourceMeta) {
       try {
-        console.log('fac update la fisier');
         dispatch(updateFileEntry({path: selectedPath, text: code}));
         return true;
       } catch (e) {
