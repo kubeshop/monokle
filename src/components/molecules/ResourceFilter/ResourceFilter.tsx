@@ -290,7 +290,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
           <Select
             mode="tags"
             value={localResourceFilter.kinds || []}
-            placeholder="Select one or more kinds.."
+            placeholder="Select one or more kinds..."
             options={autocompleteOptions.kinds}
             onChange={onKindChangeHandler}
             onClear={onKindClearHandler}
@@ -302,7 +302,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
           <Select
             mode="tags"
             style={{width: '100%'}}
-            placeholder="Select one or more namespaces.."
+            placeholder="Select one or more namespaces..."
             value={localResourceFilter.namespaces}
             options={autocompleteOptions.namespaces}
             onChange={onNamespaceChangeHandler}
