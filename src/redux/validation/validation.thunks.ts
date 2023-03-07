@@ -71,11 +71,13 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
         incremental: incrementalResourceIds ? {resourceIds: incrementalResourceIds} : undefined,
       })
     );
+
     signal.addEventListener('abort', () => {
       references.abort();
     });
-    await references;
     signal.throwIfAborted();
+
+    resources = await references.unwrap();
 
     // TODO: do we have to fetch the resources again after processing the refs?
     const transformedResources = resources.map(transformResourceForValidation).filter(isDefined);
