@@ -91,7 +91,7 @@ const FileCompareModal: React.FC = () => {
             showSearch
             onChange={setComparingFilePath}
             value={comparingFilePath}
-            placeholder="Select a comparing file"
+            placeholder="Select comparing file"
           >
             {fileSelectOptions}
           </Select>
