@@ -20,6 +20,7 @@ import {getResourceKindSchema} from '@redux/services/schema';
 import {createTransientResource} from '@redux/services/transientResource';
 import {saveTransientResources} from '@redux/thunks/saveTransientResources';
 
+import {useFileSelectOptions} from '@hooks/useFileSelectOptions';
 import {useFileFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 import {useNamespaces} from '@hooks/useNamespaces';
 
@@ -82,7 +83,7 @@ const NewResourceWizard = () => {
   const localResourceMetaMapRef = useRef(localResourceMetaMap);
   localResourceMetaMapRef.current = localResourceMetaMap;
   const localResourceContentMapRef = useResourceContentMapRef('local');
-  const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
   const [rootFolderEntry, rootFolderEntryRef] = useSelectorWithRef(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const [, userDataDirRef] = useSelectorWithRef(state => state.config.userDataDir);
   const [, k8sVersionRef] = useSelectorWithRef(state => state.config.k8sVersion);
@@ -110,6 +111,8 @@ const NewResourceWizard = () => {
   lastApiVersionRef.current = form.getFieldValue('apiVersion');
 
   const isFolderOpen = useMemo(() => Boolean(rootFolderEntry), [rootFolderEntry]);
+
+  const fileSelectOptions = useFileSelectOptions();
 
   const defaultInput = newResourceWizardState.defaultInput;
   const defaultValues = useMemo(
@@ -474,27 +477,6 @@ const NewResourceWizard = () => {
     [createResourceProcessing, closeWizard]
   );
 
-  const filesList: string[] = useMemo(() => {
-    const files: string[] = [];
-
-    Object.entries(fileMap).forEach(([key, value]) => {
-      if (value.children || !value.isSupported || value.isExcluded) {
-        return;
-      }
-      files.push(key.replace(path.sep, ''));
-    });
-
-    return files;
-  }, [fileMap]);
-
-  const renderFileSelectOptions = useCallback(() => {
-    return filesList.map(fileName => (
-      <Option key={fileName} value={fileName}>
-        {fileName}
-      </Option>
-    ));
-  }, [filesList]);
-
   const onSelectChange = useCallback(() => {
     setInputValue('');
   }, []);
@@ -690,7 +672,7 @@ const NewResourceWizard = () => {
               placeholder="Select a destination file"
               style={{flex: 3}}
             >
-              {renderFileSelectOptions()}
+              {fileSelectOptions}
             </StyledSelect>
           )}
         </SaveDestinationWrapper>

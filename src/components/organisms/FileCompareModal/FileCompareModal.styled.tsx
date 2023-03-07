@@ -1,9 +1,15 @@
 import styled from 'styled-components';
 
+export const CompareTo = styled.div`
+  margin-right: 20px;
+`;
+
 export const TitleContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  padding-right: 60px;
+  align-items: center;
+  grid-template-columns: 1fr max-content 1fr;
+  padding-right: 40px;
+  gap: 40px;
 `;
 
 export const Title = styled.div<{$width: number}>`
