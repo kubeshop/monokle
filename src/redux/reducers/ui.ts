@@ -315,6 +315,15 @@ export const uiSlice = createSlice({
     closeKeyboardShortcutsModal: (state: Draft<UiState>) => {
       state.isKeyboardShortcutsModalOpen = false;
     },
+    openFileCompareModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.fileCompareModal = {
+        isVisible: true,
+        filePath: action.payload,
+      };
+    },
+    closeFileCompareModal: (state: Draft<UiState>) => {
+      state.fileCompareModal.isVisible = false;
+    },
     openScaleModal: (state: Draft<UiState>) => {
       state.isScaleModalOpen = true;
     },
@@ -373,6 +382,7 @@ export const {
   closeAboutModal,
   closeCreateFileFolderModal,
   closeCreateProjectModal,
+  closeFileCompareModal,
   closeFiltersPresetModal,
   closeFolderExplorer,
   closeKeyboardShortcutsModal,
@@ -392,6 +402,7 @@ export const {
   openAboutModal,
   openCreateFileFolderModal,
   openCreateProjectModal,
+  openFileCompareModal,
   openFiltersPresetModal,
   openFolderExplorer,
   openKeyboardShortcutsModal,

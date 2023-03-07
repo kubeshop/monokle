@@ -10,7 +10,12 @@ import {basename, dirname, join, sep} from 'path';
 import {scanExcludesSelector, updateProjectConfig} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {openCreateFileFolderModal, openNewResourceWizard, openRenameEntityModal} from '@redux/reducers/ui';
+import {
+  openCreateFileFolderModal,
+  openFileCompareModal,
+  openNewResourceWizard,
+  openRenameEntityModal,
+} from '@redux/reducers/ui';
 import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
@@ -416,6 +421,14 @@ export const useFileMenuItems = (
       label: 'Duplicate',
       onClick: () => {
         duplicate(fileEntry);
+      },
+    });
+
+    newMenuItems.push({
+      key: 'compare',
+      label: 'Compare with another file',
+      onClick: () => {
+        dispatch(openFileCompareModal(fileEntry.filePath));
       },
     });
 
