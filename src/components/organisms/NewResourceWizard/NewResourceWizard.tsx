@@ -20,7 +20,7 @@ import {getResourceKindSchema} from '@redux/services/schema';
 import {createTransientResource} from '@redux/services/transientResource';
 import {saveTransientResources} from '@redux/thunks/saveTransientResources';
 
-import {useFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
+import {useFileFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useSelectorWithRef, useStateWithRef} from '@utils/hooks';
@@ -100,7 +100,7 @@ const NewResourceWizard = () => {
   const [namespaces] = useNamespaces({extra: ['none', 'default']});
   const getDirname = useMemo(() => (osPlatform === 'win32' ? path.win32.dirname : path.dirname), [osPlatform]);
 
-  const treeData = useFolderTreeSelectData();
+  const treeData = useFileFolderTreeSelectData('folder');
 
   const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();

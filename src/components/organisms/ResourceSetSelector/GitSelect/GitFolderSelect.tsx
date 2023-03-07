@@ -9,7 +9,7 @@ import {resourceSetSelected, selectGitResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {createRootFileEntry} from '@redux/services/fileEntry';
 
-import {useFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
+import {useFileFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
@@ -32,7 +32,7 @@ const GitFolderSelect: React.FC<IProps> = ({side}) => {
   invariant(resourceSet, 'invalid_state');
 
   const [gitFileMap, setGitFileMap] = useState<FileMapType>();
-  const treeData = useFolderTreeSelectData(gitFileMap);
+  const treeData = useFileFolderTreeSelectData('folder', gitFileMap);
 
   const {currentGitBranch, currentCommit, currentFolder} = resourceSet;
 
