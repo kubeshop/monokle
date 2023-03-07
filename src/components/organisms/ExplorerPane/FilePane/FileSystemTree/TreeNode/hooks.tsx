@@ -27,6 +27,7 @@ import {deleteFileEntry, dispatchDeleteAlert, duplicateEntity, isFileEntryDisabl
 import {useOpenOnGithub} from '@utils/git';
 import {useRefSelector} from '@utils/hooks';
 
+import {isYamlFile} from '@monokle/validation';
 import {AlertEnum} from '@shared/models/alert';
 import {FileEntry} from '@shared/models/fileEntry';
 import {isDefined} from '@shared/utils/filter';
@@ -424,13 +425,15 @@ export const useFileMenuItems = (
       },
     });
 
-    newMenuItems.push({
-      key: 'compare',
-      label: 'Compare with another file',
-      onClick: () => {
-        dispatch(openFileCompareModal(fileEntry.filePath));
-      },
-    });
+    if (isYamlFile(fileEntry.filePath)) {
+      newMenuItems.push({
+        key: 'compare',
+        label: 'Compare with another file',
+        onClick: () => {
+          dispatch(openFileCompareModal(fileEntry.filePath));
+        },
+      });
+    }
 
     newMenuItems.push(...commonMenuItems);
 
