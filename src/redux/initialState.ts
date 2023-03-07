@@ -214,8 +214,11 @@ const initialUiState: UiState = {
     browseTemplates: false,
     connectToCluster: false,
   },
-  startPageLearn: {
-    isVisible: false,
+  startPage: {
+    selectedMenuOption: 'new-project',
+    learn: {
+      isVisible: false,
+    },
   },
   templateExplorer: {
     isVisible: false,

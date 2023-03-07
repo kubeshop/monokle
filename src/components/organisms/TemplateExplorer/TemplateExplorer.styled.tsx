@@ -4,18 +4,24 @@ import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
 
-export const EmptyImage = styled.img`
+export const EmptyContainer = styled.div`
+  display: flex;
+  gap: 20px;
+  align-items: center;
   margin-left: 50px;
+  margin-top: 30px;
+`;
+
+export const EmptyImage = styled.img`
+  width: 150px;
+  max-width: 150px;
 `;
 
 export const EmptyText = styled.div`
-  display: inline-block;
   font-weight: 600;
   color: ${Colors.grey9};
   max-width: 160px;
-  transform: translateY(25px);
-  margin-left: 15px;
-  margin-top: 50px;
+  margin-top: 30px;
 `;
 
 export const LeftContainer = styled.div`

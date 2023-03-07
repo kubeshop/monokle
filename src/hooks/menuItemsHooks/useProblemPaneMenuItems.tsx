@@ -4,6 +4,7 @@ import MonacoEditor, {monaco} from 'react-monaco-editor';
 import {TabsProps} from 'antd';
 
 import fastDeepEqual from 'fast-deep-equal';
+import {sep} from 'path';
 
 import {useAppSelector} from '@redux/hooks';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
@@ -64,6 +65,14 @@ export function useProblemPaneMenuItems(width: number, height: number) {
     return JSON.stringify({...selectedProblem, rule: {...rule}}, null, 2);
   }, [rule, selectedProblem]);
 
+  const providedFilePath = useMemo(() => {
+    if (!selectedProblemMonacoData) return undefined;
+
+    const filePath = selectedProblemMonacoData.filePath;
+
+    return filePath.startsWith(sep) ? filePath : sep + filePath;
+  }, [selectedProblemMonacoData]);
+
   const items: TabsProps['items'] = useMemo(
     () => [
       {
@@ -75,7 +84,7 @@ export function useProblemPaneMenuItems(width: number, height: number) {
             applySelection={() => {}}
             diffSelectedResource={() => {}}
             providedResourceSelection={resourceSelection}
-            providedFilePath={selectedProblemMonacoData?.filePath}
+            providedFilePath={providedFilePath}
             providedRange={selectedProblemMonacoData?.range}
           />
         ),
@@ -95,14 +104,7 @@ export function useProblemPaneMenuItems(width: number, height: number) {
         ),
       },
     ],
-    [
-      height,
-      resourceSelection,
-      sarifValue,
-      selectedProblemMonacoData?.filePath,
-      selectedProblemMonacoData?.range,
-      width,
-    ]
+    [height, providedFilePath, resourceSelection, sarifValue, selectedProblemMonacoData?.range, width]
   );
 
   return items;

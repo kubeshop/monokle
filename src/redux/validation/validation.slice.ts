@@ -2,6 +2,8 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {set} from 'lodash';
 
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+
 import {ValidationIntegrationId} from '@shared/models/integrations';
 import {SelectedProblem, ValidationState} from '@shared/models/validation';
 import electronStore from '@shared/utils/electronStore';
@@ -146,6 +148,11 @@ export const validationSlice = createSlice({
     },
   },
   extraReducers: builder => {
+    builder.addCase(setRootFolder.fulfilled, state => {
+      state.validationOverview.selectedProblem = undefined;
+      state.validationOverview.newProblemsIntroducedType = 'initial';
+    });
+
     builder.addCase(loadValidation.pending, (state, {meta}) => {
       if (state.loadRequestId) return;
       state.status = 'loading';

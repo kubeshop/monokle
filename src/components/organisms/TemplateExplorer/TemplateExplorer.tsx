@@ -90,10 +90,10 @@ const TemplateExplorer: React.FC = () => {
 
       <S.RightContainer ref={rightContainerRef}>
         {!selectedTemplatePath ? (
-          <>
+          <S.EmptyContainer>
             <S.EmptyImage src={EmptySelectedTemplate} />
             <S.EmptyText>Select your desired template from the list</S.EmptyText>
-          </>
+          </S.EmptyContainer>
         ) : (
           <>
             <TemplateInformation />

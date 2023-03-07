@@ -24,6 +24,7 @@ import {
   NewResourceWizardInput,
   PaneConfiguration,
   RightMenuSelectionType,
+  StartPageMenuOptions,
   UiState,
 } from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
@@ -226,6 +227,12 @@ export const uiSlice = createSlice({
       state.renameResourceModal = undefined;
     },
     toggleStartProjectPane: (state: Draft<UiState>) => {
+      if (!state.isStartProjectPaneVisible) {
+        state.activeSettingsPanel = SettingsPanel.GlobalSettings;
+      } else {
+        state.activeSettingsPanel = SettingsPanel.ValidationSettings;
+      }
+
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
     },
     collapseNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
@@ -324,13 +331,16 @@ export const uiSlice = createSlice({
       state.isAboutModalOpen = false;
     },
     setShowStartPageLearn: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.startPageLearn.isVisible = action.payload;
+      state.startPage.learn.isVisible = action.payload;
     },
     setStartPageLearnTopic: (state: Draft<UiState>, action: PayloadAction<LearnTopicType | undefined>) => {
-      state.startPageLearn.learnTopic = action.payload;
+      state.startPage.learn.learnTopic = action.payload;
     },
     setIsInQuickClusterMode: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.isInQuickClusterMode = action.payload;
+    },
+    setStartPageMenuOption: (state: Draft<UiState>, action: PayloadAction<StartPageMenuOptions>) => {
+      state.startPage.selectedMenuOption = action.payload;
     },
   },
   extraReducers: builder => {
@@ -346,6 +356,8 @@ export const uiSlice = createSlice({
         const folders = nodes.filter(node => node.children?.length);
         const folderKeys = folders.map(folder => (folder.name === ROOT_FILE_ENTRY ? ROOT_FILE_ENTRY : folder.filePath));
         state.leftMenu.expandedFolders = folderKeys;
+        state.templateExplorer.projectCreate = undefined;
+        state.activeSettingsPanel = SettingsPanel.ValidationSettings;
       })
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;
@@ -408,6 +420,7 @@ export const {
   setSelectedTemplatePath,
   setShowStartPageLearn,
   setStartPageLearnTopic,
+  setStartPageMenuOption,
   setTemplateProjectCreate,
   toggleExpandActionsPaneFooter,
   toggleLeftMenu,
