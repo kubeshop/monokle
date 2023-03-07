@@ -10,6 +10,8 @@ import {join, sep} from 'path';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeFileCompareModal} from '@redux/reducers/ui';
 
+import {SelectItemImage} from '@components/atoms';
+
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -81,7 +83,7 @@ const FileCompareModal: React.FC = () => {
 
     const absoluteFilePath = join(rootFilePath, currentFilePath);
     setCurrentFileCode(fs.readFileSync(absoluteFilePath, 'utf-8'));
-  }, [currentFilePath, fileMap]);
+  }, [currentFilePath, fileMap, rootFilePath]);
 
   if (!currentFilePath) {
     return null;
@@ -123,7 +125,9 @@ const FileCompareModal: React.FC = () => {
           options={options}
           theme={KUBESHOP_MONACO_THEME}
         />
-      ) : null}
+      ) : (
+        <SelectItemImage imageStyle={{transform: 'scaleX(-1)'}} text="Select comparing file path" />
+      )}
     </Modal>
   );
 };
