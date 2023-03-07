@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {MonacoDiffEditor, monaco} from 'react-monaco-editor';
 import {useWindowSize} from 'react-use';
 
@@ -9,14 +9,14 @@ import {join} from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeFileCompareModal} from '@redux/reducers/ui';
+import {rootFilePathSelector} from '@redux/selectors';
 
 import {SelectItemImage} from '@components/atoms';
 
 import {useFileSelectOptions} from '@hooks/useFileSelectOptions';
 
+import {useSelectorWithRef} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
-
-import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 
 import * as S from './FileCompareModal.styled';
 
@@ -36,14 +36,12 @@ const options: monaco.editor.IDiffEditorConstructionOptions = {
 const FileCompareModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const currentFilePath = useAppSelector(state => state.ui.fileCompareModal.filePath);
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const rootFilePath = useAppSelector(rootFilePathSelector);
 
-  const [currentFileCode, setCurrentFileCode] = useState('');
   const [comparingFilePath, setComparingFilePath] = useState<string>();
 
   const {height, width} = useWindowSize();
-
-  const rootFilePath = useMemo(() => fileMap[ROOT_FILE_ENTRY].filePath, [fileMap]);
 
   const fileSelectOptions = useFileSelectOptions();
 
@@ -56,18 +54,14 @@ const FileCompareModal: React.FC = () => {
     return fs.readFileSync(absoluteFilePath, 'utf-8');
   }, [comparingFilePath, rootFilePath]);
 
-  useEffect(() => {
-    if (!currentFilePath || !fileMap[currentFilePath]) {
-      return;
-    }
-
-    if (!rootFilePath) {
-      return;
+  const currentFileCode = useMemo(() => {
+    if (!currentFilePath || !fileMapRef.current[currentFilePath] || !rootFilePath) {
+      return undefined;
     }
 
     const absoluteFilePath = join(rootFilePath, currentFilePath);
-    setCurrentFileCode(fs.readFileSync(absoluteFilePath, 'utf-8'));
-  }, [currentFilePath, fileMap, rootFilePath]);
+    return fs.readFileSync(absoluteFilePath, 'utf-8');
+  }, [currentFilePath, fileMapRef, rootFilePath]);
 
   if (!currentFilePath) {
     return null;
@@ -80,6 +74,7 @@ const FileCompareModal: React.FC = () => {
       open
       cancelButtonProps={{style: {display: 'none'}}}
       onCancel={() => dispatch(closeFileCompareModal())}
+      onOk={() => dispatch(closeFileCompareModal())}
       okText="Done"
       centered
       title={

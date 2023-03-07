@@ -322,7 +322,10 @@ export const uiSlice = createSlice({
       };
     },
     closeFileCompareModal: (state: Draft<UiState>) => {
-      state.fileCompareModal.isVisible = false;
+      state.fileCompareModal = {
+        isVisible: false,
+        filePath: '',
+      };
     },
     openScaleModal: (state: Draft<UiState>) => {
       state.isScaleModalOpen = true;
