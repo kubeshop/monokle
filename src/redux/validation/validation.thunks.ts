@@ -75,9 +75,8 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
     signal.addEventListener('abort', () => {
       references.abort();
     });
-    signal.throwIfAborted();
-
     resources = await references.unwrap();
+    signal.throwIfAborted();
 
     // TODO: do we have to fetch the resources again after processing the refs?
     const transformedResources = resources.map(transformResourceForValidation).filter(isDefined);
