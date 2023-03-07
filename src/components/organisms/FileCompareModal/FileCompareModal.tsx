@@ -20,7 +20,8 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 
 import * as S from './FileCompareModal.styled';
 
-const SIZE_PERCENTAGE = 0.92;
+const HEIGHT_SIZE_PERCENTAGE = 0.85;
+const WIDTH_SIZE_PERCENTAGE = 0.92;
 
 const options: monaco.editor.IDiffEditorConstructionOptions = {
   readOnly: true,
@@ -74,15 +75,16 @@ const FileCompareModal: React.FC = () => {
 
   return (
     <Modal
-      width={width * SIZE_PERCENTAGE}
-      bodyStyle={{height: height * SIZE_PERCENTAGE, overflow: 'hidden'}}
+      width={width * WIDTH_SIZE_PERCENTAGE}
+      bodyStyle={{height: height * HEIGHT_SIZE_PERCENTAGE, overflow: 'hidden'}}
       open
+      cancelButtonProps={{style: {display: 'none'}}}
       onCancel={() => dispatch(closeFileCompareModal())}
-      footer={null}
+      okText="Done"
       centered
       title={
         <S.TitleContainer>
-          <S.Title $width={(width * SIZE_PERCENTAGE - 175) / 2}>
+          <S.Title $width={(width * WIDTH_SIZE_PERCENTAGE - 175) / 2}>
             Compare <S.TitleFilePath>{currentFilePath}</S.TitleFilePath>
           </S.Title>
           to
@@ -100,8 +102,8 @@ const FileCompareModal: React.FC = () => {
     >
       {comparingFileCode ? (
         <MonacoDiffEditor
-          height={height * SIZE_PERCENTAGE - 50}
-          width={width * SIZE_PERCENTAGE - 50}
+          height={height * HEIGHT_SIZE_PERCENTAGE - 50}
+          width={width * WIDTH_SIZE_PERCENTAGE - 50}
           language="yaml"
           original={currentFileCode}
           value={comparingFileCode}
