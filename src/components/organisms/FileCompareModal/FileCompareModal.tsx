@@ -109,7 +109,7 @@ const FileCompareModal: React.FC = () => {
           theme={KUBESHOP_MONACO_THEME}
         />
       ) : (
-        <SelectItemImage imageStyle={{transform: 'scaleX(-1)'}} text="Select comparing file path" />
+        <SelectItemImage imageStyle={{transform: 'scaleX(-1)'}} text="Select comparing file" />
       )}
     </Modal>
   );
