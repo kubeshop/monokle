@@ -71,21 +71,3 @@ export const MonacoPlaceholder = () => {
     </S.Container>
   );
 };
-
-// <S.Text>
-//   <b>Navigate and Validate</b>
-//   <span> Resources</span>
-// </S.Text>
-// <S.Text>
-//   <b>Preview</b>
-//   <span> Kustomizations and Helm Charts</span>
-// </S.Text>
-// <S.Text>
-//   <b>Compare</b>
-//   <span> sets of Resources</span>
-// </S.Text>
-// <S.Text>
-//   <span>Use </span>
-//   <b>Templates</b>
-//   <span> to easily create new Resources</span>
-// </S.Text>
