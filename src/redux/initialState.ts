@@ -227,6 +227,10 @@ const initialUiState: UiState = {
     isVisible: false,
   },
   activeSettingsPanel: SettingsPanel.GlobalSettings,
+  fileCompareModal: {
+    isVisible: false,
+    filePath: '',
+  },
   explorerSelectedSection: 'files',
 };
 

@@ -3,7 +3,7 @@ import {TreeSelect} from 'antd';
 import {resourceSetSelected, selectResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {useFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
+import {useFileFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 
 import {CompareSide, PartialResourceSet} from '@shared/models/compare';
 
@@ -16,7 +16,7 @@ type IProps = {
 const LocalSelect: React.FC<IProps> = ({side}) => {
   const resourceSet = useAppSelector(state => selectResourceSet(state.compare, side));
   const dispatch = useAppDispatch();
-  const treeData = useFolderTreeSelectData();
+  const treeData = useFileFolderTreeSelectData('folder');
 
   const handleSelect = (folder: string) => {
     const value: PartialResourceSet = {type: 'local', folder};

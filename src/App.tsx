@@ -57,6 +57,7 @@ const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFilt
 const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
 const CreateFileFolderModal = React.lazy(() => import('@organisms/CreateFileFolderModal'));
 const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
+const FileCompareModal = React.lazy(() => import('@organisms/FileCompareModal'));
 const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
 const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
 const KeyboardShortcuts = React.lazy(() => import('@organisms/KeyboardShortcuts'));
@@ -83,6 +84,7 @@ const App = () => {
   const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
   const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
   const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
+  const isFileCompareModalVisible = useAppSelector(state => state.ui.fileCompareModal.isVisible);
   const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
   const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
@@ -413,6 +415,7 @@ const App = () => {
           {isAboutModalVisible && <AboutModal />}
           {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
           {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
+          {isFileCompareModalVisible && <FileCompareModal />}
           {isFormModalVisible && <FormEditorModal visible={isFormModalVisible} onClose={onCloseFormModal} />}
           {isCreateFileFolderModalVisible && <CreateFileFolderModal />}
           {isCreateProjectModalVisible && <CreateProjectModal />}

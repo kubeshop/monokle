@@ -8,6 +8,7 @@ export {default as CreateProjectModal} from './CreateProjectModal';
 export {default as Dashboard} from './Dashboard';
 export {default as DashboardPane} from './DashboardPane';
 export {default as ExplorerPane} from './ExplorerPane';
+export {default as FileCompareModal} from './FileCompareModal';
 export {default as FiltersPresetModal} from './FiltersPresetModal';
 export {default as GitCloneModal} from './GitCloneModal';
 export {default as GitOpsView} from './GitOpsView';

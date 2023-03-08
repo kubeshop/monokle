@@ -188,6 +188,10 @@ type UiState = {
   welcomePopup: {
     isVisible: boolean;
   };
+  fileCompareModal: {
+    isVisible: boolean;
+    filePath: string;
+  };
   explorerSelectedSection: ExplorerCollapsibleSectionsType;
 };
 
