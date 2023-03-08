@@ -204,8 +204,7 @@ export function watchNamespaces(kubeConfigPath: string, key: string, dispatch: (
 }
 
 const readAndNotifyKubeConfig = (kubeConfigPath: string, dispatch: (action: AnyAction) => void) => {
-  const kubeConfig: KubeConfig = getKubeConfigContext(kubeConfigPath);
-  dispatch({type: 'config/updateProjectKubeConfig', payload: kubeConfig});
+  dispatch({type: 'config/setKubeConfig', payload: {path: kubeConfigPath}});
 };
 
 export function watchAllClusterNamespaces(kubeConfigPath: string, dispatch: (action: AnyAction) => void) {
