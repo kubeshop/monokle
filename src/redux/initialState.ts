@@ -231,6 +231,7 @@ const initialUiState: UiState = {
     isVisible: false,
     filePath: '',
   },
+  explorerSelectedSection: 'files',
 };
 
 const initialNavigatorState: NavigatorState = {

@@ -2,6 +2,9 @@ import {Collapse as RawCollapse} from 'antd';
 
 import styled from 'styled-components';
 
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setExplorerSelectedSection} from '@redux/reducers/ui';
+
 import {trackEvent} from '@shared/utils/telemetry';
 
 import FilePane from './FilePane';
@@ -10,13 +13,17 @@ import ImagesPane from './ImagesPane';
 import KustomizePane from './KustomizePane';
 
 const ExplorerPane: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const explorerSelectedSection = useAppSelector(state => state.ui.explorerSelectedSection);
+
   return (
     <Collapse
       accordion
       ghost
-      defaultActiveKey="files"
-      onChange={key => {
-        trackEvent('left-menu/activity-changed', {activity: 'explorer', section: key as string});
+      activeKey={explorerSelectedSection}
+      onChange={(key: any) => {
+        dispatch(setExplorerSelectedSection(key));
+        trackEvent('left-menu/activity-changed', {activity: 'explorer', section: key});
       }}
     >
       <FilePane key="files" />

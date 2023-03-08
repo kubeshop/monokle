@@ -20,6 +20,7 @@ const SettingsPane = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
   const activeSettingsPanel = useAppSelector(state => state.ui.activeSettingsPanel);
+  const isInQuickClusterMode = useAppSelector(state => Boolean(state.ui.isInQuickClusterMode));
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
 
   const isOnStartProjectPage = useMemo(
@@ -29,7 +30,7 @@ const SettingsPane = () => {
 
   const tabItems = useMemo(
     () => [
-      ...(activeProject && !isStartProjectPaneVisible
+      ...((activeProject && !isStartProjectPaneVisible) || isInQuickClusterMode
         ? [
             {
               key: 'validation',
@@ -40,6 +41,11 @@ const SettingsPane = () => {
                 </S.TabItemContainer>
               ),
             },
+          ]
+        : []),
+
+      ...(activeProject && !isStartProjectPaneVisible
+        ? [
             {
               key: 'current-project-settings',
               label: <S.TabOption>Current project settings</S.TabOption>,
@@ -52,7 +58,7 @@ const SettingsPane = () => {
           ]
         : []),
 
-      ...(!activeProject || isStartProjectPaneVisible
+      ...((!activeProject || isStartProjectPaneVisible) && !isInQuickClusterMode
         ? [
             {
               key: 'global-settings',
@@ -84,11 +90,14 @@ const SettingsPane = () => {
           ]
         : []),
     ],
-    [activeProject, isOnStartProjectPage, isStartProjectPaneVisible]
+    [activeProject, isInQuickClusterMode, isOnStartProjectPage, isStartProjectPaneVisible]
   );
 
   return (
-    <S.SettingsPaneContainer $isOnStartProjectPage={isOnStartProjectPage}>
+    <S.SettingsPaneContainer
+      $isOnStartProjectPage={isOnStartProjectPage}
+      $isInQuickClusterMode={isInQuickClusterMode && !activeProject}
+    >
       {!isOnStartProjectPage && (
         <TitleBarWrapper>
           <TitleBar title="Project settings" />
