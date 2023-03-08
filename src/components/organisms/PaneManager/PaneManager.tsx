@@ -13,6 +13,7 @@ import {useMainPaneDimensions} from '@utils/hooks';
 
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 
+import {HelmRepoPane} from '../HelmRepoPane';
 import ProblemPane from '../ProblemPane';
 import StartPage from '../StartPage';
 import * as S from './PaneManager.styled';
@@ -27,6 +28,8 @@ const NewPaneManager: React.FC = () => {
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
+  const hideNavigatorPane = useAppSelector(state => state.ui.hideNavigatorPane);
+  const showHelmRepoPane = useAppSelector(state => state.ui.showHelmRepoPane);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
@@ -73,7 +76,7 @@ const NewPaneManager: React.FC = () => {
   );
 
   const currentActivity = useMemo(() => activities.find(a => a.name === leftMenuSelection), [leftMenuSelection]);
-
+  console.log('currentActivity', hideNavigatorPane);
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
       {isProjectLoading ? (
@@ -98,7 +101,9 @@ const NewPaneManager: React.FC = () => {
                   paneCloseIconStyle={{top: 15}}
                   left={leftMenuActive ? currentActivity?.component : undefined}
                   center={
-                    !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? <NavigatorPane /> : null
+                    !hideNavigatorPane && !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? (
+                      <NavigatorPane />
+                    ) : null
                   }
                   right={
                     currentActivity?.name === 'git' ? (
@@ -107,6 +112,8 @@ const NewPaneManager: React.FC = () => {
                       <Dashboard />
                     ) : currentActivity?.name === 'validation' ? (
                       <ProblemPane />
+                    ) : showHelmRepoPane ? (
+                      <HelmRepoPane />
                     ) : (
                       <ActionsPane />
                     )

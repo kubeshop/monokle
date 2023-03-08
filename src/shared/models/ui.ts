@@ -86,6 +86,11 @@ type PaneConfiguration = {
 type RightMenuSelectionType = 'logs' | 'graph';
 
 type UiState = {
+  helmRepo: {
+    search: string;
+  };
+  showHelmRepoPane: boolean;
+  hideNavigatorPane: boolean;
   isResourceFiltersOpen: boolean;
   isReleaseNotesDrawerOpen: boolean;
   isKeyboardShortcutsModalOpen: boolean;

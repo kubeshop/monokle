@@ -138,6 +138,8 @@ if (
 }
 
 const initialUiState: UiState = {
+  showHelmRepoPane: false,
+  hideNavigatorPane: false,
   isResourceFiltersOpen: false,
   isReleaseNotesDrawerOpen: false,
   isAboutModalOpen: false,
@@ -227,6 +229,9 @@ const initialUiState: UiState = {
     isVisible: false,
   },
   activeSettingsPanel: SettingsPanel.GlobalSettings,
+  helmRepo: {
+    search: '',
+  },
 };
 
 const initialNavigatorState: NavigatorState = {
