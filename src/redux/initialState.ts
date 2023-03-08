@@ -227,6 +227,7 @@ const initialUiState: UiState = {
     isVisible: false,
   },
   activeSettingsPanel: SettingsPanel.GlobalSettings,
+  explorerSelectedSection: 'files',
 };
 
 const initialNavigatorState: NavigatorState = {
