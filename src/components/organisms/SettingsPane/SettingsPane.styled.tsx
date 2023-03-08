@@ -4,11 +4,16 @@ import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
 
-export const SettingsPaneContainer = styled.div<{$isOnStartProjectPage: boolean}>`
+export const SettingsPaneContainer = styled.div<{
+  $isOnStartProjectPage: boolean;
+  $isInQuickClusterMode: boolean;
+}>`
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: ${({$isOnStartProjectPage}) => ($isOnStartProjectPage ? 'transparent' : '#191f21')};
+  background-color: ${({$isOnStartProjectPage, $isInQuickClusterMode}) =>
+    $isOnStartProjectPage && !$isInQuickClusterMode ? 'transparent' : '#191f21'};
+  padding: ${({$isInQuickClusterMode}) => ($isInQuickClusterMode ? '0px 20px' : '0px')};
 `;
 
 export const WalkThroughContainer = styled.div`
