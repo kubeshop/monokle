@@ -15,6 +15,7 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Project, SavedCommand, SettingsPanel} from '@shared/models/config';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {
+  ExplorerCollapsibleSectionsType,
   HighlightItems,
   LayoutSizeType,
   LearnTopicType,
@@ -315,6 +316,18 @@ export const uiSlice = createSlice({
     closeKeyboardShortcutsModal: (state: Draft<UiState>) => {
       state.isKeyboardShortcutsModalOpen = false;
     },
+    openFileCompareModal: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.fileCompareModal = {
+        isVisible: true,
+        filePath: action.payload,
+      };
+    },
+    closeFileCompareModal: (state: Draft<UiState>) => {
+      state.fileCompareModal = {
+        isVisible: false,
+        filePath: '',
+      };
+    },
     openScaleModal: (state: Draft<UiState>) => {
       state.isScaleModalOpen = true;
     },
@@ -341,6 +354,9 @@ export const uiSlice = createSlice({
     },
     setStartPageMenuOption: (state: Draft<UiState>, action: PayloadAction<StartPageMenuOptions>) => {
       state.startPage.selectedMenuOption = action.payload;
+    },
+    setExplorerSelectedSection: (state: Draft<UiState>, action: PayloadAction<ExplorerCollapsibleSectionsType>) => {
+      state.explorerSelectedSection = action.payload;
     },
   },
   extraReducers: builder => {
@@ -373,6 +389,7 @@ export const {
   closeAboutModal,
   closeCreateFileFolderModal,
   closeCreateProjectModal,
+  closeFileCompareModal,
   closeFiltersPresetModal,
   closeFolderExplorer,
   closeKeyboardShortcutsModal,
@@ -392,6 +409,7 @@ export const {
   openAboutModal,
   openCreateFileFolderModal,
   openCreateProjectModal,
+  openFileCompareModal,
   openFiltersPresetModal,
   openFolderExplorer,
   openKeyboardShortcutsModal,
@@ -409,6 +427,7 @@ export const {
   setActiveSettingsPanel,
   setExpandedFolders,
   setExpandedSearchedFiles,
+  setExplorerSelectedSection,
   setLayoutSize,
   setLeftBottomMenuSelection,
   setLeftMenuIsActive,

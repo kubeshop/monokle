@@ -32,7 +32,7 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, rootFolderName: 
   return node;
 };
 
-export const useFolderTreeSelectData = (gitFileMap?: FileMapType) => {
+export const useFileFolderTreeSelectData = (type: 'folder' | 'all', gitFileMap?: FileMapType) => {
   const fileMap = useAppSelector(state => gitFileMap || state.main.fileMap);
   const rootFolderName = useMemo(() => {
     return gitFileMap
@@ -46,7 +46,7 @@ export const useFolderTreeSelectData = (gitFileMap?: FileMapType) => {
 
   const treeData = createNode(
     rootFileEntry,
-    pickBy(fileMap, entry => entry.children),
+    type === 'all' ? fileMap : pickBy(fileMap, entry => entry.children),
     rootFolderName,
     Boolean(gitFileMap)
   );

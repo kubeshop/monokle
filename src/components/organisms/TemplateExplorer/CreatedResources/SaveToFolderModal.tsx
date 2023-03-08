@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import {useAppDispatch} from '@redux/hooks';
 import {saveTransientResources} from '@redux/thunks/saveTransientResources';
 
-import {useFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
+import {useFileFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 
 import {useRefSelector, useStateWithRef} from '@utils/hooks';
 
@@ -26,7 +26,7 @@ const SaveToFolderModal: React.FC<Props> = props => {
   const dispatch = useAppDispatch();
   const [selectedFolder, setSelectedFolder, selectedFolderRef] = useStateWithRef<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
-  const folderTreeData = useFolderTreeSelectData();
+  const folderTreeData = useFileFolderTreeSelectData('folder');
   const rootFolderPathRef = useRefSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]?.filePath);
 
   const resourcesRef = useRef(resources);
