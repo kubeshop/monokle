@@ -193,6 +193,7 @@ type UiState = {
     filePath: string;
   };
   explorerSelectedSection: ExplorerCollapsibleSectionsType;
+  fileExplorerExpandedFolders: string[];
 };
 
 type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {});

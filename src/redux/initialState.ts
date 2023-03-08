@@ -232,6 +232,7 @@ const initialUiState: UiState = {
     filePath: '',
   },
   explorerSelectedSection: 'files',
+  fileExplorerExpandedFolders: [],
 };
 
 const initialNavigatorState: NavigatorState = {
