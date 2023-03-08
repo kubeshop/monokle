@@ -1,5 +1,6 @@
 import {toggleEditorPlaceholderVisiblity} from '@redux/appConfig';
 import {useAppDispatch} from '@redux/hooks';
+import {setExplorerSelectedSection, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import MonacoPlaceholderImageNew from '@assets/MonacoPlaceholderImageNew.svg';
 
@@ -7,6 +8,24 @@ import * as S from './MonacoPlaceholder.styled';
 
 export const MonacoPlaceholder = () => {
   const dispatch = useAppDispatch();
+
+  const handleValidation = () => {
+    dispatch(setLeftMenuSelection('validation'));
+  };
+
+  const handleHelmCharts = () => {
+    dispatch(setLeftMenuSelection('explorer'));
+    dispatch(setExplorerSelectedSection('helm'));
+  };
+
+  const handleKustomization = () => {
+    dispatch(setLeftMenuSelection('explorer'));
+    dispatch(setExplorerSelectedSection('kustomize'));
+  };
+
+  const handleGitOperations = () => {
+    dispatch(setLeftMenuSelection('git'));
+  };
 
   const handleHideEditorPlaceholder = () => {
     dispatch(toggleEditorPlaceholderVisiblity(true));
@@ -23,27 +42,31 @@ export const MonacoPlaceholder = () => {
           <br />
           Want to go further? Try these shortcuts
         </S.Title>
+        <S.Text>Everything about your Cluster live</S.Text>
         <S.Text>
-          <S.InfoLink>Everything about your Cluster live</S.InfoLink>
+          <S.InfoLink onClick={handleHelmCharts}>Preview Helm Charts</S.InfoLink>
         </S.Text>
         <S.Text>
-          <S.InfoLink>Preview Helm Charts</S.InfoLink>
+          <S.InfoLink onClick={handleKustomization}>Preview Kustomization</S.InfoLink>
         </S.Text>
         <S.Text>
-          <S.InfoLink>Preview Kustomization</S.InfoLink>
+          <S.InfoLink onClick={handleGitOperations}>Git operations</S.InfoLink>
         </S.Text>
         <S.Text>
-          <S.InfoLink>Git operations</S.InfoLink>
+          <S.InfoLink onClick={handleValidation}>Validate your resources</S.InfoLink>
         </S.Text>
         <S.Text>
-          <S.InfoLink>Validate your resources</S.InfoLink>
+          <S.InfoLink href="https://chrome.google.com/webstore/detail/monokle-cloud-chrome-exte/loojojkleiolidaodalflgbmaijeibob?hl=en">
+            Get the Chrome extension for GitHub
+          </S.InfoLink>
         </S.Text>
         <S.Text>
-          <S.InfoLink>Get the Chrome extension for GitHub</S.InfoLink>
+          <S.InfoLink href="https://monokle.io/download">Get the CLI</S.InfoLink>
         </S.Text>
-        <S.Text>
-          <S.InfoLink>Get the CLI</S.InfoLink>
-        </S.Text>
+        <S.Info>
+          <S.InfoLink onClick={handleHideEditorPlaceholder}>Hide this</S.InfoLink>
+          <span> (You can re-enable this from the settings panel)</span>
+        </S.Info>
       </div>
     </S.Container>
   );
@@ -66,7 +89,3 @@ export const MonacoPlaceholder = () => {
 //   <b>Templates</b>
 //   <span> to easily create new Resources</span>
 // </S.Text>
-// <S.Info>
-//   <S.InfoLink onClick={handleHideEditorPlaceholder}>Hide this</S.InfoLink>
-//   <span> (You can re-enable this from the settings panel)</span>
-// </S.Info>
