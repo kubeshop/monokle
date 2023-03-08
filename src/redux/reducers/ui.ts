@@ -15,6 +15,7 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Project, SavedCommand, SettingsPanel} from '@shared/models/config';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {
+  ExplorerCollapsibleSectionsType,
   HighlightItems,
   LayoutSizeType,
   LearnTopicType,
@@ -342,6 +343,9 @@ export const uiSlice = createSlice({
     setStartPageMenuOption: (state: Draft<UiState>, action: PayloadAction<StartPageMenuOptions>) => {
       state.startPage.selectedMenuOption = action.payload;
     },
+    setExplorerSelectedSection: (state: Draft<UiState>, action: PayloadAction<ExplorerCollapsibleSectionsType>) => {
+      state.explorerSelectedSection = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -409,6 +413,7 @@ export const {
   setActiveSettingsPanel,
   setExpandedFolders,
   setExpandedSearchedFiles,
+  setExplorerSelectedSection,
   setLayoutSize,
   setLeftBottomMenuSelection,
   setLeftMenuIsActive,
