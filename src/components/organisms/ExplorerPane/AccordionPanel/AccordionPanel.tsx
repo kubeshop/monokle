@@ -15,6 +15,7 @@ export const getPanelId = (panelKey?: string) => `accordion-panel-${panelKey}`;
 
 // Props injected by Collapse when it clones the Panel
 export type InjectedPanelProps = {
+  disabled?: boolean;
   isActive?: boolean;
   panelKey?: string;
 };
@@ -37,6 +38,7 @@ const AccordionPanel: React.FC<CollapsePanelProps & InjectedPanelProps> = props 
 
   return (
     <S.Panel
+      collapsible={props.disabled ? 'disabled' : undefined}
       id={id}
       $contentHeight={contentHeight < height ? contentHeight : height}
       $panelKey={props.panelKey || ''}
