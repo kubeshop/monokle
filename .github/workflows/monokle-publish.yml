@@ -66,6 +66,9 @@ jobs:
           echo "node: $(node --version)"
           npm install
 
+      - name: Install dmg-license
+        run: npm install dmg-license
+
       # - name: Verify Dependencies
       #   run: |
       #     ls -la
