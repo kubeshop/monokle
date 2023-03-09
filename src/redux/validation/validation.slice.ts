@@ -2,6 +2,7 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {set} from 'lodash';
 
+import {startClusterConnection, stopClusterConnection} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ValidationIntegrationId} from '@shared/models/integrations';
@@ -181,6 +182,14 @@ export const validationSlice = createSlice({
       }
       state.status = 'loaded';
     });
+
+    builder
+      .addCase(startClusterConnection.fulfilled, state => {
+        state.validationOverview.selectedProblem = undefined;
+      })
+      .addCase(stopClusterConnection.fulfilled, state => {
+        state.validationOverview.selectedProblem = undefined;
+      });
   },
 });
 

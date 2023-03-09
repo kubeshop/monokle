@@ -358,6 +358,9 @@ export const uiSlice = createSlice({
     setExplorerSelectedSection: (state: Draft<UiState>, action: PayloadAction<ExplorerCollapsibleSectionsType>) => {
       state.explorerSelectedSection = action.payload;
     },
+    setFileExplorerExpandedFolders: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      state.fileExplorerExpandedFolders = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -428,6 +431,7 @@ export const {
   setExpandedFolders,
   setExpandedSearchedFiles,
   setExplorerSelectedSection,
+  setFileExplorerExpandedFolders,
   setLayoutSize,
   setLeftBottomMenuSelection,
   setLeftMenuIsActive,

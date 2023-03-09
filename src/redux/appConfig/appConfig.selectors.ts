@@ -1,4 +1,4 @@
-import {isEmpty} from 'lodash';
+import {has, isEmpty} from 'lodash';
 import {createSelector} from 'reselect';
 
 import {createDeepEqualSelector} from '@redux/selectors/utils';
@@ -109,4 +109,10 @@ export const isInClusterModeSelector = createSelector(
   (kubeConfig, clusterConnectionContext) => {
     return kubeConfig && isDefined(clusterConnectionContext) && clusterConnectionContext === kubeConfig.currentContext;
   }
+);
+
+export const isProjectKubeConfigSelector = createSelector(
+  (state: RootState) => state.config,
+  config =>
+    has(config, 'projectConfig.kubeConfig.isPathValid') && Boolean(config.projectConfig?.kubeConfig?.isPathValid)
 );

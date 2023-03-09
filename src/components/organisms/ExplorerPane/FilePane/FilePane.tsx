@@ -1,4 +1,4 @@
-import {memo, useMemo, useState} from 'react';
+import {memo, useMemo} from 'react';
 
 import {Button, CollapsePanelProps, Tooltip} from 'antd';
 
@@ -7,8 +7,9 @@ import {ExclamationCircleOutlined, FolderAddOutlined, ReloadOutlined} from '@ant
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openCreateFileFolderModal} from '@redux/reducers/ui';
+import {openCreateFileFolderModal, setFileExplorerExpandedFolders} from '@redux/reducers/ui';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {useRefSelector} from '@utils/hooks';
@@ -27,16 +28,19 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
   const dispatch = useAppDispatch();
+  const fileExplorerExpandedFolders = useAppSelector(state => state.ui.fileExplorerExpandedFolders);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const rootEntry = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
 
-  const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
-
   const filesOnly = useMemo(() => Object.values(fileMap).filter(f => !f.children), [fileMap]);
   const isButtonDisabled = useMemo(() => !rootEntry, [rootEntry]);
-  const isCollapsed = useMemo(() => expandedFolders.length === 0 || expandedFolders.length === 1, [expandedFolders]);
+  const isCollapsed = useMemo(
+    () => fileExplorerExpandedFolders.length === 0 || fileExplorerExpandedFolders.length === 1,
+    [fileExplorerExpandedFolders]
+  );
   const allFolderKeysRef = useRefSelector(state =>
     Object.values(state.main.fileMap)
       .filter(f => f.children && f.filePath !== f.rootFolderPath)
@@ -48,6 +52,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
   return (
     <AccordionPanel
       {...props}
+      disabled={isInClusterMode}
       showArrow={false}
       header={
         <AccordionTitleBarContainer>
@@ -93,7 +98,9 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
                   >
                     <Button
                       icon={<Icon name="collapse" />}
-                      onClick={() => setExpandedFolders(isCollapsed ? allFolderKeysRef.current : [])}
+                      onClick={() =>
+                        dispatch(setFileExplorerExpandedFolders(isCollapsed ? allFolderKeysRef.current : []))
+                      }
                       type="link"
                       size="small"
                       disabled={isButtonDisabled}
@@ -121,7 +128,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
         {isFolderLoading ? (
           <S.Skeleton active />
         ) : rootEntry ? (
-          <FileSystemTree expandedFolders={expandedFolders} onExpandFolders={setExpandedFolders} />
+          <FileSystemTree />
         ) : (
           <S.NoFilesContainer>
             Get started by selecting a folder containing manifests, kustomizations or Helm Charts.
