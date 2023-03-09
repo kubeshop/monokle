@@ -28,6 +28,7 @@ export const dashboardSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(startClusterConnection.fulfilled, state => {
       state.tableDrawer.selectedResourceId = undefined;
+      state.ui.activeMenu = {key: 'Overview', label: 'Overview'};
     });
   },
 });
