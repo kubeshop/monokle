@@ -1,6 +1,6 @@
 import {v4 as uuid} from 'uuid';
 
-import {runCommandInMainThread} from '@utils/commands';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 /**
  * Invokes kubectl apply for the specified yaml

@@ -2,7 +2,7 @@ import {Col} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const ContentDiv = styled.div`
   margin-right: -8px;
@@ -52,6 +52,6 @@ export const FileName = styled.div`
 `;
 
 export const StyledCol = styled(Col)`
-  background: ${Colors.blackPure};
+  background: ${Colors.black100};
   overflow: hidden;
 `;

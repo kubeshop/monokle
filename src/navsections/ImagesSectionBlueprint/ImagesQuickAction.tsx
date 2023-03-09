@@ -1,8 +1,9 @@
-import {ItemCustomComponentProps} from '@models/navigator';
-
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openReplaceImageModal} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
+
+import {ItemCustomComponentProps} from '@shared/models/navigator';
 
 import * as S from './ImagesQuickAction.styled';
 
@@ -10,7 +11,8 @@ const ImagesQuickAction: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   const onReplaceHandler = () => {
     if (isInPreviewMode) {
@@ -21,7 +23,11 @@ const ImagesQuickAction: React.FC<ItemCustomComponentProps> = props => {
   };
 
   return (
-    <S.ReplaceSpan $isDisabled={isInPreviewMode} $isSelected={itemInstance.isSelected} onClick={onReplaceHandler}>
+    <S.ReplaceSpan
+      $isDisabled={isInPreviewMode || isInClusterMode}
+      $isSelected={itemInstance.isSelected}
+      onClick={onReplaceHandler}
+    >
       Replace
     </S.ReplaceSpan>
   );

@@ -1,10 +1,9 @@
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {ImagesListType, ResourceMapType} from '@models/appstate';
-import {ImageType} from '@models/image';
-import {SectionBlueprint} from '@models/navigator';
-
 import {selectImage} from '@redux/reducers/main';
+
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {ImagesListType} from '@shared/models/appState';
+import {ImageType} from '@shared/models/image';
+import {SectionBlueprint} from '@shared/models/navigator';
 
 import sectionBlueprintMap from '../sectionBlueprintMap';
 import ImagesQuickAction from './ImagesQuickAction';
@@ -13,12 +12,11 @@ import ImagesSectionNameDisplay from './ImagesSectionNameDisplay';
 import ImagesSectionNameSuffix from './ImagesSectionNameSuffix';
 
 export type ImagesScopeType = {
-  resourceMap: ResourceMapType;
   isFolderOpen: boolean;
   isFolderLoading: boolean;
   imagesList: ImagesListType;
   imagesSearchedValue: string | undefined;
-  selectedImage?: ImageType | null;
+  selectedImageId?: string;
   selectedK8sResourceId: string | undefined;
 };
 
@@ -44,13 +42,13 @@ const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
   containerElementId: 'images-section-container',
   rootSectionId: IMAGES_SECTION_NAME,
   getScope: state => ({
-    resourceMap: state.main.resourceMap,
     isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
     isFolderLoading: state.ui.isFolderLoading,
     imagesList: state.main.imagesList,
     imagesSearchedValue: state.main.imagesSearchedValue,
-    selectedImage: state.main.selectedImage,
-    selectedK8sResourceId: state.main.selectedResourceId,
+    selectedImageId: state.main.selection?.type === 'image' ? state.main.selection.imageId : undefined,
+    selectedK8sResourceId:
+      state.main.selection?.type === 'resource' ? state.main.selection.resourceIdentifier.id : undefined,
   }),
   builder: {
     getRawItems: scope => scope.imagesList,
@@ -67,13 +65,10 @@ const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
     disableHoverStyle: true,
   },
   itemBlueprint: {
-    getName: rawItem => `${rawItem.name}:${rawItem.tag}`,
-    getInstanceId: rawItem => `${rawItem.name}:${rawItem.tag}`,
+    getName: rawItem => rawItem.id,
+    getInstanceId: rawItem => rawItem.id,
     builder: {
-      isSelected: (rawItem, scope) =>
-        scope.selectedImage
-          ? rawItem.name === scope.selectedImage.name && rawItem.tag === scope.selectedImage.tag
-          : false,
+      isSelected: (rawItem, scope) => (scope.selectedImageId ? scope.selectedImageId === rawItem.id : false),
       isHighlighted: (rawItem, scope) => {
         const {resourcesIds} = rawItem;
         const {selectedK8sResourceId} = scope;
@@ -94,17 +89,12 @@ const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
 
         return true;
       },
-      getMeta: rawItem => ({resourcesIds: rawItem.resourcesIds}),
+      getMeta: rawItem => ({resourcesIds: rawItem.resourcesIds}), // TODO: do we still need this meta?
     },
     instanceHandler: {
       onClick: (itemInstance, dispatch) => {
-        const {
-          id,
-          meta: {resourcesIds},
-        } = itemInstance;
-        const [name, tag] = id.split(':');
-
-        dispatch(selectImage({image: {id, name, tag, resourcesIds}}));
+        const {id} = itemInstance;
+        dispatch(selectImage({imageId: id}));
       },
     },
     customization: {

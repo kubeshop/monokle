@@ -3,14 +3,14 @@ import path from 'path';
 import {promisify} from 'util';
 import {v4 as uuidv4} from 'uuid';
 
-import {AppDispatch} from '@models/appdispatch';
-import {K8sResource} from '@models/k8sresource';
-
 import {extractObjectsFromYaml} from '@redux/services/manifest-utils';
 import {interpolateTemplate} from '@redux/services/templates';
-import {createUnsavedResource} from '@redux/services/unsavedResource';
+import {createTransientResource} from '@redux/services/transientResource';
 
-import {CommandOptions, runCommandInMainThread} from '@utils/commands';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {CommandOptions} from '@shared/models/commands';
+import {K8sResource} from '@shared/models/k8sResource';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 const fsWriteFilePromise = promisify(fs.writeFile);
 const fsReadFilePromise = promisify(fs.readFile);
@@ -67,7 +67,7 @@ export const previewReferencedHelmChart = async (
     const [yamlOutput, notes] = stdout.split('NOTES:');
     const objects = extractObjectsFromYaml(yamlOutput);
     objects.forEach(obj => {
-      const resource = createUnsavedResource(
+      const resource = createTransientResource(
         {
           name: obj.metadata.name,
           kind: obj.kind,

@@ -7,8 +7,9 @@ import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 
 import {filterGitFolder} from '@utils/git';
-import {debounceWithPreviousArgs} from '@utils/helpers';
 import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {debounceWithPreviousArgs} from '@shared/utils/watch';
 
 let watcher: FSWatcher;
 

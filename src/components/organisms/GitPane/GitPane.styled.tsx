@@ -4,7 +4,7 @@ import {CloseOutlined as RawCloseOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import Colors, {PanelColors} from '@styles/Colors';
+import {Colors, PanelColors} from '@shared/styles/colors';
 
 export const AuthRequiredContainer = styled.div`
   display: flex;

@@ -1,4 +1,4 @@
-import {Project} from '@models/appconfig';
+import {Project} from '@shared/models/config';
 
 export interface ProjectNameChange {
   newName: string;

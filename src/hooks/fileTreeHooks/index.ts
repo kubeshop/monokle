@@ -1,5 +1,4 @@
 import {useCreate} from './useCreate';
-import {useDelete} from './useDelete';
 import {useDuplicate} from './useDuplicate';
 import {useFileSelect} from './useFileSelect';
 import {useFilterByFileOrFolder} from './useFilterByFileOrFolder';
@@ -12,7 +11,6 @@ export {
   useFileSelect,
   useFilterByFileOrFolder,
   usePreview,
-  useDelete,
   useProcessing,
   useHighlightNode,
   useCreate,

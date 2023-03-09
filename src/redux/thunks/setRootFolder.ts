@@ -2,32 +2,24 @@ import {Modal} from 'antd';
 
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {AlertEnum} from '@models/alert';
-import {AppDispatch} from '@models/appdispatch';
-import {
-  FileMapType,
-  HelmChartMapType,
-  HelmTemplatesMapType,
-  HelmValuesMapType,
-  ResourceMapType,
-} from '@models/appstate';
-import {GitRepo} from '@models/git';
-import {RootState} from '@models/rootstate';
-
+import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {SetRootFolderPayload} from '@redux/reducers/main';
-import {currentConfigSelector} from '@redux/selectors';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
-import {processKustomizations} from '@redux/services/kustomize';
-import {getK8sVersion} from '@redux/services/projectConfig';
-import {processResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
-import {OPEN_EXISTING_PROJECT, trackEvent} from '@utils/telemetry';
 import {addDefaultCommandTerminal} from '@utils/terminal';
+
+import {AlertEnum} from '@shared/models/alert';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
+import {GitChangedFile, GitRepo} from '@shared/models/git';
+import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
+import {trackEvent} from '@shared/utils/telemetry';
 
 /**
  * Thunk to set the specified root folder
@@ -41,12 +33,12 @@ export const setRootFolder = createAsyncThunk<
     state: RootState;
   }
 >('main/setRootFolder', async (rootFolder, thunkAPI) => {
+  const startTime = new Date().getTime();
   const projectConfig = currentConfigSelector(thunkAPI.getState());
-  const userDataDir = thunkAPI.getState().config.userDataDir;
-  const resourceRefsProcessingOptions = thunkAPI.getState().main.resourceRefsProcessingOptions;
   const terminalState = thunkAPI.getState().terminal;
 
-  const resourceMap: ResourceMapType = {};
+  const resourceMetaMap: ResourceMetaMap<'local'> = {};
+  const resourceContentMap: ResourceContentMap<'local'> = {};
   const fileMap: FileMapType = {};
   const helmChartMap: HelmChartMapType = {};
   const helmValuesMap: HelmValuesMapType = {};
@@ -56,7 +48,8 @@ export const setRootFolder = createAsyncThunk<
     return {
       projectConfig,
       fileMap,
-      resourceMap,
+      resourceMetaMap,
+      resourceContentMap,
       helmChartMap,
       helmValuesMap,
       helmTemplatesMap,
@@ -79,7 +72,15 @@ export const setRootFolder = createAsyncThunk<
   const readFilesPromise = new Promise<string[]>(resolve => {
     setImmediate(() => {
       resolve(
-        readFiles(rootFolder, projectConfig, resourceMap, fileMap, helmChartMap, helmValuesMap, helmTemplatesMap)
+        readFiles(rootFolder, {
+          projectConfig,
+          resourceMetaMap,
+          resourceContentMap,
+          fileMap,
+          helmChartMap,
+          helmValuesMap,
+          helmTemplatesMap,
+        })
       );
     });
   });
@@ -87,26 +88,15 @@ export const setRootFolder = createAsyncThunk<
 
   rootEntry.children = files;
 
-  const policyPlugins = thunkAPI.getState().main.policies.plugins;
-  processKustomizations(resourceMap, fileMap);
-  processResources(getK8sVersion(projectConfig), String(userDataDir), resourceMap, resourceRefsProcessingOptions, {
-    policyPlugins,
-  });
-
   monitorRootFolder(rootFolder, thunkAPI);
 
   const generatedAlert = {
     title: 'Folder Import',
-    message: `${Object.values(resourceMap).length} resources found in ${
+    message: `${Object.values(resourceMetaMap).length} resources found in ${
       Object.values(fileMap).filter(f => !f.children).length
     } files`,
     type: AlertEnum.Success,
   };
-
-  trackEvent(OPEN_EXISTING_PROJECT, {
-    numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
-    numberOfResources: Object.values(resourceMap).length,
-  });
 
   const isFolderGitRepo = await promiseFromIpcRenderer<boolean>(
     'git.isFolderGitRepo',
@@ -115,8 +105,18 @@ export const setRootFolder = createAsyncThunk<
   );
 
   if (isFolderGitRepo) {
-    promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder).then(repo => {
+    thunkAPI.dispatch(setGitLoading(true));
+
+    Promise.all([
+      promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder),
+      promiseFromIpcRenderer<GitChangedFile[]>('git.getChangedFiles', 'git.getChangedFiles.result', {
+        localPath: rootFolder,
+        fileMap,
+      }),
+    ]).then(([repo, changedFiles]) => {
       thunkAPI.dispatch(setRepo(repo));
+      thunkAPI.dispatch(setChangedFiles(changedFiles));
+      thunkAPI.dispatch(setGitLoading(false));
 
       if (repo.remoteRepo.authRequired) {
         Modal.warning({
@@ -144,21 +144,23 @@ export const setRootFolder = createAsyncThunk<
         });
       }
     });
-
-    thunkAPI.dispatch(setGitLoading(true));
-    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-      localPath: rootFolder,
-      fileMap,
-    }).then(changedFiles => {
-      thunkAPI.dispatch(setChangedFiles(changedFiles));
-      thunkAPI.dispatch(setGitLoading(false));
-    });
   }
+
+  const endTime = new Date().getTime();
+
+  trackEvent('app_start/open_project', {
+    numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
+    numberOfResources: Object.values(resourceMetaMap).length,
+    executionTime: endTime - startTime,
+  });
+
+  // TODO: process resources in validation listener after folder was loaded
 
   return {
     projectConfig,
     fileMap,
-    resourceMap,
+    resourceMetaMap,
+    resourceContentMap,
     helmChartMap,
     helmValuesMap,
     helmTemplatesMap,

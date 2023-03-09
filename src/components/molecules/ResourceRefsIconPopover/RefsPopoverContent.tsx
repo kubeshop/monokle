@@ -1,22 +1,27 @@
 import React, {useCallback, useMemo} from 'react';
 
-import {ResourceMapType} from '@models/appstate';
-import {K8sResource, ResourceRef, ResourceRefType} from '@models/k8sresource';
-import {MonacoRange} from '@models/ui';
-
+import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile, selectK8sResource} from '@redux/reducers/main';
+import {selectFile, selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
+import {
+  activeResourceStorageSelector,
+  useActiveResourceMetaMap,
+  useResourceMetaMap,
+} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
-import {areRefPosEqual} from '@redux/services/resource';
 
 import {getRefRange} from '@utils/refs';
-import {FOLLOW_LINK, trackEvent} from '@utils/telemetry';
+
+import {ResourceRef, ResourceRefType, areRefPosEqual} from '@monokle/validation';
+import {ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
+import {MonacoRange} from '@shared/models/ui';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import RefLink from './RefLink';
 import * as S from './RefsPopoverContent.styled';
 
-const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
+export const getRefKind = (ref: ResourceRef, resourceMetaMap: ResourceMetaMap) => {
   if (ref.target?.type === 'file') {
     return 'File';
   }
@@ -26,40 +31,44 @@ const getRefKind = (ref: ResourceRef, resourceMap: ResourceMapType) => {
       return ref.target.resourceKind;
     }
     if (ref.target.resourceId) {
-      return resourceMap[ref.target.resourceId]?.kind;
+      return resourceMetaMap[ref.target.resourceId]?.kind;
     }
   }
 };
 
-const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sResource; resourceRefs: ResourceRef[]}) => {
+const RefsPopoverContent = (props: {
+  children: React.ReactNode;
+  resource: ResourceMeta;
+  resourceRefs: ResourceRef[];
+}) => {
   const {children, resourceRefs, resource} = props;
   const dispatch = useAppDispatch();
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const activeResourceMetaMap = useActiveResourceMetaMap();
+  const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
+  const localResourceMetaMap = useResourceMetaMap('local');
   const fileMap = useAppSelector(state => state.main.fileMap);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const previewType = useAppSelector(state => state.main.previewType);
-  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
+  const selection = useAppSelector(state => state.main.selection);
+  const preview = useAppSelector(state => state.main.preview);
 
   const isRefLinkDisabled = useCallback(
     (ref: ResourceRef) => {
-      if (previewType === 'kustomization' && ref.target?.type === 'resource') {
+      if (preview?.type === 'kustomize' && ref.target?.type === 'resource') {
         const targetResourceId = ref.target.resourceId;
-        const targetResource = targetResourceId ? resourceMap[targetResourceId] : undefined;
-        if (isKustomizationResource(targetResource) && targetResourceId !== previewResourceId) {
+        const targetResourceMeta = targetResourceId ? localResourceMetaMap[targetResourceId] : undefined;
+        if (isKustomizationResource(targetResourceMeta) && targetResourceId !== preview.kustomizationId) {
           return true;
         }
       }
       return false;
     },
-    [resourceMap, previewResourceId, previewType]
+    [localResourceMetaMap, preview]
   );
 
   const processedRefsWithKeys = useMemo(() => {
     return resourceRefs
       .sort((a, b) => {
-        let kindA = getRefKind(a, resourceMap);
-        let kindB = getRefKind(b, resourceMap);
+        let kindA = getRefKind(a, activeResourceMetaMap);
+        let kindB = getRefKind(b, activeResourceMetaMap);
 
         if (kindA && kindB) {
           return kindA.localeCompare(kindB);
@@ -102,11 +111,11 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
         }
         return {ref, key};
       });
-  }, [resourceRefs, resourceMap]);
+  }, [resourceRefs, activeResourceMetaMap]);
 
-  const selectResource = (selectedId: string) => {
-    if (resourceMap[selectedId]) {
-      dispatch(selectK8sResource({resourceId: selectedId}));
+  const triggerSelectResource = (selectedId: string) => {
+    if (activeResourceMetaMap[selectedId]) {
+      dispatch(selectResource({resourceIdentifier: {id: selectedId, storage: activeResourceStorage}}));
     }
   };
 
@@ -117,7 +126,7 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
   };
 
   const makeMonacoSelection = (type: 'resource' | 'file', target: string, range: MonacoRange) => {
-    const selection =
+    const newMonacoSelection =
       type === 'resource'
         ? {
             type,
@@ -127,17 +136,17 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
         : {type, filePath: target, range};
     dispatch(
       setMonacoEditor({
-        selection,
+        selection: newMonacoSelection,
       })
     );
   };
 
   const onLinkClick = (ref: ResourceRef) => {
-    trackEvent(FOLLOW_LINK, {type: ref.type});
+    trackEvent('explore/navigate_resource_link', {type: ref.type});
 
     if (ref.type !== ResourceRefType.Incoming) {
-      if (selectedResourceId !== resource.id) {
-        selectResource(resource.id);
+      if (selection?.type === 'resource' && selection.resourceIdentifier.id !== resource.id) {
+        triggerSelectResource(resource.id);
       }
 
       const refRange = getRefRange(ref);
@@ -155,16 +164,16 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
       if (!ref.target.resourceId) {
         return;
       }
-      const targetResource = resourceMap[ref.target.resourceId];
-      if (!targetResource) {
+      const targetResourceMeta = activeResourceMetaMap[ref.target.resourceId];
+      if (!targetResourceMeta) {
         return;
       }
 
-      if (selectedResourceId !== targetResource.id) {
-        selectResource(targetResource.id);
+      if (selection?.type === 'resource' && selection.resourceIdentifier.id !== targetResourceMeta.id) {
+        triggerSelectResource(targetResourceMeta.id);
       }
 
-      const targetOutgoingRef = targetResource.refs?.find(
+      const targetOutgoingRef = targetResourceMeta.refs?.find(
         r => r.type === ResourceRefType.Outgoing && r.target?.type === 'resource' && r.target.resourceId === resource.id
       );
 
@@ -174,14 +183,39 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
 
       const targetOutgoingRefRange = getRefRange(targetOutgoingRef);
       if (targetOutgoingRefRange) {
-        makeMonacoSelection('resource', targetResource.id, targetOutgoingRefRange);
+        makeMonacoSelection('resource', targetResourceMeta.id, targetOutgoingRefRange);
       }
     }
     if (ref.target?.type === 'file') {
-      if (selectedPath !== ref.target.filePath) {
+      if (selection?.type === 'file' && selection.filePath !== ref.target.filePath) {
         selectFilePath(ref.target.filePath);
       }
     }
+  };
+
+  const handleLinkClickForDashboard = (ref: ResourceRef) => {
+    if (ref.target?.type === 'resource') {
+      if (!ref.target.resourceId) {
+        return;
+      }
+      const targetResourceMeta = activeResourceMetaMap[ref.target.resourceId];
+      if (!targetResourceMeta) {
+        return;
+      }
+      selectForDashboard(targetResourceMeta);
+      return;
+    }
+    selectForDashboard(resource);
+  };
+
+  const selectForDashboard = (r: ResourceMeta) => {
+    dispatch(setDashboardSelectedResourceId(r.id));
+    dispatch(
+      setActiveDashboardMenu({
+        key: `${r.apiVersion}-${r.kind}`,
+        label: r.kind,
+      })
+    );
   };
 
   return (
@@ -195,8 +229,13 @@ const RefsPopoverContent = (props: {children: React.ReactNode; resource: K8sReso
           <RefLink
             isDisabled={isRefLinkDisabled(ref)}
             resourceRef={ref}
-            resourceMap={resourceMap}
-            onClick={() => onLinkClick(ref)}
+            resourceMetaMap={activeResourceMetaMap}
+            onClick={(e: Event) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onLinkClick(ref);
+              handleLinkClickForDashboard(ref);
+            }}
           />
         </S.RefDiv>
       ))}

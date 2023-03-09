@@ -4,8 +4,8 @@ import styled from 'styled-components';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
-import {AppBorders} from '@styles/Borders';
-import Colors, {BackgroundColors} from '@styles/Colors';
+import {AppBorders} from '@shared/styles/borders';
+import {BackgroundColors, Colors} from '@shared/styles/colors';
 
 export const FiltersNumber = styled.div`
   margin-left: 5px;
@@ -23,6 +23,7 @@ export const NavigatorPaneContainer = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
+  background-color: ${Colors.black100};
 `;
 
 export const PlusButton = styled(Button)<{$highlighted: boolean; $disabled: boolean}>`
@@ -62,5 +63,4 @@ export const TitleBarRightButtons = styled.div`
   float: right;
   display: flex;
   align-items: center;
-  padding-right: 16px;
 `;

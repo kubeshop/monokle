@@ -2,7 +2,7 @@ import {Tag as RawTag} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const MonacoDiffContainer = styled.div`
   width: 100%;

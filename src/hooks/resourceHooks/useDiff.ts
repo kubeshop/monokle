@@ -1,49 +1,49 @@
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import {DiffTooltip, KubeConfigNoValid} from '@constants/tooltips';
 
-import {AlertEnum, AlertType} from '@models/alert';
-import {K8sResource} from '@models/k8sresource';
-
+import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openResourceDiffModal} from '@redux/reducers/main';
-import {knownResourceKindsSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
+import {useSelectedResourceMeta} from '@redux/selectors/resourceSelectors';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
-export const useDiff = (resource?: K8sResource) => {
+import {AlertEnum, AlertType} from '@shared/models/alert';
+import {ResourceMeta} from '@shared/models/k8sResource';
+
+export const useDiff = (resourceMeta?: ResourceMeta) => {
   const dispatch = useAppDispatch();
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const selectedResource = useAppSelector(state =>
-    state.main.selectedResourceId ? state.main.resourceMap[state.main.selectedResourceId] : undefined
-  );
+  const selectedResourceMeta = useSelectedResourceMeta();
 
-  const currentResource = resource || selectedResource;
+  const currentResourceMeta = resourceMeta || selectedResourceMeta;
 
   const isDisabled = useMemo(() => {
     if (!isKubeConfigPathValid) {
       return true;
     }
-    if (!currentResource) {
+    if (!currentResourceMeta) {
       return true;
     }
-    if (isKustomizationPatch(currentResource) || isKustomizationResource(currentResource)) {
+    if (isKustomizationPatch(currentResourceMeta) || isKustomizationResource(currentResourceMeta)) {
       return true;
     }
-    if (!knownResourceKinds.includes(currentResource.kind)) {
+    if (!knownResourceKinds.includes(currentResourceMeta.kind)) {
       return true;
     }
     return false;
-  }, [isKubeConfigPathValid, currentResource, knownResourceKinds]);
+  }, [isKubeConfigPathValid, currentResourceMeta, knownResourceKinds]);
 
   const tooltipTitle = useMemo(
     () => (isKubeConfigPathValid ? DiffTooltip : KubeConfigNoValid),
     [isKubeConfigPathValid]
   );
 
-  const diffSelectedResource = () => {
+  const diffSelectedResource = useCallback(() => {
     if (!kubeConfigContext) {
       const alert: AlertType = {
         type: AlertEnum.Error,
@@ -55,10 +55,10 @@ export const useDiff = (resource?: K8sResource) => {
       return;
     }
 
-    if (currentResource?.id) {
-      dispatch(openResourceDiffModal(currentResource.id));
+    if (currentResourceMeta?.id) {
+      dispatch(openResourceDiffModal(currentResourceMeta.id));
     }
-  };
+  }, [currentResourceMeta?.id, kubeConfigContext, dispatch]);
 
   return {diffSelectedResource, isDisabled, tooltipTitle};
 };

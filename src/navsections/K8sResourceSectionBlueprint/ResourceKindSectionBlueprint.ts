@@ -1,24 +1,18 @@
 import navSectionNames from '@constants/navSectionNames';
 
-import {ResourceFilterType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-import {SectionBlueprint} from '@models/navigator';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {RootState} from '@models/rootstate';
-
-import {
-  checkMultipleResourceIds,
-  checkResourceId,
-  selectK8sResource,
-  uncheckMultipleResourceIds,
-  uncheckResourceId,
-} from '@redux/reducers/main';
-import {activeResourcesSelector, isInPreviewModeSelector} from '@redux/selectors';
-import {isUnsavedResource} from '@redux/services/resource';
+import {selectResource} from '@redux/reducers/main';
+import {getActiveResourceMetaMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
+import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {resourceMatchesKindHandler} from '@src/kindhandlers';
+
+import {ResourceFilterType} from '@shared/models/appState';
+import {ResourceIdentifier, ResourceMeta} from '@shared/models/k8sResource';
+import {SectionBlueprint} from '@shared/models/navigator';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {AppSelection} from '@shared/models/selection';
 
 import ResourceKindContextMenu from './ResourceKindContextMenu';
 import ResourceKindContextMenuWrapper from './ResourceKindContextMenuWrapper';
@@ -29,63 +23,64 @@ import ResourceKindSectionNameSuffix from './ResourceKindSectionNameSuffix';
 import ResourceKindSuffix from './ResourceKindSuffix';
 
 export type ResourceKindScopeType = {
-  activeResources: K8sResource[];
   resourceFilter: ResourceFilterType;
-  selectedResourceId: string | undefined;
-  selectedPath: string | undefined;
-  checkedResourceIds: string[];
-  state: RootState;
+  selection: AppSelection | undefined;
+  highlights: AppSelection[] | undefined;
+  checkedResourceIdentifiers: ResourceIdentifier[];
+  [filteredResources: string]: ResourceMeta[] | unknown; // TODO: @monokle/tree-navigator will fix this workaround
 };
 
 export function makeResourceKindNavSection(
   kindHandler: ResourceKindHandler
-): SectionBlueprint<K8sResource, ResourceKindScopeType> {
+): SectionBlueprint<ResourceMeta, ResourceKindScopeType> {
   const kindSectionName = kindHandler.navigatorPath[2];
-  const sectionBlueprint: SectionBlueprint<K8sResource, ResourceKindScopeType> = {
+  const sectionBlueprint: SectionBlueprint<ResourceMeta, ResourceKindScopeType> = {
     name: kindSectionName,
     id: kindSectionName,
     containerElementId: 'navigator-sections-container',
     rootSectionId: navSectionNames.K8S_RESOURCES,
     getScope: state => {
+      const activeResourceMetaMap = getActiveResourceMetaMapFromState(state);
+      const transientResourceMetaMap = getResourceMetaMapFromState(state, 'transient');
+      const newFilteredResources = [
+        ...Object.values(activeResourceMetaMap),
+        ...Object.values(transientResourceMetaMap),
+      ].filter(r => resourceMatchesKindHandler(r, kindHandler));
       return {
-        activeResources: activeResourcesSelector(state),
         resourceFilter: state.main.resourceFilter,
-        selectedResourceId: state.main.selectedResourceId,
-        selectedPath: state.main.selectedPath,
-        checkedResourceIds: state.main.checkedResourceIds,
-        state,
+        selection: state.main.selection,
+        highlights: state.main.highlights,
+        checkedResourceIdentifiers: state.main.checkedResourceIdentifiers,
+        [`${kindSectionName}-filteredResources`]: newFilteredResources,
       };
     },
     builder: {
       getRawItems: scope => {
-        return scope.activeResources
-          .filter(r => resourceMatchesKindHandler(r, kindHandler))
-          .sort((a, b) => {
-            if (a.namespace && !b.namespace) {
-              return -1;
-            }
-            if (!a.namespace && b.namespace) {
-              return 1;
-            }
-            if (a.namespace && b.namespace && a.namespace !== b.namespace) {
-              return a.namespace.localeCompare(b.namespace);
-            }
-            return a.name.localeCompare(b.name);
-          });
+        const filteredResources = scope[`${kindSectionName}-filteredResources`] as ResourceMeta[];
+        return filteredResources.sort((a, b) => {
+          if (a.namespace && !b.namespace) {
+            return -1;
+          }
+          if (!a.namespace && b.namespace) {
+            return 1;
+          }
+          if (a.namespace && b.namespace && a.namespace !== b.namespace) {
+            return a.namespace.localeCompare(b.namespace);
+          }
+          return a.name.localeCompare(b.name);
+        });
       },
       getMeta: () => {
         return {resourceKind: kindHandler.kind};
       },
-      isInitialized: scope => {
-        return scope.activeResources.length > 0;
-      },
-      makeCheckable: scope => {
-        return {
-          checkedItemIds: scope.checkedResourceIds,
-          checkItemsActionCreator: checkMultipleResourceIds,
-          uncheckItemsActionCreator: uncheckMultipleResourceIds,
-        };
-      },
+      // TODO: reimplement checkable
+      // makeCheckable: scope => {
+      //   return {
+      //     checkedItemIds: scope.checkedResourceIdentifiers.map(r => r.id),
+      //     checkItemsActionCreator: checkMultipleResourceIds,
+      //     uncheckItemsActionCreator: uncheckMultipleResourceIds,
+      //   };
+      // },
       shouldBeVisibleBeforeInitialized: true,
     },
     customization: {
@@ -104,34 +99,36 @@ export function makeResourceKindNavSection(
       getName: rawItem => rawItem.name,
       getInstanceId: rawItem => rawItem.id,
       builder: {
-        isSelected: rawItem => rawItem.isSelected,
-        isHighlighted: rawItem => rawItem.isHighlighted,
-        isDirty: rawItem => isUnsavedResource(rawItem),
+        isSelected: (rawItem, scope) => isResourceSelected(rawItem, scope.selection),
+        isHighlighted: (rawItem, scope) => isResourceHighlighted(rawItem, scope.highlights),
+        isDirty: rawItem => rawItem.storage === 'transient',
         isVisible: (rawItem, scope) => {
-          const isPassingFilter = isResourcePassingFilter(
-            rawItem,
-            scope.resourceFilter,
-            isInPreviewModeSelector(scope.state)
-          );
-
+          const isPassingFilter = isResourcePassingFilter(rawItem, scope.resourceFilter);
           return isPassingFilter;
         },
-        isCheckable: () => true,
-        isChecked: (itemInstance, scope) => {
-          return scope.checkedResourceIds.includes(itemInstance.id);
+        // isCheckable: () => true,
+        // isChecked: (itemInstance, scope) => {
+        //   return scope.checkedResourceIds.includes(itemInstance.id);
+        // },
+        getMeta: rawItem => {
+          return {
+            resourceStorage: rawItem.storage,
+          };
         },
       },
       instanceHandler: {
         onClick: (itemInstance, dispatch) => {
-          dispatch(selectK8sResource({resourceId: itemInstance.id}));
+          dispatch(
+            selectResource({resourceIdentifier: {id: itemInstance.id, storage: itemInstance.meta?.resourceStorage}})
+          );
         },
-        onCheck: (itemIstance, dispatch) => {
-          if (itemIstance.isChecked) {
-            dispatch(uncheckResourceId(itemIstance.id));
-          } else {
-            dispatch(checkResourceId(itemIstance.id));
-          }
-        },
+        // onCheck: (itemIstance, dispatch) => {
+        //   if (itemIstance.isChecked) {
+        //     dispatch(uncheckResourceId(itemIstance.id));
+        //   } else {
+        //     dispatch(checkResourceId(itemIstance.id));
+        //   }
+        // },
       },
       customization: {
         prefix: {component: ResourceKindPrefix},

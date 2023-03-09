@@ -3,23 +3,21 @@ import {KubernetesObject} from '@kubernetes/client-node';
 import {cloneDeep, noop} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
-import {PREVIEW_PREFIX, UNSAVED_PREFIX} from '@constants/constants';
-
-import {AppDispatch} from '@models/appdispatch';
-import {K8sResource} from '@models/k8sresource';
-import {RootState} from '@models/rootstate';
-
-import {ResourceSet} from '@redux/compare';
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/selectors';
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {updateResource} from '@redux/thunks/updateResource';
 import {createNamespace, getNamespace, getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
-import {execute} from '@utils/commands';
-import {createKubectlApplyCommand} from '@utils/commands/kubectl';
-import {createKubeClient} from '@utils/kubeclient';
 import {jsonToYaml} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {AppDispatch} from '@shared/models/appDispatch';
+import {ResourceSet} from '@shared/models/compare';
+import {K8sResource} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
+import {execute} from '@shared/utils/commands';
+import {createKubectlApplyCommand} from '@shared/utils/commands/kubectl';
+import {createKubeClient} from '@shared/utils/kubeclient';
 
 type Type = ResourceSet['type'];
 
@@ -73,7 +71,7 @@ async function deployResourceToCluster(
       {
         context: currentContext,
         namespace,
-        input: jsonToYaml(source.content),
+        input: jsonToYaml(source.object),
       },
       {
         KUBECONFIG: kubeConfigPath,
@@ -96,15 +94,18 @@ async function deployResourceToCluster(
     const sourceCopy = structuredClone(source);
     sourceCopy.namespace = namespace;
     const clusterContent = await getResourceFromCluster(sourceCopy, kubeConfigPath, currentContext);
-    updatedContent = clusterContent ?? source.content;
+    updatedContent = clusterContent ?? source.object;
   } catch {
-    updatedContent = source.content;
+    updatedContent = source.object;
   }
 
   const id = target?.id ?? uuid();
   const resource = createResource(updatedContent, {
     id,
-    filePath: `${PREVIEW_PREFIX}://${currentContext}/${id}`,
+    origin: {
+      storage: 'cluster',
+      context: currentContext,
+    },
   });
 
   return resource;
@@ -118,11 +119,11 @@ async function extractResourceToLocal(
   if (target) {
     const result = structuredClone(target);
     result.text = source.text;
-    await dispatch(updateResource({resourceId: target.id, text: source.text}));
+    await dispatch(updateResource({resourceIdentifier: target, text: source.text}));
     return result;
   }
 
-  return createResource(source.content, {
+  return createResource(source.object, {
     name: source.name,
   });
 }
@@ -135,12 +136,11 @@ function createResource(rawResource: any, overrides?: Partial<K8sResource>): K8s
     id,
     name,
     kind: rawResource.kind,
-    version: rawResource.apiVersion,
-    content: cloneDeep(rawResource),
+    apiVersion: rawResource.apiVersion,
+    object: cloneDeep(rawResource),
     text: jsonToYaml(rawResource),
-    filePath: `${UNSAVED_PREFIX}${id}`,
-    isHighlighted: false,
-    isSelected: false,
+    storage: 'transient',
+    origin: {},
     isClusterScoped: getResourceKindHandler(rawResource.kind)?.isNamespaced || false,
     ...overrides,
   };

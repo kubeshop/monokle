@@ -1,33 +1,30 @@
 import {useCallback, useMemo} from 'react';
 
-import {Menu, Modal} from 'antd';
+import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import path from 'path';
 import styled from 'styled-components';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {ItemCustomComponentProps} from '@models/navigator';
-
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile, setSelectingFile} from '@redux/reducers/main';
+import {selectFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
-import {getAbsoluteFilePath} from '@redux/services/fileEntry';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {ContextMenu} from '@molecules';
-
-import {Dots} from '@atoms';
+import {ContextMenu, Dots} from '@atoms';
 
 import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRename} from '@hooks/fileTreeHooks';
 
-import {deleteEntity, dispatchDeleteAlert} from '@utils/files';
-import {showItemInFolder} from '@utils/shell';
+import {deleteFileEntry, dispatchDeleteAlert} from '@utils/files';
 
-import Colors from '@styles/Colors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {HelmValuesFile} from '@shared/models/helm';
+import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {Colors} from '@shared/styles/colors';
+import {showItemInFolder} from '@shared/utils/shell';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;
@@ -36,32 +33,49 @@ const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   align-items: center;
 `;
 
+// TODO: temporary solution for renaming value file
+const DEFAULT_HELM_VALUE: HelmValuesFile = {
+  filePath: '',
+  id: '',
+  name: '',
+  helmChartId: '',
+  values: [],
+};
+
 const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const {itemInstance} = props;
 
   const dispatch = useAppDispatch();
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const rootFolderPath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY].filePath);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const selection = useAppSelector(state => state.main.selection);
 
   const {onCreateResource} = useCreate();
   const {onDuplicate} = useDuplicate();
   const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
   const {onRename} = useRename();
 
-  const refreshFolder = useCallback(() => setRootFolder(fileMap[ROOT_FILE_ENTRY].filePath), [fileMap]);
+  const refreshFolder = useCallback(() => setRootFolder(rootFolderPath), [rootFolderPath]);
   const {onExcludeFromProcessing} = useProcessing(refreshFolder);
 
   const helmItem = useMemo(
-    () => helmValuesMap[itemInstance.id] || helmChartMap[itemInstance.id] || helmTemplatesMap[itemInstance.id],
+    () =>
+      helmValuesMap[itemInstance.id] ||
+      helmChartMap[itemInstance.id] ||
+      helmTemplatesMap[itemInstance.id] ||
+      DEFAULT_HELM_VALUE,
     [helmChartMap, helmTemplatesMap, helmValuesMap, itemInstance.id]
   );
-  const absolutePath = useMemo(() => getAbsoluteFilePath(helmItem.filePath, fileMap), [fileMap, helmItem.filePath]);
+
+  const fileEntry = useAppSelector(state => state.main.fileMap[helmItem.filePath]);
+
+  const absolutePath = useMemo(() => path.join(rootFolderPath, helmItem.filePath), [rootFolderPath, helmItem]);
   const basename = useMemo(
     () => (osPlatform === 'win32' ? path.win32.basename(absolutePath) : path.basename(absolutePath)),
     [absolutePath, osPlatform]
@@ -70,7 +84,10 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
     () => (osPlatform === 'win32' ? path.win32.dirname(absolutePath) : path.dirname(absolutePath)),
     [absolutePath, osPlatform]
   );
-  const isHelmValueSelected = useMemo(() => helmItem.filePath === selectedPath, [helmItem.filePath, selectedPath]);
+  const isHelmValueSelected = useMemo(
+    () => selection?.type === 'helm.values.file' && selection.valuesFileId === helmItem.id,
+    [helmItem.id, selection]
+  );
   const isRoot = useMemo(() => helmItem.filePath === ROOT_FILE_ENTRY, [helmItem.filePath]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
   const target = useMemo(
@@ -87,14 +104,13 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
       {
         key: 'show_file',
         label: 'Go to file',
-        disabled: isInPreviewMode,
+        disabled: isInPreviewMode || isInClusterMode,
         onClick: () => {
           if (!helmItem) {
             return;
           }
 
-          dispatch(setLeftMenuSelection('file-explorer'));
-          dispatch(setSelectingFile(true));
+          dispatch(setLeftMenuSelection('explorer'));
           dispatch(selectFile({filePath: helmItem.filePath}));
         },
       },
@@ -150,7 +166,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
       {
         key: 'duplicate_entity',
         label: 'Duplicate',
-        disabled: isInPreviewMode,
+        disabled: isInPreviewMode || isInClusterMode,
         onClick: () => {
           onDuplicate(absolutePath, basename, dirname);
         },
@@ -158,21 +174,21 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
       {
         key: 'rename_entity',
         label: 'Rename',
-        disabled: isInPreviewMode,
+        disabled: isInPreviewMode || isInClusterMode,
         onClick: () => {
-          onRename(absolutePath, osPlatform);
+          onRename(absolutePath);
         },
       },
       {
         key: 'delete_entity',
         label: 'Delete',
-        disabled: isInPreviewMode,
+        disabled: isInPreviewMode || isInClusterMode,
         onClick: () => {
           Modal.confirm({
             title: `Are you sure you want to delete "${basename}"?`,
             icon: <ExclamationCircleOutlined />,
             onOk() {
-              deleteEntity(absolutePath, args => dispatchDeleteAlert(dispatch, args));
+              deleteFileEntry(fileEntry).then(result => dispatchDeleteAlert(dispatch, result));
             },
           });
         },
@@ -194,15 +210,16 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
       fileOrFolderContainedInFilter,
       helmItem,
       isInPreviewMode,
+      isInClusterMode,
       isRoot,
       onCreateResource,
       onDuplicate,
       onExcludeFromProcessing,
       onFilterByFileOrFolder,
       onRename,
-      osPlatform,
       platformFileManagerName,
       target,
+      fileEntry,
     ]
   );
 
@@ -211,7 +228,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   }
 
   return (
-    <ContextMenu overlay={<Menu items={menuItems} />}>
+    <ContextMenu items={menuItems}>
       <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
         <Dots color={isHelmValueSelected ? Colors.blackPure : undefined} />
       </StyledActionsMenuIconContainer>

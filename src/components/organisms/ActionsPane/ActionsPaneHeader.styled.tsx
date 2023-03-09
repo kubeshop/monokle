@@ -4,16 +4,13 @@ import {EllipsisOutlined as RawEllipsisOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const ButtonContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-left: 8px;
-
-  Button {
-    margin: 0 4px;
-  }
 `;
 
 export const LeftArrowButton = styled(Button)`
@@ -40,7 +37,7 @@ export const EllipsisOutlined = styled(RawEllipsisOutlined)`
   color: ${Colors.blue6};
   font-size: 1rem;
   cursor: pointer;
-  margin: 0 0.5rem 0 1.5rem;
+  margin: 0 0.5rem;
 `;
 
 export const DropdownActionContainer = styled.div`

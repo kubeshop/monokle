@@ -2,15 +2,11 @@ import {existsSync, promises as fs} from 'fs';
 import {orderBy} from 'lodash';
 import {SimpleGit, simpleGit} from 'simple-git';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import type {FileMapType} from '@shared/models/appState';
+import type {GitRepo} from '@shared/models/git';
+import {trackEvent} from '@shared/utils/telemetry';
 
-import {FileMapType} from '@models/appstate';
-import {GitRepo} from '@models/git';
-import {K8sResource} from '@models/k8sresource';
-
-import {extractK8sResources} from '@redux/services/resource';
-
-import {formatGitChangedFiles} from '@utils/git';
+import {formatGitChangedFiles} from '../utils/git';
 
 export async function isGitInstalled(path: string) {
   const git: SimpleGit = simpleGit({baseDir: path});
@@ -178,6 +174,7 @@ export async function checkoutGitBranch(payload: {localPath: string; branchName:
 
   try {
     await git.checkout(branchName);
+    trackEvent('git/branch_checkout');
     return {};
   } catch (e: any) {
     return {error: e.message};
@@ -193,7 +190,7 @@ export async function initGitRepo(localPath: string) {
 export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
-  const projectFolderPath = fileMap[ROOT_FILE_ENTRY].filePath;
+  const projectFolderPath = fileMap['<root>'].filePath;
   const gitFolderPath = await git.revparse({'--show-toplevel': null});
   const currentBranch = (await git.branch()).current;
 
@@ -246,6 +243,7 @@ export async function unstageFiles(localPath: string, filePaths: string[]) {
 export async function commitChanges(localPath: string, message: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
   await git.commit(message);
+  trackEvent('git/commit');
 }
 
 export async function deleteLocalBranch(localPath: string, branchName: string) {
@@ -268,6 +266,7 @@ export async function pushChanges(localPath: string, branchName: string) {
 
   try {
     await git.push('origin', branchName);
+    trackEvent('git/push');
     return {};
   } catch (e: any) {
     return {error: e.message};
@@ -312,9 +311,9 @@ export async function pullChanges(localPath: string) {
   }
 }
 
-export async function getCommitResources(localPath: string, branchName: string, commitHash: string) {
+export async function getCommitResources(localPath: string, commitHash: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  let resources: K8sResource[] = [];
+  let filesContent: Record<string, string> = {};
 
   const filesPaths = (await git.raw('ls-tree', '-r', '--name-only', commitHash))
     .split('\n')
@@ -326,17 +325,17 @@ export async function getCommitResources(localPath: string, branchName: string, 
     // get the content of the file found in current branch
     try {
       // eslint-disable-next-line no-await-in-loop
-      content = await git.show(`${branchName}:${filesPaths[i]}`);
+      content = await git.show(`${commitHash}:${filesPaths[i]}`);
     } catch (e) {
       content = '';
     }
 
     if (content) {
-      resources = [...resources, ...extractK8sResources(content, filesPaths[i])];
+      filesContent[filesPaths[i]] = content;
     }
   }
 
-  return resources;
+  return filesContent;
 }
 
 export async function getBranchCommits(localPath: string, branchName: string) {

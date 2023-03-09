@@ -1,28 +1,35 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {ERROR_MSG_FALLBACK, PREVIEW_PREFIX, ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {AppDispatch} from '@models/appdispatch';
-import {RootState} from '@models/rootstate';
-
-import {SetPreviewDataPayload} from '@redux/reducers/main';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {hasCommandFailed, runCommandInMainThread} from '@utils/commands';
 import {errorMsg} from '@utils/error';
-import {isDefined} from '@utils/filter';
+
+import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {K8sResource} from '@shared/models/k8sResource';
+import {CommandPreview} from '@shared/models/preview';
+import {RootState} from '@shared/models/rootState';
+import {hasCommandFailed, runCommandInMainThread} from '@shared/utils/commands';
+import {isDefined} from '@shared/utils/filter';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {extractK8sResources} from './resource';
 
 export const previewSavedCommand = createAsyncThunk<
-  SetPreviewDataPayload,
+  {
+    resources: K8sResource<'preview'>[];
+    preview: CommandPreview;
+  },
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
   }
 >('main/previewSavedCommand', async (commandId, thunkAPI) => {
+  const startTime = new Date().getTime();
   try {
+    trackEvent('preview/command/start');
     const configState = thunkAPI.getState().config;
     const command = configState.projectConfig?.savedCommandMap?.[commandId];
     const rootFolderPath = thunkAPI.getState().main.fileMap[ROOT_FILE_ENTRY]?.filePath;
@@ -47,7 +54,9 @@ export const previewSavedCommand = createAsyncThunk<
       throw new Error(msg);
     }
 
-    const resources = extractK8sResources(result.stdout, PREVIEW_PREFIX + command.id);
+    const resources = extractK8sResources(result.stdout, 'preview', {
+      preview: {type: 'command', commandId: command.id},
+    });
 
     if (!resources.length) {
       return createRejectionWithAlert(
@@ -56,6 +65,9 @@ export const previewSavedCommand = createAsyncThunk<
         "The command ran successfully but the output didn't contain any kubernetes resources."
       );
     }
+
+    const endTime = new Date().getTime();
+    trackEvent('preview/command/end', {resourcesCount: resources.length, executionTime: endTime - startTime});
 
     return {
       previewResourceId: command.id,

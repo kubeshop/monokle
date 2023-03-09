@@ -8,14 +8,13 @@ import styled from 'styled-components';
 
 import {DeletePreviewConfigurationTooltip} from '@constants/tooltips';
 
-import {ItemCustomComponentProps} from '@models/navigator';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
 import {deletePreviewConfiguration} from '@redux/thunks/previewConfiguration';
 
-import Colors from '@styles/Colors';
+import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {Colors} from '@shared/styles/colors';
 
 const StyledButton = styled.span<{isItemSelected: boolean}>`
   margin-right: 15px;
@@ -43,7 +42,7 @@ const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = prop
     if (!previewConfiguration) {
       return;
     }
-    startPreview(previewConfiguration.id, 'helm-preview-config', dispatch);
+    startPreview({type: 'helm-config', configId: previewConfiguration.id}, dispatch);
   }, [dispatch, previewConfiguration]);
 
   const onClickEdit = useCallback(() => {

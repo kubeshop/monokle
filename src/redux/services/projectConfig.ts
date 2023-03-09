@@ -5,13 +5,10 @@ import {sep} from 'path';
 import {AnyAction} from 'redux';
 import invariant from 'tiny-invariant';
 
-import {K8S_VERSIONS, PREDEFINED_K8S_VERSION} from '@constants/constants';
+import {updateProjectConfig} from '@redux/appConfig';
 
-import {AppConfig, ProjectConfig} from '@models/appconfig';
-
-import {updateProjectConfig} from '@redux/reducers/appConfig';
-
-import {monitorKubeConfig} from './kubeConfigMonitor';
+import {K8S_VERSIONS, PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
+import {AppConfig, ProjectConfig} from '@shared/models/config';
 
 export interface SerializableObject {
   [name: string]: any;
@@ -174,8 +171,6 @@ export const updateProjectSettings = (dispatch: (action: AnyAction) => void, pro
   const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
   if (projectConfig) {
     dispatch(updateProjectConfig({config: projectConfig, fromConfigFile: true}));
-    monitorKubeConfig(dispatch, projectConfig?.kubeConfig?.path);
-
     return;
   }
   dispatch(updateProjectConfig({config: null, fromConfigFile: true}));
@@ -203,6 +198,24 @@ export const keysToUpdateStateBulk = (
       keys.push(key);
     }
   });
+
+  return keys;
+};
+
+export const keysToDelete = (
+  serializedState: SerializableObject,
+  serializedIncomingConfig: SerializableObject,
+  incomingConfigKeys: string[]
+) => {
+  const keys: string[] = [];
+
+  Object.keys(serializedState)
+    .filter(key => incomingConfigKeys.includes(key.split('.')[0]))
+    .forEach((key: string) => {
+      if (!_.has(serializedIncomingConfig, key)) {
+        keys.push(key);
+      }
+    });
 
   return keys;
 };

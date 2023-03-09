@@ -1,10 +1,8 @@
 import {Popover} from 'antd';
 
-import {ItemInstance} from '@models/navigator';
-
-import {Icon} from '@atoms';
-
-import Colors from '@styles/Colors';
+import {Icon} from '@monokle/components';
+import {ItemInstance} from '@shared/models/navigator';
+import {Colors} from '@shared/styles/colors';
 
 import ImageOutgoingResourcesPopover from './ImageOutgoingResourcesPopover';
 import * as S from './ImagesSectionNameSuffix.styled';
@@ -30,7 +28,7 @@ const ImagesSectionNameSuffix: React.FC<IProps> = props => {
         content={<ImageOutgoingResourcesPopover resourcesIds={resourcesIds} />}
         placement="rightTop"
       >
-        <Icon name="outgoingRefs" color={isSelected ? Colors.blackPure : Colors.blue10} />
+        <Icon name="outgoingRefs" style={{color: isSelected ? Colors.blackPure : Colors.blue10}} />
       </Popover>
     </S.Container>
   );

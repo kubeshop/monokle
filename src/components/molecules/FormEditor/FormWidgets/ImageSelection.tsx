@@ -17,36 +17,18 @@ export const ImageSelection: React.FC = (params: any) => {
 
   const [images, setImages] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
-  const [selectValue, setSelectValue] = useState<string | undefined>();
 
   const handleChange = (providedValue: string) => {
     if (providedValue === NEW_ITEM) {
-      setSelectValue(inputValue);
+      onChange(inputValue);
       if (!images.includes(inputValue)) {
         setImages([...images, inputValue]);
       }
       setInputValue('');
     } else {
-      setSelectValue(providedValue);
+      onChange(providedValue);
     }
   };
-
-  useEffect(() => {
-    if (!value) {
-      setSelectValue(undefined);
-    } else {
-      setSelectValue(value);
-    }
-  }, [value]);
-
-  useEffect(() => {
-    if (!selectValue) {
-      onChange(undefined);
-    } else {
-      onChange(selectValue);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectValue]);
 
   useEffect(() => {
     if (!imagesList.length) {
@@ -61,14 +43,14 @@ export const ImageSelection: React.FC = (params: any) => {
       disabled={disabled || readonly}
       optionFilterProp="children"
       showSearch
-      value={selectValue}
+      value={value}
       onChange={handleChange}
       onSearch={(e: string) => setInputValue(e)}
       placeholder="Select or create your image"
     >
       {inputValue && images.filter(image => image === inputValue).length === 0 && (
         <Option key={inputValue} value={NEW_ITEM}>
-          {`Create '${inputValue}'`}
+          {inputValue}
         </Option>
       )}
       {images.map(image => (

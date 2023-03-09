@@ -6,16 +6,17 @@ import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
-import {GitChangedFile} from '@models/git';
-
 import {setGitLoading} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {TitleBar} from '@molecules';
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {TitleBar} from '@monokle/components';
+import {GitChangedFile} from '@shared/models/git';
 
 import BottomActions from './BottomActions';
 import FileList from './FileList';
@@ -41,7 +42,7 @@ const GitPane: React.FC = () => {
   const height = usePaneHeight();
 
   const fileContainerHeight = useMemo(() => {
-    let h: number = height - DEFAULT_PANE_TITLE_HEIGHT;
+    let h: number = height - DEFAULT_PANE_TITLE_HEIGHT - 12;
 
     // 12 is the margin top of the git pane content
     if (gitRepo) {
@@ -116,7 +117,9 @@ const GitPane: React.FC = () => {
 
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
-      <TitleBar title="Git" closable />
+      <TitleBarWrapper $closable>
+        <TitleBar title="Git" />
+      </TitleBarWrapper>
 
       {gitLoading ? (
         <S.Skeleton active />

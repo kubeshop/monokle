@@ -5,44 +5,46 @@ import {sortBy} from 'lodash';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
+import {extractK8sResources} from '@redux/services/resource';
+import {createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@models/appconfig';
-import {AppDispatch} from '@models/appdispatch';
-import {RootState} from '@models/rootstate';
-
-import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {createPreviewResult, createRejectionWithAlert} from '@redux/thunks/utils';
-
-import {CommandOptions, runCommandInMainThread} from '@utils/commands';
 import {buildHelmCommand} from '@utils/helm';
-import {RUN_PREVIEW_CONFIGURATION, trackEvent} from '@utils/telemetry';
+
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {CommandOptions} from '@shared/models/commands';
+import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
+import {K8sResource} from '@shared/models/k8sResource';
+import {HelmConfigPreview} from '@shared/models/preview';
+import {RootState} from '@shared/models/rootState';
+import {runCommandInMainThread} from '@shared/utils/commands';
+import {trackEvent} from '@shared/utils/telemetry';
 
 /**
  * Thunk to preview a Helm Chart
  */
 
 export const runPreviewConfiguration = createAsyncThunk<
-  SetPreviewDataPayload,
+  {
+    resources: K8sResource<'preview'>[];
+    preview: HelmConfigPreview;
+  },
   string,
   {
     dispatch: AppDispatch;
     state: RootState;
   }
 >('main/runPreviewConfiguration', async (previewConfigurationId, thunkAPI) => {
-  trackEvent(RUN_PREVIEW_CONFIGURATION);
+  const startTime = new Date().getTime();
   const configState = thunkAPI.getState().config;
   const mainState = thunkAPI.getState().main;
   const previewConfigurationMap = configState.projectConfig?.helm?.previewConfigurationMap;
-  const kubeconfig = configState.projectConfig?.kubeConfig?.path || configState.kubeConfig.path;
-  const k8sVersion = configState.projectConfig?.k8sVersion;
-  const userDataDir = configState.userDataDir;
-  const currentContext =
-    thunkAPI.getState().config.projectConfig?.kubeConfig?.currentContext ||
-    thunkAPI.getState().config.kubeConfig.currentContext;
-  const policyPlugins = mainState.policies.plugins;
+  const kubeconfig = configState.kubeConfig.path;
+  const currentContext = thunkAPI.getState().config.kubeConfig.currentContext;
 
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
+
+  trackEvent('preview/helm_config/start');
 
   let previewConfiguration: HelmPreviewConfiguration | null | undefined;
   if (previewConfigurationMap) {
@@ -120,26 +122,29 @@ export const runPreviewConfiguration = createAsyncThunk<
   const result = await runCommandInMainThread(commandOptions);
 
   if (result.error) {
-    return createRejectionWithAlert(thunkAPI, 'Helm Error', result.error);
+    return createRejectionWithAlert(thunkAPI, 'Helm Error', `${result.error} - ${result.stderr}`);
   }
 
+  const endTime = new Date().getTime();
+
+  trackEvent('preview/helm_config/end', {executionTime: endTime - startTime});
+
   if (result.stdout) {
-    return createPreviewResult(
-      String(k8sVersion),
-      String(userDataDir),
-      result.stdout,
-      previewConfiguration.id,
-      'Helm Preview',
-      mainState.resourceRefsProcessingOptions,
-      undefined,
-      undefined,
-      {policyPlugins}
-    );
+    const preview: HelmConfigPreview = {type: 'helm-config', configId: previewConfiguration.id};
+
+    const resources = extractK8sResources(result.stdout, 'preview', {
+      preview,
+    });
+
+    return {
+      resources,
+      preview,
+    };
   }
 
   return createRejectionWithAlert(
     thunkAPI,
     'Helm Error',
-    `Unable to run Helm with Preview Configuration: ${previewConfiguration.name}`
+    `Unable to run Helm with Preview Configuration: ${previewConfiguration.name} - [${result.stderr}]`
   );
 });

@@ -1,34 +1,36 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {ErrorBoundary} from 'react-error-boundary';
 import {useDebounce} from 'react-use';
 
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {withTheme} from '@rjsf/core';
+import {TemplatesType} from '@rjsf/utils';
+import validator from '@rjsf/validator-ajv8';
 
-import fs from 'fs';
+import {isEqual} from 'lodash';
 import log from 'loglevel';
 import {stringify} from 'yaml';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
+import {isInClusterModeSelector, settingsSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setAutosavingError, setAutosavingStatus} from '@redux/reducers/main';
-import {
-  isInClusterModeSelector,
-  isInPreviewModeSelector,
-  selectedResourceSelector,
-  settingsSelector,
-} from '@redux/selectors';
-import {getAbsoluteFilePath} from '@redux/services/fileEntry';
+import {setAutosavingStatus} from '@redux/reducers/main';
+import {isInPreviewModeSelectorNew, selectedFilePathSelector} from '@redux/selectors';
+import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
+import {readFileThunk} from '@redux/thunks/readResourceFile';
+import {saveFormEditorResource} from '@redux/thunks/saveFormEditorResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
-import {CHANGES_BY_FORM_EDITOR, trackEvent} from '@utils/telemetry';
+import {useStateWithRef} from '@utils/hooks';
 import {parseYamlDocument} from '@utils/yaml';
+
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';
 import * as S from './FormEditor.styled';
@@ -36,6 +38,11 @@ import FormObjectFieldTemplate from './FormObjectFieldTemplate';
 import {getCustomFormFields, getCustomFormWidgets} from './FormWidgets';
 
 const Form = withTheme(AntDTheme);
+
+const templates: Partial<TemplatesType> = {
+  ArrayFieldTemplate: FormArrayFieldTemplate,
+  ObjectFieldTemplate: FormObjectFieldTemplate,
+};
 
 interface IProps {
   formSchema: any;
@@ -48,115 +55,80 @@ interface IProps {
 
 const FormEditor: React.FC<IProps> = props => {
   const {formSchema, formUiSchema} = props;
-
   const dispatch = useAppDispatch();
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
-  const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const selectedResource = useAppSelector(selectedResourceSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const selectedFilePath = useAppSelector(selectedFilePathSelector);
+  const selectedResource = useSelectedResource();
+  const [formData, _setFormData, formDataRef] = useStateWithRef<any>(undefined);
+  const [schema, setSchema] = useState<any>({});
   const settings = useAppSelector(settingsSelector);
 
-  const [formData, setFormData] = useState<any>();
-  const [isResourceUpdated, setIsResourceUpdated] = useState<boolean>(false);
-  const [schema, setSchema] = useState<any>({});
-
-  const changed = useMemo(() => {
-    if (!formData) {
-      return false;
-    }
-
-    let formString = stringify(formData);
-
-    if (selectedResource) {
-      const content = mergeManifests(selectedResource.text, formString);
-      return content.trim() !== selectedResource.text.trim();
-    }
-
-    if (selectedPath) {
-      const filePath = getAbsoluteFilePath(selectedPath, fileMap);
-      const fileContent = fs.readFileSync(filePath, 'utf8');
-      const content = mergeManifests(fileContent, formString);
-      return content.trim() !== fileContent.trim();
-    }
-
-    return false;
-  }, [fileMap, formData, selectedPath, selectedResource]);
-
-  const onFormUpdate = (e: any) => {
-    setFormData(e.formData);
-  };
-
-  useEffect(() => {
-    if (!formData) {
-      return;
-    }
-
-    if (changed && !autosavingStatus) {
+  const setFormData = useCallback(
+    (newFormData: any) => {
+      if (isEqual(formDataRef.current, newFormData)) {
+        return;
+      }
+      _setFormData(newFormData);
       dispatch(setAutosavingStatus(true));
-    }
-  }, [autosavingStatus, changed, dispatch, formData]);
+    },
+    [_setFormData, formDataRef, dispatch]
+  );
+
+  const onFormUpdate = useCallback(
+    (e: any) => {
+      setFormData(e.formData);
+    },
+    [setFormData]
+  );
 
   useDebounce(
     () => {
+      if (!autosavingStatus) {
+        return;
+      }
+
       let formString = stringify(formData);
-      setIsResourceUpdated(false);
 
       if (selectedResource) {
         const content = mergeManifests(selectedResource.text, formString);
         const isChanged = content.trim() !== selectedResource.text.trim();
-        setIsResourceUpdated(isChanged);
         if (isChanged) {
-          dispatch(updateResource({resourceId: selectedResource.id, text: content, isUpdateFromForm: true}));
-        } else {
-          dispatch(setAutosavingStatus(false));
+          dispatch(updateResource({resourceIdentifier: selectedResource, text: content, isUpdateFromForm: true}));
         }
-      } else if (selectedPath) {
-        try {
-          const filePath = getAbsoluteFilePath(selectedPath, fileMap);
-          const fileContent = fs.readFileSync(filePath, 'utf8');
-          const content = mergeManifests(fileContent, formString);
-          const isChanged = content.trim() !== fileContent.trim();
-          setIsResourceUpdated(isChanged);
-          if (isChanged) {
-            fs.writeFileSync(filePath, content);
-          }
-        } catch (e: any) {
-          const {message, stack} = e;
-
-          dispatch(setAutosavingError({message, stack}));
-
-          log.error(`Failed to update file [${selectedPath}]`, e);
-        } finally {
-          dispatch(setAutosavingStatus(false));
-        }
+        dispatch(setAutosavingStatus(false));
+      } else if (selectedFilePath) {
+        dispatch(saveFormEditorResource(formString));
       }
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [formData, selectedResource, selectedPath]
+    [formData, selectedResource, selectedFilePath]
   );
 
   useEffect(() => {
-    if (selectedResource) {
-      setFormData(selectedResource.content);
-    } else if (selectedPath) {
-      try {
-        const filePath = getAbsoluteFilePath(selectedPath, fileMap);
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-        setFormData(parseYamlDocument(fileContent).toJS());
-      } catch (e) {
-        log.error(`Failed to read file [${selectedPath}]`, e);
-      }
-    }
-
-    return () => {
-      if ((selectedResource || selectedPath) && isResourceUpdated) {
-        trackEvent(CHANGES_BY_FORM_EDITOR, {resourceKind: selectedResource?.kind});
+    const loadResourceFile = async () => {
+      if (selectedResource) {
+        setFormData(selectedResource.object);
+      } else if (selectedFilePath) {
+        try {
+          const fileContent = await dispatch(readFileThunk(selectedFilePath)).unwrap();
+          if (fileContent) {
+            setFormData(parseYamlDocument(fileContent).toJS());
+          }
+        } catch (e) {
+          log.error(`Failed to read file [${selectedFilePath}]`, e);
+        }
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResource, selectedPath, fileMap]);
+    loadResourceFile();
+
+    return () => {
+      if (selectedResource || selectedFilePath) {
+        trackEvent('edit/form_editor', {resourceKind: selectedResource?.kind});
+      }
+    };
+  }, [dispatch, selectedResource, selectedFilePath, setFormData]);
 
   useEffect(() => {
     if (!settings.createDefaultObjects || !settings.setDefaultPrimitiveValues) {
@@ -164,14 +136,14 @@ const FormEditor: React.FC<IProps> = props => {
     } else {
       setSchema(formSchema);
     }
-  }, [formSchema, settings]);
+  }, [settings.createDefaultObjects, settings.setDefaultPrimitiveValues, formSchema]);
 
   const isReadOnlyMode = useMemo(
     () => isInPreviewMode || (isInClusterMode && !settings.allowEditInClusterMode),
     [isInClusterMode, isInPreviewMode, settings.allowEditInClusterMode]
   );
 
-  if (!selectedResource && !selectedPath) {
+  if (!selectedResource && selectedFilePath) {
     return <div>Nothing selected..</div>;
   }
 
@@ -196,12 +168,12 @@ const FormEditor: React.FC<IProps> = props => {
           schema={schema}
           uiSchema={formUiSchema}
           formData={formData}
-          ObjectFieldTemplate={FormObjectFieldTemplate}
-          ArrayFieldTemplate={FormArrayFieldTemplate}
+          templates={templates}
           onChange={onFormUpdate}
           widgets={getCustomFormWidgets()}
           fields={getCustomFormFields()}
           disabled={isReadOnlyMode}
+          validator={validator}
         >
           <div />
         </Form>

@@ -7,9 +7,9 @@ import {Button, Space} from 'antd';
 
 import newGithubIssueUrl from 'new-github-issue-url';
 
-import {logToFile} from '@utils/logToFile';
-
 import crashFigure from '@assets/figures/crash.svg';
+
+import {logToFile} from '@shared/utils/logs';
 
 import * as S from './ErrorPage.styled';
 import {ErrorStack} from './ErrorStack';

@@ -4,15 +4,15 @@ import {stringify} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {AlertEnum, AlertType} from '@models/alert';
-import {AppConfig} from '@models/appconfig';
-import {AppDispatch} from '@models/appdispatch';
-import {K8sResource} from '@models/k8sresource';
-
 import {setAlert} from '@redux/reducers/alert';
 import {doesTextStartWithYamlDocumentDelimiter} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {removeNamespaceFromCluster} from '@redux/thunks/utils';
+
+import {AlertEnum, AlertType} from '@shared/models/alert';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {AppConfig} from '@shared/models/config';
+import {K8sResource} from '@shared/models/k8sResource';
 
 const applyMultipleResources = async (
   config: AppConfig,
@@ -21,8 +21,8 @@ const applyMultipleResources = async (
   namespace?: {name: string; new: boolean},
   onSuccessCallback?: () => void
 ) => {
-  const kubeConfigPath = config.projectConfig?.kubeConfig?.path || config.kubeConfig.path;
-  const currentContext = config.projectConfig?.kubeConfig?.currentContext || config.kubeConfig.currentContext;
+  const kubeConfigPath = config.kubeConfig.path;
+  const currentContext = config.kubeConfig.currentContext;
 
   if (!kubeConfigPath || !currentContext || !resourcesToApply.length) {
     return;
@@ -30,12 +30,12 @@ const applyMultipleResources = async (
 
   const yamlToApply = resourcesToApply
     .map(r => {
-      const resourceContent = _.cloneDeep(r.content);
-      if (namespace && namespace.name !== resourceContent.metadata?.namespace) {
-        delete resourceContent.metadata.namespace;
+      const resourceObject = _.cloneDeep(r.object);
+      if (namespace && namespace.name !== resourceObject.metadata?.namespace) {
+        delete resourceObject.metadata.namespace;
       }
 
-      return stringify(resourceContent);
+      return stringify(resourceObject);
     })
     .reduce<string>((fullYaml, currentText) => {
       if (doesTextStartWithYamlDocumentDelimiter(currentText)) {

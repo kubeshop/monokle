@@ -1,19 +1,21 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {AppDispatch} from '@models/appdispatch';
-import {RootState} from '@models/rootstate';
-
-import {SetPreviewDataPayload} from '@redux/reducers/main';
-import {currentConfigSelector} from '@redux/selectors';
 import {fetchResources} from '@redux/services/compare/fetchResources';
-import {getK8sVersion} from '@redux/services/projectConfig';
-import {createPreviewResultFromResources, createRejectionWithAlert} from '@redux/thunks/utils';
+import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {errorMsg} from '@utils/error';
-import {DO_HELM_PREVIEW, trackEvent} from '@utils/telemetry';
+
+import {AppDispatch} from '@shared/models/appDispatch';
+import {K8sResource} from '@shared/models/k8sResource';
+import {HelmPreview} from '@shared/models/preview';
+import {RootState} from '@shared/models/rootState';
+import {trackEvent} from '@shared/utils/telemetry';
 
 export const previewHelmValuesFile = createAsyncThunk<
-  SetPreviewDataPayload,
+  {
+    resources: K8sResource<'preview'>[];
+    preview: HelmPreview;
+  },
   string,
   {
     dispatch: AppDispatch;
@@ -21,14 +23,14 @@ export const previewHelmValuesFile = createAsyncThunk<
   }
 >('main/previewHelmValuesFile', async (valuesFileId, thunkAPI) => {
   try {
-    trackEvent(DO_HELM_PREVIEW);
-
+    const startTime = new Date().getTime();
     const state = thunkAPI.getState().main;
-    const configState = thunkAPI.getState().config;
+
+    trackEvent('preview/helm/start');
 
     const valuesFile = state.helmValuesMap[valuesFileId];
     if (!valuesFile) {
-      throw new Error('Values not found');
+      throw new Error(`Values File with id ${valuesFileId} not found`);
     }
 
     const resources = await fetchResources(thunkAPI.getState(), {
@@ -37,20 +39,20 @@ export const previewHelmValuesFile = createAsyncThunk<
       valuesId: valuesFile.id,
     });
 
-    const projectConfig = currentConfigSelector(thunkAPI.getState());
-    const policyPlugins = state.policies.plugins;
+    const endTime = new Date().getTime();
 
-    return createPreviewResultFromResources(
-      getK8sVersion(projectConfig),
-      String(configState.userDataDir),
+    trackEvent('preview/helm/end', {resourcesCount: resources.length, executionTime: endTime - startTime});
+
+    const preview: HelmPreview = {
+      type: 'helm',
+      chartId: valuesFile.helmChartId,
+      valuesFileId: valuesFile.id,
+    };
+
+    return {
       resources,
-      valuesFile.id,
-      'Helm Preview',
-      state.resourceRefsProcessingOptions,
-      undefined,
-      undefined,
-      {policyPlugins}
-    );
+      preview,
+    };
   } catch (err) {
     return createRejectionWithAlert(thunkAPI, 'Helm Error', errorMsg(err));
   }

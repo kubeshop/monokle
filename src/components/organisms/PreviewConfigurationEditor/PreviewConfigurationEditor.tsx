@@ -8,15 +8,15 @@ import {v4 as uuidv4} from 'uuid';
 import {HELM_INSTALL_OPTIONS_DOCS_URL, HELM_TEMPLATE_OPTIONS_DOCS_URL} from '@constants/constants';
 import {helmInstallOptions, helmTemplateOptions} from '@constants/helmOptions';
 
-import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@models/appconfig';
-import {HelmValuesFile} from '@models/helm';
-
+import {updateProjectConfig} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateProjectConfig} from '@redux/reducers/appConfig';
 import {closePreviewConfigurationEditor} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
 
 import {KeyValueInput} from '@atoms';
+
+import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
+import {HelmValuesFile} from '@shared/models/helm';
 
 import ValuesFilesList from './ValuesFilesList';
 
@@ -167,7 +167,7 @@ const PreviewConfigurationEditor = () => {
 
       dispatch(closePreviewConfigurationEditor());
       if (shouldRunPreview) {
-        startPreview(input.id, 'helm-preview-config', dispatch);
+        startPreview({configId: input.id, type: 'helm-config'}, dispatch);
       }
     },
     [

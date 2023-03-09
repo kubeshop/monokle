@@ -5,29 +5,19 @@ import {Col, InputNumber, Modal, Row, Tooltip} from 'antd';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ScaleTooltip} from '@constants/tooltips';
 
+import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeScaleModal, openScaleModal} from '@redux/reducers/ui';
-import {
-  isInClusterModeSelector,
-  kubeConfigContextSelector,
-  kubeConfigPathSelector,
-  selectedResourceSelector,
-} from '@redux/selectors';
-import {restartPreview} from '@redux/services/preview';
+import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import scaleDeployment from '@redux/services/scaleDeployment';
+import {startClusterConnection} from '@redux/thunks/cluster';
 
-import {SecondaryButton} from '@atoms';
+import {PrimaryButton} from '@atoms';
 
-type IProps = {
-  isDropdownActive?: boolean;
-};
-
-const Scale: React.FC<IProps> = props => {
-  const {isDropdownActive = false} = props;
-
+const Scale: React.FC = () => {
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(kubeConfigContextSelector);
-  const currentResource = useAppSelector(selectedResourceSelector);
+  const currentResource = useSelectedResource();
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isScaleModalOpen = useAppSelector(state => state.ui.isScaleModalOpen);
 
@@ -35,7 +25,7 @@ const Scale: React.FC<IProps> = props => {
   const {name, namespace, kind} = currentResource || {};
 
   const isBtnEnabled = useMemo(() => kind === 'Deployment' && isInClusterMode, [kind, isInClusterMode]);
-  const defaultReplica = useMemo(() => currentResource?.content?.spec?.replicas, [currentResource]);
+  const defaultReplica = useMemo(() => currentResource?.object?.spec?.replicas, [currentResource]);
 
   const [replicas, setReplicas] = useState<number>(defaultReplica);
   const [scaling, toggleScaling] = useState(false);
@@ -49,7 +39,8 @@ const Scale: React.FC<IProps> = props => {
       toggleScaling(true);
       await scaleDeployment({name, replicas, namespace, currentContext, kubeConfigPath});
       toggleScaling(false);
-      restartPreview(currentContext, 'cluster', dispatch);
+      // TODO: we should have a way of updating a single resource instead of restarting the whole cluster
+      dispatch(startClusterConnection({context: currentContext, namespace, isRestart: true}));
     }
     dispatch(closeScaleModal());
   };
@@ -61,17 +52,17 @@ const Scale: React.FC<IProps> = props => {
   return (
     <>
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ScaleTooltip} placement="bottomLeft">
-        <SecondaryButton
-          $disableHover={isDropdownActive}
+        <PrimaryButton
           loading={Boolean(scaling)}
-          type={isDropdownActive ? 'link' : 'default'}
+          type="link"
           size="small"
           onClick={() => dispatch(openScaleModal())}
           disabled={!isBtnEnabled}
         >
           Scale
-        </SecondaryButton>
+        </PrimaryButton>
       </Tooltip>
+
       <Modal title="Set number of replicas" open={isScaleModalOpen} onOk={handleScaleOk} onCancel={handleCancel}>
         <Row style={{alignItems: 'center'}}>
           <Col span={8}>

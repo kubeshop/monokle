@@ -1,8 +1,7 @@
 import {orderBy} from 'lodash';
 
-import {FileExplorerSortOrder} from '@models/appconfig';
-
-import {TreeNode} from '@components/organisms/FileTreePane/types';
+import {FileExplorerSortOrder} from '@shared/models/config';
+import {TreeNode} from '@shared/models/explorer';
 
 const sortTree = (currentRoot: TreeNode, type: 'folders' | 'files') => {
   if (currentRoot.children) {

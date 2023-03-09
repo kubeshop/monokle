@@ -2,6 +2,159 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.3](https://github.com/kubeshop/monokle/compare/v2.0.3-nightly-2023-03-09.0...v2.0.3) (2023-03-09)
+
+
+### Features
+
+* add new k8s versions ([6cd9410](https://github.com/kubeshop/monokle/commit/6cd9410944ebf686fd8698203b2b0b9879b22fa9))
+* redux file explorer expanded keys ([64d5cf7](https://github.com/kubeshop/monokle/commit/64d5cf73368a3201009ec7915dd108eba15d984a))
+
+
+### Bug Fixes
+
+* add dmg-licence package to main workflow ([5a0786c](https://github.com/kubeshop/monokle/commit/5a0786cd7aef254821a47e17ef2200da862758d5))
+* disable section + hide git pane in cluster mode ([ed95e24](https://github.com/kubeshop/monokle/commit/ed95e243cb1494e64c25e1939f52c201269331c0))
+* keep selection in cluster dashboard ([3ff35cc](https://github.com/kubeshop/monokle/commit/3ff35ccea886bbace3b9341f2ef75f2a4dfc66fe))
+* notify when change ([f9487aa](https://github.com/kubeshop/monokle/commit/f9487aaf28719255080415435dc6b8cd117f4c18))
+* settings tabs ([7895e59](https://github.com/kubeshop/monokle/commit/7895e5999dc8922aef77f6d3ac52e5761917b791))
+* watch global kubeconf and project kubeconf ([aaaed58](https://github.com/kubeshop/monokle/commit/aaaed587027d032fccac00bd59f578b1975208f6))
+
+### [2.0.2](https://github.com/kubeshop/monokle/compare/v2.0.2-nightly-2023-03-01.0...v2.0.2) (2023-03-01)
+
+
+### Features
+
+* add Discord link to header ([572dffb](https://github.com/kubeshop/monokle/commit/572dffb6d643be61072d4efbbc80f7254d1b2d2d))
+* add trigger for docs deploy ([3583c66](https://github.com/kubeshop/monokle/commit/3583c660e78407be28cde735136f823986ca0e88))
+
+
+### Bug Fixes
+
+* fixing problems in editor ([6fcaf1a](https://github.com/kubeshop/monokle/commit/6fcaf1a5c9315efe4a09a0c194351dbde3315f8e))
+* github actions ([98efe7a](https://github.com/kubeshop/monokle/commit/98efe7a72c368de17085e1ef9439b161a3b3ae4a))
+* monaco errors & side by side editor ([9354dbe](https://github.com/kubeshop/monokle/commit/9354dbe606e7491572102d5df7f666be74cbf9ff))
+* reset validation state on folder change ([26bce7d](https://github.com/kubeshop/monokle/commit/26bce7dbb668c5fc99da02e0e578630849959742))
+* Validation pane Editor file path ([67002a7](https://github.com/kubeshop/monokle/commit/67002a7c59831bc90b860181d5a4f5e3dd3c6517))
+
+### [2.0.2](https://github.com/kubeshop/monokle/compare/v2.0.2-nightly-2023-03-01.0...v2.0.2) (2023-03-01)
+
+
+### Features
+
+* add Discord link to header ([572dffb](https://github.com/kubeshop/monokle/commit/572dffb6d643be61072d4efbbc80f7254d1b2d2d))
+* add trigger for docs deploy ([3583c66](https://github.com/kubeshop/monokle/commit/3583c660e78407be28cde735136f823986ca0e88))
+
+
+### Bug Fixes
+
+* fixing problems in editor ([6fcaf1a](https://github.com/kubeshop/monokle/commit/6fcaf1a5c9315efe4a09a0c194351dbde3315f8e))
+* monaco errors & side by side editor ([9354dbe](https://github.com/kubeshop/monokle/commit/9354dbe606e7491572102d5df7f666be74cbf9ff))
+* reset validation state on folder change ([26bce7d](https://github.com/kubeshop/monokle/commit/26bce7dbb668c5fc99da02e0e578630849959742))
+* Validation pane Editor file path ([67002a7](https://github.com/kubeshop/monokle/commit/67002a7c59831bc90b860181d5a4f5e3dd3c6517))
+
+### [2.0.1](https://github.com/kubeshop/monokle/compare/v2.0.2-nightly-2023-02-23.0...v2.0.1) (2023-02-23)
+
+### [2.0.1](https://github.com/kubeshop/monokle/compare/v2.0.1-nightly-2023-02-22.0...v2.0.1) (2023-02-22)
+
+
+### Bug Fixes
+
+*  looping syncing localState with global state ([6171068](https://github.com/kubeshop/monokle/commit/61710688fec792baac909e6d0820d4784363cc3d))
+* change left menu selection only on connect ([33c9e49](https://github.com/kubeshop/monokle/commit/33c9e493b6fc1e278553528e2d11598bdf494c01))
+* clean console.log ([c20d468](https://github.com/kubeshop/monokle/commit/c20d468a2020482569b7b9c9e492c233ddffa4d6))
+* current context ([dfeef23](https://github.com/kubeshop/monokle/commit/dfeef2356febb320e1b34fa0249ddcb4ac2d860c))
+* kubeConfig selector ([bb5daf5](https://github.com/kubeshop/monokle/commit/bb5daf50964f3fd73db5fb8cef568ad94e2fce32))
+* move config selectors ([74a8bd3](https://github.com/kubeshop/monokle/commit/74a8bd3d1e83439839a873681e8905590eb3e8a3))
+* move config selectors ([3bec8f8](https://github.com/kubeshop/monokle/commit/3bec8f81458128b2577571b7f04d2e67cd44591f))
+* path valid ([1fb3369](https://github.com/kubeshop/monokle/commit/1fb3369fab0c69b1dfff0ca07d115522d9762ab9))
+* prevent file update when it comes from file ([ccaa814](https://github.com/kubeshop/monokle/commit/ccaa8147a7720e7baeff9cccd9c56c7ccc8a82e2))
+* project kubeConfig ([2dc0989](https://github.com/kubeshop/monokle/commit/2dc098945e3df9177666c4469dd6a4728111ac3c))
+* reload kubeConfig when changing config path ([de4974d](https://github.com/kubeshop/monokle/commit/de4974de690b80f0ec16286f0b9ad0cb0054d89b))
+* set left menu selection to dashboard when connecting ([4b73205](https://github.com/kubeshop/monokle/commit/4b7320516035e3b38b81ae0e09b407005c3213e6))
+* start cluster connection ([d2816b5](https://github.com/kubeshop/monokle/commit/d2816b59c01e9feb29f2d738349da18ac1296181))
+* update project kubeConfig ([4b02c65](https://github.com/kubeshop/monokle/commit/4b02c65dae483aa051af885a3a97491973815ec8))
+* update selector ([75f0259](https://github.com/kubeshop/monokle/commit/75f0259e6fc2533c8890ca9a0657f487b07a0a95))
+* upgrade node-fetch from 2.6.7 to 2.6.9 ([467cce4](https://github.com/kubeshop/monokle/commit/467cce4bd285b24ec2fe9d9d2bce80d47d7bbcb3))
+
+### [2.0.1](https://github.com/kubeshop/monokle/compare/v2.0.1-nightly-2023-02-22.0...v2.0.1) (2023-02-22)
+
+
+### Bug Fixes
+
+*  looping syncing localState with global state ([6171068](https://github.com/kubeshop/monokle/commit/61710688fec792baac909e6d0820d4784363cc3d))
+* change left menu selection only on connect ([33c9e49](https://github.com/kubeshop/monokle/commit/33c9e493b6fc1e278553528e2d11598bdf494c01))
+* clean console.log ([c20d468](https://github.com/kubeshop/monokle/commit/c20d468a2020482569b7b9c9e492c233ddffa4d6))
+* current context ([dfeef23](https://github.com/kubeshop/monokle/commit/dfeef2356febb320e1b34fa0249ddcb4ac2d860c))
+* kubeConfig selector ([bb5daf5](https://github.com/kubeshop/monokle/commit/bb5daf50964f3fd73db5fb8cef568ad94e2fce32))
+* move config selectors ([74a8bd3](https://github.com/kubeshop/monokle/commit/74a8bd3d1e83439839a873681e8905590eb3e8a3))
+* move config selectors ([3bec8f8](https://github.com/kubeshop/monokle/commit/3bec8f81458128b2577571b7f04d2e67cd44591f))
+* path valid ([1fb3369](https://github.com/kubeshop/monokle/commit/1fb3369fab0c69b1dfff0ca07d115522d9762ab9))
+* prevent file update when it comes from file ([ccaa814](https://github.com/kubeshop/monokle/commit/ccaa8147a7720e7baeff9cccd9c56c7ccc8a82e2))
+* project kubeConfig ([2dc0989](https://github.com/kubeshop/monokle/commit/2dc098945e3df9177666c4469dd6a4728111ac3c))
+* reload kubeConfig when changing config path ([de4974d](https://github.com/kubeshop/monokle/commit/de4974de690b80f0ec16286f0b9ad0cb0054d89b))
+* set left menu selection to dashboard when connecting ([4b73205](https://github.com/kubeshop/monokle/commit/4b7320516035e3b38b81ae0e09b407005c3213e6))
+* start cluster connection ([d2816b5](https://github.com/kubeshop/monokle/commit/d2816b59c01e9feb29f2d738349da18ac1296181))
+* update project kubeConfig ([4b02c65](https://github.com/kubeshop/monokle/commit/4b02c65dae483aa051af885a3a97491973815ec8))
+* update selector ([75f0259](https://github.com/kubeshop/monokle/commit/75f0259e6fc2533c8890ca9a0657f487b07a0a95))
+* upgrade node-fetch from 2.6.7 to 2.6.9 ([467cce4](https://github.com/kubeshop/monokle/commit/467cce4bd285b24ec2fe9d9d2bce80d47d7bbcb3))
+
+## [2.0.0](https://github.com/kubeshop/monokle/compare/v1.13.5-nightly-2023-02-17.0...v2.0.0) (2023-02-17)
+
+
+### Bug Fixes
+
+* getAbsoluteResourceFolder ([0843cec](https://github.com/kubeshop/monokle/commit/0843cec3154bcfb86266215f6420d03b2b5eee0f))
+* handle namespaces change gracefuly for cluster dashboard ([2961471](https://github.com/kubeshop/monokle/commit/2961471cba5e3897863077ded70f56de679aef64))
+* init only if terminal ref doesn't exist ([2ea907f](https://github.com/kubeshop/monokle/commit/2ea907fcadeb05f2b0439799b0bc40f779cbf685))
+* memoisation of resource maps selectors ([88b6fcf](https://github.com/kubeshop/monokle/commit/88b6fcf178d09c9da9ec1dbb680501039e8d02db))
+* open shell in pod ([291dee1](https://github.com/kubeshop/monokle/commit/291dee123f26fbe8109236214cf6f57f3d52a97e))
+* remove command ([1d1b642](https://github.com/kubeshop/monokle/commit/1d1b6423fd493d27c9a7be8cefb73665f86fa786))
+* scrollbar for template explorer ([425db38](https://github.com/kubeshop/monokle/commit/425db388561b1a760f2ff59dbf3e66787bb482bf))
+* shell height ([04262b5](https://github.com/kubeshop/monokle/commit/04262b5e7e1b4f7e97dbafec986811f4006011cc))
+
+### [1.13.4](https://github.com/kubeshop/monokle/compare/v1.13.4-nightly-2023-01-27.0...v1.13.4) (2023-01-27)
+
+
+### Features
+
+* setup Sentry webpack plugin for source map ([802e066](https://github.com/kubeshop/monokle/commit/802e066775ce7022da892669915b1a4b0891f202))
+
+
+### Bug Fixes
+
+* quick performance fix for blueprints ([5bafd43](https://github.com/kubeshop/monokle/commit/5bafd431d28ca607f63bf0462d787e73fe311ef0))
+* remove unused imports ([17756dd](https://github.com/kubeshop/monokle/commit/17756dd3edc6a61d91d458d3787c8682bdc98498))
+
+### [1.13.3](https://github.com/kubeshop/monokle/compare/v1.13.3-nightly-2023-01-12.0...v1.13.3) (2023-01-12)
+
+
+### Bug Fixes
+
+* add loading skeleton for dashboard reloading ([43327a9](https://github.com/kubeshop/monokle/commit/43327a972f4db4bd1ed723de903d686afdabd9bd))
+
+### [1.13.2](https://github.com/kubeshop/monokle/compare/v1.13.2-nightly-2022-12-23.0...v1.13.2) (2022-12-23)
+
+### [1.13.1](https://github.com/kubeshop/monokle/compare/v1.13.1-nightly-2022-12-14.0...v1.13.1) (2022-12-14)
+
+
+### Features
+
+* add new tracking events ([5f7aaff](https://github.com/kubeshop/monokle/commit/5f7aaffcdef31003ca5d1266780210b591cb2a4b))
+* add Sentry to electron and remove Nucleus ([5002c21](https://github.com/kubeshop/monokle/commit/5002c21cd0ee2eafbb8ab1501e74e6abab3f3e06))
+* add Sentry to renderer ([a29e0f1](https://github.com/kubeshop/monokle/commit/a29e0f1ce43198dd12c1c7e6d022aac86d17f7aa))
+* track time for loading project & previews ([9d2fe7e](https://github.com/kubeshop/monokle/commit/9d2fe7e84a001b79ba301b4224d23ea856b98bdb))
+
+
+### Bug Fixes
+
+* create file ([f290e5d](https://github.com/kubeshop/monokle/commit/f290e5d57f89f880e7f7ed93fd3afda8e1d1e304))
+* git compare resource content ([f23cad4](https://github.com/kubeshop/monokle/commit/f23cad463a873227d45570df736ae8c01b4755f4))
+* upgrade @ant-design/icons from 4.7.0 to 4.8.0 ([c8eba2d](https://github.com/kubeshop/monokle/commit/c8eba2da3257bd5ca9a0ca12370c3b7620d86ccd))
+* upgrade react-monaco-editor from 0.50.1 to 0.51.0 ([726a136](https://github.com/kubeshop/monokle/commit/726a136eb0e7860f3b9aaaf5b1aa1fac498ea54b))
+
+## [1.13.0](https://github.com/kubeshop/monokle/compare/v1.12.1-nightly-2022-12-07.0...v1.13.0) (2022-12-07)
+
 ## [1.12.0](https://github.com/kubeshop/monokle/compare/v1.11.2-nightly-2022-10-21.0...v1.12.0) (2022-10-21)
 
 

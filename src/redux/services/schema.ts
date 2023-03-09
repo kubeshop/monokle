@@ -5,10 +5,6 @@ import path from 'path';
 
 import {KUSTOMIZATION_KIND} from '@constants/constants';
 
-import {FileMapType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-
-import {loadResource} from '@redux/services';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -16,6 +12,10 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {getFileStats} from '@utils/files';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {FileMapType} from '@shared/models/appState';
+import {ResourceMeta} from '@shared/models/k8sResource';
+import {loadResource} from '@shared/utils/resource';
 
 // @ts-ignore
 const objectMetadataSchema = JSON.parse(loadResource('schemas/objectmetadata.json'));
@@ -32,7 +32,7 @@ let k8sSchemaCache = new Map<string, any | undefined>();
 /**
  * Returns a JSON Schema for the specified resource kind
  */
-export function getResourceSchema(resource: K8sResource, schemaVersion: string, userDataDir: string) {
+export function getResourceSchema(resource: ResourceMeta, schemaVersion: string, userDataDir: string) {
   if (isKustomizationResource(resource)) {
     return kustomizeSchema;
   }

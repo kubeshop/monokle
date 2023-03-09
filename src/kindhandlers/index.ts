@@ -5,13 +5,6 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
-import {K8sResource} from '@models/k8sresource';
-import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
-
-import {getStaticResourcePath} from '@redux/services';
-import {refMapperMatchesKind} from '@redux/services/resourceRefs';
-
-import {getSubfolders, readFiles} from '@utils/fileSystem';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
 import EndpointSliceHandler from '@src/kindhandlers/EndpointSlice.handler';
@@ -22,6 +15,11 @@ import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
+import {ResourceMeta} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {getSubfolders, readFiles} from '@shared/utils/fileSystem';
+import {getStaticResourcePath} from '@shared/utils/resource';
+
 import ClusterRoleHandler from './ClusterRole.handler';
 import ClusterRoleBindingHandler from './ClusterRoleBinding.handler';
 import ConfigMapHandler from './ConfigMap.handler';
@@ -30,10 +28,12 @@ import CustomResourceDefinitionHandler from './CustomResourceDefinition.handler'
 import DaemonSetHandler from './DaemonSet.handler';
 import DeploymentHandler from './Deployment.handler';
 import EndpointsHandler from './Endpoints.handler';
+import EventHandler from './EventHandler';
 import IngressHandler from './Ingress.handler';
 import JobHandler from './Job.handler';
 import NamespaceHandler from './Namespace.handler';
 import NetworkPolicyHandler from './NetworkPolicy.handler';
+import NodeHandler from './NodeHandler';
 import PersistentVolumeHandler from './PersistentVolume.handler';
 import PersistentVolumeClaimHandler from './PersistentVolumeClaim.handler';
 import PodHandler from './Pod.handler';
@@ -81,6 +81,8 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   ResourceQuotaHandler,
   LimitRangeHandler,
   HorizontalPodAutoscalerHandler,
+  NodeHandler,
+  EventHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(
@@ -134,46 +136,6 @@ export const getResourceKindHandler = (resourceKind: string): ResourceKindHandle
   return HandlerByResourceKind[resourceKind];
 };
 
-const incomingRefMappersCache = new Map<string, RefMapper[]>();
-
-/**
- * Gets all incoming refMappers for the specified resource kind
- */
-
-export const getIncomingRefMappers = (resourceKind: string): RefMapper[] => {
-  if (!incomingRefMappersCache.has(resourceKind)) {
-    incomingRefMappersCache.set(
-      resourceKind,
-      ResourceKindHandlers.map(
-        resourceKindHandler =>
-          resourceKindHandler.outgoingRefMappers?.filter(outgoingRefMapper =>
-            refMapperMatchesKind(outgoingRefMapper, resourceKind)
-          ) || []
-      ).flat()
-    );
-  }
-  return incomingRefMappersCache.get(resourceKind) || [];
-};
-
-/**
- * Finds all resource kinds that depend on the specified resource kind(s) via refMappers
- */
-
-export const getDependentResourceKinds = (resourceKinds: string[]) => {
-  const dependentResourceKinds: string[] = [];
-  ResourceKindHandlers.forEach(kindHandler => {
-    if (!kindHandler.outgoingRefMappers || kindHandler.outgoingRefMappers.length === 0) {
-      return;
-    }
-    kindHandler.outgoingRefMappers.forEach(outgoingRefMapper => {
-      if (resourceKinds.some(kind => refMapperMatchesKind(outgoingRefMapper, kind))) {
-        dependentResourceKinds.push(kindHandler.kind);
-      }
-    });
-  });
-  return [...new Set(dependentResourceKinds)];
-};
-
 /**
  * Read bundled kindhandlers and emit event to notify when finished (used in tests)
  */
@@ -216,14 +178,14 @@ export async function readSavedCrdKindHandlers(crdsDir: string) {
   }
 }
 
-export function registerCrdKindHandlers(crdContent: string, handlerPath?: string) {
+export function registerCrdKindHandlers(crdContent: string, handlerPath?: string, shouldReplace?: boolean) {
   const documents = parseAllYamlDocuments(crdContent);
   documents.forEach(doc => {
     const crd = doc.toJS({maxAliasCount: -1});
     if (crd && crd.kind && crd.kind === 'CustomResourceDefinition') {
       const kindHandler = extractKindHandler(crd, handlerPath);
       if (kindHandler) {
-        registerKindHandler(kindHandler, false);
+        registerKindHandler(kindHandler, Boolean(shouldReplace));
       }
     }
   });
@@ -257,6 +219,6 @@ async function* findFiles(dir: string, ext: string): any {
  * Matches the specified resource against the kind and apiVersionMatcher of the specified ResourceKindHandler
  */
 
-export function resourceMatchesKindHandler(resource: K8sResource, kindHandler: ResourceKindHandler) {
-  return resource.kind === kindHandler.kind && micromatch.isMatch(resource.version, kindHandler.apiVersionMatcher);
+export function resourceMatchesKindHandler(resource: ResourceMeta, kindHandler: ResourceKindHandler) {
+  return resource.kind === kindHandler.kind && micromatch.isMatch(resource.apiVersion, kindHandler.apiVersionMatcher);
 }

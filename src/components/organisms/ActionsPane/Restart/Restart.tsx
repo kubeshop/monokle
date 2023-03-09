@@ -7,28 +7,18 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {RestartTooltip} from '@constants/tooltips';
 
+import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  isInClusterModeSelector,
-  kubeConfigContextSelector,
-  kubeConfigPathSelector,
-  selectedResourceSelector,
-} from '@redux/selectors';
-import {restartPreview} from '@redux/services/preview';
+import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import restartDeployment from '@redux/services/restartDeployment';
+import {startClusterConnection} from '@redux/thunks/cluster';
 
-import {SecondaryButton} from '@atoms';
+import {PrimaryButton} from '@atoms';
 
-type IProps = {
-  isDropdownActive?: boolean;
-};
-
-const Restart: React.FC<IProps> = props => {
-  const {isDropdownActive = false} = props;
-
+const Restart: React.FC = () => {
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(kubeConfigContextSelector);
-  const currentResource = useAppSelector(selectedResourceSelector);
+  const currentResource = useSelectedResource();
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
 
@@ -43,7 +33,8 @@ const Restart: React.FC<IProps> = props => {
       onOk() {
         if (name && namespace) {
           restartDeployment({currentContext, kubeConfigPath, name, namespace});
-          restartPreview(currentContext, 'cluster', dispatch);
+          // TODO: we should have a way of updating a single resource instead of restarting the whole cluster
+          dispatch(startClusterConnection({context: currentContext, namespace, isRestart: true}));
         }
       },
       onCancel() {},
@@ -52,15 +43,9 @@ const Restart: React.FC<IProps> = props => {
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RestartTooltip} placement="bottomLeft">
-      <SecondaryButton
-        $disableHover={isDropdownActive}
-        type={isDropdownActive ? 'link' : 'default'}
-        size="small"
-        onClick={handleClick}
-        disabled={!isBtnEnabled}
-      >
+      <PrimaryButton type="link" size="small" onClick={handleClick} disabled={!isBtnEnabled}>
         Restart
-      </SecondaryButton>
+      </PrimaryButton>
     </Tooltip>
   );
 };

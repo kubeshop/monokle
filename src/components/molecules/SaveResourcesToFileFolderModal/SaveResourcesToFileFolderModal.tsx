@@ -5,33 +5,35 @@ import {Button, Modal, Select} from 'antd';
 import {FolderAddOutlined} from '@ant-design/icons';
 
 import fs from 'fs';
+import {isEmpty} from 'lodash';
 import micromatch from 'micromatch';
 import path from 'path';
 import util from 'util';
 import {stringify} from 'yaml';
 
-import {ROOT_FILE_ENTRY, YAML_DOCUMENT_DELIMITER} from '@constants/constants';
-
-import {AlertEnum} from '@models/alert';
-import {FileMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
-import {K8sResource} from '@models/k8sresource';
+import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {uncheckAllResourceIds} from '@redux/reducers/main';
 import {closeSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {isUnsavedResource} from '@redux/services/resource';
-import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
+import {joinK8sResource} from '@redux/services/resource';
+import {saveTransientResources} from '@redux/thunks/saveTransientResources';
 
 import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import {isDefined} from '@utils/filter';
-import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+import {useRefSelector} from '@utils/hooks';
+import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
 
-import Colors from '@styles/Colors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AlertEnum} from '@shared/models/alert';
+import {FileMapType} from '@shared/models/appState';
+import {FileEntry} from '@shared/models/fileEntry';
+import {K8sResource} from '@shared/models/k8sResource';
+import {Colors} from '@shared/styles/colors';
+import {isDefined} from '@shared/utils/filter';
 
 import * as S from './SaveResourcesToFileFolderModal.styled';
 
@@ -109,8 +111,10 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
   const fileIncludes = useAppSelector(state => state.config.fileIncludes);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isVisible = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.isOpen);
-  const resourcesIds = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.resourcesIds);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const resourcesIdentifiers = useAppSelector(state => state.ui.saveResourcesToFileFolderModal.resourcesIdentifiers);
+
+  const resourceMetaMapByStorageRef = useRefSelector(state => state.main.resourceMetaMapByStorage);
+  const resourceContentMapByStorageRef = useRefSelector(state => state.main.resourceContentMapByStorage);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [savingDestination, setSavingDestination] = useState<'saveToFolder' | 'appendToFile'>('saveToFolder');
@@ -167,7 +171,7 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
   }, [foldersList]);
 
   const saveCheckedResourcesToFileFolder = () => {
-    if (!resourcesIds || !resourcesIds.length) {
+    if (!resourcesIdentifiers || !resourcesIdentifiers.length) {
       return;
     }
 
@@ -179,10 +183,18 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
     }
 
     let writeAppendErrors = 0;
-    let unsavedResources: {resource: K8sResource; absolutePath: string}[] = [];
+    let transientResources: {resource: K8sResource; absolutePath: string}[] = [];
 
-    for (let i = 0; i < resourcesIds.length; i += 1) {
-      const resource = resourceMap[resourcesIds[i]];
+    for (let i = 0; i < resourcesIdentifiers.length; i += 1) {
+      const resourceIdentifier = resourcesIdentifiers[i];
+      const resource = joinK8sResource(
+        resourceMetaMapByStorageRef.current[resourceIdentifier.storage][resourceIdentifier.id],
+        resourceContentMapByStorageRef.current[resourceIdentifier.storage][resourceIdentifier.id]
+      );
+      if (!resource) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
 
       let absolutePath;
 
@@ -202,10 +214,12 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
         absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, fullFileName);
       }
 
-      if (isUnsavedResource(resource)) {
-        unsavedResources.push({resource, absolutePath});
+      if (resource.storage === 'transient') {
+        transientResources.push({resource, absolutePath});
       } else {
-        const cleanResourceContent = removeIgnoredPathsFromResourceContent(resource.content);
+        // TODO: this should probably become a thunk that can get the resource content from the store
+        // because it would be nicer to not require us to have the entire resourceContentMapByStorage in this component
+        const cleanResourceContent = removeIgnoredPathsFromResourceObject(resource.object);
         let resourceText = stringify(cleanResourceContent, {sortMapEntries: true});
 
         if (savingDestination === 'appendToFile') {
@@ -233,8 +247,8 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
       }
     }
 
-    if (unsavedResources.length) {
-      dispatch(saveUnsavedResources({resourcePayloads: unsavedResources, saveMode: savingDestination}));
+    if (transientResources.length) {
+      dispatch(saveTransientResources({resourcePayloads: transientResources, saveMode: savingDestination}));
     }
 
     dispatch(closeSaveResourcesToFileFolderModal());
@@ -243,7 +257,7 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
       setAlert({
         type: AlertEnum.Success,
         title: `${savingDestination === 'saveToFolder' ? 'Saved' : 'Added'} ${
-          resourcesIds.length - writeAppendErrors
+          resourcesIdentifiers.length - writeAppendErrors
         } resources successfully`,
         message: '',
       })
@@ -251,7 +265,7 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!resourcesIds || !resourcesIds.length || !selectedFolder || savingDestination === 'appendToFile') {
+    if (isEmpty(resourcesIdentifiers) || !selectedFolder || savingDestination === 'appendToFile') {
       return;
     }
 
@@ -281,13 +295,26 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
       }
 
       let existingFileNames: string[] = [];
-      const resources = resourcesIds.map(id => resourceMap[id]).filter(isDefined);
+      const resources = resourcesIdentifiers
+        .map(identifier =>
+          joinK8sResource(
+            resourceMetaMapByStorageRef.current[identifier.storage][identifier.id],
+            resourceContentMapByStorageRef.current[identifier.storage][identifier.id]
+          )
+        )
+        .filter(isDefined);
       const hasNameClash = resources.some(resource =>
         resources.filter(r => r.id !== resource.id).some(r => r.name === resource.name)
       );
 
-      resourcesIds.forEach(resourceId => {
-        const resource = resourceMap[resourceId];
+      resourcesIdentifiers.forEach(resourceIdentifier => {
+        const resource = joinK8sResource(
+          resourceMetaMapByStorageRef.current[resourceIdentifier.storage][resourceIdentifier.id],
+          resourceContentMapByStorageRef.current[resourceIdentifier.storage][resourceIdentifier.id]
+        );
+        if (!resource) {
+          return;
+        }
         let fullFileName = generateFullFileName(
           subfiles,
           resource,
@@ -311,7 +338,16 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
     };
 
     generateCreatedAndReplacedFiles();
-  }, [fileIncludes, fileMap, foldersList, savingDestination, resourcesIds, resourceMap, selectedFolder]);
+  }, [
+    fileIncludes,
+    fileMap,
+    foldersList,
+    savingDestination,
+    resourcesIdentifiers,
+    resourceMetaMapByStorageRef,
+    resourceContentMapByStorageRef,
+    selectedFolder,
+  ]);
 
   useEffect(() => {
     if (isVisible) {
@@ -328,7 +364,7 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
   return (
     <Modal
       className="save-resource"
-      title={resourcesIds.length === 1 ? 'Save resource' : `Save resources (${resourcesIds.length})`}
+      title={resourcesIdentifiers.length === 1 ? 'Save resource' : `Save resources (${resourcesIdentifiers.length})`}
       open={isVisible}
       onCancel={() => dispatch(closeSaveResourcesToFileFolderModal())}
       onOk={saveCheckedResourcesToFileFolder}

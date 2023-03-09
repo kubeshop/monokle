@@ -1,39 +1,67 @@
-import {useMemo} from 'react';
+import {useMeasure} from 'react-use';
 
-import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
+import {Image} from 'antd';
+import Link from 'antd/lib/typography/Link';
 
-import {useAppSelector} from '@redux/hooks';
-
-import {TitleBar} from '@molecules';
+import {isInClusterModeSelector} from '@redux/appConfig';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setLeftMenuSelection} from '@redux/reducers/ui';
+import {useValidationSelector} from '@redux/validation/validation.selectors';
+import {setSelectedProblem} from '@redux/validation/validation.slice';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import CRDsSchemaValidation from './CRDsSchemaValidation';
-import ValidationOpenPolicyAgent from './OpenPolicyAgent';
-import ValidationOverView from './ValidationOverview';
+import ValidationFigure from '@assets/NewValidationFigure.svg';
+
+import {TitleBar, ValidationOverview} from '@monokle/components';
+
 import * as S from './ValidationPane.styled';
 
 const ValidationPane: React.FC = () => {
-  const integration = useAppSelector(state => state.main.validationIntegration);
+  const dispatch = useAppDispatch();
+  const lastResponse = useValidationSelector(state => state.lastResponse);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const newProblemsIntroducedType = useValidationSelector(state => state.validationOverview.newProblemsIntroducedType);
+  const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem);
+  const status = useValidationSelector(state => state.status);
+
+  const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
   const height = usePaneHeight();
 
-  const Panel = useMemo(() => {
-    switch (integration?.id) {
-      case 'open-policy-agent':
-        return ValidationOpenPolicyAgent;
-      case 'crd-schema':
-        return CRDsSchemaValidation;
-      default:
-        return ValidationOverView;
-    }
-  }, [integration]);
+  if (!lastResponse) {
+    return null;
+  }
 
   return (
-    <S.ValidationPaneContainer $height={height}>
-      <TitleBar title="Validate your resources" closable />
+    <S.ValidationPaneContainer>
+      <div ref={titleBarRef}>
+        <TitleBar
+          title="Validation Overview"
+          description={
+            <S.DescriptionContainer>
+              <Image src={ValidationFigure} width={95} />
+              <div>
+                Fix your resources according to your validation setup. Manage your validation policy, turn rules on or
+                off, and more in the <Link onClick={() => dispatch(setLeftMenuSelection('settings'))}>settings</Link>{' '}
+                section, located in the left menu.
+              </div>
+            </S.DescriptionContainer>
+          }
+        />
+      </div>
 
-      <Panel height={height - DEFAULT_PANE_TITLE_HEIGHT} />
+      <ValidationOverview
+        containerStyle={{marginTop: '20px'}}
+        showOnlyByResource={isInClusterMode}
+        height={height - titleBarHeight - 40}
+        newProblemsIntroducedType={newProblemsIntroducedType}
+        selectedProblem={selectedProblem?.problem}
+        validationResponse={lastResponse}
+        onProblemSelect={problem => dispatch(setSelectedProblem(problem))}
+        status={status}
+        skeletonStyle={{marginTop: '20px'}}
+      />
     </S.ValidationPaneContainer>
   );
 };

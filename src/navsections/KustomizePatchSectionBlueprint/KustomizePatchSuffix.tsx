@@ -1,20 +1,21 @@
-import {ItemCustomComponentProps} from '@models/navigator';
-
-import {useAppSelector} from '@redux/hooks';
+import {useResourceMeta} from '@redux/selectors/resourceSelectors';
 
 import {ResourceRefsIconPopover} from '@molecules';
 
+import {ItemCustomComponentProps} from '@shared/models/navigator';
+
 const Suffix = (props: ItemCustomComponentProps) => {
   const {itemInstance} = props;
-  const resource = useAppSelector(state => state.main.resourceMap[itemInstance.id]);
-  if (!resource) {
+  const resourceMeta = useResourceMeta({id: itemInstance.id, storage: itemInstance.meta.resourceStorage});
+
+  if (!resourceMeta) {
     return null;
   }
   return (
     <ResourceRefsIconPopover
       isSelected={itemInstance.isSelected}
       isDisabled={itemInstance.isDisabled}
-      resource={resource}
+      resourceMeta={resourceMeta}
       type="outgoing"
     />
   );

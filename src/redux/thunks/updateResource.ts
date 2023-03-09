@@ -1,101 +1,116 @@
 import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 
+import fastDeepEqual from 'fast-deep-equal';
 import log from 'loglevel';
 
-import {AppState} from '@models/appstate';
-import {RootState} from '@models/rootstate';
-import {ThunkApi} from '@models/thunk';
-
-import {getActiveResourceMap, getLocalResourceMap, performResourceContentUpdate} from '@redux/reducers/main';
-import {currentConfigSelector} from '@redux/selectors';
-import {isKustomizationPatch, isKustomizationResource, processKustomizations} from '@redux/services/kustomize';
+import {performResourceContentUpdate} from '@redux/reducers/main';
+import {selectResourceReducer} from '@redux/reducers/main/selectionReducers';
+import {
+  getResourceContentFromState,
+  getResourceFromState,
+  getResourceMetaFromState,
+} from '@redux/selectors/resourceGetters';
+import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {getLineChanged} from '@redux/services/manifest-utils';
-import {getK8sVersion} from '@redux/services/projectConfig';
-import {reprocessResources} from '@redux/services/resource';
-import {findResourcesToReprocess} from '@redux/services/resourceRefs';
-import {updateSelectionAndHighlights} from '@redux/services/selection';
+import {extractResourceMeta} from '@redux/services/resource';
+
+import {AppState} from '@shared/models/appState';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
+import {ThunkApi} from '@shared/models/thunk';
 
 type UpdateResourcePayload = {
-  resourceId: string;
+  resourceIdentifier: ResourceIdentifier;
   text: string;
   preventSelectionAndHighlightsUpdate?: boolean;
-  isInClusterMode?: boolean;
   isUpdateFromForm?: boolean;
 };
 
-export const updateResource = createAsyncThunk<AppState, UpdateResourcePayload, ThunkApi>(
-  'main/updateResource',
-  async (payload, thunkAPI) => {
-    const state: RootState = thunkAPI.getState();
-    const projectConfig = currentConfigSelector(state);
-    const schemaVersion = getK8sVersion(projectConfig);
-    const userDataDir = String(state.config.userDataDir);
-    const policyPlugins = state.main.policies.plugins;
+export const updateResource = createAsyncThunk<
+  {nextMainState: AppState; affectedResourceIdentifiers?: ResourceIdentifier[]},
+  UpdateResourcePayload,
+  ThunkApi
+>('main/updateResource', async (payload, thunkAPI) => {
+  const state: RootState = thunkAPI.getState();
 
-    const {isInClusterMode, resourceId, text, preventSelectionAndHighlightsUpdate, isUpdateFromForm} = payload;
+  const {resourceIdentifier, text: updatedText, preventSelectionAndHighlightsUpdate, isUpdateFromForm} = payload;
 
-    let error: any;
+  let error: any;
 
-    const nextMainState = createNextState(state.main, mainState => {
-      try {
-        const currentResourceMap = isInClusterMode ? getLocalResourceMap(mainState) : getActiveResourceMap(mainState);
-        const resourceMap = mainState.resourceMap;
-        const resource = isInClusterMode ? resourceMap[resourceId] : currentResourceMap[resourceId];
+  const nextMainState = createNextState(state.main, mainState => {
+    try {
+      const nonMutableResource = getResourceFromState(state, resourceIdentifier);
+      const resourceMeta = getResourceMetaFromState(state, resourceIdentifier);
+      const resourceContent = getResourceContentFromState(state, resourceIdentifier);
+      const fileMap = mainState.fileMap;
 
-        const fileMap = mainState.fileMap;
-        if (resource) {
-          const prevContent = resource.text;
-          const newContent = text;
-          if (isUpdateFromForm) {
-            const lineChanged = getLineChanged(prevContent, newContent);
-            mainState.lastChangedLine = lineChanged;
-          }
+      let finalText: string | undefined;
+      let finalObject: any | undefined;
 
-          performResourceContentUpdate(resource, text, fileMap, resourceMap);
-          let resourceIds = findResourcesToReprocess(resource, currentResourceMap);
-          reprocessResources(
-            schemaVersion,
-            userDataDir,
-            resourceIds,
-            currentResourceMap,
-            fileMap,
-            mainState.resourceRefsProcessingOptions,
-            {policyPlugins}
-          );
-          if (!preventSelectionAndHighlightsUpdate) {
-            resource.isSelected = false;
-            updateSelectionAndHighlights(mainState, resource);
-          }
-        } else {
-          const r = resourceMap[resourceId];
-          // check if this was a kustomization resource updated during a kustomize preview
-          if (
-            r &&
-            (isKustomizationResource(r) || isKustomizationPatch(r)) &&
-            mainState.previewResourceId &&
-            isKustomizationResource(resourceMap[mainState.previewResourceId])
-          ) {
-            performResourceContentUpdate(r, text, fileMap, resourceMap);
-            processKustomizations(resourceMap, fileMap);
-          } else {
-            log.warn('Failed to find updated resource during preview', resourceId);
-          }
-        }
-
-        if (state.main.autosaving.status) {
-          mainState.autosaving.status = false;
-        }
-      } catch (e: any) {
-        const {message, stack} = e || {};
-        error = {message, stack};
-        log.error(e);
+      if (!nonMutableResource || !resourceMeta || !resourceContent) {
+        log.warn('Failed to find updated resource.', resourceIdentifier.id, resourceIdentifier.storage);
+        return;
       }
-    });
 
-    if (error) {
-      return {...state.main, autosaving: {status: false, error}};
+      // check if this was a kustomization resource updated during a kustomize preview
+      if (
+        (isKustomizationResource(resourceMeta) || isKustomizationPatch(resourceMeta)) &&
+        mainState.preview?.type === 'kustomize' &&
+        mainState.preview.kustomizationId === resourceMeta.id
+      ) {
+        const {text, object} = performResourceContentUpdate(nonMutableResource, updatedText, fileMap);
+        finalText = text;
+        finalObject = object;
+      } else {
+        const prevContent = resourceContent.text;
+        const newContent = updatedText;
+        if (isUpdateFromForm) {
+          const lineChanged = getLineChanged(prevContent, newContent);
+          mainState.lastChangedLine = lineChanged;
+        }
+
+        const {text, object} = performResourceContentUpdate(nonMutableResource, updatedText, fileMap);
+        finalText = text;
+        finalObject = object;
+
+        if (!preventSelectionAndHighlightsUpdate) {
+          selectResourceReducer(mainState, {resourceIdentifier: resourceMeta});
+        }
+      }
+
+      if (finalText && finalObject) {
+        const updatedResourceMeta = extractResourceMeta(
+          finalObject,
+          resourceMeta.storage,
+          resourceMeta.origin,
+          resourceMeta.id
+        );
+
+        if (!fastDeepEqual(resourceMeta, updatedResourceMeta)) {
+          // @ts-ignore-next-line
+          mainState.resourceMetaMapByStorage[resourceMeta.storage][resourceMeta.id] = updatedResourceMeta;
+        }
+        if (resourceContent.text !== finalText) {
+          mainState.resourceContentMapByStorage[resourceMeta.storage][resourceMeta.id].text = finalText;
+        }
+        if (!fastDeepEqual(resourceContent.object, finalObject)) {
+          mainState.resourceContentMapByStorage[resourceMeta.storage][resourceMeta.id].object = finalObject;
+        }
+      }
+
+      if (state.main.autosaving.status) {
+        mainState.autosaving.status = false;
+      }
+    } catch (e: any) {
+      const {message, stack} = e || {};
+      error = {message, stack};
+      log.error(e);
     }
+  });
 
-    return nextMainState;
+  if (error) {
+    return {nextMainState: {...state.main, autosaving: {status: false, error}}};
   }
-);
+
+  return {nextMainState, affectedResourceIdentifiers: [resourceIdentifier]};
+});

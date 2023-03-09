@@ -1,19 +1,18 @@
-import {HELM_CHART_SECTION_NAME, ROOT_FILE_ENTRY} from '@constants/constants';
+import {HELM_CHART_SECTION_NAME} from '@constants/constants';
 
-import {HelmPreviewConfiguration} from '@models/appconfig';
-import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@models/appstate';
-import {HelmChart, HelmTemplate, HelmValuesFile} from '@models/helm';
-import {SectionBlueprint} from '@models/navigator';
-
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {selectFile, selectHelmValuesFile, selectPreviewConfiguration} from '@redux/reducers/main';
 
-import {isDefined} from '@utils/filter';
-
-import Colors from '@styles/Colors';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {FileMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
+import {HelmPreviewConfiguration} from '@shared/models/config';
+import {HelmChart, HelmTemplate, HelmValuesFile} from '@shared/models/helm';
+import {SectionBlueprint} from '@shared/models/navigator';
+import {Colors} from '@shared/styles/colors';
+import {isDefined} from '@shared/utils/filter';
 
 import CollapseSectionPrefix from './CollapseSectionPrefix';
 import HelmChartContextMenu from './HelmChartContextMenu';
-import HelmChartContextMenuWrapper from './HelmChartContextMenuWrapper';
 import HelmChartQuickAction from './HelmChartQuickAction';
 import ItemPrefix from './ItemPrefix';
 import PreviewConfigurationNameSuffix from './PreviewConfigurationNameSuffix';
@@ -24,7 +23,7 @@ type TemplatesScopeType = {
   fileOrFolderContainedIn: string;
   helmTemplatesMap: HelmTemplatesMapType;
   isFolderOpen: boolean;
-  selectedPath: string | undefined;
+  selectedFile: string | undefined;
   [currentHelmChart: string]: HelmChart | unknown;
 };
 
@@ -34,13 +33,13 @@ export type ValuesFilesScopeType = {
   fileOrFolderContainedIn: string;
   isInClusterMode: boolean;
   isFolderOpen: boolean;
-  selectedPath: string | undefined;
+  selectedHelmValuesId: string | undefined;
   [currentHelmChart: string]: HelmChart | unknown;
 };
 
 type HelmChartScopeType = {
   fileOrFolderContainedIn: string;
-  selectedPath: string | undefined;
+  selectedFile: string | undefined;
   previewValuesFileId: string | undefined;
   isInClusterMode: boolean;
   [currentHelmChart: string]: HelmChart | unknown;
@@ -64,7 +63,10 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     getScope: state => {
       return {
         previewConfigurationMap: state.config.projectConfig?.helm?.previewConfigurationMap,
-        selectedPreviewConfigurationId: state.main.selectedPreviewConfigurationId,
+        selectedPreviewConfigurationId:
+          state.main.selection?.type === 'preview.configuration'
+            ? state.main.selection.previewConfigurationId
+            : undefined,
         [helmChart.id]: state.main.helmChartMap[helmChart.id],
       };
     },
@@ -102,7 +104,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       },
       instanceHandler: {
         onClick: (itemInstance, dispatch) => {
-          dispatch(selectPreviewConfiguration(itemInstance.id));
+          dispatch(selectPreviewConfiguration({previewConfigurationId: itemInstance.id}));
         },
       },
       customization: {
@@ -146,7 +148,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
         fileOrFolderContainedIn: state.main.resourceFilter.fileOrFolderContainedIn || '',
         helmTemplatesMap: state.main.helmTemplatesMap,
         isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
-        selectedPath: state.main.selectedPath,
+        selectedFile: state.main.selection?.type === 'file' ? state.main.selection.filePath : undefined,
         [helmChart.id]: state.main.helmChartMap[helmChart.id],
       };
     },
@@ -182,7 +184,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       builder: {
         isDisabled: (rawItem, scope) => !rawItem.filePath.startsWith(scope.fileOrFolderContainedIn),
         isSelected: (rawItem, scope) => {
-          return rawItem.filePath === scope.selectedPath;
+          return rawItem.filePath === scope.selectedFile;
         },
         getMeta: template => {
           return {
@@ -207,7 +209,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       },
       customization: {
         contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
-        contextMenuWrapper: {component: HelmChartContextMenuWrapper, options: {isVisibleOnHover: false}},
         prefix: {
           component: ItemPrefix,
         },
@@ -222,16 +223,14 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
     containerElementId: 'helm-section-container',
     rootSectionId: HELM_CHART_SECTION_NAME,
     getScope: state => {
-      const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
       return {
         helmValuesMap: state.main.helmValuesMap,
-        isInClusterMode: kubeConfigPath
-          ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))
-          : false,
+        isInClusterMode: isInClusterModeSelector(state),
         fileOrFolderContainedIn: state.main.resourceFilter.fileOrFolderContainedIn || '',
-        previewValuesFileId: state.main.previewValuesFileId,
+        previewValuesFileId: state.main.preview?.type === 'helm' ? state.main.preview.valuesFileId : undefined,
         isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
-        selectedPath: state.main.selectedPath,
+        selectedHelmValuesId:
+          state.main.selection?.type === 'helm.values.file' ? state.main.selection.valuesFileId : undefined,
         [helmChart.id]: state.main.helmChartMap[helmChart.id],
       };
     },
@@ -268,7 +267,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       getInstanceId: rawItem => rawItem.id,
       builder: {
         isSelected: (rawItem, scope) => {
-          return rawItem.filePath === scope.selectedPath;
+          return rawItem.id === scope.selectedHelmValuesId;
         },
         isDisabled: (rawItem, scope) =>
           Boolean(
@@ -292,7 +291,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       },
       customization: {
         contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
-        contextMenuWrapper: {component: HelmChartContextMenuWrapper, options: {isVisibleOnHover: false}},
         quickAction: {
           component: HelmChartQuickAction,
           options: {isVisibleOnHover: true},
@@ -316,14 +314,11 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       previewConfigurationsSectionBlueprint.id,
     ],
     getScope: state => {
-      const kubeConfigPath = state.config.projectConfig?.kubeConfig?.path || state.config.kubeConfig.path;
       return {
-        isInClusterMode: kubeConfigPath
-          ? Boolean(state.main.previewResourceId && state.main.previewResourceId.endsWith(kubeConfigPath))
-          : false,
+        isInClusterMode: isInClusterModeSelector(state),
         fileOrFolderContainedIn: state.main.resourceFilter.fileOrFolderContainedIn || '',
-        previewValuesFileId: state.main.previewValuesFileId,
-        selectedPath: state.main.selectedPath,
+        previewValuesFileId: state.main.preview?.type === 'helm' ? state.main.preview.valuesFileId : undefined,
+        selectedFile: state.main.selection?.type === 'file' ? state.main.selection.filePath : undefined,
         [helmChart.id]: state.main.helmChartMap[helmChart.id],
       };
     },
@@ -352,7 +347,7 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
           itemPrefixIcon: 'helm',
         }),
         isSelected: (chart, scope) => {
-          return scope.selectedPath === chart.filePath;
+          return scope.selectedFile === chart.filePath;
         },
         isDisabled: (rawItem, scope) =>
           Boolean(
@@ -372,7 +367,6 @@ export function makeHelmChartSectionBlueprint(helmChart: HelmChart) {
       },
       customization: {
         contextMenu: {component: HelmChartContextMenu, options: {isVisibleOnHover: true}},
-        contextMenuWrapper: {component: HelmChartContextMenuWrapper, options: {isVisibleOnHover: false}},
         prefix: {component: ItemPrefix},
         lastItemMarginBottom: 0,
       },

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import Colors, {FontColors} from '@styles/Colors';
+import {Colors, FontColors} from '@shared/styles/colors';
 
 export const Container = styled.div`
   display: flex;

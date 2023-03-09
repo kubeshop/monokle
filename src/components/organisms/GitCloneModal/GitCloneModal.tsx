@@ -3,13 +3,14 @@ import {useState} from 'react';
 import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
+import fs from 'fs';
 import {sep} from 'path';
 
 import {DEFAULT_GIT_REPO_PLACEHOLDER, VALID_URL_REGEX} from '@constants/constants';
 
+import {setCreateProject} from '@redux/appConfig';
 import {closeGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCreateProject} from '@redux/reducers/appConfig';
 
 import {FileExplorer} from '@atoms';
 
@@ -47,9 +48,14 @@ const GitCloneModal: React.FC = () => {
 
       const {localPath, repoURL} = values;
       const repoName = repoURL.split('/').pop();
+      const localGitPath = `${localPath}${sep}${repoName}`;
+
+      if (!doesPathExist(localPath)) {
+        fs.mkdirSync(localPath, {recursive: true});
+      }
 
       promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
-        localPath: `${localPath}${sep}${repoName}`,
+        localPath: localGitPath,
         repoPath: repoURL,
       }).then(result => {
         setLoading(false);
@@ -61,6 +67,10 @@ const GitCloneModal: React.FC = () => {
             content: <div>{result.error}</div>,
             zIndex: 100000,
           });
+
+          if (doesPathExist(localGitPath)) {
+            fs.rmdirSync(localGitPath, {recursive: true});
+          }
         } else {
           dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName}`}));
         }
@@ -103,11 +113,6 @@ const GitCloneModal: React.FC = () => {
 
                       if (!localPath) {
                         reject(new Error('Please provide your local path!'));
-                        return;
-                      }
-
-                      if (!doesPathExist(localPath)) {
-                        reject(new Error('Provided path does not exist!'));
                         return;
                       }
 

@@ -1,11 +1,8 @@
-import {Input} from 'antd';
-
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import {ClusterColors} from '@models/cluster';
-
-import Colors, {BackgroundColors} from '@styles/Colors';
+import {ClusterColors} from '@shared/models/cluster';
+import {BackgroundColors, Colors} from '@shared/styles/colors';
 
 const OutputTag = styled.div`
   font-size: 12px;
@@ -22,22 +19,13 @@ export const ClusterOutputTag = styled(OutputTag)<{$kubeConfigContextColor: Clus
   `}
 `;
 
-export const HelperLabel = styled.div`
-  opacity: 0.5;
-`;
-
-export const ImagesCount = styled.div`
-  font-weight: bold;
-  margin-bottom: 4px;
-`;
-
 export const NameDisplayContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 20px;
 
-  padding: 16px 26px;
+  padding: 16px 0px 16px 16px;
   font-size: 12px;
   color: ${Colors.grey9};
 
@@ -49,10 +37,4 @@ export const NameDisplayContainer = styled.div`
 export const PreviewOutputTag = styled(OutputTag)`
   color: ${BackgroundColors.previewModeBackground};
   background: ${rgba(BackgroundColors.previewModeBackground, 0.2)};
-`;
-
-export const SearchInput = styled(Input.Search)`
-  & input::placeholder {
-    color: ${Colors.grey7};
-  }
 `;

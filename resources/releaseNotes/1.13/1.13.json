@@ -1,0 +1,9 @@
+{
+  "title": "Real time Cluster in Monokle 1.13!",
+  "learnMoreUrl": "https://kubeshop.io/blog/monokle-1-13-0-release",
+  "about": {
+    "when": "Dec 2022",
+    "title": "In this release, we bring you:",
+    "features": ["Real time cluster mode", "Dedicated cluster panel", "Compare subfolders"]
+  }
+}

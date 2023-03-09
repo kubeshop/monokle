@@ -1,10 +1,5 @@
 {
   "ShowGraphView": false,
   "ShowRightMenu": false,
-  "ActionsPaneFooter": false,
-  "ImagesPane": true,
-  "CompareEverything": true,
-  "Terminal": true,
-  "GitOps": true,
-  "TwoZero": false
+  "ActionsPaneFooter": false
 }

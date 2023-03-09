@@ -1,30 +1,13 @@
 import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
-
-import {NewVersionCode, Project} from '@models/appconfig';
-import {RootState} from '@models/rootstate';
-
-import {clearPreviewAndSelectionHistory, openResourceDiffModal, stopPreviewLoader} from '@redux/reducers/main';
-import {
-  openAboutModal,
-  openCreateProjectModal,
-  openFolderExplorer,
-  openKeyboardShortcutsModal,
-  openNewResourceWizard,
-  resetLayout,
-  setMonacoEditor,
-  toggleLeftMenu,
-  toggleStartProjectPane,
-  zoomIn,
-  zoomOut,
-} from '@redux/reducers/ui';
-import {isInPreviewModeSelector,kubeConfigPathValidSelector} from '@redux/selectors';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
-
-import {defineHotkey} from '@utils/defineHotkey';
-import {openDiscord, openDocumentation, openGitHub, openLogs} from '@utils/shell';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {NewVersionCode, Project} from '@shared/models/config';
+import type {RootState} from '@shared/models/rootState';
+import {defineHotkey} from '@shared/utils/hotkey';
+import {selectFromHistory} from '@shared/utils/selectionHistory';
+import {isInPreviewModeSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
+import {openDiscord, openDocumentation, openGitHub, openLogs} from '@shared/utils/shell';
 
 import {checkNewVersion} from './commands';
 import {MainDispatch, dispatchToFocusedWindow} from './ipc/ipcMainRedux';
@@ -61,7 +44,7 @@ const appMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorO
       {
         label: 'About Monokle',
         click: () => {
-          dispatch(openAboutModal());
+          dispatch({type: 'ui/openAboutModal', payload: undefined});
         },
       },
       checkForUpdateMenu(state, dispatch),
@@ -116,10 +99,10 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'New Project',
         submenu: [
           {
-            label: 'Getting Started Page',
+            label: 'Tutorial Page',
             click: () => {
               if (!state.ui.isStartProjectPaneVisible) {
-                dispatch(toggleStartProjectPane());
+                dispatch({type: 'ui/toggleStartProjectPane', payload: undefined});
               }
             },
           },
@@ -127,19 +110,19 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
           {
             label: 'Select Folder',
             click: () => {
-              dispatchToFocusedWindow(openFolderExplorer());
+              dispatchToFocusedWindow({type: 'ui/openFolderExplorer', payload: undefined});
             },
           },
           {
             label: 'Empty Project',
             click: () => {
-              dispatchToFocusedWindow(openCreateProjectModal({fromTemplate: false}));
+              dispatchToFocusedWindow({type: 'ui/openCreateProjectModal', payload: {fromTemplate: false}});
             },
           },
           {
             label: 'From Template',
             click: () => {
-              dispatchToFocusedWindow(openCreateProjectModal({fromTemplate: true}));
+              dispatchToFocusedWindow({type: 'ui/openCreateProjectModal', payload: {fromTemplate: true}});
             },
           },
         ],
@@ -157,8 +140,8 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {
         label: 'New Resource',
         enabled: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
-        click: async () => {
-          dispatch(openNewResourceWizard());
+        click: () => {
+          dispatch({type: 'ui/openNewResourceWizard', payload: undefined});
         },
       },
 
@@ -167,8 +150,8 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'Exit Preview',
         enabled: isInPreviewModeSelector(state),
         click: () => {
-          dispatch(stopPreviewLoader());
-          dispatch(clearPreviewAndSelectionHistory());
+          dispatch({type: 'main/stopPreviewLoader', payload: undefined});
+          dispatch({type: 'main/clearPreviewAndSelectionHistory', payload: undefined});
         },
       },
       {type: 'separator'},
@@ -187,7 +170,9 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
 
 const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
   const isKubeConfigPathValid = kubeConfigPathValidSelector(state);
-  const isMonacoActionEnabled = Boolean(state.main.selectedResourceId) && state.ui.monacoEditor.focused;
+  const isMonacoActionEnabled =
+    Boolean(state.main.selection?.type === 'resource' || state.main.selection?.type === 'file') &&
+    state.ui.monacoEditor.focused;
   return {
     label: 'Edit',
 
@@ -196,14 +181,14 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         enabled: isMonacoActionEnabled,
         label: 'Undo',
         click: () => {
-          dispatch(setMonacoEditor({undo: true}));
+          dispatch({type: 'ui/setMonacoEditor', payload: {undo: true}});
         },
       },
       {
         enabled: isMonacoActionEnabled,
         label: 'Redo',
         click: () => {
-          dispatch(setMonacoEditor({redo: true}));
+          dispatch({type: 'ui/setMonacoEditor', payload: {redo: true}});
         },
       },
       {type: 'separator'},
@@ -216,34 +201,35 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         enabled: isMonacoActionEnabled,
         label: 'Find',
         click: () => {
-          dispatch(setMonacoEditor({find: true}));
+          dispatch({type: 'ui/setMonacoEditor', payload: {find: true}});
         },
       },
       {
         enabled: isMonacoActionEnabled,
         label: 'Replace',
         click: () => {
-          dispatch(setMonacoEditor({replace: true}));
+          dispatch({type: 'ui/setMonacoEditor', payload: {replace: true}});
         },
       },
       {type: 'separator'},
       {
         label: 'Apply',
         accelerator: hotkeys.APPLY_SELECTION.key,
-        enabled: Boolean(state.main.selectedResourceId) && Boolean(isKubeConfigPathValid),
+        enabled: Boolean(state.main.selection?.type === 'resource') && Boolean(isKubeConfigPathValid),
         click: () => {
-          dispatch(setMonacoEditor({apply: true}));
+          dispatch({type: 'ui/setMonacoEditor', payload: {apply: true}});
         },
       },
       {
         label: 'Diff',
         accelerator: hotkeys.DIFF_RESOURCE.key,
-        enabled: Boolean(state.main.selectedResourceId) && Boolean(isKubeConfigPathValid),
+        enabled: Boolean(state.main.selection?.type === 'resource') && Boolean(isKubeConfigPathValid),
         click: () => {
-          if (!state.main.selectedResourceId) {
+          if (state.main.selection?.type !== 'resource') {
             return;
           }
-          dispatch(openResourceDiffModal(state.main.selectedResourceId));
+          // TODO: the openResourceDiffModal will have to get the origin as well
+          dispatch({type: 'main/openResourceDiffModal', payload: state.main.selection.resourceIdentifier});
         },
       },
     ],
@@ -252,13 +238,14 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
 
 const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
   const isPreviousResourceEnabled =
-    state.main.selectionHistory.length > 1 &&
-    (state.main.currentSelectionHistoryIndex === undefined ||
-      (state.main.currentSelectionHistoryIndex && state.main.currentSelectionHistoryIndex > 0));
+    state.main.selectionHistory.current.length > 1 &&
+    (state.main.selectionHistory.index === undefined ||
+      (state.main.selectionHistory.index && state.main.selectionHistory.index > 0));
+
   const isNextResourceEnabled =
-    state.main.selectionHistory.length > 1 &&
-    state.main.currentSelectionHistoryIndex !== undefined &&
-    state.main.currentSelectionHistoryIndex < state.main.selectionHistory.length - 1;
+    state.main.selectionHistory.current.length > 1 &&
+    state.main.selectionHistory.index !== undefined &&
+    state.main.selectionHistory.index < state.main.selectionHistory.current.length - 1;
 
   return {
     label: 'View',
@@ -273,9 +260,9 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         click: () => {
           selectFromHistory(
             'left',
-            state.main.currentSelectionHistoryIndex,
-            state.main.selectionHistory,
-            state.main.resourceMap,
+            state.main.selectionHistory.index,
+            state.main.selectionHistory.current,
+            state.main.resourceMetaMapByStorage,
             state.main.fileMap,
             state.main.imagesList,
             dispatch
@@ -289,9 +276,9 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         click: () => {
           selectFromHistory(
             'right',
-            state.main.currentSelectionHistoryIndex,
-            state.main.selectionHistory,
-            state.main.resourceMap,
+            state.main.selectionHistory.index,
+            state.main.selectionHistory.current,
+            state.main.resourceMetaMapByStorage,
             state.main.fileMap,
             state.main.imagesList,
             dispatch
@@ -303,14 +290,16 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'Toggle Left Menu',
         accelerator: defineHotkey(hotkeys.TOGGLE_LEFT_PANE.key),
         click: () => {
-          dispatch(toggleLeftMenu());
+          if (!state.ui.isInQuickClusterMode) {
+            dispatch({type: 'ui/toggleLeftMenu', payload: undefined});
+          }
         },
       },
       {role: 'toggleDevTools'},
       {
         label: 'Reset Layout',
         click: () => {
-          dispatch(resetLayout());
+          dispatch({type: 'ui/resetLayout', payload: undefined});
         },
       },
       {type: 'separator'},
@@ -320,14 +309,14 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'Zoom in',
         accelerator: defineHotkey(hotkeys.ZOOM_IN.key),
         click: () => {
-          dispatch(zoomIn());
+          dispatch({type: 'ui/zoomIn', payload: undefined});
         },
       },
       {
         label: 'Zoom out',
         accelerator: defineHotkey(hotkeys.ZOOM_OUT.key),
         click: () => {
-          dispatch(zoomOut());
+          dispatch({type: 'ui/zoomOut', payload: undefined});
         },
       },
     ],
@@ -363,7 +352,7 @@ const helpMenu = (
     {
       accelerator: defineHotkey(hotkeys.OPEN_SHORTCUTS.key),
       label: 'Keyboard Shortcuts',
-      click: () => dispatch(openKeyboardShortcutsModal()),
+      click: () => dispatch({type: 'ui/openKeyboardShortcutsModal', payload: undefined}),
     },
     {
       label: 'Logs',

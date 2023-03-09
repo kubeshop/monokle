@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const StyledShortCut = styled.div`
   display: flex;
@@ -16,7 +16,7 @@ export const StyledShortCell = styled.div`
 `;
 
 export const StyledKey = styled.div`
-  display: flex
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;

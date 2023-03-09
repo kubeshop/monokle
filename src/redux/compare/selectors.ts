@@ -1,15 +1,11 @@
 import {groupBy} from 'lodash';
 import {createSelector} from 'reselect';
 
-import {SavedCommand} from '@models/appconfig';
-import {RootState} from '@models/rootstate';
-
-import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
+import {selectCurrentKubeConfig} from '@redux/appConfig';
+import {kustomizationsSelector} from '@redux/selectors/resourceSelectors';
 import {canTransfer} from '@redux/services/compare/transferResource';
+import {joinK8sResource} from '@redux/services/resource';
 
-import {ComparisonListItem} from '@components/organisms/CompareModal/types';
-
-import {isDefined} from '@utils/filter';
 import {getApiVersionGroup} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
@@ -18,10 +14,14 @@ import {
   CompareSide,
   CompareState,
   CompareStatus,
+  ComparisonListItem,
   PartialResourceSet,
   ResourceComparison,
   TransferDirection,
-} from './state';
+} from '@shared/models/compare';
+import {SavedCommand} from '@shared/models/config';
+import {RootState} from '@shared/models/rootState';
+import {isDefined} from '@shared/utils/filter';
 
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;
@@ -71,8 +71,9 @@ export const selectGitResourceSet = (state: RootState, side: CompareSide) => {
   const currentGitBranch = branchName ? state.git.repo.branchMap[branchName] : undefined;
   const currentGitBranchCommits = currentGitBranch?.commits || [];
   const currentCommit = currentGitBranchCommits.find(c => c.hash === resourceSet.commitHash);
+  const currentFolder = resourceSet.folder;
 
-  return {allGitBranches, currentCommit, currentGitBranch, currentGitBranchCommits};
+  return {allGitBranches, currentCommit, currentFolder, currentGitBranch, currentGitBranchCommits};
 };
 
 export const selectCommandResourceSet = (state: RootState, side: CompareSide) => {
@@ -126,7 +127,12 @@ export const selectKustomizeResourceSet = (state: RootState, side: CompareSide) 
   if (resourceSet?.type !== 'kustomize') return undefined;
   const {kustomizationId} = resourceSet;
 
-  const currentKustomization = kustomizationId ? state.main.resourceMap[kustomizationId] : undefined;
+  const currentKustomization = kustomizationId
+    ? joinK8sResource(
+        state.main.resourceMetaMapByStorage.local[kustomizationId],
+        state.main.resourceContentMapByStorage.local[kustomizationId]
+      )
+    : undefined;
   const allKustomizations = kustomizationsSelector(state);
 
   return {allKustomizations, currentKustomization};

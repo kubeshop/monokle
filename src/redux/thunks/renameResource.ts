@@ -1,31 +1,31 @@
 import {stringify} from 'yaml';
 
-import {AppDispatch} from '@models/appdispatch';
-import {ResourceMapType} from '@models/appstate';
-
-import {isIncomingRef} from '@redux/services/resourceRefs';
 import {updateResource} from '@redux/thunks/updateResource';
 
+import {isIncomingRef} from '@monokle/validation';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {ResourceIdentifier, ResourceMap} from '@shared/models/k8sResource';
+
 export const renameResource = (
-  resourceId: string,
+  resourceIdentifier: ResourceIdentifier,
   newResourceName: string,
   shouldUpdateRefs: boolean,
-  resourceMap: ResourceMapType,
+  resourceMap: ResourceMap,
   dispatch: AppDispatch,
-  selectedResourceId?: string
+  isResourceSelected?: boolean
 ) => {
-  const resource = resourceMap[resourceId];
-  if (!resource || !resource.content) {
+  const resource = resourceMap[resourceIdentifier.id];
+  if (!resource || !resource.object) {
     return;
   }
-  const newResourceContent = {
-    ...resource.content,
+  const newResourceObject = {
+    ...resource.object,
     metadata: {
-      ...(resource.content.metadata || {}),
+      ...(resource.object.metadata || {}),
       name: newResourceName,
     },
   };
-  const newResourceText = stringify(newResourceContent);
+  const newResourceText = stringify(newResourceObject);
   if (shouldUpdateRefs && resource.refs) {
     resource.refs.forEach(ref => {
       if (!isIncomingRef(ref.type) || !(ref.target?.type === 'resource' && ref.target.resourceId)) {
@@ -46,18 +46,18 @@ export const renameResource = (
       });
       dispatch(
         updateResource({
-          resourceId: dependentResource.id,
+          resourceIdentifier: dependentResource,
           text: newDependentResourceText,
-          preventSelectionAndHighlightsUpdate: selectedResourceId !== dependentResource.id,
+          preventSelectionAndHighlightsUpdate: !isResourceSelected,
         })
       );
     });
   }
   dispatch(
     updateResource({
-      resourceId,
+      resourceIdentifier,
       text: newResourceText,
-      preventSelectionAndHighlightsUpdate: selectedResourceId !== resourceId,
+      preventSelectionAndHighlightsUpdate: !isResourceSelected,
     })
   );
 };

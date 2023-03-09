@@ -3,11 +3,6 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {WritableDraft} from 'immer/dist/internal';
 import log from 'loglevel';
 
-import {K8sResource} from '@models/k8sresource';
-
-import {trackEvent} from '@utils/telemetry';
-
-import {selectIsAllComparisonSelected} from './selectors';
 import {
   CompareFilter,
   CompareOperation,
@@ -17,8 +12,12 @@ import {
   ComparisonView,
   PartialResourceSet,
   ResourceComparison,
-  initialState,
-} from './state';
+} from '@shared/models/compare';
+import {K8sResource} from '@shared/models/k8sResource';
+import {trackEvent} from '@shared/utils/telemetry';
+
+import {initialState} from './initialState';
+import {selectIsAllComparisonSelected} from './selectors';
 import {transferResource} from './thunks';
 
 export const compareSlice = createSlice({
@@ -28,24 +27,17 @@ export const compareSlice = createSlice({
     compareToggled: (
       state: Draft<CompareState>,
       action: PayloadAction<{
-        value: boolean | undefined;
-        initialView?: ComparisonView;
+        initialView: ComparisonView;
         from?: 'compare-button' | 'quick-helm-compare' | 'quick-kustomize-compare';
       }>
     ) => {
-      const {value, initialView} = action.payload;
-      const close = value === undefined ? state.isOpen : value === false;
+      const {initialView} = action.payload;
 
-      if (close) {
-        return initialState;
-      }
-
-      state.isOpen = true;
       if (initialView) {
         state.current.view = initialView;
       }
 
-      trackEvent('COMPARE_OPENED', {from: action.payload.from});
+      trackEvent('compare/opened', {from: action.payload.from});
     },
     operationUpdated: (state: Draft<CompareState>, action: PayloadAction<{operation: CompareOperation}>) => {
       state.current.view.operation = action.payload.operation;
@@ -100,7 +92,7 @@ export const compareSlice = createSlice({
       state.current[side] = undefined;
     },
     comparisonInspecting: (state: Draft<CompareState>, action: PayloadAction<ComparisonInspection>) => {
-      trackEvent('COMPARE_INSPECTED', {type: state.current.inspect?.type});
+      trackEvent('compare/inspected', {type: state.current.inspect?.type});
       state.current.inspect = action.payload;
     },
     comparisonInspected: state => {
@@ -167,7 +159,7 @@ export const compareSlice = createSlice({
       };
     },
     resourceSetCompared: (state: Draft<CompareState>, action: PayloadAction<{comparisons: ResourceComparison[]}>) => {
-      trackEvent('COMPARE_COMPARED', {
+      trackEvent('compare/compared', {
         left: state.current.view.leftSet?.type,
         right: state.current.view.rightSet?.type,
         operation: state.current.view.operation ?? 'default',
@@ -206,7 +198,7 @@ export const compareSlice = createSlice({
       const rightSet = state.current.view.rightSet;
       const from = direction === 'left-to-right' ? leftSet?.type : rightSet?.type;
       const to = direction === 'left-to-right' ? rightSet?.type : leftSet?.type;
-      trackEvent('COMPARE_TRANSFERED', {from, to, count: delta.length});
+      trackEvent('compare/transfered', {from, to, count: delta.length});
 
       state.current.transfering.pending = false;
 

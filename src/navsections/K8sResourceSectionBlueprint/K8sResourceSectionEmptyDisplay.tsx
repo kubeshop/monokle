@@ -1,17 +1,15 @@
-import React from 'react';
-
 import styled from 'styled-components';
 
-import {ResourceFilterType} from '@models/appstate';
-import {HighlightItems} from '@models/ui';
-
+import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
-import {highlightItem, openNewResourceWizard, setLeftMenuSelection, toggleSettings} from '@redux/reducers/ui';
-import {activeResourcesSelector, kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/selectors';
-import {startPreview} from '@redux/services/preview';
+import {highlightItem, openNewResourceWizard, openTemplateExplorer, setLeftMenuSelection} from '@redux/reducers/ui';
+import {activeResourceCountSelector} from '@redux/selectors/resourceMapSelectors';
+import {startClusterConnection} from '@redux/thunks/cluster';
 
-import Colors from '@styles/Colors';
+import {ResourceFilterType} from '@shared/models/appState';
+import {HighlightItems} from '@shared/models/ui';
+import {Colors} from '@shared/styles/colors';
 
 const StyledContainer = styled.div`
   margin-top: 12px;
@@ -32,7 +30,8 @@ const StyledLink = styled.div`
 
 function K8sResourceSectionEmptyDisplay() {
   const dispatch = useAppDispatch();
-  const activeResources = useAppSelector(activeResourcesSelector);
+  const {lastNamespaceLoaded} = useAppSelector(state => state.main.clusterConnectionOptions);
+  const hasAnyActiveResources = useAppSelector(state => activeResourceCountSelector(state) > 0);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
 
@@ -46,11 +45,11 @@ function K8sResourceSectionEmptyDisplay() {
 
     setTimeout(() => {
       if (itemToHighlight === HighlightItems.BROWSE_TEMPLATES) {
-        dispatch(setLeftMenuSelection('templates-pane'));
+        dispatch(openTemplateExplorer());
       } else if (itemToHighlight === HighlightItems.CREATE_RESOURCE) {
         dispatch(openNewResourceWizard());
       } else if (itemToHighlight === HighlightItems.CONNECT_TO_CLUSTER) {
-        startPreview(kubeConfigContext, 'cluster', dispatch);
+        dispatch(startClusterConnection({context: kubeConfigContext, namespace: lastNamespaceLoaded || 'default'}));
       }
     }, 1000);
 
@@ -61,7 +60,7 @@ function K8sResourceSectionEmptyDisplay() {
 
   const handleClusterConfigure = () => {
     dispatch(highlightItem(HighlightItems.CLUSTER_PANE_ICON));
-    dispatch(toggleSettings());
+    dispatch(setLeftMenuSelection('settings'));
     setTimeout(() => {
       dispatch(highlightItem(null));
     }, 3000);
@@ -69,7 +68,7 @@ function K8sResourceSectionEmptyDisplay() {
 
   return (
     <>
-      {activeResources.length === 0 ? (
+      {!hasAnyActiveResources ? (
         <StyledContainer>
           <StyledTitle id="get-started-title">Get started:</StyledTitle>
           <StyledLink id="create-resource-link" onClick={() => handleClick(HighlightItems.CREATE_RESOURCE)}>

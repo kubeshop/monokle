@@ -1,26 +1,33 @@
 /* eslint-disable no-constructor-return */
 import * as k8s from '@kubernetes/client-node';
 
-import {PREVIEW_PREFIX} from '@constants/constants';
+import log from 'loglevel';
 
-import {ResourceMapType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-
-import {deleteClusterResource, updateClusterResource} from '@redux/reducers/main';
+import {deleteMultipleClusterResources, updateMultipleClusterResources} from '@redux/reducers/main';
 
 import {jsonToYaml} from '@utils/yaml';
 
-import {getRegisteredKindHandlers} from '@src/kindhandlers';
+import {getRegisteredKindHandlers, registerCrdKindHandlers} from '@src/kindhandlers';
+import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
+import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
+
+import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 import {extractK8sResources} from './resource';
 
+let isClusterConnected: boolean = false;
+let intervalId: string | number | NodeJS.Timeout;
+const intervalPeriod = 10000;
+let resourcesToUpdate: K8sResource[] = [];
+let resourcesToDelete: K8sResource[] = [];
+
 export const resourceKindRequestURLs: {[resourceKind: string]: string} = {
+  CustomResourceDefinition: `/apis/apiextensions.k8s.io/v1/customresourcedefinitions`,
   ClusterRole: `/apis/rbac.authorization.k8s.io/v1/clusterroles`,
   ClusterRoleBinding: `/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`,
   ConfigMap: `/api/v1/configmaps`,
   CronJob: `/apis/batch/v1/cronjobs`,
-  CustomResourceDefinition: `/apis/apiextensions.k8s.io/v1/customresourcedefinitions`,
   DaemonSet: `/apis/apps/v1/daemonsets`,
   Deployment: `/apis/apps/v1/deployments`,
   EndpointSlice: `/apis/discovery.k8s.io/v1/endpointslices`,
@@ -45,16 +52,31 @@ export const resourceKindRequestURLs: {[resourceKind: string]: string} = {
   StatefulSet: `/apis/apps/v1/statefulsets`,
   StorageClass: `/apis/storage.k8s.io/v1/storageclasses`,
   VolumeAttachment: `/apis/storage.k8s.io/v1/volumeattachments`,
+  Node: '/api/v1/nodes',
+  Event: '/apis/events.k8s.io/v1/events',
 };
 
-const watchers: {[resourceKind: string]: any} = {};
+export enum ClusterConnectionStatus {
+  REFUSED = -2,
+  ABORTED = -1,
+  IDLE = 0,
+  CONNECTED = 1,
+}
+
+const crdRequestURLGenerator = (clusterApiVersion: string, plural: string) => {
+  return `/apis/${clusterApiVersion}/${plural}`;
+};
+
+const watchers: {[resourceKind: string]: {watcher: any; status: ClusterConnectionStatus}} = {};
 
 const disconnectResourceFromCluster = (kindHandler: ResourceKindHandler) => {
-  try {
-    watchers[kindHandler.kind].abort();
-    watchers[kindHandler.kind] = undefined;
-  } catch (error) {
-    watchers[kindHandler.kind] = undefined;
+  if (watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`]) {
+    try {
+      watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher.abort();
+      watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher = undefined;
+    } catch (error) {
+      watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher = undefined;
+    }
   }
 };
 
@@ -62,53 +84,129 @@ const watchResource = async (
   dispatch: any,
   kindHandler: ResourceKindHandler,
   kubeConfig: k8s.KubeConfig,
-  previewResources: ResourceMapType
+  previewResources: ResourceMap,
+  plural?: string
 ) => {
-  disconnectResourceFromCluster(kindHandler);
-  watchers[kindHandler.kind] = await new k8s.Watch(kubeConfig).watch(
-    resourceKindRequestURLs[kindHandler.kind],
+  if (
+    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`] &&
+    watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status === ClusterConnectionStatus.CONNECTED
+  ) {
+    disconnectResourceFromCluster(kindHandler);
+  }
+  watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`] = {
+    status: ClusterConnectionStatus.IDLE,
+    watcher: undefined,
+  };
+  watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].watcher = await new k8s.Watch(kubeConfig).watch(
+    kindHandler.isCustom
+      ? crdRequestURLGenerator(kindHandler.clusterApiVersion, plural || kindHandler.kind)
+      : resourceKindRequestURLs[kindHandler.kind],
     {allowWatchBookmarks: false},
-    (type: string, apiObj: any) => {
-      if (type === 'ADDED') {
-        const resource: K8sResource = processResource(apiObj, kubeConfig);
-        if (!previewResources[resource.id]) {
-          dispatch(updateClusterResource(resource));
+    async (type: string, apiObj: any) => {
+      watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.CONNECTED;
+      const resource: K8sResource = extractClusterResourceFromObject(apiObj, kubeConfig);
+
+      if (type === 'ADDED' && !previewResources[resource.id]) {
+        if (kindHandler.kind === CustomResourceDefinitionHandler.kind) {
+          registerCrdKindHandlers(JSON.stringify(apiObj));
+          const handler = extractKindHandler(apiObj);
+          if (handler) {
+            await watchResource(dispatch, handler, kubeConfig, previewResources, handler.kindPlural);
+          }
         }
+        resourcesToUpdate.push(resource);
+        // dispatch(updateClusterResource(resource));
         return;
       }
-
       if (type === 'MODIFIED') {
-        dispatch(updateClusterResource(processResource(apiObj, kubeConfig)));
+        resourcesToUpdate.push(resource);
+        // dispatch(updateClusterResource(resource));
         return;
       }
       if (type === 'DELETED') {
-        dispatch(deleteClusterResource(processResource(apiObj, kubeConfig)));
+        resourcesToDelete.push(resource);
+        // dispatch(deleteClusterResource(resource));
       }
     },
     (error: any) => {
+      log.warn(kindHandler.clusterApiVersion, kindHandler.kind, error?.message);
+      watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.REFUSED;
       if (resourceKindRequestURLs[kindHandler.kind] && error.message !== 'aborted') {
-        disconnectResourceFromCluster(kindHandler);
+        watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.ABORTED;
         watchResource(dispatch, kindHandler, kubeConfig, previewResources);
+      }
+      if (isClusterConnected === isClusterDisconnected()) {
+        isClusterConnected = !isClusterDisconnected();
+        // TODO: after finishing the refactoring, what should we do with the following line?
+        // dispatch(setIsClusterConnected(!isClusterDisconnected()));
       }
     }
   );
 };
 
-export const processResource = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sResource => {
-  const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(apiObj), PREVIEW_PREFIX + kubeConfig.currentContext);
+export const extractClusterResourceFromObject = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sResource => {
+  const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(apiObj), 'cluster', {
+    context: kubeConfig.currentContext,
+  });
   return resource;
 };
 
-export const startWatchingResources = (
+export const startWatchingResources = async (
   dispatch: any,
   kubeConfig: k8s.KubeConfig,
-  previewResources: ResourceMapType
+  clusterResourceMap: ResourceMap,
+  namespace: string
 ) => {
   getRegisteredKindHandlers().map((handler: ResourceKindHandler) =>
-    watchResource(dispatch, handler, kubeConfig, previewResources)
+    watchResource(dispatch, handler, kubeConfig, clusterResourceMap, handler.kindPlural)
   );
+  watchResource(dispatch, CustomResourceDefinitionHandler, kubeConfig, clusterResourceMap);
+  intervalId = setInterval(() => {
+    if (resourcesToUpdate.length > 0) {
+      dispatch(
+        updateMultipleClusterResources(
+          resourcesToUpdate.filter(r => {
+            if (namespace === '<all>') {
+              return true;
+            }
+            if (namespace === '<not-namespaced>') {
+              return !r.namespace;
+            }
+            return r.namespace === namespace;
+          })
+        )
+      );
+      resourcesToUpdate = [];
+    }
+    if (resourcesToDelete.length > 0) {
+      dispatch(
+        deleteMultipleClusterResources(
+          resourcesToDelete.filter(r => {
+            if (namespace === '<all>') {
+              return true;
+            }
+            if (namespace === '<not-namespaced>') {
+              return !r.namespace;
+            }
+            return r.namespace === namespace;
+          })
+        )
+      );
+      resourcesToDelete = [];
+    }
+  }, intervalPeriod);
 };
 
 export const disconnectFromCluster = () => {
-  Object.values(watchers).forEach(req => req.abort());
+  getRegisteredKindHandlers().map((handler: ResourceKindHandler) => disconnectResourceFromCluster(handler));
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
+};
+
+/**
+ * Indicates if all elements in the "watchers" object have a "status" property less than 0
+ */
+export const isClusterDisconnected = (): boolean => {
+  return Object.values(watchers).reduce((output: boolean, watcher) => output && watcher.status < 0, true);
 };

@@ -6,18 +6,19 @@ import {PlusOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
+import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {SectionCustomComponentProps} from '@models/navigator';
-import {NewResourceWizardInput} from '@models/ui';
-
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {isInPreviewModeSelector} from '@redux/selectors';
-
-import Colors from '@styles/Colors';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {SectionCustomComponentProps} from '@shared/models/navigator';
+import {NewResourceWizardInput} from '@shared/models/ui';
+import {Colors} from '@shared/styles/colors';
 
 const SuffixContainer = styled.span`
   display: inline-block;
@@ -39,7 +40,8 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
   const dispatch = useAppDispatch();
 
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isSectionCollapsed = useAppSelector(state => state.navigator.collapsedSectionIds.includes(sectionInstance.id));
 
   const resourceKind = useMemo(() => {
@@ -71,7 +73,7 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
             type="link"
             onClick={createResource}
             size="small"
-            disabled={isInPreviewMode}
+            disabled={isInPreviewMode || isInClusterMode}
             style={{color: sectionInstance.isSelected && isSectionCollapsed ? Colors.blackPure : undefined}}
           />
         </Tooltip>

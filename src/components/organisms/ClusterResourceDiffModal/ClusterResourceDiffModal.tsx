@@ -9,20 +9,18 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import {stringify} from 'yaml';
 
-import {CLUSTER_DIFF_PREFIX, PREVIEW_PREFIX} from '@constants/constants';
 import {ClusterName, makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {AlertEnum, AlertType} from '@models/alert';
-
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setAlert} from '@redux/reducers/alert';
-import {closeResourceDiffModal} from '@redux/reducers/main';
 import {
   currentConfigSelector,
   isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
-} from '@redux/selectors';
+} from '@redux/appConfig';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
+import {closeResourceDiffModal} from '@redux/reducers/main';
+import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResource} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -30,7 +28,9 @@ import {updateResource} from '@redux/thunks/updateResource';
 import {ModalConfirmWithNamespaceSelect} from '@molecules';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
-import {removeIgnoredPathsFromResourceContent} from '@utils/resources';
+import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
+
+import {AlertEnum, AlertType} from '@shared/models/alert';
 
 import * as S from './ClusterResourceDiffModal.styled';
 
@@ -47,12 +47,11 @@ const ClusterResourceDiffModal = () => {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
-  const projectConfig = useAppSelector(currentConfigSelector);
-  const previewType = useAppSelector(state => state.main.previewType);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
-
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const projectConfig = useAppSelector(currentConfigSelector);
+  const localResourceMap = useResourceMap('local');
+  const clusterResourceMap = useResourceMap('cluster');
+  const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
 
@@ -70,12 +69,12 @@ const ClusterResourceDiffModal = () => {
   );
 
   const targetResource = useMemo(() => {
-    if (!targetResourceId || !resourceMap) {
+    if (!targetResourceId || !clusterResourceMap) {
       return undefined;
     }
 
-    return resourceMap[targetResourceId];
-  }, [resourceMap, targetResourceId]);
+    return clusterResourceMap[targetResourceId];
+  }, [clusterResourceMap, targetResourceId]);
 
   const resizableBoxHeight = useMemo(() => windowSize.height * (75 / 100), [windowSize.height]);
   const resizableBoxWidth = useMemo(() => {
@@ -84,15 +83,15 @@ const ClusterResourceDiffModal = () => {
   }, [windowSize.width]);
 
   const cleanTargetResourceText = useMemo(() => {
-    if (!isDiffModalVisible || !targetResource || !targetResource.content) {
+    if (!isDiffModalVisible || !targetResource || !targetResource.object) {
       return undefined;
     }
 
     if (!shouldDiffIgnorePaths) {
-      return stringify(targetResource.content, {sortMapEntries: true});
+      return stringify(targetResource.object, {sortMapEntries: true});
     }
 
-    return stringify(removeIgnoredPathsFromResourceContent(targetResource.content, targetResource.namespace), {
+    return stringify(removeIgnoredPathsFromResourceObject(targetResource.object, targetResource.namespace), {
       sortMapEntries: true,
     });
   }, [isDiffModalVisible, shouldDiffIgnorePaths, targetResource]);
@@ -102,16 +101,16 @@ const ClusterResourceDiffModal = () => {
   }, [cleanTargetResourceText, matchingResourceText]);
 
   const confirmModalTitle = useMemo(() => {
-    if (!selectedMatchingResourceId || !resourceMap[selectedMatchingResourceId]) {
+    if (!selectedMatchingResourceId || !localResourceMap[selectedMatchingResourceId]) {
       return '';
     }
 
-    const resource = resourceMap[selectedMatchingResourceId];
+    const resource = localResourceMap[selectedMatchingResourceId];
 
     return isKustomizationResource(resource)
       ? makeApplyKustomizationText(resource.name, kubeConfigContext, kubeConfigContextColor)
       : makeApplyResourceText(resource.name, kubeConfigContext, kubeConfigContextColor);
-  }, [selectedMatchingResourceId, resourceMap, kubeConfigContext, kubeConfigContextColor]);
+  }, [selectedMatchingResourceId, localResourceMap, kubeConfigContext, kubeConfigContextColor]);
 
   const matchingLocalResources = useMemo(() => {
     if (!isDiffModalVisible || !targetResource) {
@@ -119,16 +118,16 @@ const ClusterResourceDiffModal = () => {
     }
 
     return Object.fromEntries(
-      Object.entries(resourceMap).filter(entry => {
+      Object.entries(localResourceMap).filter(entry => {
         const value = entry[1];
         return (
-          !value.filePath.startsWith(PREVIEW_PREFIX) &&
-          !value.filePath.startsWith(CLUSTER_DIFF_PREFIX) &&
-          value.name === targetResource.name
+          value.name === targetResource.name &&
+          value.kind === targetResource.kind &&
+          value.apiVersion === targetResource.apiVersion
         );
       })
     );
-  }, [isDiffModalVisible, resourceMap, targetResource]);
+  }, [isDiffModalVisible, localResourceMap, targetResource]);
 
   const onCloseHandler = () => {
     if (isApplyModalVisible) {
@@ -141,10 +140,10 @@ const ClusterResourceDiffModal = () => {
 
   const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
     if (selectedMatchingResourceId) {
-      const resource = resourceMap[selectedMatchingResourceId];
+      const resource = localResourceMap[selectedMatchingResourceId];
       if (resource) {
-        applyResource(resource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
-          isClusterPreview: previewType === 'cluster',
+        applyResource(resource.id, localResourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
+          isInClusterMode,
         });
         onCloseHandler();
       }
@@ -158,7 +157,7 @@ const ClusterResourceDiffModal = () => {
     }
 
     setSelectedMatchingResourceId(resourceId);
-    setMatchingResourceText(stringify(matchingLocalResources[resourceId].content, {sortMapEntries: true}));
+    setMatchingResourceText(stringify(matchingLocalResources[resourceId].object, {sortMapEntries: true}));
   };
 
   const handleApply = () => {
@@ -176,16 +175,22 @@ const ClusterResourceDiffModal = () => {
 
     dispatch(
       updateResource({
-        resourceId: selectedMatchingResourceId,
+        resourceIdentifier: {id: selectedMatchingResourceId, storage: 'local'},
         text: cleanTargetResourceText,
         preventSelectionAndHighlightsUpdate: true,
-        isInClusterMode: true,
       })
     );
   };
 
   useEffect(() => {
-    if (!isDiffModalVisible || !targetResource || !targetResource.content || !resourceMap || !matchingLocalResources) {
+    if (
+      !isDiffModalVisible ||
+      !targetResource ||
+      !targetResource.object ||
+      !localResourceMap ||
+      !clusterResourceMap ||
+      !matchingLocalResources
+    ) {
       return;
     }
 
@@ -194,7 +199,7 @@ const ClusterResourceDiffModal = () => {
       const alert: AlertType = {
         type: AlertEnum.Error,
         title: 'Diff failed',
-        message: `Failed to retrieve ${targetResource.content.kind} ${targetResource.content.metadata.name} from local`,
+        message: `Failed to retrieve ${targetResource.object.kind} ${targetResource.object.metadata.name} from local`,
       };
 
       dispatch(setAlert(alert));
@@ -214,7 +219,7 @@ const ClusterResourceDiffModal = () => {
       if (foundResource) {
         hasLocalMatchingResource = true;
         setSelectedMatchingResourceId(foundResource.id);
-        setMatchingResourceText(stringify(foundResource.content, {sortMapEntries: true}));
+        setMatchingResourceText(stringify(foundResource.object, {sortMapEntries: true}));
       }
     } else if (targetResource.namespace === 'default') {
       const foundResource = Object.values(matchingLocalResources).filter(
@@ -224,25 +229,25 @@ const ClusterResourceDiffModal = () => {
       if (foundResource) {
         hasLocalMatchingResource = true;
         setSelectedMatchingResourceId(foundResource.id);
-        setMatchingResourceText(stringify(foundResource.content, {sortMapEntries: true}));
+        setMatchingResourceText(stringify(foundResource.object, {sortMapEntries: true}));
       } else {
         const foundResourceWithoutNamespace = Object.values(matchingLocalResources).filter(r => !r.namespace)[0];
 
         if (foundResourceWithoutNamespace) {
           hasLocalMatchingResource = true;
           setSelectedMatchingResourceId(foundResourceWithoutNamespace.id);
-          setMatchingResourceText(stringify(foundResourceWithoutNamespace.content, {sortMapEntries: true}));
+          setMatchingResourceText(stringify(foundResourceWithoutNamespace.object, {sortMapEntries: true}));
         }
       }
     }
 
     if (!hasLocalMatchingResource) {
       setSelectedMatchingResourceId(Object.keys(matchingLocalResources)[0]);
-      setMatchingResourceText(stringify(Object.values(matchingLocalResources)[0].content, {sortMapEntries: true}));
+      setMatchingResourceText(stringify(Object.values(matchingLocalResources)[0].object, {sortMapEntries: true}));
     }
 
     setHasDiffModalLoaded(true);
-  }, [dispatch, isDiffModalVisible, matchingLocalResources, resourceMap, targetResource]);
+  }, [dispatch, isDiffModalVisible, matchingLocalResources, localResourceMap, clusterResourceMap, targetResource]);
 
   return (
     <>
@@ -262,7 +267,7 @@ const ClusterResourceDiffModal = () => {
                 {matchingLocalResources &&
                   Object.entries(matchingLocalResources).map(([key, value]) => (
                     <Select.Option key={key} value={key}>
-                      {value.filePath}
+                      {value.origin.filePath}
                     </Select.Option>
                   ))}
               </Select>
@@ -334,7 +339,7 @@ const ClusterResourceDiffModal = () => {
       {targetResourceId && isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
           isVisible={isApplyModalVisible}
-          resources={selectedMatchingResourceId ? [resourceMap[selectedMatchingResourceId]] : []}
+          resourceMetaList={selectedMatchingResourceId ? [localResourceMap[selectedMatchingResourceId]] : []}
           title={confirmModalTitle}
           onOk={namespace => onClickApplyResource(namespace)}
           onCancel={() => setIsApplyModalVisible(false)}

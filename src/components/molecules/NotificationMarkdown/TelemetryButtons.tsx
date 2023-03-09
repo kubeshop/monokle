@@ -1,10 +1,12 @@
 import {notification} from 'antd';
 
-import {toggleErrorReporting, toggleEventTracking, updateTelemetry} from '@redux/reducers/appConfig';
-import {setActiveSettingsPanel, toggleNotifications, toggleSettings} from '@redux/reducers/ui';
+import {toggleErrorReporting, toggleEventTracking, updateTelemetry} from '@redux/appConfig';
+import {setAlert} from '@redux/reducers/alert';
+import {setActiveSettingsPanel, toggleNotifications} from '@redux/reducers/ui';
 import store from '@redux/store';
 
-import {SettingsPanel} from '@organisms/SettingsManager/types';
+import {AlertEnum} from '@shared/models/alert';
+import {SettingsPanel} from '@shared/models/config';
 
 import * as S from './styled';
 
@@ -29,10 +31,16 @@ export const TelemetryButtons = ({notificationId}: {notificationId?: string}) =>
     disableTelemetryNotification();
 
     store.dispatch(setActiveSettingsPanel(SettingsPanel.GlobalSettings));
-    store.dispatch(toggleSettings());
     store.dispatch(toggleNotifications());
-    store.dispatch(toggleEventTracking(false));
-    store.dispatch(toggleErrorReporting(false));
+    store.dispatch(toggleEventTracking(true));
+    store.dispatch(toggleErrorReporting(true));
+    store.dispatch(
+      setAlert({
+        type: AlertEnum.Success,
+        title: 'Telemetry settings have been updated',
+        message: 'The telemetry settings have been deactivated.',
+      })
+    );
   };
 
   const handleOk = () => {

@@ -5,14 +5,13 @@ import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {IDisposable, Terminal} from 'xterm';
 import {FitAddon} from 'xterm-addon-fit';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {TerminalType} from '@models/terminal';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {removeTerminal, setRunningTerminal} from '@redux/reducers/terminal';
 
 import {useWindowSize} from '@utils/hooks';
+
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {TerminalType} from '@shared/models/terminal';
 
 import * as S from './TerminalPane.styled';
 

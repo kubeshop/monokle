@@ -6,8 +6,6 @@ import {BranchesOutlined} from '@ant-design/icons';
 
 import {GIT_ERROR_MODAL_DESCRIPTION} from '@constants/constants';
 
-import {GitBranch} from '@models/git';
-
 import {setCurrentBranch} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {rootFolderSelector} from '@redux/selectors';
@@ -16,6 +14,8 @@ import {TableSelect} from '@atoms';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {addDefaultCommandTerminal} from '@utils/terminal';
+
+import {GitBranch} from '@shared/models/git';
 
 import BranchTable from './BranchTable';
 

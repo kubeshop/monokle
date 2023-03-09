@@ -2,7 +2,7 @@ import {Button as RawButton} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const AppContainer = styled.div`
   height: 100%;

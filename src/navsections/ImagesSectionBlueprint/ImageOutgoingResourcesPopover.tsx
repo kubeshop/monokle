@@ -1,12 +1,15 @@
 import {useMemo} from 'react';
 
-import {K8sResource, ResourceRef} from '@models/k8sresource';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectK8sResource} from '@redux/reducers/main';
+import {selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
+import {useActiveResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
+import {isResourceSelected} from '@redux/services/resource';
 
 import {getRefRange} from '@utils/refs';
+
+import {ResourceRef} from '@monokle/validation';
+import {ResourceMeta} from '@shared/models/k8sResource';
 
 import * as S from './ImageOutgoingResourcesPopover.styled';
 
@@ -16,13 +19,13 @@ interface IProps {
 
 const ImageOutgoingResourcesPopover: React.FC<IProps> = ({resourcesIds}) => {
   const dispatch = useAppDispatch();
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
+  const activeResourceMetaMap = useActiveResourceMetaMap();
+  const selection = useAppSelector(state => state.main.selection);
 
   const refs = useMemo(() => {
     return resourcesIds.reduce((currentRefs: {[key: string]: ResourceRef[]}, id) => {
-      const resource = resourceMap[id];
-      const resourceRefs = resource?.refs;
+      const resourceMeta = activeResourceMetaMap[id];
+      const resourceRefs = resourceMeta?.refs;
 
       if (!resourceRefs) {
         return currentRefs;
@@ -36,11 +39,11 @@ const ImageOutgoingResourcesPopover: React.FC<IProps> = ({resourcesIds}) => {
 
       return currentRefs;
     }, {});
-  }, [resourceMap, resourcesIds]);
+  }, [activeResourceMetaMap, resourcesIds]);
 
-  const handleOnResourceClick = (resource: K8sResource, ref: ResourceRef) => {
-    if (selectedResourceId !== resource.id) {
-      dispatch(selectK8sResource({resourceId: resource.id}));
+  const handleOnResourceClick = (resource: ResourceMeta, ref: ResourceRef) => {
+    if (!isResourceSelected(resource, selection)) {
+      dispatch(selectResource({resourceIdentifier: resource}));
     }
 
     const refRange = getRefRange(ref);
@@ -57,15 +60,15 @@ const ImageOutgoingResourcesPopover: React.FC<IProps> = ({resourcesIds}) => {
       <S.PopoverTitle>Resources Links</S.PopoverTitle>
       <S.Divider />
       {Object.entries(refs).map(([resourceId, resourceRefs]) => {
-        const resource = resourceMap[resourceId];
+        const resourceMeta = activeResourceMetaMap[resourceId];
         return resourceRefs.map(ref => (
           <S.RefContainer key={`${resourceId}-${ref.name}-${ref.position?.line}-${ref.position?.column}`}>
             <S.RefLinkContainer>
-              <S.ResourceNameLabel onClick={() => handleOnResourceClick(resource, ref)}>
-                {resource.name}
+              <S.ResourceNameLabel onClick={() => handleOnResourceClick(resourceMeta, ref)}>
+                {resourceMeta.name}
               </S.ResourceNameLabel>
 
-              <S.ResourceKindLabel>{resource.kind}</S.ResourceKindLabel>
+              <S.ResourceKindLabel>{resourceMeta.kind}</S.ResourceKindLabel>
               {ref.position && <S.PositionText>Ln {ref.position.line}</S.PositionText>}
             </S.RefLinkContainer>
           </S.RefContainer>

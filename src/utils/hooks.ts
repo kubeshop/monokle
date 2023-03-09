@@ -1,8 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
-
-import {Size} from '@models/window';
+import React, {MutableRefObject, useEffect, useRef, useState} from 'react';
+import {useStore} from 'react-redux';
 
 import {useAppSelector} from '@redux/hooks';
+
+import {RootState} from '@shared/models/rootState';
+import {Size} from '@shared/models/window';
 
 export function useFocus<T>(): [React.RefObject<T>, () => void] {
   const htmlElRef = useRef<T>(null);
@@ -57,3 +59,35 @@ export function useWindowSize(): Size {
   }, []); // Empty array ensures that effect is only run on mount
   return windowSize;
 }
+
+export const useStateWithRef = <T>(initialState: T): [T, (arg1: T) => void, MutableRefObject<T>] => {
+  const [state, _setState] = React.useState(initialState);
+  const ref = React.useRef(state);
+  const setState = React.useCallback((newState: T) => {
+    if (typeof newState === 'function') {
+      _setState((prevState: T) => {
+        const computedState = newState(prevState);
+        ref.current = computedState;
+        return computedState;
+      });
+    } else {
+      ref.current = newState;
+      _setState(newState);
+    }
+  }, []);
+  return [state, setState, ref];
+};
+
+export const useSelectorWithRef = <T>(selector: (state: RootState) => T): [T, MutableRefObject<T>] => {
+  const state = useAppSelector(selector);
+  const ref = useRef(state);
+  ref.current = state;
+  return [state, ref];
+};
+
+export const useRefSelector = <T>(selector: (state: RootState) => T): MutableRefObject<T> => {
+  const store = useStore<RootState>();
+  const ref = useRef(selector(store.getState()));
+  ref.current = selector(store.getState());
+  return ref;
+};

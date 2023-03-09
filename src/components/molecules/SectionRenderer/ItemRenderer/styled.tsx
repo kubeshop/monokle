@@ -2,7 +2,7 @@ import {Checkbox as RawCheckbox} from 'antd';
 
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 type ItemContainerProps = {
   isSelected: boolean;
@@ -24,6 +24,10 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   align-items: center;
   width: 100%;
   user-select: none;
+  > {
+    min-width: 0;
+  }
+
   ${props => {
     const defaultIndentation = props.$isSectionCheckable ? 32 : 26;
     return `padding-left: ${defaultIndentation + props.$indentation}px;`;
@@ -71,13 +75,14 @@ type ItemNameProps = {
   level: number;
 };
 
-export const ItemName = styled.span<ItemNameProps>`
+export const ItemName = styled.div<ItemNameProps>`
   padding: 2px 0;
   font-size: 12px;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-width: 0;
+
   ${props => {
     if (props.isSelected) {
       return `font-weight: 700;`;
@@ -104,7 +109,7 @@ export const ItemName = styled.span<ItemNameProps>`
 `;
 
 export const PrefixContainer = styled.span`
-  min-width: 20px;
+  min-width: 40px;
 `;
 
 export const SuffixContainer = styled.span`
