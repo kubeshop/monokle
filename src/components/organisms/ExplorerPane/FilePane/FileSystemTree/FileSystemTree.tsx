@@ -9,9 +9,11 @@ import path from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
+import {setFileExplorerExpandedFolders} from '@redux/reducers/ui';
 import {selectedFilePathSelector} from '@redux/selectors';
 
 import {getAllParentFolderPaths, isFileEntryDisabled} from '@utils/files';
+import {useSelectorWithRef} from '@utils/hooks';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
@@ -22,24 +24,16 @@ import {isDefined} from '@shared/utils/filter';
 import * as S from './FileSystemTree.styled';
 import FileSystemTreeNode from './TreeNode';
 
-type Props = {
-  expandedFolders: string[];
-  onExpandFolders: (expandedFolders: string[]) => void;
-};
-
-const FileSystemTree: React.FC<Props> = props => {
-  const {expandedFolders, onExpandFolders} = props;
-
+const FileSystemTree: React.FC = () => {
   const dispatch = useAppDispatch();
+  const [fileExplorerExpandedFolders, fileExplorerExpandedFoldersRef] = useSelectorWithRef(
+    state => state.ui.fileExplorerExpandedFolders
+  );
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const firstHighlightedFile = useAppSelector(state => state.main.highlights.find(isFileSelection));
 
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
 
-  const expandedFoldersRef = useRef(expandedFolders);
-  expandedFoldersRef.current = expandedFolders;
-  const onExpandFoldersRef = useRef(onExpandFolders);
-  onExpandFoldersRef.current = onExpandFolders;
   const treeRef = useRef<any>(null);
 
   const treeData = useAppSelector(state => {
@@ -62,8 +56,10 @@ const FileSystemTree: React.FC<Props> = props => {
     }
 
     const parentFolderPaths = getAllParentFolderPaths(firstHighlightedFile.filePath);
-    onExpandFoldersRef.current([...new Set([...expandedFoldersRef.current, ...parentFolderPaths])]);
-  }, [firstHighlightedFile]);
+    dispatch(
+      setFileExplorerExpandedFolders([...new Set([...fileExplorerExpandedFoldersRef.current, ...parentFolderPaths])])
+    );
+  }, [dispatch, fileExplorerExpandedFoldersRef, firstHighlightedFile]);
 
   useLayoutEffect(() => {
     if (!firstHighlightedFile) {
@@ -77,8 +73,16 @@ const FileSystemTree: React.FC<Props> = props => {
       <S.TreeDirectoryTree
         $isHighlightSelection={Boolean(firstHighlightedFile)}
         ref={treeRef}
-        expandedKeys={expandedFolders}
-        onExpand={keys => onExpandFoldersRef.current(keys.filter(isString))}
+        expandedKeys={fileExplorerExpandedFolders}
+        onExpand={(keys, info) => {
+          dispatch(
+            setFileExplorerExpandedFolders(
+              keys.filter(
+                key => isString(key) && (info.expanded === true ? true : !key.startsWith(info.node.key as string))
+              ) as string[]
+            )
+          );
+        }}
         treeData={treeData}
         height={containerHeight}
         titleRender={node => <FileSystemTreeNode node={node} />}
