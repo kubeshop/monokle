@@ -160,7 +160,7 @@ const watchKubeConfigProjectListener: AppListenerFn = listen => {
           dispatch(stopClusterConnection());
           dispatch(
             setAlert({
-              type: AlertEnum.Error,
+              type: AlertEnum.Warning,
               title: 'Cluster connection',
               message: 'Current-context of the kubeconfig file changed, cluster connection stopped.'
             })
