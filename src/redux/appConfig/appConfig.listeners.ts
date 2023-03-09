@@ -6,16 +6,20 @@ import {FSWatcher, watch} from 'chokidar';
 import {isEmpty} from 'lodash';
 
 import {AppListenerFn} from '@redux/listeners/base';
+import {setAlert} from '@redux/reducers/alert';
 import {CONFIG_PATH} from '@redux/services/projectConfig';
+import {startClusterConnection, stopClusterConnection} from '@redux/thunks/cluster';
 
+import {AlertEnum} from '@shared/models/alert';
 import {KubeConfig, KubeConfigContext} from '@shared/models/config';
 
+import {isProjectKubeConfigSelector} from './appConfig.selectors';
 import {loadProjectKubeConfig, setKubeConfig, setOpenProject, updateProjectConfig} from './appConfig.slice';
 
 const loadKubeConfigListener: AppListenerFn = listen => {
   listen({
     actionCreator: setKubeConfig,
-    async effect(_action, {dispatch, cancelActiveListeners}) {
+    async effect(_action, {dispatch, cancelActiveListeners, getState}) {
       // Cancel any other listeners that are listening to the same action
       cancelActiveListeners();
       const configPath = _action.payload.path;
@@ -32,6 +36,37 @@ const loadKubeConfigListener: AppListenerFn = listen => {
             currentContext: kc.getCurrentContext(),
           })
         );
+
+        if (!isProjectKubeConfigSelector(getState())) {
+          const clusterConnection = getState().main.clusterConnection;
+          const currentContext = kc.currentContext;
+          if (clusterConnection?.context === currentContext) {
+            dispatch(
+              startClusterConnection({
+                context: currentContext,
+                namespace: clusterConnection?.namespace,
+                isRestart: true,
+              })
+            );
+
+            dispatch(
+              setAlert({
+                type: AlertEnum.Info,
+                title: 'Cluster connection',
+                message: 'Kubeconfig file changed, cluster connection restarted.',
+              })
+            );
+          } else if (clusterConnection?.context) {
+            dispatch(stopClusterConnection());
+            dispatch(
+              setAlert({
+                type: AlertEnum.Error,
+                title: 'Cluster connection',
+                message: 'Kubeconfig file changed. cluster connection stopped.',
+              })
+            );
+          }
+        }
       } catch (error) {
         dispatch(setKubeConfig({isPathValid: false, contexts: []}));
       }
@@ -86,11 +121,7 @@ const watchKubeConfigProjectListener: AppListenerFn = listen => {
         interval: 1000,
       });
 
-      watcher.on('all', event => {
-        if (event === 'unlink') {
-          watcher.close();
-        }
-
+      const onKubeConfigChange = () => {
         let config: KubeConfig;
         try {
           const kc = new k8s.KubeConfig();
@@ -105,7 +136,45 @@ const watchKubeConfigProjectListener: AppListenerFn = listen => {
           config = {isPathValid: false, path: configPath};
         }
         dispatch(loadProjectKubeConfig(config));
+
+        const clusterConnection = getState().main.clusterConnection;
+        const currentContext = config.currentContext;
+
+        if (clusterConnection?.context === currentContext) {
+          dispatch(
+            startClusterConnection({
+              context: String(currentContext),
+              namespace: clusterConnection?.namespace,
+              isRestart: true,
+            })
+          );
+
+          dispatch(
+            setAlert({
+              type: AlertEnum.Info,
+              title: 'Cluster connection',
+              message: 'Kubeconfig file changed, cluster connection restarted.',
+            })
+          );
+        } else if (clusterConnection?.context) {
+          dispatch(stopClusterConnection());
+          dispatch(
+            setAlert({
+              type: AlertEnum.Error,
+              title: 'Cluster connection',
+              message: 'Kubeconfig file changed. cluster connection stopped.',
+            })
+          );
+        }
+      };
+
+      watcher.on('unlink', event => {
+        if (event === 'unlink') {
+          watcher.close();
+        }
       });
+
+      watcher.on('change', onKubeConfigChange);
 
       listenerApi.signal.addEventListener('abort', () => {
         watcher.close();
