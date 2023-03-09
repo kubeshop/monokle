@@ -1,7 +1,7 @@
 import {useCallback, useMemo} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
-import {useResourceContentMapRef, useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
@@ -57,13 +57,13 @@ import {Tableview} from './Tableview/Tableview';
 const Dashboard: React.FC = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
-  const clusterResourceContentMapRef = useResourceContentMapRef('cluster');
+  const clusterResourceContent = useAppSelector(state => state.main.resourceContentMapByStorage['cluster']);
   const clusterResourceMetaMapRef = useResourceMetaMapRef('cluster');
   const {height} = useMainPaneDimensions();
   const clusterConnectionOptions = useAppSelector(state => state.main.clusterConnectionOptions);
 
   const filterResources = useCallback(() => {
-    return Object.values(clusterResourceContentMapRef.current)
+    return Object.values(clusterResourceContent)
       .map(r => ({...r, ...clusterResourceMetaMapRef.current[r.id]}))
       .filter(
         resource =>
@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
           resource.object.kind === activeMenu.label
       );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMenu, clusterResourceContentMapRef, clusterResourceMetaMapRef, clusterConnectionOptions]);
+  }, [activeMenu, clusterResourceContent, clusterResourceMetaMapRef, clusterConnectionOptions]);
 
   const filteredResources = useMemo(() => {
     return filterResources();
