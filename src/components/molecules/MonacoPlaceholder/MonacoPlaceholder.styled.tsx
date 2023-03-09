@@ -33,10 +33,8 @@ export const Text = styled.p`
 export const InfoLink = styled.a`
   color: ${Colors.grey7};
   font-size: 0.9rem;
-  opacity: 0.7;
   :hover {
-    opacity: 1;
-    color: ${Colors.grey7};
+    color: ${Colors.grey9};
   }
 `;
 

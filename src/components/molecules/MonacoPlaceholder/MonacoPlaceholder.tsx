@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 import {toggleEditorPlaceholderVisiblity} from '@redux/appConfig';
 import {useAppDispatch} from '@redux/hooks';
 import {setExplorerSelectedSection, setLeftMenuSelection} from '@redux/reducers/ui';
@@ -8,6 +10,10 @@ import * as S from './MonacoPlaceholder.styled';
 
 export const MonacoPlaceholder = () => {
   const dispatch = useAppDispatch();
+
+  const handleDashboard = () => {
+    dispatch(setLeftMenuSelection('dashboard'));
+  };
 
   const handleValidation = () => {
     dispatch(setLeftMenuSelection('validation'));
@@ -31,6 +37,16 @@ export const MonacoPlaceholder = () => {
     dispatch(toggleEditorPlaceholderVisiblity(true));
   };
 
+  const handleChromeExtension = () => {
+    shell.openExternal(
+      'https://chrome.google.com/webstore/detail/monokle-cloud-chrome-exte/loojojkleiolidaodalflgbmaijeibob?hl=en'
+    );
+  };
+
+  const handleCLI = () => {
+    shell.openExternal('https://monokle.io/download');
+  };
+
   return (
     <S.Container>
       <div>
@@ -42,7 +58,9 @@ export const MonacoPlaceholder = () => {
           <br />
           Want to go further? Try these shortcuts
         </S.Title>
-        <S.Text>Everything about your Cluster live</S.Text>
+        <S.Text>
+          <S.InfoLink onClick={handleDashboard}>Everything about your Cluster live</S.InfoLink>
+        </S.Text>
         <S.Text>
           <S.InfoLink onClick={handleHelmCharts}>Preview Helm Charts</S.InfoLink>
         </S.Text>
@@ -56,12 +74,10 @@ export const MonacoPlaceholder = () => {
           <S.InfoLink onClick={handleValidation}>Validate your resources</S.InfoLink>
         </S.Text>
         <S.Text>
-          <S.InfoLink href="https://chrome.google.com/webstore/detail/monokle-cloud-chrome-exte/loojojkleiolidaodalflgbmaijeibob?hl=en">
-            Get the Chrome extension for GitHub
-          </S.InfoLink>
+          <S.InfoLink onClick={handleChromeExtension}>Get the Chrome extension for GitHub</S.InfoLink>
         </S.Text>
         <S.Text>
-          <S.InfoLink href="https://monokle.io/download">Get the CLI</S.InfoLink>
+          <S.InfoLink onClick={handleCLI}>Get the CLI</S.InfoLink>
         </S.Text>
         <S.Info>
           <S.InfoLink onClick={handleHideEditorPlaceholder}>Hide this</S.InfoLink>
