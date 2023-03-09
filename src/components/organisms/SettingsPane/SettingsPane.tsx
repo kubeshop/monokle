@@ -78,6 +78,11 @@ const SettingsPane = () => {
                 </S.TabItemContainer>
               ),
             },
+          ]
+        : []),
+
+      ...(!activeProject || isStartProjectPaneVisible
+        ? [
             {
               key: 'default-project-settings',
               label: <S.TabOption>Default project settings</S.TabOption>,
