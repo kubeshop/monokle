@@ -1,5 +1,4 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {useMount} from 'react-use';
 
 import {FundProjectionScreenOutlined} from '@ant-design/icons';
 
@@ -99,10 +98,6 @@ const DashboardPane = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMetaMapRef]);
-
-  useMount(() => {
-    dispatch(setActiveDashboardMenu({key: 'Overview', label: 'Overview'}));
-  });
 
   const setActiveMenu = useCallback(
     (menuItem: DashboardMenu) => {
