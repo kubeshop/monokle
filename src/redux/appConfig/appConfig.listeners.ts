@@ -62,7 +62,7 @@ const loadKubeConfigListener: AppListenerFn = listen => {
               setAlert({
                 type: AlertEnum.Error,
                 title: 'Cluster connection',
-                message: 'Kubeconfig file changed. cluster connection stopped.',
+                message: 'Current-context of the kubeconfig file changed, cluster connection stopped.'
               })
             );
           }
