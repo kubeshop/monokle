@@ -3,6 +3,7 @@ import {useMeasure} from 'react-use';
 
 import {CollapsePanelProps} from 'antd';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 import {kustomizationResourcesSelectors} from '@redux/selectors';
 
@@ -22,6 +23,7 @@ import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarCon
 const KustomizePane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kustomizationsResources = useAppSelector(kustomizationResourcesSelectors);
 
   const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
@@ -29,6 +31,7 @@ const KustomizePane: React.FC<InjectedPanelProps> = props => {
   return (
     <AccordionPanel
       {...props}
+      disabled={isInClusterMode}
       header={
         <AccordionTitleBarContainer ref={containerRef}>
           <TitleBar

@@ -7,6 +7,7 @@ import {ExclamationCircleOutlined, FolderAddOutlined, ReloadOutlined} from '@ant
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openCreateFileFolderModal, setFileExplorerExpandedFolders} from '@redux/reducers/ui';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -30,6 +31,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
   const fileExplorerExpandedFolders = useAppSelector(state => state.ui.fileExplorerExpandedFolders);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const rootEntry = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
 
@@ -50,6 +52,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
   return (
     <AccordionPanel
       {...props}
+      disabled={isInClusterMode}
       showArrow={false}
       header={
         <AccordionTitleBarContainer>

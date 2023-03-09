@@ -5,7 +5,7 @@ import {size} from 'lodash';
 
 import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip} from '@constants/tooltips';
 
-import {activeProjectSelector} from '@redux/appConfig';
+import {activeProjectSelector, isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
@@ -61,7 +61,7 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
 
       return {count: changedFiles.length, size: 'small'};
     },
-    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
+    isVisible: () => Boolean(useAppSelector(activeProjectSelector)) && !useAppSelector(isInClusterModeSelector),
   },
   {
     type: 'panel',

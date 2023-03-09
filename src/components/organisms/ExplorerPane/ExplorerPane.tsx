@@ -2,6 +2,7 @@ import {Collapse as RawCollapse} from 'antd';
 
 import styled from 'styled-components';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setExplorerSelectedSection} from '@redux/reducers/ui';
 
@@ -15,13 +16,17 @@ import KustomizePane from './KustomizePane';
 const ExplorerPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const explorerSelectedSection = useAppSelector(state => state.ui.explorerSelectedSection);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   return (
     <Collapse
       accordion
       ghost
-      activeKey={explorerSelectedSection}
+      activeKey={isInClusterMode ? 'images' : explorerSelectedSection}
       onChange={(key: any) => {
+        if (isInClusterMode) {
+          return;
+        }
         dispatch(setExplorerSelectedSection(key));
         trackEvent('left-menu/activity-changed', {activity: 'explorer', section: key});
       }}
