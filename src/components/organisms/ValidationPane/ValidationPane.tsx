@@ -3,7 +3,8 @@ import {useMeasure} from 'react-use';
 import {Image} from 'antd';
 import Link from 'antd/lib/typography/Link';
 
-import {useAppDispatch} from '@redux/hooks';
+import {isInClusterModeSelector} from '@redux/appConfig';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {useValidationSelector} from '@redux/validation/validation.selectors';
 import {setSelectedProblem} from '@redux/validation/validation.slice';
@@ -19,6 +20,7 @@ import * as S from './ValidationPane.styled';
 const ValidationPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const lastResponse = useValidationSelector(state => state.lastResponse);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const newProblemsIntroducedType = useValidationSelector(state => state.validationOverview.newProblemsIntroducedType);
   const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem);
   const status = useValidationSelector(state => state.status);
@@ -51,6 +53,7 @@ const ValidationPane: React.FC = () => {
 
       <ValidationOverview
         containerStyle={{marginTop: '20px'}}
+        showOnlyByResource={isInClusterMode}
         height={height - titleBarHeight - 40}
         newProblemsIntroducedType={newProblemsIntroducedType}
         selectedProblem={selectedProblem?.problem}
