@@ -6,8 +6,10 @@ import {activeProjectSelector, isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
 
-import {ActionsPane, BottomPaneManager, Dashboard, GitOpsView, NavigatorPane} from '@organisms';
+import {BottomPaneManager, Dashboard, GitOpsView, NavigatorPane} from '@organisms';
 import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
+
+import DynamicForm from '@components/atoms/DynamicForm';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
@@ -108,7 +110,7 @@ const NewPaneManager: React.FC = () => {
                     ) : currentActivity?.name === 'validation' ? (
                       <ProblemPane />
                     ) : (
-                      <ActionsPane />
+                      <DynamicForm />
                     )
                   }
                   layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}

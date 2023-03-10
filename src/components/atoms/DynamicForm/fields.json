@@ -1,0 +1,23 @@
+{
+  "staticProperties": {
+    "name": {
+      "type": "string"
+    }
+  },
+  "dynamicProperties": {
+    "namespace": {
+      "type": "string"
+    },
+    "annotations": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
