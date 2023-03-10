@@ -60,9 +60,8 @@ const Dashboard: React.FC = () => {
   const clusterResourceContentMapRef = useResourceContentMapRef('cluster');
   const clusterResourceMetaMapRef = useResourceMetaMapRef('cluster');
   const {height} = useMainPaneDimensions();
-  const clusterConnectionOptions = useAppSelector(state => state.main.clusterConnectionOptions);
 
-  const filterResources = useCallback(() => {
+  const filteredResources = useMemo(() => {
     return Object.values(clusterResourceContentMapRef.current)
       .map(r => ({...r, ...clusterResourceMetaMapRef.current[r.id]}))
       .filter(
@@ -70,12 +69,7 @@ const Dashboard: React.FC = () => {
           activeMenu.key.replace(`${resource.object.apiVersion}-`, '') === resource.object.kind &&
           resource.object.kind === activeMenu.label
       );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMenu, clusterResourceContentMapRef, clusterResourceMetaMapRef, clusterConnectionOptions]);
-
-  const filteredResources = useMemo(() => {
-    return filterResources();
-  }, [filterResources]);
+  }, [activeMenu, clusterResourceContentMapRef, clusterResourceMetaMapRef]);
 
   const getContent = useCallback(() => {
     if (activeMenu.key === 'Overview') {
@@ -107,7 +101,7 @@ const Dashboard: React.FC = () => {
         />
       );
     }
-  }, [activeMenu, filterResources, menuList]);
+  }, [activeMenu.key, activeMenu.label, filteredResources, menuList]);
 
   return (
     <S.Container $paneHeight={height}>
