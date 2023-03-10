@@ -1,11 +1,13 @@
 import {size} from 'lodash';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {errorsSelector, useValidationSelector, warningsSelector} from '@redux/validation/validation.selectors';
 
 import * as S from './Status.styled';
 
 export const Status = () => {
+  const dispatch = useAppDispatch();
   const clusterResourceCount = useAppSelector(state => size(state.main.resourceMetaMapByStorage.cluster));
   const errors = useValidationSelector(errorsSelector);
   const warnings = useValidationSelector(warningsSelector);
@@ -16,12 +18,18 @@ export const Status = () => {
         <S.Count>{clusterResourceCount}</S.Count>
         <span>resources</span>
       </S.KindRow>
+
       <S.InnerContainer>
-        <S.KindRow $type="error" style={{width: '48.5%'}}>
+        <S.KindRow $type="error" style={{width: '48.5%'}} onClick={() => dispatch(setLeftMenuSelection('validation'))}>
           <S.Count>{size(errors)}</S.Count>
           <span>errors</span>
         </S.KindRow>
-        <S.KindRow $type="warning" style={{width: '48.5%'}}>
+
+        <S.KindRow
+          $type="warning"
+          style={{width: '48.5%'}}
+          onClick={() => dispatch(setLeftMenuSelection('validation'))}
+        >
           <S.Count>{size(warnings)}</S.Count>
           <span>warnings</span>
         </S.KindRow>
