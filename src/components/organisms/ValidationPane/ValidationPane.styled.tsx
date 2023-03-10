@@ -1,4 +1,11 @@
+import {Button} from 'antd';
+
 import styled from 'styled-components';
+
+export const BackToDashboardButton = styled(Button)`
+  display: block;
+  padding-left: 0px;
+`;
 
 export const DescriptionContainer = styled.div`
   display: grid;

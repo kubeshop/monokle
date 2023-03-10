@@ -1,14 +1,16 @@
 import {shell} from 'electron';
 
-import {toggleEditorPlaceholderVisiblity} from '@redux/appConfig';
-import {useAppDispatch} from '@redux/hooks';
+import {isInClusterModeSelector, toggleEditorPlaceholderVisiblity} from '@redux/appConfig';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setExplorerSelectedSection, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import MonacoPlaceholderImageNew from '@assets/MonacoPlaceholderImageNew.svg';
 
 import * as S from './MonacoPlaceholder.styled';
 
-export const MonacoPlaceholder = () => {
+export const MonacoPlaceholder: React.FC = () => {
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+
   const dispatch = useAppDispatch();
 
   const handleDashboard = () => {
@@ -61,15 +63,21 @@ export const MonacoPlaceholder = () => {
         <S.Text>
           <S.InfoLink onClick={handleDashboard}>Everything about your Cluster live</S.InfoLink>
         </S.Text>
-        <S.Text>
-          <S.InfoLink onClick={handleHelmCharts}>Preview Helm Charts</S.InfoLink>
-        </S.Text>
-        <S.Text>
-          <S.InfoLink onClick={handleKustomization}>Preview Kustomization</S.InfoLink>
-        </S.Text>
-        <S.Text>
-          <S.InfoLink onClick={handleGitOperations}>Git operations</S.InfoLink>
-        </S.Text>
+
+        {!isInClusterMode && (
+          <>
+            <S.Text>
+              <S.InfoLink onClick={handleHelmCharts}>Preview Helm Charts</S.InfoLink>
+            </S.Text>
+            <S.Text>
+              <S.InfoLink onClick={handleKustomization}>Preview Kustomization</S.InfoLink>
+            </S.Text>
+            <S.Text>
+              <S.InfoLink onClick={handleGitOperations}>Git operations</S.InfoLink>
+            </S.Text>
+          </>
+        )}
+
         <S.Text>
           <S.InfoLink onClick={handleValidation}>Validate your resources</S.InfoLink>
         </S.Text>
