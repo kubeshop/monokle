@@ -1,4 +1,9 @@
+import {Tooltip} from 'antd';
+
 import {size} from 'lodash';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
+import {ClusterDashboardErrorsWarningTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
@@ -20,19 +25,27 @@ export const Status = () => {
       </S.KindRow>
 
       <S.InnerContainer>
-        <S.KindRow $type="error" style={{width: '48.5%'}} onClick={() => dispatch(setLeftMenuSelection('validation'))}>
-          <S.Count>{size(errors)}</S.Count>
-          <span>errors</span>
-        </S.KindRow>
+        <Tooltip title={<ClusterDashboardErrorsWarningTooltip type="errors" />} mouseEnterDelay={TOOLTIP_DELAY}>
+          <S.KindRow
+            $type="error"
+            style={{width: '48.5%'}}
+            onClick={() => dispatch(setLeftMenuSelection('validation'))}
+          >
+            <S.Count>{size(errors)}</S.Count>
+            <span>errors</span>
+          </S.KindRow>
+        </Tooltip>
 
-        <S.KindRow
-          $type="warning"
-          style={{width: '48.5%'}}
-          onClick={() => dispatch(setLeftMenuSelection('validation'))}
-        >
-          <S.Count>{size(warnings)}</S.Count>
-          <span>warnings</span>
-        </S.KindRow>
+        <Tooltip title={<ClusterDashboardErrorsWarningTooltip type="warnings" />} mouseEnterDelay={TOOLTIP_DELAY}>
+          <S.KindRow
+            $type="warning"
+            style={{width: '48.5%'}}
+            onClick={() => dispatch(setLeftMenuSelection('validation'))}
+          >
+            <S.Count>{size(warnings)}</S.Count>
+            <span>warnings</span>
+          </S.KindRow>
+        </Tooltip>
       </S.InnerContainer>
     </S.Container>
   );

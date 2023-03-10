@@ -103,3 +103,6 @@ export const GitCommitDisabledTooltip = 'There are no staged files to commit';
 export const GitCommitEnabledTooltip = ({branchName}: {branchName: string}) => (
   <div>Commit staged files to {branchName}</div>
 );
+export const ClusterDashboardErrorsWarningTooltip = ({type}: {type: 'errors' | 'warnings'}) => (
+  <div>Click to see all your cluster {type}</div>
+);
