@@ -101,6 +101,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
             isHovered={isHovered}
             level={level}
             isLastItem={isLastItem}
+            onClick={onClick}
             hasOnClick={Boolean(instanceHandlerRef.current?.onClick)}
             $indentation={indentation}
             $isSectionCheckable={isSectionCheckable}
@@ -134,7 +135,6 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
                 isDirty={itemInstance.isDirty}
                 isHighlighted={itemInstance.isHighlighted}
                 isDisabled={itemInstance.isDisabled}
-                onClick={onClick}
               >
                 {itemInstance.name} {itemInstance.isDirty ? '*' : ''}
               </S.ItemName>
