@@ -68,17 +68,17 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
   <tr>
     <td>
       <div align="center">
-        <img src="docs/img/windows.svg" height="50" width="50" />
+        <img src="docs/docs/img/windows.svg" height="50" width="50" />
       </div>
     </td>
     <td>
       <div align="center">
-        <img src="docs/img/macos.svg" height="50" width="50" />
+        <img src="docs/docs/img/macos.svg" height="50" width="50" />
       </div>
     </td>
     <td>
       <div align="center">
-        <img src="docs/img/linux.svg" height="50" width="50" />
+        <img src="docs/docs/img/linux.svg" height="50" width="50" />
       </div>
     </td>
   </tr>

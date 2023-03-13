@@ -18,7 +18,7 @@ import {mainSlice} from './reducers/main';
 import {imageListParserListener} from './reducers/main/mainListeners';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
 import {killTerminalProcessesListener, terminalSlice} from './reducers/terminal';
-import {uiSlice} from './reducers/ui';
+import {stopClusterConnectionListener, uiSlice} from './reducers/ui';
 import {validationListeners} from './validation/validation.listeners';
 import {validationSlice} from './validation/validation.slice';
 
@@ -46,6 +46,7 @@ combineListeners([
   ...validationListeners,
   ...appConfigListeners,
   imageListParserListener,
+  stopClusterConnectionListener,
 ]);
 
 const appReducer = combineReducers({

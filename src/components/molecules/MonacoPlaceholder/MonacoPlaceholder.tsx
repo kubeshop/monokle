@@ -1,40 +1,91 @@
-import {toggleEditorPlaceholderVisiblity} from '@redux/appConfig';
-import {useAppDispatch} from '@redux/hooks';
+import {shell} from 'electron';
 
-import MonacoPlaceholderImage from '@assets/MonacoPlaceholderImage.svg';
+import {isInClusterModeSelector, toggleEditorPlaceholderVisiblity} from '@redux/appConfig';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setExplorerSelectedSection, setLeftMenuSelection} from '@redux/reducers/ui';
+
+import MonacoPlaceholderImageNew from '@assets/MonacoPlaceholderImageNew.svg';
 
 import * as S from './MonacoPlaceholder.styled';
 
-export const MonacoPlaceholder = () => {
+export const MonacoPlaceholder: React.FC = () => {
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+
   const dispatch = useAppDispatch();
+
+  const handleDashboard = () => {
+    dispatch(setLeftMenuSelection('dashboard'));
+  };
+
+  const handleValidation = () => {
+    dispatch(setLeftMenuSelection('validation'));
+  };
+
+  const handleHelmCharts = () => {
+    dispatch(setLeftMenuSelection('explorer'));
+    dispatch(setExplorerSelectedSection('helm'));
+  };
+
+  const handleKustomization = () => {
+    dispatch(setLeftMenuSelection('explorer'));
+    dispatch(setExplorerSelectedSection('kustomize'));
+  };
+
+  const handleGitOperations = () => {
+    dispatch(setLeftMenuSelection('git'));
+  };
 
   const handleHideEditorPlaceholder = () => {
     dispatch(toggleEditorPlaceholderVisiblity(true));
+  };
+
+  const handleChromeExtension = () => {
+    shell.openExternal(
+      'https://chrome.google.com/webstore/detail/monokle-cloud-chrome-exte/loojojkleiolidaodalflgbmaijeibob?hl=en'
+    );
+  };
+
+  const handleCLI = () => {
+    shell.openExternal('https://monokle.io/download');
   };
 
   return (
     <S.Container>
       <div>
         <S.ImageContainer>
-          <S.Image src={MonacoPlaceholderImage} />
+          <S.Image src={MonacoPlaceholderImageNew} />
         </S.ImageContainer>
-        <S.Title>Need inspiration? Try any of these</S.Title>
+        <S.Title>
+          Select a resource on the left to edit
+          <br />
+          Want to go further? Try these shortcuts
+        </S.Title>
         <S.Text>
-          <b>Navigate and Validate</b>
-          <span> Resources</span>
+          <S.InfoLink onClick={handleDashboard}>Everything about your Cluster live</S.InfoLink>
+        </S.Text>
+
+        {!isInClusterMode && (
+          <>
+            <S.Text>
+              <S.InfoLink onClick={handleHelmCharts}>Preview Helm Charts</S.InfoLink>
+            </S.Text>
+            <S.Text>
+              <S.InfoLink onClick={handleKustomization}>Preview Kustomization</S.InfoLink>
+            </S.Text>
+            <S.Text>
+              <S.InfoLink onClick={handleGitOperations}>Git operations</S.InfoLink>
+            </S.Text>
+          </>
+        )}
+
+        <S.Text>
+          <S.InfoLink onClick={handleValidation}>Validate your resources</S.InfoLink>
         </S.Text>
         <S.Text>
-          <b>Preview</b>
-          <span> Kustomizations and Helm Charts</span>
+          <S.InfoLink onClick={handleChromeExtension}>Get the Chrome extension for GitHub</S.InfoLink>
         </S.Text>
         <S.Text>
-          <b>Compare</b>
-          <span> sets of Resources</span>
-        </S.Text>
-        <S.Text>
-          <span>Use </span>
-          <b>Templates</b>
-          <span> to easily create new Resources</span>
+          <S.InfoLink onClick={handleCLI}>Get the CLI</S.InfoLink>
         </S.Text>
         <S.Info>
           <S.InfoLink onClick={handleHideEditorPlaceholder}>Hide this</S.InfoLink>

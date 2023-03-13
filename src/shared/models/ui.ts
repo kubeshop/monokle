@@ -64,6 +64,9 @@ type NewResourceWizardInput = {
   targetFile?: string;
 };
 
+export const ExplorerCollapsibleSections = ['files', 'kustomize', 'helm', 'images'] as const;
+export type ExplorerCollapsibleSectionsType = typeof ExplorerCollapsibleSections[number];
+
 export const LeftMenuSelectionOptions = [
   'explorer',
   'compare',
@@ -190,6 +193,12 @@ type UiState = {
   welcomePopup: {
     isVisible: boolean;
   };
+  fileCompareModal: {
+    isVisible: boolean;
+    filePath: string;
+  };
+  explorerSelectedSection: ExplorerCollapsibleSectionsType;
+  fileExplorerExpandedFolders: string[];
 };
 
 type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {});

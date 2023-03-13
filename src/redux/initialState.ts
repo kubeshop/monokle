@@ -232,6 +232,12 @@ const initialUiState: UiState = {
   helmRepo: {
     search: '',
   },
+  fileCompareModal: {
+    isVisible: false,
+    filePath: '',
+  },
+  explorerSelectedSection: 'files',
+  fileExplorerExpandedFolders: [],
 };
 
 const initialNavigatorState: NavigatorState = {

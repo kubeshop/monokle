@@ -6,6 +6,7 @@ import {CollapsePanelProps, Input, Typography} from 'antd';
 import {size} from 'lodash';
 import styled from 'styled-components';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {searchHelmRepo, setHelmRepoPane, setHideNavigatorPane} from '@redux/reducers/ui';
 
@@ -27,6 +28,7 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
 
@@ -46,6 +48,7 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
   return (
     <AccordionPanel
       {...props}
+      disabled={isInClusterMode}
       header={
         <AccordionTitleBarContainer ref={containerRef}>
           <TitleBar

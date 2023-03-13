@@ -22,14 +22,30 @@ export const CellStatus = {
   width: '120px',
   render: (object: any) => (
     <div>
-      {(object?.status?.phase === 'Running' && <S.StatusRunning>{object?.status?.phase}</S.StatusRunning>) ||
-        (object?.status?.phase === 'Bound' && <S.StatusRunning>{object?.status?.phase}</S.StatusRunning>) ||
-        (object?.status?.phase === 'Pending' && <S.StatusPending>{object?.status?.phase}</S.StatusPending>) ||
-        (object?.status?.phase === 'Terminating' && (
-          <S.StatusTerminating>{object?.status?.phase}</S.StatusTerminating>
-        )) ||
-        (object?.status?.phase === 'Active' && <S.StatusActive>{object?.status?.phase}</S.StatusActive>) ||
-        (object?.status?.phase ? <Tag color="magenta">{object?.status?.phase}</Tag> : <span>-</span>)}
+      {object.status?.containerStatuses && object.status?.containerStatuses[0]?.state?.waiting?.reason
+        ? (object.status?.containerStatuses[0]?.state?.waiting?.reason === 'ContainerCreating' && (
+            <S.StatusPending>{object.status?.containerStatuses[0]?.state?.waiting?.reason}</S.StatusPending>
+          )) ||
+          (object.status?.containerStatuses[0]?.state?.waiting?.reason === 'ErrImagePull' && (
+            <S.StatusTerminating>{object.status?.containerStatuses[0]?.state?.waiting?.reason}</S.StatusTerminating>
+          )) ||
+          (object.status?.containerStatuses[0]?.state?.waiting?.reason === 'ImagePullBackOff' && (
+            <S.StatusTerminating>{object.status?.containerStatuses[0]?.state?.waiting?.reason}</S.StatusTerminating>
+          )) ||
+          (object.status?.containerStatuses[0]?.state?.waiting?.reason ? (
+            <Tag color="magenta">{object.status?.containerStatuses[0]?.state?.waiting?.reason}</Tag>
+          ) : (
+            <span>-</span>
+          ))
+        : (object?.status?.phase === 'Succeeded' && <S.StatusActive>{object?.status?.phase}</S.StatusActive>) ||
+          (object?.status?.phase === 'Running' && <S.StatusRunning>{object?.status?.phase}</S.StatusRunning>) ||
+          (object?.status?.phase === 'Bound' && <S.StatusRunning>{object?.status?.phase}</S.StatusRunning>) ||
+          (object?.status?.phase === 'Pending' && <S.StatusPending>{object?.status?.phase}</S.StatusPending>) ||
+          (object?.status?.phase === 'Terminating' && (
+            <S.StatusTerminating>{object?.status?.phase}</S.StatusTerminating>
+          )) ||
+          (object?.status?.phase === 'Active' && <S.StatusActive>{object?.status?.phase}</S.StatusActive>) ||
+          (object?.status?.phase ? <Tag color="magenta">{object?.status?.phase}</Tag> : <span>-</span>)}
     </div>
   ),
   sorter: (a: K8sResource, b: K8sResource) => a.object?.status?.phase?.localeCompare(b.object?.status?.phase),

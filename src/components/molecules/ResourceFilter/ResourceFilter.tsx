@@ -21,7 +21,7 @@ import {
 } from '@redux/selectors/resourceMapSelectors';
 import {startClusterConnection} from '@redux/thunks/cluster';
 
-import {useFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
+import {useFileFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 import {useNamespaces} from '@hooks/useNamespaces';
 
 import {useWindowSize} from '@utils/hooks';
@@ -65,7 +65,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
 
   const [localResourceFilter, setLocalResourceFilter] = useState<ResourceFilterType>(filtersMap);
   const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
-  const folderTree = useFolderTreeSelectData();
+  const folderTree = useFileFolderTreeSelectData('all');
   const autocompleteOptions = useMemo(() => {
     return {
       namespaces:

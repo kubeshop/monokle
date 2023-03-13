@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.3](https://github.com/kubeshop/monokle/compare/v2.0.3-nightly-2023-03-09.0...v2.0.3) (2023-03-09)
+
+
+### Features
+
+* add new k8s versions ([6cd9410](https://github.com/kubeshop/monokle/commit/6cd9410944ebf686fd8698203b2b0b9879b22fa9))
+* redux file explorer expanded keys ([64d5cf7](https://github.com/kubeshop/monokle/commit/64d5cf73368a3201009ec7915dd108eba15d984a))
+
+
+### Bug Fixes
+
+* add dmg-licence package to main workflow ([5a0786c](https://github.com/kubeshop/monokle/commit/5a0786cd7aef254821a47e17ef2200da862758d5))
+* disable section + hide git pane in cluster mode ([ed95e24](https://github.com/kubeshop/monokle/commit/ed95e243cb1494e64c25e1939f52c201269331c0))
+* keep selection in cluster dashboard ([3ff35cc](https://github.com/kubeshop/monokle/commit/3ff35ccea886bbace3b9341f2ef75f2a4dfc66fe))
+* notify when change ([f9487aa](https://github.com/kubeshop/monokle/commit/f9487aaf28719255080415435dc6b8cd117f4c18))
+* settings tabs ([7895e59](https://github.com/kubeshop/monokle/commit/7895e5999dc8922aef77f6d3ac52e5761917b791))
+* watch global kubeconf and project kubeconf ([aaaed58](https://github.com/kubeshop/monokle/commit/aaaed587027d032fccac00bd59f578b1975208f6))
+
 ### [2.0.2](https://github.com/kubeshop/monokle/compare/v2.0.2-nightly-2023-03-01.0...v2.0.2) (2023-03-01)
 
 
