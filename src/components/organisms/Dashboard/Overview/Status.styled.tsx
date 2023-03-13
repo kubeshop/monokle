@@ -21,12 +21,14 @@ export const Count = styled.span`
   margin-right: 4px;
 `;
 
-export const KindRow = styled.div<{$type: string}>`
+export const KindRow = styled.div<{$type: 'error' | 'warning' | 'resource'}>`
   display: flex;
+  align-items: center;
   border-radius: 4px;
   width: 100%;
   margin-bottom: 10px;
   padding: 10px;
+  cursor: ${({$type}) => ($type === 'warning' || $type === 'error' ? 'pointer' : 'default')};
 
   ${props =>
     `border-left: 4px solid ${

@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 
 import {ColumnsType} from 'antd/lib/table';
 
-import {setDashboardSelectedResourceId} from '@redux/dashboard';
+import {setActiveTab, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 
@@ -64,6 +64,7 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
             return {
               onClick: () => {
                 dispatch(setDashboardSelectedResourceId(record.id));
+                dispatch(setActiveTab('Info'));
                 dispatch(selectResource({resourceIdentifier: {id: record.id, storage: 'cluster'}}));
               },
             };

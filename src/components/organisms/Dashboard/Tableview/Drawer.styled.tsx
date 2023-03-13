@@ -10,7 +10,7 @@ export const Drawer = styled(RawDrawer)`
   & .ant-drawer-content {
     background: ${Colors.grey1};
   }
-  z-index: 100;
+  z-index: 10000;
 
   & .ant-drawer-close {
     position: absolute;

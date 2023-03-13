@@ -107,7 +107,7 @@ const Dashboard: React.FC = () => {
         />
       );
     }
-  }, [activeMenu, filterResources, menuList]);
+  }, [activeMenu.key, activeMenu.label, filteredResources, menuList]);
 
   return (
     <S.Container $paneHeight={height}>

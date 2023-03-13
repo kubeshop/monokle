@@ -29,14 +29,12 @@ export const Text = styled.p`
   font-size: 0.9rem;
 `;
 
+// text-decoration: underline;
 export const InfoLink = styled.a`
-  text-decoration: underline;
   color: ${Colors.grey7};
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   :hover {
-    opacity: 0.7;
-    color: ${Colors.grey7};
-    text-decoration: underline;
+    color: ${Colors.grey9};
   }
 `;
 
