@@ -13,7 +13,7 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import ValidationFigure from '@assets/NewValidationFigure.svg';
 
-import {TitleBar, ValidationOverview} from '@monokle/components';
+import {Icon, TitleBar, ValidationOverview} from '@monokle/components';
 
 import * as S from './ValidationPane.styled';
 
@@ -46,7 +46,11 @@ const ValidationPane: React.FC = () => {
                 off, and more in the <Link onClick={() => dispatch(setLeftMenuSelection('settings'))}>settings</Link>{' '}
                 section, located in the left menu.
                 {isInClusterMode && (
-                  <S.BackToDashboardButton type="link" onClick={() => dispatch(setLeftMenuSelection('dashboard'))}>
+                  <S.BackToDashboardButton
+                    icon={<Icon name="cluster-dashboard" />}
+                    type="primary"
+                    onClick={() => dispatch(setLeftMenuSelection('dashboard'))}
+                  >
                     Back to cluster dashboard
                   </S.BackToDashboardButton>
                 )}

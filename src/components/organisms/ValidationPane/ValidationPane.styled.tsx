@@ -4,7 +4,8 @@ import styled from 'styled-components';
 
 export const BackToDashboardButton = styled(Button)`
   display: block;
-  padding-left: 0px;
+  margin-top: 10px;
+  border-radius: 4px;
 `;
 
 export const DescriptionContainer = styled.div`
