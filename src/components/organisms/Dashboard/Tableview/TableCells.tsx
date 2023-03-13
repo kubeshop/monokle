@@ -23,8 +23,9 @@ export const CellStatus = {
   render: (object: any) => (
     <div>
       {object.status?.containerStatuses && object.status?.containerStatuses[0]?.state?.waiting?.reason ? (
-        <S.StatusPending>{object.status?.containerStatuses[0]?.state?.waiting?.reason}</S.StatusPending>
+        <S.StatusTerminating>{object.status?.containerStatuses[0]?.state?.waiting?.reason}</S.StatusTerminating>
       ) : (
+        (object?.status?.phase === 'Succeeded' && <S.StatusActive>{object?.status?.phase}</S.StatusActive>) ||
         (object?.status?.phase === 'Running' && <S.StatusRunning>{object?.status?.phase}</S.StatusRunning>) ||
         (object?.status?.phase === 'Bound' && <S.StatusRunning>{object?.status?.phase}</S.StatusRunning>) ||
         (object?.status?.phase === 'Pending' && <S.StatusPending>{object?.status?.phase}</S.StatusPending>) ||
