@@ -1,6 +1,9 @@
-import {useEffect} from 'react';
+import {useCallback, useMemo, useState} from 'react';
+import {useAsync, useMeasure} from 'react-use';
 
-import {Select as AntSelect, Form, Table, Typography} from 'antd';
+import {Table as AntTable, Button, Typography} from 'antd';
+
+import {RightOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -9,91 +12,99 @@ import {useAppSelector} from '@redux/hooks';
 import {Colors} from '@shared/styles';
 import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
 
-const columns = [
+import HelmChartDetails from './HelmChartDetails';
+
+interface TableDataType {
+  name: string;
+  description: string;
+  version: string;
+  app_version: string;
+}
+
+const createColumns = (onItemClick: (chartName: string) => void) => [
   {
     title: 'Name',
     dataIndex: 'name',
     key: 'name',
+    ellipsis: true,
+    sorter: true,
   },
   {
     title: 'Description',
     dataIndex: 'description',
     key: 'description',
+    ellipsis: true,
+    sorter: true,
+    responsive: ['lg'],
   },
   {
-    title: 'Chart Version',
-    dataIndex: 'chartVersion',
-    key: 'chartVersion',
+    title: 'Version',
+    dataIndex: 'version',
+    key: 'version',
   },
   {
     title: 'App Version',
-    dataIndex: 'appVersion',
-    key: 'appVersion',
+    dataIndex: 'app_version',
+    key: 'app_version',
+  },
+  {
+    title: '',
+    dataIndex: '',
+    key: 'x',
+
+    render: (_text: string, record: TableDataType) => (
+      <HoverArea>
+        <Button type="primary" onClick={() => onItemClick(record.name)}>
+          Details & Download
+        </Button>
+        <RightOutlined style={{fontSize: 14, marginLeft: 8}} />
+      </HoverArea>
+    ),
   },
 ];
 
 const HelmRepoPane = () => {
-  const [form] = Form.useForm();
-  const filters = Form.useWatch([], form);
-  const healmRepoSearch = useAppSelector(state => state.ui.helmRepo.search);
-  const searchResultCount = 0;
+  const helmRepoSearch = useAppSelector(state => state.ui.helmRepo.search);
+  const [selectedChart, setSelectedChart] = useState<string | null>(null);
+  const [ref, {height: contentHeight}] = useMeasure<HTMLDivElement>();
+  const onItemClick = useCallback((chart: string) => {
+    setSelectedChart(chart);
+  }, []);
 
-  useEffect(() => {
-    runCommandInMainThread(searchHelmRepoCommand({q: 'nginx'}))
-      .then(console.log)
-      .catch(console.error);
-  });
+  const columns = useMemo(() => {
+    return createColumns(onItemClick);
+  }, [onItemClick]);
+
+  const {
+    value: data = [],
+    error,
+    loading,
+  } = useAsync(async () => {
+    const result = await runCommandInMainThread(searchHelmRepoCommand({q: helmRepoSearch}));
+    return JSON.parse(result.stdout || '[]') as Array<TableDataType>;
+  }, [helmRepoSearch]);
+
+  const searchResultCount = data.length;
 
   return (
     <Container>
       <Header>
         <Title>{searchResultCount} Helm Charts found</Title>
-
-        <Form layout="inline" form={form}>
-          <Form.Item name="publisher">
-            <Select placeholder="Publisher">
-              <Select.Option value="official">Official</Select.Option>
-              <Select.Option value="verified">Verified publishers</Select.Option>
-              <Select.Option value="cncf">CNCF</Select.Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="kind">
-            <Select placeholder="Kind">
-              <Select.Option value="containerImages">Containers images</Select.Option>
-              <Select.Option value="falcoRules">Falco rules</Select.Option>
-              <Select.Option value="helmCharts">Helm charts</Select.Option>
-              <Select.Option value="krewKubectlPlugins">Krew kubectl plugins</Select.Option>
-              <Select.Option value="olm">OLM operators</Select.Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="category">
-            <Select placeholder="Category">
-              <Select.Option value="integration">Integration and delivery</Select.Option>
-              <Select.Option value="monitoring">Monitoring and logging</Select.Option>
-              <Select.Option value="networking">Networking</Select.Option>
-              <Select.Option value="security">Security</Select.Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="license">
-            <Select placeholder="License">
-              <Select.Option value="apache">Apache-2.0</Select.Option>
-              <Select.Option value="mit">MIT</Select.Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="others">
-            <Select placeholder="Others">
-              <Select.Option value="onlyOperators">Only operators</Select.Option>
-              <Select.Option value="includeDeprecated">Include deprecated</Select.Option>
-            </Select>
-          </Form.Item>
-        </Form>
       </Header>
-
-      <Table columns={columns} />
+      <div ref={ref} style={{height: '100%', overflow: 'hidden'}}>
+        <Table
+          showSorterTooltip
+          sticky
+          rowKey="name"
+          dataSource={data}
+          columns={columns}
+          sortDirections={['ascend', 'descend']}
+          loading={loading}
+          pagination={false}
+          scroll={{y: contentHeight - 56}}
+        />
+      </div>
+      {selectedChart && <HelmChartDetails chart={selectedChart} onDismissPane={setSelectedChart} />}
     </Container>
   );
 };
@@ -101,13 +112,20 @@ const HelmRepoPane = () => {
 export default HelmRepoPane;
 
 const Container = styled.div`
+  position: relative;
   display: grid;
   grid-template-columns: 1fr;
+  grid-template-rows: 56px 1fr;
   row-gap: 16px;
   padding: 12px 12px 12px 22px;
+  overflow: hidden;
+  height: 100%;
+  place-content: start;
 `;
 
 const Header = styled.div`
+  position: sticky;
+  top: 0;
   display: flex;
   background-color: ${Colors.grey3b};
   justify-content: space-between;
@@ -123,6 +141,44 @@ const Title = styled(Typography.Text)`
   font-weight: 700;
 `;
 
-const Select = styled(AntSelect)`
-  width: 108px !important;
+const Table = styled(props => <AntTable {...props} />)`
+  .ant-table {
+    border: 1px solid ${Colors.grey4};
+    border-radius: 2px;
+  }
+
+  .ant-table-header {
+    background-color: ${Colors.grey2};
+    color: ${Colors.grey9};
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 700;
+    border-bottom: 1px solid ${Colors.grey4};
+    margin-bottom: 0;
+  }
+
+  .ant-table-thead .ant-table-cell::before {
+    display: none;
+  }
+
+  .ant-table-body .ant-table-row {
+    background-color: ${Colors.grey1};
+    border-bottom: 1px solid ${Colors.grey4};
+  }
+
+  .ant-table-body .ant-table-row:hover {
+    background-color: ${Colors.grey2};
+  }
+
+  .ant-table-body .ant-table-row:hover .hover-area {
+    visibility: visible;
+  }
+`;
+
+const HoverArea = styled.div.attrs({
+  className: 'hover-area',
+})`
+  display: flex;
+  align-items: center;
+  visibility: hidden;
 `;

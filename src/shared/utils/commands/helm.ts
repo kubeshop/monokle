@@ -76,3 +76,39 @@ export function searchHelmRepoCommand({q}: {q: string}, env?: HelmEnv): CommandO
     env,
   };
 }
+
+export function helmChartInfoCommand({name}: {name: string}, env?: HelmEnv): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['show', 'chart', name],
+    env,
+  };
+}
+
+export function helmChartReadmeCommand({name}: {name: string}, env?: HelmEnv): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['show', 'readme', name],
+    env,
+  };
+}
+
+export function helmChartTemplateCommand({name}: {name: string}, env?: HelmEnv): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['template', name],
+    env,
+  };
+}
+
+export function helmChartValuesCommand({name}: {name: string}, env?: HelmEnv): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['show', 'values', name],
+    env,
+  };
+}

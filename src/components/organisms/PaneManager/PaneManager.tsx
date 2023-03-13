@@ -76,7 +76,6 @@ const NewPaneManager: React.FC = () => {
   );
 
   const currentActivity = useMemo(() => activities.find(a => a.name === leftMenuSelection), [leftMenuSelection]);
-  console.log('currentActivity', hideNavigatorPane);
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
       {isProjectLoading ? (

@@ -59,19 +59,21 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
     >
-      <HelmExplorer>
-        <HelmExplorerTitle>Browse Helm Charts</HelmExplorerTitle>
-        <HelmExplorerInput
-          prefix={<Icon name="globe-search" />}
-          placeholder="Search Charts to download"
-          onChange={onHelmRepoSearchChangeHandler}
-          onFocus={onHelmRepoSearchFocusHandler}
-          onBlur={onHelmRepoSearchBlurHandler}
-        />
-      </HelmExplorer>
-      <SectionBlueprintList id="helm-sections-container" $width={containerWidth + 15}>
-        <SectionRenderer sectionId={RootHelmChartsSectionBlueprint.id} level={0} isLastSection={false} />
-      </SectionBlueprintList>
+      <div>
+        <HelmExplorer>
+          <HelmExplorerTitle>Browse Helm Charts</HelmExplorerTitle>
+          <HelmExplorerInput
+            prefix={<Icon name="globe-search" />}
+            placeholder="Search Charts to download"
+            onChange={onHelmRepoSearchChangeHandler}
+            onFocus={onHelmRepoSearchFocusHandler}
+            onBlur={onHelmRepoSearchBlurHandler}
+          />
+        </HelmExplorer>
+        <SectionBlueprintList id="helm-sections-container" $width={containerWidth + 15}>
+          <SectionRenderer sectionId={RootHelmChartsSectionBlueprint.id} level={0} isLastSection={false} />
+        </SectionBlueprintList>
+      </div>
     </AccordionPanel>
   );
 };
@@ -79,6 +81,8 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
 export default memo(HelmPane);
 
 const HelmExplorer = styled.div`
+  position: sticky;
+  top: 0;
   height: 136px;
   background-color: rgba(82, 115, 224, 0.3);
   margin: 0px 16px 16px 16px;
@@ -88,6 +92,16 @@ const HelmExplorer = styled.div`
   justify-content: center;
   padding-left: 16px;
   padding-right: 14px;
+  z-index: 10;
+  &:before {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+  }
 `;
 
 const HelmExplorerTitle = styled(Typography.Text)`
