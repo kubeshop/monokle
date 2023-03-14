@@ -13,10 +13,7 @@ import {
   getHelmChartFromFileEntry,
   getHelmChartName,
   getHelmValuesFile,
-  isHelmChartFile,
   isHelmChartFolder,
-  isHelmTemplateFile,
-  isHelmValuesFile,
   processHelmChartFolder,
 } from '@redux/services/helm';
 import {createChildrenResourcesHighlights} from '@redux/services/selection';
@@ -43,6 +40,7 @@ import {
   ResourceMetaMap,
 } from '@shared/models/k8sResource';
 import {AppSelection, ResourceSelection} from '@shared/models/selection';
+import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
 
 import {
   deleteResource,
