@@ -238,6 +238,7 @@ const initialUiState: UiState = {
   },
   explorerSelectedSection: 'files',
   fileExplorerExpandedFolders: [],
+  showOpenProjectAlert: electronStore.get('ui.showOpenProjectAlert', true),
 };
 
 const initialNavigatorState: NavigatorState = {

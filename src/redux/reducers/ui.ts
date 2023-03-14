@@ -330,6 +330,10 @@ export const uiSlice = createSlice({
         filePath: '',
       };
     },
+    setShowOpenProjectAlert: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.showOpenProjectAlert = action.payload;
+      electronStore.set('ui.showOpenProjectAlert', action.payload);
+    },
     openScaleModal: (state: Draft<UiState>) => {
       state.isScaleModalOpen = true;
     },
@@ -452,6 +456,7 @@ export const {
   setRightMenuIsActive,
   setRightMenuSelection,
   setSelectedTemplatePath,
+  setShowOpenProjectAlert,
   setShowStartPageLearn,
   setStartPageLearnTopic,
   setStartPageMenuOption,
