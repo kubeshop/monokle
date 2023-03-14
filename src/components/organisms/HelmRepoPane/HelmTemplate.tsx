@@ -1,5 +1,5 @@
 import MonacoEditor, {monaco} from 'react-monaco-editor';
-import {useAsync, useMeasure} from 'react-use';
+import {useAsync} from 'react-use';
 
 import {Skeleton} from 'antd';
 
@@ -20,7 +20,6 @@ const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
 };
 
 const HelmTemplate = ({chartName}: IProps) => {
-  const [ref, {height}] = useMeasure<HTMLDivElement>();
   const {value, loading} = useAsync(async () => {
     const result = await runCommandInMainThread(helmChartTemplateCommand({name: chartName}));
     return result.stdout;
@@ -29,7 +28,7 @@ const HelmTemplate = ({chartName}: IProps) => {
   return loading ? (
     <Skeleton loading={loading} />
   ) : (
-    <div ref={ref} style={{height: '100%', width: '100%', backgroundColor: 'purple'}}>
+    <div style={{height: '100%', width: '100%', backgroundColor: 'purple'}}>
       <MonacoEditor
         width="100%"
         height="85vh"

@@ -75,12 +75,11 @@ const HelmRepoPane = () => {
     return createColumns(onItemClick);
   }, [onItemClick]);
 
-  const {
-    value: data = [],
-    error,
-    loading,
-  } = useAsync(async () => {
+  const {value: data = [], loading} = useAsync(async () => {
     const result = await runCommandInMainThread(searchHelmRepoCommand({q: helmRepoSearch}));
+    if (result.stderr) {
+      throw new Error(result.stderr);
+    }
     return JSON.parse(result.stdout || '[]') as Array<TableDataType>;
   }, [helmRepoSearch]);
 
