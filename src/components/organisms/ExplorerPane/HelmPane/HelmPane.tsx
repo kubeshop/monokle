@@ -62,7 +62,7 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
     >
-      <div>
+      <Content>
         <HelmExplorer>
           <HelmExplorerTitle>Browse Helm Charts</HelmExplorerTitle>
           <HelmExplorerInput
@@ -73,22 +73,32 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
             onBlur={onHelmRepoSearchBlurHandler}
           />
         </HelmExplorer>
-        <SectionBlueprintList id="helm-sections-container" $width={containerWidth + 15}>
-          <SectionRenderer sectionId={RootHelmChartsSectionBlueprint.id} level={0} isLastSection={false} />
-        </SectionBlueprintList>
-      </div>
+        <div style={{overflowY: 'auto'}}>
+          <SectionBlueprintList id="helm-sections-container" $width={containerWidth + 15}>
+            <SectionRenderer sectionId={RootHelmChartsSectionBlueprint.id} level={0} isLastSection={false} />
+          </SectionBlueprintList>
+        </div>
+      </Content>
     </AccordionPanel>
   );
 };
 
 export default memo(HelmPane);
 
+const Content = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 136px 1fr;
+  height: 100%;
+  row-gap: 8px;
+`;
+
 const HelmExplorer = styled.div`
   position: sticky;
   top: 0;
   height: 136px;
   background-color: rgba(82, 115, 224, 0.3);
-  margin: 0px 16px 16px 16px;
+  margin: 0px 24px 16px 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -96,15 +106,6 @@ const HelmExplorer = styled.div`
   padding-left: 16px;
   padding-right: 14px;
   z-index: 10;
-  &:before {
-    position: absolute;
-    content: '';
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 0;
-  }
 `;
 
 const HelmExplorerTitle = styled(Typography.Text)`
