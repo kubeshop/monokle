@@ -112,3 +112,12 @@ export function helmChartValuesCommand({name}: {name: string}, env?: HelmEnv): C
     env,
   };
 }
+
+export function helmPullChartCommand({name, path}: {name: string; path: string}, env?: HelmEnv): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['pull', name, '--untar', '--untardir', path],
+    env,
+  };
+}

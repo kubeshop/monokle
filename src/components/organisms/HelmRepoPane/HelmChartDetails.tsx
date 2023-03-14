@@ -67,7 +67,7 @@ const Container = styled.div`
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 50%;
+  left: 40%;
   right: 0;
   z-index: 10;
   background: ${Colors.grey1};
