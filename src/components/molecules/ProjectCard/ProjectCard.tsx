@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 
 import {Modal, Tooltip} from 'antd';
 
@@ -6,10 +6,12 @@ import {DeleteOutlined, ExclamationCircleOutlined, PushpinFilled, PushpinOutline
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {setDeleteProject, setOpenProject, toggleProjectPin} from '@redux/appConfig';
+import {isInClusterModeSelector, setDeleteProject, setOpenProject, toggleProjectPin} from '@redux/appConfig';
 import {useAppDispatch} from '@redux/hooks';
-import {toggleStartProjectPane} from '@redux/reducers/ui';
+import {setShowOpenProjectAlert, toggleStartProjectPane} from '@redux/reducers/ui';
+import {stopClusterConnection} from '@redux/thunks/cluster';
 
+import {useSelectorWithRef} from '@utils/hooks';
 import {getRelativeDate} from '@utils/index';
 
 import {Project} from '@shared/models/config';
@@ -22,8 +24,11 @@ export const ProjectCard: React.FC<IProps> = props => {
   const {isActive, project} = props;
 
   const dispatch = useAppDispatch();
+  const [, showOpenProjectAlertRef] = useSelectorWithRef(state => state.ui.showOpenProjectAlert);
+  const [, isInClusterModeRef] = useSelectorWithRef(isInClusterModeSelector);
 
   const [isTooltipMessageVisible, setIsTooltipMessageVisible] = useState(false);
+  const checkboxValueRef = useRef(false);
 
   const handleOnDelete = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     e.stopPropagation();
@@ -58,6 +63,37 @@ export const ProjectCard: React.FC<IProps> = props => {
     if (isActive) {
       dispatch(toggleStartProjectPane());
       return;
+    }
+
+    if (isInClusterModeRef.current) {
+      if (showOpenProjectAlertRef.current) {
+        Modal.confirm({
+          title: (
+            <div>
+              Opening this project will close the cluster connection. Do you want to continue?
+              <S.Checkbox
+                onChange={e => {
+                  checkboxValueRef.current = e.target.checked;
+                }}
+              >
+                Don&lsquo;t show this again
+              </S.Checkbox>
+            </div>
+          ),
+          zIndex: 9999,
+          onOk: () => {
+            if (checkboxValueRef.current) {
+              dispatch(setShowOpenProjectAlert(false));
+            }
+
+            dispatch(stopClusterConnection());
+            dispatch(setOpenProject(project.rootFolder));
+          },
+        });
+
+        return;
+      }
+      dispatch(stopClusterConnection());
     }
 
     dispatch(setOpenProject(project.rootFolder));

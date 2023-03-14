@@ -1,3 +1,5 @@
+import {Checkbox as RawCheckbox} from 'antd';
+
 import styled from 'styled-components';
 
 import {AnimationDurations} from '@shared/styles/animations';
@@ -10,6 +12,10 @@ export const ActionsContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 15px;
+`;
+
+export const Checkbox = styled(RawCheckbox)`
+  margin-top: 10px;
 `;
 
 export const LastOpened = styled.div`

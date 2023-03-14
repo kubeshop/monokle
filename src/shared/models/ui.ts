@@ -194,6 +194,7 @@ type UiState = {
   };
   explorerSelectedSection: ExplorerCollapsibleSectionsType;
   fileExplorerExpandedFolders: string[];
+  showOpenProjectAlert: boolean;
 };
 
 type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {});
