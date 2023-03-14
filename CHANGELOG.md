@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.4](https://github.com/kubeshop/monokle/compare/v2.0.4-nightly-2023-03-14.0...v2.0.4) (2023-03-14)
+
+
+### Features
+
+* show alert when opening project if in cluster mode ([7ccb848](https://github.com/kubeshop/monokle/commit/7ccb848e4c55612e0d1f44347578c58ea457bb28))
+
+
+### Bug Fixes
+
+* bring back use kubectl proxy ([766e889](https://github.com/kubeshop/monokle/commit/766e889815b96a1a6b9c0bc6f908bc11f25d11b5))
+* compare git branches ([0184d7d](https://github.com/kubeshop/monokle/commit/0184d7d997fe4b1087f89cc2b415b9b98114a445))
+* dependencies ([e8c21c3](https://github.com/kubeshop/monokle/commit/e8c21c3020eb07b35aa78ec1ebdd42c073434655))
+* initial compare state on setRootFolder ([36806db](https://github.com/kubeshop/monokle/commit/36806dbdd7fda3eb857b94fdf517e989c766f4d5))
+* remove shared from gitignore ([ea390f5](https://github.com/kubeshop/monokle/commit/ea390f50eead15b88b1c0b6fe955f08d2c590f89))
+
 ### [2.0.3](https://github.com/kubeshop/monokle/compare/v2.0.3-nightly-2023-03-09.0...v2.0.3) (2023-03-09)
 
 
