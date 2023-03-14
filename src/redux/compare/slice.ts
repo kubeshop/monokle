@@ -3,6 +3,8 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {WritableDraft} from 'immer/dist/internal';
 import log from 'loglevel';
 
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+
 import {
   CompareFilter,
   CompareOperation,
@@ -245,6 +247,9 @@ export const compareSlice = createSlice({
           }
         }
       });
+    });
+    builder.addCase(setRootFolder.fulfilled, state => {
+      state.current = initialState.current;
     });
   },
 });

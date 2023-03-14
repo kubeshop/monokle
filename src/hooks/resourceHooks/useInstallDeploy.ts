@@ -8,10 +8,10 @@ import {useAppSelector} from '@redux/hooks';
 import {selectedFilePathSelector} from '@redux/selectors';
 import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
 import {useSelectedResourceMeta} from '@redux/selectors/resourceSelectors';
-import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
 import {ResourceMeta} from '@shared/models/k8sResource';
+import {isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
 
 export const useInstallDeploy = (resourceMeta?: ResourceMeta) => {
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);

@@ -18,7 +18,7 @@ import {
 } from '@redux/reducers/ui';
 import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
-import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
+import {getHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile, isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -31,6 +31,7 @@ import {isYamlFile} from '@monokle/validation';
 import {AlertEnum} from '@shared/models/alert';
 import {FileEntry} from '@shared/models/fileEntry';
 import {isDefined} from '@shared/utils/filter';
+import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
 import {showItemInFolder} from '@shared/utils/shell';
 
 export const useCanPreview = (fileEntry?: FileEntry, isDisabled?: boolean) => {
