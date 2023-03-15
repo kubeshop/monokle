@@ -50,13 +50,15 @@ const HelmChartDetails = ({chart, onDismissPane}: IProps) => {
 
   return (
     <Container>
-      <Header>
-        <Title>{chartName}</Title>
-        <CloseButton onClick={() => onDismissPane(null)}>
-          <CloseOutlined />
-        </CloseButton>
-      </Header>
-      <Tabs style={{height: '100%'}} items={tabItems} />
+      <Content>
+        <Header>
+          <Title>{chartName}</Title>
+          <CloseButton onClick={() => onDismissPane(null)}>
+            <CloseOutlined />
+          </CloseButton>
+        </Header>
+        <Tabs style={{height: '100%'}} items={tabItems} />
+      </Content>
     </Container>
   );
 };
@@ -72,6 +74,11 @@ const Container = styled.div`
   z-index: 10;
   background: ${Colors.grey1};
   border-left: 1px solid ${Colors.grey4};
+`;
+
+const Content = styled.div`
+  position: relative;
+  height: 100%;
 `;
 
 const Header = styled.div`
@@ -110,5 +117,10 @@ const Tabs = styled(props => <AntTabs {...props} />)`
 
   &.ant-tabs > .ant-tabs-nav > .ant-tabs-nav-wrap {
     padding: 0px 28px !important;
+  }
+
+  .ant-tabs-content {
+    position: unset;
+    margin-bottom: 36px;
   }
 `;

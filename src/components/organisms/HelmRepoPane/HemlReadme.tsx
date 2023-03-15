@@ -10,12 +10,12 @@ interface IProps {
 }
 
 const HelmReadme = ({chartName}: IProps) => {
-  const {value, loading} = useAsync(async () => {
+  const {value = '', loading} = useAsync(async () => {
     const result = await runCommandInMainThread(helmChartReadmeCommand({name: chartName}));
     return result.stdout;
   }, [chartName]);
 
-  return loading ? <Skeleton loading={loading} /> : <ReactMarkdown>{String(value || '')}</ReactMarkdown>;
+  return loading ? <Skeleton loading={loading} /> : <ReactMarkdown>{value}</ReactMarkdown>;
 };
 
 export default HelmReadme;
