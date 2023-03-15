@@ -6,14 +6,13 @@ import {activeProjectSelector, isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
 
-import {ActionsPane, BottomPaneManager, Dashboard, GitOpsView, NavigatorPane} from '@organisms';
+import {ActionsPane, BottomPaneManager, Dashboard, GitOpsView, HelmRepoPane, NavigatorPane} from '@organisms';
 import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 
-import {HelmRepoPane} from '../HelmRepoPane';
 import ProblemPane from '../ProblemPane';
 import StartPage from '../StartPage';
 import * as S from './PaneManager.styled';

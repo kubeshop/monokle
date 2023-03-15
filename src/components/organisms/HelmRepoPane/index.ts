@@ -1,1 +1,1 @@
-export {default as HelmRepoPane} from './HelmRepoPane';
+export {default} from './HelmRepoPane';

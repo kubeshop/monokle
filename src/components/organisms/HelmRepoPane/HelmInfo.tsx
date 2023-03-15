@@ -17,6 +17,31 @@ interface IProps {
   chartName: string;
 }
 
+const HelmInfo = ({chartName}: IProps) => {
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const {value = '', loading} = useAsync(async () => {
+    const result = await runCommandInMainThread(helmChartInfoCommand({name: chartName}));
+    return result.stdout;
+  }, [chartName]);
+  return loading ? (
+    <Skeleton loading={loading} />
+  ) : (
+    <div>
+      <ReactMarkdown>{value}</ReactMarkdown>
+      <Button type="primary" onClick={() => setConfirmModalOpen(true)}>
+        Pull helm chart
+      </Button>
+      <PullHelmChartModal
+        open={confirmModalOpen}
+        dismissModal={() => setConfirmModalOpen(false)}
+        chartName={chartName}
+      />
+    </div>
+  );
+};
+
+export default HelmInfo;
+
 const PullHelmChartModal = ({
   open,
   dismissModal,
@@ -85,28 +110,3 @@ const PullHelmChartModal = ({
     </Modal>
   );
 };
-
-const HelmInfo = ({chartName}: IProps) => {
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const {value = '', loading} = useAsync(async () => {
-    const result = await runCommandInMainThread(helmChartInfoCommand({name: chartName}));
-    return result.stdout;
-  }, [chartName]);
-  return loading ? (
-    <Skeleton loading={loading} />
-  ) : (
-    <div>
-      <ReactMarkdown>{value}</ReactMarkdown>
-      <Button type="primary" onClick={() => setConfirmModalOpen(true)}>
-        Pull helm chart
-      </Button>
-      <PullHelmChartModal
-        open={confirmModalOpen}
-        dismissModal={() => setConfirmModalOpen(false)}
-        chartName={chartName}
-      />
-    </div>
-  );
-};
-
-export default HelmInfo;
