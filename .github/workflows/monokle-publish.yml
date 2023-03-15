@@ -320,7 +320,7 @@ jobs:
         with:
           allowUpdates: true
           prerelease: true
-          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
+          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage,dist/*.rpm'
           omitBody: true
           tag: ${{ steps.package.outputs.TAG }}
           token: ${{ secrets.github_token }}
