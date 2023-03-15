@@ -2,6 +2,7 @@ import {useCallback, useMemo, useState} from 'react';
 import {useAsync, useMeasure} from 'react-use';
 
 import {Button} from 'antd';
+import {ColumnsType} from 'antd/lib/table';
 
 import {RightOutlined} from '@ant-design/icons';
 
@@ -20,7 +21,7 @@ interface TableDataType {
   app_version: string;
 }
 
-const createColumns = (onItemClick: (chartName: string) => void) => [
+const createColumns = (onItemClick: (chartName: string) => void): ColumnsType<TableDataType> => [
   {
     title: 'Name',
     dataIndex: 'name',
@@ -40,11 +41,13 @@ const createColumns = (onItemClick: (chartName: string) => void) => [
     title: 'Version',
     dataIndex: 'version',
     key: 'version',
+    responsive: ['lg'],
   },
   {
     title: 'App Version',
     dataIndex: 'app_version',
     key: 'app_version',
+    responsive: ['lg'],
   },
   {
     title: '',
@@ -100,6 +103,7 @@ const HelmRepoPane = () => {
           loading={loading}
           pagination={false}
           scroll={{y: contentHeight - 56}}
+          rowClassName={(record: TableDataType) => (record.name === selectedChart ? 'row-selected' : '')}
         />
       </div>
       {selectedChart && <HelmChartDetails chart={selectedChart} onDismissPane={setSelectedChart} />}

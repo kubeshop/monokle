@@ -28,16 +28,14 @@ const HelmTemplate = ({chartName}: IProps) => {
   return loading ? (
     <Skeleton loading={loading} />
   ) : (
-    <div style={{height: '100%', width: '100%', backgroundColor: 'purple'}}>
-      <MonacoEditor
-        width="100%"
-        height="85vh"
-        theme={KUBESHOP_MONACO_THEME}
-        options={monacoOptions}
-        language="yaml"
-        value={value}
-      />
-    </div>
+    <MonacoEditor
+      width="100%"
+      height="85vh"
+      theme={KUBESHOP_MONACO_THEME}
+      options={monacoOptions}
+      language="yaml"
+      value={value}
+    />
   );
 };
 

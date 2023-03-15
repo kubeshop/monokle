@@ -31,7 +31,8 @@ export const Header = styled.div`
 export const Title = styled(Typography.Text)`
   font-size: 16px;
   line-height: 22px;
-  font-weight: 700;
+  font-weight: bold;
+  color: ${Colors.whitePure};
 `;
 
 export const Table = styled(props => <AntTable {...props} />)`
@@ -44,10 +45,16 @@ export const Table = styled(props => <AntTable {...props} />)`
     background-color: ${Colors.grey2};
     color: ${Colors.grey9};
     text-transform: uppercase;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 14px !important;
+    font-weight: 700 !important;
     border-bottom: 1px solid ${Colors.grey4};
     margin-bottom: 0;
+  }
+
+  & .ant-table-header .ant-table-cell {
+    font-size: 14px;
+    font-weight: 700;
+    color: ${Colors.grey9};
   }
 
   .ant-table-thead .ant-table-cell::before {
@@ -57,6 +64,10 @@ export const Table = styled(props => <AntTable {...props} />)`
   .ant-table-body .ant-table-row {
     background-color: ${Colors.grey1};
     border-bottom: 1px solid ${Colors.grey4};
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
+    color: ${Colors.grey9};
   }
 
   .ant-table-body .ant-table-row:hover {
@@ -65,6 +76,11 @@ export const Table = styled(props => <AntTable {...props} />)`
 
   .ant-table-body .ant-table-row:hover .hover-area {
     visibility: visible;
+  }
+
+  .row-selected {
+    background-color: ${Colors.cyan8} !important;
+    color: ${Colors.grey1} !important;
   }
 `;
 

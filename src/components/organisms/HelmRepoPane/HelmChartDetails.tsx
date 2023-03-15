@@ -51,7 +51,7 @@ const HelmChartDetails = ({chart, onDismissPane}: IProps) => {
   return (
     <Container>
       <Header>
-        <Typography.Title level={4}>{chartName}</Typography.Title>
+        <Title>{chartName}</Title>
         <CloseButton onClick={() => onDismissPane(null)}>
           <CloseOutlined />
         </CloseButton>
@@ -72,13 +72,22 @@ const Container = styled.div`
   z-index: 10;
   background: ${Colors.grey1};
   border-left: 1px solid ${Colors.grey4};
-  padding: 20px 28px;
 `;
 
 const Header = styled.div`
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 20px 28px;
+  padding-bottom: 0;
+`;
+
+const Title = styled(Typography.Text)`
+  font-size: 16px;
+  line-height: 18px;
+  font-weight: 700;
+  color: ${Colors.grey9};
 `;
 
 const CloseButton = styled(IconButton)`
@@ -96,5 +105,10 @@ const Tabs = styled(props => <AntTabs {...props} />)`
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    padding: 0px 28px;
+  }
+
+  &.ant-tabs > .ant-tabs-nav > .ant-tabs-nav-wrap {
+    padding: 0px 28px !important;
   }
 `;
