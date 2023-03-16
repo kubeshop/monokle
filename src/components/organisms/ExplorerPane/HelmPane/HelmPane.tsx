@@ -88,7 +88,7 @@ export default memo(HelmPane);
 const Content = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 136px 1fr;
+  grid-template-rows: 100px 1fr;
   height: 100%;
   row-gap: 8px;
 `;
@@ -96,7 +96,7 @@ const Content = styled.div`
 const HelmExplorer = styled.div`
   position: sticky;
   top: 0;
-  height: 136px;
+  height: 100px;
   background-color: rgba(82, 115, 224, 0.3);
   margin: 0px 24px 16px 16px;
   display: flex;
