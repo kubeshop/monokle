@@ -77,7 +77,7 @@ const NewPaneManager: React.FC = () => {
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
       {isProjectLoading ? (
-        <S.Skeleton />
+        <S.Skeleton active />
       ) : (activeProject || isInQuickClusterMode) && !isStartProjectPaneVisible ? (
         <>
           <PaneManagerLeftMenu />

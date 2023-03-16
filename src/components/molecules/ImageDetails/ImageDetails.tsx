@@ -70,7 +70,7 @@ const ImageDetails: React.FC = () => {
     <>
       {isLoading ? (
         <div style={{padding: '10px'}}>
-          <Skeleton />
+          <Skeleton active />
         </div>
       ) : imageInfo ? (
         <>
