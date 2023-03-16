@@ -53,7 +53,7 @@ const ReleaseNotes: React.FC<ReleaseNotesProps> = ({onClose, singleColumn}) => {
   }, []);
 
   if (!title || !learnMoreUrl || !markdown) {
-    return <Skeleton />;
+    return <Skeleton active />;
   }
 
   return (
