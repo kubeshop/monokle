@@ -5,12 +5,15 @@ import {Dropdown, Tooltip} from 'antd';
 
 import {PlusOutlined} from '@ant-design/icons';
 
+import styled from 'styled-components';
+
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {NewResourceTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {toggleResourceFilters} from '@redux/reducers/ui';
+import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
 import {isInPreviewModeSelectorNew} from '@redux/selectors';
+import {resourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
@@ -19,8 +22,9 @@ import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrappe
 import {useNewResourceMenuItems} from '@hooks/menuItemsHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import {ResizableRowsPanel, TitleBar} from '@monokle/components';
+import {Icon, ResizableRowsPanel, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {Colors} from '@shared/styles';
 
 import * as S from './NavigatorPane.styled';
 import NavigatorTitle from './NavigatorTitle';
@@ -63,6 +67,7 @@ const NavPane: React.FC = () => {
             title={<NavigatorTitle />}
             actions={
               <S.TitleBarRightButtons>
+                <CollapseAction />
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
                   <Dropdown
                     trigger={['click']}
@@ -109,3 +114,29 @@ const NavPane: React.FC = () => {
 };
 
 export default memo(NavPane);
+
+function CollapseAction() {
+  const dispatch = useAppDispatch();
+  const allKinds = useAppSelector(resourceKindsSelector);
+  const collapsedKinds = useAppSelector(s => s.ui.navigator.collapsedResourceKinds);
+
+  const onClick = useCallback(() => {
+    if (collapsedKinds.length === allKinds.length) {
+      dispatch(expandResourceKinds(allKinds));
+      return;
+    }
+    dispatch(collapseResourceKinds(allKinds));
+  }, [dispatch, collapsedKinds, allKinds]);
+
+  return (
+    <CollapseIconWrapper onClick={onClick}>
+      <Icon name="collapse" />
+    </CollapseIconWrapper>
+  );
+}
+
+const CollapseIconWrapper = styled.div`
+  color: ${Colors.blue6};
+  cursor: pointer;
+  padding-right: 8px;
+`;

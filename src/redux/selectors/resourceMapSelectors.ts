@@ -1,4 +1,4 @@
-import {keyBy, size} from 'lodash';
+import {keyBy, size, uniq} from 'lodash';
 import {Selector, createSelector} from 'reselect';
 
 import {useAppSelector} from '@redux/hooks';
@@ -261,8 +261,12 @@ export const allResourcesMetaSelector = createDeepEqualSelector(
 export const allResourceKindsSelector = createDeepEqualSelector(
   [knownResourceKindsSelector, allResourcesMetaSelector],
   (knownResourceKinds, allResourceMetas) => {
-    return allResourceMetas.filter(r => knownResourceKinds.includes(r.kind)).map(r => r.kind);
+    return uniq(allResourceMetas.filter(r => knownResourceKinds.includes(r.kind)).map(r => r.kind));
   }
+);
+
+export const resourceKindsSelector = createDeepEqualSelector(allResourcesMetaSelector, allResourceMetas =>
+  uniq(allResourceMetas.map(r => r.kind))
 );
 
 export const allResourceLabelsSelector = createSelector(allResourcesMetaSelector, allResourceMetas => {
