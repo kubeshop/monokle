@@ -201,8 +201,8 @@ export const resourceNavigatorSelector = createSelector(
   (activeResourceStorage, resourceMetaMap, resourceFilter, collapsedResourceKinds) => {
     const list: ResourceNavigatorNode[] = [];
 
-    const resources = Object.values(resourceMetaMap).filter(resource =>
-      isResourcePassingFilter(resource, resourceFilter)
+    const resources = Object.values(resourceMetaMap).filter(
+      resource => isResourcePassingFilter(resource, resourceFilter) && !isKustomizationResource(resource)
     );
 
     const groups = groupBy(resources, 'kind');
