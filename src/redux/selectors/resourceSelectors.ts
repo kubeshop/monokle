@@ -5,7 +5,7 @@ import {createSelector} from '@reduxjs/toolkit';
 import {groupBy} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
-import {isKustomizationResource} from '@redux/services/kustomize';
+import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {joinK8sResource} from '@redux/services/resource';
 
 import {useRefSelector} from '@utils/hooks';
@@ -202,7 +202,10 @@ export const resourceNavigatorSelector = createSelector(
     const list: ResourceNavigatorNode[] = [];
 
     const resources = Object.values(resourceMetaMap).filter(
-      resource => isResourcePassingFilter(resource, resourceFilter) && !isKustomizationResource(resource)
+      resource =>
+        isResourcePassingFilter(resource, resourceFilter) &&
+        !isKustomizationResource(resource) &&
+        !isKustomizationPatch(resource)
     );
 
     const groups = groupBy(resources, 'kind');
