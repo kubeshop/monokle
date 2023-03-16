@@ -4,6 +4,8 @@ import {SimpleGit, simpleGit} from 'simple-git';
 
 import type {FileMapType} from '@shared/models/appState';
 import type {GitRepo} from '@shared/models/git';
+import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
+import {isKustomizationFilePath} from '@shared/utils/kustomize';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {formatGitChangedFiles} from '../utils/git';
@@ -317,7 +319,14 @@ export async function getCommitResources(localPath: string, commitHash: string) 
 
   const filesPaths = (await git.raw('ls-tree', '-r', '--name-only', commitHash))
     .split('\n')
-    .filter(el => el.includes('.yaml') || el.includes('.yml'));
+    .filter(
+      el =>
+        (el.includes('.yaml') || el.includes('.yml')) &&
+        !isKustomizationFilePath(el) &&
+        !isHelmTemplateFile(el) &&
+        !isHelmChartFile(el) &&
+        !isHelmValuesFile(el)
+    );
 
   for (let i = 0; i < filesPaths.length; i += 1) {
     let content: string;

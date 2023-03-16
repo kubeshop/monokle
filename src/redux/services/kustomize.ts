@@ -1,10 +1,8 @@
-import micromatch from 'micromatch';
-import path from 'path';
-
 import {KUSTOMIZATION_API_GROUP, KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {FileEntry} from '@shared/models/fileEntry';
 import {ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
+import {isKustomizationFilePath} from '@shared/utils/kustomize';
 
 import {getLocalResourceMetasForPath} from './fileEntry';
 
@@ -17,10 +15,6 @@ import {getLocalResourceMetasForPath} from './fileEntry';
 // import {K8sResource, ResourceRefType} from '@shared/models/k8sResource';
 
 // import {NodeWrapper, getScalarNodes, linkResources} from './resource';
-
-export function isKustomizationFilePath(filePath: string) {
-  return micromatch.isMatch(path.basename(filePath).toLowerCase(), '*kustomization*.yaml');
-}
 
 // /**
 //  * Creates kustomization refs between a kustomization and its resources

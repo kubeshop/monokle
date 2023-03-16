@@ -43,9 +43,8 @@ import {isLocalOrigin} from '@shared/models/origin';
 import {AnyPreview, isKustomizePreview} from '@shared/models/preview';
 import {AppSelection, isResourceSelection} from '@shared/models/selection';
 import {createKubeClient} from '@shared/utils/kubeclient';
+import {isKustomizationFilePath} from '@shared/utils/kustomize';
 import {AllKeysRequired} from '@shared/utils/types';
-
-import {isKustomizationFilePath} from './kustomize';
 
 /**
  * Parse documents lazily...
@@ -444,7 +443,7 @@ export function extractK8sResources<
       docIndex += 1;
     });
   }
-  return result;
+  return result.filter(hasSupportedResourceContent);
 }
 
 /**

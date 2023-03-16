@@ -9,7 +9,7 @@ import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
 import {UpdateFileEntryPayload} from '@redux/reducers/main';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
-import {isHelmTemplateFile, isHelmValuesFile, reprocessHelm} from '@redux/services/helm';
+import {reprocessHelm} from '@redux/services/helm';
 import {deleteResource, extractK8sResources, splitK8sResource} from '@redux/services/resource';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
@@ -19,6 +19,7 @@ import {AppState} from '@shared/models/appState';
 import {FileSideEffect} from '@shared/models/fileEntry';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
+import {isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
 
 export const updateFileEntry = createAsyncThunk<
   {nextMainState: AppState; affectedResourceIdentifiers?: ResourceIdentifier[]},

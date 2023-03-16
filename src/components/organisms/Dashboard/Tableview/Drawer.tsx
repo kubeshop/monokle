@@ -105,11 +105,15 @@ export const Drawer = () => {
                     key: 'Logs',
                     children: <Logs />,
                   },
-                  {
-                    label: 'Shell',
-                    key: 'Shell',
-                    children: <TerminalTab resourceId={selectedResourceId as string} />,
-                  },
+                  ...(localResource.object.status.phase === 'Running'
+                    ? [
+                        {
+                          label: 'Shell',
+                          key: 'Shell',
+                          children: <TerminalTab resourceId={selectedResourceId as string} />,
+                        },
+                      ]
+                    : []),
                 ]
               : []),
           ]}

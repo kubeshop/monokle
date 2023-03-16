@@ -53,7 +53,7 @@ module.exports = {
         path: path.resolve(__dirname, 'build'),
       };
       webpackConfig.externals = {
-        "fsevents": "require('fsevents')"
+        'fsevents': "require('fsevents')",
       };
       // Temporary solution until react-scripts 5.0.1 is released
       webpackConfig.ignoreWarnings = [/Failed to parse source map/];

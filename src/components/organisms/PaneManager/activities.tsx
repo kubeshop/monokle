@@ -48,7 +48,7 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
       const problemsCount = useValidationSelector(state => size(problemsSelector(state)));
       return {count: problemsCount, size: 'small'};
     },
-    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
+    isVisible: () => Boolean(useAppSelector(activeProjectSelector)) || Boolean(useAppSelector(isInClusterModeSelector)),
   },
   {
     type: 'panel',

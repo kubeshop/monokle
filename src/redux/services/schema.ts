@@ -6,7 +6,6 @@ import path from 'path';
 import {KUSTOMIZATION_KIND} from '@constants/constants';
 
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
-import {isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {getFileStats} from '@utils/files';
@@ -15,6 +14,7 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {FileMapType} from '@shared/models/appState';
 import {ResourceMeta} from '@shared/models/k8sResource';
+import {isHelmValuesFile} from '@shared/utils/helm';
 import {loadResource} from '@shared/utils/resource';
 
 // @ts-ignore

@@ -13,7 +13,7 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import ValidationFigure from '@assets/NewValidationFigure.svg';
 
-import {TitleBar, ValidationOverview} from '@monokle/components';
+import {Icon, TitleBar, ValidationOverview} from '@monokle/components';
 
 import * as S from './ValidationPane.styled';
 
@@ -37,7 +37,7 @@ const ValidationPane: React.FC = () => {
     <S.ValidationPaneContainer>
       <div ref={titleBarRef}>
         <TitleBar
-          title="Validation Overview"
+          title={`Validation Overview ${isInClusterMode ? '( Cluster mode )' : ''}`}
           description={
             <S.DescriptionContainer>
               <Image src={ValidationFigure} width={95} />
@@ -45,6 +45,15 @@ const ValidationPane: React.FC = () => {
                 Fix your resources according to your validation setup. Manage your validation policy, turn rules on or
                 off, and more in the <Link onClick={() => dispatch(setLeftMenuSelection('settings'))}>settings</Link>{' '}
                 section, located in the left menu.
+                {isInClusterMode && (
+                  <S.BackToDashboardButton
+                    icon={<Icon name="cluster-dashboard" />}
+                    type="primary"
+                    onClick={() => dispatch(setLeftMenuSelection('dashboard'))}
+                  >
+                    Back to cluster dashboard
+                  </S.BackToDashboardButton>
+                )}
               </div>
             </S.DescriptionContainer>
           }

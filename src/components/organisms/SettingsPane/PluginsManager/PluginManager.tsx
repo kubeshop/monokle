@@ -87,7 +87,7 @@ export const PluginManager: React.FC = () => {
         {sortedPluginEntries.length === 0 ? (
           <>
             {isLoadingExistingPlugins ? (
-              <Skeleton />
+              <Skeleton active />
             ) : (
               <div>
                 <p>No plugins installed yet.</p>
