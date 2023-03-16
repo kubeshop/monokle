@@ -238,17 +238,17 @@ export const uiSlice = createSlice({
 
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
     },
-    collapseNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
-      const expandedSections = action.payload.filter(s => !state.navPane.collapsedNavSectionNames.includes(s));
-      if (expandedSections.length > 0) {
-        state.navPane.collapsedNavSectionNames.push(...expandedSections);
+    collapseResourceKinds: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      const kindsToCollapse = action.payload.filter(s => !state.navigator.collapsedResourceKinds.includes(s));
+      if (kindsToCollapse.length > 0) {
+        state.navigator.collapsedResourceKinds.push(...kindsToCollapse);
       }
     },
-    expandNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
-      const collapsedSections = action.payload.filter(s => state.navPane.collapsedNavSectionNames.includes(s));
-      if (collapsedSections.length > 0) {
-        state.navPane.collapsedNavSectionNames = state.navPane.collapsedNavSectionNames.filter(
-          n => !collapsedSections.includes(n)
+    expandResourceKinds: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      const kindsToExpand = action.payload.filter(s => state.navigator.collapsedResourceKinds.includes(s));
+      if (kindsToExpand.length > 0) {
+        state.navigator.collapsedResourceKinds = state.navigator.collapsedResourceKinds.filter(
+          n => !kindsToExpand.includes(n)
         );
       }
     },
@@ -412,8 +412,8 @@ export const {
   closeSaveResourcesToFileFolderModal,
   closeTemplateExplorer,
   closeWelcomePopup,
-  collapseNavSections,
-  expandNavSections,
+  collapseResourceKinds,
+  expandResourceKinds,
   highlightItem,
   openAboutModal,
   openCreateFileFolderModal,

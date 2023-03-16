@@ -201,8 +201,8 @@ const initialUiState: UiState = {
     apply: false,
     diff: false,
   },
-  navPane: {
-    collapsedNavSectionNames: [],
+  navigator: {
+    collapsedResourceKinds: [],
   },
   paneConfiguration,
   layoutSize: {header: 0},

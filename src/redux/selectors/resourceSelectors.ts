@@ -192,8 +192,12 @@ export const previewedKustomizationSelector = createDeepEqualSelector(
 );
 
 export const resourceNavigatorSelector = createSelector(
-  [activeResourceMetaMapSelector, (state: RootState) => state.main.resourceFilter],
-  (resourceMetaMap, resourceFilter) => {
+  [
+    activeResourceMetaMapSelector,
+    (state: RootState) => state.main.resourceFilter,
+    (state: RootState) => state.ui.navigator.collapsedResourceKinds,
+  ],
+  (resourceMetaMap, resourceFilter, collapsedResourceKinds) => {
     const list: ResourceNavigatorNode[] = [];
 
     const resources = Object.values(resourceMetaMap).filter(resource =>
@@ -205,7 +209,7 @@ export const resourceNavigatorSelector = createSelector(
     const sortedEntries = entries.sort();
 
     for (const [kind, kindResources] of sortedEntries) {
-      const collapsed = false; // TODO: get from state
+      const collapsed = collapsedResourceKinds.indexOf(kind) !== -1;
 
       list.push({
         type: 'kind',
