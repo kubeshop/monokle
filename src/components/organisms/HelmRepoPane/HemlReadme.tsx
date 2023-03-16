@@ -15,7 +15,7 @@ const HelmReadme = ({chartName}: IProps) => {
     return result.stdout;
   }, [chartName]);
 
-  return loading ? <Skeleton loading={loading} /> : <ReactMarkdown>{value}</ReactMarkdown>;
+  return loading ? <Skeleton active={loading} /> : <ReactMarkdown>{value}</ReactMarkdown>;
 };
 
 export default HelmReadme;

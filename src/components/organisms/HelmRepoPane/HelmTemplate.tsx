@@ -26,7 +26,7 @@ const HelmTemplate = ({chartName}: IProps) => {
   }, [chartName]);
 
   return loading ? (
-    <Skeleton loading={loading} />
+    <Skeleton active={loading} />
   ) : (
     <MonacoEditor
       width="100%"

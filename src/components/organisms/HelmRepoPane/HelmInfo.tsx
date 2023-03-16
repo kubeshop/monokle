@@ -22,7 +22,7 @@ const HelmInfo = ({chartName}: IProps) => {
     return result.stdout;
   }, [chartName]);
   return loading ? (
-    <Skeleton loading={loading} />
+    <Skeleton active={loading} />
   ) : (
     <Container>
       <div>
