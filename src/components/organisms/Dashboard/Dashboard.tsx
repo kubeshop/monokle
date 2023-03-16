@@ -1,7 +1,7 @@
 import {useCallback, useMemo} from 'react';
 
 import {useAppSelector} from '@redux/hooks';
-import {useResourceContentMapRef, useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
+import {useResourceContentMap, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
@@ -57,19 +57,25 @@ import {Tableview} from './Tableview/Tableview';
 const Dashboard: React.FC = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
-  const clusterResourceContentMapRef = useResourceContentMapRef('cluster');
-  const clusterResourceMetaMapRef = useResourceMetaMapRef('cluster');
   const {height} = useMainPaneDimensions();
+  const clusterConnectionOptions = useAppSelector(state => state.main.clusterConnectionOptions);
+  const clusterResourceMeta = useResourceMetaMap('cluster');
+  const clusterResourceContent = useResourceContentMap('cluster');
 
-  const filteredResources = useMemo(() => {
-    return Object.values(clusterResourceContentMapRef.current)
-      .map(r => ({...r, ...clusterResourceMetaMapRef.current[r.id]}))
+  const filterResources = useCallback(() => {
+    return Object.values(clusterResourceContent)
+      .map(r => ({...r, ...clusterResourceMeta[r.id]}))
       .filter(
         resource =>
           activeMenu.key.replace(`${resource.object.apiVersion}-`, '') === resource.object.kind &&
           resource.object.kind === activeMenu.label
       );
-  }, [activeMenu, clusterResourceContentMapRef, clusterResourceMetaMapRef]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeMenu, clusterResourceContent, clusterResourceMeta, clusterConnectionOptions]);
+
+  const filteredResources = useMemo(() => {
+    return filterResources();
+  }, [filterResources]);
 
   const getContent = useCallback(() => {
     if (activeMenu.key === 'Overview') {

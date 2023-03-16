@@ -1,7 +1,6 @@
 import {EventEmitter} from 'events';
 import fs from 'fs';
 import log from 'loglevel';
-import micromatch from 'micromatch';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 import {LineCounter, Scalar, parse} from 'yaml';
@@ -26,6 +25,7 @@ import {ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmChart, HelmTemplate, HelmValueMatch, HelmValuesFile, RangeAndValue} from '@shared/models/helm';
 import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
+import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
 
 import {splitK8sResource} from './resource';
 
@@ -45,32 +45,6 @@ export function getHelmValuesFile(fileEntry: FileEntry, helmValuesMap: HelmValue
 
 export function getHelmChartFromFileEntry(fileEntry: FileEntry, helmChartMap: HelmChartMapType) {
   return Object.values(helmChartMap).find(chart => chart.filePath === fileEntry.filePath);
-}
-
-/**
- * Checks if the specified path is a helm values file
- */
-
-export function isHelmValuesFile(filePath: string): boolean {
-  return micromatch.isMatch(path.basename(filePath).toLowerCase(), '*values*.yaml');
-}
-
-/**
- * Checks if the specified path is a helm chart template
- */
-export function isHelmTemplateFile(filePath: string): boolean {
-  return (
-    filePath.includes('templates') &&
-    ['*.yaml', '*.yml'].some(ext => micromatch.isMatch(path.basename(filePath).toLowerCase(), ext))
-  );
-}
-
-/**
- * Checks if the specified path is a helm chart file
- */
-
-export function isHelmChartFile(filePath: string): boolean {
-  return path.basename(filePath).toLowerCase() === 'chart.yaml';
 }
 
 /**

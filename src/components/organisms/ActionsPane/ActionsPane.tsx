@@ -33,7 +33,6 @@ import {selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selec
 import {getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
-import {isHelmChartFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {getResourceSchema, getSchemaForPath, getUiSchemaForPath} from '@redux/services/schema';
 import {applyHelmChart} from '@redux/thunks/applyHelmChart';
@@ -64,6 +63,7 @@ import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandle
 import {Icon} from '@monokle/components';
 import {HelmChart} from '@shared/models/helm';
 import {RootState} from '@shared/models/rootState';
+import {isHelmChartFile} from '@shared/utils/helm';
 import {openExternalResourceKindDocumentation} from '@shared/utils/shell';
 
 import * as S from './ActionsPane.styled';

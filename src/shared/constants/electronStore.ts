@@ -161,6 +161,9 @@ export const electronStoreSchema = {
       isFolderLoading: {
         type: 'boolean',
       },
+      showOpenProjectPopup: {
+        type: 'boolean',
+      },
       leftMenu: {
         type: 'object',
         properties: {
@@ -328,6 +331,7 @@ export const electronStoreDefaults = {
   ui: {
     isSettingsOpen: false,
     isNewResourceWizardOpen: false,
+    showOpenProjectPopup: true,
     leftMenu: {
       bottomSelection: null,
       selection: 'explorer',
