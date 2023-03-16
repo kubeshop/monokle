@@ -11,6 +11,7 @@ import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import KindRenderer from './KindRenderer';
 import ResourceRenderer from './ResourceRenderer';
+import {useScroll} from './useScroll';
 
 function ResourceNavigator() {
   const list = useAppSelector(resourceNavigatorSelector);
@@ -25,6 +26,15 @@ function ResourceNavigator() {
     estimateSize: () => 28,
     getScrollElement: () => ref.current,
     scrollToFn: elementScroll,
+  });
+
+  useScroll({
+    list,
+    scrollTo: index =>
+      rowVirtualizer.scrollToIndex(index, {
+        align: 'center',
+        behavior: 'smooth',
+      }),
   });
 
   if (isLoading) {
