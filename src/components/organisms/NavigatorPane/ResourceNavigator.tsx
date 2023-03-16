@@ -9,6 +9,7 @@ import {resourceNavigatorSelector} from '@redux/selectors/resourceSelectors';
 
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
+import EmptyResourceNavigator from './EmptyResourceNavigator';
 import KindRenderer from './KindRenderer';
 import ResourceRenderer from './ResourceRenderer';
 import {useScroll} from './useScroll';
@@ -36,6 +37,10 @@ function ResourceNavigator() {
         behavior: 'smooth',
       }),
   });
+
+  if (list.length === 0) {
+    return <EmptyResourceNavigator />;
+  }
 
   if (isLoading) {
     return (
