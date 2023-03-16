@@ -69,6 +69,8 @@ function ResourceRenderer(props: ResourceRendererProps) {
           <ResourceSuffix resourceMeta={resourceMeta} isSelected={isSelected} />
         </S.SuffixContainer>
 
+        <S.BlankSpace onClick={onClick} />
+
         {isHovered && (
           <S.ContextMenuContainer>
             <ResourceContextMenu resourceMeta={resourceMeta} isSelected={isSelected} />

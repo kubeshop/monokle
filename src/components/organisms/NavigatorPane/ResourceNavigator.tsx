@@ -9,6 +9,7 @@ import {resourceNavigatorSelector} from '@redux/selectors/resourceSelectors';
 
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
+import KindRenderer from './KindRenderer';
 import ResourceRenderer from './ResourceRenderer';
 
 function ResourceNavigator() {
@@ -57,7 +58,7 @@ function ResourceNavigator() {
               }}
             >
               {node.type === 'kind' ? (
-                <span>{node.name}</span>
+                <KindRenderer kind={node.name} />
               ) : (
                 <ResourceRenderer resourceIdentifier={node.identifier} />
               )}
