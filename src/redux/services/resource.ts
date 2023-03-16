@@ -43,6 +43,7 @@ import {isLocalOrigin} from '@shared/models/origin';
 import {AnyPreview, isKustomizePreview} from '@shared/models/preview';
 import {AppSelection, isResourceSelection} from '@shared/models/selection';
 import {createKubeClient} from '@shared/utils/kubeclient';
+import {AllKeysRequired} from '@shared/utils/types';
 
 import {isKustomizationFilePath} from './kustomize';
 
@@ -302,7 +303,7 @@ export function extractResourceMeta<Storage extends ResourceStorage>(
   storage: Storage,
   origin: OriginFromStorage<Storage>,
   id?: string
-): ResourceMeta<Storage> {
+): AllKeysRequired<ResourceMeta<Storage>> {
   return {
     name: createResourceName(resourceObject, isLocalOrigin(origin) ? origin.filePath : undefined),
     storage,
@@ -315,6 +316,8 @@ export function extractResourceMeta<Storage extends ResourceStorage>(
     labels: resourceObject.metadata?.labels || {},
     templateLabels: resourceObject.spec?.template?.metadata?.labels || {},
     annotations: resourceObject.metadata?.annotations || {},
+    range: undefined,
+    refs: undefined,
   };
 }
 
