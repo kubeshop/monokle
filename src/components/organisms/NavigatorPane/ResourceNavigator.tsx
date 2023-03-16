@@ -9,6 +9,8 @@ import {resourceNavigatorSelector} from '@redux/selectors/resourceSelectors';
 
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
+import ResourceRenderer from './ResourceRenderer';
+
 function ResourceNavigator() {
   const list = useAppSelector(resourceNavigatorSelector);
   const ref = useRef<HTMLUListElement>(null);
@@ -54,7 +56,11 @@ function ResourceNavigator() {
                 transform: `translateY(${virtualItem.start}px)`,
               }}
             >
-              {node.type === 'kind' ? <span>{node.name}</span> : <span>{node.id}</span>}
+              {node.type === 'kind' ? (
+                <span>{node.name}</span>
+              ) : (
+                <ResourceRenderer resourceIdentifier={node.identifier} />
+              )}
             </VirtualItem>
           );
         })}

@@ -21,7 +21,7 @@ import {
 import {ResourceNavigatorNode} from '@shared/models/navigator';
 import {RootState} from '@shared/models/rootState';
 
-import {activeResourceMetaMapSelector} from './resourceMapSelectors';
+import {activeResourceMetaMapSelector, activeResourceStorageSelector} from './resourceMapSelectors';
 import {createDeepEqualSelector} from './utils';
 
 export const createResourceSelector = <Storage extends ResourceStorage>(storage: Storage) => {
@@ -193,11 +193,12 @@ export const previewedKustomizationSelector = createDeepEqualSelector(
 
 export const resourceNavigatorSelector = createSelector(
   [
+    activeResourceStorageSelector,
     activeResourceMetaMapSelector,
     (state: RootState) => state.main.resourceFilter,
     (state: RootState) => state.ui.navigator.collapsedResourceKinds,
   ],
-  (resourceMetaMap, resourceFilter, collapsedResourceKinds) => {
+  (activeResourceStorage, resourceMetaMap, resourceFilter, collapsedResourceKinds) => {
     const list: ResourceNavigatorNode[] = [];
 
     const resources = Object.values(resourceMetaMap).filter(resource =>
@@ -224,7 +225,10 @@ export const resourceNavigatorSelector = createSelector(
       for (const resource of kindResources) {
         list.push({
           type: 'resource',
-          id: resource.id,
+          identifier: {
+            id: resource.id,
+            storage: activeResourceStorage,
+          },
         });
       }
     }

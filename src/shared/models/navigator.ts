@@ -3,6 +3,7 @@ import React, {ReactNode} from 'react';
 import {ActionCreatorWithPayload, AnyAction} from '@reduxjs/toolkit';
 
 import {AppDispatch} from './appDispatch';
+import {ResourceIdentifier} from './k8sResource';
 import {RootState} from './rootState';
 
 export type ItemCustomComponentProps = {
@@ -215,7 +216,7 @@ type KindNode = {
 
 type ResourceNode = {
   type: 'resource';
-  id: string;
+  identifier: ResourceIdentifier;
 };
 
 export type ResourceNavigatorNode = KindNode | ResourceNode;
