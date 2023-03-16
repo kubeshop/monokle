@@ -1,10 +1,15 @@
 import {useMemo} from 'react';
 
+import {createSelector} from '@reduxjs/toolkit';
+
+import {groupBy} from 'lodash';
+
 import {useAppSelector} from '@redux/hooks';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {joinK8sResource} from '@redux/services/resource';
 
 import {useRefSelector} from '@utils/hooks';
+import {isResourcePassingFilter} from '@utils/resources';
 
 import {
   K8sResource,
@@ -13,8 +18,10 @@ import {
   ResourceMeta,
   ResourceStorage,
 } from '@shared/models/k8sResource';
+import {ResourceNavigatorNode} from '@shared/models/navigator';
 import {RootState} from '@shared/models/rootState';
 
+import {activeResourceMetaMapSelector} from './resourceMapSelectors';
 import {createDeepEqualSelector} from './utils';
 
 export const createResourceSelector = <Storage extends ResourceStorage>(storage: Storage) => {
@@ -181,5 +188,43 @@ export const previewedKustomizationSelector = createDeepEqualSelector(
       return undefined;
     }
     return joinK8sResource(meta, content);
+  }
+);
+
+export const resourceNavigatorSelector = createSelector(
+  [activeResourceMetaMapSelector, (state: RootState) => state.main.resourceFilter],
+  (resourceMetaMap, resourceFilter) => {
+    const list: ResourceNavigatorNode[] = [];
+
+    const resources = Object.values(resourceMetaMap).filter(resource =>
+      isResourcePassingFilter(resource, resourceFilter)
+    );
+
+    const groups = groupBy(resources, 'kind');
+    const entries = Object.entries(groups);
+    const sortedEntries = entries.sort();
+
+    for (const [kind, kindResources] of sortedEntries) {
+      const collapsed = false; // TODO: get from state
+
+      list.push({
+        type: 'kind',
+        name: kind,
+        resourceCount: kindResources.length,
+      });
+
+      if (collapsed) {
+        continue;
+      }
+
+      for (const resource of kindResources) {
+        list.push({
+          type: 'resource',
+          id: resource.id,
+        });
+      }
+    }
+
+    return list;
   }
 );

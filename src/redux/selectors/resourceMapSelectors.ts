@@ -24,6 +24,19 @@ import {isDefined} from '@shared/utils/filter';
 import {knownResourceKindsSelector} from './resourceKindSelectors';
 import {createDeepEqualSelector} from './utils';
 
+export const activeResourceStorageSelector = createSelector(
+  (state: RootState) => state.main,
+  (mainState): ResourceStorage => {
+    if (mainState.clusterConnection) {
+      return 'cluster';
+    }
+    if (mainState.preview) {
+      return 'preview';
+    }
+    return 'local';
+  }
+);
+
 // TODO: do the same thing for resource maps as I did for resource selectors
 export const createResourceMapSelector = <Storage extends ResourceStorage>(
   storage: Storage
@@ -113,6 +126,11 @@ export const useActiveResourceMetaMapRef = () => {
   return useRefSelector(getResourceMetaMapSelector(activeResourceStorage));
 };
 
+export const activeResourceMetaMapSelector = createDeepEqualSelector(
+  [activeResourceStorageSelector, (state: RootState) => state.main.resourceMetaMapByStorage],
+  (activeStorage, resourceMetaMapByStorage) => resourceMetaMapByStorage[activeStorage]
+);
+
 export const createResourceContentMapSelector = <Storage extends ResourceStorage>(
   storage: Storage
 ): Selector<RootState, ResourceContentMap<Storage>> => {
@@ -162,19 +180,6 @@ export const useActiveResourceContentMapRef = () => {
   const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
   return useRefSelector(getResourceContentMapSelector(activeResourceStorage));
 };
-
-export const activeResourceStorageSelector = createSelector(
-  (state: RootState) => state.main,
-  (mainState): ResourceStorage => {
-    if (mainState.clusterConnection) {
-      return 'cluster';
-    }
-    if (mainState.preview) {
-      return 'preview';
-    }
-    return 'local';
-  }
-);
 
 export const activeResourceCountSelector = createSelector(
   [activeResourceStorageSelector, (state: RootState) => state.main.resourceMetaMapByStorage],

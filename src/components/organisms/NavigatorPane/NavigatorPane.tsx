@@ -12,21 +12,19 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleResourceFilters} from '@redux/reducers/ui';
 import {isInPreviewModeSelectorNew} from '@redux/selectors';
 
-import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
+import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
 import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import {useNewResourceMenuItems} from '@hooks/menuItemsHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
-import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
-
 import {ResizableRowsPanel, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 
 import * as S from './NavigatorPane.styled';
 import NavigatorTitle from './NavigatorTitle';
+import ResourceNavigator from './ResourceNavigator';
 
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -99,8 +97,7 @@ const NavPane: React.FC = () => {
         }
         bottom={
           <S.List id="navigator-sections-container">
-            <SectionRenderer sectionId={K8sResourceSectionBlueprint.id} level={0} isLastSection={false} />
-            <SectionRenderer sectionId={UnknownResourceSectionBlueprint.id} level={0} isLastSection={false} />
+            <ResourceNavigator />
           </S.List>
         }
         height={height - 40}

@@ -206,3 +206,16 @@ export interface NavigatorState extends NavigatorInstanceState {
   collapsedSectionIds: string[];
   registeredSectionBlueprintIds: string[];
 }
+
+type KindNode = {
+  type: 'kind';
+  name: string;
+  resourceCount: number;
+};
+
+type ResourceNode = {
+  type: 'resource';
+  id: string;
+};
+
+export type ResourceNavigatorNode = KindNode | ResourceNode;
