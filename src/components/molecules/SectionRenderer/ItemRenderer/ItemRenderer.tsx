@@ -163,7 +163,7 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
             {ContextMenu.Component &&
               !options?.disableContextMenu &&
               (ContextMenu.options?.isVisibleOnHover ? isHovered : true) && (
-                <S.ContextMenuContainer>
+                <S.ContextMenuContainer onClick={e => e.stopPropagation()}>
                   <ContextMenu.Component itemInstance={itemInstance} options={QuickAction.options} />
                 </S.ContextMenuContainer>
               )}
