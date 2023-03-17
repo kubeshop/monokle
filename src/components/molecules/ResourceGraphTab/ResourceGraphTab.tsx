@@ -1,6 +1,7 @@
 import {useCallback, useMemo} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {selectImage, selectResource} from '@redux/reducers/main';
 import {activeResourceStorageSelector, useResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {problemsByResourceSelector, useValidationSelector} from '@redux/validation/validation.selectors';
@@ -21,8 +22,18 @@ const ResourceGraphTab: React.FC = () => {
     [validationState]
   );
 
-  const onSelectResource = useCallback((r: any) => {}, []);
-  const onSelectImage = useCallback((imageId: string) => {}, []);
+  const onSelectResource = useCallback(
+    (resource: any) => {
+      dispatch(selectResource({resourceIdentifier: {id: resource.id, storage: activeStorage}}));
+    },
+    [activeStorage, dispatch]
+  );
+  const onSelectImage = useCallback(
+    (imageId: string) => {
+      dispatch(selectImage({imageId}));
+    },
+    [dispatch]
+  );
 
   const elkWorker = useMemo(() => {
     return new Worker(new URL('elkjs/lib/elk-worker.min.js', import.meta.url));
