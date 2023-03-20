@@ -54,9 +54,11 @@ function ResourceNavigator() {
 
   return (
     <ListContainer ref={ref}>
-      <ControlledHeightContainer
+      <div
         style={{
           height: `${rowVirtualizer.getTotalSize()}px`,
+          width: '100%',
+          position: 'relative',
         }}
       >
         {rowVirtualizer.getVirtualItems().map(virtualItem => {
@@ -80,7 +82,7 @@ function ResourceNavigator() {
             </VirtualItem>
           );
         })}
-      </ControlledHeightContainer>
+      </div>
     </ListContainer>
   );
 }
@@ -99,9 +101,4 @@ const ListContainer = styled.ul`
   height: 100%;
   overflow-y: auto;
   padding: 0 0 12px;
-`;
-
-const ControlledHeightContainer = styled.div`
-  width: '100%';
-  position: 'relative';
 `;
