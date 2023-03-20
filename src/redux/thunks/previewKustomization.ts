@@ -63,7 +63,7 @@ export const previewKustomization = createAsyncThunk<
 
   if (!result.stdout) {
     log.warn("Couldn't find any resources in the preview output");
-    return {};
+    return createRejectionWithAlert(thunkAPI, "Couldn't find any resources in the preview output", '');
   }
 
   const preview = {type: 'kustomize', kustomizationId: kustomization.id} as const;
@@ -71,6 +71,11 @@ export const previewKustomization = createAsyncThunk<
   const resources = extractK8sResources(result.stdout, 'preview', {
     preview,
   });
+
+  if (!resources.length) {
+    log.warn("Couldn't find any resources in the preview output");
+    return createRejectionWithAlert(thunkAPI, "Couldn't find any resources in the preview output", '');
+  }
 
   return {
     resources,
