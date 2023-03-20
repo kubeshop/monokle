@@ -31,7 +31,8 @@ export const ClusterContextSelect: React.FC<Props> = ({side}) => {
   return (
     <S.SelectColor>
       <Select
-        defaultOpen={!resourceSet}
+        autoFocus={Boolean(resourceSet)}
+        defaultOpen={Boolean(resourceSet)}
         onChange={handleSelect}
         placeholder="Choose context…"
         value={currentContext?.name}
