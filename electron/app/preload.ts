@@ -1,5 +1,10 @@
 import {contextBridge, ipcRenderer} from 'electron';
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  // initKubeConfig: () => ipcRenderer.invoke('initKubeConfig'),
+contextBridge.exposeInMainWorld('api', {
+  startKubeConfigService: () => {
+    ipcRenderer.invoke('kubeService:start');
+  },
+  stopKubeConfigService: () => {
+    ipcRenderer.invoke('kubeService:stop');
+  },
 });

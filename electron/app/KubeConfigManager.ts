@@ -1,139 +1,70 @@
-import * as k8s from '@kubernetes/client-node';
+import {UtilityProcess, app, utilityProcess} from 'electron';
 
-import {FSWatcher} from 'chokidar';
-import fs from 'fs';
 import log from 'loglevel';
 import path from 'path';
+import {AnyAction} from 'redux';
 
-const kubeConfigList: {[key: string]: {watcher: any; req: any}} = {};
+import {AlertEnum} from '@shared/models/alert';
+import electronStore from '@shared/utils/electronStore';
+import {getKubeAccess} from '@shared/utils/kubeclient';
 
-function getKubeConfPath() {
-  let kubeConfigPath = process.argv[2]; // kubeconig from path
-  if (kubeConfigPath) {
-    return kubeConfigPath;
+import {dispatchToAllWindows} from './ipc/ipcMainRedux';
+
+let kubeServiceProcess: UtilityProcess | null = null;
+
+export const startKubeConfigService = () => {
+  if (kubeServiceProcess) {
+    kubeServiceProcess.kill();
   }
 
-  kubeConfigPath = process.argv[3]; // kubeconig from env
-  if (kubeConfigPath) {
-    const envKubeconfigParts = kubeConfigPath.split(path.delimiter);
-    return envKubeconfigParts[0];
-  }
+  kubeServiceProcess = utilityProcess.fork(path.normalize(`${__dirname}/KubeConfigService.js`), [
+    electronStore.get('appConfig.kubeConfig') || '',
+    process.env.KUBECONFIG || '',
+    electronStore.get('appConfig.kubeconfig') || '',
+    path.join(app.getPath('home'), `${path.sep}.kube${path.sep}config`),
+  ]);
 
-  kubeConfigPath = process.argv[4]; // kubeconig from settings
-  if (kubeConfigPath) {
-    return kubeConfigPath;
-  }
+  kubeServiceProcess.on('message', handleKubeServiceMessage);
 
-  kubeConfigPath = process.argv[5]; // kubeconig from
-  return kubeConfigPath;
-}
+  kubeServiceProcess.on('exit', () => {
+    log.info('stop: watching cluster namespaces resources');
+  });
 
-function loadKubeConf() {
-  let kubeConfigPath = process.argv[2]; // kubeconig from path
-  if (kubeConfigPath) {
-    const data = getKubeConfigContext(kubeConfigPath);
-    process.parentPort.postMessage(data);
-    return;
-  }
+  kubeServiceProcess.on('spawn', () => {
+    log.info('start: watching cluster namespaces resources');
+  });
+};
 
-  kubeConfigPath = process.argv[3]; // kubeconig from env
-  if (kubeConfigPath) {
-    const envKubeconfigParts = kubeConfigPath.split(path.delimiter);
-    const data = getKubeConfigContext(envKubeconfigParts[0]);
-
-    process.parentPort.postMessage(data);
-    return;
-  }
-
-  kubeConfigPath = process.argv[4]; // kubeconig from settings
-  if (kubeConfigPath) {
-    const data = getKubeConfigContext(kubeConfigPath);
-
-    process.parentPort.postMessage(data);
-    return;
-  }
-
-  kubeConfigPath = process.argv[5]; // kubeconig from
-  const data = getKubeConfigContext(kubeConfigPath);
-
-  process.parentPort.postMessage(data);
-}
-
-export const getKubeConfigContext = (configPath: string) => {
-  try {
-    const kc = new k8s.KubeConfig();
-    kc.loadFromFile(configPath);
-
-    return {
-      path: configPath,
-      currentContext: kc.getCurrentContext(),
-      isPathValid: kc.contexts.length > 0,
-      contexts: kc.contexts,
-    };
-  } catch (error) {
-    return {
-      path: configPath,
-      isPathValid: false,
-      contexts: [],
-    };
+export const stopKubeConfigService = () => {
+  if (kubeServiceProcess) {
+    kubeServiceProcess.kill();
   }
 };
 
-function watchNamespace(context: string) {
-  const kubeConfigPath = getKubeConfPath();
-  const kc = new k8s.KubeConfig();
-  kc.loadFromFile(kubeConfigPath);
-  kc.setCurrentContext(context);
+const handleKubeServiceMessage = (message: AnyAction) => {
+  if (message.type) {
+    dispatchToAllWindows(message);
+    return;
+  }
 
-  kubeConfigList[context].watcher = new k8s.Watch(kc);
-  kubeConfigList[context].watcher
-    .watch(
-      '/api/v1/namespaces',
-      // optional query parameters can go here.
-      {
-        watch: 'true',
-        allowWatchBookmarks: true,
-      },
-      // callback is called for each received object.
-      (type: any, apiObj: any) => {
-        if (type === 'ADDED') {
-          process.parentPort.postMessage({objectname: apiObj.metadata.name, context, event: 'watch/ObjectAdded'});
-        } else if (type === 'DELETED') {
-          process.parentPort.postMessage({type: 'config/setAccessLoading', payload: true});
-          process.parentPort.postMessage({
-            type: 'config/removeNamespaceFromContext',
-            payload: {namespace: apiObj.metadata.name, context},
-          });
-        }
-      },
-      (err: any) => {
-        log.log(err);
-        kubeConfigList[context].req.abort();
-        kubeConfigList[context].watcher = null;
-        kubeConfigList[context].req = null;
-        watchNamespace(context);
-      }
-    )
-    .then((req: any) => {
-      kubeConfigList[context].req = req;
-    });
-}
-
-function runNamespaceWatcher() {
-  const kubeConfigPath = getKubeConfPath();
-  const kc = new k8s.KubeConfig();
-  kc.loadFromFile(kubeConfigPath);
-  kc.contexts.forEach((context: any) => {
-    kubeConfigList[context.name] = {watcher: null, req: null};
-    watchNamespace(context.name);
-  });
-}
-
-function main() {
-  loadKubeConf();
-  runNamespaceWatcher();
-}
-
-main();
-// eslint-disable-next-line no-bitwise
-setInterval(() => {}, 1 << 30);
+  if (message.event && message.event === 'watch/ObjectAdded') {
+    getKubeAccess(message.objectName, message.context)
+      .then(clusterAccess => {
+        dispatchToAllWindows({type: 'config/setKubeConfig', payload: message.payload});
+        dispatchToAllWindows({type: 'config/setAccessLoading', payload: true});
+        dispatchToAllWindows({type: 'config/addNamespaceToContext', payload: clusterAccess});
+      })
+      .catch(() => {
+        dispatchToAllWindows({
+          type: 'alert/setAlert',
+          payload: {
+            type: AlertEnum.Warning,
+            title: 'Cluster Watcher Error',
+            message:
+              "We're unable to watch for namespaces changes in your cluster. This may be due to a lack of permissions.",
+          },
+        });
+        dispatchToAllWindows({type: 'config/setAccessLoading', payload: false});
+      });
+  }
+};
