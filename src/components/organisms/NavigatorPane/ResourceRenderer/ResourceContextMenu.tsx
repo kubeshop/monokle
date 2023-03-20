@@ -43,8 +43,7 @@ import {useDiff, useInstallDeploy} from '@hooks/resourceHooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {K8sResource, ResourceMap, isLocalResource} from '@shared/models/k8sResource';
-import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {K8sResource, ResourceMap, ResourceMeta, isLocalResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 import {defineHotkey} from '@shared/utils/hotkey';
 
@@ -84,8 +83,13 @@ function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceM
   });
 }
 
-const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
-  const {itemInstance} = props;
+type Props = {
+  resourceMeta: ResourceMeta;
+  isSelected: boolean;
+};
+
+const ResourceKindContextMenu = (props: Props) => {
+  const {resourceMeta, isSelected} = props;
 
   const dispatch = useAppDispatch();
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
@@ -99,7 +103,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const projectConfig = useAppSelector(currentConfigSelector);
 
-  const resource = useResource({id: itemInstance.id, storage: itemInstance.meta?.resourceStorage});
+  const resource = useResource(resourceMeta);
   const resourceMapRef = useActiveResourceMapRef();
   const isThisResourceSelected = useAppSelector(state =>
     Boolean(resource && isResourceSelected(resource, state.main.selection))
@@ -263,7 +267,7 @@ const ResourceKindContextMenu = (props: ItemCustomComponentProps) => {
   return (
     <>
       <ContextMenu items={menuItems}>
-        <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
+        <StyledActionsMenuIconContainer isSelected={isSelected}>
           <Dots color={isThisResourceSelected ? Colors.blackPure : undefined} />
         </StyledActionsMenuIconContainer>
       </ContextMenu>

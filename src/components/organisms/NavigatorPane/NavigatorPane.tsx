@@ -1,32 +1,34 @@
-import {memo, useCallback, useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 import {useMeasure} from 'react-use';
 
 import {Dropdown, Tooltip} from 'antd';
 
 import {PlusOutlined} from '@ant-design/icons';
 
+import styled from 'styled-components';
+
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {NewResourceTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {toggleResourceFilters} from '@redux/reducers/ui';
+import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
 import {isInPreviewModeSelectorNew} from '@redux/selectors';
+import {resourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
 
-import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
+import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
 import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import {useNewResourceMenuItems} from '@hooks/menuItemsHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
-import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
-
-import {ResizableRowsPanel, TitleBar} from '@monokle/components';
+import {Icon, ResizableRowsPanel, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {Colors} from '@shared/styles';
 
 import * as S from './NavigatorPane.styled';
 import NavigatorTitle from './NavigatorTitle';
+import ResourceNavigator from './ResourceNavigator';
 
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -65,6 +67,7 @@ const NavPane: React.FC = () => {
             title={<NavigatorTitle />}
             actions={
               <S.TitleBarRightButtons>
+                <CollapseAction />
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
                   <Dropdown
                     trigger={['click']}
@@ -99,8 +102,7 @@ const NavPane: React.FC = () => {
         }
         bottom={
           <S.List id="navigator-sections-container">
-            <SectionRenderer sectionId={K8sResourceSectionBlueprint.id} level={0} isLastSection={false} />
-            <SectionRenderer sectionId={UnknownResourceSectionBlueprint.id} level={0} isLastSection={false} />
+            <ResourceNavigator />
           </S.List>
         }
         height={height - 40}
@@ -111,4 +113,30 @@ const NavPane: React.FC = () => {
   );
 };
 
-export default memo(NavPane);
+export default NavPane;
+
+function CollapseAction() {
+  const dispatch = useAppDispatch();
+  const allKinds = useAppSelector(resourceKindsSelector);
+  const collapsedKinds = useAppSelector(s => s.ui.navigator.collapsedResourceKinds);
+
+  const onClick = useCallback(() => {
+    if (collapsedKinds.length === allKinds.length) {
+      dispatch(expandResourceKinds(allKinds));
+      return;
+    }
+    dispatch(collapseResourceKinds(allKinds));
+  }, [dispatch, collapsedKinds, allKinds]);
+
+  return (
+    <CollapseIconWrapper onClick={onClick}>
+      <Icon name="collapse" />
+    </CollapseIconWrapper>
+  );
+}
+
+const CollapseIconWrapper = styled.div`
+  color: ${Colors.blue6};
+  cursor: pointer;
+  padding-right: 8px;
+`;

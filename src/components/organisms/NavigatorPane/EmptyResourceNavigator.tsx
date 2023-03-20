@@ -28,7 +28,7 @@ const StyledLink = styled.div`
   }
 `;
 
-function K8sResourceSectionEmptyDisplay() {
+function EmptyResourceNavigator() {
   const dispatch = useAppDispatch();
   const {lastNamespaceLoaded} = useAppSelector(state => state.main.clusterConnectionOptions);
   const hasAnyActiveResources = useAppSelector(state => activeResourceCountSelector(state) > 0);
@@ -67,7 +67,7 @@ function K8sResourceSectionEmptyDisplay() {
   };
 
   return (
-    <>
+    <div style={{padding: 16}}>
       {!hasAnyActiveResources ? (
         <StyledContainer>
           <StyledTitle id="get-started-title">Get started:</StyledTitle>
@@ -88,15 +88,12 @@ function K8sResourceSectionEmptyDisplay() {
           )}
         </StyledContainer>
       ) : (
-        <>
-          <h1>K8s Resources</h1>
-          <p>
-            No resources match the active filters. <a onClick={resetFilters}>[Reset Filters]</a>
-          </p>
-        </>
+        <p>
+          No resources match the active filters. <a onClick={resetFilters}>[Reset Filters]</a>
+        </p>
       )}
-    </>
+    </div>
   );
 }
 
-export default K8sResourceSectionEmptyDisplay;
+export default EmptyResourceNavigator;

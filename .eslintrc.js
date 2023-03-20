@@ -81,6 +81,8 @@ module.exports = {
     'no-nested-ternary': 'off', // warn
     'no-param-reassign': 'off',
     'no-restricted-exports': 'off',
+    'no-restricted-syntax': 'off',
+    'no-continue': 'off',
     'no-shadow': 'off',
     'no-underscore-dangle': 'off',
     'no-undef': 'off',
