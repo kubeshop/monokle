@@ -2,6 +2,7 @@ import {useCallback, useMemo} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectImage, selectResource} from '@redux/reducers/main';
+import {setExplorerSelectedSection} from '@redux/reducers/ui';
 import {activeResourceStorageSelector, useResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {problemsByResourceSelector, useValidationSelector} from '@redux/validation/validation.selectors';
@@ -30,6 +31,7 @@ const ResourceGraphTab: React.FC = () => {
   );
   const onSelectImage = useCallback(
     (imageId: string) => {
+      dispatch(setExplorerSelectedSection('images'));
       dispatch(selectImage({imageId}));
     },
     [dispatch]

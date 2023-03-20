@@ -159,7 +159,7 @@ export function transformResourceForValidation(r: K8sResource): ValidationResour
   let fileOffset = 0;
 
   if (isLocalResource(r)) {
-    filePath = r.origin.filePath;
+    filePath = r.origin.filePath.replaceAll('\\', '/');
     fileOffset = r.origin.fileOffset;
   } else if (isClusterResource(r)) {
     filePath = r.origin.context;
