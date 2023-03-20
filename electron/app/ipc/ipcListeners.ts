@@ -33,6 +33,7 @@ import {AnyPlugin} from '@shared/models/plugin';
 import {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@shared/models/template';
 import {getSegmentClient} from '@shared/utils/segment';
 
+import {startKubeConfigService, stopKubeConfigService} from '../KubeConfigManager';
 import autoUpdater from '../autoUpdater';
 import {
   checkNewVersion,
@@ -383,7 +384,7 @@ ipcMain.on('pod.terminal.close', () => {
 });
 
 ipcMain.on('pod.terminal.init', (event, args) => {
-  const { podNamespace, podName, containerName, webContentsId} = args;
+  const {podNamespace, podName, containerName, webContentsId} = args;
   if (!webContentsId) {
     return;
   }
@@ -417,3 +418,6 @@ ipcMain.on('pod.terminal.init', (event, args) => {
     }
   );
 });
+
+ipcMain.handle('kubeService:start', () => startKubeConfigService());
+ipcMain.handle('kubeService:stop', () => stopKubeConfigService());
