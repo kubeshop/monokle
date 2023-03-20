@@ -4,6 +4,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseResourceKinds, expandResourceKinds} from '@redux/reducers/ui';
 import {getResourceMetaFromState} from '@redux/selectors/resourceGetters';
 
+import {useSelectorWithRef} from '@utils/hooks';
+
 import * as S from './KindRenderer.styled';
 import KindSuffix from './KindSuffix';
 import ResourceCounter from './ResourceCounter';
@@ -28,15 +30,17 @@ function KindRenderer(props: KindRendererProps) {
         highlight.type === 'resource' && getResourceMetaFromState(state, highlight.resourceIdentifier)?.kind === kind
     )
   );
-  const isCollapsed = useAppSelector(state => state.ui.navigator.collapsedResourceKinds.includes(kind));
+  const [isCollapsed, isCollapsedRef] = useSelectorWithRef(state =>
+    state.ui.navigator.collapsedResourceKinds.includes(kind)
+  );
 
   const toggleCollapse = useCallback(() => {
-    if (isCollapsed) {
+    if (isCollapsedRef.current) {
       dispatch(expandResourceKinds([kind]));
     } else {
       dispatch(collapseResourceKinds([kind]));
     }
-  }, [kind, isCollapsed, dispatch]);
+  }, [kind, isCollapsedRef, dispatch]);
 
   return (
     <S.SectionContainer
