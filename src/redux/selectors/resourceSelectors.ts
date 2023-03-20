@@ -1,10 +1,15 @@
 import {useMemo} from 'react';
 
+import {createSelector} from '@reduxjs/toolkit';
+
+import {groupBy} from 'lodash';
+
 import {useAppSelector} from '@redux/hooks';
-import {isKustomizationResource} from '@redux/services/kustomize';
+import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {joinK8sResource} from '@redux/services/resource';
 
 import {useRefSelector} from '@utils/hooks';
+import {isResourcePassingFilter} from '@utils/resources';
 
 import {
   K8sResource,
@@ -13,8 +18,14 @@ import {
   ResourceMeta,
   ResourceStorage,
 } from '@shared/models/k8sResource';
+import {ResourceNavigatorNode} from '@shared/models/navigator';
 import {RootState} from '@shared/models/rootState';
 
+import {
+  activeResourceMetaMapSelector,
+  activeResourceStorageSelector,
+  transientResourceMetaMapSelector,
+} from './resourceMapSelectors';
 import {createDeepEqualSelector} from './utils';
 
 export const createResourceSelector = <Storage extends ResourceStorage>(storage: Storage) => {
@@ -181,5 +192,57 @@ export const previewedKustomizationSelector = createDeepEqualSelector(
       return undefined;
     }
     return joinK8sResource(meta, content);
+  }
+);
+
+export const resourceNavigatorSelector = createSelector(
+  [
+    activeResourceStorageSelector,
+    activeResourceMetaMapSelector,
+    transientResourceMetaMapSelector,
+    (state: RootState) => state.main.resourceFilter,
+    (state: RootState) => state.ui.navigator.collapsedResourceKinds,
+  ],
+  (activeResourceStorage, activeResourceMetaMap, transientResourceMetaMap, resourceFilter, collapsedResourceKinds) => {
+    const list: ResourceNavigatorNode[] = [];
+
+    const resources = Object.values(activeResourceMetaMap)
+      .concat(Object.values(transientResourceMetaMap))
+      .filter(
+        resource =>
+          isResourcePassingFilter(resource, resourceFilter) &&
+          !isKustomizationResource(resource) &&
+          !isKustomizationPatch(resource)
+      );
+
+    const groups = groupBy(resources, 'kind');
+    const entries = Object.entries(groups);
+    const sortedEntries = entries.sort();
+
+    for (const [kind, kindResources] of sortedEntries) {
+      const collapsed = collapsedResourceKinds.indexOf(kind) !== -1;
+
+      list.push({
+        type: 'kind',
+        name: kind,
+        resourceCount: kindResources.length,
+      });
+
+      if (collapsed) {
+        continue;
+      }
+
+      for (const resource of kindResources) {
+        list.push({
+          type: 'resource',
+          identifier: {
+            id: resource.id,
+            storage: activeResourceStorage,
+          },
+        });
+      }
+    }
+
+    return list;
   }
 );
