@@ -184,7 +184,7 @@ const App = () => {
   }, [shouldTriggerTelemetryNotification, dispatch]);
 
   useEffect(() => {
-    ipcRenderer.invoke('initKubeConfig');
+    ipcRenderer.invoke('kubeService:start');
   }, []);
 
   useEffect(() => {
