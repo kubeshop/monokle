@@ -67,7 +67,7 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
     // Build references
     const references = dispatch(
       processResourceRefs({
-        resources,
+        resources: resources.map(transformResourceForValidation).filter(isDefined),
         incremental: incrementalResourceIds ? {resourceIds: incrementalResourceIds} : undefined,
       })
     );
@@ -75,15 +75,12 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
     signal.addEventListener('abort', () => {
       references.abort();
     });
-    resources = await references.unwrap();
+    const resourcesWithRefs = await references.unwrap();
     signal.throwIfAborted();
-
-    // TODO: do we have to fetch the resources again after processing the refs?
-    const transformedResources = resources.map(transformResourceForValidation).filter(isDefined);
 
     // TODO: could the active resource map change while the validation is running? before we get the refs?
     const {response} = await VALIDATOR.runValidation({
-      resources: transformedResources,
+      resources: resourcesWithRefs,
       incremental: incrementalResourceIds ? {resourceIds: incrementalResourceIds} : undefined,
     });
 

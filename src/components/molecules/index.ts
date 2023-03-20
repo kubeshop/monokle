@@ -15,6 +15,7 @@ export {default as ProjectCard} from './ProjectCard';
 export {default as ProjectsList} from './ProjectsList';
 export {default as ResourceDiff} from './ResourceDiff';
 export {default as ResourceFilter} from './ResourceFilter';
+export {default as ResourceGraphTab} from './ResourceGraphTab';
 export {default as ResourceNamespaceFilter} from './ResourceNamespaceFilter';
 export {default as ResourceRefsIconPopover} from './ResourceRefsIconPopover';
 export {default as SaveResourcesToFileFolderModal} from './SaveResourcesToFileFolderModal';
