@@ -1,6 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {BrowserWindow, app, ipcMain} from 'electron';
+import {BrowserWindow, app, ipcMain, utilityProcess} from 'electron';
 
 import asyncLib from 'async';
 import {spawn} from 'child_process';
@@ -31,6 +31,8 @@ import {
 import type {FileExplorerOptions, FileOptions} from '@shared/models/fileExplorer';
 import {AnyPlugin} from '@shared/models/plugin';
 import {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@shared/models/template';
+import utilsElectronStore from '@shared/utils/electronStore';
+import electronStore from '@shared/utils/electronStore';
 import {getSegmentClient} from '@shared/utils/segment';
 
 import autoUpdater from '../autoUpdater';
@@ -383,7 +385,7 @@ ipcMain.on('pod.terminal.close', () => {
 });
 
 ipcMain.on('pod.terminal.init', (event, args) => {
-  const { podNamespace, podName, containerName, webContentsId} = args;
+  const {podNamespace, podName, containerName, webContentsId} = args;
   if (!webContentsId) {
     return;
   }
@@ -416,4 +418,17 @@ ipcMain.on('pod.terminal.init', (event, args) => {
       }
     }
   );
+});
+
+ipcMain.handle('initKubeConfig', () => {
+  const initKubeProcess = utilityProcess.fork(path.normalize(`${__dirname}/../KubeConfigManager.js`), [
+    utilsElectronStore.get('appConfig.kubeConfig') || '',
+    process.env.KUBECONFIG || '',
+    electronStore.get('appConfig.kubeconfig') || '',
+    path.join(app.getPath('home'), `${path.sep}.kube${path.sep}config`),
+  ]);
+
+  initKubeProcess.on('message', message => {});
+  initKubeProcess.on('exit', () => {});
+  initKubeProcess.on('spawn', () => {});
 });

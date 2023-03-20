@@ -1,4 +1,4 @@
-import {BrowserWindow, app, globalShortcut, nativeImage} from 'electron';
+import {BrowserWindow, Menu, app, globalShortcut, nativeImage} from 'electron';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import ElectronStore from 'electron-store';
 
@@ -15,6 +15,7 @@ Object.assign(console, logToFile.functions);
 const isDev = process.env.NODE_ENV === 'development';
 
 export const openApplication = async (givenPath?: string) => {
+  Menu.setApplicationMenu(null);
   await app.whenReady();
 
   if (isDev) {

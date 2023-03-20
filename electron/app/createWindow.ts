@@ -1,6 +1,6 @@
 import {BrowserWindow, app, nativeImage} from 'electron';
 
-import {indexOf} from 'lodash';
+import indexOf from 'lodash/indexOf';
 import {machineIdSync} from 'node-machine-id';
 import * as path from 'path';
 
@@ -19,7 +19,7 @@ import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import autoUpdater from './autoUpdater';
 import {checkNewVersion} from './commands';
-import initKubeconfig from './initKubeconfig';
+// import initKubeconfig from './initKubeconfig';
 import {
   createDispatchForWindow,
   dispatchToAllWindows,
@@ -52,6 +52,7 @@ const machineId = machineIdSync();
 export const createWindow = (givenPath?: string) => {
   const iconPath = isDev ? path.join('resources', 'icon.ico') : path.join(process.resourcesPath, 'icon.ico');
   const image = nativeImage.createFromPath(iconPath);
+  console.log('@@', path.join(__dirname, 'preload.js'));
   const mainBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 1200,
     height: 800,
@@ -60,6 +61,7 @@ export const createWindow = (givenPath?: string) => {
     title: 'Monokle',
     icon: image,
     webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
       zoomFactor: utilsElectronStore.get('ui.zoomFactor'),
       webSecurity: false,
       contextIsolation: false,
@@ -198,7 +200,7 @@ export const createWindow = (givenPath?: string) => {
       await checkNewVersion(dispatch, true);
     }, NEW_VERSION_CHECK_INTERVAL);
 
-    initKubeconfig(dispatch, userHomeDir, utilsElectronStore.get('appConfig.kubeConfig'));
+    // initKubeconfig(dispatch, userHomeDir, utilsElectronStore.get('appConfig.kubeConfig'));
     dispatch({type: 'main/setAppRehydrating', payload: false});
 
     const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);
