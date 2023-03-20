@@ -20,17 +20,32 @@ export type ResourceRendererProps = {
 };
 
 function ResourceRenderer(props: ResourceRendererProps) {
-  const {resourceIdentifier} = props;
+  const {resourceIdentifier: propsResourceIdentifier} = props;
   const dispatch = useAppDispatch();
 
-  const resourceMeta = useResourceMeta(resourceIdentifier);
+  const transientResourceIdentifier: ResourceIdentifier = {id: propsResourceIdentifier.id, storage: 'transient'};
+  const activeResourceMeta = useResourceMeta(propsResourceIdentifier);
+  const transientResourceMeta = useResourceMeta(transientResourceIdentifier);
+  const resourceMeta = activeResourceMeta || transientResourceMeta;
+  const resourceIdentifier = activeResourceMeta
+    ? propsResourceIdentifier
+    : transientResourceMeta
+    ? transientResourceIdentifier
+    : undefined;
 
-  const isSelected = useAppSelector(state => isResourceSelected(resourceIdentifier, state.main.selection));
-  const isHighlighted = useAppSelector(state => isResourceHighlighted(resourceIdentifier, state.main.highlights));
+  const isSelected = useAppSelector(state =>
+    Boolean(resourceIdentifier && isResourceSelected(resourceIdentifier, state.main.selection))
+  );
+  const isHighlighted = useAppSelector(state =>
+    Boolean(resourceIdentifier && isResourceHighlighted(resourceIdentifier, state.main.highlights))
+  );
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const onClick = useCallback(() => {
+    if (!resourceIdentifier) {
+      return;
+    }
     dispatch(selectResource({resourceIdentifier}));
   }, [resourceIdentifier, dispatch]);
 

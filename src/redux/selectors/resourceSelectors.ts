@@ -21,7 +21,11 @@ import {
 import {ResourceNavigatorNode} from '@shared/models/navigator';
 import {RootState} from '@shared/models/rootState';
 
-import {activeResourceMetaMapSelector, activeResourceStorageSelector} from './resourceMapSelectors';
+import {
+  activeResourceMetaMapSelector,
+  activeResourceStorageSelector,
+  transientResourceMetaMapSelector,
+} from './resourceMapSelectors';
 import {createDeepEqualSelector} from './utils';
 
 export const createResourceSelector = <Storage extends ResourceStorage>(storage: Storage) => {
@@ -195,18 +199,21 @@ export const resourceNavigatorSelector = createSelector(
   [
     activeResourceStorageSelector,
     activeResourceMetaMapSelector,
+    transientResourceMetaMapSelector,
     (state: RootState) => state.main.resourceFilter,
     (state: RootState) => state.ui.navigator.collapsedResourceKinds,
   ],
-  (activeResourceStorage, resourceMetaMap, resourceFilter, collapsedResourceKinds) => {
+  (activeResourceStorage, activeResourceMetaMap, transientResourceMetaMap, resourceFilter, collapsedResourceKinds) => {
     const list: ResourceNavigatorNode[] = [];
 
-    const resources = Object.values(resourceMetaMap).filter(
-      resource =>
-        isResourcePassingFilter(resource, resourceFilter) &&
-        !isKustomizationResource(resource) &&
-        !isKustomizationPatch(resource)
-    );
+    const resources = Object.values(activeResourceMetaMap)
+      .concat(Object.values(transientResourceMetaMap))
+      .filter(
+        resource =>
+          isResourcePassingFilter(resource, resourceFilter) &&
+          !isKustomizationResource(resource) &&
+          !isKustomizationPatch(resource)
+      );
 
     const groups = groupBy(resources, 'kind');
     const entries = Object.entries(groups);

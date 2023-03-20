@@ -90,10 +90,10 @@ export const createResourceMetaMapSelector = <Storage extends ResourceStorage>(
   );
 };
 
-const localResourceMetaMapSelector = createResourceMetaMapSelector('local');
-const clusterResourceMetaMapSelector = createResourceMetaMapSelector('cluster');
-const previewResourceMetaMapSelector = createResourceMetaMapSelector('preview');
-const transientResourceMetaMapSelector = createResourceMetaMapSelector('transient');
+export const localResourceMetaMapSelector = createResourceMetaMapSelector('local');
+export const clusterResourceMetaMapSelector = createResourceMetaMapSelector('cluster');
+export const previewResourceMetaMapSelector = createResourceMetaMapSelector('preview');
+export const transientResourceMetaMapSelector = createResourceMetaMapSelector('transient');
 
 const getResourceMetaMapSelector = <Storage extends ResourceStorage>(
   storage: Storage

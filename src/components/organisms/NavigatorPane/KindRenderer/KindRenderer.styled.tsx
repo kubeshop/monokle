@@ -11,6 +11,7 @@ export const NameContainer = styled.span<NameContainerProps>`
   display: flex;
   align-items: center;
   width: 100%;
+  height: 26px;
   padding-left: 0;
   ${props => !props.isHovered && 'padding-right: 30px;'}
 `;
@@ -46,6 +47,7 @@ export const SectionContainer = styled.li<SectionContainerProps>`
       return `background: ${Colors.blackPearl};`;
     }
   }};
+  height: 26px;
 `;
 
 type NameProps = {
