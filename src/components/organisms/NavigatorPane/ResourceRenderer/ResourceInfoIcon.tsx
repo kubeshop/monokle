@@ -6,14 +6,19 @@ import {DateTime} from 'luxon';
 
 import {useResourceContent} from '@redux/selectors/resourceSelectors';
 
-import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {ResourceMeta} from '@shared/models/k8sResource';
 
-import * as S from './ResourceKindInformation.styled';
+import * as S from './ResourceInfoIcon.styled';
 
-export const ResourceKindInformation = (props: ItemCustomComponentProps) => {
-  const {itemInstance} = props;
+type Props = {
+  resourceMeta: ResourceMeta;
+  isSelected: boolean;
+};
 
-  const resourceContent = useResourceContent({id: itemInstance.id, storage: itemInstance.meta?.resourceStorage});
+export const ResourceInfoIcon = (props: Props) => {
+  const {resourceMeta, isSelected} = props;
+
+  const resourceContent = useResourceContent(resourceMeta);
 
   const ageInfo = useMemo(() => {
     if (!resourceContent?.object?.metadata) {
@@ -56,7 +61,7 @@ export const ResourceKindInformation = (props: ItemCustomComponentProps) => {
         </S.InfoContainer>
       }
     >
-      <S.InfoCircleFilled $isSelected={itemInstance.isSelected} />
+      <S.InfoCircleFilled $isSelected={isSelected} />
     </Tooltip>
   );
 };

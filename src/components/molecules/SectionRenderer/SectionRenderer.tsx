@@ -186,7 +186,7 @@ function SectionRenderer(props: SectionRendererProps) {
   }
 
   if (sectionInstance?.isLoading) {
-    return <S.Skeleton />;
+    return <S.Skeleton active />;
   }
 
   if (sectionInstance?.isEmpty) {

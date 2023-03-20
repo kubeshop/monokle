@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback} from 'react';
 
 import {Button, Tooltip} from 'antd';
 
@@ -16,7 +16,6 @@ import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {SectionCustomComponentProps} from '@shared/models/navigator';
 import {NewResourceWizardInput} from '@shared/models/ui';
 import {Colors} from '@shared/styles/colors';
 
@@ -35,18 +34,19 @@ const ButtonContainer = styled.span`
   }
 `;
 
-const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props => {
-  const {sectionInstance} = props;
+type Props = {
+  kind: string;
+  isSelected: boolean;
+};
+
+const KindSuffix: React.FC<Props> = props => {
+  const {kind: resourceKind, isSelected} = props;
   const dispatch = useAppDispatch();
 
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isSectionCollapsed = useAppSelector(state => state.navigator.collapsedSectionIds.includes(sectionInstance.id));
-
-  const resourceKind = useMemo(() => {
-    return sectionInstance.meta?.resourceKind;
-  }, [sectionInstance]);
+  const isSectionCollapsed = useAppSelector(state => state.ui.navigator.collapsedResourceKinds.includes(resourceKind));
 
   const createResource = useCallback(() => {
     if (!resourceKind) {
@@ -74,7 +74,7 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
             onClick={createResource}
             size="small"
             disabled={isInPreviewMode || isInClusterMode}
-            style={{color: sectionInstance.isSelected && isSectionCollapsed ? Colors.blackPure : undefined}}
+            style={{color: isSelected && isSectionCollapsed ? Colors.blackPure : undefined}}
           />
         </Tooltip>
       </ButtonContainer>
@@ -82,4 +82,4 @@ const ResourceKindSectionSuffix: React.FC<SectionCustomComponentProps> = props =
   );
 };
 
-export default ResourceKindSectionSuffix;
+export default KindSuffix;

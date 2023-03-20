@@ -152,8 +152,8 @@ type UiState = {
     selection?: RightMenuSelectionType;
     isActive: boolean;
   };
-  navPane: {
-    collapsedNavSectionNames: string[];
+  navigator: {
+    collapsedResourceKinds: string[];
   };
   folderExplorer: {
     isOpen: boolean;

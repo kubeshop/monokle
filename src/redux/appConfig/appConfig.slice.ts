@@ -1,4 +1,4 @@
-import {Draft, PayloadAction, createAsyncThunk, createSlice, isAnyOf} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import flatten from 'flat';
 import {existsSync, mkdirSync} from 'fs';
@@ -6,7 +6,6 @@ import _ from 'lodash';
 import log from 'loglevel';
 import path, {join} from 'path';
 
-import {AppListenerFn} from '@redux/listeners/base';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {
@@ -18,16 +17,11 @@ import {
   writeProjectConfigFile,
 } from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
-import {getResourceKindSchema} from '@redux/services/schema';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
-import {VALIDATOR} from '@redux/validation/validator';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
-import {ResourceKindHandlers, readSavedCrdKindHandlers} from '@src/kindhandlers';
-
-import {CustomSchema} from '@monokle/validation';
 import {init as sentryInit} from '@sentry/electron/renderer';
 import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
 import {ClusterColors} from '@shared/models/cluster';
@@ -585,46 +579,6 @@ export const sortProjects = (projects: Array<Project>, isAnyProjectOpened: boole
 
   const [lastOpened, ...rest] = sortedProjects;
   return [lastOpened, ..._.sortBy(rest, (p: Project) => !p.isPinned)];
-};
-
-export const crdsPathChangedListener: AppListenerFn = listen => {
-  listen({
-    type: setUserDirs.type,
-    effect: async (action, {getState}) => {
-      const crdsDir = getState().config.userCrdsDir;
-
-      if (crdsDir) {
-        // TODO: can we avoid having this property on the window object?
-        (window as any).monokleUserCrdsDir = crdsDir;
-        readSavedCrdKindHandlers(crdsDir);
-      }
-    },
-  });
-};
-
-export const k8sVersionSchemaListener: AppListenerFn = listen => {
-  listen({
-    matcher: isAnyOf(setOpenProject.fulfilled),
-    effect: async (action, {getState}) => {
-      const state = getState().config;
-      const k8sVersion = state.projectConfig?.k8sVersion || state.k8sVersion;
-      const userDataDir = state.userDataDir;
-      if (!userDataDir) {
-        return;
-      }
-
-      const schemas: CustomSchema[] = ResourceKindHandlers.filter(h => !h.isCustom).map(kindHandler => {
-        const schema = getResourceKindSchema(kindHandler.kind, k8sVersion, userDataDir);
-        return {
-          apiVersion: kindHandler.clusterApiVersion,
-          kind: kindHandler.kind,
-          schema,
-        };
-      });
-
-      await VALIDATOR.bulkRegisterCustomSchemas(schemas);
-    },
-  });
 };
 
 export const {

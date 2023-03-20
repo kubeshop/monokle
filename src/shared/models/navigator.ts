@@ -3,6 +3,7 @@ import React, {ReactNode} from 'react';
 import {ActionCreatorWithPayload, AnyAction} from '@reduxjs/toolkit';
 
 import {AppDispatch} from './appDispatch';
+import {ResourceIdentifier} from './k8sResource';
 import {RootState} from './rootState';
 
 export type ItemCustomComponentProps = {
@@ -206,3 +207,16 @@ export interface NavigatorState extends NavigatorInstanceState {
   collapsedSectionIds: string[];
   registeredSectionBlueprintIds: string[];
 }
+
+type KindNode = {
+  type: 'kind';
+  name: string;
+  resourceCount: number;
+};
+
+type ResourceNode = {
+  type: 'resource';
+  identifier: ResourceIdentifier;
+};
+
+export type ResourceNavigatorNode = KindNode | ResourceNode;

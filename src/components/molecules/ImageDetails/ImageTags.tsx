@@ -70,7 +70,7 @@ const ImageTags: React.FC<IProps> = props => {
       <S.SearchInput placeholder="Search image tag" onChange={handleSearch} />
 
       {isLoading ? (
-        <Skeleton />
+        <Skeleton active />
       ) : (
         <S.ImageTagsContainer>
           {tags.results.length ? (

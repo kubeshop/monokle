@@ -82,7 +82,7 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
   }, [templateForm]);
 
   if (isLoading) {
-    return <Skeleton />;
+    return <Skeleton active />;
   }
 
   if (errorMessage) {

@@ -1,9 +1,11 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {setClusterProxyPort} from '@redux/appConfig';
+import {setAlert} from '@redux/reducers/alert';
 import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 import {stopPreview} from '@redux/services/preview';
 
+import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
 import {openKubectlProxy} from '@shared/utils/commands/kubectl';
@@ -55,8 +57,15 @@ export const startClusterConnection = createAsyncThunk<
 
   // TODO: if the listener has not been called in 10 seconds, then stop the preview and send an error notification
   const kubectlProxyListener = (event: any) => {
-    if (event.type === 'error' || event.type === 'exit') {
+    if (event.type === 'stderr' || event.type === 'exit') {
       stopPreview(thunkAPI.dispatch);
+
+      if (event.type === 'stderr') {
+        thunkAPI.dispatch(
+          setAlert({type: AlertEnum.Error, title: 'Cluster Resources Failed', message: event.result.data})
+        );
+      }
+
       return;
     }
 

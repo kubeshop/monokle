@@ -49,6 +49,7 @@ const loadClusterResourcesHandler = async (
   const startTime = new Date().getTime();
   const clusterAccess = currentClusterAccessSelector(thunkAPI.getState());
   const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
+  const useKubectlProxy = thunkAPI.getState().config.useKubectlProxy;
 
   let currentNamespace: string = namespace || '<all>';
 
@@ -146,8 +147,6 @@ const loadClusterResourcesHandler = async (
       }
     }
 
-    // TODO: process the resources via the validation listener after the preview is complete
-
     const endTime = new Date().getTime();
 
     trackEvent('preview/cluster/end', {
@@ -172,7 +171,12 @@ const loadClusterResourcesHandler = async (
     };
   } catch (e: any) {
     log.error(e);
-    return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', e.message);
+
+    if (useKubectlProxy) {
+      return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', e.message);
+    }
+
+    return thunkAPI.rejectWithValue({});
   }
 };
 

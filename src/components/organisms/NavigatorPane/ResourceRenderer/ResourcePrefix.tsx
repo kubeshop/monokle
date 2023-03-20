@@ -5,11 +5,13 @@ import {Button, Popover, Tag as RawTag} from 'antd';
 import {isEqual} from 'lodash';
 import styled from 'styled-components';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {extendResourceFilter, selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {activeResourceStorageSelector, useActiveResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
-import {useResourceMeta, useSelectedResourceRef} from '@redux/selectors/resourceSelectors';
+import {useSelectedResourceRef} from '@redux/selectors/resourceSelectors';
 
 import {ResourceRefsIconPopover} from '@molecules';
 
@@ -19,13 +21,18 @@ import {useRefSelector} from '@utils/hooks';
 
 import {ValidationPopover} from '@monokle/components';
 import {ValidationResult, getResourceId, getResourceLocation} from '@monokle/validation';
-import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {MonacoRange} from '@shared/models/ui';
 import {Colors} from '@shared/styles/colors';
 import {trackEvent} from '@shared/utils/telemetry';
 
-const Prefix = (props: ItemCustomComponentProps) => {
-  const {itemInstance} = props;
+type Props = {
+  resourceMeta: ResourceMeta;
+  isSelected: boolean;
+};
+
+const Prefix = (props: Props) => {
+  const {resourceMeta, isSelected} = props;
 
   const dispatch = useAppDispatch();
   const activeResourceMetaMapRef = useActiveResourceMetaMapRef();
@@ -33,9 +40,7 @@ const Prefix = (props: ItemCustomComponentProps) => {
   const selectedResourceRef = useSelectedResourceRef();
   const hasFilterNamespaces = useAppSelector(state => Boolean(state?.main?.resourceFilter?.namespaces?.length));
 
-  const resourceMeta = useResourceMeta({id: itemInstance.id, storage: itemInstance.meta?.resourceStorage});
-
-  const {level, errors, warnings} = useValidationLevel(itemInstance.id);
+  const {level, errors, warnings} = useValidationLevel(resourceMeta.id);
 
   const applyNamespaceFilter = useCallback(() => {
     if (!resourceMeta) {
@@ -79,22 +84,17 @@ const Prefix = (props: ItemCustomComponentProps) => {
   return (
     <Container>
       <ValidationPopover
-        disabled={itemInstance.isDisabled}
         level={level}
         results={[...errors, ...warnings]}
         onMessageClickHandler={onMessageClickHandler}
         popoverIconStyle={{transform: 'translateY(-2px)'}}
       />
 
-      <ResourceRefsIconPopover
-        isSelected={itemInstance.isSelected}
-        isDisabled={itemInstance.isDisabled}
-        resourceMeta={resourceMeta}
-        type="incoming"
-      />
+      <ResourceRefsIconPopover isDisabled={false} isSelected={isSelected} resourceMeta={resourceMeta} type="incoming" />
 
       {resourceMeta.namespace && !hasFilterNamespaces && (
         <Popover
+          mouseEnterDelay={TOOLTIP_DELAY}
           title="Filter"
           overlayClassName="resource-prefix-popover-overlay"
           content={
@@ -103,7 +103,7 @@ const Prefix = (props: ItemCustomComponentProps) => {
             </Button>
           }
         >
-          <Tag $isSelected={itemInstance.isSelected} color="default">
+          <Tag $isSelected={isSelected} color="default">
             {resourceMeta.namespace}
           </Tag>
         </Popover>

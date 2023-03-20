@@ -4,7 +4,7 @@ import {createLogger} from 'redux-logger';
 
 import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
 
-import {configSlice, crdsPathChangedListener, k8sVersionSchemaListener} from './appConfig';
+import {configSlice} from './appConfig';
 import {appConfigListeners} from './appConfig/appConfig.listeners';
 import * as compareListeners from './compare/listeners';
 import {compareSlice} from './compare/slice';
@@ -15,6 +15,7 @@ import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
 import {extensionSlice} from './reducers/extension';
 import {mainSlice} from './reducers/main';
+import {retryClusterConnectionListener} from './reducers/main/clusterListeners';
 import {imageListParserListener} from './reducers/main/mainListeners';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
 import {killTerminalProcessesListener, terminalSlice} from './reducers/terminal';
@@ -41,12 +42,11 @@ combineListeners([
   compareListeners.compareListener,
   compareListeners.filterListener,
   killTerminalProcessesListener,
-  k8sVersionSchemaListener,
-  crdsPathChangedListener,
   ...validationListeners,
   ...appConfigListeners,
   imageListParserListener,
   stopClusterConnectionListener,
+  retryClusterConnectionListener,
 ]);
 
 const appReducer = combineReducers({

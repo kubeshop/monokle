@@ -5,6 +5,7 @@ import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 
 import {removeNestedEmptyObjects} from '@utils/objects';
 
+import {ResourceRef} from '@monokle/validation';
 import {ResourceFilterType} from '@shared/models/appState';
 import {
   K8sResource,
@@ -159,7 +160,7 @@ export function transformResourceForValidation(r: K8sResource): ValidationResour
   let fileOffset = 0;
 
   if (isLocalResource(r)) {
-    filePath = r.origin.filePath;
+    filePath = r.origin.filePath.replaceAll('\\', '/');
     fileOffset = r.origin.fileOffset;
   } else if (isClusterResource(r)) {
     filePath = r.origin.context;
@@ -180,4 +181,12 @@ export function transformResourceForValidation(r: K8sResource): ValidationResour
     fileId: filePath,
     content: r.object,
   };
+}
+
+export function transformRefsFilePath(ref: ResourceRef) {
+  if (!ref.target || ref.target.type !== 'file') {
+    return ref;
+  }
+
+  return {...ref, target: {...ref.target, filePath: ref.target.filePath.replaceAll('/', '\\')}};
 }

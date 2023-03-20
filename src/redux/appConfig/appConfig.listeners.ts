@@ -8,13 +8,24 @@ import {isEmpty} from 'lodash';
 import {AppListenerFn} from '@redux/listeners/base';
 import {setAlert} from '@redux/reducers/alert';
 import {CONFIG_PATH} from '@redux/services/projectConfig';
+import {getResourceKindSchema} from '@redux/services/schema';
 import {startClusterConnection, stopClusterConnection} from '@redux/thunks/cluster';
+import {VALIDATOR} from '@redux/validation/validator';
 
+import {ResourceKindHandlers, readSavedCrdKindHandlers} from '@src/kindhandlers';
+
+import {CustomSchema} from '@monokle/validation';
 import {AlertEnum} from '@shared/models/alert';
 import {KubeConfig, KubeConfigContext} from '@shared/models/config';
 
 import {isProjectKubeConfigSelector} from './appConfig.selectors';
-import {loadProjectKubeConfig, setKubeConfig, setOpenProject, updateProjectConfig} from './appConfig.slice';
+import {
+  loadProjectKubeConfig,
+  setKubeConfig,
+  setOpenProject,
+  setUserDirs,
+  updateProjectConfig,
+} from './appConfig.slice';
 
 const loadKubeConfigListener: AppListenerFn = listen => {
   listen({
@@ -185,7 +196,49 @@ const watchKubeConfigProjectListener: AppListenerFn = listen => {
   });
 };
 
+const crdsPathChangedListener: AppListenerFn = listen => {
+  listen({
+    type: setUserDirs.type,
+    effect: async (action, {getState}) => {
+      const crdsDir = getState().config.userCrdsDir;
+
+      if (crdsDir) {
+        // TODO: can we avoid having this property on the window object?
+        (window as any).monokleUserCrdsDir = crdsDir;
+        readSavedCrdKindHandlers(crdsDir);
+      }
+    },
+  });
+};
+
+const k8sVersionSchemaListener: AppListenerFn = listen => {
+  listen({
+    matcher: isAnyOf(setOpenProject.fulfilled),
+    effect: async (action, {getState}) => {
+      const state = getState().config;
+      const k8sVersion = state.projectConfig?.k8sVersion || state.k8sVersion;
+      const userDataDir = state.userDataDir;
+      if (!userDataDir) {
+        return;
+      }
+
+      const schemas: CustomSchema[] = ResourceKindHandlers.filter(h => !h.isCustom).map(kindHandler => {
+        const schema = getResourceKindSchema(kindHandler.kind, k8sVersion, userDataDir);
+        return {
+          apiVersion: kindHandler.clusterApiVersion,
+          kind: kindHandler.kind,
+          schema,
+        };
+      });
+
+      await VALIDATOR.bulkRegisterCustomSchemas(schemas);
+    },
+  });
+};
+
 export const appConfigListeners = [
+  crdsPathChangedListener,
+  k8sVersionSchemaListener,
   loadKubeConfigListener,
   loadKubeConfigProjectListener,
   watchKubeConfigProjectListener,

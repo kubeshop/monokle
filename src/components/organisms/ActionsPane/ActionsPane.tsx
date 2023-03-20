@@ -46,6 +46,7 @@ import {
   ModalConfirmWithNamespaceSelect,
   Monaco,
   PreviewConfigurationDetails,
+  ResourceGraphTab,
 } from '@molecules';
 
 import {TabHeader} from '@atoms';
@@ -344,6 +345,7 @@ const ActionsPane: React.FC = () => {
             },
           ]
         : []),
+      {key: 'graph', label: <TabHeader>Graph</TabHeader>, children: <ResourceGraphTab />, style: {height: '100%'}},
       ...(selectedResourceId && selectedResourceRef.current?.kind === 'Pod' && isInClusterMode
         ? [
             {
