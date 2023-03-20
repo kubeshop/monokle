@@ -1,4 +1,4 @@
-import {memo, useCallback, useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 import {useMeasure} from 'react-use';
 
 import {Dropdown, Tooltip} from 'antd';
@@ -113,7 +113,7 @@ const NavPane: React.FC = () => {
   );
 };
 
-export default memo(NavPane);
+export default NavPane;
 
 function CollapseAction() {
   const dispatch = useAppDispatch();

@@ -1,11 +1,9 @@
-import {useLayoutEffect, useMemo} from 'react';
+import {useLayoutEffect, useMemo, useRef} from 'react';
 import {usePrevious} from 'react-use';
 
 import fastDeepEqual from 'fast-deep-equal';
 
-import {useAppSelector} from '@redux/hooks';
-
-import {useRefSelector} from '@utils/hooks';
+import {useRefSelector, useSelectorWithRef} from '@utils/hooks';
 
 import {ResourceNavigatorNode} from '@shared/models/navigator';
 import {isResourceSelection} from '@shared/models/selection';
@@ -14,31 +12,37 @@ import {isResourceSelection} from '@shared/models/selection';
  * Scrolls the navigator to resources of interest.
  */
 export function useScroll({scrollTo, list}: {scrollTo: (index: number) => void; list: ResourceNavigatorNode[]}) {
-  const selection = useAppSelector(state => state.main.selection);
+  const [selection, selectionRef] = useSelectorWithRef(state => state.main.selection);
   const previousSelection = usePrevious(selection);
   const changed = useMemo(() => !fastDeepEqual(selection, previousSelection), [selection, previousSelection]);
   const highlightsRef = useRefSelector(state => state.main.highlights);
+  const listRef = useRef(list);
+  listRef.current = list;
+  const scrollToRef = useRef(scrollTo);
+  scrollToRef.current = scrollTo;
 
   useLayoutEffect(() => {
-    if (!selection || !changed) {
+    if (!selectionRef.current || !changed) {
       return;
     }
 
     let resourceIdToScrollTo: string | undefined;
 
-    if (selection.type === 'file') {
+    if (selectionRef.current.type === 'file') {
       const firstResourceHighlight = highlightsRef.current.find(h => h.type === 'resource');
       if (isResourceSelection(firstResourceHighlight)) {
         resourceIdToScrollTo = firstResourceHighlight.resourceIdentifier.id;
       }
     }
 
-    if (selection.type === 'resource') {
-      resourceIdToScrollTo = selection.resourceIdentifier.id;
+    if (selectionRef.current.type === 'resource') {
+      resourceIdToScrollTo = selectionRef.current.resourceIdentifier.id;
     }
 
-    const index = list.findIndex(item => item.type === 'resource' && item.identifier.id === resourceIdToScrollTo);
+    const index = listRef.current.findIndex(
+      item => item.type === 'resource' && item.identifier.id === resourceIdToScrollTo
+    );
     if (index === -1) return;
-    scrollTo(index);
-  }, [changed]);
+    scrollToRef.current(index);
+  }, [changed, selectionRef, highlightsRef]);
 }

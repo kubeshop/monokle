@@ -39,45 +39,43 @@ function ResourceRenderer(props: ResourceRendererProps) {
   }
 
   return (
-    <span>
-      <S.ItemContainer
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+    <S.ItemContainer
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      isSelected={isSelected}
+      isHighlighted={isHighlighted}
+      isHovered={isHovered}
+    >
+      <S.PrefixContainer>
+        <ResourcePrefix resourceMeta={resourceMeta} isSelected={isSelected} />
+      </S.PrefixContainer>
+
+      <S.ItemName
         isSelected={isSelected}
+        isDirty={resourceMeta.storage === 'transient'}
         isHighlighted={isHighlighted}
-        isHovered={isHovered}
+        isDisabled={false}
+        onClick={onClick}
       >
-        <S.PrefixContainer>
-          <ResourcePrefix resourceMeta={resourceMeta} isSelected={isSelected} />
-        </S.PrefixContainer>
+        {resourceMeta.name} {resourceMeta.storage === 'transient' ? '*' : ''}
+      </S.ItemName>
 
-        <S.ItemName
-          isSelected={isSelected}
-          isDirty={resourceMeta.storage === 'transient'}
-          isHighlighted={isHighlighted}
-          isDisabled={false}
-          onClick={onClick}
-        >
-          {resourceMeta.name} {resourceMeta.storage === 'transient' ? '*' : ''}
-        </S.ItemName>
+      <S.InformationContainer>
+        <ResourceInfoIcon resourceMeta={resourceMeta} isSelected={isSelected} />
+      </S.InformationContainer>
 
-        <S.InformationContainer>
-          <ResourceInfoIcon resourceMeta={resourceMeta} isSelected={isSelected} />
-        </S.InformationContainer>
+      <S.SuffixContainer>
+        <ResourceSuffix resourceMeta={resourceMeta} isSelected={isSelected} />
+      </S.SuffixContainer>
 
-        <S.SuffixContainer>
-          <ResourceSuffix resourceMeta={resourceMeta} isSelected={isSelected} />
-        </S.SuffixContainer>
+      <S.BlankSpace onClick={onClick} />
 
-        <S.BlankSpace onClick={onClick} />
-
-        {isHovered && (
-          <S.ContextMenuContainer>
-            <ResourceContextMenu resourceMeta={resourceMeta} isSelected={isSelected} />
-          </S.ContextMenuContainer>
-        )}
-      </S.ItemContainer>
-    </span>
+      {isHovered && (
+        <S.ContextMenuContainer>
+          <ResourceContextMenu resourceMeta={resourceMeta} isSelected={isSelected} />
+        </S.ContextMenuContainer>
+      )}
+    </S.ItemContainer>
   );
 }
 

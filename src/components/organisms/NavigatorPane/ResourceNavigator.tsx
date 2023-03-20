@@ -14,6 +14,8 @@ import KindRenderer from './KindRenderer';
 import ResourceRenderer from './ResourceRenderer';
 import {useScroll} from './useScroll';
 
+const ROW_HEIGHT = 26;
+
 function ResourceNavigator() {
   const list = useAppSelector(resourceNavigatorSelector);
   const ref = useRef<HTMLUListElement>(null);
@@ -24,7 +26,7 @@ function ResourceNavigator() {
 
   const rowVirtualizer = useVirtualizer({
     count: list.length,
-    estimateSize: () => 28,
+    estimateSize: () => ROW_HEIGHT,
     getScrollElement: () => ref.current,
     scrollToFn: elementScroll,
   });
@@ -52,11 +54,9 @@ function ResourceNavigator() {
 
   return (
     <ListContainer ref={ref}>
-      <div
+      <ControlledHeightContainer
         style={{
           height: `${rowVirtualizer.getTotalSize()}px`,
-          width: '100%',
-          position: 'relative',
         }}
       >
         {rowVirtualizer.getVirtualItems().map(virtualItem => {
@@ -80,7 +80,7 @@ function ResourceNavigator() {
             </VirtualItem>
           );
         })}
-      </div>
+      </ControlledHeightContainer>
     </ListContainer>
   );
 }
@@ -99,4 +99,9 @@ const ListContainer = styled.ul`
   height: 100%;
   overflow-y: auto;
   padding: 0 0 12px;
+`;
+
+const ControlledHeightContainer = styled.div`
+  width: '100%';
+  position: 'relative';
 `;
