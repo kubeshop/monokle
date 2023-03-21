@@ -113,10 +113,16 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
             }
             description={
               <S.RootFolderText>
-                <span id="file-explorer-count">
-                  <b>{filesOnly.length || 0} files</b>
-                </span>{' '}
-                in <span id="file-explorer-project-name">{rootEntry?.filePath}</span>
+                {isFolderLoading ? (
+                  'Loading...'
+                ) : (
+                  <>
+                    <span id="file-explorer-count">
+                      <b>{filesOnly.length || 0} files</b>
+                    </span>{' '}
+                    in <span id="file-explorer-project-name">{rootEntry?.filePath}</span>
+                  </>
+                )}
               </S.RootFolderText>
             }
           />
