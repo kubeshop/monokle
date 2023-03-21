@@ -2,6 +2,9 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
+import {useAppDispatch} from '@redux/hooks';
+import {k8sApi} from '@redux/services/K8sApi';
+
 import {ResourceMeta} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
@@ -23,8 +26,9 @@ const NamespaceHandler: ResourceKindHandler = {
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
-    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    await k8sCoreV1Api.deleteNamespace(resource.name);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const dispatch = useAppDispatch();
+    await dispatch(k8sApi.endpoints.deleteNamespace.initiate({namespace: resource.name})).unwrap();
   },
   helpLink: 'https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/',
 };

@@ -4,13 +4,14 @@ import {stringify} from 'yaml';
 
 import {setAlert} from '@redux/reducers/alert';
 import {addResource, openResourceDiffModal, setApplyingResource} from '@redux/reducers/main';
+import {k8sApi} from '@redux/services/K8sApi';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {extractK8sResources} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 import {updateResource} from '@redux/thunks/updateResource';
-import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
+import {getResourceFromCluster} from '@redux/thunks/utils';
 
 import {errorAlert, successAlert} from '@utils/alert';
 
@@ -150,7 +151,8 @@ export async function applyResource(
 
         if (result.stderr) {
           if (namespace && namespace.new && kubeconfigPath) {
-            await removeNamespaceFromCluster(namespace.name, kubeconfigPath, context);
+            //  await removeNamespaceFromCluster(namespace.name, kubeconfigPath, context);
+            await dispatch(k8sApi.endpoints.deleteNamespace.initiate({namespace: namespace.name})).unwrap();
           }
 
           const alert = errorAlert(`Applying ${resource.name} to cluster ${context} failed`, result.stderr);

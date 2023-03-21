@@ -5,9 +5,9 @@ import {stringify} from 'yaml';
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {setAlert} from '@redux/reducers/alert';
+import {k8sApi} from '@redux/services/K8sApi';
 import {doesTextStartWithYamlDocumentDelimiter} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
-import {removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
@@ -84,7 +84,8 @@ const applyMultipleResources = async (
       };
 
       if (namespace && namespace.new) {
-        await removeNamespaceFromCluster(namespace.name, kubeConfigPath, currentContext);
+        // await removeNamespaceFromCluster(namespace.name, kubeConfigPath, currentContext);
+        await dispatch(k8sApi.endpoints.deleteNamespace.initiate({namespace: namespace.name})).unwrap();
       }
 
       dispatch(setAlert(alert));

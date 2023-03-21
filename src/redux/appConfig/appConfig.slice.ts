@@ -6,6 +6,7 @@ import _ from 'lodash';
 import log from 'loglevel';
 import path, {join} from 'path';
 
+import {k8sApi} from '@redux/services/K8sApi';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {
@@ -18,7 +19,7 @@ import {
 } from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
+import {createNamespace} from '@redux/thunks/utils';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
@@ -129,8 +130,9 @@ export const updateClusterNamespaces = createAsyncThunk(
     });
 
     removedNamespaces.forEach(({namespace, context}) => {
-      const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
-      removeNamespaceFromCluster(namespace, kubeConfigPath, context);
+      // const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
+      // removeNamespaceFromCluster(namespace, kubeConfigPath, context);
+      thunkAPI.dispatch(k8sApi.endpoints.deleteNamespace.initiate({namespace}));
     });
 
     const results: ClusterAccess[] = await Promise.all(

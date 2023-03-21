@@ -20,6 +20,7 @@ import {imageListParserListener} from './reducers/main/mainListeners';
 import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
 import {killTerminalProcessesListener, terminalSlice} from './reducers/terminal';
 import {stopClusterConnectionListener, uiSlice} from './reducers/ui';
+import {k8sApi} from './services/K8sApi';
 import {validationListeners} from './validation/validation.listeners';
 import {validationSlice} from './validation/validation.slice';
 
@@ -62,6 +63,7 @@ const appReducer = combineReducers({
   form: formSlice.reducer,
   validation: validationSlice.reducer,
   dashboard: dashboardSlice.reducer,
+  [k8sApi.reducerPath]: k8sApi.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {
@@ -83,7 +85,8 @@ const store = configureStore({
     })
       .prepend(listenerMiddleware.middleware)
       .concat(middlewares)
-      .concat(sectionBlueprintMiddleware),
+      .concat(sectionBlueprintMiddleware)
+      .concat(k8sApi.middleware),
 });
 
 export default store;

@@ -1,11 +1,11 @@
 import {KubernetesObject} from '@kubernetes/client-node';
 
-import {cloneDeep, noop} from 'lodash';
+import {cloneDeep} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {updateResource} from '@redux/thunks/updateResource';
-import {createNamespace, getNamespace, getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
+import {createNamespace, getNamespace, getResourceFromCluster} from '@redux/thunks/utils';
 
 import {jsonToYaml} from '@utils/yaml';
 
@@ -18,6 +18,8 @@ import {RootState} from '@shared/models/rootState';
 import {execute} from '@shared/utils/commands';
 import {createKubectlApplyCommand} from '@shared/utils/commands/kubectl';
 import {createKubeClient} from '@shared/utils/kubeclient';
+
+import {k8sApi} from '../K8sApi';
 
 type Type = ResourceSet['type'];
 
@@ -42,7 +44,7 @@ export function doTransferResource(
 ): Promise<K8sResource> {
   switch (options.to) {
     case 'cluster':
-      return deployResourceToCluster(source, target, options, state);
+      return deployResourceToCluster(source, target, options, state, dispatch);
     case 'local':
       return extractResourceToLocal(source, target, dispatch);
     default:
@@ -54,7 +56,8 @@ async function deployResourceToCluster(
   source: K8sResource,
   target: K8sResource | undefined,
   options: TransferOptions,
-  state: RootState
+  state: RootState,
+  dispatch: AppDispatch
 ) {
   const currentContext = options.context ?? kubeConfigContextSelector(state);
   const kubeConfigPath = kubeConfigPathSelector(state);
@@ -82,7 +85,9 @@ async function deployResourceToCluster(
   } catch (err) {
     if (!hasNamespace) {
       // Best-effort attempt to revert the newly created namespace.
-      await removeNamespaceFromCluster(namespace, kubeConfigPath, currentContext).catch(noop);
+
+      //  await removeNamespaceFromCluster(namespace, kubeConfigPath, currentContext).catch(noop);
+      await dispatch(k8sApi.endpoints.deleteNamespace.initiate({namespace})).unwrap();
     }
     throw err;
   }
