@@ -1,112 +1,41 @@
-import {useCallback, useMemo, useState} from 'react';
-import {useAsync, useMeasure} from 'react-use';
+import {useState} from 'react';
 
 import {Button} from 'antd';
-import {ColumnsType} from 'antd/lib/table';
 
-import {RightOutlined} from '@ant-design/icons';
+import {LeftOutlined} from '@ant-design/icons';
 
-import {useAppSelector} from '@redux/hooks';
-
-import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
-
-import HelmChartDetails from './HelmChartDetails';
+import HelmChartsTable from './HelmChartsTable';
 
 import * as S from './styled';
 
-interface TableDataType {
-  name: string;
-  description: string;
-  version: string;
-  app_version: string;
-}
-
-const createColumns = (onItemClick: (chartName: string) => void): ColumnsType<TableDataType> => [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    ellipsis: true,
-    sorter: true,
-  },
-  {
-    title: 'Description',
-    dataIndex: 'description',
-    key: 'description',
-    ellipsis: true,
-    sorter: true,
-    responsive: ['lg'],
-  },
-  {
-    title: 'Version',
-    dataIndex: 'version',
-    key: 'version',
-    responsive: ['lg'],
-  },
-  {
-    title: 'App Version',
-    dataIndex: 'app_version',
-    key: 'app_version',
-    responsive: ['lg'],
-  },
-  {
-    title: '',
-    dataIndex: '',
-    key: 'x',
-
-    render: (_text: string, record: TableDataType) => (
-      <S.HoverArea>
-        <Button type="primary" onClick={() => onItemClick(record.name)}>
-          Details & Download
-        </Button>
-        <RightOutlined style={{fontSize: 14, marginLeft: 8}} />
-      </S.HoverArea>
-    ),
-  },
+const menuItems = [
+  {label: 'Browse Charts', key: 'browse-charts'},
+  {label: 'Manage Repositories', key: 'manage-repositories'},
 ];
 
+type MenuItemKeys = 'browse-charts' | 'manage-repositories';
+
 const HelmRepoPane = () => {
-  const helmRepoSearch = useAppSelector(state => state.ui.helmRepo.search);
-  const [selectedChart, setSelectedChart] = useState<string | null>(null);
-  const [ref, {height: contentHeight}] = useMeasure<HTMLDivElement>();
-  const onItemClick = useCallback((chart: string) => {
-    setSelectedChart(chart);
-  }, []);
-
-  const columns = useMemo(() => {
-    return createColumns(onItemClick);
-  }, [onItemClick]);
-
-  const {value: data = [], loading} = useAsync(async () => {
-    const result = await runCommandInMainThread(searchHelmRepoCommand({q: helmRepoSearch}));
-    if (result.stderr) {
-      throw new Error(result.stderr);
-    }
-    return JSON.parse(result.stdout || '[]') as Array<TableDataType>;
-  }, [helmRepoSearch]);
-
-  const searchResultCount = data.length;
+  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItemKeys>('browse-charts');
+  const onSelectItemMenuHandler = ({key}: any) => {
+    setSelectedMenuItem(key);
+  };
 
   return (
     <S.Container>
       <S.Header>
-        <S.Title>{searchResultCount} Helm Charts found</S.Title>
-      </S.Header>
-      <div ref={ref} style={{height: '100%', overflow: 'hidden'}}>
-        <S.Table
-          showSorterTooltip
-          sticky
-          rowKey="name"
-          dataSource={data}
-          columns={columns}
-          sortDirections={['ascend', 'descend']}
-          loading={loading}
-          pagination={false}
-          scroll={{y: contentHeight - 56}}
-          rowClassName={(record: TableDataType) => (record.name === selectedChart ? 'row-selected' : '')}
+        <S.Menu
+          style={{width: '100%'}}
+          items={menuItems}
+          mode="horizontal"
+          onSelect={onSelectItemMenuHandler}
+          selectedKeys={[selectedMenuItem]}
         />
-      </div>
-      {selectedChart && <HelmChartDetails chart={selectedChart} onDismissPane={setSelectedChart} />}
+        <Button size="large" type="primary" icon={<LeftOutlined />}>
+          Back to Editor view
+        </Button>
+      </S.Header>
+      {selectedMenuItem === 'browse-charts' && <HelmChartsTable />}
     </S.Container>
   );
 };

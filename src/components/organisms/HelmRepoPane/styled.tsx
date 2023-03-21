@@ -1,4 +1,4 @@
-import {Table as AntTable, Typography} from 'antd';
+import {Menu as AntMenu, Table as AntTable, Typography} from 'antd';
 
 import styled from 'styled-components';
 
@@ -20,12 +20,28 @@ export const Header = styled.div`
   position: sticky;
   top: 0;
   display: flex;
-  background-color: ${Colors.grey3b};
-  justify-content: space-between;
   align-items: center;
   height: 56px;
-  padding: 0 16px;
   border-radius: 4px;
+  margin-left: -18px;
+`;
+
+export const Menu = styled(AntMenu)`
+  &.ant-menu {
+    width: 100%;
+    background: unset;
+  }
+
+  &.ant-menu-horizontal {
+    border-bottom: unset;
+  }
+  &.ant-menu-horizontal > .ant-menu-item-selected {
+    color: ${Colors.whitePure};
+  }
+
+  &.ant-menu-horizontal > .ant-menu-item-selected::after {
+    border-bottom: 2px solid ${Colors.whitePure};
+  }
 `;
 
 export const Title = styled(Typography.Text)`
