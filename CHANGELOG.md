@@ -2,6 +2,62 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.5](https://github.com/kubeshop/monokle/compare/v2.0.5-nightly-2023-03-20.0...v2.0.5) (2023-03-20)
+
+
+### Features
+
+* collapsed state for navigator kinds ([585ee63](https://github.com/kubeshop/monokle/commit/585ee632867d3b7ab18da766ec0ce05974d08b5e))
+* initial virtualization of navigator ([2925779](https://github.com/kubeshop/monokle/commit/2925779e03f5e063d19f96ec6b4a8a29310bc9db))
+* Navigator collapse all button ([a667893](https://github.com/kubeshop/monokle/commit/a667893890189c010d35486639a1346981205bb4))
+* navigator scroll resource into view ([0a65b79](https://github.com/kubeshop/monokle/commit/0a65b79b5efc78f6cb769b9887b10cdde7de9563))
+* reject with value ([5528617](https://github.com/kubeshop/monokle/commit/552861728599e8b23fbbd99a3056c968ff3f5e08))
+
+
+### Bug Fixes
+
+* empty resource navigator ([6e90492](https://github.com/kubeshop/monokle/commit/6e9049283743fcd71e02868620a916edad35e4ee))
+* filter kustomization patches out of navigator ([3bb2340](https://github.com/kubeshop/monokle/commit/3bb2340175f96b5f5952da7b99f4b17e42cef8e4))
+* filter kustomizations out of navigator ([84ae5cc](https://github.com/kubeshop/monokle/commit/84ae5cca90b4c5d30ba2b479c0f161546faa85e0))
+* nav virtualization container ([2197737](https://github.com/kubeshop/monokle/commit/2197737b5014f0e43983a3a8a662691b2a0237d4))
+* PR comments ([31f33cb](https://github.com/kubeshop/monokle/commit/31f33cba56c6e1958a5802a3f85f9cc49241f894))
+* ref selector ([92d8b28](https://github.com/kubeshop/monokle/commit/92d8b2885d5167d2454fc298bbb5b8dec1e86d38))
+* refs file path ([fff5eb0](https://github.com/kubeshop/monokle/commit/fff5eb033cbaecfe164739ce353e8f3529171a45))
+* resource counter ([d0dada6](https://github.com/kubeshop/monokle/commit/d0dada66c3737f8c6058462369a70a29b7ef189a))
+* select explorer section to image ([7a00ba7](https://github.com/kubeshop/monokle/commit/7a00ba762ba42efbb5a6a176fae88ad35427199c))
+* show alert when no resources are created on preview ([35e9576](https://github.com/kubeshop/monokle/commit/35e957664a57371d3f29892905d11eeaa8f7a395))
+* transient resources in navigator ([335e6eb](https://github.com/kubeshop/monokle/commit/335e6eb69e6c0b0a5c016e4b24d7aff458df478f))
+* update package version ([a0f317a](https://github.com/kubeshop/monokle/commit/a0f317a6447f1485a215d7842c1171eec00b23de))
+* versions ([79375bb](https://github.com/kubeshop/monokle/commit/79375bbc8d04119f96b6709250fc67e436be3d09))
+* windows kustomization refs ([f1773ec](https://github.com/kubeshop/monokle/commit/f1773eccacb17a5c0f48463c0bae34a1525f9a04))
+
+### [2.0.5](https://github.com/kubeshop/monokle/compare/v2.0.5-nightly-2023-03-20.0...v2.0.5) (2023-03-20)
+
+
+### Features
+
+* collapsed state for navigator kinds ([585ee63](https://github.com/kubeshop/monokle/commit/585ee632867d3b7ab18da766ec0ce05974d08b5e))
+* initial virtualization of navigator ([2925779](https://github.com/kubeshop/monokle/commit/2925779e03f5e063d19f96ec6b4a8a29310bc9db))
+* Navigator collapse all button ([a667893](https://github.com/kubeshop/monokle/commit/a667893890189c010d35486639a1346981205bb4))
+* navigator scroll resource into view ([0a65b79](https://github.com/kubeshop/monokle/commit/0a65b79b5efc78f6cb769b9887b10cdde7de9563))
+* reject with value ([5528617](https://github.com/kubeshop/monokle/commit/552861728599e8b23fbbd99a3056c968ff3f5e08))
+
+
+### Bug Fixes
+
+* empty resource navigator ([6e90492](https://github.com/kubeshop/monokle/commit/6e9049283743fcd71e02868620a916edad35e4ee))
+* filter kustomization patches out of navigator ([3bb2340](https://github.com/kubeshop/monokle/commit/3bb2340175f96b5f5952da7b99f4b17e42cef8e4))
+* filter kustomizations out of navigator ([84ae5cc](https://github.com/kubeshop/monokle/commit/84ae5cca90b4c5d30ba2b479c0f161546faa85e0))
+* nav virtualization container ([2197737](https://github.com/kubeshop/monokle/commit/2197737b5014f0e43983a3a8a662691b2a0237d4))
+* PR comments ([31f33cb](https://github.com/kubeshop/monokle/commit/31f33cba56c6e1958a5802a3f85f9cc49241f894))
+* ref selector ([92d8b28](https://github.com/kubeshop/monokle/commit/92d8b2885d5167d2454fc298bbb5b8dec1e86d38))
+* refs file path ([fff5eb0](https://github.com/kubeshop/monokle/commit/fff5eb033cbaecfe164739ce353e8f3529171a45))
+* resource counter ([d0dada6](https://github.com/kubeshop/monokle/commit/d0dada66c3737f8c6058462369a70a29b7ef189a))
+* select explorer section to image ([7a00ba7](https://github.com/kubeshop/monokle/commit/7a00ba762ba42efbb5a6a176fae88ad35427199c))
+* show alert when no resources are created on preview ([35e9576](https://github.com/kubeshop/monokle/commit/35e957664a57371d3f29892905d11eeaa8f7a395))
+* transient resources in navigator ([335e6eb](https://github.com/kubeshop/monokle/commit/335e6eb69e6c0b0a5c016e4b24d7aff458df478f))
+* windows kustomization refs ([f1773ec](https://github.com/kubeshop/monokle/commit/f1773eccacb17a5c0f48463c0bae34a1525f9a04))
+
 ### [2.0.4](https://github.com/kubeshop/monokle/compare/v2.0.4-nightly-2023-03-14.0...v2.0.4) (2023-03-14)
 
 

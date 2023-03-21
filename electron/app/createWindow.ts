@@ -1,6 +1,6 @@
 import {BrowserWindow, app, nativeImage} from 'electron';
 
-import {indexOf} from 'lodash';
+import indexOf from 'lodash/indexOf';
 import {machineIdSync} from 'node-machine-id';
 import * as path from 'path';
 
@@ -19,7 +19,6 @@ import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import autoUpdater from './autoUpdater';
 import {checkNewVersion} from './commands';
-import initKubeconfig from './initKubeconfig';
 import {
   createDispatchForWindow,
   dispatchToAllWindows,
@@ -60,6 +59,7 @@ export const createWindow = (givenPath?: string) => {
     title: 'Monokle',
     icon: image,
     webPreferences: {
+      preload: path.normalize(`${__dirname}/preload.js`),
       zoomFactor: utilsElectronStore.get('ui.zoomFactor'),
       webSecurity: false,
       contextIsolation: false,
@@ -198,7 +198,6 @@ export const createWindow = (givenPath?: string) => {
       await checkNewVersion(dispatch, true);
     }, NEW_VERSION_CHECK_INTERVAL);
 
-    initKubeconfig(dispatch, userHomeDir, utilsElectronStore.get('appConfig.kubeConfig'));
     dispatch({type: 'main/setAppRehydrating', payload: false});
 
     const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);
