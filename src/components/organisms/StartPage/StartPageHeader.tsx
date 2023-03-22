@@ -48,6 +48,7 @@ const StartPageHeader: React.FC = () => {
             <Typography.Text>{p.name}</Typography.Text>
           </S.SearchItemLabel>
         ),
+        key: `${p.name}-${p.rootFolder}`,
       })),
     [projects, selectedProjectRootFolder]
   );
