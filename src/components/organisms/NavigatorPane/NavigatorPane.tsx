@@ -61,7 +61,7 @@ const NavPane: React.FC = () => {
           <CheckedResourcesActionsMenu />
         </S.SelectionBar>
       ) : (
-        <TitleBarWrapper>
+        <TitleBarWrapper $navigator>
           <TitleBar
             type="secondary"
             title={<NavigatorTitle />}
