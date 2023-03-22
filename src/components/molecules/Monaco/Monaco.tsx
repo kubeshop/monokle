@@ -393,12 +393,19 @@ const Monaco: React.FC<IProps> = props => {
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all - or allowEditInClusterMode is false
   const isReadOnlyMode = useMemo(() => {
-    if ((isInClusterMode && !settings.allowEditInClusterMode) || isInPreviewMode) {
+    if ((isInClusterMode && !settings.allowEditInClusterMode) || (isInPreviewMode && selection?.type === 'resource')) {
       return true;
     }
 
     return !selectedFilePath && !selectedResource;
-  }, [isInPreviewMode, isInClusterMode, selectedResource, selectedFilePath, settings.allowEditInClusterMode]);
+  }, [
+    isInClusterMode,
+    settings.allowEditInClusterMode,
+    isInPreviewMode,
+    selection?.type,
+    selectedFilePath,
+    selectedResource,
+  ]);
 
   const options = useMemo(() => {
     const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
