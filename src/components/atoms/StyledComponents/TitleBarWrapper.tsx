@@ -9,7 +9,7 @@ export const TitleBarWrapper = styled.div<{$closable?: boolean; $navigator?: boo
     }
 
     if ($navigator) {
-      return `padding-left: 20px;`;
+      return `padding-left: 20px; padding-bottom: 0px;`;
     }
   }};
 `;

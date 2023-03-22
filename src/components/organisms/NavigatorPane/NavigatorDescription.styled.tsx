@@ -16,9 +16,9 @@ export const NavigatorDescriptionContainer = styled.div`
 `;
 
 export const ResourcesCount = styled.span`
-  color: ${Colors.grey7};
+  color: ${Colors.grey6};
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
 `;
 
 export const WarningsErrorsContainer = styled.div`
