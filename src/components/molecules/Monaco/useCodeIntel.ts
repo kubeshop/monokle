@@ -21,6 +21,7 @@ import {
 import {K8sResource, ResourceIdentifier, ResourceMetaMap, ResourceStorage} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
 
+import {EDITOR_DISPOSABLES} from './disposables';
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 
 interface CodeIntelProps {
@@ -133,6 +134,7 @@ function useCodeIntel(props: CodeIntelProps) {
           }
           if (newDisposables) {
             disposablesRef.current = newDisposables;
+            EDITOR_DISPOSABLES.push(...newDisposables);
           }
 
           if (editorRef.current) {
