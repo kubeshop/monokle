@@ -64,6 +64,8 @@ const loadListener: AppListenerFn = listen => {
   });
 };
 
+// TODO: should we have a separate listener for each resource storage?
+// for example I'm thinking that a preview might cancel the validation of the cluster
 const validateListener: AppListenerFn = listen => {
   listen({
     matcher: isAnyOf(

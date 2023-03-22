@@ -1,7 +1,7 @@
 /* eslint-disable import/order */
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
-import {useMeasure} from 'react-use';
+import {useMeasure, useUnmount} from 'react-use';
 
 import fs from 'fs';
 import log from 'loglevel';
@@ -29,9 +29,8 @@ import {
   activeResourceStorageSelector,
   useActiveResourceContentMapRef,
   useActiveResourceMetaMap,
-  useResourceContentMap,
   useResourceContentMapRef,
-  useResourceMetaMap,
+  useResourceMetaMapRef,
 } from '@redux/selectors/resourceMapSelectors';
 import {useResource, useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {getLocalResourcesForPath} from '@redux/services/fileEntry';
@@ -53,6 +52,7 @@ import {ResourceSelection} from '@shared/models/selection';
 import {MonacoRange, NewResourceWizardInput} from '@shared/models/ui';
 
 import * as S from './Monaco.styled';
+import {EDITOR_DISPOSABLES} from './disposables';
 import useCodeIntel from './useCodeIntel';
 import useDebouncedCodeSave from './useDebouncedCodeSave';
 import useEditorKeybindings from './useEditorKeybindings';
@@ -117,8 +117,8 @@ const Monaco: React.FC<IProps> = props => {
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
 
-  const localResourceMetaMap = useResourceMetaMap('local');
-  const localResourceContentMap = useResourceContentMap('local');
+  const localResourceMetaMapRef = useResourceMetaMapRef('local');
+  const localResourceContentMapRef = useResourceContentMapRef('local');
   // TODO: 2.0+ as a quick fix for Monaco, we're including the selectedHelmValuesFile in this selector
   const [selectedFilePath, selectedFilePathRef] = useSelectorWithRef(state => {
     if (providedFilePath) {
@@ -147,10 +147,10 @@ const Monaco: React.FC<IProps> = props => {
       return [];
     }
     return getLocalResourcesForPath(selectedFilePath, {
-      resourceMetaMap: localResourceMetaMap,
-      resourceContentMap: localResourceContentMap,
+      resourceMetaMap: localResourceMetaMapRef.current,
+      resourceContentMap: localResourceContentMapRef.current,
     });
-  }, [selectedFilePath, localResourceMetaMap, localResourceContentMap]);
+  }, [selectedFilePath, localResourceMetaMapRef, localResourceContentMapRef]);
 
   const [containerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -199,6 +199,10 @@ const Monaco: React.FC<IProps> = props => {
       dispatch(openNewResourceWizard({defaultInput: input}));
     }
   };
+
+  useUnmount(() => {
+    EDITOR_DISPOSABLES.forEach(disposable => disposable.dispose());
+  });
 
   useCodeIntel({
     editorRef,
