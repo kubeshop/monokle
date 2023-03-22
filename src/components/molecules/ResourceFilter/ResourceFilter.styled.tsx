@@ -15,7 +15,7 @@ export const FilterActionButton = styled(Button)`
 
 export const Container = styled.div`
   & > div {
-    padding: 0 16px !important;
+    padding: 0 16px 0 20px !important;
   }
 `;
 

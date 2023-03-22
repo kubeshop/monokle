@@ -59,7 +59,7 @@ export const Name = styled.span<NameProps>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding-left: 16px;
+  padding-left: 20px;
   font-weight: 600;
 
   cursor: pointer;

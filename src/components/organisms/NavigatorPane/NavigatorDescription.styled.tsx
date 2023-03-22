@@ -9,10 +9,16 @@ export const Count = styled.span<{$type: 'warning' | 'error'}>`
   color: ${({$type}) => ($type === 'warning' ? Colors.yellow12 : Colors.red7)};
 `;
 
-export const NavigatorTitleContainer = styled.div`
+export const NavigatorDescriptionContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 15px;
+`;
+
+export const ResourcesCount = styled.span`
+  color: ${Colors.grey6};
+  font-size: 10px;
+  font-weight: 700;
 `;
 
 export const WarningsErrorsContainer = styled.div`

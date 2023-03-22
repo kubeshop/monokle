@@ -26,8 +26,8 @@ import {Icon, ResizableRowsPanel, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Colors} from '@shared/styles';
 
+import NavigatorDescription from './NavigatorDescription';
 import * as S from './NavigatorPane.styled';
-import NavigatorTitle from './NavigatorTitle';
 import ResourceNavigator from './ResourceNavigator';
 
 const NavPane: React.FC = () => {
@@ -61,10 +61,11 @@ const NavPane: React.FC = () => {
           <CheckedResourcesActionsMenu />
         </S.SelectionBar>
       ) : (
-        <TitleBarWrapper>
+        <TitleBarWrapper $navigator>
           <TitleBar
             type="secondary"
-            title={<NavigatorTitle />}
+            title="Kubernetes Resources"
+            description={<NavigatorDescription />}
             actions={
               <S.TitleBarRightButtons>
                 <CollapseAction />
