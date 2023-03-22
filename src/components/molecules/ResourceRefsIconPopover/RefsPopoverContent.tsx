@@ -145,7 +145,7 @@ const RefsPopoverContent = (props: {
     trackEvent('explore/navigate_resource_link', {type: ref.type});
 
     if (ref.type !== ResourceRefType.Incoming) {
-      if (selection?.type === 'resource' && selection.resourceIdentifier.id !== resource.id) {
+      if (!selection || (selection?.type === 'resource' && selection.resourceIdentifier.id !== resource.id)) {
         triggerSelectResource(resource.id);
       }
 
