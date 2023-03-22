@@ -94,12 +94,10 @@ const loadClusterResourcesHandler = async (
 
     const fulfilledResults = flatResults.filter((r: any) => r.status === 'fulfilled' && r.value);
     if (fulfilledResults.length === 0) {
-      return createRejectionWithAlert(
-        thunkAPI,
-        'Cluster Resources Failed',
-        // @ts-ignore
-        results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0])
-      );
+      // @ts-ignore
+      let message = results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0]);
+      trackEvent('preview/cluster/fail', {reason: message});
+      return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', message);
     }
 
     // @ts-ignore
@@ -171,6 +169,7 @@ const loadClusterResourcesHandler = async (
     };
   } catch (e: any) {
     log.error(e);
+    trackEvent('preview/cluster/fail', {reason: e.message});
 
     if (useKubectlProxy) {
       return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', e.message);
