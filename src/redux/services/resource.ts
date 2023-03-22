@@ -488,7 +488,7 @@ export function isKustomizationPreviewed(kustomization: ResourceIdentifier, prev
 export function splitK8sResource<Storage extends ResourceStorage = ResourceStorage>(
   resource: K8sResource<Storage>
 ): {meta: ResourceMeta<Storage>; content: ResourceContent<Storage>} {
-  const meta: ResourceMeta<Storage> = {
+  const meta: AllKeysRequired<ResourceMeta<Storage>> = {
     id: resource.id,
     storage: resource.storage,
     origin: resource.origin,
@@ -503,7 +503,7 @@ export function splitK8sResource<Storage extends ResourceStorage = ResourceStora
     range: resource.range,
     refs: resource.refs,
   };
-  const content: ResourceContent<Storage> = {
+  const content: AllKeysRequired<ResourceContent<Storage>> = {
     id: resource.id,
     storage: resource.storage,
     text: resource.text,
