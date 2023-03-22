@@ -363,7 +363,7 @@ export const useFileMenuItems = (
       isHelmValuesFile(fileEntry.filePath) ||
       isHelmTemplateFile(fileEntry.filePath) ||
       !fileEntry.isSupported ||
-      !fileEntry.isExcluded;
+      fileEntry.isExcluded;
 
     const newMenuItems: AntdMenuItem[] = [];
 
