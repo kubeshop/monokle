@@ -49,8 +49,7 @@ import {ResourceRef} from '@monokle/validation';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
-import {isHelmPreview} from '@shared/models/preview';
-import {ResourceSelection, isHelmValuesFileSelection} from '@shared/models/selection';
+import {ResourceSelection} from '@shared/models/selection';
 import {MonacoRange, NewResourceWizardInput} from '@shared/models/ui';
 
 import * as S from './Monaco.styled';
@@ -117,7 +116,6 @@ const Monaco: React.FC<IProps> = props => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
-  const preview = useAppSelector(state => state.main.preview);
 
   const localResourceMetaMap = useResourceMetaMap('local');
   const localResourceContentMap = useResourceContentMap('local');
@@ -395,26 +393,25 @@ const Monaco: React.FC<IProps> = props => {
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all - or allowEditInClusterMode is false
   const isReadOnlyMode = useMemo(() => {
-    if (isInClusterMode && !settings.allowEditInClusterMode) {
+    if (!selection) {
       return true;
     }
+
     if (
-      isInPreviewMode &&
-      isHelmPreview(preview) &&
-      isHelmValuesFileSelection(selection) &&
-      preview.valuesFileId === selection.valuesFileId
+      (isInClusterMode && !settings.allowEditInClusterMode) ||
+      (isInPreviewMode && selection.type === 'resource' && selection.resourceIdentifier.storage === 'preview')
     ) {
       return true;
     }
+
     return !selectedFilePath && !selectedResource;
   }, [
-    isInPreviewMode,
     isInClusterMode,
-    selectedResource,
-    selectedFilePath,
     settings.allowEditInClusterMode,
-    preview,
+    isInPreviewMode,
     selection,
+    selectedFilePath,
+    selectedResource,
   ]);
 
   const options = useMemo(() => {
