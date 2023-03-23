@@ -43,7 +43,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   const dispatch = useAppDispatch();
   const {width: windowWidth} = useWindowSize();
 
-  const [allNamespaces] = useNamespaces({extra: []});
+  const [allNamespaces] = useNamespaces({extra: ['none']});
   const isPaneWideEnough = useAppSelector(
     state => windowWidth * state.ui.paneConfiguration.navPane > PANE_CONSTRAINT_VALUES.navPane
   );
@@ -66,6 +66,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   const [localResourceFilter, setLocalResourceFilter] = useState<ResourceFilterType>(filtersMap);
   const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
   const folderTree = useFileFolderTreeSelectData('all');
+
   const autocompleteOptions = useMemo(() => {
     return {
       namespaces:
