@@ -55,8 +55,7 @@ export const PluginManager: React.FC = () => {
   };
 
   const openHelpUrl = () => {
-    const repositoryUrl = PLUGINS_HELP_URL;
-    shell.openExternal(repositoryUrl);
+    shell.openExternal(PLUGINS_HELP_URL);
   };
 
   return (
@@ -68,7 +67,7 @@ export const PluginManager: React.FC = () => {
           Install
         </SecondaryButton>
 
-        <div>
+        <div style={{display: 'flex'}}>
           <S.QuestionCircleOutlined onClick={openHelpUrl} />
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={PluginManagerReloadTooltip} placement="bottom">
