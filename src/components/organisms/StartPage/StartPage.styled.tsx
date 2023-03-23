@@ -42,10 +42,6 @@ export const Menu = styled.div`
   gap: 20px;
   margin-top: 10px;
 
-  & div:nth-child(4) {
-    margin-top: 50px;
-  }
-
   & div:nth-child(6) {
     display: none;
   }
