@@ -5,6 +5,7 @@ import {set} from 'lodash';
 import {startClusterConnection, stopClusterConnection} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
+import {ValidationFiltersValueType} from '@monokle/components';
 import {ValidationIntegrationId} from '@shared/models/integrations';
 import {SelectedProblem, ValidationState} from '@shared/models/validation';
 import electronStore from '@shared/utils/electronStore';
@@ -65,6 +66,10 @@ export const validationSlice = createSlice({
 
     clearValidation: (state: Draft<ValidationState>) => {
       state.lastResponse = undefined;
+    },
+
+    setValidationFilters: (state: Draft<ValidationState>, action: PayloadAction<ValidationFiltersValueType>) => {
+      state.validationOverview.filters = action.payload;
     },
 
     setSelectedProblem: (state: Draft<ValidationState>, action: PayloadAction<SelectedProblem>) => {
@@ -197,6 +202,7 @@ export const {
   changeRuleLevel,
   clearValidation,
   setConfigK8sSchemaVersion,
+  setValidationFilters,
   setSelectedProblem,
   toggleRule,
   toggleValidation,

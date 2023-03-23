@@ -343,19 +343,17 @@ const ResourceFilter = ({active, onToggle}: Props) => {
         </FilterField>
 
         <FilterField name="Contained in file/folder:">
-          <S.TreeSelectContainer>
-            <TreeSelect
-              showSearch
-              disabled={isInPreviewMode || areFiltersDisabled}
-              value={localResourceFilter.fileOrFolderContainedIn}
-              defaultValue={ROOT_FILE_ENTRY}
-              onChange={updateFileOrFolderContainedIn}
-              treeData={[folderTree]}
-              treeDefaultExpandAll
-              onClear={onClearFileOrFolderContainedInHandler}
-              allowClear
-            />
-          </S.TreeSelectContainer>
+          <TreeSelect
+            showSearch
+            disabled={isInPreviewMode || areFiltersDisabled}
+            value={localResourceFilter.fileOrFolderContainedIn}
+            defaultValue={ROOT_FILE_ENTRY}
+            onChange={updateFileOrFolderContainedIn}
+            treeData={[folderTree]}
+            treeDefaultExpandAll
+            onClear={onClearFileOrFolderContainedInHandler}
+            allowClear
+          />
         </FilterField>
       </Filter>
     </S.Container>

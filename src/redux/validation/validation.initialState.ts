@@ -21,6 +21,10 @@ export const validationInitialState: ValidationState = {
   rules: undefined,
   status: 'uninitialized',
   validationOverview: {
+    filters: {
+      'tool-component': undefined,
+      type: undefined,
+    },
     newProblemsIntroducedType: 'initial',
   },
 };
