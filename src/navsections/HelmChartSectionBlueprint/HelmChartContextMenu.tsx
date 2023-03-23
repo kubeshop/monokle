@@ -54,7 +54,6 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
-  const selection = useAppSelector(state => state.main.selection);
 
   const {onCreateResource} = useCreate();
   const {onDuplicate} = useDuplicate();
@@ -84,10 +83,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
     () => (osPlatform === 'win32' ? path.win32.dirname(absolutePath) : path.dirname(absolutePath)),
     [absolutePath, osPlatform]
   );
-  const isHelmValueSelected = useMemo(
-    () => selection?.type === 'helm.values.file' && selection.valuesFileId === helmItem.id,
-    [helmItem.id, selection]
-  );
+
   const isRoot = useMemo(() => helmItem.filePath === ROOT_FILE_ENTRY, [helmItem.filePath]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
   const target = useMemo(
@@ -230,7 +226,7 @@ const HelmChartContextMenu: React.FC<ItemCustomComponentProps> = props => {
   return (
     <ContextMenu items={menuItems}>
       <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
-        <Dots color={isHelmValueSelected ? Colors.blackPure : undefined} />
+        <Dots color={itemInstance.isSelected ? Colors.blackPure : undefined} />
       </StyledActionsMenuIconContainer>
     </ContextMenu>
   );

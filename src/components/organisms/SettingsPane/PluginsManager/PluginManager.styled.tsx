@@ -22,7 +22,7 @@ export const ButtonsContainer = styled.div`
 
 export const QuestionCircleOutlined = styled(RawQuestionCircleOutlined)`
   cursor: pointer;
-  margin-top: 5px;
+  align-self: center;
   padding-right: 5px;
   color: ${Colors.blue6};
 `;

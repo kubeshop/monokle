@@ -32,3 +32,15 @@ export const Badge = styled(AntBadge)`
     box-shadow: none;
   }
 `;
+
+export const TreeSelectContainer = styled.div`
+  width: 100%;
+
+  & .ant-select {
+    width: 100%;
+  }
+
+  & .ant-select-clear {
+    border-radius: 50%;
+  }
+`;

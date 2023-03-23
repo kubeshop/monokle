@@ -54,7 +54,11 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     type: 'panel',
     name: 'git',
     tooltip: 'View Git operations',
-    icon: () => <Icon name="git-ops" style={{fontSize: '18px', marginTop: 4}} />,
+    icon: () => {
+      const changedFiles = useAppSelector(state => state.git.changedFiles);
+
+      return <Icon name="git-ops" style={{fontSize: '18px', marginTop: changedFiles.length ? '0px' : '4px'}} />;
+    },
     component: <GitPane />,
     useBadge: () => {
       const changedFiles = useAppSelector(state => state.git.changedFiles);

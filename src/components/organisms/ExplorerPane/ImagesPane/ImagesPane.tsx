@@ -1,5 +1,4 @@
 import {memo} from 'react';
-import {useMeasure} from 'react-use';
 
 import {CollapsePanelProps} from 'antd';
 
@@ -20,17 +19,15 @@ import AccordionPanel from '../AccordionPanel';
 import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
 
 const ImagesPane: React.FC<InjectedPanelProps> = props => {
-  const {isActive, panelKey} = props;
+  const {isActive, panelKey, width} = props;
 
   const imagesList = useAppSelector(state => state.main.imagesList);
-
-  const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
 
   return (
     <AccordionPanel
       {...props}
       header={
-        <AccordionTitleBarContainer ref={containerRef}>
+        <AccordionTitleBarContainer>
           <TitleBar
             title="Images"
             expandable
@@ -42,7 +39,7 @@ const ImagesPane: React.FC<InjectedPanelProps> = props => {
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
     >
-      <SectionBlueprintList id="images-section-container" $width={containerWidth + 15}>
+      <SectionBlueprintList id="images-section-container" $width={width}>
         <SectionRenderer sectionId={ImagesSectionBlueprint.id} level={0} isLastSection={false} />
       </SectionBlueprintList>
     </AccordionPanel>

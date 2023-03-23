@@ -1,5 +1,4 @@
 import {memo} from 'react';
-import {useMeasure} from 'react-use';
 
 import {CollapsePanelProps} from 'antd';
 
@@ -21,19 +20,17 @@ import AccordionPanel from '../AccordionPanel';
 import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
 
 const HelmPane: React.FC<InjectedPanelProps> = props => {
-  const {isActive, panelKey} = props;
+  const {isActive, panelKey, width} = props;
 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-
-  const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
 
   return (
     <AccordionPanel
       {...props}
       disabled={isInClusterMode}
       header={
-        <AccordionTitleBarContainer ref={containerRef}>
+        <AccordionTitleBarContainer>
           <TitleBar
             title="Helm"
             expandable
@@ -45,7 +42,7 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
     >
-      <SectionBlueprintList id="helm-sections-container" $width={containerWidth + 15}>
+      <SectionBlueprintList id="helm-sections-container" $width={width}>
         <SectionRenderer sectionId={RootHelmChartsSectionBlueprint.id} level={0} isLastSection={false} />
       </SectionBlueprintList>
     </AccordionPanel>
