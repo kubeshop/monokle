@@ -33,6 +33,8 @@ export const previewSavedCommand = createAsyncThunk<
     const command = configState.projectConfig?.savedCommandMap?.[commandId];
     const rootFolderPath = thunkAPI.getState().main.fileMap[ROOT_FILE_ENTRY]?.filePath;
 
+    trackEvent('preview/command/start');
+
     if (!command) {
       throw new Error('Saved command not found!');
     }
@@ -40,8 +42,6 @@ export const previewSavedCommand = createAsyncThunk<
     if (!rootFolderPath) {
       throw new Error("Couldn't find current working directory.");
     }
-
-    trackEvent('preview/command/start');
 
     const result = await runCommandInMainThread({
       commandId: command.id,

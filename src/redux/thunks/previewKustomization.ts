@@ -31,7 +31,6 @@ export const previewKustomization = createAsyncThunk<
   string,
   {dispatch: AppDispatch; state: RootState}
 >('main/previewKustomization', async (resourceId, thunkAPI) => {
-  trackEvent('preview/kustomize/start');
   const startTime = new Date().getTime();
   const state = thunkAPI.getState().main;
   const projectConfig = currentConfigSelector(thunkAPI.getState());
@@ -44,6 +43,7 @@ export const previewKustomization = createAsyncThunk<
     return {};
   }
 
+  trackEvent('preview/kustomize/start');
   const kustomization = joinK8sResource(kustomizationMeta, kustomizationContent);
 
   const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;

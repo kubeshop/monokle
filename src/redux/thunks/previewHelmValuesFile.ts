@@ -25,13 +25,13 @@ export const previewHelmValuesFile = createAsyncThunk<
   try {
     const startTime = new Date().getTime();
     const state = thunkAPI.getState().main;
-
     const valuesFile = state.helmValuesMap[valuesFileId];
+
+    trackEvent('preview/helm/start');
+
     if (!valuesFile) {
       throw new Error(`Values File with id ${valuesFileId} not found`);
     }
-
-    trackEvent('preview/helm/start');
 
     const resources = await fetchResources(thunkAPI.getState(), {
       type: 'helm',
