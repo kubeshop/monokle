@@ -1,3 +1,4 @@
+import type {ValidationFiltersValueType} from '@monokle/components';
 import type {
   Config,
   PluginMetadataWithConfig,
@@ -34,6 +35,7 @@ export type ValidationState = {
    */
   rules?: Record<PluginName, RuleMetadataWithConfig[]>;
   validationOverview: {
+    filters: ValidationFiltersValueType;
     selectedProblem?: SelectedProblem;
     newProblemsIntroducedType: NewProblemsIntroducedType;
   };
