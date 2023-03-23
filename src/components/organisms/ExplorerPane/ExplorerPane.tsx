@@ -1,3 +1,5 @@
+import {useMeasure} from 'react-use';
+
 import {Collapse as RawCollapse} from 'antd';
 
 import styled from 'styled-components';
@@ -18,24 +20,28 @@ const ExplorerPane: React.FC = () => {
   const explorerSelectedSection = useAppSelector(state => state.ui.explorerSelectedSection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
+  const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
+
   return (
-    <Collapse
-      accordion
-      ghost
-      activeKey={isInClusterMode ? 'images' : explorerSelectedSection}
-      onChange={(key: any) => {
-        if (isInClusterMode) {
-          return;
-        }
-        dispatch(setExplorerSelectedSection(key));
-        trackEvent('left-menu/activity-changed', {activity: 'explorer', section: key});
-      }}
-    >
-      <FilePane key="files" />
-      <KustomizePane key="kustomize" />
-      <HelmPane key="helm" />
-      <ImagesPane key="images" />
-    </Collapse>
+    <CollapseContainer ref={containerRef}>
+      <Collapse
+        accordion
+        ghost
+        activeKey={isInClusterMode ? 'images' : explorerSelectedSection}
+        onChange={(key: any) => {
+          if (isInClusterMode) {
+            return;
+          }
+          dispatch(setExplorerSelectedSection(key));
+          trackEvent('left-menu/activity-changed', {activity: 'explorer', section: key});
+        }}
+      >
+        <FilePane key="files" />
+        <KustomizePane key="kustomize" width={containerWidth - 24} />
+        <HelmPane key="helm" width={containerWidth - 24} />
+        <ImagesPane key="images" width={containerWidth - 24} />
+      </Collapse>
+    </CollapseContainer>
   );
 };
 
@@ -56,4 +62,9 @@ const Collapse = styled(RawCollapse)`
     padding-top: 2px !important;
     padding-bottom: 0 !important;
   }
+`;
+
+const CollapseContainer = styled.div`
+  width: 100%;
+  height: 100%;
 `;

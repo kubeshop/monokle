@@ -1,5 +1,4 @@
 import {memo} from 'react';
-import {useMeasure} from 'react-use';
 
 import {CollapsePanelProps} from 'antd';
 
@@ -21,19 +20,19 @@ import AccordionPanel from '../AccordionPanel';
 import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
 
 const KustomizePane: React.FC<InjectedPanelProps> = props => {
-  const {isActive, panelKey} = props;
+  const {isActive, panelKey, width} = props;
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kustomizationsResources = useAppSelector(kustomizationResourcesSelectors);
 
-  const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
+  console.log(width);
 
   return (
     <AccordionPanel
       {...props}
       disabled={isInClusterMode}
       header={
-        <AccordionTitleBarContainer ref={containerRef}>
+        <AccordionTitleBarContainer>
           <TitleBar
             title="Kustomize"
             expandable
@@ -45,7 +44,7 @@ const KustomizePane: React.FC<InjectedPanelProps> = props => {
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
     >
-      <SectionBlueprintList id="kustomize-sections-container" $width={containerWidth + 15}>
+      <SectionBlueprintList id="kustomize-sections-container" $width={width}>
         <SectionRenderer sectionId={KustomizationSectionBlueprint.id} level={0} isLastSection={false} />
         <SectionRenderer sectionId={KustomizePatchSectionBlueprint.id} level={0} isLastSection={false} />
       </SectionBlueprintList>
