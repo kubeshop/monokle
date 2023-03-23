@@ -49,7 +49,7 @@ const Logs = () => {
       const containerName = selectedResource.object?.spec?.containers[0]?.name;
 
       logStream.on('data', (chunk: any) => {
-        setLogs(prevLogs => [
+        setLogs((prevLogs: LogLineType[]) => [
           ...prevLogs,
           {
             id: uuidv4(),
