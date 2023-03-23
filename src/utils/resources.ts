@@ -28,8 +28,14 @@ export function isResourcePassingFilter(resourceMeta: ResourceMeta, filters: Res
     return false;
   }
 
-  if (filters.namespaces?.length && !filters.namespaces?.includes(resourceMeta?.namespace || 'default')) {
-    return false;
+  if (filters.namespaces?.length) {
+    if (filters.namespaces.includes('<none>') && !resourceMeta.namespace) {
+      return true;
+    }
+
+    if (!filters.namespaces?.includes(resourceMeta?.namespace || 'default')) {
+      return false;
+    }
   }
 
   if (
