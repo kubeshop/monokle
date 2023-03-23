@@ -48,7 +48,6 @@ interface AppConfig {
   folderReadsMaxDepth: number;
   useKubectlProxy: boolean;
   loadLastProjectOnStartup: boolean;
-  isClusterSelectorVisible: boolean;
   settings: Settings;
   newVersion: {
     code: NewVersionCode;

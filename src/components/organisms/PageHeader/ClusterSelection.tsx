@@ -40,7 +40,6 @@ const ClusterSelection = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
@@ -200,10 +199,6 @@ const ClusterSelection = () => {
       startPreview(preview, dispatch);
     }
   };
-
-  if (!isClusterSelectorVisible) {
-    return null;
-  }
 
   return (
     <S.ClusterContainer id="ClusterContainer">

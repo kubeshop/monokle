@@ -41,9 +41,6 @@ export const electronStoreSchema = {
       useKubectlProxy: {
         type: 'boolean',
       },
-      isClusterSelectorVisible: {
-        type: 'boolean',
-      },
       loadLastProjectOnStartup: {
         type: 'boolean',
       },
@@ -309,7 +306,6 @@ export const electronStoreDefaults = {
     kubeConfigContextsColors: {},
     lastNamespaceLoaded: 'default',
     useKubectlProxy: false,
-    isClusterSelectorVisible: true,
     loadLastProjectOnStartup: false,
     fileExplorerSortOrder: 'folders',
     scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', '.monokle'],

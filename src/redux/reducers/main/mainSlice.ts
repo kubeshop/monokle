@@ -270,8 +270,18 @@ export const mainSlice = createSlice({
         if (!isClusterResource(r)) {
           return;
         }
+        // TODO: this action should probably receive only the new content? and then we check if anything has changed in the meta?
+        // because right now if we do changes to the meta, for example setting refs after processing, if we replace the whole meta,
+        // we lose the refs.
+        // Old code for context:
+        // const {meta, content} = splitK8sResource(r);
+        // state.resourceMetaMapByStorage.cluster[r.id] = meta;
+        // state.resourceContentMapByStorage.cluster[r.id] = content;
+        // Quick fix:
+        const originalResourceMeta = state.resourceMetaMapByStorage.cluster[r.id];
         const {meta, content} = splitK8sResource(r);
-        state.resourceMetaMapByStorage.cluster[r.id] = meta;
+        const newMeta = {...originalResourceMeta, ...meta, refs: originalResourceMeta.refs};
+        state.resourceMetaMapByStorage.cluster[r.id] = newMeta;
         state.resourceContentMapByStorage.cluster[r.id] = content;
       });
     },

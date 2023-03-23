@@ -197,10 +197,6 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.loadLastProjectOnStartup', action.payload);
       state.loadLastProjectOnStartup = action.payload;
     },
-    updateClusterSelectorVisibilty: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
-      electronStore.set('appConfig.isClusterSelectorVisible', action.payload);
-      state.isClusterSelectorVisible = action.payload;
-    },
     updateFolderReadsMaxDepth: (state: Draft<AppConfig>, action: PayloadAction<number>) => {
       electronStore.set('appConfig.folderReadsMaxDepth', action.payload);
       state.folderReadsMaxDepth = action.payload;
@@ -603,7 +599,6 @@ export const {
   toggleEventTracking,
   toggleProjectPin,
   updateApplicationSettings,
-  updateClusterSelectorVisibilty,
   updateFileExplorerSortOrder,
   updateFileIncludes,
   updateFolderReadsMaxDepth,

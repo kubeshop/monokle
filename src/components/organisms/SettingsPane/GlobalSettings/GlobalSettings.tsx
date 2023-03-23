@@ -13,7 +13,6 @@ import {
   changeProjectsRootPath,
   toggleErrorReporting,
   toggleEventTracking,
-  updateClusterSelectorVisibilty,
   updateFileExplorerSortOrder,
   updateLoadLastProjectOnStartup,
   updateUsingKubectlProxy,
@@ -34,7 +33,6 @@ export const GlobalSettings = () => {
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
   const fileExplorerSortOrder = useAppSelector(state => state.config.fileExplorerSortOrder);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
-  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
   const useKubectlProxy = useAppSelector(state => state.config.useKubectlProxy);
 
@@ -52,10 +50,6 @@ export const GlobalSettings = () => {
 
   const handleChangeLoadLastFolderOnStartup = (e: any) => {
     dispatch(updateLoadLastProjectOnStartup(e.target.checked));
-  };
-
-  const handleChangeClusterSelectorVisibilty = (e: any) => {
-    dispatch(updateClusterSelectorVisibilty(e.target.checked));
   };
 
   const handleChangeUsingKubectlProxy = (e: any) => {
@@ -155,12 +149,6 @@ export const GlobalSettings = () => {
             Automatically load last project
           </Checkbox>
         </Tooltip>
-
-        <S.Div style={{marginTop: '12px'}}>
-          <Checkbox checked={isClusterSelectorVisible} onChange={handleChangeClusterSelectorVisibilty}>
-            Show Cluster Selector
-          </Checkbox>
-        </S.Div>
       </div>
 
       <div style={{width: '45%'}}>

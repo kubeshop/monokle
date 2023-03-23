@@ -87,7 +87,6 @@ const initialAppConfigState: AppConfig = {
   },
   fileExplorerSortOrder: electronStore.get('appConfig.fileExplorerSortOrder') || 'folders',
   useKubectlProxy: electronStore.get('appConfig.useKubectlProxy') || false,
-  isClusterSelectorVisible: electronStore.get('appConfig.isClusterSelectorVisible', true),
   loadLastProjectOnStartup: electronStore.get('appConfig.loadLastProjectOnStartup'),
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
   isScanExcludesUpdated: 'applied',
