@@ -412,7 +412,11 @@ export const Settings = ({
         <S.Div>
           <S.Span>Helm Preview Mode</S.Span>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={HelmPreviewModeTooltip}>
-            <Select value={localConfig?.settings?.helmPreviewMode} onChange={onChangeHelmPreviewMode}>
+            <Select
+              style={{width: '100%'}}
+              value={localConfig?.settings?.helmPreviewMode}
+              onChange={onChangeHelmPreviewMode}
+            >
               <Select.Option value="template">Template</Select.Option>
               <Select.Option value="install">Install</Select.Option>
             </Select>
@@ -422,6 +426,7 @@ export const Settings = ({
           <S.Span>Kustomize Command</S.Span>
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KustomizeCommandTooltip}>
             <Select
+              style={{width: '100%'}}
               dropdownMatchSelectWidth={false}
               value={localConfig?.settings?.kustomizeCommand}
               onChange={onChangeKustomizeCommand}
