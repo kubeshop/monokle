@@ -3,6 +3,7 @@ import {AnyAction} from '@reduxjs/toolkit';
 import {FileMapType, ImagesListType} from '@shared/models/appState';
 import {ResourceMetaMapByStorage} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
+import {ExplorerCollapsibleSectionsType} from '@shared/models/ui';
 
 // TODO: this should become a thunk so we don't have to pass resourceMetaStorage to it...
 export const selectFromHistory = (
@@ -12,7 +13,8 @@ export const selectFromHistory = (
   resourceMetaMapByStorage: ResourceMetaMapByStorage,
   fileMap: FileMapType,
   imagesList: ImagesListType,
-  dispatch: (action: AnyAction) => void
+  dispatch: (action: AnyAction) => void,
+  explorerSelectedSection: ExplorerCollapsibleSectionsType
 ) => {
   let removedSelectionHistoryEntriesCount = 0;
   const newSelectionHistory = selectionHistory.filter(selection => {
@@ -90,9 +92,16 @@ export const selectFromHistory = (
   }
 
   const nextSelection = newSelectionHistory[nextSelectionHistoryIndex];
+
+  if (nextSelection.type === 'image' && explorerSelectedSection !== 'images') {
+    dispatch({type: 'ui/setExplorerSelectedSection', payload: 'images'});
+  } else if (nextSelection.type === 'file' && explorerSelectedSection !== 'files') {
+    dispatch({type: 'ui/setExplorerSelectedSection', payload: 'files'});
+  }
+
   if (nextSelection.type === 'resource') {
     dispatch({
-      type: 'main/selectK8sResource',
+      type: 'main/selectResource',
       payload: {
         resourceIdentifier: nextSelection.resourceIdentifier,
         isVirtualSelection: true,

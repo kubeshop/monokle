@@ -25,8 +25,6 @@ const KustomizePane: React.FC<InjectedPanelProps> = props => {
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kustomizationsResources = useAppSelector(kustomizationResourcesSelectors);
 
-  console.log(width);
-
   return (
     <AccordionPanel
       {...props}

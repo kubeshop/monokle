@@ -31,6 +31,7 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {stopPreview} from '@redux/services/preview';
 import {applyResource} from '@redux/thunks/applyResource';
 import {startClusterConnection} from '@redux/thunks/cluster';
+import {selectFromHistory} from '@redux/thunks/selectFromHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ModalConfirmWithNamespaceSelect} from '@molecules';
@@ -44,7 +45,6 @@ import {useSelectorWithRef} from '@utils/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 import {RootState} from '@shared/models/rootState';
-import {selectFromHistory} from '@shared/utils/selectionHistory';
 
 const HotKeysHandler = () => {
   const store = useStore();
@@ -63,10 +63,7 @@ const HotKeysHandler = () => {
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const selectedResource = useSelectedResource();
 
-  const [, selectionHistoryRef] = useSelectorWithRef(state => state.main.selectionHistory);
-  const [, imagesListRef] = useSelectorWithRef(state => state.main.imagesList);
   const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
-  const [, resourceMetaMapByStorageRef] = useSelectorWithRef(state => state.main.resourceMetaMapByStorage);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -220,27 +217,11 @@ const HotKeysHandler = () => {
   });
 
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK.key, () => {
-    selectFromHistory(
-      'left',
-      selectionHistoryRef.current.index,
-      selectionHistoryRef.current.current,
-      resourceMetaMapByStorageRef.current,
-      fileMapRef.current,
-      imagesListRef.current,
-      dispatch
-    );
+    dispatch(selectFromHistory('left'));
   });
 
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_FORWARD.key, () => {
-    selectFromHistory(
-      'right',
-      selectionHistoryRef.current.index,
-      selectionHistoryRef.current.current,
-      resourceMetaMapByStorageRef.current,
-      fileMapRef.current,
-      imagesListRef.current,
-      dispatch
-    );
+    dispatch(selectFromHistory('right'));
   });
 
   useHotkeys(
