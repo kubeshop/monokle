@@ -137,8 +137,10 @@ export const ActiveProjectButton = styled(RawButton).attrs({
   padding: 0px;
   width: 100%;
   background-color: transparent !important;
+
   :hover {
     background-color: transparent;
+
     & span {
       color: ${Colors.geekblue9} !important;
     }
@@ -156,7 +158,7 @@ export const ProjectName = styled.span`
   font-size: 16px;
   line-height: 20px;
   text-align: left;
-  transition: all ${AnimationDurations.slow} ease-in;
+  transition: all ${AnimationDurations.fast} ease-in;
 
   &:disabled {
     color: inherit !important;
