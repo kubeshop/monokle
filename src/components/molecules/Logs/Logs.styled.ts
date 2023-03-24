@@ -14,14 +14,14 @@ export const LogContainer = styled.div`
 
 export const LogText = styled(Text)`
   display: block;
-  margin: 0;
-  padding: 6px 4px;
-  font-size: 14px;
+  margin-bottom: 0;
+  padding: 4px;
+  font-size: 13px;
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
     sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   font-variant: tabular-nums;
   font-style: normal;
-  font-weight: 500;
-  line-height: 18px;
+  font-weight: 600;
+  line-height: 28px;
   color: ${Colors.grey8};
 `;
