@@ -21,7 +21,7 @@ import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarCon
 const ImagesPane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey, width} = props;
 
-  const imagesList = useAppSelector(state => state.main.imagesList);
+  const imageMap = useAppSelector(state => state.main.imageMap);
 
   return (
     <AccordionPanel
@@ -32,7 +32,7 @@ const ImagesPane: React.FC<InjectedPanelProps> = props => {
             title="Images"
             expandable
             isOpen={Boolean(isActive)}
-            actions={<TitleBarCount count={size(imagesList)} isActive={Boolean(isActive)} />}
+            actions={<TitleBarCount count={size(imageMap)} isActive={Boolean(isActive)} />}
           />
         </AccordionTitleBarContainer>
       }

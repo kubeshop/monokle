@@ -263,7 +263,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory.current,
             state.main.resourceMetaMapByStorage,
             state.main.fileMap,
-            state.main.imagesList,
+            state.main.imageMap,
             dispatch,
             state.ui.explorerSelectedSection
           );
@@ -280,7 +280,7 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory.current,
             state.main.resourceMetaMapByStorage,
             state.main.fileMap,
-            state.main.imagesList,
+            state.main.imageMap,
             dispatch,
             state.ui.explorerSelectedSection
           );

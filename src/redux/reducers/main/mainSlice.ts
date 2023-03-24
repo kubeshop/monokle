@@ -586,7 +586,7 @@ export const {
   setAutosavingError,
   setAutosavingStatus,
   setFiltersToBeChanged,
-  setImagesList,
+  setImageMap,
   setImagesSearchedValue,
   setSelectionHistory,
   uncheckAllResourceIds,

@@ -112,7 +112,7 @@ const Monaco: React.FC<IProps> = props => {
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const imagesList = useAppSelector(state => state.main.imagesList);
+  const imageMap = useAppSelector(state => state.main.imageMap);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
@@ -177,7 +177,7 @@ const Monaco: React.FC<IProps> = props => {
   };
 
   const selectImageHandler = (imageId: string) => {
-    const image = imagesList.find(im => im.id === imageId);
+    const image = imageMap[imageId];
 
     if (image) {
       dispatch(selectImage({imageId: image.id}));
@@ -211,7 +211,7 @@ const Monaco: React.FC<IProps> = props => {
     code,
     resourceMetaMap: activeResourceMetaMap,
     fileMap,
-    imagesList,
+    imageMap,
     selectResource: triggerSelectResource,
     selectFilePath,
     createResource: isInPreviewMode ? undefined : createResource,

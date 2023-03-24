@@ -63,7 +63,7 @@ const initialAppState: AppState = {
   },
   deviceID: electronStore.get('main.deviceID'),
   filtersPresets: electronStore.get('main.filtersPresets') || {},
-  imagesList: [],
+  imageMap: {},
   validationIntegration: undefined,
   autosaving: {},
   lastChangedLine: 0,

@@ -70,14 +70,7 @@ const ResourceRefsIconPopover = ({
       }
     >
       <S.IconsContainer>
-        <Icon
-          name={iconType}
-          style={
-            type === 'incoming'
-              ? {...baseIconStyle, margin: '0px 8px', color: incomingColor}
-              : {...baseIconStyle, margin: '0px 8px', color: incomingColor}
-          }
-        />
+        <Icon name={iconType} style={{...baseIconStyle, margin: '0px 8px', color: incomingColor}} />
       </S.IconsContainer>
     </Popover>
   );
