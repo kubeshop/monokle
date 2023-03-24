@@ -435,9 +435,11 @@ const Monaco: React.FC<IProps> = props => {
   useEffect(() => {
     if (!providedRange || !editorRef.current) return;
 
-    editorRef.current.setSelection(providedRange);
-    editorRef.current.revealLineInCenter(providedRange.startLineNumber);
-  }, [providedRange]);
+    setImmediate(() => {
+      editorRef.current?.setSelection(providedRange);
+      editorRef.current?.revealLineInCenter(providedRange.startLineNumber);
+    });
+  }, [dispatch, providedRange]);
 
   return (
     <S.MonacoContainer ref={containerRef} $height={height}>
