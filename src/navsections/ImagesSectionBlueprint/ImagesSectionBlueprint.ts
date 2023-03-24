@@ -1,7 +1,7 @@
 import {selectImage} from '@redux/reducers/main';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {ImagesListType} from '@shared/models/appState';
+import {ImageMapType} from '@shared/models/appState';
 import {ImageType} from '@shared/models/image';
 import {SectionBlueprint} from '@shared/models/navigator';
 
@@ -14,7 +14,7 @@ import ImagesSectionNameSuffix from './ImagesSectionNameSuffix';
 export type ImagesScopeType = {
   isFolderOpen: boolean;
   isFolderLoading: boolean;
-  imagesList: ImagesListType;
+  imageMap: ImageMapType;
   imagesSearchedValue: string | undefined;
   selectedImageId?: string;
   selectedK8sResourceId: string | undefined;
@@ -44,14 +44,14 @@ const ImagesSectionBlueprint: SectionBlueprint<ImageType, ImagesScopeType> = {
   getScope: state => ({
     isFolderOpen: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
     isFolderLoading: state.ui.isFolderLoading,
-    imagesList: state.main.imagesList,
+    imageMap: state.main.imageMap,
     imagesSearchedValue: state.main.imagesSearchedValue,
     selectedImageId: state.main.selection?.type === 'image' ? state.main.selection.imageId : undefined,
     selectedK8sResourceId:
       state.main.selection?.type === 'resource' ? state.main.selection.resourceIdentifier.id : undefined,
   }),
   builder: {
-    getRawItems: scope => scope.imagesList,
+    getRawItems: scope => Object.values(scope.imageMap),
     isLoading: scope => scope.isFolderLoading,
     isInitialized: scope => scope.isFolderOpen,
     isEmpty: (scope, rawItems) => scope.isFolderOpen && rawItems.length === 0,

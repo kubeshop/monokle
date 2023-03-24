@@ -145,7 +145,11 @@ const RefsPopoverContent = (props: {
     trackEvent('explore/navigate_resource_link', {type: ref.type});
 
     if (ref.type !== ResourceRefType.Incoming) {
-      if (!selection || (selection?.type === 'resource' && selection.resourceIdentifier.id !== resource.id)) {
+      if (
+        !selection ||
+        selection?.type !== 'resource' ||
+        (selection?.type === 'resource' && selection.resourceIdentifier.id !== resource.id)
+      ) {
         triggerSelectResource(resource.id);
       }
 
@@ -189,6 +193,12 @@ const RefsPopoverContent = (props: {
     if (ref.target?.type === 'file') {
       if (selection?.type === 'file' && selection.filePath !== ref.target.filePath) {
         selectFilePath(ref.target.filePath);
+      }
+    }
+
+    if (ref.target?.type === 'image') {
+      if (!selection || (selection.type === 'resource' && selection.resourceIdentifier.id !== resource.id)) {
+        triggerSelectResource(resource.id);
       }
     }
   };

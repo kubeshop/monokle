@@ -4,14 +4,14 @@ import {AppListenerFn} from '@redux/listeners/base';
 import {getActiveResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
 
-import {ImagesListType} from '@shared/models/appState';
+import {ImageMapType} from '@shared/models/appState';
 import {ResourceMetaMap} from '@shared/models/k8sResource';
 
-import {toggleLeftMenu} from '../ui';
-import {selectImage, setImagesList} from './mainSlice';
+import {setExplorerSelectedSection, setLeftMenuSelection, toggleLeftMenu} from '../ui';
+import {selectImage, setImageMap} from './mainSlice';
 
 function parseImages(resourceMetaMap: ResourceMetaMap) {
-  let images: ImagesListType = [];
+  let imageMap: ImageMapType = {};
 
   Object.values(resourceMetaMap).forEach(k8sResource => {
     if (k8sResource.refs?.length) {
@@ -20,10 +20,12 @@ function parseImages(resourceMetaMap: ResourceMetaMap) {
           const refName = ref.name;
           const refTag = ref.target?.tag || 'latest';
 
-          const foundImage = images.find(image => image.id === `${refName}:${refTag}`);
+          const imageId = `${refName}:${refTag}`;
+
+          const foundImage = imageMap[imageId];
 
           if (!foundImage) {
-            images.push({id: `${refName}:${refTag}`, name: refName, tag: refTag, resourcesIds: [k8sResource.id]});
+            imageMap[imageId] = {id: imageId, name: refName, tag: refTag, resourcesIds: [k8sResource.id]};
           } else if (!foundImage.resourcesIds.includes(k8sResource.id)) {
             foundImage.resourcesIds.push(k8sResource.id);
           }
@@ -32,7 +34,7 @@ function parseImages(resourceMetaMap: ResourceMetaMap) {
     }
   });
 
-  return images;
+  return imageMap;
 }
 
 export const imageListParserListener: AppListenerFn = listen => {
@@ -51,11 +53,11 @@ export const imageListParserListener: AppListenerFn = listen => {
     effect: async (_action, {dispatch, getState}) => {
       const activeResourceMetaMap = getActiveResourceMetaMapFromState(getState());
 
-      const imagesList = getState().main.imagesList;
-      const images = parseImages(activeResourceMetaMap);
+      const imageMap = getState().main.imageMap;
+      const newImageMap = parseImages(activeResourceMetaMap);
 
-      if (!isEqual(images, imagesList)) {
-        dispatch(setImagesList(images));
+      if (!isEqual(newImageMap, imageMap)) {
+        dispatch(setImageMap(newImageMap));
       }
     },
   });
@@ -65,16 +67,20 @@ export const imageSelectedListener: AppListenerFn = listen => {
   listen({
     type: selectImage.type,
     effect: async (_action, {dispatch, getState}) => {
+      const explorerSelectedSection = getState().ui.explorerSelectedSection;
       const leftMenu = getState().ui.leftMenu;
 
       if (!leftMenu.isActive) {
         dispatch(toggleLeftMenu());
       }
 
-      // TODO: images are inside accordiong
-      // if (leftMenu.selection !== 'images-pane') {
-      //   dispatch(setLeftMenuSelection('images-pane'));
-      // }
+      if (leftMenu.selection !== 'explorer') {
+        dispatch(setLeftMenuSelection('explorer'));
+      }
+
+      if (explorerSelectedSection !== 'images') {
+        dispatch(setExplorerSelectedSection('images'));
+      }
     },
   });
 };

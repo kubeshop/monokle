@@ -12,7 +12,7 @@ export const selectFromHistory = createAsyncThunk<{}, 'left' | 'right', {dispatc
     const state = thunkAPI.getState();
     const explorerSelectedSection = state.ui.explorerSelectedSection;
     const fileMap = state.main.fileMap;
-    const imagesList = state.main.imagesList;
+    const imageMap = state.main.imageMap;
     const resourceMetaMapByStorage = state.main.resourceMetaMapByStorage;
     const selectionHistory = state.main.selectionHistory;
     let currentSelectionHistoryIndex = selectionHistory.index;
@@ -34,10 +34,8 @@ export const selectFromHistory = createAsyncThunk<{}, 'left' | 'right', {dispatc
           return true;
         }
       }
-      if (selection.type === 'image') {
-        if (imagesList.find(image => image.id === selection.imageId)) {
-          return true;
-        }
+      if (selection.type === 'image' && imageMap[selection.imageId]) {
+        return true;
       }
       removedSelectionHistoryEntriesCount += 1;
       return false;

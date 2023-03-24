@@ -73,8 +73,7 @@ type AppState = {
   deviceID: string;
   imagesSearchedValue?: string;
   filtersPresets: FiltersPresetsType;
-  // TODO: imagesList should probably be transformed to a map "imageMap"
-  imagesList: ImagesListType;
+  imageMap: ImageMapType;
   validationIntegration: ValidationIntegration | undefined;
   autosaving: {
     status?: boolean;
@@ -116,9 +115,9 @@ type HelmValuesMapType = {
 };
 
 /**
- * List of images from current project
+ * Map of images from current project
  */
-type ImagesListType = ImageType[];
+type ImageMapType = {[id: string]: ImageType};
 
 type MatchParamProps = {
   matchCase: boolean;
@@ -157,7 +156,7 @@ export type {
   HelmChartMapType,
   HelmValuesMapType,
   HelmTemplatesMapType,
-  ImagesListType,
+  ImageMapType,
   MatchParamProps,
   PreviewLoaderType,
   ResourceRefsProcessingOptions,

@@ -1,6 +1,6 @@
 import {AnyAction} from '@reduxjs/toolkit';
 
-import {FileMapType, ImagesListType} from '@shared/models/appState';
+import {FileMapType, ImageMapType} from '@shared/models/appState';
 import {ResourceMetaMapByStorage} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
 import {ExplorerCollapsibleSectionsType} from '@shared/models/ui';
@@ -12,7 +12,7 @@ export const selectFromHistory = (
   selectionHistory: AppSelection[],
   resourceMetaMapByStorage: ResourceMetaMapByStorage,
   fileMap: FileMapType,
-  imagesList: ImagesListType,
+  imageMap: ImageMapType,
   dispatch: (action: AnyAction) => void,
   explorerSelectedSection: ExplorerCollapsibleSectionsType
 ) => {
@@ -29,10 +29,8 @@ export const selectFromHistory = (
         return true;
       }
     }
-    if (selection.type === 'image') {
-      if (imagesList.find(image => image.id === selection.imageId)) {
-        return true;
-      }
+    if (selection.type === 'image' && imageMap[selection.imageId]) {
+      return true;
     }
     removedSelectionHistoryEntriesCount += 1;
     return false;

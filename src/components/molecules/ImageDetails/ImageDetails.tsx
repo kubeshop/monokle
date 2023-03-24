@@ -19,7 +19,7 @@ const ImageDetails: React.FC = () => {
     if (!selectedImageId) {
       return undefined;
     }
-    return state.main.imagesList.find(i => i.id === selectedImageId);
+    return state.main.imageMap[selectedImageId];
   });
 
   const [isLoading, setIsLoading] = useState(true);

@@ -143,7 +143,7 @@ export const selectionReducers = createSliceReducers('main', {
       type: 'image',
       imageId: action.payload.imageId,
     };
-    const image = state.imagesList.find(img => img.id === action.payload.imageId);
+    const image = state.imageMap[action.payload.imageId];
     if (image) {
       highlightResourcesUsingImage(image, state);
     }
