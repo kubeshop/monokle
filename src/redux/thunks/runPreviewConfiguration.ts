@@ -44,8 +44,6 @@ export const runPreviewConfiguration = createAsyncThunk<
 
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
 
-  trackEvent('preview/helm_config/start');
-
   let previewConfiguration: HelmPreviewConfiguration | null | undefined;
   if (previewConfigurationMap) {
     previewConfiguration = previewConfigurationMap[previewConfigurationId];
@@ -103,6 +101,8 @@ export const runPreviewConfiguration = createAsyncThunk<
     );
   }
 
+  trackEvent('preview/helm_config/start');
+
   const args = buildHelmCommand(
     chart,
     orderedValuesFilePaths,
@@ -122,12 +122,11 @@ export const runPreviewConfiguration = createAsyncThunk<
   const result = await runCommandInMainThread(commandOptions);
 
   if (result.error) {
+    trackEvent('preview/helm_config/fail', {reason: result.error});
     return createRejectionWithAlert(thunkAPI, 'Helm Error', `${result.error} - ${result.stderr}`);
   }
 
   const endTime = new Date().getTime();
-
-  trackEvent('preview/helm_config/end', {executionTime: endTime - startTime});
 
   if (result.stdout) {
     const preview: HelmConfigPreview = {type: 'helm-config', configId: previewConfiguration.id};
@@ -136,11 +135,15 @@ export const runPreviewConfiguration = createAsyncThunk<
       preview,
     });
 
+    trackEvent('preview/helm_config/end', {resourcesCount: resources.length, executionTime: endTime - startTime});
+
     return {
       resources,
       preview,
     };
   }
+
+  trackEvent('preview/helm_config/end', {executionTime: endTime - startTime});
 
   return createRejectionWithAlert(
     thunkAPI,

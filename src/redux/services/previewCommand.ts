@@ -29,10 +29,11 @@ export const previewSavedCommand = createAsyncThunk<
 >('main/previewSavedCommand', async (commandId, thunkAPI) => {
   const startTime = new Date().getTime();
   try {
-    trackEvent('preview/command/start');
     const configState = thunkAPI.getState().config;
     const command = configState.projectConfig?.savedCommandMap?.[commandId];
     const rootFolderPath = thunkAPI.getState().main.fileMap[ROOT_FILE_ENTRY]?.filePath;
+
+    trackEvent('preview/command/start');
 
     if (!command) {
       throw new Error('Saved command not found!');
@@ -74,6 +75,8 @@ export const previewSavedCommand = createAsyncThunk<
       previewResources: resources,
     };
   } catch (err) {
-    return createRejectionWithAlert(thunkAPI, 'Command Preview Error', errorMsg(err));
+    let reason = errorMsg(err);
+    trackEvent('preview/command/fail', {reason});
+    return createRejectionWithAlert(thunkAPI, 'Command Preview Error', reason);
   }
 });
