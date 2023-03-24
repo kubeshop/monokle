@@ -21,7 +21,6 @@ import {
   selectFile,
   selectImage,
   selectResource,
-  setAutosavingStatus,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelectorNew, selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
@@ -106,7 +105,6 @@ const Monaco: React.FC<IProps> = props => {
   const selectedResourceRef = useRef(selectedResource);
   selectedResourceRef.current = selectedResource;
 
-  const [, autosavingStatusRef] = useSelectorWithRef(state => state.main.autosaving.status);
   const [, activeResourceStorageRef] = useSelectorWithRef(activeResourceStorageSelector);
 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
@@ -274,10 +272,6 @@ const Monaco: React.FC<IProps> = props => {
       isDirtyRef.current = originalCodeRef.current !== newValue;
       setCode(newValue);
 
-      if (!autosavingStatusRef.current) {
-        dispatch(setAutosavingStatus(true));
-      }
-
       if (selectedResourceIdRef.current) {
         // this will slow things down if document gets large - need to find a better solution...
         const documents = parseAllYamlDocuments(newValue);
@@ -296,7 +290,7 @@ const Monaco: React.FC<IProps> = props => {
         debouncedSaveContent(newValue);
       }
     },
-    [autosavingStatusRef, debouncedSaveContent, dispatch, setCode]
+    [debouncedSaveContent, setCode]
   );
 
   useEffect(() => {
