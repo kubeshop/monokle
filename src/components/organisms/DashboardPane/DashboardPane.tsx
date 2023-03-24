@@ -8,7 +8,7 @@ import {currentKubeContextSelector} from '@redux/appConfig';
 import {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
-import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
+import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
 import {useSelectorWithRef} from '@utils/hooks';
@@ -26,13 +26,14 @@ const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const [menuList, menuListRef] = useSelectorWithRef(state => state.dashboard.ui.menuList);
-  const clusterResourceMetaMapRef = useResourceMetaMapRef('cluster');
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const currentContext = useAppSelector(currentKubeContextSelector);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
   const [filterText, setFilterText] = useState<string>('');
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
   const problems = useValidationSelector(state => problemsSelector(state));
+  const clusterConnectionOptions = useAppSelector(state => state.main.clusterConnectionOptions);
+  const clusterResourceMeta = useResourceMetaMap('cluster');
 
   const filteredMenu = useMemo(() => {
     if (!filterText) {
@@ -55,7 +56,7 @@ const DashboardPane = () => {
           ) > 0
       );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterText, menuListRef, menuList]);
+  }, [filterText, menuListRef, menuList, clusterConnectionOptions]);
 
   useEffect(() => {
     let tempMenu: DashboardMenu[] = [
@@ -97,7 +98,7 @@ const DashboardPane = () => {
     dispatch(setDashboardMenuList(tempMenu));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMetaMapRef]);
+  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMeta]);
 
   const setActiveMenu = useCallback(
     (menuItem: DashboardMenu) => {
@@ -108,31 +109,44 @@ const DashboardPane = () => {
     [dispatch]
   );
 
-  const getResourceCount = useCallback(
-    (kind: string) => {
-      return Object.values(clusterResourceMetaMapRef.current).filter(r => r.kind === kind).length;
+  const compareNamespaces = useCallback(
+    (namespace?: string) => {
+      if (clusterConnectionOptions.lastNamespaceLoaded === '<all>') {
+        return true;
+      }
+      if (clusterConnectionOptions.lastNamespaceLoaded === '<not-namespaced>') {
+        return !namespace;
+      }
+      return clusterConnectionOptions.lastNamespaceLoaded === namespace;
     },
-    [clusterResourceMetaMapRef]
+    [clusterConnectionOptions]
   );
+
+  const getResources = useCallback(
+    (kind: string) => {
+      return Object.values(clusterResourceMeta).filter(r => r.kind === kind && compareNamespaces(r.namespace));
+    },
+    [clusterResourceMeta, compareNamespaces]
+  );
+
+  const getResourceCount = useCallback((kind: string) => getResources(kind).length, [getResources]);
 
   const getProblemCount = useCallback(
     (kind: string, level: 'error' | 'warning') => {
-      return Object.values(clusterResourceMetaMapRef.current)
-        .filter(resource => resource.kind === kind)
-        .reduce((total: number, resource: ResourceMeta) => {
-          const problemCount = problems
-            .filter(p => p.level === level)
-            .filter(p =>
-              p.locations.find(
-                l =>
-                  l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
-                  l.physicalLocation.artifactLocation.uri === resource.id
-              )
-            );
-          return total + problemCount.length;
-        }, 0);
+      return getResources(kind).reduce((total: number, resource: ResourceMeta) => {
+        const problemCount = problems
+          .filter(p => p.level === level)
+          .filter(p =>
+            p.locations.find(
+              l =>
+                l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
+                l.physicalLocation.artifactLocation.uri === resource.id
+            )
+          );
+        return total + problemCount.length;
+      }, 0);
     },
-    [clusterResourceMetaMapRef, problems]
+    [getResources, problems]
   );
 
   return (
