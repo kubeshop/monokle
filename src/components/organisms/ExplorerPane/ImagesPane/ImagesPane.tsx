@@ -6,17 +6,12 @@ import {size} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {SectionRenderer} from '@molecules';
-
-import {SectionBlueprintList} from '@atoms';
-
-import ImagesSectionBlueprint from '@src/navsections/ImagesSectionBlueprint';
-
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {InjectedPanelProps} from '@shared/models/explorer';
 
 import AccordionPanel from '../AccordionPanel';
 import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
+import ImagesList from './ImagesList';
 
 const ImagesPane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey, width} = props;
@@ -39,9 +34,10 @@ const ImagesPane: React.FC<InjectedPanelProps> = props => {
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
     >
-      <SectionBlueprintList id="images-section-container" $width={width}>
+      <ImagesList />
+      {/* <SectionBlueprintList id="images-section-container" $width={width}>
         <SectionRenderer sectionId={ImagesSectionBlueprint.id} level={0} isLastSection={false} />
-      </SectionBlueprintList>
+      </SectionBlueprintList> */}
     </AccordionPanel>
   );
 };
