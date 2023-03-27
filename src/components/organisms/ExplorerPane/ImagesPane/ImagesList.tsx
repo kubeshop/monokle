@@ -1,10 +1,12 @@
 import {useRef} from 'react';
 
+import {size} from 'lodash';
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 import {imageListSelector} from '@redux/selectors/imageSelectors';
 
+import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import ImageRenderer from './ImageRenderer/ImageRenderer';
@@ -30,6 +32,10 @@ const ImagesList: React.FC = () => {
   //         behavior: 'smooth',
   //       }),
   //   });
+
+  if (!size(list)) {
+    return <EmptyText>No images were found in the current project.</EmptyText>;
+  }
 
   return (
     <ListContainer ref={ref}>
@@ -67,6 +73,11 @@ const ImagesList: React.FC = () => {
 export default ImagesList;
 
 // Styled Components
+
+const EmptyText = styled.div`
+  padding: 16px;
+  color: ${Colors.grey8};
+`;
 
 const ListContainer = styled.ul`
   height: 100%;
