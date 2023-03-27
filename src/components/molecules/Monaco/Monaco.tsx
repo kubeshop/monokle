@@ -349,13 +349,13 @@ const Monaco: React.FC<IProps> = props => {
     isDirtyRef.current = false;
   }, [
     selectedFilePath,
-    selectedResource?.id,
-    selectedResource?.storage,
+    selectedResource,
     codeRef,
     activeResourceContentMapRef,
     transientResourceContentMapRef,
     fileMapRef,
     setCode,
+    localResourceContentMapRef,
   ]);
 
   useEffect(() => {
