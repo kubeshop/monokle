@@ -18,7 +18,7 @@ import ImageSearch from './ImageSearch';
 import ImagesList from './ImagesList';
 
 const ImagesPane: React.FC<InjectedPanelProps> = props => {
-  const {isActive, panelKey, width} = props;
+  const {isActive, panelKey} = props;
 
   const imageMap = useAppSelector(state => state.main.imageMap);
 
@@ -44,9 +44,6 @@ const ImagesPane: React.FC<InjectedPanelProps> = props => {
       </ImageTopContainer>
 
       <ImagesList />
-      {/* <SectionBlueprintList id="images-section-container" $width={width}>
-        <SectionRenderer sectionId={ImagesSectionBlueprint.id} level={0} isLastSection={false} />
-      </SectionBlueprintList> */}
     </AccordionPanel>
   );
 };

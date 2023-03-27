@@ -39,7 +39,7 @@ const ExplorerPane: React.FC = () => {
         <FilePane key="files" />
         <KustomizePane key="kustomize" width={containerWidth - 24} />
         <HelmPane key="helm" width={containerWidth - 24} />
-        <ImagesPane key="images" width={containerWidth - 24} />
+        <ImagesPane key="images" />
       </Collapse>
     </CollapseContainer>
   );
