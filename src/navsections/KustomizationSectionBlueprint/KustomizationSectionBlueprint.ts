@@ -2,7 +2,7 @@ import {isInClusterModeSelector} from '@redux/appConfig';
 import {selectResource} from '@redux/reducers/main';
 import {getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {isKustomizationResource} from '@redux/services/kustomize';
-import {isKustomizationPreviewed, isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
+import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {isResourcePassingFilter} from '@utils/resources';
 
@@ -86,8 +86,7 @@ const KustomizationSectionBlueprint: SectionBlueprint<ResourceMeta<'local'>, Kus
     getName: rawItem => rawItem.name,
     getInstanceId: rawItem => rawItem.id,
     builder: {
-      isSelected: (rawItem, scope) =>
-        isResourceSelected(rawItem, scope.selection) || isKustomizationPreviewed(rawItem, scope.preview),
+      isSelected: (rawItem, scope) => isResourceSelected(rawItem, scope.selection),
       isHighlighted: (rawItem, scope) => isResourceHighlighted(rawItem, scope.highlights),
       isDisabled: (rawItem, scope) =>
         Boolean(
