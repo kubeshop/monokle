@@ -12,6 +12,8 @@ import {ValidationPopover} from '@monokle/components';
 import {ValidationResult, getResourceLocation} from '@monokle/validation';
 import {MonacoRange} from '@shared/models/ui';
 
+import * as S from './ErrorCell.styled';
+
 type IProps = {
   resourceId: string;
 };
@@ -51,7 +53,7 @@ const ErrorCell: React.FC<IProps> = props => {
   }
 
   return (
-    <div
+    <S.Container
       onClick={e => {
         e.stopPropagation();
       }}
@@ -61,7 +63,11 @@ const ErrorCell: React.FC<IProps> = props => {
         results={[...errors, ...warnings]}
         onMessageClickHandler={onMessageClickHandler}
       />
-    </div>
+      <S.ErrorContainer>
+        {errors.length > 0 && <S.ErrorText>{errors.length} errors</S.ErrorText>}
+        {warnings.length > 0 && <S.ErrorText>{warnings.length} warnings</S.ErrorText>}
+      </S.ErrorContainer>
+    </S.Container>
   );
 };
 
