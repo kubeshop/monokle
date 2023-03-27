@@ -1,10 +1,11 @@
 import {Popover} from 'antd';
 
+import styled from 'styled-components';
+
 import {Icon} from '@monokle/components';
-import {Colors} from '@shared/styles/colors';
+import {Colors, FontColors} from '@shared/styles/colors';
 
 import ImageOutgoingResourcesPopover from './ImageOutgoingResourcesPopover';
-import * as S from './ImageSuffix.styled';
 
 type IProps = {
   isSelected: boolean;
@@ -15,8 +16,8 @@ const ImageSuffix: React.FC<IProps> = props => {
   const {isSelected, resourcesIds} = props;
 
   return (
-    <S.Container>
-      <S.Counter $selected={isSelected}>{resourcesIds.length}</S.Counter>
+    <Container>
+      <Counter $selected={isSelected}>{resourcesIds.length}</Counter>
 
       <Popover
         mouseEnterDelay={0.5}
@@ -25,8 +26,25 @@ const ImageSuffix: React.FC<IProps> = props => {
       >
         <Icon name="outgoingRefs" style={{color: isSelected ? Colors.blackPure : Colors.blue10}} />
       </Popover>
-    </S.Container>
+    </Container>
   );
 };
 
 export default ImageSuffix;
+
+// Styled Components
+
+export const Container = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const Counter = styled.span<{$selected: boolean}>`
+  ${({$selected}) => `
+    color: ${$selected ? Colors.blackPure : FontColors.grey};
+  `}
+
+  margin-left: 6px;
+  font-size: 12px;
+`;
