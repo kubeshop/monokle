@@ -1,11 +1,9 @@
 import {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
-import {useStore} from 'react-redux';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {
-  currentConfigSelector,
   isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
@@ -24,12 +22,11 @@ import {
   toggleRightMenu,
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelectorNew, rootFilePathSelector, selectedFilePathSelector} from '@redux/selectors';
-import {getActiveResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {stopPreview} from '@redux/services/preview';
-import {applyResource} from '@redux/thunks/applyResource';
+import {applyResourceToCluster} from '@redux/thunks/applyResource';
 import {startClusterConnection} from '@redux/thunks/cluster';
 import {selectFromHistory} from '@redux/thunks/selectFromHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -44,10 +41,8 @@ import {useFeatureFlags} from '@utils/features';
 import {useSelectorWithRef} from '@utils/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
-import {RootState} from '@shared/models/rootState';
 
 const HotKeysHandler = () => {
-  const store = useStore();
   const {ShowRightMenu} = useFeatureFlags();
   const dispatch = useAppDispatch();
   const uiState = useAppSelector(state => state.ui);
@@ -56,7 +51,6 @@ const HotKeysHandler = () => {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const projectConfig = useAppSelector(currentConfigSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
   const rootFilePath = useAppSelector(rootFilePathSelector);
@@ -123,20 +117,16 @@ const HotKeysHandler = () => {
       return;
     }
 
-    const resourceMap = getActiveResourceMapFromState(store.getState() as RootState);
-
-    applyResource(
-      selectedResource.id,
-      resourceMap,
-      fileMapRef.current,
-      dispatch,
-      projectConfig,
-      kubeConfigContext,
-      namespace,
-      {
-        isInClusterMode,
-      }
+    dispatch(
+      applyResourceToCluster({
+        resourceIdentifier: selectedResource,
+        namespace,
+        options: {
+          isInClusterMode,
+        },
+      })
     );
+
     setIsApplyModalVisible(false);
   };
 

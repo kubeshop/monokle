@@ -12,7 +12,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath, uncheckAllResourceIds} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {isInPreviewModeSelectorNew} from '@redux/selectors';
-import {useActiveResourceMetaMap, useResourceMap} from '@redux/selectors/resourceMapSelectors';
+import {useActiveResourceMetaMap, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import {removeResources} from '@redux/thunks/removeResources';
 
@@ -31,7 +31,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const resourceMetaMap = useActiveResourceMetaMap();
-  const transientResourceMetaMap = useResourceMap('transient');
+  const transientResourceMetaMap = useResourceMetaMap('transient');
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
 

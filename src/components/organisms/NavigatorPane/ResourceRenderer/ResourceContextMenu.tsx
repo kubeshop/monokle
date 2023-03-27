@@ -10,12 +10,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {
-  currentConfigSelector,
-  isInClusterModeSelector,
-  kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
-} from '@redux/appConfig';
+import {isInClusterModeSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
@@ -27,12 +22,12 @@ import {
 } from '@redux/reducers/ui';
 import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
-import {useActiveResourceMapRef} from '@redux/selectors/resourceMapSelectors';
+import {useActiveResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {useResource} from '@redux/selectors/resourceSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {isResourceSelected} from '@redux/services/resource';
-import {applyResource} from '@redux/thunks/applyResource';
+import {applyResourceToCluster} from '@redux/thunks/applyResource';
 import {removeResources} from '@redux/thunks/removeResources';
 
 import {ModalConfirmWithNamespaceSelect} from '@molecules';
@@ -43,7 +38,7 @@ import {useDiff, useInstallDeploy} from '@hooks/resourceHooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {K8sResource, ResourceMap, ResourceMeta, isLocalResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMeta, ResourceMetaMap, isLocalResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 import {defineHotkey} from '@shared/utils/hotkey';
 
@@ -54,13 +49,13 @@ const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   align-items: center;
 `;
 
-function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMap, dispatch: AppDispatch) {
+function deleteResourceWithConfirm(resource: K8sResource, resourceMap: ResourceMetaMap, dispatch: AppDispatch) {
   let title = `Are you sure you want to delete ${resource.name}?`;
 
   if (isLocalResource(resource)) {
     const resourcesFromPath = getLocalResourceMetasForPath(
       resource.origin.filePath,
-      resourceMap as ResourceMap<'local'>
+      resourceMap as ResourceMetaMap<'local'>
     );
     if (resourcesFromPath.length === 1) {
       title = `This action will delete the ${resource.origin.filePath} file.\n${title}`;
@@ -94,17 +89,15 @@ const ResourceKindContextMenu = (props: Props) => {
   const dispatch = useAppDispatch();
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
-  const fileMap = useAppSelector(state => state.main.fileMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
-  const projectConfig = useAppSelector(currentConfigSelector);
+  const resourceMetaMapRef = useActiveResourceMetaMapRef();
 
   const resource = useResource(resourceMeta);
-  const resourceMapRef = useActiveResourceMapRef();
   const isThisResourceSelected = useAppSelector(state =>
     Boolean(resource && isResourceSelected(resource, state.main.selection))
   );
@@ -149,28 +142,26 @@ const ResourceKindContextMenu = (props: Props) => {
         setIsApplyModalVisible(false);
         return;
       }
-      applyResource(
-        resource.id,
-        resourceMapRef.current,
-        fileMap,
-        dispatch,
-        projectConfig,
-        kubeConfigContext,
-        namespace,
-        {
-          isInClusterMode,
-        }
+      dispatch(
+        applyResourceToCluster({
+          resourceIdentifier: resource,
+          namespace,
+          options: {
+            isInClusterMode,
+          },
+        })
       );
+
       setIsApplyModalVisible(false);
     },
-    [resource, isInClusterMode, resourceMapRef, fileMap, dispatch, projectConfig, kubeConfigContext]
+    [resource, isInClusterMode, dispatch]
   );
 
   useHotkeys(
     defineHotkey(hotkeys.DELETE_RESOURCE.key),
     () => {
       if (isThisResourceSelected && resource) {
-        deleteResourceWithConfirm(resource, resourceMapRef.current, dispatch);
+        deleteResourceWithConfirm(resource, resourceMetaMapRef.current, dispatch);
       }
     },
     [isThisResourceSelected]
@@ -199,7 +190,7 @@ const ResourceKindContextMenu = (props: Props) => {
   };
 
   const onClickDelete = () => {
-    deleteResourceWithConfirm(resource, resourceMapRef.current, dispatch);
+    deleteResourceWithConfirm(resource, resourceMetaMapRef.current, dispatch);
   };
 
   const onClickSaveToFileFolder = () => {
