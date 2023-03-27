@@ -17,12 +17,7 @@ const ImageRenderer: React.FC<IProps> = props => {
 
   const dispatch = useAppDispatch();
   const image = useAppSelector(state => state.main.imageMap[id]);
-  const isHighlighted = useAppSelector(state =>
-    isImageHighlighted(
-      image.resourcesIds,
-      state.main.selection?.type === 'resource' ? state.main.selection.resourceIdentifier.id : undefined
-    )
-  );
+  const isHighlighted = useAppSelector(state => isImageHighlighted(id, state.main.highlights));
   const isSelected = useAppSelector(state => isImageSelected(id, state.main.selection));
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
