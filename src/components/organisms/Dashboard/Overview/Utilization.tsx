@@ -3,7 +3,7 @@ import {useInterval} from 'react-use';
 
 import {Tooltip} from 'antd';
 
-import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
+import {useResourceContentMap} from '@redux/selectors/resourceMapSelectors';
 import {NodeMetric, getClusterUtilization} from '@redux/services/clusterDashboard';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
@@ -13,13 +13,13 @@ import InfoCircle from '@assets/InfoCircle.svg';
 
 import NodeHandler from '@src/kindhandlers/NodeHandler';
 
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceContent} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 
 import * as S from './Utilization.styled';
 
 export const Utilization = () => {
-  const clusterResourceMap = useResourceMap('cluster');
+  const clusterResourceContentMap = useResourceContentMap('cluster');
   const [averageCpuUsage, setAverageCpuUsage] = useState(0);
   const [totalCpu, setTotalCpu] = useState(0);
   const [averageMemoryUsage, setAverageMemoryUsage] = useState(0);
@@ -50,18 +50,19 @@ export const Utilization = () => {
   }, [utilizationData]);
 
   const getTotalCapacity = useCallback(() => {
-    return Object.values(clusterResourceMap)
+    return Object.values(clusterResourceContentMap)
       .filter(
-        (resource: K8sResource) =>
-          resource.object.apiVersion === NodeHandler.clusterApiVersion && resource.kind === NodeHandler.kind
+        resourceContent =>
+          resourceContent.object.apiVersion === NodeHandler.clusterApiVersion &&
+          resourceContent.object.kind === NodeHandler.kind
       )
-      .reduce((total: number, node: K8sResource) => {
+      .reduce((total: number, node: ResourceContent) => {
         if (node.object?.status?.capacity && node.object?.status?.capacity['ephemeral-storage']) {
           return total + memoryParser(node.object?.status?.capacity['ephemeral-storage']);
         }
         return total;
       }, 0);
-  }, [clusterResourceMap]);
+  }, [clusterResourceContentMap]);
 
   return (
     <S.Container>
