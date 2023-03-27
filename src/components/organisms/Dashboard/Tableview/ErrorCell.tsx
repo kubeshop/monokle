@@ -64,8 +64,8 @@ const ErrorCell: React.FC<IProps> = props => {
         onMessageClickHandler={onMessageClickHandler}
       />
       <S.ErrorContainer>
-        {errors.length > 0 && <S.ErrorText>{errors.length} errors</S.ErrorText>}
-        {warnings.length > 0 && <S.ErrorText>{warnings.length} warnings</S.ErrorText>}
+        {errors.length > 0 && <S.ErrorText $type="error">{errors.length} errors</S.ErrorText>}
+        {warnings.length > 0 && <S.ErrorText $type="warning">{warnings.length} warnings</S.ErrorText>}
       </S.ErrorContainer>
     </S.Container>
   );
