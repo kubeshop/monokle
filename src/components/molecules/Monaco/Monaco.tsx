@@ -313,6 +313,8 @@ const Monaco: React.FC<IProps> = props => {
       const resourceContent =
         selectedResource.storage === 'transient'
           ? transientResourceContentMapRef.current[selectedResource.id]
+          : selectedResource.kind === 'Kustomization'
+          ? localResourceContentMapRef.current?.[selectedResource.id]
           : activeResourceContentMapRef.current?.[selectedResource.id];
       if (resourceContent) {
         if (codeRef.current === resourceContent.text) {
@@ -347,13 +349,13 @@ const Monaco: React.FC<IProps> = props => {
     isDirtyRef.current = false;
   }, [
     selectedFilePath,
-    selectedResource?.id,
-    selectedResource?.storage,
+    selectedResource,
     codeRef,
     activeResourceContentMapRef,
     transientResourceContentMapRef,
     fileMapRef,
     setCode,
+    localResourceContentMapRef,
   ]);
 
   useEffect(() => {
