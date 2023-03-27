@@ -119,6 +119,8 @@ type HelmValuesMapType = {
  */
 type ImageMapType = {[id: string]: ImageType};
 
+type ImageNode = {type: 'image'; id: string};
+
 type MatchParamProps = {
   matchCase: boolean;
   matchWholeWord: boolean;
@@ -157,6 +159,7 @@ export type {
   HelmValuesMapType,
   HelmTemplatesMapType,
   ImageMapType,
+  ImageNode,
   MatchParamProps,
   PreviewLoaderType,
   ResourceRefsProcessingOptions,
