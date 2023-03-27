@@ -2,7 +2,7 @@ import {useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectImage} from '@redux/reducers/main';
-import {isImageSelected} from '@redux/services/image';
+import {isImageHighlighted, isImageSelected} from '@redux/services/image';
 
 import ImageQuickAction from './ImageQuickAction';
 import * as S from './ImageRenderer.styled';
@@ -17,6 +17,12 @@ const ImageRenderer: React.FC<IProps> = props => {
 
   const dispatch = useAppDispatch();
   const image = useAppSelector(state => state.main.imageMap[id]);
+  const isHighlighted = useAppSelector(state =>
+    isImageHighlighted(
+      image.resourcesIds,
+      state.main.selection?.type === 'resource' ? state.main.selection.resourceIdentifier.id : undefined
+    )
+  );
   const isSelected = useAppSelector(state => isImageSelected(id, state.main.selection));
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -27,9 +33,12 @@ const ImageRenderer: React.FC<IProps> = props => {
       onMouseLeave={() => setIsHovered(false)}
       isHovered={isHovered}
       isSelected={isSelected}
+      isHighlighted={isHighlighted}
       onClick={() => dispatch(selectImage({imageId: id}))}
     >
-      <S.ItemName isSelected={isSelected}>{id}</S.ItemName>
+      <S.ItemName isSelected={isSelected} isHighlighted={isHighlighted}>
+        {id}
+      </S.ItemName>
 
       <S.SuffixContainer>
         <ImageSuffix resourcesIds={image.resourcesIds} isSelected={isSelected} />

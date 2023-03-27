@@ -119,7 +119,7 @@ type HelmValuesMapType = {
  */
 type ImageMapType = {[id: string]: ImageType};
 
-type ImageNode = {type: 'image'; id: string; count: number};
+type ImageNode = {type: 'image'; id: string};
 
 type MatchParamProps = {
   matchCase: boolean;

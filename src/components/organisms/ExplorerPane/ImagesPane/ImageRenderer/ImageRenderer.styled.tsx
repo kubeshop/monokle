@@ -4,9 +4,8 @@ import {Colors} from '@shared/styles/colors';
 
 type ItemContainerProps = {
   isSelected: boolean;
-  isHighlighted?: boolean;
-  isHovered?: boolean;
-  isLastItem?: boolean;
+  isHighlighted: boolean;
+  isHovered: boolean;
 };
 
 type ItemNameProps = {
@@ -28,11 +27,6 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   padding-right: 8px;
   margin-bottom: 2px;
   cursor: pointer;
-  ${props => {
-    if (props.isLastItem) {
-      return `margin-bottom: 12px;`;
-    }
-  }}
   ${props => {
     if (!props.isSelected && props.isHighlighted) {
       if (props.isHovered) {

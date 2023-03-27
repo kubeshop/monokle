@@ -10,6 +10,7 @@ import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import ImageRenderer from './ImageRenderer/ImageRenderer';
+import {useScroll} from './useScroll';
 
 const ROW_HEIGHT = 23;
 
@@ -24,14 +25,14 @@ const ImagesList: React.FC = () => {
     scrollToFn: elementScroll,
   });
 
-  //   useScroll({
-  //     list,
-  //     scrollTo: index =>
-  //       rowVirtualizer.scrollToIndex(index, {
-  //         align: 'center',
-  //         behavior: 'smooth',
-  //       }),
-  //   });
+  useScroll({
+    list,
+    scrollTo: index =>
+      rowVirtualizer.scrollToIndex(index, {
+        align: 'center',
+        behavior: 'smooth',
+      }),
+  });
 
   if (!size(list)) {
     return <EmptyText>No images were found in the current project.</EmptyText>;
