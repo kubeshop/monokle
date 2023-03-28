@@ -11,11 +11,17 @@ export const Container = styled.div`
   }
 `;
 
+export const RenderContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
 export const ErrorContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-left: 5px;
+  margin-left: 8px;
 `;
 
 export const ErrorText = styled.span<{$type: string}>`
