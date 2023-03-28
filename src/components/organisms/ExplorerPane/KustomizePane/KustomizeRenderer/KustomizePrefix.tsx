@@ -21,12 +21,13 @@ import {MonacoRange} from '@shared/models/ui';
 import {trackEvent} from '@shared/utils/telemetry';
 
 type IProps = {
+  isDisabled: boolean;
   isSelected: boolean;
   resourceMeta: ResourceMeta;
 };
 
 const KustomizePrefix: React.FC<IProps> = props => {
-  const {isSelected, resourceMeta} = props;
+  const {isDisabled, isSelected, resourceMeta} = props;
 
   const dispatch = useAppDispatch();
   const activeResourceMetaMapRef = useActiveResourceMetaMapRef();
@@ -70,13 +71,19 @@ const KustomizePrefix: React.FC<IProps> = props => {
   return (
     <Container>
       <ValidationPopover
+        disabled={isDisabled}
         level={level}
         results={[...errors, ...warnings]}
         onMessageClickHandler={onMessageClickHandler}
         popoverIconStyle={{transform: 'translateY(-2px)'}}
       />
 
-      <ResourceRefsIconPopover isSelected={isSelected} isDisabled={false} resourceMeta={resourceMeta} type="incoming" />
+      <ResourceRefsIconPopover
+        isSelected={isSelected}
+        isDisabled={isDisabled}
+        resourceMeta={resourceMeta}
+        type="incoming"
+      />
     </Container>
   );
 };

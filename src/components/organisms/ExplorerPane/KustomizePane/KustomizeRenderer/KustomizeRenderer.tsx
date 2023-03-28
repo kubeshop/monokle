@@ -53,10 +53,14 @@ const KustomizeRenderer: React.FC<IProps> = props => {
       isHighlighted={isHighlighted}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => dispatch(selectResource({resourceIdentifier: identifier}))}
+      onClick={() => {
+        if (!isDisabled) {
+          dispatch(selectResource({resourceIdentifier: identifier}));
+        }
+      }}
     >
       <S.PrefixContainer>
-        <KustomizePrefix resourceMeta={resourceMeta} isSelected={isSelected} />
+        <KustomizePrefix resourceMeta={resourceMeta} isSelected={isSelected} isDisabled={isDisabled} />
       </S.PrefixContainer>
 
       <S.ItemName isDisabled={isDisabled} isSelected={isSelected} isHighlighted={isHighlighted}>
@@ -64,7 +68,7 @@ const KustomizeRenderer: React.FC<IProps> = props => {
       </S.ItemName>
 
       <S.SuffixContainer>
-        <KustomizeSuffix resourceMeta={resourceMeta} isSelected={isSelected} />
+        <KustomizeSuffix resourceMeta={resourceMeta} isSelected={isSelected} isDisabled={isDisabled} />
       </S.SuffixContainer>
 
       {isHovered && (
