@@ -5,4 +5,15 @@ type KustomizationMenuItem = {
   name: string;
 };
 
-export type {KustomizationMenuItem, KustomizeCommandType};
+type KustomizeNode = {
+  type: 'kustomize';
+  id: string;
+};
+
+type KustomizeHeaderNode = {
+  type: 'kustomize-header';
+  label: string;
+  count: number;
+};
+
+export type {KustomizationMenuItem, KustomizeCommandType, KustomizeHeaderNode, KustomizeNode};
