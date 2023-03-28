@@ -22,6 +22,7 @@ import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRena
 
 import {deleteFileEntry, dispatchDeleteAlert} from '@utils/files';
 import {useRefSelector} from '@utils/hooks';
+import {isResourcePassingFilter} from '@utils/resources';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Colors} from '@shared/styles/colors';
@@ -46,6 +47,7 @@ const KustomizeContextMenu: React.FC<IProps> = props => {
     resource?.origin.filePath ? state.main.fileMap[resource.origin.filePath] : undefined
   );
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
+  const filters = useAppSelector(state => state.main.resourceFilter);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isKustomizationSelected = useAppSelector(state =>
     resource ? isResourceSelected(resource, state.main.selection) : false
@@ -66,6 +68,10 @@ const KustomizeContextMenu: React.FC<IProps> = props => {
   const targetFile = useMemo(
     () => (isRoot ? ROOT_FILE_ENTRY : resource?.origin.filePath.replace(sep, '')),
     [isRoot, resource?.origin.filePath]
+  );
+  const isPassingFilter = useMemo(
+    () => (resource ? isResourcePassingFilter(resource, filters) : false),
+    [filters, resource]
   );
 
   const refreshFolder = useCallback(
@@ -215,6 +221,10 @@ const KustomizeContextMenu: React.FC<IProps> = props => {
       onClickShowFile,
     ]
   );
+
+  if (!isPassingFilter) {
+    return null;
+  }
 
   return (
     <ContextMenu items={menuItems}>

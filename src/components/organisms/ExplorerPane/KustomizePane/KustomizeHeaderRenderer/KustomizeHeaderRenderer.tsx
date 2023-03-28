@@ -3,6 +3,7 @@ import {useCallback, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseKustomizeKinds, expandKustomizeKinds} from '@redux/reducers/ui';
 import {getResourceMetaFromState} from '@redux/selectors/resourceGetters';
+import {isKustomizationPatch} from '@redux/services/kustomize';
 
 import {useSelectorWithRef} from '@utils/hooks';
 
@@ -22,17 +23,33 @@ const KustomizeHeaderRenderer: React.FC<IProps> = props => {
   const dispatch = useAppDispatch();
   const [isCollapsed, isCollapsedRef] = useSelectorWithRef(state => state.ui.collapsedKustomizeKinds.includes(kind));
   const isHighlighted = useAppSelector(state =>
-    state.main.highlights.some(
-      highlight =>
-        highlight.type === 'resource' &&
-        getResourceMetaFromState(state, highlight.resourceIdentifier)?.kind === 'Kustomization'
-    )
+    state.main.highlights.some(highlight => {
+      if (highlight.type !== 'resource') {
+        return false;
+      }
+
+      const resourceMeta = getResourceMetaFromState(state, highlight.resourceIdentifier);
+
+      if (!resourceMeta) {
+        return false;
+      }
+
+      return resourceMeta.kind === kind && (kind !== 'Kustomization' ? isKustomizationPatch(resourceMeta) : true);
+    })
   );
-  const isSelected = useAppSelector(
-    state =>
-      state.main.selection?.type === 'resource' &&
-      getResourceMetaFromState(state, state.main.selection.resourceIdentifier)?.kind === 'Kustomization'
-  );
+  const isSelected = useAppSelector(state => {
+    if (state.main.selection?.type !== 'resource') {
+      return false;
+    }
+
+    const resourceMeta = getResourceMetaFromState(state, state.main.selection.resourceIdentifier);
+
+    if (!resourceMeta) {
+      return false;
+    }
+
+    return resourceMeta.kind === kind && (kind !== 'Kustomization' ? isKustomizationPatch(resourceMeta) : true);
+  });
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 

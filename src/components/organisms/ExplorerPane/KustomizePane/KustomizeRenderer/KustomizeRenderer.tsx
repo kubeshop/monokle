@@ -67,7 +67,7 @@ const KustomizeRenderer: React.FC<IProps> = props => {
         <KustomizeSuffix resourceMeta={resourceMeta} isSelected={isSelected} />
       </S.SuffixContainer>
 
-      {isHovered && !isDisabled && (
+      {isHovered && (
         <div
           style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}
           onClick={e => {

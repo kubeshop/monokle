@@ -18,6 +18,7 @@ import {isKustomizationPreviewed, isResourceSelected} from '@redux/services/reso
 import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 
 import {useRefSelector} from '@utils/hooks';
+import {isResourcePassingFilter} from '@utils/resources';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 import {defineHotkey} from '@shared/utils/hotkey';
@@ -31,11 +32,16 @@ const KustomizeQuickAction: React.FC<IProps> = props => {
   const {id, isSelected} = props;
 
   const dispatch = useAppDispatch();
+  const filters = useAppSelector(state => state.main.resourceFilter);
   const preview = useAppSelector(state => state.main.preview);
   const selectionRef = useRefSelector(state => state.main.selection);
 
   const thisKustomization = useResource({id, storage: 'local'});
 
+  const isPassingFilter = useMemo(
+    () => (thisKustomization ? isResourcePassingFilter(thisKustomization, filters) : false),
+    [filters, thisKustomization]
+  );
   const isThisPreviewed = useMemo(
     () => Boolean(thisKustomization && isKustomizationPreviewed(thisKustomization, preview)),
     [thisKustomization, preview]
@@ -63,6 +69,10 @@ const KustomizeQuickAction: React.FC<IProps> = props => {
   useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {
     reloadPreview();
   });
+
+  if (!isPassingFilter) {
+    return null;
+  }
 
   return (
     <Container>
