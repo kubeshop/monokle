@@ -41,7 +41,13 @@ const ImageOutgoingResourcesPopover: React.FC<IProps> = ({resourcesIds}) => {
     }, {});
   }, [activeResourceMetaMap, resourcesIds]);
 
-  const handleOnResourceClick = (resource: ResourceMeta, ref: ResourceRef) => {
+  const handleOnResourceClick = (
+    e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+    resource: ResourceMeta,
+    ref: ResourceRef
+  ) => {
+    e.stopPropagation();
+
     if (!isResourceSelected(resource, selection)) {
       dispatch(selectResource({resourceIdentifier: resource}));
     }
@@ -64,7 +70,7 @@ const ImageOutgoingResourcesPopover: React.FC<IProps> = ({resourcesIds}) => {
         return resourceRefs.map(ref => (
           <S.RefContainer key={`${resourceId}-${ref.name}-${ref.position?.line}-${ref.position?.column}`}>
             <S.RefLinkContainer>
-              <S.ResourceNameLabel onClick={() => handleOnResourceClick(resourceMeta, ref)}>
+              <S.ResourceNameLabel onClick={e => handleOnResourceClick(e, resourceMeta, ref)}>
                 {resourceMeta.name}
               </S.ResourceNameLabel>
 

@@ -3,8 +3,13 @@ import {useCallback, useMemo} from 'react';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectImage, selectResource} from '@redux/reducers/main';
 import {setExplorerSelectedSection} from '@redux/reducers/ui';
-import {activeResourceStorageSelector, useResourceMap} from '@redux/selectors/resourceMapSelectors';
+import {
+  activeResourceStorageSelector,
+  useActiveResourceContentMap,
+  useActiveResourceMetaMap,
+} from '@redux/selectors/resourceMapSelectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
+import {joinK8sResourceMap} from '@redux/services/resource';
 import {problemsByResourceSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
 import {ResourceGraph} from '@monokle/components';
@@ -15,7 +20,13 @@ const ResourceGraphTab: React.FC = () => {
   const activeStorage = useAppSelector(activeResourceStorageSelector);
   const selectedResource = useSelectedResource();
   const resources = useMemo(() => (selectedResource ? [selectedResource] : []), [selectedResource]);
-  const resourceMap = useResourceMap(activeStorage);
+  const activeResoureMetaMap = useActiveResourceMetaMap();
+  const activeResoureContentMap = useActiveResourceContentMap();
+  // TODO: computing this is expensive, but the Graph is from core and it needs the resource map...
+  const resourceMap = useMemo(
+    () => joinK8sResourceMap(activeResoureMetaMap, activeResoureContentMap),
+    [activeResoureMetaMap, activeResoureContentMap]
+  );
   const validationState = useValidationSelector(state => state);
 
   const getProblemsForResource = useCallback(
