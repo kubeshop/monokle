@@ -1,3 +1,5 @@
+import {ResourceIdentifier} from './k8sResource';
+
 type KustomizeCommandType = 'kubectl' | 'kustomize';
 
 type KustomizationMenuItem = {
@@ -5,15 +7,20 @@ type KustomizationMenuItem = {
   name: string;
 };
 
-type KustomizeNode = {
-  type: 'kustomize';
-  id: string;
+type KustomizeResourceNode = {
+  type: 'kustomize-resource';
+  identifier: ResourceIdentifier;
 };
 
-type KustomizeHeaderNode = {
-  type: 'kustomize-header';
-  label: string;
+type KustomizeNode = {
+  type: 'kustomize';
+  identifier: ResourceIdentifier;
+};
+
+type KustomizeKindNode = {
+  type: 'kustomize-kind';
+  name: string;
   count: number;
 };
 
-export type {KustomizationMenuItem, KustomizeCommandType, KustomizeHeaderNode, KustomizeNode};
+export type {KustomizationMenuItem, KustomizeCommandType, KustomizeKindNode, KustomizeNode, KustomizeResourceNode};

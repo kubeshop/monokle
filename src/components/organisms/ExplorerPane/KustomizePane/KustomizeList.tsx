@@ -10,6 +10,7 @@ import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import KustomizeHeaderRenderer from './KustomizeHeaderRenderer';
+import KustomizeRenderer from './KustomizeRenderer';
 
 const ROW_HEIGHT = 26;
 
@@ -52,7 +53,11 @@ const KustomizeList: React.FC = () => {
                 transform: `translateY(${virtualItem.start}px)`,
               }}
             >
-              {node.type === 'kustomize-header' ? <KustomizeHeaderRenderer node={node} /> : null}
+              {node.type === 'kustomize-kind' ? (
+                <KustomizeHeaderRenderer node={node} />
+              ) : node.type === 'kustomize' ? (
+                <KustomizeRenderer identifier={node.identifier} />
+              ) : null}
             </VirtualItem>
           );
         })}

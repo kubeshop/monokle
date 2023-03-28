@@ -4,17 +4,17 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleKustomizationsCollapse} from '@redux/reducers/ui';
 import {getResourceMetaFromState} from '@redux/selectors/resourceGetters';
 
-import {KustomizeHeaderNode} from '@shared/models/kustomize';
+import {KustomizeKindNode} from '@shared/models/kustomize';
 
 import * as S from './KustomizeHeaderRenderer.styled';
 
 type IProps = {
-  node: KustomizeHeaderNode;
+  node: KustomizeKindNode;
 };
 
 const KustomizeHeaderRenderer: React.FC<IProps> = props => {
   const {
-    node: {count, label},
+    node: {count, name},
   } = props;
 
   const dispatch = useAppDispatch();
@@ -45,7 +45,7 @@ const KustomizeHeaderRenderer: React.FC<IProps> = props => {
     >
       <S.NameContainer isHovered={isHovered} onClick={() => dispatch(toggleKustomizationsCollapse())}>
         <S.Name $isSelected={Boolean(isSelected && isCollapsed)} $isHighlighted={Boolean(isHighlighted && isCollapsed)}>
-          {label}
+          {name}
         </S.Name>
 
         <S.KustomizationsCounter selected={Boolean(isSelected && isCollapsed)}>{count}</S.KustomizationsCounter>

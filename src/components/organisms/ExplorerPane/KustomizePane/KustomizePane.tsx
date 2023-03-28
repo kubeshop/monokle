@@ -37,6 +37,7 @@ const KustomizePane: React.FC<InjectedPanelProps> = props => {
       key={panelKey as CollapsePanelProps['key']}
     >
       <KustomizeList />
+
       {/* <SectionBlueprintList id="kustomize-sections-container" $width={width}>
         <SectionRenderer sectionId={KustomizationSectionBlueprint.id} level={0} isLastSection={false} />
         <SectionRenderer sectionId={KustomizePatchSectionBlueprint.id} level={0} isLastSection={false} />
