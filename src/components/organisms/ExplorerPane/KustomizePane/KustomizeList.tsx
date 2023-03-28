@@ -1,5 +1,7 @@
 import {useRef} from 'react';
 
+import {Skeleton} from 'antd';
+
 import {size} from 'lodash';
 import styled from 'styled-components';
 
@@ -13,11 +15,18 @@ import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import KustomizeHeaderRenderer from './KustomizeHeaderRenderer';
 import KustomizeRenderer from './KustomizeRenderer';
+import {useScroll} from './useScroll';
 
 const ROW_HEIGHT = 26;
 
 const KustomizeList: React.FC = () => {
   const list = useAppSelector(kustomizeListSelector);
+  const isLoading = useAppSelector(state =>
+    Boolean(state.main.previewOptions.isLoading) && state.main.preview?.type !== 'kustomize'
+      ? true
+      : state.ui.isFolderLoading
+  );
+
   const ref = useRef<HTMLUListElement>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -26,6 +35,23 @@ const KustomizeList: React.FC = () => {
     getScrollElement: () => ref.current,
     scrollToFn: elementScroll,
   });
+
+  useScroll({
+    list,
+    scrollTo: index =>
+      rowVirtualizer.scrollToIndex(index, {
+        align: 'center',
+        behavior: 'smooth',
+      }),
+  });
+
+  if (isLoading) {
+    return (
+      <div style={{padding: '16px'}}>
+        <Skeleton active />
+      </div>
+    );
+  }
 
   if (!size(list)) {
     return <EmptyText>No Kustomizations found in the current project.</EmptyText>;

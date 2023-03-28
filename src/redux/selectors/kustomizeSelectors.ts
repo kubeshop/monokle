@@ -3,7 +3,7 @@ import {createSelector} from 'reselect';
 
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
-import {KustomizeKindNode, KustomizeNode, KustomizeResourceNode} from '@shared/models/kustomize';
+import {KustomizeListNode} from '@shared/models/kustomize';
 import {RootState} from '@shared/models/rootState';
 
 import {getResourceMetaMapFromState} from './resourceMapGetters';
@@ -17,7 +17,7 @@ const kindNameRenderer = (kind: string) => {
 export const kustomizeListSelector = createSelector(
   [(state: RootState) => getResourceMetaMapFromState(state, 'local')],
   localResourceMetaMap => {
-    const list: (KustomizeKindNode | KustomizeNode | KustomizeResourceNode)[] = [];
+    const list: KustomizeListNode[] = [];
 
     const resources = Object.values(localResourceMetaMap).filter(
       resource => isKustomizationResource(resource) || isKustomizationPatch(resource)

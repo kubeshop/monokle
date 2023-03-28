@@ -23,4 +23,13 @@ type KustomizeKindNode = {
   count: number;
 };
 
-export type {KustomizationMenuItem, KustomizeCommandType, KustomizeKindNode, KustomizeNode, KustomizeResourceNode};
+type KustomizeListNode = KustomizeKindNode | KustomizeNode | KustomizeResourceNode;
+
+export type {
+  KustomizationMenuItem,
+  KustomizeCommandType,
+  KustomizeListNode,
+  KustomizeKindNode,
+  KustomizeNode,
+  KustomizeResourceNode,
+};
