@@ -238,9 +238,19 @@ export const uiSlice = createSlice({
 
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
     },
-    toggleKustomizationsCollapse: (state: Draft<UiState>) => {
-      state.isKustomizationsCollapsed = !state.isKustomizationsCollapsed;
+    collapseKustomizeKinds: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      const kindsToCollapse = action.payload.filter(s => !state.collapsedKustomizeKinds.includes(s));
+      if (kindsToCollapse.length > 0) {
+        state.collapsedKustomizeKinds.push(...kindsToCollapse);
+      }
     },
+    expandKustomizeKinds: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      const kindsToExpand = action.payload.filter(s => state.collapsedKustomizeKinds.includes(s));
+      if (kindsToExpand.length > 0) {
+        state.collapsedKustomizeKinds = state.collapsedKustomizeKinds.filter(n => !kindsToExpand.includes(n));
+      }
+    },
+
     collapseResourceKinds: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       const kindsToCollapse = action.payload.filter(s => !state.navigator.collapsedResourceKinds.includes(s));
       if (kindsToCollapse.length > 0) {
@@ -415,7 +425,9 @@ export const {
   closeSaveResourcesToFileFolderModal,
   closeTemplateExplorer,
   closeWelcomePopup,
+  collapseKustomizeKinds,
   collapseResourceKinds,
+  expandKustomizeKinds,
   expandResourceKinds,
   highlightItem,
   openAboutModal,
@@ -457,7 +469,6 @@ export const {
   setTemplateProjectCreate,
   toggleExpandActionsPaneFooter,
   toggleLeftMenu,
-  toggleKustomizationsCollapse,
   toggleNotifications,
   toggleResourceFilters,
   toggleRightMenu,

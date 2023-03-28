@@ -1,8 +1,10 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {toggleKustomizationsCollapse} from '@redux/reducers/ui';
+import {collapseKustomizeKinds, expandKustomizeKinds} from '@redux/reducers/ui';
 import {getResourceMetaFromState} from '@redux/selectors/resourceGetters';
+
+import {useSelectorWithRef} from '@utils/hooks';
 
 import {KustomizeKindNode} from '@shared/models/kustomize';
 
@@ -14,11 +16,11 @@ type IProps = {
 
 const KustomizeHeaderRenderer: React.FC<IProps> = props => {
   const {
-    node: {count, name},
+    node: {count, label, kind},
   } = props;
 
   const dispatch = useAppDispatch();
-  const isCollapsed = useAppSelector(state => state.ui.isKustomizationsCollapsed);
+  const [isCollapsed, isCollapsedRef] = useSelectorWithRef(state => state.ui.collapsedKustomizeKinds.includes(kind));
   const isHighlighted = useAppSelector(state =>
     state.main.highlights.some(
       highlight =>
@@ -34,6 +36,14 @@ const KustomizeHeaderRenderer: React.FC<IProps> = props => {
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
+  const toggleCollapse = useCallback(() => {
+    if (isCollapsedRef.current) {
+      dispatch(expandKustomizeKinds([kind]));
+    } else {
+      dispatch(collapseKustomizeKinds([kind]));
+    }
+  }, [kind, isCollapsedRef, dispatch]);
+
   return (
     <S.SectionContainer
       isHovered={isHovered}
@@ -43,9 +53,9 @@ const KustomizeHeaderRenderer: React.FC<IProps> = props => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <S.NameContainer isHovered={isHovered} onClick={() => dispatch(toggleKustomizationsCollapse())}>
+      <S.NameContainer isHovered={isHovered} onClick={toggleCollapse}>
         <S.Name $isSelected={Boolean(isSelected && isCollapsed)} $isHighlighted={Boolean(isHighlighted && isCollapsed)}>
-          {name}
+          {label}
         </S.Name>
 
         <S.KustomizationsCounter selected={Boolean(isSelected && isCollapsed)}>{count}</S.KustomizationsCounter>

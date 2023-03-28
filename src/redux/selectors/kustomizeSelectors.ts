@@ -15,8 +15,11 @@ const kindNameRenderer = (kind: string) => {
 };
 
 export const kustomizeListSelector = createSelector(
-  [(state: RootState) => getResourceMetaMapFromState(state, 'local')],
-  localResourceMetaMap => {
+  [
+    (state: RootState) => getResourceMetaMapFromState(state, 'local'),
+    (state: RootState) => state.ui.collapsedKustomizeKinds,
+  ],
+  (localResourceMetaMap, collapsedKustomizeKinds) => {
     const list: KustomizeListNode[] = [];
 
     const resources = Object.values(localResourceMetaMap).filter(
@@ -27,7 +30,13 @@ export const kustomizeListSelector = createSelector(
     const entries = Object.entries(groups);
 
     for (const [kind, kindResources] of entries) {
-      list.push({type: 'kustomize-kind', name: kindNameRenderer(kind), count: size(kindResources)});
+      const collapsed = collapsedKustomizeKinds.indexOf(kind) !== -1;
+
+      list.push({type: 'kustomize-kind', kind, label: kindNameRenderer(kind), count: size(kindResources)});
+
+      if (collapsed) {
+        continue;
+      }
 
       for (const resource of kindResources) {
         list.push({

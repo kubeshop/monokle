@@ -19,7 +19,8 @@ type KustomizeNode = {
 
 type KustomizeKindNode = {
   type: 'kustomize-kind';
-  name: string;
+  kind: string;
+  label: string;
   count: number;
 };
 
