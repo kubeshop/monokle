@@ -14,7 +14,7 @@ import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarCon
 import KustomizeList from './KustomizeList';
 
 const KustomizePane: React.FC<InjectedPanelProps> = props => {
-  const {isActive, panelKey, width} = props;
+  const {isActive, panelKey} = props;
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kustomizationsResources = useAppSelector(kustomizationResourcesSelectors);
@@ -37,11 +37,6 @@ const KustomizePane: React.FC<InjectedPanelProps> = props => {
       key={panelKey as CollapsePanelProps['key']}
     >
       <KustomizeList />
-
-      {/* <SectionBlueprintList id="kustomize-sections-container" $width={width}>
-        <SectionRenderer sectionId={KustomizationSectionBlueprint.id} level={0} isLastSection={false} />
-        <SectionRenderer sectionId={KustomizePatchSectionBlueprint.id} level={0} isLastSection={false} />
-      </SectionBlueprintList> */}
     </AccordionPanel>
   );
 };

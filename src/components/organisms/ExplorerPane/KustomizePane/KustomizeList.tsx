@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import {useAppSelector} from '@redux/hooks';
 import {kustomizeListSelector} from '@redux/selectors/kustomizeSelectors';
 
+import ResourceRenderer from '@components/organisms/NavigatorPane/ResourceRenderer';
+
 import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
@@ -57,6 +59,8 @@ const KustomizeList: React.FC = () => {
                 <KustomizeHeaderRenderer node={node} />
               ) : node.type === 'kustomize' ? (
                 <KustomizeRenderer identifier={node.identifier} />
+              ) : node.type === 'kustomize-resource' ? (
+                <ResourceRenderer resourceIdentifier={node.identifier} disableContextMenu />
               ) : null}
             </VirtualItem>
           );
@@ -78,7 +82,7 @@ const EmptyText = styled.div`
 const ListContainer = styled.ul`
   height: 100%;
   overflow-y: auto;
-  padding: 10px 0 12px;
+  padding: 10px 0 0px;
 `;
 
 const VirtualItem = styled.div`
