@@ -17,10 +17,11 @@ import ResourceSuffix from './ResourceSuffix';
 
 export type ResourceRendererProps = {
   resourceIdentifier: ResourceIdentifier;
+  disableContextMenu?: boolean;
 };
 
 function ResourceRenderer(props: ResourceRendererProps) {
-  const {resourceIdentifier: propsResourceIdentifier} = props;
+  const {disableContextMenu = false, resourceIdentifier: propsResourceIdentifier} = props;
   const dispatch = useAppDispatch();
 
   const transientResourceIdentifier: ResourceIdentifier = {id: propsResourceIdentifier.id, storage: 'transient'};
@@ -85,7 +86,7 @@ function ResourceRenderer(props: ResourceRendererProps) {
 
       <S.BlankSpace onClick={onClick} />
 
-      {isHovered && (
+      {isHovered && !disableContextMenu && (
         <S.ContextMenuContainer>
           <ResourceContextMenu resourceMeta={resourceMeta} isSelected={isSelected} />
         </S.ContextMenuContainer>

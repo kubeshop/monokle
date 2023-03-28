@@ -6,7 +6,7 @@ import {useAppDispatch} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {activeResourceStorageSelector, useActiveResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
-import {useResourceMeta, useSelectedResourceRef} from '@redux/selectors/resourceSelectors';
+import {useSelectedResourceRef} from '@redux/selectors/resourceSelectors';
 
 import {ResourceRefsIconPopover} from '@molecules';
 
@@ -16,21 +16,25 @@ import {useRefSelector} from '@utils/hooks';
 
 import {ValidationPopover} from '@monokle/components';
 import {ValidationResult, getResourceId, getResourceLocation} from '@monokle/validation';
-import {ItemCustomComponentProps} from '@shared/models/navigator';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {MonacoRange} from '@shared/models/ui';
 import {trackEvent} from '@shared/utils/telemetry';
 
-const Prefix = (props: ItemCustomComponentProps) => {
-  const {itemInstance} = props;
+type IProps = {
+  isDisabled: boolean;
+  isSelected: boolean;
+  resourceMeta: ResourceMeta;
+};
+
+const KustomizePrefix: React.FC<IProps> = props => {
+  const {isDisabled, isSelected, resourceMeta} = props;
 
   const dispatch = useAppDispatch();
   const activeResourceMetaMapRef = useActiveResourceMetaMapRef();
   const activeResourceStorageRef = useRefSelector(activeResourceStorageSelector);
   const selectedResourceRef = useSelectedResourceRef();
 
-  const resourceMeta = useResourceMeta({id: itemInstance.id, storage: itemInstance.meta?.resourceStorage});
-
-  const {level, errors, warnings} = useValidationLevel(itemInstance.id);
+  const {level, errors, warnings} = useValidationLevel(resourceMeta.id);
 
   const onMessageClickHandler = useCallback(
     (result: ValidationResult) => {
@@ -67,7 +71,7 @@ const Prefix = (props: ItemCustomComponentProps) => {
   return (
     <Container>
       <ValidationPopover
-        disabled={itemInstance.isDisabled}
+        disabled={isDisabled}
         level={level}
         results={[...errors, ...warnings]}
         onMessageClickHandler={onMessageClickHandler}
@@ -75,8 +79,8 @@ const Prefix = (props: ItemCustomComponentProps) => {
       />
 
       <ResourceRefsIconPopover
-        isSelected={itemInstance.isSelected}
-        isDisabled={itemInstance.isDisabled}
+        isSelected={isSelected}
+        isDisabled={isDisabled}
         resourceMeta={resourceMeta}
         type="incoming"
       />
@@ -84,7 +88,7 @@ const Prefix = (props: ItemCustomComponentProps) => {
   );
 };
 
-export default Prefix;
+export default KustomizePrefix;
 
 // Styled Components
 

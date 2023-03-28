@@ -1,6 +1,8 @@
 import {useCallback, useMemo} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
+import styled from 'styled-components';
+
 import {
   ExitKustomizationPreviewTooltip,
   KustomizationPreviewTooltip,
@@ -15,52 +17,54 @@ import {isKustomizationPreviewed, isResourceSelected} from '@redux/services/reso
 
 import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 
+import {useRefSelector} from '@utils/hooks';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {hotkeys} from '@shared/constants/hotkeys';
-import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {defineHotkey} from '@shared/utils/hotkey';
 
-import * as S from './KustomizationQuickAction.styled';
+type IProps = {
+  id: string;
+  isSelected: boolean;
+};
 
-const QuickAction = (props: ItemCustomComponentProps) => {
-  const {itemInstance} = props;
+const KustomizeQuickAction: React.FC<IProps> = props => {
+  const {id, isSelected} = props;
+
   const dispatch = useAppDispatch();
   const filters = useAppSelector(state => state.main.resourceFilter);
-
-  const selection = useAppSelector(state => state.main.selection);
   const preview = useAppSelector(state => state.main.preview);
+  const selectionRef = useRefSelector(state => state.main.selection);
 
-  const thisKustomization = useResource({id: itemInstance.id, storage: 'local'});
-
-  const isThisPreviewed = useMemo(
-    () => Boolean(thisKustomization && isKustomizationPreviewed(thisKustomization, preview)),
-    [thisKustomization, preview]
-  );
+  const thisKustomization = useResource({id, storage: 'local'});
 
   const isPassingFilter = useMemo(
     () => (thisKustomization ? isResourcePassingFilter(thisKustomization, filters) : false),
     [filters, thisKustomization]
   );
+  const isThisPreviewed = useMemo(
+    () => Boolean(thisKustomization && isKustomizationPreviewed(thisKustomization, preview)),
+    [thisKustomization, preview]
+  );
 
   const selectAndPreviewKustomization = useCallback(() => {
-    if (thisKustomization && !isResourceSelected(thisKustomization, selection)) {
+    if (thisKustomization && !isResourceSelected(thisKustomization, selectionRef.current)) {
       dispatch(selectResource({resourceIdentifier: {id: thisKustomization.id, storage: 'local'}}));
     }
     if (!isThisPreviewed) {
-      startPreview({type: 'kustomize', kustomizationId: itemInstance.id}, dispatch);
+      startPreview({type: 'kustomize', kustomizationId: id}, dispatch);
     } else {
       stopPreview(dispatch);
     }
-  }, [itemInstance, isThisPreviewed, thisKustomization, selection, dispatch]);
+  }, [thisKustomization, selectionRef, isThisPreviewed, dispatch, id]);
 
   const reloadPreview = useCallback(() => {
-    if (thisKustomization && isResourceSelected(thisKustomization, selection)) {
+    if (thisKustomization && isResourceSelected(thisKustomization, selectionRef.current)) {
       dispatch(selectResource({resourceIdentifier: {id: thisKustomization.id, storage: 'local'}}));
     }
 
-    restartPreview({type: 'kustomize', kustomizationId: itemInstance.id}, dispatch);
-  }, [itemInstance, selection, thisKustomization, dispatch]);
+    restartPreview({type: 'kustomize', kustomizationId: id}, dispatch);
+  }, [thisKustomization, selectionRef, id, dispatch]);
 
   useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {
     reloadPreview();
@@ -71,11 +75,11 @@ const QuickAction = (props: ItemCustomComponentProps) => {
   }
 
   return (
-    <S.Container>
+    <Container>
       {preview?.type === 'kustomize' && !isThisPreviewed && (
         <QuickActionCompare
           from="quick-kustomize-compare"
-          isItemSelected={itemInstance.isSelected}
+          isItemSelected={isSelected}
           view={{
             leftSet: {
               type: 'kustomize',
@@ -83,14 +87,14 @@ const QuickAction = (props: ItemCustomComponentProps) => {
             },
             rightSet: {
               type: 'kustomize',
-              kustomizationId: itemInstance.id,
+              kustomizationId: id,
             },
           }}
         />
       )}
 
       <QuickActionPreview
-        isItemSelected={itemInstance.isSelected}
+        isItemSelected={isSelected}
         isItemBeingPreviewed={isThisPreviewed}
         previewTooltip={KustomizationPreviewTooltip}
         reloadPreviewTooltip={ReloadKustomizationPreviewTooltip}
@@ -98,8 +102,15 @@ const QuickAction = (props: ItemCustomComponentProps) => {
         selectAndPreview={selectAndPreviewKustomization}
         reloadPreview={reloadPreview}
       />
-    </S.Container>
+    </Container>
   );
 };
 
-export default QuickAction;
+export default KustomizeQuickAction;
+
+// Styled Components
+
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+`;
