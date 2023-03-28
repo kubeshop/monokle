@@ -84,9 +84,9 @@ const store = configureStore({
       immutableCheck: false,
     })
       .prepend(listenerMiddleware.middleware)
+      .concat(k8sApi.middleware)
       .concat(middlewares)
-      .concat(sectionBlueprintMiddleware)
-      .concat(k8sApi.middleware),
+      .concat(sectionBlueprintMiddleware),
 });
 
 export default store;

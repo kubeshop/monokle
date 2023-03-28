@@ -1,5 +1,6 @@
 import {UtilityProcess, app, utilityProcess} from 'electron';
 
+import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
 import log from 'loglevel';
 import path from 'path';
 import {AnyAction} from 'redux';
@@ -10,19 +11,70 @@ import {getKubeAccess} from '@shared/utils/kubeclient';
 
 import {dispatchToAllWindows} from './ipc/ipcMainRedux';
 
-let kubeServiceProcess: UtilityProcess | null = null;
+const PROXY_PORT_REGEX = /127.0.0.1:[0-9]+/;
 
-export const startKubeConfigService = () => {
+let kubeServiceProcess: UtilityProcess | null = null;
+let proxyPort: number | null = null;
+let kubectlProxyProcess: ChildProcessWithoutNullStreams | null = null;
+
+electronStore.onDidChange('appConfig.kubeConfig', () => {
   if (kubeServiceProcess) {
-    kubeServiceProcess.kill();
+    startKubeConfigService();
+  }
+});
+
+const initProxy = (kubeConfigPath: string) => {
+  return new Promise((resolve, reject) => {
+    try {
+      kubectlProxyProcess = spawn('kubectl', ['proxy', '--port=0'], {
+        env: {
+          ...process.env,
+          KUBECONFIG: kubeConfigPath,
+        },
+        shell: true,
+        windowsHide: true,
+      });
+
+      kubectlProxyProcess.on('exit', (code, signal) => {
+        reject();
+      });
+
+      kubectlProxyProcess.stdout.on('data', data => {
+        const proxyPortMatches = PROXY_PORT_REGEX.exec(data);
+        const proxyPortString = proxyPortMatches?.[0]?.split(':')[1];
+        proxyPort = proxyPortString ? parseInt(proxyPortString, 10) : null;
+        resolve(proxyPort);
+      });
+
+      kubectlProxyProcess.stderr.on('data', data => {
+        reject();
+      });
+    } catch (e: any) {
+      reject();
+    }
+  });
+};
+
+export const startKubeConfigService = async () => {
+  await initProxy(electronStore.get('appConfig.kubeConfig'));
+
+  if (proxyPort === null) {
+    return;
   }
 
-  kubeServiceProcess = utilityProcess.fork(path.normalize(`${__dirname}/KubeConfigService.js`), [
-    electronStore.get('appConfig.kubeConfig') || '',
-    process.env.KUBECONFIG || '',
-    electronStore.get('appConfig.kubeconfig') || '',
-    path.join(app.getPath('home'), `${path.sep}.kube${path.sep}config`),
-  ]);
+  kubeServiceProcess = utilityProcess.fork(
+    path.normalize(`${__dirname}/KubeConfigService.js`),
+    [
+      electronStore.get('appConfig.kubeConfig') || '',
+      process.env.KUBECONFIG || '',
+      path.join(app.getPath('home'), `${path.sep}.kube${path.sep}config`),
+    ],
+    {
+      env: {
+        KUBECONFIG_PROXY_PORT: String(proxyPort),
+      },
+    }
+  );
 
   kubeServiceProcess.on('message', handleKubeServiceMessage);
 
@@ -37,7 +89,7 @@ export const startKubeConfigService = () => {
 
 export const stopKubeConfigService = () => {
   if (kubeServiceProcess) {
-    kubeServiceProcess.kill();
+    killKubeConfigProcess();
   }
 };
 
@@ -48,7 +100,7 @@ const handleKubeServiceMessage = (message: AnyAction) => {
   }
 
   if (message.event && message.event === 'watch/ObjectAdded') {
-    getKubeAccess(message.objectName, message.context)
+    getKubeAccess(message.objectName, message.context, message.kubeConfigPath)
       .then(clusterAccess => {
         dispatchToAllWindows({type: 'config/setKubeConfig', payload: message.payload});
         dispatchToAllWindows({type: 'config/setAccessLoading', payload: true});
@@ -66,5 +118,30 @@ const handleKubeServiceMessage = (message: AnyAction) => {
         });
         dispatchToAllWindows({type: 'config/setAccessLoading', payload: false});
       });
+  }
+
+  if (message.event && message.event === 'watch/KubeConfigChanged') {
+    killKubeConfigProcess();
+    startKubeConfigService();
+  }
+};
+
+const killKubeConfigProcess = () => {
+  if (kubeServiceProcess?.pid) {
+    if (process.platform === 'win32') {
+      spawn('taskkill', ['/pid', kubeServiceProcess.pid.toString(), '/f', '/t']);
+    } else {
+      kubeServiceProcess.kill();
+    }
+    kubeServiceProcess = null;
+  }
+
+  if (kubectlProxyProcess?.pid) {
+    if (process.platform === 'win32') {
+      spawn('taskkill', ['/pid', kubectlProxyProcess.pid.toString(), '/f', '/t']);
+    } else {
+      kubectlProxyProcess.kill();
+    }
+    kubectlProxyProcess = null;
   }
 };

@@ -3,6 +3,7 @@ import * as k8s from '@kubernetes/client-node';
 import {FSWatcher, watch} from 'chokidar';
 import fs from 'fs';
 import log from 'loglevel';
+import fetch from 'node-fetch';
 import path from 'path';
 
 const kubeConfigList: {[key: string]: {watcher: any; req: any}} = {};
@@ -19,12 +20,7 @@ function getKubeConfPath() {
     return envKubeconfigParts[0];
   }
 
-  kubeConfigPath = process.argv[4]; // kubeconig from settings
-  if (kubeConfigPath) {
-    return kubeConfigPath;
-  }
-
-  kubeConfigPath = process.argv[5]; // kubeconig from
+  kubeConfigPath = process.argv[4]; // kubeconig from .kube
   return kubeConfigPath;
 }
 
@@ -55,17 +51,8 @@ function loadKubeConf() {
     return;
   }
 
-  kubeConfigPath = process.argv[4]; // kubeconig from settings
-  if (kubeConfigPath) {
-    const data = getKubeConfigContext(kubeConfigPath);
-
-    process.parentPort.postMessage({type: 'config/setKubeConfig', payload: data});
-    return;
-  }
-
-  kubeConfigPath = process.argv[5]; // kubeconig from
+  kubeConfigPath = process.argv[4]; // kubeconig from .kube
   const data = getKubeConfigContext(kubeConfigPath);
-
   process.parentPort.postMessage({type: 'config/setKubeConfig', payload: data});
 }
 
@@ -112,6 +99,7 @@ function watchNamespace(context: string) {
             context,
             event: 'watch/ObjectAdded',
             payload: getKubeConfigContext(kubeConfigPath),
+            kubeConfigPath,
           });
         } else if (type === 'DELETED') {
           process.parentPort.postMessage({type: 'config/setAccessLoading', payload: true});
@@ -152,6 +140,7 @@ function runNamespaceWatcher() {
 }
 
 let watcher: FSWatcher;
+let abortSignal: AbortController;
 
 async function monitorKubeConfig() {
   const filePath = getKubeConfPath();
@@ -178,11 +167,19 @@ async function monitorKubeConfig() {
         if (type === 'unlink') {
           watcher.close();
           process.parentPort.postMessage({type: 'config/setKubeConfig', payload: {path: filePath}});
-          runNamespaceWatcher();
+          if (abortSignal) {
+            abortSignal.abort();
+          }
+          watchCurrentContext();
           return;
         }
+        process.parentPort.postMessage({event: 'watch/KubeConfigChanged'});
         process.parentPort.postMessage({type: 'config/setKubeConfig', payload: {path: filePath}});
-        runNamespaceWatcher();
+
+        if (abortSignal) {
+          abortSignal.abort();
+        }
+        watchCurrentContext();
       });
     }
   } catch (e: any) {
@@ -190,8 +187,73 @@ async function monitorKubeConfig() {
   }
 }
 
+async function loadCurrentContextNamespaces() {
+  abortSignal = new AbortController();
+  const kubeConfigPath = getKubeConfPath();
+  const kubeConfigData = getKubeConfigContext(kubeConfigPath);
+  const proxyPort = process.env.KUBECONFIG_PROXY_PORT;
+  const baseURL = `http://localhost:${proxyPort}`;
+
+  const response = await fetch(`${baseURL}/api/v1/namespaces`, {
+    signal: abortSignal.signal as any,
+  });
+  const json = await response.json();
+  json.items.forEach((apiObj: any) => {
+    process.parentPort.postMessage({
+      objectName: apiObj.metadata.name,
+      context: kubeConfigData.currentContext,
+      event: 'watch/ObjectAdded',
+      payload: getKubeConfigContext(kubeConfigPath),
+    });
+  });
+}
+
+async function watchCurrentContext() {
+  abortSignal = new AbortController();
+  const kubeConfigPath = getKubeConfPath();
+  const kubeConfigData = getKubeConfigContext(kubeConfigPath);
+  const proxyPort = process.env.KUBECONFIG_PROXY_PORT;
+  const baseURL = `http://localhost:${proxyPort}`;
+
+  const response = await fetch(`${baseURL}/api/v1/namespaces?watch=true`, {
+    signal: abortSignal.signal as any,
+  });
+
+  response.body.on('data', (chunk: any) => {
+    try {
+      const {type, object: apiObj} = JSON.parse(chunk);
+      if (type === 'ADDED') {
+        process.parentPort.postMessage({
+          objectName: apiObj.metadata.name,
+          context: kubeConfigData.currentContext,
+          event: 'watch/ObjectAdded',
+          payload: getKubeConfigContext(kubeConfigPath),
+        });
+      } else if (type === 'DELETED') {
+        process.parentPort.postMessage({type: 'config/setAccessLoading', payload: true});
+        process.parentPort.postMessage({
+          type: 'config/removeNamespaceFromContext',
+          payload: {namespace: apiObj.metadata.name, context: kubeConfigData.currentContext},
+        });
+      }
+    } catch (e: any) {
+      log.error('watchCurrentContext', e.message);
+    }
+  });
+
+  response.body.on('error', (err: any) => {
+    abortSignal.abort();
+    watchCurrentContext();
+  });
+
+  response.body.on('end', () => {
+    watchCurrentContext();
+  });
+}
+
 function main() {
   loadKubeConf();
+  loadCurrentContextNamespaces();
   monitorKubeConfig();
 }
 

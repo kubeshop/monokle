@@ -19,6 +19,7 @@ import {
   UPDATE_EXTENSIONS,
   UPDATE_EXTENSIONS_RESULT,
 } from '@shared/constants/ipcEvents';
+import {ClusterProxyOptions} from '@shared/models/cluster';
 import type {CommandOptions} from '@shared/models/commands';
 import {NewVersionCode} from '@shared/models/config';
 import {
@@ -260,8 +261,8 @@ ipcMain.on('run-command', (event, args: CommandOptions) => {
   runCommand(args, event);
 });
 
-ipcMain.on('kubectl-proxy-open', event => {
-  startKubectlProxyProcess(event);
+ipcMain.handle('kubectl-proxy-open', (event, args: ClusterProxyOptions) => {
+  return startKubectlProxyProcess(event, args);
 });
 
 ipcMain.on('kubectl-proxy-close', () => {
@@ -384,7 +385,7 @@ ipcMain.on('pod.terminal.close', () => {
 });
 
 ipcMain.on('pod.terminal.init', (event, args) => {
-  const {podNamespace, podName, containerName, webContentsId} = args;
+  const {previewKubeConfigPath, podNamespace, podName, containerName, webContentsId} = args;
   if (!webContentsId) {
     return;
   }
@@ -400,7 +401,7 @@ ipcMain.on('pod.terminal.init', (event, args) => {
   };
 
   const kc = new k8s.KubeConfig();
-  kc.loadFromDefault();
+  kc.loadFromFile(previewKubeConfigPath);
   const exec = new k8s.Exec(kc);
   exec.exec(
     podNamespace,

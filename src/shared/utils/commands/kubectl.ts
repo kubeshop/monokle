@@ -2,6 +2,7 @@ import {ipcRenderer} from 'electron';
 
 import {v4 as uuid} from 'uuid';
 
+import {ClusterProxyOptions} from '@shared/models/cluster';
 import {CommandOptions, KubectlApplyArgs, KubectlEnv} from '@shared/models/commands';
 
 export function createKubectlApplyCommand(
@@ -23,10 +24,13 @@ export function createKubectlApplyCommand(
   };
 }
 
-export function openKubectlProxy(listener: (...args: any[]) => void) {
+export function openKubectlProxy(
+  listener: (...args: any[]) => void,
+  clusterProxyOptions: ClusterProxyOptions
+): Promise<number> {
   ipcRenderer.removeAllListeners('kubectl-proxy-event');
   ipcRenderer.on('kubectl-proxy-event', (event, args) => listener(args));
-  ipcRenderer.send('kubectl-proxy-open');
+  return ipcRenderer.invoke('kubectl-proxy-open', clusterProxyOptions);
 }
 
 export function closeKubectlProxy() {

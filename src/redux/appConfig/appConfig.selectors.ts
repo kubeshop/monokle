@@ -9,7 +9,7 @@ import {RootState} from '@shared/models/rootState';
 import {Colors} from '@shared/styles';
 import {isDefined} from '@shared/utils/filter';
 
-export {activeProjectSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
+export {activeProjectSelector, kubeConfigPathValidSelector, kubeConfigPathSelector} from '@shared/utils/selectors';
 
 export const kubeConfigContextSelector = createSelector(
   [
@@ -63,14 +63,6 @@ export const currentClusterAccessSelector = createSelector(
     }
     return clusterAccess?.filter(ca => ca.context === currentContext) || [];
   }
-);
-
-export const kubeConfigPathSelector = createSelector(
-  [
-    (state: RootState) => state.config.projectConfig?.kubeConfig?.path,
-    (state: RootState) => state.config.kubeConfig.path,
-  ],
-  (projectKubeConfigPath, kubeConfigPath) => projectKubeConfigPath || kubeConfigPath || ''
 );
 
 export const currentConfigSelector = createDeepEqualSelector(

@@ -33,3 +33,11 @@ export const kubeConfigPathValidSelector = createSelector(
     return Boolean(config.kubeConfig.isPathValid);
   }
 );
+
+export const kubeConfigPathSelector = createSelector(
+  [
+    (state: RootState) => state.config.projectConfig?.kubeConfig?.path,
+    (state: RootState) => state.config.kubeConfig.path,
+  ],
+  (projectKubeConfigPath, kubeConfigPath) => projectKubeConfigPath || kubeConfigPath || ''
+);

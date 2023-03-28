@@ -16,14 +16,22 @@ const NamespaceHandler: ResourceKindHandler = {
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
   isCustom: false,
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
-    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    return k8sCoreV1Api.readNamespace(resource.name, 'true');
+  async getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
+    // const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    // const json = await k8sCoreV1Api.readNamespace(resource.name, 'true');
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const dispatch = useAppDispatch();
+    const result = await dispatch(k8sApi.endpoints.getNamespace.initiate({namespace: resource.name})).unwrap();
+    return result;
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
-    const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
-    const response = await k8sCoreV1Api.listNamespace();
-    return response.body.items;
+    // const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    // const response = await k8sCoreV1Api.listNamespace();
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const dispatch = useAppDispatch();
+    const result = await dispatch(k8sApi.endpoints.getNamespaces.initiate({})).unwrap();
+
+    return result.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     // eslint-disable-next-line react-hooks/rules-of-hooks

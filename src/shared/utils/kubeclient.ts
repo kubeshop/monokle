@@ -105,19 +105,25 @@ function parseCanI(stdout: string): {permissions: KubePermissions[]; hasFullAcce
   };
 }
 
-export const getKubeAccess = async (namespace: string, currentContext: string): Promise<ClusterAccess> => {
+export const getKubeAccess = async (
+  namespace: string,
+  currentContext: string,
+  kubeConfigPath: string
+): Promise<ClusterAccess> => {
   let result;
   if (isRendererThread()) {
     result = await runCommandInMainThread({
       commandId: uuid(),
       cmd: 'kubectl',
       args: ['auth', 'can-i', '--list', `--namespace=${namespace}`],
+      env: {KUBECONFIG: kubeConfigPath},
     });
   } else {
     result = await runCommandPromise({
       commandId: uuid(),
       cmd: 'kubectl',
       args: ['auth', 'can-i', '--list', `--namespace=${namespace}`],
+      env: {KUBECONFIG: kubeConfigPath},
     });
   }
 

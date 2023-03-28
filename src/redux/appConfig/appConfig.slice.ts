@@ -113,6 +113,7 @@ export const updateClusterNamespaces = createAsyncThunk(
   'config/updateClusterNamespaces',
   async (values: {namespace: string; cluster: string}[], thunkAPI: any) => {
     thunkAPI.dispatch(configSlice.actions.setAccessLoading(true));
+    const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
 
     let accesses: ClusterAccess[] = thunkAPI.getState().config.clusterAccess;
     const newNamespaces = values.filter(
@@ -124,7 +125,6 @@ export const updateClusterNamespaces = createAsyncThunk(
     accesses = accesses.filter(a => a.context !== values[0].cluster);
 
     newNamespaces.forEach(({namespace, cluster}) => {
-      const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
       const kubeClient = createKubeClient(kubeConfigPath, cluster);
       createNamespace(kubeClient, namespace);
     });
@@ -136,7 +136,7 @@ export const updateClusterNamespaces = createAsyncThunk(
     });
 
     const results: ClusterAccess[] = await Promise.all(
-      values.map(value => getKubeAccess(value.namespace, value.cluster))
+      values.map(value => getKubeAccess(value.namespace, value.cluster, kubeConfigPath))
     );
 
     thunkAPI.dispatch(configSlice.actions.updateClusterAccess([...accesses, ...results]));
@@ -617,5 +617,6 @@ export const {
   updateTheme,
   updateUsingKubectlProxy,
   setClusterProxyPort,
+  updateClusterAccess,
 } = configSlice.actions;
 export default configSlice.reducer;

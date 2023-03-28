@@ -7,6 +7,7 @@ import {isEmpty} from 'lodash';
 
 import {AppListenerFn} from '@redux/listeners/base';
 import {setAlert} from '@redux/reducers/alert';
+import {k8sApi} from '@redux/services/K8sApi';
 import {CONFIG_PATH} from '@redux/services/projectConfig';
 import {getResourceKindSchema} from '@redux/services/schema';
 import {startClusterConnection, stopClusterConnection} from '@redux/thunks/cluster';
@@ -17,13 +18,17 @@ import {ResourceKindHandlers, readSavedCrdKindHandlers} from '@src/kindhandlers'
 import {CustomSchema} from '@monokle/validation';
 import {AlertEnum} from '@shared/models/alert';
 import {KubeConfig, KubeConfigContext} from '@shared/models/config';
+import {openKubectlProxy} from '@shared/utils/commands/kubectl';
+import {getKubeAccess} from '@shared/utils/kubeclient';
 
 import {isProjectKubeConfigSelector} from './appConfig.selectors';
 import {
   loadProjectKubeConfig,
+  setClusterProxyPort,
   setKubeConfig,
   setOpenProject,
   setUserDirs,
+  updateClusterAccess,
   updateProjectConfig,
 } from './appConfig.slice';
 
@@ -91,10 +96,14 @@ const loadKubeConfigProjectListener: AppListenerFn = listen => {
     async effect(_action, {dispatch, cancelActiveListeners}) {
       // Cancel any other listeners that are listening to the same action
       cancelActiveListeners();
+
       const configPath = _action.payload.config?.kubeConfig?.path;
       if (!configPath) {
         return;
       }
+      const proxyPort = await openKubectlProxy(() => {}, {kubeConfigPath: configPath});
+      console.log('@@proxyPort', proxyPort);
+      dispatch(setClusterProxyPort(proxyPort));
       let config: KubeConfig;
       try {
         const kc = new k8s.KubeConfig();
@@ -109,6 +118,16 @@ const loadKubeConfigProjectListener: AppListenerFn = listen => {
         config = {isPathValid: false, path: configPath};
       }
       dispatch(loadProjectKubeConfig(config));
+      dispatch(k8sApi.util.resetApiState());
+      const results = await dispatch(k8sApi.endpoints.getNamespaces.initiate({})).unwrap();
+      if (config.currentContext) {
+        const namespaces = await Promise.all(
+          results.items.map((item: any) => {
+            return getKubeAccess(item.metadata.name, String(config.currentContext), configPath);
+          })
+        );
+        dispatch(updateClusterAccess(namespaces));
+      }
     },
   });
 };

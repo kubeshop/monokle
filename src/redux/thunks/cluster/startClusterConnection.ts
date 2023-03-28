@@ -1,6 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {setClusterProxyPort} from '@redux/appConfig';
+import {kubeConfigPathSelector, setClusterProxyPort} from '@redux/appConfig';
 import {setAlert} from '@redux/reducers/alert';
 import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 import {stopPreview} from '@redux/services/preview';
@@ -87,6 +87,6 @@ export const startClusterConnection = createAsyncThunk<
       }
     }
   };
-
-  openKubectlProxy(kubectlProxyListener);
+  const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
+  openKubectlProxy(kubectlProxyListener, {kubeConfigPath});
 });

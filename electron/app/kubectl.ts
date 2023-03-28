@@ -1,47 +1,66 @@
-import {IpcMainEvent} from 'electron';
+import {IpcMainInvokeEvent} from 'electron';
 
 import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
 
-let kubectlProxyProcess: ChildProcessWithoutNullStreams | undefined;
+import {ClusterProxyOptions} from '@shared/models/cluster';
+import electronStore from '@shared/utils/electronStore';
 
-export const startKubectlProxyProcess = async (event: IpcMainEvent) => {
+let kubectlProxyProcess: ChildProcessWithoutNullStreams | undefined;
+const PROXY_PORT_REGEX = /127.0.0.1:[0-9]+/;
+
+export const startKubectlProxyProcess = async (event: IpcMainInvokeEvent, args: ClusterProxyOptions) => {
   killKubectlProxyProcess();
 
-  try {
-    kubectlProxyProcess = spawn('kubectl', ['proxy', '--port=0'], {
-      env: {
-        ...process.env,
-      },
-      shell: true,
-      windowsHide: true,
-    });
+  return new Promise((resolve, reject) => {
+    try {
+      let kubeConfigPath = args.kubeConfigPath;
+      if (!kubeConfigPath || kubeConfigPath === '') {
+        kubeConfigPath = electronStore.get('appConfig.kubeConfig');
+      }
 
-    kubectlProxyProcess.on('exit', (code, signal) => {
-      event.sender.send('kubectl-proxy-event', {
-        type: 'exit',
-        result: {exitCode: code, signal: signal?.toString()},
+      kubectlProxyProcess = spawn('kubectl', ['proxy', '--port=0'], {
+        env: {
+          ...process.env,
+          KUBECONFIG: kubeConfigPath,
+        },
+        shell: true,
+        windowsHide: true,
       });
-    });
 
-    kubectlProxyProcess.stdout.on('data', data => {
-      event.sender.send('kubectl-proxy-event', {
-        type: 'stdout',
-        result: {data: data?.toString()},
+      kubectlProxyProcess.on('exit', (code, signal) => {
+        event.sender.send('kubectl-proxy-event', {
+          type: 'exit',
+          result: {exitCode: code, signal: signal?.toString()},
+        });
       });
-    });
 
-    kubectlProxyProcess.stderr.on('data', data => {
-      event.sender.send('kubectl-proxy-event', {
-        type: 'stderr',
-        result: {data: data?.toString()},
+      kubectlProxyProcess.stdout.on('data', data => {
+        const proxyPortMatches = PROXY_PORT_REGEX.exec(data);
+        const proxyPortString = proxyPortMatches?.[0]?.split(':')[1];
+        const proxyPort = proxyPortString ? parseInt(proxyPortString, 10) : null;
+        resolve(proxyPort);
+        event.sender.send('kubectl-proxy-event', {
+          type: 'stdout',
+          result: {data: data?.toString()},
+        });
       });
-    });
-  } catch (e: any) {
-    event.sender.send('kubectl-proxy-event', {
-      type: 'error',
-      result: {message: e?.message},
-    });
-  }
+
+      kubectlProxyProcess.stderr.on('data', data => {
+        reject();
+        event.sender.send('kubectl-proxy-event', {
+          type: 'stderr',
+          result: {data: data?.toString()},
+        });
+      });
+    } catch (e: any) {
+      console.log('error', e.message);
+      reject();
+      event.sender.send('kubectl-proxy-event', {
+        type: 'error',
+        result: {message: e?.message},
+      });
+    }
+  });
 };
 
 export const killKubectlProxyProcess = () => {
