@@ -238,6 +238,9 @@ export const uiSlice = createSlice({
 
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
     },
+    toggleKustomizationsCollapse: (state: Draft<UiState>) => {
+      state.isKustomizationsCollapsed = !state.isKustomizationsCollapsed;
+    },
     collapseResourceKinds: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       const kindsToCollapse = action.payload.filter(s => !state.navigator.collapsedResourceKinds.includes(s));
       if (kindsToCollapse.length > 0) {
@@ -454,6 +457,7 @@ export const {
   setTemplateProjectCreate,
   toggleExpandActionsPaneFooter,
   toggleLeftMenu,
+  toggleKustomizationsCollapse,
   toggleNotifications,
   toggleResourceFilters,
   toggleRightMenu,

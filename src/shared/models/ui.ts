@@ -185,6 +185,7 @@ type UiState = {
     projectCreate?: Project;
   };
   isInQuickClusterMode?: boolean;
+  isKustomizationsCollapsed: boolean;
   welcomePopup: {
     isVisible: boolean;
   };
