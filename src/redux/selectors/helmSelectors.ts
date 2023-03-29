@@ -2,7 +2,7 @@ import {createSelector} from '@reduxjs/toolkit';
 
 import {orderBy} from 'lodash';
 
-import {HelmListNode} from '@shared/models/helm';
+import {HelmListNode, PreviewConfigurationNode} from '@shared/models/helm';
 import {RootState} from '@shared/models/rootState';
 import {isDefined} from '@shared/utils/filter';
 
@@ -31,6 +31,25 @@ export const helmChartListSelector = createSelector(
       for (const valueFile of valuesFiles) {
         list.push({type: 'helm-value', id: valueFile.id});
       }
+    }
+
+    return list;
+  }
+);
+
+export const previewConfigurationListSelector = createSelector(
+  [(state: RootState) => state.config.projectConfig?.helm?.previewConfigurationMap],
+  previewConfigurationMap => {
+    const list: PreviewConfigurationNode[] = [];
+
+    if (!previewConfigurationMap) {
+      return list;
+    }
+
+    const sortedEntries = Object.entries(previewConfigurationMap).filter(entry => isDefined(entry[1]));
+
+    for (const [id] of sortedEntries) {
+      list.push({type: 'preview-configuration', id});
     }
 
     return list;
