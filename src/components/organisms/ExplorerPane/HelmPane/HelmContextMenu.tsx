@@ -38,7 +38,7 @@ const DEFAULT_HELM_VALUE: HelmValuesFile = {
   values: [],
 };
 
-const HelmChartContextMenu: React.FC<IProps> = props => {
+const HelmContextMenu: React.FC<IProps> = props => {
   const {id, isSelected} = props;
 
   const dispatch = useAppDispatch();
@@ -191,7 +191,7 @@ const HelmChartContextMenu: React.FC<IProps> = props => {
   );
 };
 
-export default HelmChartContextMenu;
+export default HelmContextMenu;
 
 // Styled Components
 

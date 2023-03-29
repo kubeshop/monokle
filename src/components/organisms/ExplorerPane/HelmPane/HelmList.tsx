@@ -10,6 +10,7 @@ import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import HelmChartRenderer from './HelmChartRenderer';
+import HelmValueRenderer from './HelmValueRenderer';
 
 const ROW_HEIGHT = 26;
 
@@ -52,7 +53,11 @@ const HelmList: React.FC = () => {
                 transform: `translateY(${virtualItem.start}px)`,
               }}
             >
-              {node.type === 'helm-chart' ? <HelmChartRenderer id={node.id} /> : null}
+              {node.type === 'helm-chart' ? (
+                <HelmChartRenderer id={node.id} />
+              ) : node.type === 'helm-value' ? (
+                <HelmValueRenderer id={node.id} />
+              ) : null}
             </VirtualItem>
           );
         })}
