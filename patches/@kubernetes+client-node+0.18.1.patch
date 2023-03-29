@@ -1,0 +1,13 @@
+diff --git a/node_modules/@kubernetes/client-node/dist/config.js b/node_modules/@kubernetes/client-node/dist/config.js
+index dff6609..b15fddb 100644
+--- a/node_modules/@kubernetes/client-node/dist/config.js
++++ b/node_modules/@kubernetes/client-node/dist/config.js
+@@ -96,7 +96,7 @@ class KubeConfig {
+     async applyToRequest(opts) {
+         const cluster = this.getCurrentCluster();
+         const user = this.getCurrentUser();
+-        await this.applyOptions(opts);
++        // await this.applyOptions(opts);
+         if (cluster && cluster.skipTLSVerify) {
+             opts.strictSSL = false;
+         }
