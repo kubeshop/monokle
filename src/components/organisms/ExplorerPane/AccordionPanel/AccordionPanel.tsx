@@ -1,8 +1,8 @@
-import {CollapsePanelProps} from 'antd';
+import {Collapse, CollapsePanelProps} from 'antd';
+
+import styled from 'styled-components';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
-
-import * as S from './AccordionPanel.styled';
 
 export const PANEL_HEADER_HEIGHT = 72;
 
@@ -18,9 +18,24 @@ export type InjectedPanelProps = {
 const AccordionPanel: React.FC<CollapsePanelProps & InjectedPanelProps> = props => {
   const id = getPanelId(props.panelKey);
 
-  const height = usePaneHeight() - PANEL_HEADER_HEIGHT - 130 - (props.panelKey === 'files' ? 30 : 0);
+  const height = usePaneHeight() - PANEL_HEADER_HEIGHT - 130 - (props.panelKey === 'files' ? 35 : 25);
 
-  return <S.Panel collapsible={props.disabled ? 'disabled' : undefined} id={id} $contentHeight={height} {...props} />;
+  return <Panel collapsible={props.disabled ? 'disabled' : undefined} id={id} $contentHeight={height} {...props} />;
 };
 
 export default AccordionPanel;
+
+// Styled Components
+
+const Panel = styled(Collapse.Panel)<{$contentHeight: number}>`
+  &.ant-collapse-item-active {
+    height: 100%;
+  }
+
+  .ant-collapse-content-box {
+    padding: 0 !important;
+    overflow-y: hidden;
+    max-height: ${props => props.$contentHeight}px;
+    height: ${props => props.$contentHeight}px;
+  }
+`;
