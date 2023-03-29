@@ -24,7 +24,7 @@ const AccordionPanel: React.FC<CollapsePanelProps & InjectedPanelProps> = props 
   const id = getPanelId(props.panelKey);
   const [contentHeight, setContentHeight] = useState<number>(1);
 
-  const height = usePaneHeight() - PANEL_HEADER_HEIGHT - 130;
+  const height = usePaneHeight() - PANEL_HEADER_HEIGHT - 165;
 
   const [containerRef] = useResizeObserverRef(el => {
     if (!el) return;

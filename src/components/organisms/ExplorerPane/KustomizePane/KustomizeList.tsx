@@ -29,6 +29,8 @@ const KustomizeList: React.FC = () => {
 
   const ref = useRef<HTMLUListElement>(null);
 
+  console.log('Here list');
+
   const rowVirtualizer = useVirtualizer({
     count: list.length,
     estimateSize: () => ROW_HEIGHT,
