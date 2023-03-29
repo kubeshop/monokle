@@ -84,7 +84,6 @@ const loadKubeConfigListener: AppListenerFn = listen => {
           }
         }
       } catch (error: any) {
-        console.log('@@error', error.message);
         dispatch(setKubeConfig({isPathValid: false, contexts: []}));
       }
     },

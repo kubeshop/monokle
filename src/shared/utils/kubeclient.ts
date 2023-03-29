@@ -1,38 +1,15 @@
 import * as k8s from '@kubernetes/client-node';
 
 import {spawn} from 'child_process';
-import {readFileSync} from 'fs';
 import log from 'loglevel';
 import {v4 as uuid} from 'uuid';
-import YAML from 'yaml';
 
 import {CommandOptions, CommandResult} from '@shared/models/commands';
-import {ClusterAccess, KubeConfig, KubePermissions} from '@shared/models/config';
+import {ClusterAccess, KubePermissions} from '@shared/models/config';
 import {getMainProcessEnv} from '@shared/utils/env';
 
 import {runCommandInMainThread} from './commands';
 import {isRendererThread} from './thread';
-
-export const readKubeConfigFile = (path: string): Promise<KubeConfig> => {
-  return new Promise((resolve, reject) => {
-    if (!path) {
-      reject(new Error('Missing path to kubeconfing'));
-      return;
-    }
-    try {
-      const content = readFileSync(path, 'utf8');
-      const kubeConfig = YAML.parse(content);
-      resolve({
-        path,
-        isPathValid: true,
-        contexts: kubeConfig.contexts,
-        currentContext: kubeConfig['current-context'],
-      });
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
 
 export function createKubeClient(path: string, context?: string, proxy?: number): k8s.KubeConfig {
   let kc = new k8s.KubeConfig();

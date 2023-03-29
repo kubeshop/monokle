@@ -1,9 +1,10 @@
+import * as k8s from '@kubernetes/client-node';
+
 import {FSWatcher, watch} from 'chokidar';
-import fs, {readFileSync} from 'fs';
+import fs from 'fs';
 import log from 'loglevel';
 import fetch from 'node-fetch';
 import path from 'path';
-import YAML from 'yaml';
 
 function getKubeConfPath() {
   let kubeConfigPath = process.argv[2]; // kubeconig from path
@@ -20,6 +21,26 @@ function getKubeConfPath() {
   kubeConfigPath = process.argv[4]; // kubeconig from .kube
   return kubeConfigPath;
 }
+
+const readKubeConfigFile = (filePath: string) => {
+  try {
+    let kc = new k8s.KubeConfig();
+    kc.loadFromFile(filePath);
+
+    return {
+      path: filePath,
+      isPathValid: kc.contexts.length > 0,
+      contexts: kc.contexts,
+      currentContext: kc.currentContext,
+    };
+  } catch (error) {
+    return {
+      path: filePath,
+      isPathValid: false,
+      contexts: [],
+    };
+  }
+};
 
 async function loadKubeConf() {
   let kubeConfigPath = process.argv[2]; // kubeconig from path
@@ -52,25 +73,6 @@ async function loadKubeConf() {
   const data = await readKubeConfigFile(kubeConfigPath);
   process.parentPort.postMessage({type: 'config/setKubeConfig', payload: data});
 }
-
-const readKubeConfigFile = (filePath: string) => {
-  try {
-    const content = readFileSync(filePath, 'utf8');
-    const kubeConfig = YAML.parse(content);
-    return {
-      path: filePath,
-      isPathValid: kubeConfig.contexts.length > 0,
-      contexts: kubeConfig.contexts,
-      currentContext: kubeConfig['current-context'],
-    };
-  } catch (error) {
-    return {
-      path: filePath,
-      isPathValid: false,
-      contexts: [],
-    };
-  }
-};
 
 let watcher: FSWatcher;
 let abortSignal: AbortController;
