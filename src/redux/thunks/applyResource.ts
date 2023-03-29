@@ -127,7 +127,7 @@ export async function applyResource(
 
         if (result.stdout) {
           if (options?.isInClusterMode && kubeconfigPath) {
-            getResourceFromCluster(resourceMeta, kubeconfigPath, context).then(resourceFromCluster => {
+            getResourceFromCluster(resourceMeta).then(resourceFromCluster => {
               delete resourceFromCluster?.metadata?.managedFields;
               const updatedResourceText = stringify(resourceFromCluster, {sortMapEntries: true});
               if (resourceContentMapByStorage.cluster[resourceFromCluster?.metadata?.uid]) {

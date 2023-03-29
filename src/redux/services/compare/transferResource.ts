@@ -1,11 +1,11 @@
 import {KubernetesObject} from '@kubernetes/client-node';
 
-import {cloneDeep} from 'lodash';
+import {cloneDeep, noop} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {updateResource} from '@redux/thunks/updateResource';
-import {createNamespace, getNamespace, getResourceFromCluster} from '@redux/thunks/utils';
+import {createNamespace, getNamespace, getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {jsonToYaml} from '@utils/yaml';
 
@@ -18,8 +18,6 @@ import {RootState} from '@shared/models/rootState';
 import {execute} from '@shared/utils/commands';
 import {createKubectlApplyCommand} from '@shared/utils/commands/kubectl';
 import {createKubeClient} from '@shared/utils/kubeclient';
-
-import {k8sApi} from '../K8sApi';
 
 type Type = ResourceSet['type'];
 
@@ -44,7 +42,7 @@ export function doTransferResource(
 ): Promise<K8sResource> {
   switch (options.to) {
     case 'cluster':
-      return deployResourceToCluster(source, target, options, state, dispatch);
+      return deployResourceToCluster(source, target, options, state);
     case 'local':
       return extractResourceToLocal(source, target, dispatch);
     default:
@@ -56,8 +54,7 @@ async function deployResourceToCluster(
   source: K8sResource,
   target: K8sResource | undefined,
   options: TransferOptions,
-  state: RootState,
-  dispatch: AppDispatch
+  state: RootState
 ) {
   const currentContext = options.context ?? kubeConfigContextSelector(state);
   const kubeConfigPath = kubeConfigPathSelector(state);
@@ -86,8 +83,7 @@ async function deployResourceToCluster(
     if (!hasNamespace) {
       // Best-effort attempt to revert the newly created namespace.
 
-      //  await removeNamespaceFromCluster(namespace, kubeConfigPath, currentContext).catch(noop);
-      await dispatch(k8sApi.endpoints.deleteNamespace.initiate({namespace})).unwrap();
+      await removeNamespaceFromCluster(namespace).catch(noop);
     }
     throw err;
   }
@@ -98,7 +94,7 @@ async function deployResourceToCluster(
   try {
     const sourceCopy = structuredClone(source);
     sourceCopy.namespace = namespace;
-    const clusterContent = await getResourceFromCluster(sourceCopy, kubeConfigPath, currentContext);
+    const clusterContent = await getResourceFromCluster(sourceCopy);
     updatedContent = clusterContent ?? source.object;
   } catch {
     updatedContent = source.object;

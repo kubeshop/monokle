@@ -44,11 +44,7 @@ export function createRejectionWithAlert(thunkAPI: any, title: string, message: 
   });
 }
 
-export async function getResourceFromCluster(
-  resourceMeta: ResourceMeta,
-  kubeconfigPath: string,
-  context?: string
-): Promise<K8sObject | undefined> {
+export async function getResourceFromCluster(resourceMeta: ResourceMeta): Promise<K8sObject | undefined> {
   const resourceKindHandler = getResourceKindHandler(resourceMeta.kind);
 
   if (resourceKindHandler) {
@@ -58,7 +54,7 @@ export async function getResourceFromCluster(
   }
 }
 
-export async function removeNamespaceFromCluster(namespace: string, kubeconfigPath: string, context?: string) {
+export async function removeNamespaceFromCluster(namespace: string) {
   const kubeClient = getGlobalK8sClient();
   const k8sCoreV1Api = kubeClient.makeApiClient(k8s.CoreV1Api);
   await k8sCoreV1Api.deleteNamespace(namespace);
