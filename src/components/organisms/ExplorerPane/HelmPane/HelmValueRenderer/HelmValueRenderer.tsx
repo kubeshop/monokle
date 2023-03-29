@@ -1,7 +1,8 @@
 import {useState} from 'react';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {selectHelmValuesFile} from '@redux/reducers/main';
 
 import HelmContextMenu from '../HelmContextMenu';
 import HelmValueQuickAction from './HelmValueQuickAction';
@@ -14,6 +15,7 @@ type IProps = {
 const HelmValueRenderer: React.FC<IProps> = props => {
   const {id} = props;
 
+  const dispatch = useAppDispatch();
   const fileOrFolderContainedIn = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn || '');
   const helmValue = useAppSelector(state => state.main.helmValuesMap[id]);
   const isDisabled = useAppSelector(state =>
@@ -40,6 +42,7 @@ const HelmValueRenderer: React.FC<IProps> = props => {
       isSelected={isSelected}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => dispatch(selectHelmValuesFile({valuesFileId: id}))}
     >
       <S.ItemName isDisabled={isDisabled} isSelected={isSelected}>
         {helmValue.name}
