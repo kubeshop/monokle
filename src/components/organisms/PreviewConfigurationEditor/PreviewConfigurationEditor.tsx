@@ -18,6 +18,7 @@ import {KeyValueInput} from '@atoms';
 import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
 import {HelmValuesFile} from '@shared/models/helm';
 
+import HelmChartSelect from './HelmChartSelect';
 import ValuesFilesList from './ValuesFilesList';
 
 import * as S from './styled';
@@ -38,11 +39,14 @@ const PreviewConfigurationEditor = () => {
     }
     return previewConfigurationMap[previewConfigurationId];
   });
+
   const helmChart = useAppSelector(state => {
     const helmChartId = state.main.prevConfEditor.helmChartId;
+
     if (!helmChartId) {
       return undefined;
     }
+
     return state.main.helmChartMap[helmChartId];
   });
 
@@ -182,50 +186,52 @@ const PreviewConfigurationEditor = () => {
     ]
   );
 
-  if (!helmChart) {
-    return <p>Something went wrong, could not find the helm chart.</p>;
-  }
-
   return (
     <div>
-      <S.Field>
-        <S.Label>Name your configuration:</S.Label>
-        <Input value={name} onChange={e => setName(e.target.value)} placeholder="Enter the configuration name" />
-        {showNameError && <S.Error>You must enter a name for this Preview Configuration.</S.Error>}
-      </S.Field>
-      <S.Field>
-        <S.Label style={{marginBottom: 0}}>Select which values files to use:</S.Label>
-        <S.Description>Drag and drop to specify order</S.Description>
-        <ValuesFilesList itemMap={valuesFileItemMap} onChange={itemMap => setValuesFileItemMap(itemMap)} />
-      </S.Field>
-      <S.Field>
-        <S.Label>Select which helm command to use for this Preview:</S.Label>
-        <Select value={helmCommand} onChange={setHelmCommand} style={{width: 150}}>
-          <Select.Option value="template">Template</Select.Option>
-          <Select.Option value="install">Install</Select.Option>
-        </Select>
-      </S.Field>
-      <S.Field>
-        <KeyValueInput
-          label="Specify options:"
-          value={helmOptions}
-          schema={keyValueInputSchema}
-          availableValuesByKey={{}}
-          docsUrl={helmOptionsDocsUrl}
-          onChange={setHelmOptions}
-        />
-      </S.Field>
-      <S.ActionsContainer>
-        <Button onClick={onClose} type="primary" ghost>
-          Discard
-        </Button>
-        <Button onClick={() => onSave()} type="primary" ghost>
-          Save
-        </Button>
-        <Button onClick={() => onSave(true)} type="primary">
-          Save and Preview
-        </Button>
-      </S.ActionsContainer>
+      <HelmChartSelect />
+
+      {helmChart && (
+        <>
+          <S.Field>
+            <S.Label>Name your configuration:</S.Label>
+            <Input value={name} onChange={e => setName(e.target.value)} placeholder="Enter the configuration name" />
+            {showNameError && <S.Error>You must enter a name for this Preview Configuration.</S.Error>}
+          </S.Field>
+          <S.Field>
+            <S.Label style={{marginBottom: 0}}>Select which values files to use:</S.Label>
+            <S.Description>Drag and drop to specify order</S.Description>
+            <ValuesFilesList itemMap={valuesFileItemMap} onChange={itemMap => setValuesFileItemMap(itemMap)} />
+          </S.Field>
+          <S.Field>
+            <S.Label>Select which helm command to use for this Preview:</S.Label>
+            <Select value={helmCommand} onChange={setHelmCommand} style={{width: 150}}>
+              <Select.Option value="template">Template</Select.Option>
+              <Select.Option value="install">Install</Select.Option>
+            </Select>
+          </S.Field>
+          <S.Field>
+            <KeyValueInput
+              label="Specify options:"
+              value={helmOptions}
+              schema={keyValueInputSchema}
+              availableValuesByKey={{}}
+              docsUrl={helmOptionsDocsUrl}
+              onChange={setHelmOptions}
+            />
+          </S.Field>
+          <S.ActionsContainer>
+            <Button onClick={onClose} type="primary" ghost>
+              Discard
+            </Button>
+            <Button onClick={() => onSave()} type="primary" ghost>
+              Save
+            </Button>
+            <Button onClick={() => onSave(true)} type="primary">
+              Save and Preview
+            </Button>
+          </S.ActionsContainer>
+        </>
+      )}
     </div>
   );
 };
