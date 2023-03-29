@@ -5,12 +5,12 @@ import {Tooltip} from 'antd';
 
 import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {NodeMetric, getClusterUtilization} from '@redux/services/clusterDashboard';
-import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import {convertBytesToGigabyte, memoryParser} from '@utils/unit-converter';
 
 import InfoCircle from '@assets/InfoCircle.svg';
 
+import {useK8sClient} from '@src/K8sClientContext';
 import NodeHandler from '@src/kindhandlers/NodeHandler';
 
 import {K8sResource} from '@shared/models/k8sResource';
@@ -26,10 +26,10 @@ export const Utilization = () => {
   const [totalMemory, setTotalMemory] = useState(0);
   const [utilizationData, setUtilizationData] = useState<NodeMetric[]>([]);
   const [heartbeat, setHeartbeat] = useState(0);
-
+  const k8sClient = useK8sClient();
   useEffect(() => {
-    const k8sApiClient = new KubeConfigManager().getV1ApiClient();
-    const metricClient = new KubeConfigManager().getMetricsClient();
+    const k8sApiClient = k8sClient.getV1ApiClient();
+    const metricClient = k8sClient.getMetricsClient();
     if (metricClient && k8sApiClient) {
       getClusterUtilization(k8sApiClient, metricClient)
         .then(data => setUtilizationData(data))

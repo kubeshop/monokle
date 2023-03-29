@@ -32,6 +32,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const defaultClusterNamespace = clusterNamespaces && clusterNamespaces.length ? clusterNamespaces[0] : 'default';
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const clusterProxyPort = useAppSelector(state => state.config.clusterProxyPort);
 
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resourceMetaList, defaultClusterNamespace);
 
@@ -42,14 +43,14 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const [selectedNamespace, setSelectedNamespace] = useState(defaultNamespace);
   const [selectedOption, setSelectedOption] = useState<'existing' | 'create' | 'none'>();
 
-  const onClickOk = useCallback(() => {
+  const onClickOk = useCallback(async () => {
     if (selectedOption === 'create') {
       if (!createNamespaceName) {
         setErrorMessage('Namespace name must not be empty!');
         return;
       }
 
-      const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
+      const kc = createKubeClient(kubeConfigPath, kubeConfigContext, clusterProxyPort);
       const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 
       k8sCoreV1Api
@@ -69,7 +70,15 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     } else if (!selectedOption || selectedOption === 'none') {
       onOk();
     }
-  }, [selectedOption, createNamespaceName, kubeConfigPath, kubeConfigContext, onOk, selectedNamespace]);
+  }, [
+    selectedOption,
+    createNamespaceName,
+    kubeConfigPath,
+    kubeConfigContext,
+    onOk,
+    selectedNamespace,
+    clusterProxyPort,
+  ]);
 
   const clusterScopedResourcesCount = useMemo(
     () => resourceMetaList.filter(r => r.isClusterScoped).length,

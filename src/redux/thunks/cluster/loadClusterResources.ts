@@ -45,29 +45,19 @@ const loadClusterResourcesHandler = async (
   payload: {context: string; namespace?: string; port?: number},
   thunkAPI: any
 ) => {
-  const {context, port, namespace} = payload;
+  const {context, namespace} = payload;
   const startTime = new Date().getTime();
   const clusterAccess = currentClusterAccessSelector(thunkAPI.getState());
   const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
   const useKubectlProxy = thunkAPI.getState().config.useKubectlProxy;
+  const clusterProxyPort = thunkAPI.getState().config.clusterProxyPort;
 
   let currentNamespace: string = namespace || '<all>';
 
   trackEvent('preview/cluster/start');
 
   try {
-    let kc = createKubeClient(kubeConfigPath, context);
-
-    if (port) {
-      const proxyKubeConfig = new KubeConfig();
-      proxyKubeConfig.loadFromOptions({
-        currentContext: kc.getCurrentContext(),
-        clusters: kc.getClusters().map(c => ({...c, server: `http://127.0.0.1:${port}`, skipTLSVerify: true})),
-        users: kc.getUsers(),
-        contexts: kc.getContexts(),
-      });
-      kc = proxyKubeConfig;
-    }
+    let kc = createKubeClient(kubeConfigPath, context, clusterProxyPort);
 
     let foundNamespace: ClusterAccess | undefined;
     let results: PromiseSettledResult<string>[] | PromiseSettledResult<string>[][];

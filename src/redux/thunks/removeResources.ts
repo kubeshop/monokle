@@ -56,7 +56,8 @@ export const removeResources = createAsyncThunk<
         try {
           const kubeClient = createKubeClient(
             mainState.clusterConnection.kubeConfigPath,
-            mainState.clusterConnection.context
+            mainState.clusterConnection.context,
+            state.config.clusterProxyPort
           );
 
           const kindHandler = getResourceKindHandler(resourceMeta.kind);

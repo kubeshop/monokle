@@ -1,18 +1,21 @@
-import {IpcMainInvokeEvent} from 'electron';
+import {BrowserWindow, IpcMainInvokeEvent} from 'electron';
 
 import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
 
 import {ClusterProxyOptions} from '@shared/models/cluster';
 import electronStore from '@shared/utils/electronStore';
 
+import {dispatchToWindow} from './ipc/ipcMainRedux';
+
 let kubectlProxyProcess: ChildProcessWithoutNullStreams | undefined;
 const PROXY_PORT_REGEX = /127.0.0.1:[0-9]+/;
-
+let windowId: number = -1;
 export const startKubectlProxyProcess = async (event: IpcMainInvokeEvent, args: ClusterProxyOptions) => {
   killKubectlProxyProcess();
 
   return new Promise((resolve, reject) => {
     try {
+      windowId = event.sender.id;
       let kubeConfigPath = args.kubeConfigPath;
       if (!kubeConfigPath || kubeConfigPath === '') {
         kubeConfigPath = electronStore.get('appConfig.kubeConfig');
@@ -32,6 +35,10 @@ export const startKubectlProxyProcess = async (event: IpcMainInvokeEvent, args: 
           type: 'exit',
           result: {exitCode: code, signal: signal?.toString()},
         });
+        const window = BrowserWindow.fromId(windowId) || BrowserWindow.getFocusedWindow();
+        if (window) {
+          dispatchToWindow(window, {type: 'config/setClusterProxyPort', payload: null});
+        }
       });
 
       kubectlProxyProcess.stdout.on('data', data => {
@@ -55,6 +62,7 @@ export const startKubectlProxyProcess = async (event: IpcMainInvokeEvent, args: 
     } catch (e: any) {
       console.log('error', e.message);
       reject();
+
       event.sender.send('kubectl-proxy-event', {
         type: 'error',
         result: {message: e?.message},

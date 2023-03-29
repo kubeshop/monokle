@@ -9,7 +9,7 @@ import {AlertEnum} from '@shared/models/alert';
 import electronStore from '@shared/utils/electronStore';
 import {getKubeAccess} from '@shared/utils/kubeclient';
 
-import {dispatchToAllWindows} from './ipc/ipcMainRedux';
+import {dispatchToAllWindows, dispatchToFocusedWindow} from './ipc/ipcMainRedux';
 
 const PROXY_PORT_REGEX = /127.0.0.1:[0-9]+/;
 
@@ -20,6 +20,13 @@ let kubectlProxyProcess: ChildProcessWithoutNullStreams | null = null;
 electronStore.onDidChange('appConfig.kubeConfig', () => {
   if (kubeServiceProcess) {
     startKubeConfigService();
+  }
+});
+
+electronStore.onDidChange('appConfig.clusterProxyPort', () => {
+  const newProxyPort = electronStore.get('appConfig.clusterProxyPort');
+  if (newProxyPort === null && proxyPort !== null) {
+    dispatchToFocusedWindow({type: 'config/setClusterProxyPort', payload: proxyPort});
   }
 });
 
@@ -61,6 +68,8 @@ export const startKubeConfigService = async () => {
   if (proxyPort === null) {
     return;
   }
+
+  dispatchToAllWindows({type: 'config/setClusterProxyPort', payload: proxyPort});
 
   kubeServiceProcess = utilityProcess.fork(
     path.normalize(`${__dirname}/KubeConfigService.js`),
@@ -143,5 +152,6 @@ const killKubeConfigProcess = () => {
       kubectlProxyProcess.kill();
     }
     kubectlProxyProcess = null;
+    proxyPort = null;
   }
 };

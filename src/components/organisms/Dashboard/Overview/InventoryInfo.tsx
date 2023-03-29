@@ -3,8 +3,8 @@ import {useCallback} from 'react';
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch} from '@redux/hooks';
 import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
-import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
+import {useK8sClient} from '@src/K8sClientContext';
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import NodeHandler from '@src/kindhandlers/NodeHandler';
@@ -20,7 +20,7 @@ import * as S from './InventoryInfo.styled';
 export const InventoryInfo = () => {
   const dispatch = useAppDispatch();
   const clusterResourceMap = useResourceMap('cluster');
-
+  const k8sClient = useK8sClient();
   const filterResources = useCallback(
     (kind: string, apiVersion?: string) => {
       return Object.values(clusterResourceMap).filter(
@@ -99,7 +99,7 @@ export const InventoryInfo = () => {
       <S.ClusterInfoContainer>
         <S.ClusterInfoRow>
           <S.Title>Cluster API address</S.Title>
-          <S.Description>{new KubeConfigManager().getV1ApiClient()?.basePath || '-'}</S.Description>
+          <S.Description>{k8sClient.getV1ApiClient()?.basePath || '-'}</S.Description>
         </S.ClusterInfoRow>
         <S.ClusterInfoRow>
           <S.Title>Kubernetes Version</S.Title>

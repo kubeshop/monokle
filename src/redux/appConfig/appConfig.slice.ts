@@ -8,7 +8,6 @@ import path, {join} from 'path';
 
 import {k8sApi} from '@redux/services/K8sApi';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
-import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {
   CONFIG_PATH,
   keysToDelete,
@@ -129,7 +128,7 @@ export const updateClusterNamespaces = createAsyncThunk(
       createNamespace(kubeClient, namespace);
     });
 
-    removedNamespaces.forEach(({namespace, context}) => {
+    removedNamespaces.forEach(({namespace}) => {
       // const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
       // removeNamespaceFromCluster(namespace, kubeConfigPath, context);
       thunkAPI.dispatch(k8sApi.endpoints.deleteNamespace.initiate({namespace}));
@@ -208,7 +207,6 @@ export const configSlice = createSlice({
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       electronStore.set('kubeConfig.currentContext', action.payload);
       state.kubeConfig.currentContext = action.payload;
-      new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
     },
     setAccessLoading: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.isAccessLoading = action.payload;
@@ -218,7 +216,6 @@ export const configSlice = createSlice({
 
       if (state.kubeConfig.path) {
         electronStore.set('appConfig.kubeConfig', state.kubeConfig.path);
-        new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
       }
     },
     createProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
@@ -312,7 +309,6 @@ export const configSlice = createSlice({
       }
 
       const kubeConfig = state.projectConfig?.kubeConfig;
-      new KubeConfigManager().initializeKubeConfig(kubeConfig.path as string, kubeConfig.currentContext);
 
       const serializedIncomingConfig = flatten<any, any>(action.payload, {safe: true});
       const serializedState = flatten<any, any>(state.projectConfig.kubeConfig, {safe: true});
@@ -385,8 +381,6 @@ export const configSlice = createSlice({
           ...action.payload.config.kubeConfig,
         };
       }
-
-      new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
 
       if (
         !action.payload.fromConfigFile &&
@@ -555,6 +549,9 @@ export const configSlice = createSlice({
     },
     setClusterProxyPort: (state: Draft<AppConfig>, action: PayloadAction<number | undefined>) => {
       state.clusterProxyPort = action.payload;
+      if (!action.payload) {
+        electronStore.delete('appConfig.clusterProxyPort');
+      }
     },
   },
   extraReducers: builder => {

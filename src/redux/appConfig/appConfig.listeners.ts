@@ -83,7 +83,8 @@ const loadKubeConfigListener: AppListenerFn = listen => {
             );
           }
         }
-      } catch (error) {
+      } catch (error: any) {
+        console.log('@@error', error.message);
         dispatch(setKubeConfig({isPathValid: false, contexts: []}));
       }
     },
@@ -102,7 +103,6 @@ const loadKubeConfigProjectListener: AppListenerFn = listen => {
         return;
       }
       const proxyPort = await openKubectlProxy(() => {}, {kubeConfigPath: configPath});
-      console.log('@@proxyPort', proxyPort);
       dispatch(setClusterProxyPort(proxyPort));
       let config: KubeConfig;
       try {
@@ -128,6 +128,16 @@ const loadKubeConfigProjectListener: AppListenerFn = listen => {
         );
         dispatch(updateClusterAccess(namespaces));
       }
+    },
+  });
+};
+
+const invalidateK8sApiProxy: AppListenerFn = listen => {
+  listen({
+    actionCreator: setClusterProxyPort,
+    async effect(_action, {dispatch, cancelActiveListeners}) {
+      cancelActiveListeners();
+      dispatch(k8sApi.util.resetApiState());
     },
   });
 };
@@ -261,4 +271,5 @@ export const appConfigListeners = [
   loadKubeConfigListener,
   loadKubeConfigProjectListener,
   watchKubeConfigProjectListener,
+  invalidateK8sApiProxy,
 ];

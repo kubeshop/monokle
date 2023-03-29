@@ -29,12 +29,13 @@ const logOptions = {
 const Logs = () => {
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const clusterProxyPort = useAppSelector(state => state.config.clusterProxyPort);
   const selectedResource = useSelectedResource();
   const [logs, setLogs] = useState<LogLineType[]>([]);
 
   useEffect(() => {
     setLogs([]);
-    const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
+    const kc = createKubeClient(kubeConfigPath, kubeConfigContext, clusterProxyPort);
     const k8sLog = new k8s.Log(kc);
     const logStream = new stream.PassThrough();
     if (selectedResource && selectedResource.kind === 'Pod') {
@@ -62,7 +63,7 @@ const Logs = () => {
     return () => {
       logStream.destroy();
     };
-  }, [kubeConfigContext, kubeConfigPath, selectedResource]);
+  }, [kubeConfigContext, kubeConfigPath, selectedResource, clusterProxyPort]);
 
   return (
     <S.LogContainer>

@@ -1,14 +1,9 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {kubeConfigPathSelector, setClusterProxyPort} from '@redux/appConfig';
-import {setAlert} from '@redux/reducers/alert';
 import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
-import {stopPreview} from '@redux/services/preview';
 
-import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
-import {openKubectlProxy} from '@shared/utils/commands/kubectl';
 
 import {loadClusterResources, reloadClusterResources} from './loadClusterResources';
 
@@ -19,7 +14,7 @@ export type StartClusterConnectionPayload = {
   isRestart?: boolean;
 };
 
-const PROXY_PORT_REGEX = /127.0.0.1:[0-9]+/;
+// const PROXY_PORT_REGEX = /127.0.0.1:[0-9]+/;
 
 export const startClusterConnection = createAsyncThunk<
   void,
@@ -51,42 +46,38 @@ export const startClusterConnection = createAsyncThunk<
     } else {
       thunkAPI.dispatch(loadClusterResources({context, namespace, port: clusterProxyPort}));
     }
-
-    return;
   }
 
   // TODO: if the listener has not been called in 10 seconds, then stop the preview and send an error notification
-  const kubectlProxyListener = (event: any) => {
-    if (event.type === 'stderr' || event.type === 'exit') {
-      stopPreview(thunkAPI.dispatch);
+  // const kubectlProxyListener = (event: any) => {
+  //   if (event.type === 'stderr' || event.type === 'exit') {
+  //     stopPreview(thunkAPI.dispatch);
 
-      if (event.type === 'stderr') {
-        thunkAPI.dispatch(
-          setAlert({type: AlertEnum.Error, title: 'Cluster Resources Failed', message: event.result.data})
-        );
-      }
+  //     if (event.type === 'stderr') {
+  //       thunkAPI.dispatch(
+  //         setAlert({type: AlertEnum.Error, title: 'Cluster Resources Failed', message: event.result.data})
+  //       );
+  //     }
 
-      return;
-    }
+  //     return;
+  //   }
 
-    if (event.type === 'stdout' && event.result && event.result.data) {
-      const proxyPortMatches = PROXY_PORT_REGEX.exec(event.result.data);
-      const proxyPortString = proxyPortMatches?.[0]?.split(':')[1];
-      const proxyPort = proxyPortString ? parseInt(proxyPortString, 10) : undefined;
+  //   if (event.type === 'stdout' && event.result && event.result.data) {
+  //     const proxyPortMatches = PROXY_PORT_REGEX.exec(event.result.data);
+  //     const proxyPortString = proxyPortMatches?.[0]?.split(':')[1];
+  //     const proxyPort = proxyPortString ? parseInt(proxyPortString, 10) : undefined;
 
-      if (!proxyPort) {
-        return;
-      }
+  //     if (!proxyPort) {
+  //       return;
+  //     }
 
-      thunkAPI.dispatch(setClusterProxyPort(proxyPort));
-
-      if (isRestart) {
-        thunkAPI.dispatch(reloadClusterResources({context, namespace, port: proxyPort}));
-      } else {
-        thunkAPI.dispatch(loadClusterResources({context, namespace, port: proxyPort}));
-      }
-    }
-  };
-  const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
-  openKubectlProxy(kubectlProxyListener, {kubeConfigPath});
+  //     if (isRestart) {
+  //       thunkAPI.dispatch(reloadClusterResources({context, namespace, port: proxyPort}));
+  //     } else {
+  //       thunkAPI.dispatch(loadClusterResources({context, namespace, port: proxyPort}));
+  //     }
+  //   }
+  // };
+  // const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
+  // openKubectlProxy(kubectlProxyListener, {kubeConfigPath});
 });
