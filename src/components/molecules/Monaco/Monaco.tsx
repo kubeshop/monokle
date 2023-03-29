@@ -21,7 +21,6 @@ import {
   selectFile,
   selectImage,
   selectResource,
-  setAutosavingStatus,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
 import {isInPreviewModeSelectorNew, selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
@@ -106,13 +105,12 @@ const Monaco: React.FC<IProps> = props => {
   const selectedResourceRef = useRef(selectedResource);
   selectedResourceRef.current = selectedResource;
 
-  const [, autosavingStatusRef] = useSelectorWithRef(state => state.main.autosaving.status);
   const [, activeResourceStorageRef] = useSelectorWithRef(activeResourceStorageSelector);
 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const imagesList = useAppSelector(state => state.main.imagesList);
+  const imageMap = useAppSelector(state => state.main.imageMap);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
@@ -177,7 +175,7 @@ const Monaco: React.FC<IProps> = props => {
   };
 
   const selectImageHandler = (imageId: string) => {
-    const image = imagesList.find(im => im.id === imageId);
+    const image = imageMap[imageId];
 
     if (image) {
       dispatch(selectImage({imageId: image.id}));
@@ -211,7 +209,7 @@ const Monaco: React.FC<IProps> = props => {
     code,
     resourceMetaMap: activeResourceMetaMap,
     fileMap,
-    imagesList,
+    imageMap,
     selectResource: triggerSelectResource,
     selectFilePath,
     createResource: isInPreviewMode ? undefined : createResource,
@@ -274,10 +272,6 @@ const Monaco: React.FC<IProps> = props => {
       isDirtyRef.current = originalCodeRef.current !== newValue;
       setCode(newValue);
 
-      if (!autosavingStatusRef.current) {
-        dispatch(setAutosavingStatus(true));
-      }
-
       if (selectedResourceIdRef.current) {
         // this will slow things down if document gets large - need to find a better solution...
         const documents = parseAllYamlDocuments(newValue);
@@ -296,7 +290,7 @@ const Monaco: React.FC<IProps> = props => {
         debouncedSaveContent(newValue);
       }
     },
-    [autosavingStatusRef, debouncedSaveContent, dispatch, setCode]
+    [debouncedSaveContent, setCode]
   );
 
   useEffect(() => {
@@ -319,6 +313,8 @@ const Monaco: React.FC<IProps> = props => {
       const resourceContent =
         selectedResource.storage === 'transient'
           ? transientResourceContentMapRef.current[selectedResource.id]
+          : selectedResource.kind === 'Kustomization'
+          ? localResourceContentMapRef.current?.[selectedResource.id]
           : activeResourceContentMapRef.current?.[selectedResource.id];
       if (resourceContent) {
         if (codeRef.current === resourceContent.text) {
@@ -353,13 +349,13 @@ const Monaco: React.FC<IProps> = props => {
     isDirtyRef.current = false;
   }, [
     selectedFilePath,
-    selectedResource?.id,
-    selectedResource?.storage,
+    selectedResource,
     codeRef,
     activeResourceContentMapRef,
     transientResourceContentMapRef,
     fileMapRef,
     setCode,
+    localResourceContentMapRef,
   ]);
 
   useEffect(() => {
@@ -435,9 +431,11 @@ const Monaco: React.FC<IProps> = props => {
   useEffect(() => {
     if (!providedRange || !editorRef.current) return;
 
-    editorRef.current.setSelection(providedRange);
-    editorRef.current.revealLineInCenter(providedRange.startLineNumber);
-  }, [providedRange]);
+    setImmediate(() => {
+      editorRef.current?.setSelection(providedRange);
+      editorRef.current?.revealLineInCenter(providedRange.startLineNumber);
+    });
+  }, [dispatch, providedRange]);
 
   return (
     <S.MonacoContainer ref={containerRef} $height={height}>

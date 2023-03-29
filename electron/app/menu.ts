@@ -150,7 +150,6 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'Exit Preview',
         enabled: isInPreviewModeSelector(state),
         click: () => {
-          dispatch({type: 'main/stopPreviewLoader', payload: undefined});
           dispatch({type: 'main/clearPreviewAndSelectionHistory', payload: undefined});
         },
       },
@@ -264,8 +263,9 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory.current,
             state.main.resourceMetaMapByStorage,
             state.main.fileMap,
-            state.main.imagesList,
-            dispatch
+            state.main.imageMap,
+            dispatch,
+            state.ui.explorerSelectedSection
           );
         },
       },
@@ -280,8 +280,9 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
             state.main.selectionHistory.current,
             state.main.resourceMetaMapByStorage,
             state.main.fileMap,
-            state.main.imagesList,
-            dispatch
+            state.main.imageMap,
+            dispatch,
+            state.ui.explorerSelectedSection
           );
         },
       },

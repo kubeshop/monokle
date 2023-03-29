@@ -2,6 +2,8 @@ import {useEffect, useState} from 'react';
 
 import {Select} from 'antd';
 
+import {size} from 'lodash';
+
 import {useAppSelector} from '@redux/hooks';
 
 import * as S from './styled';
@@ -13,7 +15,7 @@ const NEW_ITEM = 'CREATE_NEW_ITEM';
 export const ImageSelection: React.FC = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
 
-  const imagesList = useAppSelector(state => state.main.imagesList);
+  const imageMap = useAppSelector(state => state.main.imageMap);
 
   const [images, setImages] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
@@ -31,12 +33,12 @@ export const ImageSelection: React.FC = (params: any) => {
   };
 
   useEffect(() => {
-    if (!imagesList.length) {
+    if (!size(imageMap)) {
       return;
     }
 
-    setImages(imagesList.map(image => image.id));
-  }, [imagesList]);
+    setImages(Object.keys(imageMap));
+  }, [imageMap]);
 
   return (
     <S.SelectStyled

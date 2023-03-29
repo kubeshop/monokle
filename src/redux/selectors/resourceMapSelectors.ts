@@ -3,7 +3,7 @@ import {Selector, createSelector} from 'reselect';
 
 import {useAppSelector} from '@redux/hooks';
 import {isKustomizationResource} from '@redux/services/kustomize';
-import {joinK8sResource, joinK8sResourceMap} from '@redux/services/resource';
+import {joinK8sResource} from '@redux/services/resource';
 
 import {useRefSelector} from '@utils/hooks';
 import {mapKeyValuesFromNestedObjects} from '@utils/objects';
@@ -11,13 +11,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {
-  K8sResource,
-  ResourceContentMap,
-  ResourceMap,
-  ResourceMetaMap,
-  ResourceStorage,
-} from '@shared/models/k8sResource';
+import {K8sResource, ResourceContentMap, ResourceMetaMap, ResourceStorage} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {isDefined} from '@shared/utils/filter';
 
@@ -36,50 +30,6 @@ export const activeResourceStorageSelector = createSelector(
     return 'local';
   }
 );
-
-// TODO: do the same thing for resource maps as I did for resource selectors
-export const createResourceMapSelector = <Storage extends ResourceStorage>(
-  storage: Storage
-): Selector<RootState, ResourceMetaMap<Storage>> => {
-  return createDeepEqualSelector(
-    [
-      (state: RootState) => state.main.resourceMetaMapByStorage[storage],
-      (state: RootState) => state.main.resourceContentMapByStorage[storage],
-    ],
-    (resourceMetaMap, resourceContentMap): ResourceMap<Storage> => {
-      return joinK8sResourceMap(resourceMetaMap, resourceContentMap);
-    }
-  );
-};
-
-const localResourceMapSelector = createResourceMapSelector('local');
-const clusterResourceMapSelector = createResourceMapSelector('cluster');
-const previewResourceMapSelector = createResourceMapSelector('preview');
-const transientResourceMapSelector = createResourceMapSelector('transient');
-
-const getResourceMapSelector = <Storage extends ResourceStorage>(
-  storage: Storage
-): Selector<RootState, ResourceMap<Storage>> => {
-  if (storage === 'cluster') return clusterResourceMapSelector as Selector<RootState, ResourceMap<typeof storage>>;
-  if (storage === 'preview') return previewResourceMapSelector as Selector<RootState, ResourceMap<typeof storage>>;
-  if (storage === 'transient') return transientResourceMapSelector as Selector<RootState, ResourceMap<typeof storage>>;
-  if (storage === 'local') return localResourceMapSelector as Selector<RootState, ResourceMap<typeof storage>>;
-  throw new Error(`Unknown resource storage: ${storage}`);
-};
-
-export const useResourceMap = <Storage extends ResourceStorage>(storage: Storage): ResourceMap<Storage> => {
-  return useAppSelector(getResourceMapSelector(storage));
-};
-
-export const useActiveResourceMap = (): ResourceMap<ResourceStorage> => {
-  const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
-  return useAppSelector(getResourceMapSelector(activeResourceStorage));
-};
-
-export const useActiveResourceMapRef = (): React.MutableRefObject<ResourceMap<ResourceStorage>> => {
-  const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
-  return useRefSelector(getResourceMapSelector(activeResourceStorage));
-};
 
 export const createResourceMetaMapSelector = <Storage extends ResourceStorage>(
   storage: Storage

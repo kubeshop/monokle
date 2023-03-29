@@ -1,8 +1,9 @@
 import {AnyAction} from '@reduxjs/toolkit';
 
-import {FileMapType, ImagesListType} from '@shared/models/appState';
+import {FileMapType, ImageMapType} from '@shared/models/appState';
 import {ResourceMetaMapByStorage} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
+import {ExplorerCollapsibleSectionsType} from '@shared/models/ui';
 
 // TODO: this should become a thunk so we don't have to pass resourceMetaStorage to it...
 export const selectFromHistory = (
@@ -11,8 +12,9 @@ export const selectFromHistory = (
   selectionHistory: AppSelection[],
   resourceMetaMapByStorage: ResourceMetaMapByStorage,
   fileMap: FileMapType,
-  imagesList: ImagesListType,
-  dispatch: (action: AnyAction) => void
+  imageMap: ImageMapType,
+  dispatch: (action: AnyAction) => void,
+  explorerSelectedSection: ExplorerCollapsibleSectionsType
 ) => {
   let removedSelectionHistoryEntriesCount = 0;
   const newSelectionHistory = selectionHistory.filter(selection => {
@@ -27,10 +29,8 @@ export const selectFromHistory = (
         return true;
       }
     }
-    if (selection.type === 'image') {
-      if (imagesList.find(image => image.id === selection.imageId)) {
-        return true;
-      }
+    if (selection.type === 'image' && imageMap[selection.imageId]) {
+      return true;
     }
     removedSelectionHistoryEntriesCount += 1;
     return false;
@@ -90,9 +90,16 @@ export const selectFromHistory = (
   }
 
   const nextSelection = newSelectionHistory[nextSelectionHistoryIndex];
+
+  if (nextSelection.type === 'image' && explorerSelectedSection !== 'images') {
+    dispatch({type: 'ui/setExplorerSelectedSection', payload: 'images'});
+  } else if (nextSelection.type === 'file' && explorerSelectedSection !== 'files') {
+    dispatch({type: 'ui/setExplorerSelectedSection', payload: 'files'});
+  }
+
   if (nextSelection.type === 'resource') {
     dispatch({
-      type: 'main/selectK8sResource',
+      type: 'main/selectResource',
       payload: {
         resourceIdentifier: nextSelection.resourceIdentifier,
         isVirtualSelection: true,

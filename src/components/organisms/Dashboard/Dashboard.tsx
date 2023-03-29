@@ -62,14 +62,29 @@ const Dashboard: React.FC = () => {
   const clusterResourceMeta = useResourceMetaMap('cluster');
   const clusterResourceContent = useResourceContentMap('cluster');
 
+  const compareNamespaces = useCallback(
+    (namespace: string) => {
+      if (clusterConnectionOptions.lastNamespaceLoaded === '<all>') {
+        return true;
+      }
+      if (clusterConnectionOptions.lastNamespaceLoaded === '<not-namespaced>') {
+        return !namespace;
+      }
+      return clusterConnectionOptions.lastNamespaceLoaded === namespace;
+    },
+    [clusterConnectionOptions]
+  );
+
   const filterResources = useCallback(() => {
     return Object.values(clusterResourceContent)
       .map(r => ({...r, ...clusterResourceMeta[r.id]}))
-      .filter(
-        resource =>
+      .filter(resource => {
+        return (
           activeMenu.key.replace(`${resource.object.apiVersion}-`, '') === resource.object.kind &&
-          resource.object.kind === activeMenu.label
-      );
+          resource.object.kind === activeMenu.label &&
+          compareNamespaces(resource.object.metadata.namespace)
+        );
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeMenu, clusterResourceContent, clusterResourceMeta, clusterConnectionOptions]);
 

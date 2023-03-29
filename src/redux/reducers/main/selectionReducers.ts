@@ -68,7 +68,7 @@ export const selectResourceReducer = (
     if (ref.target?.type === 'image' && ref.target.tag) {
       newHighlights.push({
         type: 'image',
-        imageId: ref.target.tag,
+        imageId: `${ref.name}:${ref.target.tag}`,
       });
     }
   });
@@ -143,7 +143,7 @@ export const selectionReducers = createSliceReducers('main', {
       type: 'image',
       imageId: action.payload.imageId,
     };
-    const image = state.imagesList.find(img => img.id === action.payload.imageId);
+    const image = state.imageMap[action.payload.imageId];
     if (image) {
       highlightResourcesUsingImage(image, state);
     }

@@ -1,10 +1,10 @@
-import React, {useCallback, useMemo} from 'react';
+import {useCallback, useMemo, useRef} from 'react';
 
 import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
-import path from 'path';
+import {basename, dirname, sep} from 'path';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -25,38 +25,34 @@ import {useRefSelector} from '@utils/hooks';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {Colors} from '@shared/styles/colors';
 import {showItemInFolder} from '@shared/utils/shell';
 
-const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-`;
+type IProps = {
+  id: string;
+  isSelected: boolean;
+};
 
-const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
-  const {itemInstance} = props;
+const KustomizeContextMenu: React.FC<IProps> = props => {
+  const {id, isSelected} = props;
 
   const dispatch = useAppDispatch();
   const fileMapRef = useRefSelector(state => state.main.fileMap);
 
-  const resource = useResource({id: itemInstance.id, storage: 'local'});
-  const resourceRef = React.useRef(resource);
+  const resource = useResource({id, storage: 'local'});
+  const resourceRef = useRef(resource);
   resourceRef.current = resource;
 
   const fileEntry = useAppSelector(state =>
     resource?.origin.filePath ? state.main.fileMap[resource.origin.filePath] : undefined
   );
-
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const filters = useAppSelector(state => state.main.resourceFilter);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
-  const osPlatform = useAppSelector(state => state.config.osPlatform);
   const isKustomizationSelected = useAppSelector(state =>
     resource ? isResourceSelected(resource, state.main.selection) : false
   );
+  const osPlatform = useAppSelector(state => state.config.osPlatform);
 
   const {onCreateResource} = useCreate();
   const {onDuplicate} = useDuplicate();
@@ -67,11 +63,10 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     () => (resource?.origin.filePath ? getAbsoluteFilePath(resource?.origin.filePath, fileMapRef.current) : undefined),
     [resource?.origin.filePath, fileMapRef]
   );
-
   const isRoot = useMemo(() => resource?.origin.filePath === ROOT_FILE_ENTRY, [resource?.origin.filePath]);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
   const targetFile = useMemo(
-    () => (isRoot ? ROOT_FILE_ENTRY : resource?.origin.filePath.replace(path.sep, '')),
+    () => (isRoot ? ROOT_FILE_ENTRY : resource?.origin.filePath.replace(sep, '')),
     [isRoot, resource?.origin.filePath]
   );
   const isPassingFilter = useMemo(
@@ -79,7 +74,10 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
     [filters, resource]
   );
 
-  const refreshFolder = useCallback(() => setRootFolder(fileMapRef.current[ROOT_FILE_ENTRY].filePath), [fileMapRef]);
+  const refreshFolder = useCallback(
+    () => dispatch(setRootFolder(fileMapRef.current[ROOT_FILE_ENTRY].filePath)),
+    [dispatch, fileMapRef]
+  );
   const {onExcludeFromProcessing} = useProcessing(refreshFolder);
 
   const onClickShowFile = useCallback(() => {
@@ -162,7 +160,7 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
           if (!absolutePath) {
             return;
           }
-          onDuplicate(absolutePath, path.basename(absolutePath), path.dirname(absolutePath));
+          onDuplicate(absolutePath, basename(absolutePath), dirname(absolutePath));
         },
       },
       {
@@ -230,11 +228,20 @@ const KustomizationContextMenu: React.FC<ItemCustomComponentProps> = props => {
 
   return (
     <ContextMenu items={menuItems}>
-      <StyledActionsMenuIconContainer isSelected={itemInstance.isSelected}>
+      <ActionsMenuIconContainer isSelected={isSelected}>
         <Dots color={isKustomizationSelected ? Colors.blackPure : undefined} />
-      </StyledActionsMenuIconContainer>
+      </ActionsMenuIconContainer>
     </ContextMenu>
   );
 };
 
-export default KustomizationContextMenu;
+export default KustomizeContextMenu;
+
+// Styled Components
+
+const ActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+`;

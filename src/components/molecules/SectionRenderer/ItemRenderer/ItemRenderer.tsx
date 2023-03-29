@@ -146,27 +146,29 @@ function ItemRenderer<ItemType, ScopeType>(props: ItemRendererProps<ItemType, Sc
               </S.InformationContainer>
             )}
 
-            {QuickAction.Component &&
-              !options?.disableQuickAction &&
-              (QuickAction.options?.isVisibleOnHover ? isHovered : true) && (
-                <S.QuickActionContainer>
-                  <QuickAction.Component itemInstance={itemInstance} options={QuickAction.options} />
-                </S.QuickActionContainer>
-              )}
-
             {Suffix.Component && !options?.disableSuffix && (Suffix.options?.isVisibleOnHover ? isHovered : true) && (
               <S.SuffixContainer>
                 <Suffix.Component itemInstance={itemInstance} options={Suffix.options} />
               </S.SuffixContainer>
             )}
 
-            {ContextMenu.Component &&
-              !options?.disableContextMenu &&
-              (ContextMenu.options?.isVisibleOnHover ? isHovered : true) && (
-                <S.ContextMenuContainer onClick={e => e.stopPropagation()}>
-                  <ContextMenu.Component itemInstance={itemInstance} options={QuickAction.options} />
-                </S.ContextMenuContainer>
-              )}
+            <div style={{display: 'flex', marginLeft: 'auto'}}>
+              {QuickAction.Component &&
+                !options?.disableQuickAction &&
+                (QuickAction.options?.isVisibleOnHover ? isHovered : true) && (
+                  <S.QuickActionContainer>
+                    <QuickAction.Component itemInstance={itemInstance} options={QuickAction.options} />
+                  </S.QuickActionContainer>
+                )}
+
+              {ContextMenu.Component &&
+                !options?.disableContextMenu &&
+                (ContextMenu.options?.isVisibleOnHover ? isHovered : true) && (
+                  <S.ContextMenuContainer onClick={e => e.stopPropagation()}>
+                    <ContextMenu.Component itemInstance={itemInstance} options={QuickAction.options} />
+                  </S.ContextMenuContainer>
+                )}
+            </div>
           </S.ItemContainer>
         </Wrapper>
       )}

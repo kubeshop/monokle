@@ -492,6 +492,10 @@ export const mainSlice = createSlice({
       return action.payload.nextMainState;
     });
 
+    builder.addCase(updateResource.pending, state => {
+      state.autosaving.status = true;
+    });
+
     builder.addCase(updateResource.fulfilled, (state, action) => {
       return action.payload.nextMainState;
     });
@@ -502,6 +506,10 @@ export const mainSlice = createSlice({
 
     builder.addCase(updateMultipleResources.fulfilled, (state, action) => {
       return action.payload.nextMainState;
+    });
+
+    builder.addCase(updateFileEntry.pending, state => {
+      state.autosaving.status = true;
     });
 
     builder.addCase(updateFileEntry.fulfilled, (state, action) => {
@@ -586,7 +594,7 @@ export const {
   setAutosavingError,
   setAutosavingStatus,
   setFiltersToBeChanged,
-  setImagesList,
+  setImageMap,
   setImagesSearchedValue,
   setSelectionHistory,
   uncheckAllResourceIds,

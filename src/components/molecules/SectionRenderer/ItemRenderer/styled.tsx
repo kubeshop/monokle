@@ -24,6 +24,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   align-items: center;
   width: 100%;
   user-select: none;
+
   > {
     min-width: 0;
   }
@@ -122,13 +123,9 @@ export const InformationContainer = styled.span`
   align-items: center;
 `;
 
-export const QuickActionContainer = styled.span`
-  margin-left: auto;
-`;
+export const QuickActionContainer = styled.span``;
 
-export const ContextMenuContainer = styled.span`
-  margin-left: auto;
-`;
+export const ContextMenuContainer = styled.span``;
 
 export const BlankSpace = styled.span`
   flex-grow: 1;

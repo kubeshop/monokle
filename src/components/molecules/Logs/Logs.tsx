@@ -1,6 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {useEffect, useState} from 'react';
+import {memo, useEffect, useRef, useState} from 'react';
 
 import log from 'loglevel';
 import stream from 'stream';
@@ -32,6 +32,14 @@ const Logs = () => {
   const clusterProxyPort = useAppSelector(state => state.config.clusterProxyPort);
   const selectedResource = useSelectedResource();
   const [logs, setLogs] = useState<LogLineType[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef && containerRef.current) {
+      const position = containerRef.current.scrollHeight - containerRef.current.clientHeight;
+      containerRef.current.scrollTop = position;
+    }
+  }, [logs]);
 
   useEffect(() => {
     setLogs([]);
@@ -61,18 +69,23 @@ const Logs = () => {
     }
 
     return () => {
-      logStream.destroy();
+      if (logStream) {
+        logStream.destroy();
+      }
     };
   }, [kubeConfigContext, kubeConfigPath, selectedResource, clusterProxyPort]);
 
   return (
-    <S.LogContainer>
+    <S.LogContainer ref={containerRef}>
       {logs.map(logLine => (
-        <S.LogText key={logLine.id}>{logLine.text}</S.LogText>
+        <LogItem key={logLine.id} logLine={logLine} />
       ))}
-      ;
     </S.LogContainer>
   );
 };
 
 export default Logs;
+
+export const LogItem = memo(({logLine}: any) => {
+  return <S.LogText key={logLine.id}>{logLine.text}</S.LogText>;
+});

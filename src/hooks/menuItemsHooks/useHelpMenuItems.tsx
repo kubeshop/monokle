@@ -68,7 +68,7 @@ export function useHelpMenuItems() {
       {
         label: (
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FeedbackTooltip}>
-            {renderMenuItem('Feedback', <CommentOutlined />)}
+            {renderMenuItem('Feedback', <CommentOutlined />, false, true)}
           </Tooltip>
         ),
         key: 'feedback',
@@ -81,8 +81,8 @@ export function useHelpMenuItems() {
   return items;
 }
 
-const renderMenuItem = (label: string, icon: JSX.Element, border?: boolean) => (
-  <MenuItem style={{cursor: 'default'}} $border={border}>
+const renderMenuItem = (label: string, icon: JSX.Element, border?: boolean, cursorPointer?: boolean) => (
+  <MenuItem style={{cursor: cursorPointer ? 'pointer' : 'default'}} $border={border}>
     {icon && <MenuItemIcon>{icon}</MenuItemIcon>}
     <MenuItemLabel>{label}</MenuItemLabel>
   </MenuItem>

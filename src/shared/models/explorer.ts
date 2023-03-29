@@ -6,6 +6,7 @@ import {DataNode} from 'antd/lib/tree';
 export type InjectedPanelProps = {
   isActive?: boolean;
   panelKey?: string;
+  width?: number;
 };
 
 export type ProcessingEntity = {

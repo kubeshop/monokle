@@ -11,7 +11,7 @@ import {NotificationsTooltip} from '@constants/tooltips';
 
 import {setOpenProject} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setShowStartPageLearn, toggleNotifications} from '@redux/reducers/ui';
+import {setShowStartPageLearn, setStartPageMenuOption, toggleNotifications} from '@redux/reducers/ui';
 
 import {WelcomePopupContent} from '@molecules';
 
@@ -63,7 +63,12 @@ const StartPageHeader: React.FC = () => {
   return (
     <S.StartPageHeaderContainer>
       <S.LogoContainer>
-        <S.Logo id="monokle-logo-header" src={MonokleKubeshopLogo} alt="Monokle" />
+        <S.Logo
+          id="monokle-logo-header"
+          src={MonokleKubeshopLogo}
+          alt="Monokle"
+          onClick={() => dispatch(setStartPageMenuOption('new-project'))}
+        />
       </S.LogoContainer>
 
       <S.SearchContainer>

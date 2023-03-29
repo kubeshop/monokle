@@ -9,7 +9,7 @@ export const ImageDetailsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 30px;
-  padding: 10px;
+  padding: 10px 16px;
 `;
 
 export const ImageExtraInfoContainer = styled.div`
@@ -23,7 +23,7 @@ export const ImageName = styled.div`
   font-weight: 700;
   color: ${Colors.cyan7};
   border-bottom: ${AppBorders.sectionDivider};
-  padding: 10px;
+  padding: 10px 16px;
 
   display: flex;
   align-items: center;

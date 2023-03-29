@@ -15,7 +15,7 @@ import {
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
-  ImagesListType,
+  ImageMapType,
   ResourceFilterType,
 } from '@shared/models/appState';
 import {K8sResource, ResourceIdentifier, ResourceMetaMap, ResourceStorage} from '@shared/models/k8sResource';
@@ -31,7 +31,7 @@ interface CodeIntelProps {
   code: string | undefined;
   resourceMetaMap: ResourceMetaMap;
   fileMap: FileMapType;
-  imagesList: ImagesListType;
+  imageMap: ImageMapType;
   selectResource: (resourceIdentifier: ResourceIdentifier) => void;
   selectFilePath: (filePath: string) => void;
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined;
@@ -50,7 +50,7 @@ function useCodeIntel(props: CodeIntelProps) {
     editorRef,
     selectedResource,
     code,
-    imagesList,
+    imageMap,
     resourceMetaMap,
     fileMap,
     selectResource,
@@ -185,7 +185,7 @@ function useCodeIntel(props: CodeIntelProps) {
       debouncedUpdate.current.cancel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, selectedResource, resourceMetaMap, editorRef, imagesList, helmTemplatesMap, helmValuesMap]);
+  }, [code, selectedResource, resourceMetaMap, editorRef, imageMap, helmTemplatesMap, helmValuesMap]);
 
   // useEffect(() => {
   //   if (completionDisposableRef.current && completionDisposableRef.current.dispose) {

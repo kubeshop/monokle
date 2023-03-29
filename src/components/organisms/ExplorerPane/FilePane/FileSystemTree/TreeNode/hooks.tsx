@@ -23,11 +23,14 @@ import {isKustomizationFile, isKustomizationResource} from '@redux/services/kust
 import {startPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
+import {useFilterByFileOrFolder} from '@hooks/fileTreeHooks';
+
 import {deleteFileEntry, dispatchDeleteAlert, duplicateEntity, isFileEntryDisabled} from '@utils/files';
 import {useOpenOnGithub} from '@utils/git';
 import {useRefSelector} from '@utils/hooks';
 
 import {isYamlFile} from '@monokle/validation';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AlertEnum} from '@shared/models/alert';
 import {FileEntry} from '@shared/models/fileEntry';
 import {isDefined} from '@shared/utils/filter';
@@ -345,8 +348,12 @@ export const useFileMenuItems = (
   const {deleteEntry, canBePreviewed} = props;
   const dispatch = useAppDispatch();
   const commonMenuItems = useCommonMenuItems({deleteEntry}, fileEntry);
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const localResourceMetaMapRef = useResourceMetaMapRef('local');
   const createNewResource = useCreateResource();
+  const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
+
+  const isRoot = useMemo(() => fileEntry?.filePath === ROOT_FILE_ENTRY, [fileEntry]);
 
   const preview = usePreview();
   const duplicate = useDuplicate();
@@ -414,8 +421,18 @@ export const useFileMenuItems = (
 
     newMenuItems.push({
       key: 'filter_on_file',
-      label: 'Filter on this file',
+      label:
+        fileOrFolderContainedInFilter && fileEntry.filePath === fileOrFolderContainedInFilter
+          ? 'Remove from filter'
+          : 'Filter on this file',
       disabled: isNonResourceFile,
+      onClick: () => {
+        if (isRoot || (fileOrFolderContainedInFilter && fileEntry.filePath === fileOrFolderContainedInFilter)) {
+          onFilterByFileOrFolder(undefined);
+        } else {
+          onFilterByFileOrFolder(fileEntry.filePath);
+        }
+      },
     });
 
     newMenuItems.push({
@@ -441,13 +458,16 @@ export const useFileMenuItems = (
     return newMenuItems;
   }, [
     fileEntry,
+    localResourceMetaMapRef,
     canBePreviewed,
     commonMenuItems,
-    createNewResource,
     preview,
-    duplicate,
-    localResourceMetaMapRef,
     dispatch,
+    createNewResource,
+    isRoot,
+    fileOrFolderContainedInFilter,
+    onFilterByFileOrFolder,
+    duplicate,
   ]);
 
   return menuItems;

@@ -10,28 +10,28 @@ import {Merge} from 'type-fest';
 
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch} from '@redux/hooks';
-import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
+import {useResourceContentMap} from '@redux/selectors/resourceMapSelectors';
 
 import {useStateWithRef} from '@utils/hooks';
 import {timeAgo} from '@utils/timeAgo';
 
 import EventHandler from '@src/kindhandlers/EventHandler';
 
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceContent} from '@shared/models/k8sResource';
 
 import * as S from './Activity.styled';
 
 export const Activity = ({paused}: {paused?: boolean}) => {
   const dispatch = useAppDispatch();
-  const clusterResourceMap = useResourceMap('cluster');
+  const clusterResourceContentMap = useResourceContentMap('cluster');
   const [isToLatestVisible, setIsToLatestVisible] = useState<boolean>(false);
   const [isToOldestVisible, setIsToOldestVisible] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [events, setEvents, eventsRef] = useStateWithRef<Merge<K8sResource, {eventTime: string}>[]>([]);
+  const [events, setEvents, eventsRef] = useStateWithRef<Merge<ResourceContent, {eventTime: string}>[]>([]);
   const [tempEventLength, setTempEventLength] = useState(0);
 
-  const pausedResource = useMemo<K8sResource | undefined>(() => {
+  const pausedResource = useMemo<ResourceContent | undefined>(() => {
     if (paused) {
       return eventsRef.current[0];
     }
@@ -81,10 +81,11 @@ export const Activity = ({paused}: {paused?: boolean}) => {
     }
     setEvents(
       sortBy(
-        Object.values(clusterResourceMap)
+        Object.values(clusterResourceContentMap)
           .filter(
             resource =>
-              resource.object.apiVersion === EventHandler.clusterApiVersion && resource.kind === EventHandler.kind
+              resource.object.apiVersion === EventHandler.clusterApiVersion &&
+              resource.object.kind === EventHandler.kind
           )
           .map(resource => ({
             ...resource,
@@ -94,7 +95,7 @@ export const Activity = ({paused}: {paused?: boolean}) => {
         'eventTime'
       ).reverse()
     );
-  }, [clusterResourceMap, tempEventLength, pausedResource, setEvents, eventsRef]);
+  }, [clusterResourceContentMap, tempEventLength, pausedResource, setEvents, eventsRef]);
 
   return (
     <S.Container ref={containerRef} onScroll={handleScroll}>

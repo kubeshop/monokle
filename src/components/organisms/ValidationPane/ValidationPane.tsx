@@ -7,7 +7,7 @@ import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {useValidationSelector} from '@redux/validation/validation.selectors';
-import {setSelectedProblem} from '@redux/validation/validation.slice';
+import {setSelectedProblem, setValidationFilters} from '@redux/validation/validation.slice';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
@@ -24,6 +24,7 @@ const ValidationPane: React.FC = () => {
   const newProblemsIntroducedType = useValidationSelector(state => state.validationOverview.newProblemsIntroducedType);
   const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem);
   const status = useValidationSelector(state => state.status);
+  const validationFilters = useValidationSelector(state => state.validationOverview.filters);
 
   const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
@@ -63,6 +64,7 @@ const ValidationPane: React.FC = () => {
       <ValidationOverview
         containerStyle={{marginTop: '20px'}}
         showOnlyByResource={isInClusterMode}
+        filters={validationFilters}
         height={height - titleBarHeight - 40}
         newProblemsIntroducedType={newProblemsIntroducedType}
         selectedProblem={selectedProblem?.problem}
@@ -70,6 +72,7 @@ const ValidationPane: React.FC = () => {
         onProblemSelect={problem => dispatch(setSelectedProblem(problem))}
         status={status}
         skeletonStyle={{marginTop: '20px'}}
+        onFiltersChange={filters => dispatch(setValidationFilters(filters))}
       />
     </S.ValidationPaneContainer>
   );

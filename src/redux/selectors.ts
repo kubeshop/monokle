@@ -84,12 +84,12 @@ export const previewedHelmConfigSelector = createSelector(
 );
 
 export const selectedImageSelector = createSelector(
-  [(state: RootState) => state.main.selection, (state: RootState) => state.main.imagesList],
-  (selection, imagesList) => {
+  [(state: RootState) => state.main.selection, (state: RootState) => state.main.imageMap],
+  (selection, imageMap) => {
     if (!selection || selection.type !== 'image') {
       return undefined;
     }
-    return imagesList.find(image => image.id === selection.imageId);
+    return imageMap[selection.imageId];
   }
 );
 
