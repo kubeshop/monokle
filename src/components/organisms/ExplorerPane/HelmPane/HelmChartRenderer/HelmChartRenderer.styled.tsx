@@ -77,5 +77,6 @@ export const ItemName = styled.div<ItemNameProps>`
 export const PrefixContainer = styled.span`
   display: flex;
   align-items: center;
-  min-width: 25px;
+  gap: 8px;
+  margin-right: 7px;
 `;

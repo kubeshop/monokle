@@ -238,6 +238,14 @@ export const uiSlice = createSlice({
 
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
     },
+    collapseHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.collapsedHelmCharts.push(action.payload);
+    },
+
+    toggleHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.collapsedHelmCharts = state.collapsedHelmCharts.filter(chart => chart !== action.payload);
+    },
+
     collapseKustomizeKinds: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       const kindsToCollapse = action.payload.filter(s => !state.collapsedKustomizeKinds.includes(s));
       if (kindsToCollapse.length > 0) {
@@ -425,6 +433,7 @@ export const {
   closeSaveResourcesToFileFolderModal,
   closeTemplateExplorer,
   closeWelcomePopup,
+  collapseHelmChart,
   collapseKustomizeKinds,
   collapseResourceKinds,
   expandKustomizeKinds,
@@ -468,6 +477,7 @@ export const {
   setStartPageMenuOption,
   setTemplateProjectCreate,
   toggleExpandActionsPaneFooter,
+  toggleHelmChart,
   toggleLeftMenu,
   toggleNotifications,
   toggleResourceFilters,

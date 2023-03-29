@@ -8,6 +8,7 @@ import {Icon} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
 
 import HelmContextMenu from '../HelmContextMenu';
+import HelmChartCollapse from './HelmChartCollapse';
 import * as S from './HelmChartRenderer.styled';
 
 type IProps = {
@@ -45,6 +46,7 @@ const HelmChartRenderer: React.FC<IProps> = props => {
       onClick={() => dispatch(selectFile({filePath: helmChart.filePath}))}
     >
       <S.PrefixContainer>
+        <HelmChartCollapse id={id} isSelected={isSelected} />
         <Icon name="helm" style={{color: isSelected ? Colors.blackPure : Colors.grey9, fontSize: '18px'}} />
       </S.PrefixContainer>
 

@@ -186,6 +186,7 @@ type UiState = {
   };
   isInQuickClusterMode?: boolean;
   collapsedKustomizeKinds: string[];
+  collapsedHelmCharts: string[];
   welcomePopup: {
     isVisible: boolean;
   };
