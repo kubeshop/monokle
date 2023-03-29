@@ -1,5 +1,3 @@
-import {useMeasure} from 'react-use';
-
 import {Collapse as RawCollapse} from 'antd';
 
 import styled from 'styled-components';
@@ -20,10 +18,8 @@ const ExplorerPane: React.FC = () => {
   const explorerSelectedSection = useAppSelector(state => state.ui.explorerSelectedSection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
-  const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
-
   return (
-    <CollapseContainer ref={containerRef}>
+    <CollapseContainer>
       <Collapse
         accordion
         ghost
@@ -38,7 +34,7 @@ const ExplorerPane: React.FC = () => {
       >
         <FilePane key="files" />
         <KustomizePane key="kustomize" />
-        <HelmPane key="helm" width={containerWidth - 24} />
+        <HelmPane key="helm" />
         <ImagesPane key="images" />
       </Collapse>
     </CollapseContainer>

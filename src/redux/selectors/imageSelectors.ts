@@ -1,4 +1,4 @@
-import {createSelector} from 'reselect';
+import {createSelector} from '@reduxjs/toolkit';
 
 import {ImageNode} from '@shared/models/appState';
 import {RootState} from '@shared/models/rootState';

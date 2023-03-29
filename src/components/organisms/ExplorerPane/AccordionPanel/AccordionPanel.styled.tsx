@@ -9,7 +9,7 @@ export const Panel = styled(Collapse.Panel)<{$contentHeight: number; $panelKey: 
 
   .ant-collapse-content-box {
     padding: 0 !important;
-    overflow-y: ${props => (props.$panelKey !== 'helm' ? 'hidden' : 'auto')};
+    overflow-y: hidden;
     max-height: ${props => props.$contentHeight}px;
     height: ${props => props.$contentHeight}px;
   }
