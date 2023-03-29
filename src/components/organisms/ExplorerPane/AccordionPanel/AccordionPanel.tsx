@@ -1,9 +1,4 @@
-import {useState} from 'react';
-import {useEffectOnce} from 'react-use';
-
 import {CollapsePanelProps} from 'antd';
-
-import {useResizeObserverRef} from 'rooks';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
@@ -22,28 +17,10 @@ export type InjectedPanelProps = {
 
 const AccordionPanel: React.FC<CollapsePanelProps & InjectedPanelProps> = props => {
   const id = getPanelId(props.panelKey);
-  const [contentHeight, setContentHeight] = useState<number>(1);
 
-  const height = usePaneHeight() - PANEL_HEADER_HEIGHT - 165;
+  const height = usePaneHeight() - PANEL_HEADER_HEIGHT - 130 - (props.panelKey === 'files' ? 30 : 0);
 
-  const [containerRef] = useResizeObserverRef(el => {
-    if (!el) return;
-    const [{contentRect}] = el;
-    setContentHeight(contentRect ? contentRect.height - PANEL_HEADER_HEIGHT : 1);
-  });
-
-  useEffectOnce(() => {
-    containerRef(document.querySelector(`#${id}`));
-  });
-
-  return (
-    <S.Panel
-      collapsible={props.disabled ? 'disabled' : undefined}
-      id={id}
-      $contentHeight={contentHeight < height ? contentHeight : height}
-      {...props}
-    />
-  );
+  return <S.Panel collapsible={props.disabled ? 'disabled' : undefined} id={id} $contentHeight={height} {...props} />;
 };
 
 export default AccordionPanel;
