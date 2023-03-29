@@ -42,7 +42,7 @@ const initProxy = (kubeConfigPath: string) => {
         windowsHide: true,
       });
 
-      kubectlProxyProcess.on('exit', (code, signal) => {
+      kubectlProxyProcess.on('exit', () => {
         reject();
       });
 

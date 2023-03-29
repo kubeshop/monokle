@@ -34,6 +34,14 @@ const readKubeConfigFile = (filePath: string) => {
       currentContext: kc.currentContext,
     };
   } catch (error) {
+    process.parentPort.postMessage({
+      type: 'alert/setAlert',
+      payload: {
+        title: 'KUBECONFIG error',
+        message: 'there was an error parsing the file.',
+        type: 3, // AlertEnum.Error,
+      },
+    });
     return {
       path: filePath,
       isPathValid: false,

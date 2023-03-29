@@ -84,6 +84,13 @@ const loadKubeConfigListener: AppListenerFn = listen => {
           }
         }
       } catch (error: any) {
+        dispatch(
+          setAlert({
+            title: 'KUBECONFIG error',
+            message: 'there was an error parsing the file.',
+            type: AlertEnum.Error,
+          })
+        );
         dispatch(setKubeConfig({isPathValid: false, contexts: []}));
       }
     },
