@@ -58,10 +58,6 @@ const HelmChartRenderer: React.FC<IProps> = props => {
             e.stopPropagation();
           }}
         >
-          {/* <S.QuickActionContainer>
-            <KustomizeQuickAction id={resourceMeta.id} isSelected={isSelected} />
-          </S.QuickActionContainer> */}
-
           <S.ContextMenuContainer>
             <HelmChartContextMenu id={id} isSelected={isSelected} />
           </S.ContextMenuContainer>

@@ -58,4 +58,21 @@ type HelmChartNode = {
   id: string;
 };
 
-export type {HelmChart, HelmChartNode, HelmChartMenuItem, HelmValuesFile, RangeAndValue, HelmValueMatch, HelmTemplate};
+type HelmValueNode = {
+  type: 'helm-value';
+  id: string;
+};
+
+type HelmListNode = HelmChartNode | HelmValueNode;
+
+export type {
+  HelmChart,
+  HelmChartMenuItem,
+  HelmChartNode,
+  HelmListNode,
+  HelmTemplate,
+  HelmValuesFile,
+  HelmValueMatch,
+  HelmValueNode,
+  RangeAndValue,
+};

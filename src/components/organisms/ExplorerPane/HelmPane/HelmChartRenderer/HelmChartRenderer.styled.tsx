@@ -23,7 +23,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   > {
     min-width: 0;
   }
-  padding-left: 30px;
+  padding-left: 20px;
   padding-right: 8px;
   margin-bottom: 2px;
   cursor: pointer;
