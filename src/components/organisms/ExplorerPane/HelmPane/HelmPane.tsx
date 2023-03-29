@@ -32,7 +32,7 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
       header={
         <AccordionTitleBarContainer>
           <TitleBar
-            title="Helm"
+            title="Helm Charts"
             expandable
             isOpen={Boolean(isActive)}
             actions={<TitleBarCount count={count} isActive={Boolean(isActive)} />}

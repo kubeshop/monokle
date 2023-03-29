@@ -38,7 +38,7 @@ const PreviewConfigurationPane: React.FC<InjectedPanelProps> = props => {
       header={
         <AccordionTitleBarContainer>
           <TitleBar
-            title="Preview Configurations"
+            title="Helm Preview Configurations"
             expandable
             isOpen={Boolean(isActive)}
             actions={<TitleBarCount count={count} isActive={Boolean(isActive)} />}

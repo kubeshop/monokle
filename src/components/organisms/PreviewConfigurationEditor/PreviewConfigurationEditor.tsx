@@ -15,6 +15,8 @@ import {startPreview} from '@redux/services/preview';
 
 import {KeyValueInput} from '@atoms';
 
+import {useRefSelector} from '@utils/hooks';
+
 import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
 import {HelmValuesFile} from '@shared/models/helm';
 
@@ -49,6 +51,7 @@ const PreviewConfigurationEditor = () => {
 
     return state.main.helmChartMap[helmChartId];
   });
+  const projectConfigRef = useRefSelector(state => state.config.projectConfig);
 
   const [name, setName] = useState<string>(() => previewConfiguration?.name || '');
   const [showNameError, setShowNameError] = useState(false);
@@ -143,10 +146,12 @@ const PreviewConfigurationEditor = () => {
       if (!helmChart) {
         return;
       }
+
       if (!name.trim().length) {
         setShowNameError(true);
         return;
       }
+
       const input: HelmPreviewConfiguration = {
         id: previewConfiguration ? previewConfiguration.id : uuidv4(),
         name,
@@ -155,12 +160,14 @@ const PreviewConfigurationEditor = () => {
         options: helmOptions,
         valuesFileItemMap,
       };
+
       const updatedPreviewConfigurationMap = JSON.parse(JSON.stringify(previewConfigurationMap));
       updatedPreviewConfigurationMap[input.id] = input;
 
       dispatch(
         updateProjectConfig({
           config: {
+            ...projectConfigRef.current,
             helm: {
               previewConfigurationMap: updatedPreviewConfigurationMap,
             },
