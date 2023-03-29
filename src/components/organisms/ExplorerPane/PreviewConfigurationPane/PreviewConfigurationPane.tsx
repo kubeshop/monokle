@@ -1,4 +1,4 @@
-import {memo, useMemo} from 'react';
+import {memo} from 'react';
 
 import {CollapsePanelProps} from 'antd';
 
@@ -12,18 +12,13 @@ import {InjectedPanelProps} from '@shared/models/explorer';
 
 import AccordionPanel from '../AccordionPanel';
 import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
-import HelmList from './HelmList';
+import PreviewConfigurationList from './PreviewConfigurationList';
 
-const HelmPane: React.FC<InjectedPanelProps> = props => {
+const PreviewConfigurationPane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
-  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-
-  const count = useMemo(
-    () => size(Object.values(helmChartMap).filter(chart => !chart.name.includes('Unnamed Chart:'))),
-    [helmChartMap]
-  );
+  const previewConfigurationMap = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap);
 
   return (
     <AccordionPanel
@@ -32,19 +27,19 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
       header={
         <AccordionTitleBarContainer>
           <TitleBar
-            title="Helm"
+            title="Preview Configurations"
             expandable
             isOpen={Boolean(isActive)}
-            actions={<TitleBarCount count={count} isActive={Boolean(isActive)} />}
+            actions={<TitleBarCount count={size(previewConfigurationMap)} isActive={Boolean(isActive)} />}
           />
         </AccordionTitleBarContainer>
       }
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
     >
-      <HelmList />
+      <PreviewConfigurationList />
     </AccordionPanel>
   );
 };
 
-export default memo(HelmPane);
+export default memo(PreviewConfigurationPane);

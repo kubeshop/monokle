@@ -15,7 +15,9 @@ export const helmChartListSelector = createSelector(
   (helmChartMap, helmValuesMap, collapsedHelmCharts) => {
     const list: HelmListNode[] = [];
 
-    const ordererHelmChartMap = orderBy(helmChartMap, ['name'], ['asc']);
+    const ordererHelmChartMap = orderBy(helmChartMap, ['name'], ['asc']).filter(
+      chart => !chart.name.includes('Unnamed Chart:')
+    );
 
     for (const helmChart of ordererHelmChartMap) {
       list.push({type: 'helm-chart', id: helmChart.id, filePath: helmChart.filePath});
@@ -27,10 +29,6 @@ export const helmChartListSelector = createSelector(
       const valuesFiles = helmChart.valueFileIds.map(id => helmValuesMap[id]).filter(isDefined);
 
       for (const valueFile of valuesFiles) {
-        list.push({type: 'helm-value', id: valueFile.id});
-        list.push({type: 'helm-value', id: valueFile.id});
-        list.push({type: 'helm-value', id: valueFile.id});
-        list.push({type: 'helm-value', id: valueFile.id});
         list.push({type: 'helm-value', id: valueFile.id});
       }
     }

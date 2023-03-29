@@ -50,6 +50,10 @@ export const ItemContainer = styled.span<ItemContainerProps>`
 export const ItemName = styled.div<ItemNameProps>`
   padding: 2px 0;
   font-size: 14px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   ${props => {
     if (props.isSelected) {

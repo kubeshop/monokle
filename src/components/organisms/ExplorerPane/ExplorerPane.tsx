@@ -12,6 +12,7 @@ import FilePane from './FilePane';
 import HelmPane from './HelmPane';
 import ImagesPane from './ImagesPane';
 import KustomizePane from './KustomizePane';
+import PreviewConfigurationPane from './PreviewConfigurationPane';
 
 const ExplorerPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -35,6 +36,7 @@ const ExplorerPane: React.FC = () => {
         <FilePane key="files" />
         <KustomizePane key="kustomize" />
         <HelmPane key="helm" />
+        <PreviewConfigurationPane key="preview-configuration" />
         <ImagesPane key="images" />
       </Collapse>
     </CollapseContainer>
