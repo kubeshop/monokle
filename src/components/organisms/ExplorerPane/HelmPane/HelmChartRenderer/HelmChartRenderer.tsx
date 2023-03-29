@@ -1,5 +1,7 @@
 import {useState} from 'react';
 
+import {dirname} from 'path';
+
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
@@ -53,6 +55,8 @@ const HelmChartRenderer: React.FC<IProps> = props => {
       <S.ItemName isDisabled={isDisabled} isSelected={isSelected}>
         {helmChart.name}
       </S.ItemName>
+
+      <S.SuffixContainer isSelected={isSelected}>{dirname(helmChart.filePath)}</S.SuffixContainer>
 
       {isHovered && (
         <div

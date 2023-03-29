@@ -50,10 +50,6 @@ export const ItemContainer = styled.span<ItemContainerProps>`
 export const ItemName = styled.div<ItemNameProps>`
   padding: 2px 0;
   font-size: 14px;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 
   ${props => {
     if (props.isSelected) {
@@ -79,4 +75,14 @@ export const PrefixContainer = styled.span`
   align-items: center;
   gap: 8px;
   margin-right: 7px;
+`;
+
+export const SuffixContainer = styled.span<{isSelected: boolean}>`
+  min-width: 0;
+  color: ${({isSelected}) => (isSelected ? Colors.grey4 : Colors.grey6)};
+  margin-left: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
 `;
