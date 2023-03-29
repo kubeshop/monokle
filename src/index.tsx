@@ -15,6 +15,7 @@ import '@redux/storeListeners';
 import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
 import App from './App';
+import {K8sClientProvider} from './K8sClientContext';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 
@@ -25,9 +26,11 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 
 ReactDOM.render(
   <Provider store={store}>
-    <ErrorBoundary FallbackComponent={ErrorPage}>
-      <App />
-    </ErrorBoundary>
+    <K8sClientProvider>
+      <ErrorBoundary FallbackComponent={ErrorPage}>
+        <App />
+      </ErrorBoundary>
+    </K8sClientProvider>
   </Provider>,
   document.getElementById('root')
 );

@@ -9,16 +9,26 @@ import {createKubeClient} from '@shared/utils/kubeclient';
 
 export const k8sClientContext = createContext<any>(null);
 
+let globalK8sClient: k8s.KubeConfig | null;
+
+export const getGlobalK8sClient = (): k8s.KubeConfig => {
+  if (!globalK8sClient) {
+    throw new Error('getGlobalK8sClient has not been initialized');
+  }
+  return globalK8sClient;
+};
+
 export const K8sClientProvider: FC<any> = ({children}) => {
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const clusterProxyPort = useAppSelector(state => state.config.clusterProxyPort);
   const currentContext = useAppSelector(currentKubeContextSelector);
   const k8sClient = new KubeConfigManager();
-  k8sClient.initializeKubeConfig(kubeConfigPath, currentContext, clusterProxyPort);
+  if (kubeConfigPath) {
+    globalK8sClient = createKubeClient(kubeConfigPath as string, currentContext, clusterProxyPort);
+    k8sClient.initializeKubeConfig(kubeConfigPath, currentContext, clusterProxyPort);
+  }
   const context = {
-    setKubeConfigContext: k8sClient.setKubeConfigContext,
-    getKubeConfig: k8sClient.getKubeConfig,
-    setKubeConfig: k8sClient.setKubeConfig,
+    k8sClient: globalK8sClient,
     getV1ApiClient: k8sClient.getV1ApiClient,
     getStorageApiClient: k8sClient.getStorageApiClient,
     getMetricsClient: k8sClient.getMetricsClient,
@@ -26,8 +36,15 @@ export const K8sClientProvider: FC<any> = ({children}) => {
   return <k8sClientContext.Provider value={context}>{children}</k8sClientContext.Provider>;
 };
 
+type K8sClientContextType = {
+  k8sClient: k8s.KubeConfig;
+  getV1ApiClient: () => k8s.CoreV1Api;
+  getStorageApiClient: () => k8s.StorageV1Api;
+  getMetricsClient: () => k8s.Metrics;
+};
+
 export const useK8sClient = () => {
-  const k8sClient = useContext(k8sClientContext);
+  const k8sClient = useContext<K8sClientContextType>(k8sClientContext);
   if (!k8sClient) {
     throw new Error('K8sClientContext must be used within a K8sClientProvider');
   }

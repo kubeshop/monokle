@@ -4,15 +4,16 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Input, Modal, Radio, Select} from 'antd';
 
-import {currentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {currentClusterAccessSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
 import {getDefaultNamespaceForApply} from '@utils/resources';
 
+import {useK8sClient} from '@src/K8sClientContext';
+
 import {ResourceMeta} from '@shared/models/k8sResource';
-import {createKubeClient} from '@shared/utils/kubeclient';
 
 import * as S from './ModalConfirmWithNamespaceSelect.styled';
 
@@ -30,10 +31,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const clusterNamespaces = clusterAccess?.map(cl => cl.namespace);
   const defaultClusterNamespace = clusterNamespaces && clusterNamespaces.length ? clusterNamespaces[0] : 'default';
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const clusterProxyPort = useAppSelector(state => state.config.clusterProxyPort);
-
+  const {k8sClient} = useK8sClient();
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resourceMetaList, defaultClusterNamespace);
 
   const [namespaces] = useTargetClusterNamespaces();
@@ -50,7 +48,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         return;
       }
 
-      const kc = createKubeClient(kubeConfigPath, kubeConfigContext, clusterProxyPort);
+      const kc = k8sClient;
       const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 
       k8sCoreV1Api
@@ -70,15 +68,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     } else if (!selectedOption || selectedOption === 'none') {
       onOk();
     }
-  }, [
-    selectedOption,
-    createNamespaceName,
-    kubeConfigPath,
-    kubeConfigContext,
-    onOk,
-    selectedNamespace,
-    clusterProxyPort,
-  ]);
+  }, [selectedOption, createNamespaceName, onOk, selectedNamespace, k8sClient]);
 
   const clusterScopedResourcesCount = useMemo(
     () => resourceMetaList.filter(r => r.isClusterScoped).length,

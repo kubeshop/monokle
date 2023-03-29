@@ -6,12 +6,12 @@ import log from 'loglevel';
 import {clearSelectionReducer} from '@redux/reducers/main/selectionReducers';
 import {deleteResource, isResourceSelected, removeResourceFromFile} from '@redux/services/resource';
 
+import {getGlobalK8sClient} from '@src/K8sClientContext';
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AppState} from '@shared/models/appState';
 import {ResourceIdentifier, isClusterResourceMeta, isLocalResourceMeta} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
-import {createKubeClient} from '@shared/utils/kubeclient';
 
 export const removeResources = createAsyncThunk<
   {nextMainState: AppState; affectedResourceIdentifiers?: ResourceIdentifier[]},
@@ -54,11 +54,7 @@ export const removeResources = createAsyncThunk<
 
       if (mainState.clusterConnection && isClusterResourceMeta(resourceMeta)) {
         try {
-          const kubeClient = createKubeClient(
-            mainState.clusterConnection.kubeConfigPath,
-            mainState.clusterConnection.context,
-            state.config.clusterProxyPort
-          );
+          const kubeClient = getGlobalK8sClient();
 
           const kindHandler = getResourceKindHandler(resourceMeta.kind);
           if (kindHandler?.deleteResourceInCluster) {
