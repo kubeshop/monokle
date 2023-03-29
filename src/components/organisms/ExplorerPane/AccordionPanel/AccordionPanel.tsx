@@ -41,7 +41,6 @@ const AccordionPanel: React.FC<CollapsePanelProps & InjectedPanelProps> = props 
       collapsible={props.disabled ? 'disabled' : undefined}
       id={id}
       $contentHeight={contentHeight < height ? contentHeight : height}
-      $panelKey={props.panelKey || ''}
       {...props}
     />
   );

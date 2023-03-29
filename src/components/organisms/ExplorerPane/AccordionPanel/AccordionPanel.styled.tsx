@@ -2,7 +2,7 @@ import {Collapse} from 'antd';
 
 import styled from 'styled-components';
 
-export const Panel = styled(Collapse.Panel)<{$contentHeight: number; $panelKey: string}>`
+export const Panel = styled(Collapse.Panel)<{$contentHeight: number}>`
   &.ant-collapse-item-active {
     height: 100%;
   }
