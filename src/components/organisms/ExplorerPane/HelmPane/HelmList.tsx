@@ -11,6 +11,7 @@ import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import HelmChartRenderer from './HelmChartRenderer';
 import HelmValueRenderer from './HelmValueRenderer';
+import {useScroll} from './useScroll';
 
 const ROW_HEIGHT = 26;
 
@@ -23,6 +24,15 @@ const HelmList: React.FC = () => {
     estimateSize: () => ROW_HEIGHT,
     getScrollElement: () => ref.current,
     scrollToFn: elementScroll,
+  });
+
+  useScroll({
+    list,
+    scrollTo: index =>
+      rowVirtualizer.scrollToIndex(index, {
+        align: 'center',
+        behavior: 'smooth',
+      }),
   });
 
   if (!size(list)) {

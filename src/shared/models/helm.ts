@@ -56,6 +56,7 @@ type HelmTemplate = {
 type HelmChartNode = {
   type: 'helm-chart';
   id: string;
+  filePath: string;
 };
 
 type HelmValueNode = {
