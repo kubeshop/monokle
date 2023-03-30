@@ -59,10 +59,16 @@ const BottomActions: React.FC = () => {
         return;
       }
 
-      const result = await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
-        localPath: selectedProjectRootFolder,
-        branchName: currentBranch || 'main',
-      });
+      let result: any;
+
+      if (type === 'pull') {
+        result = await promiseFromIpcRenderer('git.pullChanges', 'git.pushChanges.result', selectedProjectRootFolder);
+      } else if (type === 'push') {
+        result = await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
+          localPath: selectedProjectRootFolder,
+          branchName: currentBranch || 'main',
+        });
+      }
 
       if (result.error) {
         Modal.warning({
@@ -110,15 +116,44 @@ const BottomActions: React.FC = () => {
 
     dispatch(setGitLoading(true));
 
-    await promiseFromIpcRenderer('git.publishLocalBranch', 'git.publishLocalBranch.result', {
+    const result = await promiseFromIpcRenderer('git.publishLocalBranch', 'git.publishLocalBranch.result', {
       localPath: selectedProjectRootFolder,
       branchName: currentBranch || 'main',
     });
+
+    if (result.error) {
+      Modal.warning({
+        title: `Publishing local branch failed`,
+        content: <div>{GIT_ERROR_MODAL_DESCRIPTION}</div>,
+        zIndex: 100000,
+        onCancel: () => {
+          addDefaultCommandTerminal(
+            terminalsMap,
+            `git push -u origin ${currentBranch || 'main'}`,
+            defaultShell,
+            bottomSelection,
+            dispatch
+          );
+        },
+        onOk: () => {
+          addDefaultCommandTerminal(
+            terminalsMap,
+            `git push -u origin ${currentBranch || 'main'}`,
+            defaultShell,
+            bottomSelection,
+            dispatch
+          );
+        },
+      });
+      setGitLoading(false);
+      return;
+    }
+
     dispatch(addGitBranch(`origin/${currentBranch}`));
     dispatch(setAlert({title: 'Branch published successfully', message: '', type: AlertEnum.Success}));
 
     dispatch(setGitLoading(false));
-  }, [currentBranch, dispatch, gitRepo, selectedProjectRootFolder]);
+  }, [bottomSelection, currentBranch, defaultShell, dispatch, gitRepo, selectedProjectRootFolder, terminalsMap]);
 
   const isBranchOnRemote = useMemo(() => {
     if (!gitRepo) {

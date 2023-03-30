@@ -260,7 +260,13 @@ export async function createLocalBranch(localPath: string, branchName: string) {
 
 export async function publishLocalBranch(localPath: string, branchName: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  await git.push({'-u': null, origin: null, [branchName]: null});
+
+  try {
+    await git.push({'-u': null, origin: null, [branchName]: null});
+    return {};
+  } catch (e: any) {
+    return {error: e.message};
+  }
 }
 
 export async function pushChanges(localPath: string, branchName: string) {
@@ -277,8 +283,14 @@ export async function pushChanges(localPath: string, branchName: string) {
 
 export async function setRemote(localPath: string, remoteURL: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  await git.addRemote('origin', remoteURL);
-  await git.fetch();
+
+  try {
+    await git.addRemote('origin', remoteURL);
+    await git.fetch();
+    return {};
+  } catch (e: any) {
+    return {error: e.message};
+  }
 }
 
 export async function getCommitsCount(localPath: string, branchName: string) {
@@ -299,7 +311,13 @@ export async function getCommitsCount(localPath: string, branchName: string) {
 
 export async function fetchRepo(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
-  await git.fetch();
+
+  try {
+    await git.fetch();
+    return {};
+  } catch (e: any) {
+    return {error: e.message};
+  }
 }
 
 export async function pullChanges(localPath: string) {
