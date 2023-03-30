@@ -8,6 +8,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
 
 import {AlertEnum} from '@shared/models/alert';
 
@@ -39,12 +40,16 @@ const CommitModal: React.FC<IProps> = props => {
     setLoading(true);
 
     form.validateFields().then(async values => {
-      await promiseFromIpcRenderer('git.commitChanges', 'git.commitChanges.result', {
+      const result = await promiseFromIpcRenderer('git.commitChanges', 'git.commitChanges.result', {
         localPath: selectedProjectRootFolder,
         message: values.message,
       });
 
-      dispatch(setAlert({title: 'Committed successfully', message: '', type: AlertEnum.Success}));
+      if (result.error) {
+        showGitErrorModal('Commit failed', `git commit -m "${values.message}"`, dispatch);
+      } else {
+        dispatch(setAlert({title: 'Committed successfully', message: '', type: AlertEnum.Success}));
+      }
 
       form.resetFields();
     });

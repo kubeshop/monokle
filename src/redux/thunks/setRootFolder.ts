@@ -1,5 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
+import log from 'loglevel';
+
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {SetRootFolderPayload} from '@redux/reducers/main';
@@ -110,15 +112,21 @@ export const setRootFolder = createAsyncThunk<
         localPath: rootFolder,
         fileMap,
       }),
-    ]).then(([repo, changedFiles]) => {
-      thunkAPI.dispatch(setRepo(repo));
-      thunkAPI.dispatch(setChangedFiles(changedFiles));
-      thunkAPI.dispatch(setGitLoading(false));
+    ])
+      .then(([repo, changedFiles]) => {
+        thunkAPI.dispatch(setRepo(repo));
+        thunkAPI.dispatch(setChangedFiles(changedFiles));
+        thunkAPI.dispatch(setGitLoading(false));
 
-      if (repo.remoteRepo.authRequired) {
-        showGitErrorModal('Authentication failed', `git remote show origin`, thunkAPI.dispatch);
-      }
-    });
+        if (repo.remoteRepo.authRequired) {
+          showGitErrorModal('Authentication failed', `git remote show origin`, thunkAPI.dispatch);
+        }
+      })
+      .catch(err => {
+        log.error(err.message);
+        showGitErrorModal(err.message);
+        thunkAPI.dispatch(setGitLoading(false));
+      });
   }
 
   const endTime = new Date().getTime();

@@ -18,6 +18,7 @@ import {Dots} from '@components/atoms';
 
 import {createFileWithContent} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
 
 import {AlertEnum} from '@shared/models/alert';
 import {GitChangedFile} from '@shared/models/git';
@@ -71,11 +72,21 @@ const FileList: React.FC<IProps> = props => {
             promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
               localPath: selectedProjectRootFolder,
               filePaths: [item.fullGitPath],
+            }).then(result => {
+              if (result.error) {
+                showGitErrorModal('Stage changes failed!', `git add ${[item.fullGitPath].join(' ')}`, dispatch);
+                setGitLoading(false);
+              }
             });
           } else {
             promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
               localPath: selectedProjectRootFolder,
               filePaths: [item.fullGitPath],
+            }).then(result => {
+              if (result.error) {
+                showGitErrorModal('Unstage changes failed!', `git reset ${[item.fullGitPath].join(' ')}`, dispatch);
+                setGitLoading(false);
+              }
             });
           }
         },
