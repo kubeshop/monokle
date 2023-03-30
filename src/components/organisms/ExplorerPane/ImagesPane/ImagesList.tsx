@@ -83,7 +83,8 @@ const EmptyText = styled.div`
 const ListContainer = styled.ul`
   height: 100%;
   overflow-y: auto;
-  padding: 0 0 12px;
+  padding: 0px;
+  margin-top: 15px;
 `;
 
 const VirtualItem = styled.div`

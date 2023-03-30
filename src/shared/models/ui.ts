@@ -64,7 +64,7 @@ type NewResourceWizardInput = {
   targetFile?: string;
 };
 
-export const ExplorerCollapsibleSections = ['files', 'kustomize', 'helm', 'images'] as const;
+export const ExplorerCollapsibleSections = ['files', 'kustomize', 'helm', 'preview-configuration', 'images'] as const;
 export type ExplorerCollapsibleSectionsType = typeof ExplorerCollapsibleSections[number];
 
 export const LeftMenuSelectionOptions = [
@@ -186,6 +186,7 @@ type UiState = {
   };
   isInQuickClusterMode?: boolean;
   collapsedKustomizeKinds: string[];
+  collapsedHelmCharts: string[];
   welcomePopup: {
     isVisible: boolean;
   };

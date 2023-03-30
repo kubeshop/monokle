@@ -1,5 +1,6 @@
+import {createSelector} from '@reduxjs/toolkit';
+
 import {groupBy, size} from 'lodash';
-import {createSelector} from 'reselect';
 
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
