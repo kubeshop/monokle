@@ -1,5 +1,3 @@
-import {Modal} from 'antd';
-
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {currentConfigSelector} from '@redux/appConfig';
@@ -11,7 +9,7 @@ import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
-import {addDefaultCommandTerminal} from '@utils/terminal';
+import {showGitErrorModal} from '@utils/terminal';
 
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
@@ -35,7 +33,6 @@ export const setRootFolder = createAsyncThunk<
 >('main/setRootFolder', async (rootFolder, thunkAPI) => {
   const startTime = new Date().getTime();
   const projectConfig = currentConfigSelector(thunkAPI.getState());
-  const terminalState = thunkAPI.getState().terminal;
 
   const resourceMetaMap: ResourceMetaMap<'local'> = {};
   const resourceContentMap: ResourceContentMap<'local'> = {};
@@ -119,29 +116,7 @@ export const setRootFolder = createAsyncThunk<
       thunkAPI.dispatch(setGitLoading(false));
 
       if (repo.remoteRepo.authRequired) {
-        Modal.warning({
-          title: 'Authentication failed',
-          content: `${repo.remoteRepo.errorMessage}. Please sign in using the terminal.`,
-          zIndex: 100000,
-          onCancel: () => {
-            addDefaultCommandTerminal(
-              terminalState.terminalsMap,
-              `git remote show origin`,
-              terminalState.settings.defaultShell,
-              thunkAPI.getState().ui.leftMenu.bottomSelection,
-              thunkAPI.dispatch
-            );
-          },
-          onOk: () => {
-            addDefaultCommandTerminal(
-              terminalState.terminalsMap,
-              `git remote show origin`,
-              terminalState.settings.defaultShell,
-              thunkAPI.getState().ui.leftMenu.bottomSelection,
-              thunkAPI.dispatch
-            );
-          },
-        });
+        showGitErrorModal('Authentication failed', `git remote show origin`, thunkAPI.dispatch);
       }
     });
   }
