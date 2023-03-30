@@ -1,32 +1,22 @@
 import {useRef} from 'react';
 
-import {Skeleton} from 'antd';
-
 import {size} from 'lodash';
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {kustomizeListSelector} from '@redux/selectors/kustomizeSelectors';
-
-import ResourceRenderer from '@components/organisms/NavigatorPane/ResourceRenderer';
+import {helmChartListSelector} from '@redux/selectors/helmSelectors';
 
 import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
-import KustomizeHeaderRenderer from './KustomizeHeaderRenderer';
-import KustomizeRenderer from './KustomizeRenderer';
+import HelmChartRenderer from './HelmChartRenderer';
+import HelmValueRenderer from './HelmValueRenderer';
 import {useScroll} from './useScroll';
 
 const ROW_HEIGHT = 26;
 
-const KustomizeList: React.FC = () => {
-  const list = useAppSelector(kustomizeListSelector);
-  const isLoading = useAppSelector(state =>
-    Boolean(state.main.previewOptions.isLoading) && state.main.preview?.type !== 'kustomize'
-      ? true
-      : state.ui.isFolderLoading
-  );
-
+const HelmList: React.FC = () => {
+  const list = useAppSelector(helmChartListSelector);
   const ref = useRef<HTMLUListElement>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -45,16 +35,8 @@ const KustomizeList: React.FC = () => {
       }),
   });
 
-  if (isLoading) {
-    return (
-      <div style={{padding: '16px'}}>
-        <Skeleton active />
-      </div>
-    );
-  }
-
   if (!size(list)) {
-    return <EmptyText>No Kustomizations found in the current project.</EmptyText>;
+    return <EmptyText>No Helm Charts found in the current project.</EmptyText>;
   }
 
   return (
@@ -81,12 +63,10 @@ const KustomizeList: React.FC = () => {
                 transform: `translateY(${virtualItem.start}px)`,
               }}
             >
-              {node.type === 'kustomize-kind' ? (
-                <KustomizeHeaderRenderer node={node} />
-              ) : node.type === 'kustomize' ? (
-                <KustomizeRenderer identifier={node.identifier} />
-              ) : node.type === 'kustomize-resource' ? (
-                <ResourceRenderer resourceIdentifier={node.identifier} disableContextMenu />
+              {node.type === 'helm-chart' ? (
+                <HelmChartRenderer id={node.id} />
+              ) : node.type === 'helm-value' ? (
+                <HelmValueRenderer id={node.id} />
               ) : null}
             </VirtualItem>
           );
@@ -96,7 +76,7 @@ const KustomizeList: React.FC = () => {
   );
 };
 
-export default KustomizeList;
+export default HelmList;
 
 // Styled Components
 

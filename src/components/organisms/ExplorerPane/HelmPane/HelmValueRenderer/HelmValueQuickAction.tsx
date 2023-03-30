@@ -1,6 +1,7 @@
-import React, {useCallback} from 'react';
+import {useCallback} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
+import styled from 'styled-components';
 import invariant from 'tiny-invariant';
 
 import {ExitHelmPreviewTooltip, HelmPreviewTooltip, ReloadHelmPreviewTooltip} from '@constants/tooltips';
@@ -15,16 +16,18 @@ import {
 } from '@redux/selectors';
 import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 
-import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
+import {QuickActionCompare, QuickActionPreview} from '@molecules';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 import {ResourceSet} from '@shared/models/compare';
-import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {RootState} from '@shared/models/rootState';
 import {isDefined} from '@shared/utils/filter';
 import {defineHotkey} from '@shared/utils/hotkey';
 
-import * as S from './HelmChartQuickAction.styled';
+type IProps = {
+  id: string;
+  isSelected: boolean;
+};
 
 const selectQuickActionData = (state: RootState, itemId: string) => {
   const previewedHelmValuesFile = previewedValuesFileSelector(state);
@@ -56,32 +59,31 @@ const selectQuickActionData = (state: RootState, itemId: string) => {
   return {isFiltered, thisValuesFile, isAnyPreviewing, isThisPreviewing, isThisSelected, previewingResourceSet};
 };
 
-const QuickAction = (props: ItemCustomComponentProps) => {
-  const {itemInstance} = props;
+const HelmValueQuickAction: React.FC<IProps> = props => {
+  const {id, isSelected} = props;
+
   const dispatch = useAppDispatch();
   const {isFiltered, thisValuesFile, isAnyPreviewing, isThisPreviewing, isThisSelected, previewingResourceSet} =
-    useAppSelector(state => selectQuickActionData(state, itemInstance.id));
-
-  const helmValuesFile = useAppSelector(state => state.main.helmValuesMap[itemInstance.id]);
+    useAppSelector(state => selectQuickActionData(state, id));
 
   const selectAndPreviewHelmValuesFile = useCallback(() => {
     if (!isThisSelected) {
-      dispatch(selectHelmValuesFile({valuesFileId: itemInstance.id}));
+      dispatch(selectHelmValuesFile({valuesFileId: id}));
     }
     if (!isThisPreviewing) {
-      startPreview({type: 'helm', valuesFileId: itemInstance.id, chartId: helmValuesFile.helmChartId}, dispatch);
+      startPreview({type: 'helm', valuesFileId: id, chartId: thisValuesFile.helmChartId}, dispatch);
     } else {
       stopPreview(dispatch);
     }
-  }, [isThisSelected, isThisPreviewing, itemInstance.id, helmValuesFile.helmChartId, dispatch]);
+  }, [isThisSelected, isThisPreviewing, dispatch, id, thisValuesFile.helmChartId]);
 
   const reloadPreview = useCallback(() => {
     if (!isThisSelected) {
-      dispatch(selectHelmValuesFile({valuesFileId: itemInstance.id}));
+      dispatch(selectHelmValuesFile({valuesFileId: id}));
     }
 
-    restartPreview({type: 'helm', valuesFileId: itemInstance.id, chartId: helmValuesFile.helmChartId}, dispatch);
-  }, [isThisSelected, itemInstance.id, helmValuesFile.helmChartId, dispatch]);
+    restartPreview({type: 'helm', valuesFileId: id, chartId: thisValuesFile.helmChartId}, dispatch);
+  }, [isThisSelected, id, thisValuesFile.helmChartId, dispatch]);
 
   useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {
     reloadPreview();
@@ -92,10 +94,10 @@ const QuickAction = (props: ItemCustomComponentProps) => {
   }
 
   return (
-    <S.QuickActionsContainer>
+    <Container>
       {isAnyPreviewing && !isThisPreviewing && (
         <QuickActionCompare
-          isItemSelected={itemInstance.isSelected}
+          isItemSelected={isSelected}
           from="quick-helm-compare"
           view={{
             leftSet: previewingResourceSet,
@@ -109,7 +111,7 @@ const QuickAction = (props: ItemCustomComponentProps) => {
       )}
 
       <QuickActionPreview
-        isItemSelected={itemInstance.isSelected}
+        isItemSelected={isSelected}
         isItemBeingPreviewed={isThisPreviewing}
         previewTooltip={HelmPreviewTooltip}
         reloadPreviewTooltip={ReloadHelmPreviewTooltip}
@@ -117,8 +119,15 @@ const QuickAction = (props: ItemCustomComponentProps) => {
         selectAndPreview={selectAndPreviewHelmValuesFile}
         reloadPreview={reloadPreview}
       />
-    </S.QuickActionsContainer>
+    </Container>
   );
 };
 
-export default QuickAction;
+export default HelmValueQuickAction;
+
+// Styled Components
+
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+`;

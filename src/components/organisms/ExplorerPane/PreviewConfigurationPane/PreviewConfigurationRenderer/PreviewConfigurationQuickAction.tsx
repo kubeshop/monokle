@@ -13,53 +13,49 @@ import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {startPreview} from '@redux/services/preview';
 import {deletePreviewConfiguration} from '@redux/thunks/previewConfiguration';
 
-import {ItemCustomComponentProps} from '@shared/models/navigator';
 import {Colors} from '@shared/styles/colors';
 
-const StyledButton = styled.span<{isItemSelected: boolean}>`
-  margin-right: 15px;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  color: ${props => (props.isItemSelected ? Colors.blackPure : Colors.blue6)};
-`;
+type IProps = {
+  id: string;
+  isSelected: boolean;
+};
 
-const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = props => {
-  const {itemInstance} = props;
+const PreviewConfigurationQuickAction: React.FC<IProps> = props => {
+  const {id, isSelected} = props;
+
   const dispatch = useAppDispatch();
-
-  const previewConfiguration = useAppSelector(
-    state => state.config.projectConfig?.helm?.previewConfigurationMap?.[itemInstance.id]
-  );
-
+  const previewConfiguration = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap?.[id]);
   const helmChart = useAppSelector(state =>
     previewConfiguration
       ? Object.values(state.main.helmChartMap).find(h => h.filePath === previewConfiguration.helmChartFilePath)
       : undefined
   );
 
-  const onClickRun = useCallback(() => {
+  const onClickDelete = useCallback(() => {
     if (!previewConfiguration) {
       return;
     }
-    startPreview({type: 'helm-config', configId: previewConfiguration.id}, dispatch);
-  }, [dispatch, previewConfiguration]);
+
+    dispatch(deletePreviewConfiguration(previewConfiguration.id));
+  }, [previewConfiguration, dispatch]);
 
   const onClickEdit = useCallback(() => {
     if (!previewConfiguration || !helmChart) {
       return;
     }
+
     dispatch(
       openPreviewConfigurationEditor({helmChartId: helmChart.id, previewConfigurationId: previewConfiguration.id})
     );
   }, [previewConfiguration, helmChart, dispatch]);
 
-  const onClickDelete = useCallback(() => {
+  const onClickRun = useCallback(() => {
     if (!previewConfiguration) {
       return;
     }
-    dispatch(deletePreviewConfiguration(previewConfiguration.id));
-  }, [previewConfiguration, dispatch]);
+
+    startPreview({type: 'helm-config', configId: previewConfiguration.id}, dispatch);
+  }, [dispatch, previewConfiguration]);
 
   if (!previewConfiguration || !helmChart) {
     return null;
@@ -67,19 +63,31 @@ const PreviewConfigurationQuickAction: React.FC<ItemCustomComponentProps> = prop
 
   return (
     <>
-      <StyledButton isItemSelected={itemInstance.isSelected} onClick={() => onClickRun()}>
+      <Button isItemSelected={isSelected} onClick={() => onClickRun()}>
         Preview
-      </StyledButton>
-      <StyledButton isItemSelected={itemInstance.isSelected} onClick={() => onClickEdit()}>
+      </Button>
+
+      <Button isItemSelected={isSelected} onClick={() => onClickEdit()}>
         <EditOutlined />
-      </StyledButton>
+      </Button>
+
       <Popconfirm title={DeletePreviewConfigurationTooltip} onConfirm={() => onClickDelete()}>
-        <StyledButton isItemSelected={itemInstance.isSelected}>
+        <Button isItemSelected={isSelected}>
           <DeleteOutlined />
-        </StyledButton>
+        </Button>
       </Popconfirm>
     </>
   );
 };
 
 export default PreviewConfigurationQuickAction;
+
+// Styled Components
+
+const Button = styled.span<{isItemSelected: boolean}>`
+  margin-right: 15px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: ${props => (props.isItemSelected ? Colors.blackPure : Colors.blue6)};
+`;

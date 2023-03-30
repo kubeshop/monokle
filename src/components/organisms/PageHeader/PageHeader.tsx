@@ -32,6 +32,7 @@ import BranchSelect from '@components/molecules/BranchSelect';
 import {useHelpMenuItems} from '@hooks/menuItemsHooks';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
@@ -120,13 +121,19 @@ const PageHeader = () => {
     trackEvent('git/initialize');
     setIsInitializingGitRepo(true);
 
-    await promiseFromIpcRenderer('git.initGitRepo', 'git.initGitRepo.result', projectRootFolder);
+    const result = await promiseFromIpcRenderer('git.initGitRepo', 'git.initGitRepo.result', projectRootFolder);
+
+    if (result.error) {
+      showGitErrorModal('Failed to initialize git repo');
+      setIsInitializingGitRepo(false);
+      return;
+    }
 
     monitorGitFolder(projectRootFolder, store);
 
-    promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', projectRootFolder).then(result => {
-      dispatch(setRepo(result));
-      dispatch(setCurrentBranch(result.currentBranch));
+    promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', projectRootFolder).then(repo => {
+      dispatch(setRepo(repo));
+      dispatch(setCurrentBranch(repo.currentBranch));
       setIsInitializingGitRepo(false);
       dispatch(updateProjectsGitRepo([{path: projectRootFolder, isGitRepo: true}]));
     });

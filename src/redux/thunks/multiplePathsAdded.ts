@@ -50,7 +50,10 @@ export const multiplePathsAdded = createAsyncThunk<
       localPath: projectRootFolder,
       fileMap: nextMainState.fileMap,
     }).then(result => {
-      thunkAPI.dispatch(setChangedFiles(result));
+      if (!result?.error) {
+        thunkAPI.dispatch(setChangedFiles(result));
+      }
+
       thunkAPI.dispatch(setGitLoading(false));
     });
   }

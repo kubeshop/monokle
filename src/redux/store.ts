@@ -2,8 +2,6 @@ import {Middleware, combineReducers, configureStore, createAction} from '@reduxj
 
 import {createLogger} from 'redux-logger';
 
-import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
-
 import {configSlice} from './appConfig';
 import {appConfigListeners} from './appConfig/appConfig.listeners';
 import * as compareListeners from './compare/listeners';
@@ -17,7 +15,6 @@ import {extensionSlice} from './reducers/extension';
 import {mainSlice} from './reducers/main';
 import {retryClusterConnectionListener} from './reducers/main/clusterListeners';
 import {imageListParserListener} from './reducers/main/mainListeners';
-import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
 import {killTerminalProcessesListener, terminalSlice} from './reducers/terminal';
 import {stopClusterConnectionListener, uiSlice} from './reducers/ui';
 import {k8sApi} from './services/K8sApi';
@@ -28,7 +25,6 @@ const middlewares: Middleware[] = [];
 
 if (process.env.NODE_ENV === `development`) {
   const reduxLoggerMiddleware = createLogger({
-    predicate: (getState, action) => action.type !== updateNavigatorInstanceState.type,
     collapsed: (getState, action, logEntry) => !logEntry?.error,
   });
 
@@ -56,7 +52,6 @@ const appReducer = combineReducers({
   config: configSlice.reducer,
   extension: extensionSlice.reducer,
   main: mainSlice.reducer,
-  navigator: navigatorSlice.reducer,
   terminal: terminalSlice.reducer,
   ui: uiSlice.reducer,
   git: gitSlice.reducer,
@@ -85,8 +80,7 @@ const store = configureStore({
     })
       .prepend(listenerMiddleware.middleware)
       .concat(k8sApi.middleware)
-      .concat(middlewares)
-      .concat(sectionBlueprintMiddleware),
+      .concat(middlewares),
 });
 
 export default store;

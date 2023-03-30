@@ -1,32 +1,20 @@
 import {useRef} from 'react';
 
-import {Skeleton} from 'antd';
-
 import {size} from 'lodash';
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {kustomizeListSelector} from '@redux/selectors/kustomizeSelectors';
-
-import ResourceRenderer from '@components/organisms/NavigatorPane/ResourceRenderer';
+import {previewConfigurationListSelector} from '@redux/selectors/helmSelectors';
 
 import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
-import KustomizeHeaderRenderer from './KustomizeHeaderRenderer';
-import KustomizeRenderer from './KustomizeRenderer';
-import {useScroll} from './useScroll';
+import PreviewConfigurationRenderer from './PreviewConfigurationRenderer';
 
 const ROW_HEIGHT = 26;
 
-const KustomizeList: React.FC = () => {
-  const list = useAppSelector(kustomizeListSelector);
-  const isLoading = useAppSelector(state =>
-    Boolean(state.main.previewOptions.isLoading) && state.main.preview?.type !== 'kustomize'
-      ? true
-      : state.ui.isFolderLoading
-  );
-
+const PreviewConfigurationList: React.FC = () => {
+  const list = useAppSelector(previewConfigurationListSelector);
   const ref = useRef<HTMLUListElement>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -36,25 +24,8 @@ const KustomizeList: React.FC = () => {
     scrollToFn: elementScroll,
   });
 
-  useScroll({
-    list,
-    scrollTo: index =>
-      rowVirtualizer.scrollToIndex(index, {
-        align: 'center',
-        behavior: 'smooth',
-      }),
-  });
-
-  if (isLoading) {
-    return (
-      <div style={{padding: '16px'}}>
-        <Skeleton active />
-      </div>
-    );
-  }
-
   if (!size(list)) {
-    return <EmptyText>No Kustomizations found in the current project.</EmptyText>;
+    return <EmptyText>No Preview Configurations found in the current project.</EmptyText>;
   }
 
   return (
@@ -81,13 +52,7 @@ const KustomizeList: React.FC = () => {
                 transform: `translateY(${virtualItem.start}px)`,
               }}
             >
-              {node.type === 'kustomize-kind' ? (
-                <KustomizeHeaderRenderer node={node} />
-              ) : node.type === 'kustomize' ? (
-                <KustomizeRenderer identifier={node.identifier} />
-              ) : node.type === 'kustomize-resource' ? (
-                <ResourceRenderer resourceIdentifier={node.identifier} disableContextMenu />
-              ) : null}
+              {node.type === 'preview-configuration' ? <PreviewConfigurationRenderer id={node.id} /> : null}
             </VirtualItem>
           );
         })}
@@ -96,12 +61,12 @@ const KustomizeList: React.FC = () => {
   );
 };
 
-export default KustomizeList;
+export default PreviewConfigurationList;
 
 // Styled Components
 
 const EmptyText = styled.div`
-  padding: 16px;
+  padding: 0px 14px 0px 16px;
   color: ${Colors.grey8};
 `;
 

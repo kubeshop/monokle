@@ -3,26 +3,32 @@ import {memo, useMemo} from 'react';
 import {CollapsePanelProps} from 'antd';
 
 import {size} from 'lodash';
+import styled from 'styled-components';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {InjectedPanelProps} from '@shared/models/explorer';
+import {isDefined} from '@shared/utils/filter';
 
 import AccordionPanel from '../AccordionPanel';
 import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
-import HelmList from './HelmList';
+import PreviewConfigurationAdd from './PreviewConfigurationAdd';
+import PreviewConfigurationList from './PreviewConfigurationList';
 
-const HelmPane: React.FC<InjectedPanelProps> = props => {
+const PreviewConfigurationPane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
-  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const previewConfigurationMap = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap);
 
   const count = useMemo(
-    () => size(Object.values(helmChartMap).filter(chart => !chart.name.includes('Unnamed Chart:'))),
-    [helmChartMap]
+    () =>
+      isDefined(previewConfigurationMap)
+        ? size(Object.values(previewConfigurationMap).filter(previewConfiguration => isDefined(previewConfiguration)))
+        : 0,
+    [previewConfigurationMap]
   );
 
   return (
@@ -32,7 +38,7 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
       header={
         <AccordionTitleBarContainer>
           <TitleBar
-            title="Helm Charts"
+            title="Helm Preview Configurations"
             expandable
             isOpen={Boolean(isActive)}
             actions={<TitleBarCount count={count} isActive={Boolean(isActive)} />}
@@ -42,9 +48,20 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
     >
-      <HelmList />
+      <PreviewConfigurationTopContainer>
+        <PreviewConfigurationAdd />
+      </PreviewConfigurationTopContainer>
+
+      <PreviewConfigurationList />
     </AccordionPanel>
   );
 };
 
-export default memo(HelmPane);
+export default memo(PreviewConfigurationPane);
+
+// Styled Components
+
+const PreviewConfigurationTopContainer = styled.div`
+  width: 100%;
+  padding: 16px 14px 16px 16px;
+`;

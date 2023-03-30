@@ -4,7 +4,7 @@ import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
-import {basename, dirname, sep} from 'path';
+import {basename, dirname} from 'path';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -18,7 +18,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ContextMenu, Dots} from '@atoms';
 
-import {useCreate, useDuplicate, useFilterByFileOrFolder, useProcessing, useRename} from '@hooks/fileTreeHooks';
+import {useDuplicate, useProcessing, useRename} from '@hooks/fileTreeHooks';
 
 import {deleteFileEntry, dispatchDeleteAlert} from '@utils/files';
 import {useRefSelector} from '@utils/hooks';
@@ -54,21 +54,16 @@ const KustomizeContextMenu: React.FC<IProps> = props => {
   );
   const osPlatform = useAppSelector(state => state.config.osPlatform);
 
-  const {onCreateResource} = useCreate();
   const {onDuplicate} = useDuplicate();
-  const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
+
   const {onRename} = useRename();
 
   const absolutePath = useMemo(
     () => (resource?.origin.filePath ? getAbsoluteFilePath(resource?.origin.filePath, fileMapRef.current) : undefined),
     [resource?.origin.filePath, fileMapRef]
   );
-  const isRoot = useMemo(() => resource?.origin.filePath === ROOT_FILE_ENTRY, [resource?.origin.filePath]);
+
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
-  const targetFile = useMemo(
-    () => (isRoot ? ROOT_FILE_ENTRY : resource?.origin.filePath.replace(sep, '')),
-    [isRoot, resource?.origin.filePath]
-  );
   const isPassingFilter = useMemo(
     () => (resource ? isResourcePassingFilter(resource, filters) : false),
     [filters, resource]
@@ -102,9 +97,7 @@ const KustomizeContextMenu: React.FC<IProps> = props => {
         key: 'create_resource',
         label: 'Add Resource',
         disabled: true,
-        onClick: () => {
-          onCreateResource({targetFile});
-        },
+        onClick: () => {},
       },
       {key: 'divider-2', type: 'divider'},
       {
@@ -114,16 +107,7 @@ const KustomizeContextMenu: React.FC<IProps> = props => {
             ? 'Remove from filter'
             : 'Filter on this file',
         disabled: true,
-        onClick: () => {
-          if (
-            isRoot ||
-            (fileOrFolderContainedInFilter && resourceRef.current?.origin.filePath === fileOrFolderContainedInFilter)
-          ) {
-            onFilterByFileOrFolder(undefined);
-          } else {
-            onFilterByFileOrFolder(resourceRef.current?.origin.filePath);
-          }
-        },
+        onClick: () => {},
       },
       {
         key: 'add_to_files_exclude',
@@ -206,15 +190,11 @@ const KustomizeContextMenu: React.FC<IProps> = props => {
     [
       fileEntry,
       isInPreviewMode,
-      isRoot,
       absolutePath,
       fileOrFolderContainedInFilter,
       platformFileManagerName,
-      targetFile,
       resourceRef,
       dispatch,
-      onCreateResource,
-      onFilterByFileOrFolder,
       onDuplicate,
       onRename,
       onExcludeFromProcessing,
