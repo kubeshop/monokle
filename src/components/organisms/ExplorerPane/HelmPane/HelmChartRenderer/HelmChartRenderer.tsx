@@ -1,6 +1,10 @@
 import {useState} from 'react';
 
+import {Tooltip} from 'antd';
+
 import {dirname} from 'path';
+
+import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -52,11 +56,15 @@ const HelmChartRenderer: React.FC<IProps> = props => {
         <Icon name="helm" style={{color: isSelected ? Colors.blackPure : Colors.grey9, fontSize: '18px'}} />
       </S.PrefixContainer>
 
-      <S.ItemName isDisabled={isDisabled} isSelected={isSelected}>
-        {helmChart.name}
-      </S.ItemName>
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={helmChart.name}>
+        <S.ItemName isDisabled={isDisabled} isSelected={isSelected}>
+          {helmChart.name}
+        </S.ItemName>
+      </Tooltip>
 
-      <S.SuffixContainer isSelected={isSelected}>{dirname(helmChart.filePath)}</S.SuffixContainer>
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={helmChart.filePath}>
+        <S.SuffixContainer isSelected={isSelected}>{dirname(helmChart.filePath)}</S.SuffixContainer>
+      </Tooltip>
 
       {isHovered && (
         <div
