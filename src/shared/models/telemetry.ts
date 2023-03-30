@@ -29,6 +29,7 @@ export type EventMap = {
   APP_SESSION: {appVersion: string};
   APP_UPDATED: {oldVersion: string; newVersion: string};
   APP_DOWNGRADED: {oldVersion: string; newVersion: string};
+  APP_QUIT: {exitCode: number};
   'app_start/open_project': {numberOfFiles: number; numberOfResources: number; executionTime: number};
   'app_start/create_project': {from: 'scratch' | 'git' | 'template'; templateID?: string};
   'app_start/quick_cluster_preview': undefined;
@@ -89,3 +90,4 @@ export const APP_SESSION = 'APP_SESSION';
 export const APP_UPDATED = 'APP_UPDATED';
 export const APP_DOWNGRADED = 'APP_DOWNGRADED';
 export const DISABLED_TELEMETRY = 'DISABLED_TELEMETRY';
+export const APP_QUIT = 'APP_QUIT';

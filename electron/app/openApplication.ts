@@ -5,6 +5,7 @@ import ElectronStore from 'electron-store';
 import log from 'loglevel';
 import * as path from 'path';
 
+import {trackEvent} from '@shared/utils';
 import {logToFile} from '@shared/utils/logs';
 
 import {createWindow} from './createWindow';
@@ -65,5 +66,9 @@ export const openApplication = async (givenPath?: string) => {
   app.on('browser-window-blur', () => {
     globalShortcut.unregister('CommandOrControl+R');
     globalShortcut.unregister('CommandOrControl+Shift+R');
+  });
+
+  app.on('quit', (event, exitCode) => {
+    trackEvent('APP_QUIT', {exitCode});
   });
 };
