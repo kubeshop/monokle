@@ -8,7 +8,6 @@ import {withTheme} from '@rjsf/core';
 import {TemplatesType} from '@rjsf/utils';
 import validator from '@rjsf/validator-ajv8';
 
-import {isEqual} from 'lodash';
 import log from 'loglevel';
 import {stringify} from 'yaml';
 
@@ -30,6 +29,7 @@ import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 import {useStateWithRef} from '@utils/hooks';
 import {parseYamlDocument} from '@utils/yaml';
 
+import {isEqual} from '@shared/utils/isEqual';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';

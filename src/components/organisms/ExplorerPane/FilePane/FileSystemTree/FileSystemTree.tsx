@@ -3,7 +3,6 @@ import {useMeasure} from 'react-use';
 
 import {DataNode} from 'antd/lib/tree';
 
-import fastDeepEqual from 'fast-deep-equal';
 import {isString} from 'lodash';
 import path from 'path';
 
@@ -20,6 +19,7 @@ import {FileMapType} from '@shared/models/appState';
 import {FileExplorerSortOrder} from '@shared/models/config';
 import {isFileSelection} from '@shared/models/selection';
 import {isDefined} from '@shared/utils/filter';
+import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './FileSystemTree.styled';
 import FileSystemTreeNode from './TreeNode';
@@ -48,7 +48,7 @@ const FileSystemTree: React.FC = () => {
         .filter(isDefined) || [];
 
     return sortNodes(rootFolderNodes, rootFileNodes, state.config.fileExplorerSortOrder);
-  }, fastDeepEqual);
+  }, isEqual);
 
   useEffect(() => {
     if (!firstHighlightedFile) {

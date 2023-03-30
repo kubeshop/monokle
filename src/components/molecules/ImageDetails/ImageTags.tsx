@@ -2,12 +2,13 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {Skeleton, Tooltip} from 'antd';
 
-import {debounce, isEqual} from 'lodash';
+import {debounce} from 'lodash';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ImageTagTooltip} from '@constants/tooltips';
 
 import {DockerHubImageTags} from '@shared/models/image';
+import {isEqual} from '@shared/utils/isEqual';
 import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import * as S from './ImageTags.styled';

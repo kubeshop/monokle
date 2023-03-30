@@ -1,11 +1,10 @@
 import {memo} from 'react';
 
-import {isEqual} from 'lodash';
-
 import {ResourceRefsIconPopover} from '@molecules';
 
 import {isOutgoingRef, isUnsatisfiedRef} from '@monokle/validation';
 import {ResourceMeta} from '@shared/models/k8sResource';
+import {isEqual} from '@shared/utils/isEqual';
 
 type Props = {
   resourceMeta: ResourceMeta;

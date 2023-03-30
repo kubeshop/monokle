@@ -1,11 +1,10 @@
-import {isEqual} from 'lodash';
-
 import {AppListenerFn} from '@redux/listeners/base';
 import {getActiveResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {ImageMapType} from '@shared/models/appState';
 import {ResourceMetaMap} from '@shared/models/k8sResource';
+import {isEqual} from '@shared/utils/isEqual';
 
 import {setExplorerSelectedSection, setLeftMenuSelection, toggleLeftMenu} from '../ui';
 import {selectImage, setImageMap} from './mainSlice';

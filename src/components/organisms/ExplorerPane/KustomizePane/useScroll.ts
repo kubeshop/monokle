@@ -1,17 +1,16 @@
 import {useLayoutEffect, useMemo, useRef} from 'react';
 import {usePrevious} from 'react-use';
 
-import fastDeepEqual from 'fast-deep-equal';
-
 import {useRefSelector, useSelectorWithRef} from '@utils/hooks';
 
 import {KustomizeListNode} from '@shared/models/kustomize';
 import {isResourceSelection} from '@shared/models/selection';
+import {isEqual} from '@shared/utils/isEqual';
 
 export function useScroll({scrollTo, list}: {scrollTo: (index: number) => void; list: KustomizeListNode[]}) {
   const [selection, selectionRef] = useSelectorWithRef(state => state.main.selection);
   const previousSelection = usePrevious(selection);
-  const changed = useMemo(() => !fastDeepEqual(selection, previousSelection), [selection, previousSelection]);
+  const changed = useMemo(() => !isEqual(selection, previousSelection), [selection, previousSelection]);
   const highlightsRef = useRefSelector(state => state.main.highlights);
   const listRef = useRef(list);
   listRef.current = list;

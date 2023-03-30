@@ -39,6 +39,7 @@ import {doesSchemaExist} from '@utils/index';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {K8S_VERSIONS} from '@shared/constants/k8s';
 import {ProjectConfig} from '@shared/models/config';
+import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './Settings.styled';
 
@@ -84,7 +85,7 @@ export const Settings = ({
   const [localConfig, setLocalConfig, localConfigRef] = useStateWithRef<ProjectConfig | null | undefined>(config);
 
   const handleConfigChange = () => {
-    if (onConfigChange && !_.isEqual(localConfigRef.current, config)) {
+    if (onConfigChange && !isEqual(localConfigRef.current, config)) {
       onConfigChange(localConfig);
     }
   };

@@ -1,6 +1,5 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {isEqual} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
@@ -52,6 +51,7 @@ import {PreviewType} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {AppSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
+import {isEqual} from '@shared/utils/isEqual';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {filterReducers} from './filterReducers';
