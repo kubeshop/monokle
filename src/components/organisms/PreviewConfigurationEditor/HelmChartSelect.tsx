@@ -1,3 +1,5 @@
+import {useMemo} from 'react';
+
 import {Select, Tooltip} from 'antd';
 
 import {orderBy} from 'lodash';
@@ -16,6 +18,8 @@ const HelmChartSelect: React.FC = () => {
   const editorHelmChartId = useAppSelector(state => state.main.prevConfEditor.helmChartId);
   const previewConfigurationId = useAppSelector(state => state.main.prevConfEditor.previewConfigurationId);
 
+  const orderedHelmChartMap = useMemo(() => orderBy(helmChartMap, ['name'], ['asc']), [helmChartMap]);
+
   return (
     <>
       <span>Helm Chart</span>
@@ -28,7 +32,7 @@ const HelmChartSelect: React.FC = () => {
         onChange={value => dispatch(setPreviewConfigurationEditorHelmChartId(value))}
         value={editorHelmChartId}
       >
-        {orderBy(helmChartMap, ['name'], ['asc']).map(chart => (
+        {orderedHelmChartMap.map(chart => (
           <Select.Option key={chart.id} value={chart.id}>
             {chart.name}
             <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={chart.filePath}>
