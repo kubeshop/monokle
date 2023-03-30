@@ -1,5 +1,7 @@
 import {Button} from 'antd';
 
+import {ExclamationCircleOutlined as RawExclamationCircleOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
@@ -19,12 +21,23 @@ export const DescriptionContainer = styled.div`
 `;
 
 export const ErrorMessage = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+export const ErrorEmptyMessageContainer = styled.div`
   padding-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   color: ${Colors.grey9};
   font-weight: 600;
+`;
+
+export const ExclamationCircleOutlined = styled(RawExclamationCircleOutlined)`
+  color: ${Colors.redError};
+  font-size: 15px;
 `;
 
 export const RevalidateButton = styled(Button)`

@@ -65,16 +65,19 @@ const ValidationPane: React.FC = () => {
       </div>
 
       {status === 'error' ? (
-        <S.ErrorMessage>
-          There was an error with validating your resources.
+        <S.ErrorEmptyMessageContainer>
+          <S.ErrorMessage>
+            <S.ExclamationCircleOutlined /> <span>There was an error with validating your resources.</span>
+          </S.ErrorMessage>
+
           <S.RevalidateButton
             icon={<ReloadOutlined />}
             type="primary"
             onClick={() => dispatch(validateResources({type: 'full', resourceStorage: activeStorageRef.current}))}
           >
-            Revalidate
+            Try again
           </S.RevalidateButton>
-        </S.ErrorMessage>
+        </S.ErrorEmptyMessageContainer>
       ) : lastResponse ? (
         <ValidationOverview
           containerStyle={{marginTop: '20px'}}
@@ -90,7 +93,7 @@ const ValidationPane: React.FC = () => {
           onFiltersChange={filters => dispatch(setValidationFilters(filters))}
         />
       ) : (
-        <S.ErrorMessage>There are no errors or warnings found.</S.ErrorMessage>
+        <S.ErrorEmptyMessageContainer>There are no errors or warnings found.</S.ErrorEmptyMessageContainer>
       )}
     </S.ValidationPaneContainer>
   );
