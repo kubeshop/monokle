@@ -13,11 +13,15 @@ export {activeProjectSelector, kubeConfigPathValidSelector, kubeConfigPathSelect
 
 export const kubeConfigContextSelector = createSelector(
   [
+    (state: RootState) => state.config.projectConfig?.kubeConfig?.path,
     (state: RootState) => state.config.projectConfig?.kubeConfig?.currentContext,
     (state: RootState) => state.config.kubeConfig.currentContext,
   ],
-  (projectCurrentContext, currentContext) => {
-    return projectCurrentContext || currentContext || '';
+  (projectKubeConfigPath, projectCurrentContext, currentContext) => {
+    if (projectKubeConfigPath) {
+      return projectCurrentContext || '';
+    }
+    return currentContext || '';
   }
 );
 

@@ -30,7 +30,8 @@ export function monitorProjectConfigFile(dispatch: AppDispatch, filePath?: strin
 
   watcher
     .on('add', () => {
-      updateProjectSettings(dispatch, filePath);
+      // we update the project settings on add, From setOpenProject
+      //   updateProjectSettings(dispatch, filePath);
     })
     .on('change', () => {
       updateProjectSettings(dispatch, filePath);

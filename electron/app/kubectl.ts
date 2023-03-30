@@ -60,7 +60,6 @@ export const startKubectlProxyProcess = async (event: IpcMainInvokeEvent, args: 
         });
       });
     } catch (e: any) {
-      console.log('error', e.message);
       reject();
 
       event.sender.send('kubectl-proxy-event', {

@@ -1,8 +1,10 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {FC, createContext, useContext} from 'react';
+import {FC, createContext, useContext, useMemo} from 'react';
 
-import {currentKubeContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {isEmpty} from 'lodash';
+
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 
 import {createKubeClient} from '@shared/utils/kubeclient';
@@ -21,18 +23,23 @@ export const getGlobalK8sClient = (): k8s.KubeConfig => {
 export const K8sClientProvider: FC<any> = ({children}) => {
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const clusterProxyPort = useAppSelector(state => state.config.clusterProxyPort);
-  const currentContext = useAppSelector(currentKubeContextSelector);
-  const k8sClient = new KubeConfigManager();
-  if (kubeConfigPath) {
-    globalK8sClient = createKubeClient(kubeConfigPath as string, currentContext, clusterProxyPort);
-    k8sClient.initializeKubeConfig(kubeConfigPath, currentContext, clusterProxyPort);
-  }
-  const context = {
-    k8sClient: globalK8sClient,
-    getV1ApiClient: k8sClient.getV1ApiClient,
-    getStorageApiClient: k8sClient.getStorageApiClient,
-    getMetricsClient: k8sClient.getMetricsClient,
-  };
+  const currentContext = useAppSelector(kubeConfigContextSelector);
+
+  const context = useMemo(() => {
+    const k8sClient = new KubeConfigManager();
+
+    if (!isEmpty(kubeConfigPath) && !isEmpty(currentContext) && !isEmpty(clusterProxyPort)) {
+      globalK8sClient = createKubeClient(kubeConfigPath as string, currentContext, clusterProxyPort);
+      k8sClient.initializeKubeConfig(kubeConfigPath, currentContext, clusterProxyPort);
+    }
+    return {
+      k8sClient: globalK8sClient,
+      getV1ApiClient: k8sClient.getV1ApiClient,
+      getStorageApiClient: k8sClient.getStorageApiClient,
+      getMetricsClient: k8sClient.getMetricsClient,
+    };
+  }, [kubeConfigPath, currentContext, clusterProxyPort]);
+
   return <k8sClientContext.Provider value={context}>{children}</k8sClientContext.Provider>;
 };
 

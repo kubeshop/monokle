@@ -100,16 +100,14 @@ const loadKubeConfigListener: AppListenerFn = listen => {
 const loadKubeConfigProjectListener: AppListenerFn = listen => {
   listen({
     actionCreator: updateProjectConfig,
-    async effect(_action, {dispatch, cancelActiveListeners}) {
+    async effect(_action, {dispatch, cancelActiveListeners, getState}) {
       // Cancel any other listeners that are listening to the same action
       cancelActiveListeners();
-
-      const configPath = _action.payload.config?.kubeConfig?.path;
+      const configPath = getState().config.projectConfig?.kubeConfig?.path;
       if (!configPath) {
         return;
       }
       const proxyPort = await openKubectlProxy(() => {}, {kubeConfigPath: configPath});
-      dispatch(setClusterProxyPort(proxyPort));
       let config: KubeConfig;
       try {
         const kc = new k8s.KubeConfig();
@@ -124,6 +122,8 @@ const loadKubeConfigProjectListener: AppListenerFn = listen => {
         config = {isPathValid: false, path: configPath};
       }
       dispatch(loadProjectKubeConfig(config));
+      dispatch(setClusterProxyPort(proxyPort));
+
       dispatch(k8sApi.util.resetApiState());
       const results = await dispatch(k8sApi.endpoints.getNamespaces.initiate({})).unwrap();
       if (config.currentContext) {
