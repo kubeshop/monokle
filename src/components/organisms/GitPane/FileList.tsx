@@ -3,8 +3,6 @@ import {useCallback, useEffect, useState} from 'react';
 import {Checkbox, Dropdown, List, Modal, Space, Tooltip} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
-import {isEqual} from 'lodash';
-
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {setGitLoading, setSelectedItem} from '@redux/git';
@@ -24,6 +22,7 @@ import {AlertEnum} from '@shared/models/alert';
 import {GitChangedFile} from '@shared/models/git';
 import {Colors} from '@shared/styles/colors';
 import {deleteFile} from '@shared/utils/fileSystem';
+import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './FileList.styled';
 

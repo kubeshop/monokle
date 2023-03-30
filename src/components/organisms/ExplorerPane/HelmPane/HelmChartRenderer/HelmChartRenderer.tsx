@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {memo, useState} from 'react';
 
 import {Tooltip} from 'antd';
 
@@ -82,4 +82,4 @@ const HelmChartRenderer: React.FC<IProps> = props => {
   );
 };
 
-export default HelmChartRenderer;
+export default memo(HelmChartRenderer);

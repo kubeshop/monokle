@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {memo, useState} from 'react';
 
 import {EyeOutlined} from '@ant-design/icons';
 
@@ -66,4 +66,4 @@ const PreviewConfigurationRenderer: React.FC<IProps> = props => {
   );
 };
 
-export default PreviewConfigurationRenderer;
+export default memo(PreviewConfigurationRenderer);

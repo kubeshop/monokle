@@ -108,7 +108,7 @@ const EmptyText = styled.div`
 const ListContainer = styled.ul`
   height: 100%;
   overflow-y: auto;
-  padding: 0px;
+  padding: 0px 0px 12px;
   margin-top: 15px;
 `;
 

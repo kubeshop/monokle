@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {memo, useState} from 'react';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -9,6 +9,7 @@ import {isResourceHighlighted, isResourceSelected} from '@redux/services/resourc
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {isEqual} from '@shared/utils/isEqual';
 
 import KustomizeContextMenu from './KustomizeContextMenu';
 import KustomizePrefix from './KustomizePrefix';
@@ -91,4 +92,4 @@ const KustomizeRenderer: React.FC<IProps> = props => {
   );
 };
 
-export default KustomizeRenderer;
+export default memo(KustomizeRenderer, isEqual);

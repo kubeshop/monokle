@@ -18,6 +18,7 @@ import {
 } from '@shared/models/k8sResource';
 import {ValidationResource} from '@shared/models/validation';
 import {isPassingKeyValueFilter} from '@shared/utils/filter';
+import {isEqual} from '@shared/utils/isEqual';
 
 export function isResourcePassingFilter(resourceMeta: ResourceMeta, filters: ResourceFilterType) {
   if (filters.name && filters.name.length && !resourceMeta.name.toLowerCase().includes(filters.name.toLowerCase())) {
@@ -110,7 +111,7 @@ export function diffLocalToClusterResources(localResource: K8sResource, clusterR
   const cleanLocalResourceObject = removeNestedEmptyObjects(localResource.object);
 
   return {
-    areDifferent: !_.isEqual(cleanLocalResourceObject, cleanClusterResourceObject),
+    areDifferent: !isEqual(cleanLocalResourceObject, cleanClusterResourceObject),
     cleanLocalResourceObject,
     cleanClusterResourceObject,
   };

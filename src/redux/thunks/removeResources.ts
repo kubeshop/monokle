@@ -1,6 +1,5 @@
 import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
 
-import {isEqual} from 'lodash';
 import log from 'loglevel';
 
 import {clearSelectionReducer} from '@redux/reducers/main/selectionReducers';
@@ -11,6 +10,7 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 import {AppState} from '@shared/models/appState';
 import {ResourceIdentifier, isClusterResourceMeta, isLocalResourceMeta} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
+import {isEqual} from '@shared/utils/isEqual';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
 export const removeResources = createAsyncThunk<

@@ -9,6 +9,7 @@ import {updateProjectConfig} from '@redux/appConfig';
 
 import {K8S_VERSIONS, PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
 import {AppConfig, ProjectConfig} from '@shared/models/config';
+import {isEqual} from '@shared/utils/isEqual';
 
 export interface SerializableObject {
   [name: string]: any;
@@ -25,7 +26,7 @@ export const writeProjectConfigFile = (state: AppConfig | SerializableObject) =>
     if (projectConfig && !_.isEmpty(projectConfig)) {
       try {
         const savedConfig: ProjectConfig = JSON.parse(readFileSync(absolutePath, 'utf8'));
-        if (!_.isEqual(savedConfig, projectConfig)) {
+        if (!isEqual(savedConfig, projectConfig)) {
           writeFileSync(absolutePath, JSON.stringify(projectConfig, null, 4), 'utf-8');
         }
       } catch (error: any) {
@@ -191,10 +192,10 @@ export const keysToUpdateStateBulk = (
     if (
       _.isArray(serializedState[key]) &&
       _.isArray(serializedIncomingConfig[key]) &&
-      !_.isEqual(_.sortBy(serializedState[key]), _.sortBy(serializedIncomingConfig[key]))
+      !isEqual(_.sortBy(serializedState[key]), _.sortBy(serializedIncomingConfig[key]))
     ) {
       keys.push(key);
-    } else if (!_.isEqual(serializedState[key], serializedIncomingConfig[key])) {
+    } else if (!isEqual(serializedState[key], serializedIncomingConfig[key])) {
       keys.push(key);
     }
   });

@@ -48,6 +48,7 @@ import {NewVersionCode, Project} from '@shared/models/config';
 import {Size} from '@shared/models/window';
 import electronStore from '@shared/utils/electronStore';
 import {setMainProcessEnv} from '@shared/utils/env';
+import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';
@@ -278,9 +279,7 @@ const App = () => {
         if (!newData || !oldData) {
           return;
         }
-        if (
-          lodash.isEqual(lodash.sortBy(newData.map((d: any) => d.name)), lodash.sortBy(oldData.map((d: any) => d.name)))
-        ) {
+        if (isEqual(lodash.sortBy(newData.map((d: any) => d.name)), lodash.sortBy(oldData.map((d: any) => d.name)))) {
           return;
         }
 
