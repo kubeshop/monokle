@@ -7,6 +7,7 @@ import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
@@ -134,6 +135,8 @@ export const setRootFolder = createAsyncThunk<
   trackEvent('app_start/open_project', {
     numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
     numberOfResources: Object.values(resourceMetaMap).length,
+    numberOfOverlays: Object.values(resourceMetaMap).filter(r => isKustomizationResource(r)).length,
+    numberOfHelmCharts: Object.values(helmChartMap).length,
     executionTime: endTime - startTime,
   });
 
