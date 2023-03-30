@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import {memo, useCallback, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseResourceKinds, expandResourceKinds} from '@redux/reducers/ui';
@@ -88,4 +88,4 @@ function KindRenderer(props: KindRendererProps) {
   );
 }
 
-export default KindRenderer;
+export default memo(KindRenderer);

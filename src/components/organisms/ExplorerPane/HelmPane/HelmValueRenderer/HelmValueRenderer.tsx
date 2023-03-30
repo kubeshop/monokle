@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {memo, useState} from 'react';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -68,4 +68,4 @@ const HelmValueRenderer: React.FC<IProps> = props => {
   );
 };
 
-export default HelmValueRenderer;
+export default memo(HelmValueRenderer);

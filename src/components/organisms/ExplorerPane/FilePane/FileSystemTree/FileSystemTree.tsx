@@ -1,4 +1,4 @@
-import {memo, useEffect, useLayoutEffect, useRef} from 'react';
+import {useLayoutEffect, useRef} from 'react';
 import {useMeasure} from 'react-use';
 
 import {DataNode} from 'antd/lib/tree';
@@ -30,7 +30,9 @@ const FileSystemTree: React.FC = () => {
     state => state.ui.fileExplorerExpandedFolders
   );
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
-  const firstHighlightedFile = useAppSelector(state => state.main.highlights.find(isFileSelection));
+  const [firstHighlightedFile, firstHighlightedFileRef] = useSelectorWithRef(state =>
+    state.main.highlights.find(isFileSelection)
+  );
 
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -50,23 +52,33 @@ const FileSystemTree: React.FC = () => {
     return sortNodes(rootFolderNodes, rootFileNodes, state.config.fileExplorerSortOrder);
   }, isEqual);
 
-  useEffect(() => {
-    if (!firstHighlightedFile) {
-      return;
-    }
-
-    const parentFolderPaths = getAllParentFolderPaths(firstHighlightedFile.filePath);
-    dispatch(
-      setFileExplorerExpandedFolders([...new Set([...fileExplorerExpandedFoldersRef.current, ...parentFolderPaths])])
-    );
-  }, [dispatch, fileExplorerExpandedFoldersRef, firstHighlightedFile]);
-
   useLayoutEffect(() => {
     if (!firstHighlightedFile) {
       return;
     }
-    treeRef.current?.scrollTo({key: firstHighlightedFile.filePath});
-  }, [firstHighlightedFile]);
+
+    const parentFolderPaths = getAllParentFolderPaths(firstHighlightedFile.filePath).filter(
+      folderPath => !fileExplorerExpandedFoldersRef.current.includes(folderPath)
+    );
+
+    if (parentFolderPaths.length) {
+      dispatch(
+        setFileExplorerExpandedFolders([...new Set([...fileExplorerExpandedFoldersRef.current, ...parentFolderPaths])])
+      );
+    } else {
+      treeRef.current?.scrollTo({key: firstHighlightedFile.filePath});
+    }
+  }, [dispatch, fileExplorerExpandedFoldersRef, firstHighlightedFile]);
+
+  useLayoutEffect(() => {
+    if (!firstHighlightedFileRef.current) {
+      return;
+    }
+
+    setTimeout(() => {
+      treeRef.current?.scrollTo({key: firstHighlightedFileRef.current?.filePath});
+    }, 50);
+  }, [fileExplorerExpandedFolders, firstHighlightedFileRef]);
 
   return (
     <S.TreeContainer ref={containerRef}>
@@ -158,4 +170,4 @@ function createFolderTree(folderPath: string, fileMap: FileMapType, fileExplorer
   return treeNode;
 }
 
-export default memo(FileSystemTree);
+export default FileSystemTree;

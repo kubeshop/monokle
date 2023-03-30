@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import {memo, useCallback, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseKustomizeKinds, expandKustomizeKinds} from '@redux/reducers/ui';
@@ -8,6 +8,7 @@ import {isKustomizationPatch} from '@redux/services/kustomize';
 import {useSelectorWithRef} from '@utils/hooks';
 
 import {KustomizeKindNode} from '@shared/models/kustomize';
+import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './KustomizeHeaderRenderer.styled';
 
@@ -81,4 +82,4 @@ const KustomizeHeaderRenderer: React.FC<IProps> = props => {
   );
 };
 
-export default KustomizeHeaderRenderer;
+export default memo(KustomizeHeaderRenderer, isEqual);

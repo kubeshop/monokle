@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {memo, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectImage} from '@redux/reducers/main';
@@ -44,4 +44,4 @@ const ImageRenderer: React.FC<IProps> = props => {
   );
 };
 
-export default ImageRenderer;
+export default memo(ImageRenderer);
