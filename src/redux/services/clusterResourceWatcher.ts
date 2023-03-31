@@ -106,6 +106,10 @@ const watchResource = async (
       watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.CONNECTED;
       const resource: K8sResource = extractClusterResourceFromObject(apiObj, kubeConfig);
 
+      if (!resource) {
+        return;
+      }
+
       if (type === 'ADDED' && !previewResources[resource.id]) {
         if (kindHandler.kind === CustomResourceDefinitionHandler.kind) {
           registerCrdKindHandlers(JSON.stringify(apiObj));

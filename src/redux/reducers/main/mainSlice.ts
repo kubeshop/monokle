@@ -284,7 +284,7 @@ export const mainSlice = createSlice({
         // Quick fix:
         const originalResourceMeta = state.resourceMetaMapByStorage.cluster[r.id];
         const {meta, content} = splitK8sResource(r);
-        const newMeta = {...originalResourceMeta, ...meta, refs: originalResourceMeta.refs};
+        const newMeta = {...originalResourceMeta, ...meta, refs: originalResourceMeta?.refs};
         state.resourceMetaMapByStorage.cluster[r.id] = newMeta;
         state.resourceContentMapByStorage.cluster[r.id] = content;
       });

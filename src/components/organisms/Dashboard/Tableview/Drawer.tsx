@@ -18,6 +18,7 @@ export const Drawer = () => {
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
   const clusterResourceMetaMap = useResourceMetaMap('cluster');
   const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
+  const isApplyingResource = useAppSelector(state => state.main.isApplyingResource);
 
   const selectedResource = useResource(selectedResourceId ? {id: selectedResourceId, storage: 'cluster'} : undefined);
 
@@ -115,7 +116,11 @@ export const Drawer = () => {
         <S.TabsFooter>
           <S.ActionButtons>
             {activeTab === 'Manifest' && (
-              <S.ActionButton disabled={!selectedResource} onClick={() => handleApplyResource()}>
+              <S.ActionButton
+                loading={isApplyingResource}
+                disabled={!selectedResource}
+                onClick={() => handleApplyResource()}
+              >
                 Update
               </S.ActionButton>
             )}

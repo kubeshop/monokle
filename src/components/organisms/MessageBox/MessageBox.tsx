@@ -46,6 +46,7 @@ const MessageBox: React.FC = () => {
           />
         ),
         duration: alert.duration || 4,
+        style: {zIndex: '10000'},
       });
     }
 
