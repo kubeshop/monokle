@@ -53,7 +53,7 @@ import {MonacoPlaceholder} from '@components/molecules/MonacoPlaceholder/MonacoP
 import {useDiff} from '@hooks/resourceHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector, useSelectorWithRef} from '@utils/hooks';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
@@ -70,7 +70,7 @@ import ActionsPaneHeader from './ActionsPaneHeader';
 const ActionsPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
-  const [, kubeConfigPathRef] = useSelectorWithRef(kubeConfigPathSelector);
+  const kubeConfigPathRef = useRefSelector(kubeConfigPathSelector);
   const [kubeConfigContext, kubeConfigContextRef] = useSelectorWithRef(kubeConfigContextSelector);
 
   const [helmChartMap, helmChartMapRef] = useSelectorWithRef(state => state.main.helmChartMap);

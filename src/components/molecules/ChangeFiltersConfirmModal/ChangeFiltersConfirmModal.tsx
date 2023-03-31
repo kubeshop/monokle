@@ -9,7 +9,7 @@ import {isEqual} from 'lodash';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {extendResourceFilter, setFiltersToBeChanged, uncheckMultipleResourceIds} from '@redux/reducers/main';
 
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceFilterType} from '@shared/models/appState';
@@ -19,8 +19,8 @@ const ChangeFiltersConfirmModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const filtersToBeChanged = useAppSelector(state => state.main.filtersToBeChanged);
-  const [, resourceFilterRef] = useSelectorWithRef(state => state.main.resourceFilter);
-  const [, resourceMetaMapByStorageRef] = useSelectorWithRef(state => state.main.resourceMetaMapByStorage);
+  const resourceFilterRef = useRefSelector(state => state.main.resourceFilter);
+  const resourceMetaMapByStorageRef = useRefSelector(state => state.main.resourceMetaMapByStorage);
 
   const constructNewFilter = useCallback(() => {
     if (!filtersToBeChanged) {

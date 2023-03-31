@@ -38,7 +38,7 @@ import FileExplorer from '@atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFeatureFlags} from '@utils/features';
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 
@@ -57,7 +57,7 @@ const HotKeysHandler = () => {
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const selectedResource = useSelectedResource();
 
-  const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const fileMapRef = useRefSelector(state => state.main.fileMap);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 

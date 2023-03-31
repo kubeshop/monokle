@@ -87,7 +87,19 @@ export const useSelectorWithRef = <T>(selector: (state: RootState) => T): [T, Mu
 
 export const useRefSelector = <T>(selector: (state: RootState) => T): MutableRefObject<T> => {
   const store = useStore<RootState>();
-  const ref = useRef(selector(store.getState()));
-  ref.current = selector(store.getState());
-  return ref;
+  const storeRef = useRef(store);
+  storeRef.current = store;
+  const selectorRef = useRef(selector);
+  selectorRef.current = selector;
+
+  const valueRef = useRef(selector(store.getState()));
+
+  useEffect(() => {
+    const unsubscribe = storeRef.current.subscribe(() => {
+      valueRef.current = selectorRef.current(storeRef.current.getState());
+    });
+    return () => unsubscribe();
+  }, []);
+
+  return valueRef;
 };

@@ -15,7 +15,7 @@ import {SelectItemImage} from '@components/atoms';
 
 import {useFileSelectOptions} from '@hooks/useFileSelectOptions';
 
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import * as S from './FileCompareModal.styled';
@@ -36,7 +36,7 @@ const options: monaco.editor.IDiffEditorConstructionOptions = {
 const FileCompareModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const currentFilePath = useAppSelector(state => state.ui.fileCompareModal.filePath);
-  const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const fileMapRef = useRefSelector(state => state.main.fileMap);
   const rootFilePath = useAppSelector(rootFilePathSelector);
 
   const [comparingFilePath, setComparingFilePath] = useState<string>();
