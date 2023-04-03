@@ -255,31 +255,6 @@ export const electronStoreSchema = {
       },
     },
   },
-  pluginConfig: {
-    type: 'object',
-    properties: {
-      policies: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            id: {
-              type: 'string',
-            },
-            enabled: {
-              type: 'boolean',
-            },
-            enabledRules: {
-              type: 'array',
-              items: {
-                type: 'string',
-              },
-            },
-          },
-        },
-      },
-    },
-  },
   terminal: {
     type: 'object',
     properties: {
@@ -348,9 +323,6 @@ export const electronStoreDefaults = {
   kubeConfig: {
     namespaces: [],
     contextsWithRemovedNamespace: [],
-  },
-  pluginConfig: {
-    policies: [],
   },
   terminal: {
     settings: {
