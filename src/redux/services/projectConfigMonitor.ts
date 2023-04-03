@@ -29,9 +29,6 @@ export function monitorProjectConfigFile(dispatch: AppDispatch, filePath?: strin
   });
 
   watcher
-    .on('add', () => {
-      updateProjectSettings(dispatch, filePath);
-    })
     .on('change', () => {
       updateProjectSettings(dispatch, filePath);
     })
