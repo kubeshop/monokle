@@ -19,7 +19,6 @@ import {FileMapType} from '@shared/models/appState';
 import {FileExplorerSortOrder} from '@shared/models/config';
 import {isFileSelection} from '@shared/models/selection';
 import {isDefined} from '@shared/utils/filter';
-import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './FileSystemTree.styled';
 import FileSystemTreeNode from './TreeNode';
@@ -38,19 +37,20 @@ const FileSystemTree: React.FC = () => {
 
   const treeRef = useRef<any>(null);
 
-  const treeData = useAppSelector(state => {
-    const rootEntry = state.main.fileMap[ROOT_FILE_ENTRY];
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const fileExplorerSortOrder = useAppSelector(state => state.config.fileExplorerSortOrder);
 
-    const rootFileNodes = createFileNodes(path.sep, state.main.fileMap);
+  const treeData = useMemo(() => {
+    const rootEntry = fileMap[ROOT_FILE_ENTRY];
+
+    const rootFileNodes = createFileNodes(path.sep, fileMap);
     const rootFolderNodes =
       rootEntry?.children
-        ?.map(folderPath =>
-          createFolderTree(`${path.sep}${folderPath}`, state.main.fileMap, state.config.fileExplorerSortOrder)
-        )
+        ?.map(folderPath => createFolderTree(`${path.sep}${folderPath}`, fileMap, fileExplorerSortOrder))
         .filter(isDefined) || [];
-
-    return sortNodes(rootFolderNodes, rootFileNodes, state.config.fileExplorerSortOrder);
-  }, isEqual);
+    console.log('@@@treeData');
+    return sortNodes(rootFolderNodes, rootFileNodes, fileExplorerSortOrder);
+  }, [fileExplorerSortOrder, fileMap]);
 
   useLayoutEffect(() => {
     if (!firstHighlightedFile) {
