@@ -1,4 +1,4 @@
-import {useLayoutEffect, useRef} from 'react';
+import {useLayoutEffect, useMemo, useRef} from 'react';
 import {useMeasure} from 'react-use';
 
 import {DataNode} from 'antd/lib/tree';
@@ -48,7 +48,6 @@ const FileSystemTree: React.FC = () => {
       rootEntry?.children
         ?.map(folderPath => createFolderTree(`${path.sep}${folderPath}`, fileMap, fileExplorerSortOrder))
         .filter(isDefined) || [];
-    console.log('@@@treeData');
     return sortNodes(rootFolderNodes, rootFileNodes, fileExplorerSortOrder);
   }, [fileExplorerSortOrder, fileMap]);
 
