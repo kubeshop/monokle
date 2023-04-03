@@ -53,7 +53,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
   return (
     <AccordionPanel
       {...props}
-      disabled={isInClusterMode}
+      collapsible={isInClusterMode ? 'disabled' : undefined}
       showArrow={false}
       header={
         <AccordionTitleBarContainer>

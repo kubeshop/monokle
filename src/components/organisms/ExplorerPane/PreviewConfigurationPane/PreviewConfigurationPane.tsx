@@ -34,7 +34,7 @@ const PreviewConfigurationPane: React.FC<InjectedPanelProps> = props => {
   return (
     <AccordionPanel
       {...props}
-      disabled={isInClusterMode}
+      collapsible={isInClusterMode ? 'disabled' : undefined}
       header={
         <AccordionTitleBarContainer>
           <TitleBar
