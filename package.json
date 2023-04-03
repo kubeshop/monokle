@@ -157,6 +157,7 @@
     "react-resizable": "3.0.4",
     "react-use": "17.4.0",
     "redux": "4.2.1",
+    "redux-batched-subscribe": "^0.1.6",
     "redux-logger": "3.0.6",
     "redux-thunk": "2.4.2",
     "reselect": "4.1.7",

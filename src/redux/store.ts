@@ -1,5 +1,7 @@
 import {Middleware, combineReducers, configureStore, createAction} from '@reduxjs/toolkit';
 
+import debounce from 'lodash/debounce';
+import {batchedSubscribe} from 'redux-batched-subscribe';
 import {createLogger} from 'redux-logger';
 
 import {configSlice} from './appConfig';
@@ -69,6 +71,8 @@ const rootReducer: typeof appReducer = (state, action) => {
   return appReducer(state, action);
 };
 
+const debounceNotify = debounce(notify => notify(), 300);
+
 const store = configureStore({
   reducer: rootReducer,
   middleware: getDefaultMiddleware =>
@@ -78,6 +82,7 @@ const store = configureStore({
     })
       .prepend(listenerMiddleware.middleware)
       .concat(middlewares),
+  enhancers: [batchedSubscribe(debounceNotify)],
 });
 
 export default store;
