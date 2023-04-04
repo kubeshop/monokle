@@ -1,4 +1,4 @@
-import {useRef} from 'react';
+import {useMemo, useRef} from 'react';
 
 import {Skeleton} from 'antd';
 
@@ -21,11 +21,17 @@ const ROW_HEIGHT = 26;
 
 const KustomizeList: React.FC = () => {
   const list = useAppSelector(kustomizeListSelector);
-  const isLoading = useAppSelector(state =>
-    Boolean(state.main.previewOptions.isLoading) && state.main.preview?.type !== 'kustomize'
-      ? true
-      : state.ui.isFolderLoading
-  );
+  const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
+  const isPreviewOptionsLoading = useAppSelector(state => state.main.previewOptions.isLoading);
+  const preview = useAppSelector(state => state.main.preview);
+
+  const isLoading = useMemo(() => {
+    if (Boolean(isPreviewOptionsLoading) && preview?.type !== 'kustomize') {
+      return true;
+    }
+
+    return isFolderLoading;
+  }, [preview, isPreviewOptionsLoading, isFolderLoading]);
 
   const ref = useRef<HTMLUListElement>(null);
 

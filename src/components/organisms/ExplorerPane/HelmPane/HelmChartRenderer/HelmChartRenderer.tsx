@@ -1,4 +1,4 @@
-import {memo, useState} from 'react';
+import {memo, useMemo, useState} from 'react';
 
 import {Tooltip} from 'antd';
 
@@ -25,22 +25,30 @@ const HelmChartRenderer: React.FC<IProps> = props => {
   const {id} = props;
 
   const dispatch = useAppDispatch();
-  const fileOrFolderContainedIn = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn || '');
-  const helmChart = useAppSelector(state => state.main.helmChartMap[id]);
-  const isDisabled = useAppSelector(state =>
-    Boolean(
-      (state.main.preview?.type === 'helm' &&
-        state.main.preview.valuesFileId &&
-        state.main.preview.valuesFileId !== helmChart.id) ||
-        isInClusterModeSelector(state) ||
-        !helmChart.filePath.startsWith(fileOrFolderContainedIn)
-    )
-  );
-  const isSelected = useAppSelector(
-    state => state.main.selection?.type === 'file' && state.main.selection.filePath === helmChart.filePath
-  );
+  const fileOrFolderContainedIn = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn) || '';
+  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const preview = useAppSelector(state => state.main.preview);
+  const selection = useAppSelector(state => state.main.selection);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
+
+  const helmChart = useMemo(() => helmChartMap[id], [helmChartMap, id]);
+  const isDisabled = useMemo(() => {
+    if (preview?.type === 'helm' && preview.valuesFileId && preview.valuesFileId !== helmChart.id) {
+      return true;
+    }
+
+    if (isInClusterMode) {
+      return true;
+    }
+
+    return !helmChart.filePath.startsWith(fileOrFolderContainedIn);
+  }, [fileOrFolderContainedIn, helmChart.filePath, helmChart.id, isInClusterMode, preview]);
+  const isSelected = useMemo(
+    () => selection?.type === 'file' && selection.filePath === helmChart.filePath,
+    [helmChart.filePath, selection]
+  );
 
   return (
     <S.ItemContainer

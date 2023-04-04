@@ -21,7 +21,7 @@ import {ContextMenu, Dots} from '@atoms';
 import {useDuplicate, useProcessing, useRename} from '@hooks/fileTreeHooks';
 
 import {deleteFileEntry, dispatchDeleteAlert} from '@utils/files';
-import {useRefSelector} from '@utils/hooks';
+import {useSelectorWithRef} from '@utils/hooks';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -37,37 +37,37 @@ const KustomizeContextMenu: React.FC<IProps> = props => {
   const {id, isSelected} = props;
 
   const dispatch = useAppDispatch();
-  const fileMapRef = useRefSelector(state => state.main.fileMap);
+  const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
+  const filters = useAppSelector(state => state.main.resourceFilter);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const osPlatform = useAppSelector(state => state.config.osPlatform);
+  const selection = useAppSelector(state => state.main.selection);
+
+  const {onDuplicate} = useDuplicate();
+  const {onRename} = useRename();
 
   const resource = useResource({id, storage: 'local'});
   const resourceRef = useRef(resource);
   resourceRef.current = resource;
 
-  const fileEntry = useAppSelector(state =>
-    resource?.origin.filePath ? state.main.fileMap[resource.origin.filePath] : undefined
-  );
-  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
-  const filters = useAppSelector(state => state.main.resourceFilter);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
-  const isKustomizationSelected = useAppSelector(state =>
-    resource ? isResourceSelected(resource, state.main.selection) : false
-  );
-  const osPlatform = useAppSelector(state => state.config.osPlatform);
-
-  const {onDuplicate} = useDuplicate();
-
-  const {onRename} = useRename();
-
   const absolutePath = useMemo(
     () => (resource?.origin.filePath ? getAbsoluteFilePath(resource?.origin.filePath, fileMapRef.current) : undefined),
     [resource?.origin.filePath, fileMapRef]
   );
-
-  const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
+  const fileEntry = useMemo(
+    () => (resource?.origin.filePath ? fileMap[resource.origin.filePath] : undefined),
+    [fileMap, resource]
+  );
+  const isKustomizationSelected = useMemo(
+    () => (resource ? isResourceSelected(resource, selection) : false),
+    [resource, selection]
+  );
   const isPassingFilter = useMemo(
     () => (resource ? isResourcePassingFilter(resource, filters) : false),
     [filters, resource]
   );
+  const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
 
   const refreshFolder = useCallback(
     () => dispatch(setRootFolder(fileMapRef.current[ROOT_FILE_ENTRY].filePath)),

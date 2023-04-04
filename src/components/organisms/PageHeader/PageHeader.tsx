@@ -60,7 +60,6 @@ const PageHeader = () => {
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const previewType = useAppSelector(state => state.main.preview?.type);
-  // const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   let timeoutRef = useRef<any>(null);
 
@@ -69,13 +68,6 @@ const PageHeader = () => {
   const [showAutosaving, setShowAutosaving] = useState(false);
 
   const helpMenuItems = useHelpMenuItems();
-
-  // const runningPreviewConfiguration = useAppSelector(state => {
-  //   if (!state.main.previewConfigurationId) {
-  //     return undefined;
-  //   }
-  //   return state.config.projectConfig?.helm?.previewConfigurationMap?.[state.main.previewConfigurationId];
-  // });
 
   const [pageHeaderRef, {height: pageHeaderHeight}] = useMeasure<HTMLDivElement>();
 

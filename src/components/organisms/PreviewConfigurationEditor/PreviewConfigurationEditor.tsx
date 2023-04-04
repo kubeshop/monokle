@@ -34,13 +34,7 @@ const PreviewConfigurationEditor = () => {
   const previewConfigurationMap = useAppSelector(
     state => state.config.projectConfig?.helm?.previewConfigurationMap || {}
   );
-  const previewConfiguration = useAppSelector(state => {
-    const previewConfigurationId = state.main.prevConfEditor.previewConfigurationId;
-    if (!previewConfigurationId) {
-      return undefined;
-    }
-    return previewConfigurationMap[previewConfigurationId];
-  });
+  const previewConfigurationId = useAppSelector(state => state.main.prevConfEditor.previewConfigurationId);
 
   const helmChart = useAppSelector(state => {
     const helmChartId = state.main.prevConfEditor.helmChartId;
@@ -52,6 +46,14 @@ const PreviewConfigurationEditor = () => {
     return state.main.helmChartMap[helmChartId];
   });
   const projectConfigRef = useRefSelector(state => state.config.projectConfig);
+
+  const previewConfiguration = useMemo(() => {
+    if (!previewConfigurationId) {
+      return undefined;
+    }
+
+    return previewConfigurationMap[previewConfigurationId];
+  }, [previewConfigurationId, previewConfigurationMap]);
 
   const [name, setName] = useState<string>(() => previewConfiguration?.name || '');
   const [showNameError, setShowNameError] = useState(false);
@@ -182,14 +184,15 @@ const PreviewConfigurationEditor = () => {
       }
     },
     [
-      dispatch,
+      helmChart,
       name,
+      previewConfiguration,
       helmCommand,
       helmOptions,
-      previewConfigurationMap,
-      previewConfiguration,
-      helmChart,
       valuesFileItemMap,
+      previewConfigurationMap,
+      dispatch,
+      projectConfigRef,
     ]
   );
 

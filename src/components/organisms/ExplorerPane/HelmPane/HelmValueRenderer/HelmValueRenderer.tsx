@@ -1,4 +1,4 @@
-import {memo, useState} from 'react';
+import {memo, useMemo, useState} from 'react';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -16,19 +16,27 @@ const HelmValueRenderer: React.FC<IProps> = props => {
   const {id} = props;
 
   const dispatch = useAppDispatch();
-  const fileOrFolderContainedIn = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn || '');
-  const helmValue = useAppSelector(state => state.main.helmValuesMap[id]);
-  const isDisabled = useAppSelector(state =>
-    Boolean(
-      (state.main.preview?.type === 'helm' &&
-        state.main.preview.valuesFileId &&
-        state.main.preview.valuesFileId !== helmValue.id) ||
-        isInClusterModeSelector(state) ||
-        !helmValue.filePath.startsWith(fileOrFolderContainedIn)
-    )
-  );
-  const isSelected = useAppSelector(
-    state => state.main.selection?.type === 'helm.values.file' && state.main.selection.valuesFileId === helmValue.id
+  const fileOrFolderContainedIn = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn) || '';
+  const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const preview = useAppSelector(state => state.main.preview);
+  const selection = useAppSelector(state => state.main.selection);
+
+  const helmValue = useMemo(() => helmValuesMap[id], [helmValuesMap, id]);
+  const isDisabled = useMemo(() => {
+    if (preview?.type === 'helm' && preview.valuesFileId && preview.valuesFileId !== helmValue.id) {
+      return true;
+    }
+
+    if (isInClusterMode) {
+      return true;
+    }
+
+    return !helmValue.filePath.startsWith(fileOrFolderContainedIn);
+  }, [fileOrFolderContainedIn, helmValue.filePath, helmValue.id, isInClusterMode, preview]);
+  const isSelected = useMemo(
+    () => selection?.type === 'helm.values.file' && selection.valuesFileId === helmValue.id,
+    [helmValue.id, selection]
   );
 
   const [isHovered, setIsHovered] = useState<boolean>(false);

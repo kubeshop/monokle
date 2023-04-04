@@ -18,11 +18,18 @@ const {Text} = Typography;
 
 const PreviwConfigurationDetails: React.FC = () => {
   const currentContext = useAppSelector(kubeConfigContextSelector);
+  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const previewConfigurationMap = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap);
   const rootFolderPath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY].filePath);
-  const selectedPreviewConfigurationId = useAppSelector(state =>
-    state.main.selection?.type === 'preview.configuration' ? state.main.selection.previewConfigurationId : undefined
-  );
+  const selection = useAppSelector(state => state.main.selection);
+
+  const selectedPreviewConfigurationId = useMemo(() => {
+    if (selection?.type !== 'preview.configuration') {
+      return undefined;
+    }
+
+    return selection.previewConfigurationId;
+  }, [selection]);
 
   const previewConfiguration = useMemo(
     () =>
@@ -32,14 +39,13 @@ const PreviwConfigurationDetails: React.FC = () => {
     [selectedPreviewConfigurationId, previewConfigurationMap]
   );
 
-  const helmChart = useAppSelector(state => {
+  const helmChart = useMemo(() => {
     if (!previewConfiguration) {
       return undefined;
     }
-    return Object.values(state.main.helmChartMap).find(
-      chart => chart.filePath === previewConfiguration.helmChartFilePath
-    );
-  });
+
+    return Object.values(helmChartMap).find(chart => chart.filePath === previewConfiguration.helmChartFilePath);
+  }, [helmChartMap, previewConfiguration]);
 
   const orderedValuesFilePaths = useMemo(
     () =>

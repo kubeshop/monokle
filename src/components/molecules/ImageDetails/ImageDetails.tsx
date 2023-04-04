@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import {Skeleton} from 'antd';
 
@@ -14,13 +14,16 @@ import * as S from './ImageDetails.styled';
 import ImageTags from './ImageTags';
 
 const ImageDetails: React.FC = () => {
-  const selectedImage = useAppSelector(state => {
-    const selectedImageId = state.main.selection?.type === 'image' && state.main.selection?.imageId;
+  const imageMap = useAppSelector(state => state.main.imageMap);
+  const selection = useAppSelector(state => state.main.selection);
+
+  const selectedImage = useMemo(() => {
+    const selectedImageId = selection?.type === 'image' && selection?.imageId;
     if (!selectedImageId) {
       return undefined;
     }
-    return state.main.imageMap[selectedImageId];
-  });
+    return imageMap[selectedImageId];
+  }, [imageMap, selection]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [imageInfo, setImageInfo] = useState<DockerHubImage>();

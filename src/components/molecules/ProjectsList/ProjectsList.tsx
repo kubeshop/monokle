@@ -23,15 +23,17 @@ const ProjectsList: React.FC<IProps> = props => {
   const {type} = props;
 
   const activeProject = useAppSelector(activeProjectSelector);
-  const currentProjects = useAppSelector(state => {
-    let projects = sortProjects(state.config.projects, Boolean(activeProject));
+  const configProjects = useAppSelector(state => state.config.projects);
+
+  const currentProjects = useMemo(() => {
+    let projects = sortProjects(configProjects, Boolean(activeProject));
 
     if (type === 'recent') {
       projects = projects.slice(0, 5);
     }
 
     return projects;
-  });
+  }, [activeProject, configProjects, type]);
 
   const [typeFilter, setTypeFilter] = useState<FiltersType>('all');
   const [creationFilter, setCreationFilter] = useState<CreationFiltersType>('last-created');

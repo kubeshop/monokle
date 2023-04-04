@@ -1,8 +1,8 @@
-import {memo, useCallback, useState} from 'react';
+import {memo, useCallback, useMemo, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseKustomizeKinds, expandKustomizeKinds} from '@redux/reducers/ui';
-import {getResourceMetaFromState} from '@redux/selectors/resourceGetters';
+import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {isKustomizationPatch} from '@redux/services/kustomize';
 
 import {useSelectorWithRef} from '@utils/hooks';
@@ -23,34 +23,33 @@ const KustomizeHeaderRenderer: React.FC<IProps> = props => {
 
   const dispatch = useAppDispatch();
   const [isCollapsed, isCollapsedRef] = useSelectorWithRef(state => state.ui.collapsedKustomizeKinds.includes(kind));
-  const isHighlighted = useAppSelector(state =>
-    state.main.highlights.some(highlight => {
+  const selectedResource = useSelectedResource();
+  const highlights = useAppSelector(state => state.main.highlights);
+  const resourceMetaMapByStorage = useAppSelector(state => state.main.resourceMetaMapByStorage);
+
+  const isHighlighted = useMemo(() => {
+    return highlights.some(highlight => {
       if (highlight.type !== 'resource') {
         return false;
       }
-
-      const resourceMeta = getResourceMetaFromState(state, highlight.resourceIdentifier);
+      const resourceMeta =
+        resourceMetaMapByStorage[highlight.resourceIdentifier.storage][highlight.resourceIdentifier.id];
 
       if (!resourceMeta) {
         return false;
       }
 
       return resourceMeta.kind === kind && (kind !== 'Kustomization' ? isKustomizationPatch(resourceMeta) : true);
-    })
-  );
-  const isSelected = useAppSelector(state => {
-    if (state.main.selection?.type !== 'resource') {
+    });
+  }, [highlights, kind, resourceMetaMapByStorage]);
+
+  const isSelected = useMemo(() => {
+    if (!selectedResource) {
       return false;
     }
 
-    const resourceMeta = getResourceMetaFromState(state, state.main.selection.resourceIdentifier);
-
-    if (!resourceMeta) {
-      return false;
-    }
-
-    return resourceMeta.kind === kind && (kind !== 'Kustomization' ? isKustomizationPatch(resourceMeta) : true);
-  });
+    return selectedResource.kind === kind && (kind !== 'Kustomization' ? isKustomizationPatch(selectedResource) : true);
+  }, [kind, selectedResource]);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
