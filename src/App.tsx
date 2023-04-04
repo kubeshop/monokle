@@ -1,6 +1,6 @@
 import {ipcRenderer} from 'electron';
 
-import React, {Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useState} from 'react';
+import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
 import {useEffectOnce, useMount} from 'react-use';
 
 import {Image, Modal} from 'antd';
@@ -204,7 +204,7 @@ const App = () => {
     };
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     fetchAppVersion().then(version => {
       setAppVersion(version);
 
