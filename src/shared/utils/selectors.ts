@@ -19,17 +19,17 @@ export const isInPreviewModeSelector = createSelector(
 );
 
 export const activeProjectSelector = createSelector(
-  (state: RootState) => state.config,
-  config => config.projects.find(p => p.rootFolder === config.selectedProjectRootFolder)
+  [(state: RootState) => state.config.projects, (state: RootState) => state.config.selectedProjectRootFolder],
+  (projects, selectedProjectRootFolder) => projects.find(p => p.rootFolder === selectedProjectRootFolder)
 );
 
 export const kubeConfigPathValidSelector = createSelector(
-  (state: RootState) => state.config,
-  config => {
-    if (has(config, 'projectConfig.kubeConfig.isPathValid')) {
-      return Boolean(config.projectConfig?.kubeConfig?.isPathValid);
+  [(state: RootState) => state.config.projectConfig?.kubeConfig, (state: RootState) => state.config.kubeConfig],
+  (projectKubeConfig, globalKubeConfig) => {
+    if (has(projectKubeConfig, 'isPathValid')) {
+      return Boolean(projectKubeConfig?.isPathValid);
     }
 
-    return Boolean(config.kubeConfig.isPathValid);
+    return Boolean(globalKubeConfig.isPathValid);
   }
 );
