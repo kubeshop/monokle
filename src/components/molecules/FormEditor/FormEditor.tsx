@@ -143,7 +143,7 @@ const FormEditor: React.FC<IProps> = props => {
     [isInClusterMode, isInPreviewMode, settings.allowEditInClusterMode]
   );
 
-  if (!selectedResource && selectedFilePath) {
+  if (!selectedResource && !selectedFilePath) {
     return <div>Nothing selected..</div>;
   }
 
