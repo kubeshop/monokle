@@ -90,12 +90,16 @@ export const setRootFolder = createAsyncThunk<
 
   monitorRootFolder(rootFolder, thunkAPI);
 
+  const filesNumber = Object.values(fileMap).filter(f => !f.children).length;
+  const resourcesNumber = Object.values(resourceMetaMap).length;
+  const helmChartsNumber = Object.values(helmChartMap).length;
+  const overlaysNumber = Object.values(resourceMetaMap).filter(r => isKustomizationResource(r)).length;
+
   const generatedAlert = {
     title: 'Folder Import',
-    message: `${Object.values(resourceMetaMap).length} resources found in ${
-      Object.values(fileMap).filter(f => !f.children).length
-    } files`,
+    message: `Found ${resourcesNumber} resources, ${helmChartsNumber} Helm charts and ${overlaysNumber} Kustomize overlays configurations in ${filesNumber} files processed.`,
     type: AlertEnum.Success,
+    silent: true,
   };
 
   const isFolderGitRepo = await promiseFromIpcRenderer<boolean>(
@@ -133,10 +137,10 @@ export const setRootFolder = createAsyncThunk<
   const endTime = new Date().getTime();
 
   trackEvent('app_start/open_project', {
-    numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
-    numberOfResources: Object.values(resourceMetaMap).length,
-    numberOfOverlays: Object.values(resourceMetaMap).filter(r => isKustomizationResource(r)).length,
-    numberOfHelmCharts: Object.values(helmChartMap).length,
+    numberOfFiles: filesNumber,
+    numberOfResources: resourcesNumber,
+    numberOfOverlays: overlaysNumber,
+    numberOfHelmCharts: helmChartsNumber,
     executionTime: endTime - startTime,
   });
 
