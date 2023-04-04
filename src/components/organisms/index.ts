@@ -39,3 +39,4 @@ export {default as TerminalPane} from './TerminalPane';
 export {default as UpdateNotice} from './UpdateNotice';
 export {default as ValidationPane} from './ValidationPane';
 export {default as ValidationSettings} from './ValidationSettings';
+export {default as GlobalModals} from './GlobalModals';
