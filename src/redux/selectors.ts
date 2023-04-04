@@ -16,9 +16,8 @@ export const rootFolderSelector = createSelector(
 );
 
 export const selectedFilePathSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const selection = state.main.selection;
+  (state: RootState) => state.main.selection,
+  selection => {
     if (!isFileSelection(selection)) {
       return undefined;
     }

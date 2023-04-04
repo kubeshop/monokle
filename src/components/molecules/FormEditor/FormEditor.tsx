@@ -29,6 +29,7 @@ import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 import {useStateWithRef} from '@utils/hooks';
 import {parseYamlDocument} from '@utils/yaml';
 
+import {isHelmChartFile} from '@shared/utils';
 import {isEqual} from '@shared/utils/isEqual';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -143,7 +144,7 @@ const FormEditor: React.FC<IProps> = props => {
     [isInClusterMode, isInPreviewMode, settings.allowEditInClusterMode]
   );
 
-  if (!selectedResource && selectedFilePath) {
+  if (!selectedResource && selectedFilePath && !isHelmChartFile(selectedFilePath)) {
     return <div>Nothing selected..</div>;
   }
 
