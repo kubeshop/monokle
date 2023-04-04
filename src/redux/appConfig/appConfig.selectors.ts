@@ -113,7 +113,6 @@ export const isInClusterModeSelector = createSelector(
 );
 
 export const isProjectKubeConfigSelector = createSelector(
-  (state: RootState) => state.config,
-  config =>
-    has(config, 'projectConfig.kubeConfig.isPathValid') && Boolean(config.projectConfig?.kubeConfig?.isPathValid)
+  (state: RootState) => state.config.projectConfig?.kubeConfig,
+  kubeConfig => has(kubeConfig, 'isPathValid') && Boolean(kubeConfig?.isPathValid)
 );
