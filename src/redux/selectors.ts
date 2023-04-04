@@ -16,9 +16,8 @@ export const rootFolderSelector = createSelector(
 );
 
 export const selectedFilePathSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const selection = state.main.selection;
+  (state: RootState) => state.main.selection,
+  selection => {
     if (!isFileSelection(selection)) {
       return undefined;
     }
@@ -27,46 +26,45 @@ export const selectedFilePathSelector = createSelector(
 );
 
 export const selectedHelmConfigSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const selection = state.main.selection;
+  [
+    (state: RootState) => state.main.selection,
+    (state: RootState) => state.config.projectConfig?.helm?.previewConfigurationMap,
+  ],
+  (selection, previewConfigurationMap) => {
     if (!isPreviewConfigurationSelection(selection)) {
       return undefined;
     }
-    return state.config.projectConfig?.helm?.previewConfigurationMap?.[selection.previewConfigurationId];
+    return previewConfigurationMap?.[selection.previewConfigurationId];
   }
 );
 
 export const previewedValuesFileSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const preview = state.main.preview;
+  [(state: RootState) => state.main.preview, (state: RootState) => state.main.helmValuesMap],
+  (preview, helmValuesMap) => {
     if (!preview || preview.type !== 'helm') {
       return undefined;
     }
-    return state.main.helmValuesMap[preview.valuesFileId];
+    return helmValuesMap[preview.valuesFileId];
   }
 );
 
 export const selectedHelmValuesSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const selection = state.main.selection;
+  [(state: RootState) => state.main.selection, (state: RootState) => state.main.helmValuesMap],
+  (selection, helmValuesMap) => {
     if (!selection || selection.type !== 'helm.values.file') {
       return undefined;
     }
-    return state.main.helmValuesMap[selection.valuesFileId];
+    return helmValuesMap[selection.valuesFileId];
   }
 );
 
 export const previewedHelmChartSelector = createSelector(
-  (state: RootState) => state,
-  state => {
-    const preview = state.main.preview;
+  [(state: RootState) => state.main.preview, (state: RootState) => state.main.helmChartMap],
+  (preview, helmChartMap) => {
     if (!preview || preview.type !== 'helm') {
       return undefined;
     }
-    return state.main.helmChartMap[preview.chartId];
+    return helmChartMap[preview.chartId];
   }
 );
 
