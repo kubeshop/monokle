@@ -1,8 +1,7 @@
 import {TypedUseSelectorHook} from 'react-redux';
 
-import {createSelector} from '@reduxjs/toolkit';
-
 import {useAppSelector} from '@redux/hooks';
+import {createDeepEqualSelector} from '@redux/selectors/utils';
 
 import {
   RuleLevel,
@@ -24,7 +23,7 @@ export const useValidationSelector: TypedUseSelectorHook<ValidationState> = (sel
 /* * * * * * * * * * * * * * * * * *
  * All problems
  * * * * * * * * * * * * * * * * * */
-export const problemsSelector = createSelector(
+export const problemsSelector = createDeepEqualSelector(
   [(state: ValidationState) => state.lastResponse, (_: ValidationState, level?: RuleLevel) => level],
   (response, level) => {
     const allProblems = response?.runs.flatMap(r => r.results) ?? [];
@@ -38,7 +37,7 @@ export const warningsSelector = (state: ValidationState) => problemsSelector(sta
 /* * * * * * * * * * * * * * * * * *
  * Problems by resource
  * * * * * * * * * * * * * * * * * */
-export const problemsByResourcesSelector = createSelector(
+export const problemsByResourcesSelector = createDeepEqualSelector(
   [(state: ValidationState) => problemsSelector(state), (_: ValidationState, level?: RuleLevel) => level],
   (problems, level): Record<string, ValidationResult[] | undefined> => {
     const problemsByResources: Map<string, ValidationResult[]> = new Map();
@@ -68,7 +67,7 @@ export const problemsByResourcesSelector = createSelector(
 export const errorsByResourcesSelector = (state: ValidationState) => problemsByResourcesSelector(state, 'error');
 export const warningsByResourcesSelector = (state: ValidationState) => problemsByResourcesSelector(state, 'warning');
 
-export const problemsByResourceSelector = createSelector(
+export const problemsByResourceSelector = createDeepEqualSelector(
   [
     (state: ValidationState, _resource?: string, level?: RuleLevel) => {
       return problemsByResourcesSelector(state, level);
@@ -88,7 +87,7 @@ export const warningsByResourceSelector = (state: ValidationState, resource?: st
 /* * * * * * * * * * * * * * * * * *
  * Problems by file path
  * * * * * * * * * * * * * * * * * */
-export const problemsByFilePathsSelector = createSelector(
+export const problemsByFilePathsSelector = createDeepEqualSelector(
   [(state: ValidationState) => problemsSelector(state), (_: ValidationState, level?: RuleLevel) => level],
   (problems, level): Record<string, ValidationResult[] | undefined> => {
     const problemsByFile: Map<string, ValidationResult[]> = new Map();
@@ -118,7 +117,7 @@ export const problemsByFilePathsSelector = createSelector(
 export const errorsByFilePathsSelector = (state: ValidationState) => problemsByFilePathsSelector(state, 'error');
 export const warningsByFilePathsSelector = (state: ValidationState) => problemsByFilePathsSelector(state, 'warning');
 
-export const problemsByFilePathSelector = createSelector(
+export const problemsByFilePathSelector = createDeepEqualSelector(
   [
     (state: ValidationState, _path: string, level?: RuleLevel) => problemsByFilePathsSelector(state, level),
     (_state: ValidationState, path?: string) => path,
@@ -138,7 +137,7 @@ export const warningsByFilePathSelector = (state: ValidationState, path: string)
  * Problems by rule
  * * * * * * * * * * * * * * * * * */
 
-export const problemsByRulesSelector = createSelector(
+export const problemsByRulesSelector = createDeepEqualSelector(
   [(state: ValidationState) => problemsSelector(state), (_: ValidationState, level?: RuleLevel) => level],
   (problems, level): Record<string, ValidationResult[] | undefined> => {
     const problemsByRule: Map<string, ValidationResult[]> = new Map();
@@ -169,12 +168,12 @@ export const problemsByRulesSelector = createSelector(
  * Miscellaneous
  * * * * * * * * * * * * * * * * * */
 
-export const pluginMetadataSelector = createSelector(
+export const pluginMetadataSelector = createDeepEqualSelector(
   [(state: ValidationState) => state.metadata, (state: ValidationState, plugin?: string) => plugin],
   (metadata, plugin) => (!plugin ? undefined : metadata?.[plugin])
 );
 
-export const pluginRulesSelector = createSelector(
+export const pluginRulesSelector = createDeepEqualSelector(
   [(state: ValidationState) => state.rules, (state: ValidationState, plugin?: string) => plugin],
   (rules, plugin) => (!plugin ? [] : rules?.[plugin] ?? [])
 );
@@ -191,13 +190,13 @@ export const opaRuleCountSelector = (state: ValidationState) => {
   }, 0);
 };
 
-export const pluginEnabledSelector = createSelector(
+export const pluginEnabledSelector = createDeepEqualSelector(
   (state: RootState, id: string) => state.validation.config?.plugins?.[id],
   (_: RootState, id: string) => id,
   (_config, id): boolean => VALIDATOR.getPlugin(id)?.enabled ?? false
 );
 
-export const problemFilePathAndRangeSelector = createSelector(
+export const problemFilePathAndRangeSelector = createDeepEqualSelector(
   (state: ValidationState) => state.validationOverview.selectedProblem?.problem ?? null,
   (problem: ValidationResult | null) => {
     if (!problem) {
@@ -223,7 +222,7 @@ export const problemFilePathAndRangeSelector = createSelector(
   }
 );
 
-export const problemResourceIdAndRangeSelector = createSelector(
+export const problemResourceIdAndRangeSelector = createDeepEqualSelector(
   (state: ValidationState) => state.validationOverview.selectedProblem?.problem ?? null,
   (problem: ValidationResult | null) => {
     if (!problem) {
