@@ -1,5 +1,6 @@
 import {memo, useCallback, useState} from 'react';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 import {useResourceMeta} from '@redux/selectors/resourceSelectors';
@@ -22,6 +23,7 @@ export type ResourceRendererProps = {
 function ResourceRenderer(props: ResourceRendererProps) {
   const {disableContextMenu = false, resourceIdentifier: propsResourceIdentifier} = props;
   const dispatch = useAppDispatch();
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   const transientResourceIdentifier: ResourceIdentifier = {id: propsResourceIdentifier.id, storage: 'transient'};
   const activeResourceMeta = useResourceMeta(propsResourceIdentifier);
@@ -75,9 +77,11 @@ function ResourceRenderer(props: ResourceRendererProps) {
         {resourceMeta.name} {resourceMeta.storage === 'transient' ? '*' : ''}
       </S.ItemName>
 
-      <S.InformationContainer>
-        <ResourceInfoIcon resourceMeta={resourceMeta} isSelected={isSelected} />
-      </S.InformationContainer>
+      {isInClusterMode && (
+        <S.InformationContainer>
+          <ResourceInfoIcon resourceMeta={resourceMeta} isSelected={isSelected} />
+        </S.InformationContainer>
+      )}
 
       <S.SuffixContainer>
         <ResourceSuffix resourceMeta={resourceMeta} isSelected={isSelected} />
