@@ -125,7 +125,12 @@ export const getKubeAccess = async (namespace: string, currentContext: string): 
   if (hasErrors) {
     const errors = result.stderr;
     log.error(`get cluster access errors ${errors}`);
-    throw new Error(`Couldn't get cluster access for namespaces. Errors: ${JSON.stringify(errors)}`);
+    // Shall we create CustomErrors to handle different error types?
+    const clusterAccessError = new Error(
+      `Couldn't get cluster access for namespaces. Errors: ${JSON.stringify(errors)}`
+    );
+    (clusterAccessError as any).code = 'CLUSTER_ACCESS_FAILED';
+    throw clusterAccessError;
   }
   const stdout = result.stdout;
   if (typeof stdout !== 'string') {

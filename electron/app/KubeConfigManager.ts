@@ -54,16 +54,18 @@ const handleKubeServiceMessage = (message: AnyAction) => {
         dispatchToAllWindows({type: 'config/setAccessLoading', payload: true});
         dispatchToAllWindows({type: 'config/addNamespaceToContext', payload: clusterAccess});
       })
-      .catch(() => {
-        dispatchToAllWindows({
-          type: 'alert/setAlert',
-          payload: {
-            type: AlertEnum.Warning,
-            title: 'Cluster Watcher Error',
-            message:
-              "We're unable to watch for namespaces changes in your cluster. This may be due to a lack of permissions.",
-          },
-        });
+      .catch((e: any) => {
+        if (e.code !== 'CLUSTER_ACCESS_FAILED') {
+          dispatchToAllWindows({
+            type: 'alert/setAlert',
+            payload: {
+              type: AlertEnum.Warning,
+              title: 'Cluster Watcher Error',
+              message:
+                "We're unable to watch for namespaces changes in your cluster. This may be due to a lack of permissions.",
+            },
+          });
+        }
         dispatchToAllWindows({type: 'config/setAccessLoading', payload: false});
       });
   }
