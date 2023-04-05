@@ -142,6 +142,7 @@ const initialUiState: UiState = {
   isKeyboardShortcutsModalOpen: false,
   collapsedKustomizeKinds: [],
   collapsedHelmCharts: [],
+  collapsedPreviewConfigurationsHelmCharts: [],
   isScaleModalOpen: false,
   isNotificationsOpen: false,
   isFolderLoading: false,

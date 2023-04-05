@@ -2,13 +2,6 @@ import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
 
-type ItemNameProps = {
-  isDisabled: boolean;
-  isSelected: boolean;
-};
-
-export const ContextMenuContainer = styled.span``;
-
 export const ItemContainer = styled.span`
   display: flex;
   align-items: center;

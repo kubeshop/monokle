@@ -41,8 +41,9 @@ export const previewConfigurationListSelector = createSelector(
   [
     (state: RootState) => state.main.helmChartMap,
     (state: RootState) => state.config.projectConfig?.helm?.previewConfigurationMap,
+    (state: RootState) => state.ui.collapsedPreviewConfigurationsHelmCharts,
   ],
-  (helmChartMap, previewConfigurationMap) => {
+  (helmChartMap, previewConfigurationMap, collapsedPreviewConfigurationsHelmCharts) => {
     const list: PreviewConfigurationListNode[] = [];
 
     if (!previewConfigurationMap) {
@@ -58,9 +59,9 @@ export const previewConfigurationListSelector = createSelector(
     for (const helmChart of ordererHelmChartMap) {
       list.push({type: 'preview-configuration-helm-chart', id: helmChart.id, filePath: helmChart.filePath});
 
-      // if (collapsedpreviewConfigurationsHelmCharts.indexOf(helmChart.id) !== -1) {
-      //   continue;
-      // }
+      if (collapsedPreviewConfigurationsHelmCharts.indexOf(helmChart.id) !== -1) {
+        continue;
+      }
 
       const previewConfigurations = orderBy(
         filteredPreviewConfigurations.filter(
