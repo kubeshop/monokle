@@ -2,7 +2,6 @@ import {memo, useCallback} from 'react';
 
 import {Button, Popover, Tag as RawTag} from 'antd';
 
-import {isEqual} from 'lodash';
 import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
@@ -24,6 +23,7 @@ import {ValidationResult, getResourceId, getResourceLocation} from '@monokle/val
 import {ResourceMeta} from '@shared/models/k8sResource';
 import {MonacoRange} from '@shared/models/ui';
 import {Colors} from '@shared/styles/colors';
+import {isEqual} from '@shared/utils/isEqual';
 import {trackEvent} from '@shared/utils/telemetry';
 
 type Props = {

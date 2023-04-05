@@ -7,11 +7,11 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 import {scanExcludesSelector, updateProjectConfig} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 
 export const useProcessing = (onOkHandler: () => void) => {
   const scanExcludes = useAppSelector(scanExcludesSelector);
-  const [, projectConfigRef] = useSelectorWithRef(state => state.config.projectConfig);
+  const projectConfigRef = useRefSelector(state => state.config.projectConfig);
   const dispatch = useAppDispatch();
 
   const openConfirmModal = useCallback(() => {

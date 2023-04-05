@@ -157,7 +157,8 @@ const loadClusterResourcesHandler = async (
     const alert: AlertType = {
       type: AlertEnum.Success,
       title: 'Cluster Resources Loaded',
-      message: `Loaded ${Object.keys(clusterResourceMap).length} resources from ${context}}`,
+      message: `Processed ${Object.keys(clusterResourceMap).length} resources from ${context}}`,
+      silent: true,
     };
 
     return {

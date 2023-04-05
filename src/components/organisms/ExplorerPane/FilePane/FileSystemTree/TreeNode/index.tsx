@@ -1,6 +1,9 @@
+import {memo} from 'react';
+
 import {useAppSelector} from '@redux/hooks';
 
 import {isDefined} from '@shared/utils/filter';
+import {isEqual} from '@shared/utils/isEqual';
 
 import TreeNodeFile from './TreeNodeFile';
 import TreeNodeFolder from './TreeNodeFolder';
@@ -11,4 +14,4 @@ const FileSystemTreeNode: React.FC<{node: any}> = props => {
   return isFolder ? <TreeNodeFolder folderPath={node.key} /> : <TreeNodeFile filePath={node.key} />;
 };
 
-export default FileSystemTreeNode;
+export default memo(FileSystemTreeNode, isEqual);

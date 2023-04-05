@@ -7,7 +7,6 @@ import {AlertState} from '@shared/models/alert';
 import {AppState} from '@shared/models/appState';
 import {AppConfig, NewVersionCode, SettingsPanel} from '@shared/models/config';
 import {ExtensionState} from '@shared/models/extension';
-import {NavigatorState} from '@shared/models/navigator';
 import {TerminalState} from '@shared/models/terminal';
 import {LeftMenuSelectionOptions, PaneConfiguration, UiState} from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
@@ -141,6 +140,8 @@ const initialUiState: UiState = {
   isReleaseNotesDrawerOpen: false,
   isAboutModalOpen: false,
   isKeyboardShortcutsModalOpen: false,
+  collapsedKustomizeKinds: [],
+  collapsedHelmCharts: [],
   isScaleModalOpen: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
@@ -235,13 +236,6 @@ const initialUiState: UiState = {
   showOpenProjectAlert: electronStore.get('ui.showOpenProjectAlert', true),
 };
 
-const initialNavigatorState: NavigatorState = {
-  sectionInstanceMap: {},
-  itemInstanceMap: {},
-  collapsedSectionIds: [],
-  registeredSectionBlueprintIds: [],
-};
-
 const initialExtensionState: ExtensionState = {
   isLoadingExistingPlugins: true,
   isLoadingExistingTemplates: true,
@@ -265,7 +259,6 @@ export default {
   config: initialAppConfigState,
   extension: initialExtensionState,
   main: initialAppState,
-  navigator: initialNavigatorState,
   terminal: initialTerminalState,
   ui: initialUiState,
 };

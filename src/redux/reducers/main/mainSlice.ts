@@ -1,6 +1,5 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {isEqual} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
@@ -52,6 +51,7 @@ import {PreviewType} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {AppSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
+import {isEqual} from '@shared/utils/isEqual';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {filterReducers} from './filterReducers';
@@ -241,7 +241,7 @@ export const mainSlice = createSlice({
     },
     openPreviewConfigurationEditor: (
       state: Draft<AppState>,
-      action: PayloadAction<{helmChartId: string; previewConfigurationId?: string}>
+      action: PayloadAction<{helmChartId?: string; previewConfigurationId?: string}>
     ) => {
       const {helmChartId, previewConfigurationId} = action.payload;
       state.prevConfEditor = {
@@ -256,6 +256,10 @@ export const mainSlice = createSlice({
         helmChartId: undefined,
         previewConfigurationId: undefined,
       };
+    },
+
+    setPreviewConfigurationEditorHelmChartId: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.prevConfEditor.helmChartId = action.payload;
     },
 
     setLastChangedLine: (state: Draft<AppState>, action: PayloadAction<number>) => {
@@ -280,7 +284,7 @@ export const mainSlice = createSlice({
         // Quick fix:
         const originalResourceMeta = state.resourceMetaMapByStorage.cluster[r.id];
         const {meta, content} = splitK8sResource(r);
-        const newMeta = {...originalResourceMeta, ...meta, refs: originalResourceMeta.refs};
+        const newMeta = {...originalResourceMeta, ...meta, refs: originalResourceMeta?.refs};
         state.resourceMetaMapByStorage.cluster[r.id] = newMeta;
         state.resourceContentMapByStorage.cluster[r.id] = content;
       });
@@ -596,6 +600,7 @@ export const {
   setFiltersToBeChanged,
   setImageMap,
   setImagesSearchedValue,
+  setPreviewConfigurationEditorHelmChartId,
   setSelectionHistory,
   uncheckAllResourceIds,
   uncheckMultipleResourceIds,

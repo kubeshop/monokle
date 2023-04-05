@@ -1,4 +1,4 @@
-import {useCallback, useRef, useState} from 'react';
+import {memo, useCallback, useRef, useState} from 'react';
 import {useMeasure} from 'react-use';
 
 import {Tooltip} from 'antd';
@@ -16,6 +16,7 @@ import {ContextMenu, Dots} from '@components/atoms';
 import {Spinner} from '@monokle/components';
 import {FileEntry} from '@shared/models/fileEntry';
 import {Colors} from '@shared/styles';
+import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './TreeNode.styled';
 import {useCanPreview, useDelete, useFileMenuItems, useIsDisabled, usePreview} from './hooks';
@@ -113,4 +114,4 @@ const TreeNodeFile: React.FC<Props> = props => {
   );
 };
 
-export default TreeNodeFile;
+export default memo(TreeNodeFile, isEqual);

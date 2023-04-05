@@ -37,7 +37,7 @@ import {getLocalResourcesForPath} from '@redux/services/fileEntry';
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
 import {getFileStats} from '@utils/files';
-import {useSelectorWithRef, useStateWithRef} from '@utils/hooks';
+import {useRefSelector, useSelectorWithRef, useStateWithRef} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
@@ -105,7 +105,7 @@ const Monaco: React.FC<IProps> = props => {
   const selectedResourceRef = useRef(selectedResource);
   selectedResourceRef.current = selectedResource;
 
-  const [, activeResourceStorageRef] = useSelectorWithRef(activeResourceStorageSelector);
+  const activeResourceStorageRef = useRefSelector(activeResourceStorageSelector);
 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
@@ -313,6 +313,8 @@ const Monaco: React.FC<IProps> = props => {
       const resourceContent =
         selectedResource.storage === 'transient'
           ? transientResourceContentMapRef.current[selectedResource.id]
+          : selectedResource.kind === 'Kustomization'
+          ? localResourceContentMapRef.current?.[selectedResource.id]
           : activeResourceContentMapRef.current?.[selectedResource.id];
       if (resourceContent) {
         if (codeRef.current === resourceContent.text) {
@@ -347,13 +349,13 @@ const Monaco: React.FC<IProps> = props => {
     isDirtyRef.current = false;
   }, [
     selectedFilePath,
-    selectedResource?.id,
-    selectedResource?.storage,
+    selectedResource,
     codeRef,
     activeResourceContentMapRef,
     transientResourceContentMapRef,
     fileMapRef,
     setCode,
+    localResourceContentMapRef,
   ]);
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 import {LegacyRef, useEffect, useMemo, useState} from 'react';
 import {MonacoDiffEditor} from 'react-monaco-editor';
+import {useStore} from 'react-redux';
 import {ResizableBox, ResizeHandle} from 'react-resizable';
 import {useMeasure} from 'react-use';
 
@@ -19,7 +20,6 @@ import {
 
 import {
   currentClusterAccessSelector,
-  currentConfigSelector,
   isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
@@ -28,9 +28,9 @@ import {
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal} from '@redux/reducers/main';
-import {useActiveResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
-import {applyResource} from '@redux/thunks/applyResource';
+import {joinK8sResource} from '@redux/services/resource';
+import {applyResourceToCluster} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import {ModalConfirm, ModalConfirmWithNamespaceSelect} from '@components/molecules';
@@ -43,6 +43,7 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {Icon} from '@monokle/components';
 import {AlertEnum, AlertType} from '@shared/models/alert';
+import {RootState} from '@shared/models/rootState';
 import {createKubeClient, hasAccessToResourceKind} from '@shared/utils/kubeclient';
 
 import * as S from './styled';
@@ -54,24 +55,28 @@ enum ModalTypes {
 
 const DiffModal = () => {
   const dispatch = useAppDispatch();
-
-  const fileMap = useAppSelector(state => state.main.fileMap);
+  const store = useStore<RootState>();
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const projectConfig = useAppSelector(currentConfigSelector);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
-  const resourceMap = useActiveResourceMap();
   const configState = useAppSelector(state => state.config);
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const namespaces = useMemo(() => clusterAccess?.map(cl => cl.namespace), [clusterAccess]);
 
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
-  const targetResource = useMemo(
-    () => (targetResourceId ? resourceMap[targetResourceId] : undefined),
-    [targetResourceId, resourceMap]
-  );
+  const targetResource = useMemo(() => {
+    if (!targetResourceId) {
+      return;
+    }
+    const meta = store.getState().main.resourceMetaMapByStorage.local[targetResourceId];
+    const content = store.getState().main.resourceContentMapByStorage.local[targetResourceId];
+    if (!meta || !content) {
+      return;
+    }
+    return joinK8sResource(meta, content);
+  }, [targetResourceId, store]);
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
 
@@ -121,14 +126,17 @@ const DiffModal = () => {
   }, [targetResource, kubeConfigContext, applyModalType, kubeConfigContextColor]);
 
   const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
-    if (targetResource?.id) {
-      const resource = resourceMap[targetResource.id];
-      if (resource) {
-        applyResource(resource.id, resourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
-          isInClusterMode,
-          shouldPerformDiff: true,
-        });
-      }
+    if (targetResource) {
+      dispatch(
+        applyResourceToCluster({
+          resourceIdentifier: targetResource,
+          namespace,
+          options: {
+            isInClusterMode,
+            shouldPerformDiff: true,
+          },
+        })
+      );
     }
     setApplyModalType(null);
   };
@@ -215,7 +223,7 @@ const DiffModal = () => {
   };
 
   useEffect(() => {
-    if (!isDiffModalVisible || !targetResource || !resourceMap) {
+    if (!isDiffModalVisible || !targetResource) {
       return;
     }
 
@@ -312,7 +320,6 @@ const DiffModal = () => {
   }, [
     kubeConfigContext,
     dispatch,
-    resourceMap,
     resourceFilter.namespaces,
     targetResource,
     isDiffModalVisible,

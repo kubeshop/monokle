@@ -3,7 +3,7 @@ import {useDebounce} from 'react-use';
 
 import {Select, Tooltip, TreeSelect} from 'antd';
 
-import {isEmpty, isEqual, omit, uniqWith} from 'lodash';
+import {isEmpty, omit, uniqWith} from 'lodash';
 
 import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES, TOOLTIP_DELAY} from '@constants/constants';
 import {QuickFilterTooltip} from '@constants/tooltips';
@@ -29,6 +29,7 @@ import {useWindowSize} from '@utils/hooks';
 import {Filter, FilterButton, FilterField, FilterHeader, KeyValueInput, NewKeyValueInput} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
+import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './ResourceFilter.styled';
 

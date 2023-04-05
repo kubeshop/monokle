@@ -68,7 +68,7 @@ export const selectResourceReducer = (
     if (ref.target?.type === 'image' && ref.target.tag) {
       newHighlights.push({
         type: 'image',
-        imageId: ref.target.tag,
+        imageId: `${ref.name}:${ref.target.tag}`,
       });
     }
   });

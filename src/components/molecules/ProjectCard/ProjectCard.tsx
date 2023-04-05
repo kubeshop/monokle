@@ -11,7 +11,7 @@ import {useAppDispatch} from '@redux/hooks';
 import {setShowOpenProjectAlert, toggleStartProjectPane} from '@redux/reducers/ui';
 import {stopClusterConnection} from '@redux/thunks/cluster';
 
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 import {getRelativeDate} from '@utils/index';
 
 import {Project} from '@shared/models/config';
@@ -24,8 +24,8 @@ export const ProjectCard: React.FC<IProps> = props => {
   const {isActive, project} = props;
 
   const dispatch = useAppDispatch();
-  const [, showOpenProjectAlertRef] = useSelectorWithRef(state => state.ui.showOpenProjectAlert);
-  const [, isInClusterModeRef] = useSelectorWithRef(isInClusterModeSelector);
+  const showOpenProjectAlertRef = useRefSelector(state => state.ui.showOpenProjectAlert);
+  const isInClusterModeRef = useRefSelector(isInClusterModeSelector);
 
   const [isTooltipMessageVisible, setIsTooltipMessageVisible] = useState(false);
   const checkboxValueRef = useRef(false);

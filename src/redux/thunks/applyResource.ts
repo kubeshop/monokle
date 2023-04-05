@@ -1,7 +1,10 @@
-import _ from 'lodash';
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
+import _, {cloneDeep} from 'lodash';
 import log from 'loglevel';
 import {stringify} from 'yaml';
 
+import {currentConfigSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {setAlert} from '@redux/reducers/alert';
 import {addResource, openResourceDiffModal, setApplyingResource} from '@redux/reducers/main';
 import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
@@ -18,7 +21,15 @@ import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType} from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
-import {K8sResource, ResourceMap, isLocalResource} from '@shared/models/k8sResource';
+import {
+  ResourceContent,
+  ResourceContentMapByStorage,
+  ResourceIdentifier,
+  ResourceMeta,
+  ResourceMetaMapByStorage,
+  isLocalResourceMeta,
+} from '@shared/models/k8sResource';
+import {ThunkApi} from '@shared/models/thunk';
 import {trackEvent} from '@shared/utils/telemetry';
 
 /**
@@ -26,12 +37,12 @@ import {trackEvent} from '@shared/utils/telemetry';
  */
 
 function applyK8sResource(
-  resource: K8sResource,
+  resourceContent: ResourceContent,
   context: string,
   kubeconfig?: string,
   namespace?: {name: string; new: boolean}
 ) {
-  const resourceObject = _.cloneDeep(resource.object);
+  const resourceObject = _.cloneDeep(resourceContent.object);
   if (namespace && namespace.name !== resourceObject.metadata?.namespace) {
     delete resourceObject.metadata.namespace;
   }
@@ -49,13 +60,13 @@ function applyK8sResource(
  */
 
 function applyKustomization(
-  resource: K8sResource<'local'>,
+  resourceMeta: ResourceMeta<'local'>,
   fileMap: FileMapType,
   context: string,
   projectConfig: ProjectConfig,
   namespace?: {name: string; new: boolean}
 ) {
-  const folder = getAbsoluteResourceFolder(resource, fileMap);
+  const folder = getAbsoluteResourceFolder(resourceMeta, fileMap);
 
   const args: string[] = ['--context', context];
   if (namespace) {
@@ -72,8 +83,9 @@ function applyKustomization(
  */
 
 export async function applyResource(
-  resourceId: string,
-  resourceMap: ResourceMap,
+  resourceIdentifeir: ResourceIdentifier,
+  resourceMetaMapByStorage: ResourceMetaMapByStorage,
+  resourceContentMapByStorage: ResourceContentMapByStorage,
   fileMap: FileMapType,
   dispatch: AppDispatch,
   projectConfig: ProjectConfig,
@@ -86,23 +98,33 @@ export async function applyResource(
   }
 ) {
   const showAlert = options?.quiet !== true;
+  const resourceMeta = resourceMetaMapByStorage[resourceIdentifeir.storage][resourceIdentifeir.id];
+
+  const resourceContent = cloneDeep(resourceContentMapByStorage[resourceIdentifeir.storage][resourceIdentifeir.id]);
+
+  // Related to this https://stackoverflow.com/questions/51297136/kubectl-error-the-object-has-been-modified-please-apply-your-changes-to-the-la
+  // We need to remove certain properties before updating the resource in cluster mode
+  if (options?.isInClusterMode) {
+    delete resourceContent.object.metadata.creationTimestamp;
+    delete resourceContent.object.metadata.resourceVersion;
+  }
+
   try {
-    const resource = resourceMap[resourceId];
-    if (resource && resource.text) {
+    if (resourceMeta) {
       dispatch(setApplyingResource(true));
 
       try {
         const kubeconfigPath = projectConfig.kubeConfig?.path;
-        const isKustomization = isKustomizationResource(resource);
+        const isKustomization = isKustomizationResource(resourceMeta);
         const result =
-          isKustomization && isLocalResource(resource)
-            ? await applyKustomization(resource, fileMap, context, projectConfig, namespace)
-            : await applyK8sResource(resource, context, kubeconfigPath, namespace);
+          isKustomization && isLocalResourceMeta(resourceMeta)
+            ? await applyKustomization(resourceMeta, fileMap, context, projectConfig, namespace)
+            : await applyK8sResource(resourceContent, context, kubeconfigPath, namespace);
 
         if (isKustomization) {
           trackEvent('cluster/deploy_kustomization');
         } else {
-          trackEvent('cluster/deploy_resource', {kind: resource.kind});
+          trackEvent('cluster/deploy_resource', {kind: resourceMeta.kind});
         }
 
         if (result.exitCode !== null && result.exitCode !== 0) {
@@ -113,10 +135,10 @@ export async function applyResource(
 
         if (result.stdout) {
           if (options?.isInClusterMode && kubeconfigPath) {
-            getResourceFromCluster(resource, kubeconfigPath, context).then(resourceFromCluster => {
+            getResourceFromCluster(resourceMeta, kubeconfigPath, context).then(resourceFromCluster => {
               delete resourceFromCluster?.metadata?.managedFields;
               const updatedResourceText = stringify(resourceFromCluster, {sortMapEntries: true});
-              if (resourceMap[resourceFromCluster?.metadata?.uid]) {
+              if (resourceContentMapByStorage.cluster[resourceFromCluster?.metadata?.uid]) {
                 dispatch(
                   updateResource({
                     resourceIdentifier: {id: resourceFromCluster?.metadata?.uid, storage: 'cluster'},
@@ -144,7 +166,7 @@ export async function applyResource(
             if (showAlert) dispatch(setAlert(namespaceAlert));
           }
 
-          const alert = successAlert(`Applied ${resource.name} to cluster ${context} successfully`, result.stdout);
+          const alert = successAlert(`Applied ${resourceMeta.name} to cluster ${context} successfully`, result.stdout);
           if (showAlert) setTimeout(() => dispatch(setAlert(alert)), 400);
         }
 
@@ -153,7 +175,8 @@ export async function applyResource(
             await removeNamespaceFromCluster(namespace.name, kubeconfigPath, context);
           }
 
-          const alert = errorAlert(`Applying ${resource.name} to cluster ${context} failed`, result.stderr);
+          const alert = errorAlert(`Applying ${resourceMeta.name} to cluster ${context} failed`, result.stderr);
+
           if (showAlert) dispatch(setAlert(alert));
           dispatch(setApplyingResource(false));
         }
@@ -169,3 +192,32 @@ export async function applyResource(
     dispatch(setApplyingResource(false));
   }
 }
+
+export const applyResourceToCluster = createAsyncThunk<
+  void,
+  {
+    resourceIdentifier: ResourceIdentifier;
+    namespace?: {name: string; new: boolean};
+    options?: {
+      isInClusterMode?: boolean;
+      shouldPerformDiff?: boolean;
+      quiet?: boolean;
+    };
+  },
+  ThunkApi
+>('main/applyResource', async ({resourceIdentifier, namespace, options}, {getState, dispatch}) => {
+  const state = getState();
+  const projectConfig = currentConfigSelector(state);
+  const kubeConfigContext = kubeConfigContextSelector(state);
+  await applyResource(
+    resourceIdentifier,
+    state.main.resourceMetaMapByStorage,
+    state.main.resourceContentMapByStorage,
+    state.main.fileMap,
+    dispatch,
+    projectConfig,
+    kubeConfigContext,
+    namespace,
+    options
+  );
+});

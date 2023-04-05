@@ -9,7 +9,7 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AlertEnum} from '@shared/models/alert';
 import {K8sObject} from '@shared/models/k8s';
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
 /**
@@ -45,15 +45,15 @@ export function createRejectionWithAlert(thunkAPI: any, title: string, message: 
 }
 
 export async function getResourceFromCluster(
-  resource: K8sResource,
+  resourceMeta: ResourceMeta,
   kubeconfigPath: string,
   context?: string
 ): Promise<K8sObject | undefined> {
-  const resourceKindHandler = getResourceKindHandler(resource.kind);
+  const resourceKindHandler = getResourceKindHandler(resourceMeta.kind);
 
-  if (resource && resource.text && resourceKindHandler) {
+  if (resourceKindHandler) {
     const kubeClient = createKubeClient(kubeconfigPath, context);
-    const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kubeClient, resource);
+    const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kubeClient, resourceMeta);
     return toPojo(resourceFromCluster.body);
   }
 }

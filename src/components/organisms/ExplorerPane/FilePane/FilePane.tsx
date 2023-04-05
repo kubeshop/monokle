@@ -17,6 +17,7 @@ import {useRefSelector} from '@utils/hooks';
 import {Icon, TitleBar, TitleBarCount} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {InjectedPanelProps} from '@shared/models/explorer';
+import {isEqual} from '@shared/utils/isEqual';
 
 import AccordionPanel from '../AccordionPanel';
 import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
@@ -52,7 +53,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
   return (
     <AccordionPanel
       {...props}
-      disabled={isInClusterMode}
+      collapsible={isInClusterMode ? 'disabled' : undefined}
       showArrow={false}
       header={
         <AccordionTitleBarContainer>
@@ -145,4 +146,4 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
   );
 };
 
-export default memo(FilePane);
+export default memo(FilePane, isEqual);

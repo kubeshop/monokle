@@ -2,7 +2,7 @@ import {useCallback} from 'react';
 
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch} from '@redux/hooks';
-import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
+import {useResourceContentMap} from '@redux/selectors/resourceMapSelectors';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
@@ -12,30 +12,29 @@ import PersistentVolumeClaimHandler from '@src/kindhandlers/PersistentVolumeClai
 import PodHandler from '@src/kindhandlers/Pod.handler';
 import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 
-import {K8sResource} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 import * as S from './InventoryInfo.styled';
 
 export const InventoryInfo = () => {
   const dispatch = useAppDispatch();
-  const clusterResourceMap = useResourceMap('cluster');
+  const clusterResourceContentMap = useResourceContentMap('cluster');
 
   const filterResources = useCallback(
     (kind: string, apiVersion?: string) => {
-      return Object.values(clusterResourceMap).filter(
-        (resource: K8sResource) =>
-          (apiVersion ? resource.object.apiVersion === apiVersion : true) && resource.kind === kind
+      return Object.values(clusterResourceContentMap).filter(
+        resourceContent =>
+          (apiVersion ? resourceContent.object.apiVersion === apiVersion : true) && resourceContent.object.kind === kind
       );
     },
-    [clusterResourceMap]
+    [clusterResourceContentMap]
   );
 
   const getNodes = useCallback(() => {
-    return Object.values(clusterResourceMap).filter(
-      resource => resource.object.apiVersion === 'v1' && resource.kind === 'Node'
+    return Object.values(clusterResourceContentMap).filter(
+      resource => resource.object.apiVersion === 'v1' && resource.object.kind === 'Node'
     );
-  }, [clusterResourceMap]);
+  }, [clusterResourceContentMap]);
 
   const podsCapacity = useCallback(() => {
     return getNodes().reduce((total, node) => total + Number(node.object.status?.capacity?.pods), 0);

@@ -6,7 +6,6 @@ import {DashboardState} from './dashboard';
 import {ExtensionState} from './extension';
 import {FormsState} from './form';
 import {GitSliceState} from './git';
-import {NavigatorState} from './navigator';
 import {TerminalState} from './terminal';
 import {UiState} from './ui';
 import {ValidationState} from './validation';
@@ -23,7 +22,6 @@ type RootState = {
   form: FormsState;
   git: GitSliceState;
   main: AppState;
-  navigator: NavigatorState;
   terminal: TerminalState;
   ui: UiState;
   validation: ValidationState;

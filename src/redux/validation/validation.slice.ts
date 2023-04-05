@@ -180,6 +180,12 @@ export const validationSlice = createSlice({
       state.status = 'loading';
     });
 
+    builder.addCase(validateResources.rejected, state => {
+      state.status = 'error';
+      state.lastResponse = undefined;
+      state.loadRequestId = undefined;
+    });
+
     builder.addCase(validateResources.fulfilled, (state, action) => {
       if (action.payload) {
         // @ts-ignore

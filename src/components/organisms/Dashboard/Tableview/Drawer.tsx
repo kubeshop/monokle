@@ -1,16 +1,12 @@
-import {useEffect, useState} from 'react';
-
-import {currentConfigSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {setActiveTab, setDashboardSelectedResourceId} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
-import {applyResource} from '@redux/thunks/applyResource';
+import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
+import {useResource} from '@redux/selectors/resourceSelectors';
+import {applyResourceToCluster} from '@redux/thunks/applyResource';
 
 import {Logs, ResourceRefsIconPopover} from '@components/molecules';
 
 import PodHandler from '@src/kindhandlers/Pod.handler';
-
-import {K8sResource} from '@shared/models/k8sResource';
 
 import * as S from './Drawer.styled';
 import {EditorTab} from './EditorTab';
@@ -20,31 +16,30 @@ import {TerminalTab} from './TerminalTab';
 export const Drawer = () => {
   const dispatch = useAppDispatch();
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
-  const clusterResourceMap = useResourceMap('cluster');
-  const [localResource, setLocalResource] = useState<K8sResource | undefined>();
+  const clusterResourceMetaMap = useResourceMetaMap('cluster');
   const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
-  const projectConfig = useAppSelector(currentConfigSelector);
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const isApplyingResource = useAppSelector(state => state.main.isApplyingResource);
 
-  useEffect(() => {
-    if (selectedResourceId && clusterResourceMap[selectedResourceId]) {
-      setLocalResource(clusterResourceMap[selectedResourceId]);
-      return;
-    }
-    setLocalResource(undefined);
-  }, [clusterResourceMap, selectedResourceId]);
+  const selectedResource = useResource(selectedResourceId ? {id: selectedResourceId, storage: 'cluster'} : undefined);
 
   const handleApplyResource = () => {
-    if (localResource && localResource.namespace && selectedResourceId && clusterResourceMap[selectedResourceId]) {
-      applyResource(
-        selectedResourceId,
-        clusterResourceMap,
-        {},
-        dispatch,
-        projectConfig,
-        kubeConfigContext,
-        localResource.namespace ? {name: localResource.namespace, new: false} : undefined,
-        {isInClusterMode: true}
+    if (
+      selectedResource &&
+      selectedResource.namespace &&
+      selectedResourceId &&
+      clusterResourceMetaMap[selectedResourceId]
+    ) {
+      dispatch(
+        applyResourceToCluster({
+          resourceIdentifier: {
+            id: selectedResourceId,
+            storage: 'cluster',
+          },
+          namespace: selectedResource.namespace ? {name: selectedResource.namespace, new: false} : undefined,
+          options: {
+            isInClusterMode: true,
+          },
+        })
       );
     }
   };
@@ -56,19 +51,19 @@ export const Drawer = () => {
       open={Boolean(selectedResourceId)}
       getContainer={false}
       title={
-        localResource ? (
+        selectedResource ? (
           <S.TitleContainer>
             <ResourceRefsIconPopover
               isSelected={false}
               isDisabled={false}
-              resourceMeta={localResource}
+              resourceMeta={selectedResource}
               type="incoming"
             />
-            <S.DrawerTitle>{localResource.name}</S.DrawerTitle>
+            <S.DrawerTitle>{selectedResource.name}</S.DrawerTitle>
             <ResourceRefsIconPopover
               isSelected={false}
               isDisabled={false}
-              resourceMeta={localResource}
+              resourceMeta={selectedResource}
               type="outgoing"
             />
           </S.TitleContainer>
@@ -98,14 +93,14 @@ export const Drawer = () => {
               key: 'Manifest',
               children: <EditorTab />,
             },
-            ...(localResource?.kind === PodHandler.kind
+            ...(selectedResource?.kind === PodHandler.kind
               ? [
                   {
                     label: 'Logs',
                     key: 'Logs',
                     children: <Logs />,
                   },
-                  ...(localResource.object.status.phase === 'Running'
+                  ...(selectedResource.object.status.phase === 'Running'
                     ? [
                         {
                           label: 'Shell',
@@ -121,7 +116,11 @@ export const Drawer = () => {
         <S.TabsFooter>
           <S.ActionButtons>
             {activeTab === 'Manifest' && (
-              <S.ActionButton disabled={!localResource} onClick={() => handleApplyResource()}>
+              <S.ActionButton
+                loading={isApplyingResource}
+                disabled={!selectedResource}
+                onClick={() => handleApplyResource()}
+              >
                 Update
               </S.ActionButton>
             )}

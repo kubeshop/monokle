@@ -70,7 +70,10 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
               localPath: folder,
               fileMap: thunkAPI.getState().main.fileMap,
             }).then(result => {
-              thunkAPI.dispatch(setChangedFiles(result));
+              if (!result?.error) {
+                thunkAPI.dispatch(setChangedFiles(result));
+              }
+
               thunkAPI.dispatch(setGitLoading(false));
             });
           }
@@ -96,7 +99,10 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
               localPath: folder,
               fileMap: thunkAPI.getState().main.fileMap,
             }).then(result => {
-              thunkAPI.dispatch(setChangedFiles(result));
+              if (!result?.error) {
+                thunkAPI.dispatch(setChangedFiles(result));
+              }
+
               thunkAPI.dispatch(setGitLoading(false));
             });
           }

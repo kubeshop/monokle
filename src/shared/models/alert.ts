@@ -27,6 +27,7 @@ type AlertType = {
   duration?: number | null;
   extraContentType?: ExtraContentType;
   silent?: boolean;
+  icon?: React.ReactNode;
 };
 
 export type {AlertState, AlertType};

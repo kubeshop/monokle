@@ -1,12 +1,11 @@
 import {useLayoutEffect, useMemo, useRef} from 'react';
 import {usePrevious} from 'react-use';
 
-import fastDeepEqual from 'fast-deep-equal';
-
 import {useRefSelector, useSelectorWithRef} from '@utils/hooks';
 
 import {ResourceNavigatorNode} from '@shared/models/navigator';
 import {isResourceSelection} from '@shared/models/selection';
+import {isEqual} from '@shared/utils/isEqual';
 
 /**
  * Scrolls the navigator to resources of interest.
@@ -14,7 +13,7 @@ import {isResourceSelection} from '@shared/models/selection';
 export function useScroll({scrollTo, list}: {scrollTo: (index: number) => void; list: ResourceNavigatorNode[]}) {
   const [selection, selectionRef] = useSelectorWithRef(state => state.main.selection);
   const previousSelection = usePrevious(selection);
-  const changed = useMemo(() => !fastDeepEqual(selection, previousSelection), [selection, previousSelection]);
+  const changed = useMemo(() => !isEqual(selection, previousSelection), [selection, previousSelection]);
   const highlightsRef = useRefSelector(state => state.main.highlights);
   const listRef = useRef(list);
   listRef.current = list;

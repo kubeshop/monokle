@@ -4,8 +4,7 @@ import {Select} from 'antd';
 
 import {uniq} from 'lodash';
 
-import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
-import {getResourcesOfKind} from '@redux/services/resource';
+import {useResourceContentMap} from '@redux/selectors/resourceMapSelectors';
 
 import * as S from './styled';
 
@@ -16,7 +15,7 @@ const EMPTY_VALUE = 'NONE';
 
 export const PodSelectorSelection = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
-  const resourceMap = useResourceMap('local');
+  const resourceContentMap = useResourceContentMap('local');
   const [podSelectors, setPodSelectors] = useState<(string | undefined)[]>([]);
   const [inputValue, setInputValue] = useState<string>();
 
@@ -45,15 +44,21 @@ export const PodSelectorSelection = (params: any) => {
   useEffect(() => {
     const labels: string[] = [];
 
-    getResourcesOfKind(resourceMap, 'Pod').forEach(r => {
-      if (r.object?.metadata?.labels) {
-        Object.keys(r.object.metadata?.labels).forEach(key => labels.push(`${key}: ${r.object.metadata?.labels[key]}`));
-      }
-    });
+    Object.values(resourceContentMap)
+      .filter(r => r.object?.kind === 'Pod')
+      .forEach(r => {
+        if (r.object?.metadata?.labels) {
+          Object.keys(r.object.metadata?.labels).forEach(key =>
+            labels.push(`${key}: ${r.object.metadata?.labels[key]}`)
+          );
+        }
+      });
 
-    Object.values(resourceMap)
+    Object.values(resourceContentMap)
       .filter(r =>
-        ['DaemonSet', 'Deployment', 'Job', 'ReplicaSet', 'ReplicationController', 'StatefulSet'].includes(r.kind)
+        ['DaemonSet', 'Deployment', 'Job', 'ReplicaSet', 'ReplicationController', 'StatefulSet'].includes(
+          r.object?.kind
+        )
       )
       .forEach(r => {
         if (r.object?.spec?.template?.metadata?.labels) {
@@ -64,7 +69,7 @@ export const PodSelectorSelection = (params: any) => {
       });
 
     setPodSelectors(uniq(labels).sort());
-  }, [resourceMap]);
+  }, [resourceContentMap]);
 
   return (
     <S.SelectStyled
