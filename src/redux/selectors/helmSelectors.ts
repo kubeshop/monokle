@@ -57,12 +57,6 @@ export const previewConfigurationListSelector = createSelector(
     const filteredPreviewConfigurations = Object.values(previewConfigurationMap).filter(entry => isDefined(entry));
 
     for (const helmChart of ordererHelmChartMap) {
-      list.push({type: 'preview-configuration-helm-chart', id: helmChart.id, filePath: helmChart.filePath});
-
-      if (collapsedPreviewConfigurationsHelmCharts.indexOf(helmChart.id) !== -1) {
-        continue;
-      }
-
       const previewConfigurations = orderBy(
         filteredPreviewConfigurations.filter(
           previewConfiguration => previewConfiguration?.helmChartFilePath === helmChart.filePath
@@ -70,6 +64,16 @@ export const previewConfigurationListSelector = createSelector(
         ['name'],
         ['asc']
       );
+
+      if (!previewConfigurations.length) {
+        continue;
+      }
+
+      list.push({type: 'preview-configuration-helm-chart', id: helmChart.id, filePath: helmChart.filePath});
+
+      if (collapsedPreviewConfigurationsHelmCharts.indexOf(helmChart.id) !== -1) {
+        continue;
+      }
 
       for (const previewConfiguration of previewConfigurations) {
         if (!previewConfiguration) {
