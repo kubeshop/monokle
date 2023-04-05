@@ -72,10 +72,10 @@ export const updateResource = createAsyncThunk<
         const {text, object} = performResourceContentUpdate(nonMutableResource, updatedText, fileMap);
         finalText = text;
         finalObject = object;
+      }
 
-        if (!preventSelectionAndHighlightsUpdate) {
-          selectResourceReducer(mainState, {resourceIdentifier: resourceMeta});
-        }
+      if (!preventSelectionAndHighlightsUpdate) {
+        selectResourceReducer(mainState, {resourceIdentifier: resourceMeta});
       }
 
       if (finalText && finalObject) {
