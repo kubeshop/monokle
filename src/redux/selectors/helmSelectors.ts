@@ -2,7 +2,7 @@ import {createSelector} from '@reduxjs/toolkit';
 
 import {orderBy} from 'lodash';
 
-import {HelmListNode, PreviewConfigurationNode} from '@shared/models/helm';
+import {HelmListNode, PreviewConfigurationListNode} from '@shared/models/helm';
 import {RootState} from '@shared/models/rootState';
 import {isDefined} from '@shared/utils/filter';
 
@@ -38,18 +38,45 @@ export const helmChartListSelector = createSelector(
 );
 
 export const previewConfigurationListSelector = createSelector(
-  [(state: RootState) => state.config.projectConfig?.helm?.previewConfigurationMap],
-  previewConfigurationMap => {
-    const list: PreviewConfigurationNode[] = [];
+  [
+    (state: RootState) => state.main.helmChartMap,
+    (state: RootState) => state.config.projectConfig?.helm?.previewConfigurationMap,
+  ],
+  (helmChartMap, previewConfigurationMap) => {
+    const list: PreviewConfigurationListNode[] = [];
 
     if (!previewConfigurationMap) {
       return list;
     }
 
-    const sortedEntries = Object.entries(previewConfigurationMap).filter(entry => isDefined(entry[1]));
+    const ordererHelmChartMap = orderBy(helmChartMap, ['name'], ['asc']).filter(
+      chart => !chart.name.includes('Unnamed Chart:')
+    );
 
-    for (const [id] of sortedEntries) {
-      list.push({type: 'preview-configuration', id});
+    const filteredPreviewConfigurations = Object.values(previewConfigurationMap).filter(entry => isDefined(entry));
+
+    for (const helmChart of ordererHelmChartMap) {
+      list.push({type: 'preview-configuration-helm-chart', id: helmChart.id, filePath: helmChart.filePath});
+
+      // if (collapsedpreviewConfigurationsHelmCharts.indexOf(helmChart.id) !== -1) {
+      //   continue;
+      // }
+
+      const previewConfigurations = orderBy(
+        filteredPreviewConfigurations.filter(
+          previewConfiguration => previewConfiguration?.helmChartFilePath === helmChart.filePath
+        ),
+        ['name'],
+        ['asc']
+      );
+
+      for (const previewConfiguration of previewConfigurations) {
+        if (!previewConfiguration) {
+          continue;
+        }
+
+        list.push({type: 'preview-configuration', id: previewConfiguration.id});
+      }
     }
 
     return list;
