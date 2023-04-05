@@ -443,7 +443,7 @@ export function extractK8sResources<
       docIndex += 1;
     });
   }
-  return result.filter(hasSupportedResourceContent);
+  return result.filter(isSupportedResource);
 }
 
 /**
@@ -459,14 +459,23 @@ export function deleteResource<Storage extends ResourceStorage>(
 }
 
 /**
- * check if the k8sResource is supported - currently excludes any files
- * that seem to contain Helm template or Monokle Vanilla template content
+ * check if the k8sResource is supported - currently excludes any resources
+ * that have one of []{} in their name/namespace/kind/apiVersion
+ * (for example helm templates with template syntax in any of these)
  */
 
-export function hasSupportedResourceContent(resource: K8sResource): boolean {
-  const helmVariableRegex = /{{.*}}/g;
-  const vanillaTemplateVariableRegex = /\[\[.*]]/g;
-  return !resource.text.match(helmVariableRegex)?.length && !resource.text.match(vanillaTemplateVariableRegex)?.length;
+const unsupportedCharactersRegEx = /[{}[]]*/;
+
+export function isSupportedResource(resource: K8sResource): boolean {
+  // const helmVariableRegex = /{{.*}}/g;
+  // const vanillaTemplateVariableRegex = /\[\[.*]]/g;
+
+  return (
+    !unsupportedCharactersRegEx.test(resource.apiVersion) &&
+    !unsupportedCharactersRegEx.test(resource.kind) &&
+    !unsupportedCharactersRegEx.test(resource.name) &&
+    (!resource.namespace || !unsupportedCharactersRegEx.test(resource.namespace))
+  );
 }
 
 export function isResourceSelected(resourceIdentifier: ResourceIdentifier, selection: AppSelection | undefined) {
