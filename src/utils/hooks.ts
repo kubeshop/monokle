@@ -53,7 +53,6 @@ export function useWindowSize(): Size {
     }
 
     window.addEventListener('resize', handleResize);
-    handleResize();
     // Remove event listener on cleanup
     return () => window.removeEventListener('resize', handleResize);
   }, []); // Empty array ensures that effect is only run on mount
