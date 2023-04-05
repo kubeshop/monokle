@@ -14,6 +14,8 @@ import '@redux/storeListeners';
 
 import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
+import {ignoreKnownErrors} from '@utils/knownErrors';
+
 import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
@@ -22,6 +24,8 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
   log.enableAll();
   log.debug('Enabled all log levels');
 }
+
+ignoreKnownErrors();
 
 ReactDOM.render(
   <Provider store={store}>
