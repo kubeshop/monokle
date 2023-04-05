@@ -38,16 +38,18 @@ import FileExplorer from '@atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFeatureFlags} from '@utils/features';
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 
 const HotKeysHandler = () => {
   const {ShowRightMenu} = useFeatureFlags();
   const dispatch = useAppDispatch();
-  const uiState = useAppSelector(state => state.ui);
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isNewResourceWizardOpened = useAppSelector(state => state.ui.newResourceWizard.isOpen);
+  const isQuickSearchActionsPopupOpened = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
@@ -57,7 +59,7 @@ const HotKeysHandler = () => {
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const selectedResource = useSelectedResource();
 
-  const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const fileMapRef = useRefSelector(state => state.main.fileMap);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -173,14 +175,14 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.TOGGLE_TERMINAL_PANE.key,
     () => {
-      if (uiState.leftMenu.bottomSelection === 'terminal') {
+      if (bottomSelection === 'terminal') {
         dispatch(setLeftBottomMenuSelection(undefined));
       } else {
         dispatch(setLeftBottomMenuSelection('terminal'));
       }
     },
     {enableOnFormTags: ['TEXTAREA']},
-    [uiState.leftMenu.bottomSelection]
+    [bottomSelection]
   );
 
   useHotkeys(
@@ -217,11 +219,11 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.OPEN_NEW_RESOURCE_WIZARD.key,
     () => {
-      if (!uiState.newResourceWizard.isOpen && rootFilePath) {
+      if (!isNewResourceWizardOpened && rootFilePath) {
         dispatch(openNewResourceWizard());
       }
     },
-    [rootFilePath]
+    [isNewResourceWizardOpened, rootFilePath]
   );
 
   useHotkeys(hotkeys.OPEN_EXPLORER_TAB.key, () => {
@@ -243,11 +245,11 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.OPEN_QUICK_SEARCH.key,
     () => {
-      if (!uiState.quickSearchActionsPopup.isOpen) {
+      if (!isQuickSearchActionsPopupOpened) {
         dispatch(openQuickSearchActionsPopup());
       }
     },
-    [uiState.quickSearchActionsPopup.isOpen]
+    [isQuickSearchActionsPopupOpened]
   );
 
   useHotkeys(hotkeys.FIND.key, () => {

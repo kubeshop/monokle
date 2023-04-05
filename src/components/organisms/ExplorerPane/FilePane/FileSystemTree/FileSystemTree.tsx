@@ -1,9 +1,8 @@
-import {memo, useEffect, useLayoutEffect, useRef} from 'react';
+import {useLayoutEffect, useMemo, useRef} from 'react';
 import {useMeasure} from 'react-use';
 
 import {DataNode} from 'antd/lib/tree';
 
-import fastDeepEqual from 'fast-deep-equal';
 import {isString} from 'lodash';
 import path from 'path';
 
@@ -30,43 +29,55 @@ const FileSystemTree: React.FC = () => {
     state => state.ui.fileExplorerExpandedFolders
   );
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
-  const firstHighlightedFile = useAppSelector(state => state.main.highlights.find(isFileSelection));
+  const [firstHighlightedFile, firstHighlightedFileRef] = useSelectorWithRef(state =>
+    state.main.highlights.find(isFileSelection)
+  );
 
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
 
   const treeRef = useRef<any>(null);
 
-  const treeData = useAppSelector(state => {
-    const rootEntry = state.main.fileMap[ROOT_FILE_ENTRY];
+  const fileMap = useAppSelector(state => state.main.fileMap);
+  const fileExplorerSortOrder = useAppSelector(state => state.config.fileExplorerSortOrder);
 
-    const rootFileNodes = createFileNodes(path.sep, state.main.fileMap);
+  const treeData = useMemo(() => {
+    const rootEntry = fileMap[ROOT_FILE_ENTRY];
+
+    const rootFileNodes = createFileNodes(path.sep, fileMap);
     const rootFolderNodes =
       rootEntry?.children
-        ?.map(folderPath =>
-          createFolderTree(`${path.sep}${folderPath}`, state.main.fileMap, state.config.fileExplorerSortOrder)
-        )
+        ?.map(folderPath => createFolderTree(`${path.sep}${folderPath}`, fileMap, fileExplorerSortOrder))
         .filter(isDefined) || [];
-
-    return sortNodes(rootFolderNodes, rootFileNodes, state.config.fileExplorerSortOrder);
-  }, fastDeepEqual);
-
-  useEffect(() => {
-    if (!firstHighlightedFile) {
-      return;
-    }
-
-    const parentFolderPaths = getAllParentFolderPaths(firstHighlightedFile.filePath);
-    dispatch(
-      setFileExplorerExpandedFolders([...new Set([...fileExplorerExpandedFoldersRef.current, ...parentFolderPaths])])
-    );
-  }, [dispatch, fileExplorerExpandedFoldersRef, firstHighlightedFile]);
+    return sortNodes(rootFolderNodes, rootFileNodes, fileExplorerSortOrder);
+  }, [fileExplorerSortOrder, fileMap]);
 
   useLayoutEffect(() => {
     if (!firstHighlightedFile) {
       return;
     }
-    treeRef.current?.scrollTo({key: firstHighlightedFile.filePath});
-  }, [firstHighlightedFile]);
+
+    const parentFolderPaths = getAllParentFolderPaths(firstHighlightedFile.filePath).filter(
+      folderPath => !fileExplorerExpandedFoldersRef.current.includes(folderPath)
+    );
+
+    if (parentFolderPaths.length) {
+      dispatch(
+        setFileExplorerExpandedFolders([...new Set([...fileExplorerExpandedFoldersRef.current, ...parentFolderPaths])])
+      );
+    } else {
+      treeRef.current?.scrollTo({key: firstHighlightedFile.filePath});
+    }
+  }, [dispatch, fileExplorerExpandedFoldersRef, firstHighlightedFile]);
+
+  useLayoutEffect(() => {
+    if (!firstHighlightedFileRef.current) {
+      return;
+    }
+
+    setTimeout(() => {
+      treeRef.current?.scrollTo({key: firstHighlightedFileRef.current?.filePath});
+    }, 50);
+  }, [fileExplorerExpandedFolders, firstHighlightedFileRef]);
 
   return (
     <S.TreeContainer ref={containerRef}>
@@ -158,4 +169,4 @@ function createFolderTree(folderPath: string, fileMap: FileMapType, fileExplorer
   return treeNode;
 }
 
-export default memo(FileSystemTree);
+export default FileSystemTree;

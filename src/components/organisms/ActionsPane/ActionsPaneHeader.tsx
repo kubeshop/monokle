@@ -21,7 +21,7 @@ import {selectFromHistory} from '@redux/thunks/selectFromHistory';
 
 import {TitleBarWrapper} from '@components/atoms';
 
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 
 import {TitleBar} from '@monokle/components';
 import {ResourceMeta} from '@shared/models/k8sResource';
@@ -41,7 +41,7 @@ interface IProps {
 const ActionsPaneHeader: React.FC<IProps> = props => {
   const {selectedResourceMeta, applySelection, actionsPaneWidth} = props;
   const dispatch = useAppDispatch();
-  const [, helmChartMapRef] = useSelectorWithRef(state => state.main.helmChartMap);
+  const helmChartMapRef = useRefSelector(state => state.main.helmChartMap);
   const selectionHistory = useAppSelector(state => state.main.selectionHistory);
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);

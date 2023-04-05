@@ -1,12 +1,11 @@
 import {useLayoutEffect, useMemo, useRef} from 'react';
 import {usePrevious} from 'react-use';
 
-import fastDeepEqual from 'fast-deep-equal';
-
 import {useRefSelector, useSelectorWithRef} from '@utils/hooks';
 
 import {ImageNode} from '@shared/models/appState';
 import {isImageSelection} from '@shared/models/selection';
+import {isEqual} from '@shared/utils/isEqual';
 
 type ScrollType = {
   list: ImageNode[];
@@ -16,7 +15,7 @@ type ScrollType = {
 export function useScroll({scrollTo, list}: ScrollType) {
   const [selection, selectionRef] = useSelectorWithRef(state => state.main.selection);
   const previousSelection = usePrevious(selection);
-  const changed = useMemo(() => !fastDeepEqual(selection, previousSelection), [selection, previousSelection]);
+  const changed = useMemo(() => !isEqual(selection, previousSelection), [selection, previousSelection]);
   const highlightsRef = useRefSelector(state => state.main.highlights);
   const listRef = useRef(list);
   listRef.current = list;

@@ -5,6 +5,8 @@ import {useForm} from 'antd/es/form/Form';
 
 import {CheckOutlined} from '@ant-design/icons';
 
+import log from 'loglevel';
+
 import {updateRemoteRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
@@ -24,10 +26,15 @@ const RemoteInput: React.FC = () => {
     setLoading(true);
 
     form.validateFields().then(async values => {
-      await promiseFromIpcRenderer('git.setRemote', 'git.setRemote.result', {
+      const result = await promiseFromIpcRenderer('git.setRemote', 'git.setRemote.result', {
         localPath: selectedProjectRootFolder,
         remoteURL: values.remoteURL,
       });
+
+      if (result.error) {
+        log.error('Error setting remote', result.error);
+        return;
+      }
 
       dispatch(updateRemoteRepo({exists: true, authRequired: false}));
 

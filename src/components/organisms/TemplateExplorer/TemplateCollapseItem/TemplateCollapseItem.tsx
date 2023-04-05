@@ -1,7 +1,7 @@
-import {isEqual} from 'lodash';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setSelectedTemplatePath} from '@redux/reducers/ui';
+
+import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './TemplateCollapseItem.styled';
 

@@ -1,8 +1,9 @@
-import {useCallback, useState} from 'react';
+import {memo, useCallback, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseResourceKinds, expandResourceKinds} from '@redux/reducers/ui';
 import {getResourceMetaFromState} from '@redux/selectors/resourceGetters';
+import {isKustomizationPatch} from '@redux/services/kustomize';
 
 import {useSelectorWithRef} from '@utils/hooks';
 
@@ -19,16 +20,33 @@ function KindRenderer(props: KindRendererProps) {
   const dispatch = useAppDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  const isSelected = useAppSelector(
-    state =>
-      state.main.selection?.type === 'resource' &&
-      getResourceMetaFromState(state, state.main.selection.resourceIdentifier)?.kind === kind
-  );
+  const isSelected = useAppSelector(state => {
+    if (state.main.selection?.type !== 'resource') {
+      return false;
+    }
+
+    const resourceMeta = getResourceMetaFromState(state, state.main.selection.resourceIdentifier);
+
+    if (!resourceMeta) {
+      return false;
+    }
+
+    return resourceMeta.kind === kind && (kind !== 'Kustomization' ? !isKustomizationPatch(resourceMeta) : true);
+  });
   const isHighlighted = useAppSelector(state =>
-    state.main.highlights.some(
-      highlight =>
-        highlight.type === 'resource' && getResourceMetaFromState(state, highlight.resourceIdentifier)?.kind === kind
-    )
+    state.main.highlights.some(highlight => {
+      if (highlight.type !== 'resource') {
+        return false;
+      }
+
+      const resourceMeta = getResourceMetaFromState(state, highlight.resourceIdentifier);
+
+      if (!resourceMeta) {
+        return false;
+      }
+
+      return resourceMeta.kind === kind && (kind !== 'Kustomization' ? !isKustomizationPatch(resourceMeta) : true);
+    })
   );
   const [isCollapsed, isCollapsedRef] = useSelectorWithRef(state =>
     state.ui.navigator.collapsedResourceKinds.includes(kind)
@@ -70,4 +88,4 @@ function KindRenderer(props: KindRendererProps) {
   );
 }
 
-export default KindRenderer;
+export default memo(KindRenderer);

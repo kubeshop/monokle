@@ -3,7 +3,6 @@ import MonacoEditor, {monaco} from 'react-monaco-editor';
 
 import {TabsProps} from 'antd';
 
-import fastDeepEqual from 'fast-deep-equal';
 import {sep} from 'path';
 
 import {useAppSelector} from '@redux/hooks';
@@ -20,6 +19,7 @@ import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {getRuleForResult} from '@monokle/validation';
 import {ResourceSelection} from '@shared/models/selection';
+import {isEqual} from '@shared/utils/isEqual';
 
 const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   readOnly: true,
@@ -45,7 +45,7 @@ export function useProblemPaneMenuItems(width: number, height: number) {
     if (selectedFrom === 'resource') {
       return {...monacoData, ...problemResourceIdAndRangeSelector(state)};
     }
-  }, fastDeepEqual);
+  }, isEqual);
 
   const resourceSelection: ResourceSelection | undefined = useMemo(() => {
     if (!selectedProblemMonacoData?.resourceId) return undefined;

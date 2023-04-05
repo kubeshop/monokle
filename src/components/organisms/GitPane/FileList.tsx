@@ -3,8 +3,6 @@ import {useCallback, useEffect, useState} from 'react';
 import {Checkbox, Dropdown, List, Modal, Space, Tooltip} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
-import {isEqual} from 'lodash';
-
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {setGitLoading, setSelectedItem} from '@redux/git';
@@ -18,11 +16,13 @@ import {Dots} from '@components/atoms';
 
 import {createFileWithContent} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
 
 import {AlertEnum} from '@shared/models/alert';
 import {GitChangedFile} from '@shared/models/git';
 import {Colors} from '@shared/styles/colors';
 import {deleteFile} from '@shared/utils/fileSystem';
+import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './FileList.styled';
 
@@ -71,11 +71,21 @@ const FileList: React.FC<IProps> = props => {
             promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
               localPath: selectedProjectRootFolder,
               filePaths: [item.fullGitPath],
+            }).then(result => {
+              if (result.error) {
+                showGitErrorModal('Stage changes failed!', `git add ${[item.fullGitPath].join(' ')}`, dispatch);
+                setGitLoading(false);
+              }
             });
           } else {
             promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
               localPath: selectedProjectRootFolder,
               filePaths: [item.fullGitPath],
+            }).then(result => {
+              if (result.error) {
+                showGitErrorModal('Unstage changes failed!', `git reset ${[item.fullGitPath].join(' ')}`, dispatch);
+                setGitLoading(false);
+              }
             });
           }
         },

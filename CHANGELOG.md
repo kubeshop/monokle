@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.6](https://github.com/kubeshop/monokle/compare/v2.0.6-nightly-2023-03-31.0...v2.0.6) (2023-03-31)
+
+
+### Bug Fixes
+
+* added APP_QUIT telemetry event ([6a1c9c8](https://github.com/kubeshop/monokle/commit/6a1c9c863fd072cfaf2e3fdb0505fe179b933d1d))
+* added number of Kustomize overlays and helmCharts to the open_project event ([270a467](https://github.com/kubeshop/monokle/commit/270a467ab317cfbb1544b0ba037bc10fd1f36bce))
+* update cluster resources errors ([fb8d58b](https://github.com/kubeshop/monokle/commit/fb8d58befbe318909938ee78f152f9f842dcc7b4))
+* update resource in cluster mode ([a391f2f](https://github.com/kubeshop/monokle/commit/a391f2f4cb244ba97bb2dfd5a2b28fe91e8751a0))
+
 ### [2.0.5](https://github.com/kubeshop/monokle/compare/v2.0.5-nightly-2023-03-20.0...v2.0.5) (2023-03-20)
 
 

@@ -11,6 +11,7 @@ import {setCurrentBranch, setGitLoading, setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
 
 import * as S from './CreateBranchInput.styled';
 
@@ -22,7 +23,6 @@ const CreateBranchInput: React.FC<IProps> = props => {
   const dispatch = useAppDispatch();
   const {hideCreateBranchInputHandler} = props;
   const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
-
   const gitRepoBranches = useAppSelector(state => state.git.repo?.branches || []);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
@@ -43,15 +43,22 @@ const CreateBranchInput: React.FC<IProps> = props => {
 
     setLoading(true);
 
-    await promiseFromIpcRenderer('git.createLocalBranch', 'git.createLocalBranch.result', {
+    const result = await promiseFromIpcRenderer('git.createLocalBranch', 'git.createLocalBranch.result', {
       localPath: selectedProjectRootFolder,
       branchName,
     });
 
+    if (result.error) {
+      showGitErrorModal(`Creating ${branchName} failed`, `git checkout -b ${branchName}`, dispatch);
+      setBranchName('');
+      setLoading(false);
+      return;
+    }
+
     setBranchName('');
     setLoading(false);
-    await promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', projectRootFolder).then(result => {
-      dispatch(setRepo(result));
+    await promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', projectRootFolder).then(repo => {
+      dispatch(setRepo(repo));
       dispatch(setCurrentBranch(result.currentBranch));
       dispatch(setGitLoading(false));
     });

@@ -1,6 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import _ from 'lodash';
+import _, {cloneDeep} from 'lodash';
 import log from 'loglevel';
 import {stringify} from 'yaml';
 
@@ -99,7 +99,16 @@ export async function applyResource(
 ) {
   const showAlert = options?.quiet !== true;
   const resourceMeta = resourceMetaMapByStorage[resourceIdentifeir.storage][resourceIdentifeir.id];
-  const resourceContent = resourceContentMapByStorage[resourceIdentifeir.storage][resourceIdentifeir.id];
+
+  const resourceContent = cloneDeep(resourceContentMapByStorage[resourceIdentifeir.storage][resourceIdentifeir.id]);
+
+  // Related to this https://stackoverflow.com/questions/51297136/kubectl-error-the-object-has-been-modified-please-apply-your-changes-to-the-la
+  // We need to remove certain properties before updating the resource in cluster mode
+  if (options?.isInClusterMode) {
+    delete resourceContent.object.metadata.creationTimestamp;
+    delete resourceContent.object.metadata.resourceVersion;
+  }
+
   try {
     if (resourceMeta) {
       dispatch(setApplyingResource(true));
@@ -167,6 +176,7 @@ export async function applyResource(
           }
 
           const alert = errorAlert(`Applying ${resourceMeta.name} to cluster ${context} failed`, result.stderr);
+
           if (showAlert) dispatch(setAlert(alert));
           dispatch(setApplyingResource(false));
         }

@@ -37,7 +37,7 @@ import {getLocalResourcesForPath} from '@redux/services/fileEntry';
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
 import {getFileStats} from '@utils/files';
-import {useSelectorWithRef, useStateWithRef} from '@utils/hooks';
+import {useRefSelector, useSelectorWithRef, useStateWithRef} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
@@ -105,7 +105,7 @@ const Monaco: React.FC<IProps> = props => {
   const selectedResourceRef = useRef(selectedResource);
   selectedResourceRef.current = selectedResource;
 
-  const [, activeResourceStorageRef] = useSelectorWithRef(activeResourceStorageSelector);
+  const activeResourceStorageRef = useRefSelector(activeResourceStorageSelector);
 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);

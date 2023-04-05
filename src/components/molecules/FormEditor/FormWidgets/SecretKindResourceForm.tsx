@@ -10,6 +10,8 @@ import {v4 as uuidv4} from 'uuid';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
+import {isEqual} from '@shared/utils/isEqual';
+
 import * as S from './SecretKindResourceForm.styled';
 
 import {SelectStyled} from './styled';
@@ -51,7 +53,7 @@ export const SecretKindResourceForm = ({onChange, formData, disabled}: any) => {
       }));
 
       if (
-        !_.isEqual(
+        !isEqual(
           _.sortBy(
             dataKeyValuePairs.map(p => ({key: p.key, value: p.value})),
             'key'
@@ -73,7 +75,7 @@ export const SecretKindResourceForm = ({onChange, formData, disabled}: any) => {
       }));
 
       if (
-        !_.isEqual(
+        !isEqual(
           _.sortBy(
             stringDataKeyValuePairs.map(p => ({key: p.key, value: p.value})),
             'key'
@@ -95,7 +97,7 @@ export const SecretKindResourceForm = ({onChange, formData, disabled}: any) => {
         object[value.key] = value.value;
         return object;
       }, emptyObject);
-      if (!_.isEqual(formData.data, data)) {
+      if (!isEqual(formData.data, data)) {
         onChange({
           ...formData,
           stringData: undefined,
@@ -115,7 +117,7 @@ export const SecretKindResourceForm = ({onChange, formData, disabled}: any) => {
         object[value.key] = value.value;
         return object;
       }, emptyObject);
-      if (!_.isEqual(formData.stringData, stringData)) {
+      if (!isEqual(formData.stringData, stringData)) {
         onChange({
           ...formData,
           data: undefined,
@@ -319,7 +321,7 @@ const TextAreaForm = ({value, onChange, disabled}: {value: string; onChange: Fun
   };
 
   useEffect(() => {
-    if (_.isEqual(localValue, value)) {
+    if (isEqual(localValue, value)) {
       return;
     }
 
@@ -501,7 +503,7 @@ const DynamicKeyValue = ({value, onChange, onDelete, disabled}: any) => {
 
   useDebounce(
     () => {
-      if (_.isEqual(localValue, value)) {
+      if (isEqual(localValue, value)) {
         return;
       }
 
@@ -593,7 +595,7 @@ export const Base64Input = ({value, onChange, type = 'INPUT', disabled}: any) =>
   };
 
   useEffect(() => {
-    if (_.isEqual(debouncedValue, value)) {
+    if (isEqual(debouncedValue, value)) {
       return;
     }
 

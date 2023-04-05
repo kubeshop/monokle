@@ -1,9 +1,8 @@
 import {Draft, PayloadAction} from '@reduxjs/toolkit';
 
-import {isEqual} from 'lodash';
-
 import {AppState, ResourceFilterType} from '@shared/models/appState';
 import electronStore from '@shared/utils/electronStore';
+import {isEqual} from '@shared/utils/isEqual';
 import {createSliceReducers} from '@shared/utils/redux';
 
 export const filterReducers = createSliceReducers('main', {

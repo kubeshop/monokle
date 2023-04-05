@@ -1,17 +1,18 @@
-import {Modal} from 'antd';
-
 import {createAsyncThunk} from '@reduxjs/toolkit';
+
+import log from 'loglevel';
 
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
-import {addDefaultCommandTerminal} from '@utils/terminal';
+import {showGitErrorModal} from '@utils/terminal';
 
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
@@ -35,7 +36,6 @@ export const setRootFolder = createAsyncThunk<
 >('main/setRootFolder', async (rootFolder, thunkAPI) => {
   const startTime = new Date().getTime();
   const projectConfig = currentConfigSelector(thunkAPI.getState());
-  const terminalState = thunkAPI.getState().terminal;
 
   const resourceMetaMap: ResourceMetaMap<'local'> = {};
   const resourceContentMap: ResourceContentMap<'local'> = {};
@@ -90,12 +90,16 @@ export const setRootFolder = createAsyncThunk<
 
   monitorRootFolder(rootFolder, thunkAPI);
 
+  const filesNumber = Object.values(fileMap).filter(f => !f.children).length;
+  const resourcesNumber = Object.values(resourceMetaMap).length;
+  const helmChartsNumber = Object.values(helmChartMap).length;
+  const overlaysNumber = Object.values(resourceMetaMap).filter(r => isKustomizationResource(r)).length;
+
   const generatedAlert = {
     title: 'Folder Import',
-    message: `${Object.values(resourceMetaMap).length} resources found in ${
-      Object.values(fileMap).filter(f => !f.children).length
-    } files`,
+    message: `Found ${resourcesNumber} resources, ${helmChartsNumber} Helm charts and ${overlaysNumber} Kustomize overlays configurations in ${filesNumber} files processed.`,
     type: AlertEnum.Success,
+    silent: true,
   };
 
   const isFolderGitRepo = await promiseFromIpcRenderer<boolean>(
@@ -113,44 +117,30 @@ export const setRootFolder = createAsyncThunk<
         localPath: rootFolder,
         fileMap,
       }),
-    ]).then(([repo, changedFiles]) => {
-      thunkAPI.dispatch(setRepo(repo));
-      thunkAPI.dispatch(setChangedFiles(changedFiles));
-      thunkAPI.dispatch(setGitLoading(false));
+    ])
+      .then(([repo, changedFiles]) => {
+        thunkAPI.dispatch(setRepo(repo));
+        thunkAPI.dispatch(setChangedFiles(changedFiles));
+        thunkAPI.dispatch(setGitLoading(false));
 
-      if (repo.remoteRepo.authRequired) {
-        Modal.warning({
-          title: 'Authentication failed',
-          content: `${repo.remoteRepo.errorMessage}. Please sign in using the terminal.`,
-          zIndex: 100000,
-          onCancel: () => {
-            addDefaultCommandTerminal(
-              terminalState.terminalsMap,
-              `git remote show origin`,
-              terminalState.settings.defaultShell,
-              thunkAPI.getState().ui.leftMenu.bottomSelection,
-              thunkAPI.dispatch
-            );
-          },
-          onOk: () => {
-            addDefaultCommandTerminal(
-              terminalState.terminalsMap,
-              `git remote show origin`,
-              terminalState.settings.defaultShell,
-              thunkAPI.getState().ui.leftMenu.bottomSelection,
-              thunkAPI.dispatch
-            );
-          },
-        });
-      }
-    });
+        if (repo.remoteRepo.authRequired) {
+          showGitErrorModal('Authentication failed', `git remote show origin`, thunkAPI.dispatch);
+        }
+      })
+      .catch(err => {
+        log.error(err.message);
+        showGitErrorModal(err.message);
+        thunkAPI.dispatch(setGitLoading(false));
+      });
   }
 
   const endTime = new Date().getTime();
 
   trackEvent('app_start/open_project', {
-    numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
-    numberOfResources: Object.values(resourceMetaMap).length,
+    numberOfFiles: filesNumber,
+    numberOfResources: resourcesNumber,
+    numberOfOverlays: overlaysNumber,
+    numberOfHelmCharts: helmChartsNumber,
     executionTime: endTime - startTime,
   });
 

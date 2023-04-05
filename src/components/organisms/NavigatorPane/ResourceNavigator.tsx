@@ -47,7 +47,7 @@ function ResourceNavigator() {
   if (isLoading) {
     return (
       <div style={{padding: '10px'}}>
-        <Skeleton />
+        <Skeleton active />
       </div>
     );
   }

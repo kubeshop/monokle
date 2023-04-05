@@ -1,4 +1,5 @@
-import fastDeepEqual from 'fast-deep-equal';
 import {createSelectorCreator, defaultMemoize} from 'reselect';
 
-export const createDeepEqualSelector = createSelectorCreator(defaultMemoize, fastDeepEqual);
+import {isEqual} from '@shared/utils/isEqual';
+
+export const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual);

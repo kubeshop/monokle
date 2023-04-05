@@ -1,13 +1,13 @@
 import {memo, useCallback, useState} from 'react';
 
-import {isEqual} from 'lodash';
-
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 import {useResourceMeta} from '@redux/selectors/resourceSelectors';
 import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
 import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {isEqual} from '@shared/utils/isEqual';
 
 import ResourceContextMenu from './ResourceContextMenu';
 import {ResourceInfoIcon} from './ResourceInfoIcon';
@@ -17,11 +17,13 @@ import ResourceSuffix from './ResourceSuffix';
 
 export type ResourceRendererProps = {
   resourceIdentifier: ResourceIdentifier;
+  disableContextMenu?: boolean;
 };
 
 function ResourceRenderer(props: ResourceRendererProps) {
-  const {resourceIdentifier: propsResourceIdentifier} = props;
+  const {disableContextMenu = false, resourceIdentifier: propsResourceIdentifier} = props;
   const dispatch = useAppDispatch();
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   const transientResourceIdentifier: ResourceIdentifier = {id: propsResourceIdentifier.id, storage: 'transient'};
   const activeResourceMeta = useResourceMeta(propsResourceIdentifier);
@@ -75,9 +77,11 @@ function ResourceRenderer(props: ResourceRendererProps) {
         {resourceMeta.name} {resourceMeta.storage === 'transient' ? '*' : ''}
       </S.ItemName>
 
-      <S.InformationContainer>
-        <ResourceInfoIcon resourceMeta={resourceMeta} isSelected={isSelected} />
-      </S.InformationContainer>
+      {isInClusterMode && (
+        <S.InformationContainer>
+          <ResourceInfoIcon resourceMeta={resourceMeta} isSelected={isSelected} />
+        </S.InformationContainer>
+      )}
 
       <S.SuffixContainer>
         <ResourceSuffix resourceMeta={resourceMeta} isSelected={isSelected} />
@@ -85,7 +89,7 @@ function ResourceRenderer(props: ResourceRendererProps) {
 
       <S.BlankSpace onClick={onClick} />
 
-      {isHovered && (
+      {isHovered && !disableContextMenu && (
         <S.ContextMenuContainer>
           <ResourceContextMenu resourceMeta={resourceMeta} isSelected={isSelected} />
         </S.ContextMenuContainer>

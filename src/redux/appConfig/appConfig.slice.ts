@@ -40,6 +40,7 @@ import {
 } from '@shared/models/config';
 import {UiState} from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
+import {isEqual} from '@shared/utils/isEqual';
 import {createKubeClient, getKubeAccess} from '@shared/utils/kubeclient';
 
 import initialState from '../initialState';
@@ -360,10 +361,10 @@ export const configSlice = createSlice({
         _.remove(keys, k => _.includes(['kubeConfig.contexts', 'kubeConfig.isPathValid'], k));
       }
 
-      if (!_.isEqual(_.sortBy(state.projectConfig?.scanExcludes), _.sortBy(action.payload.config?.scanExcludes))) {
+      if (!isEqual(_.sortBy(state.projectConfig?.scanExcludes), _.sortBy(action.payload.config?.scanExcludes))) {
         state.isScanExcludesUpdated = 'outdated';
       }
-      if (!_.isEqual(_.sortBy(state.projectConfig?.fileIncludes), _.sortBy(action.payload.config?.fileIncludes))) {
+      if (!isEqual(_.sortBy(state.projectConfig?.fileIncludes), _.sortBy(action.payload.config?.fileIncludes))) {
         state.isScanIncludesUpdated = 'outdated';
       }
 
