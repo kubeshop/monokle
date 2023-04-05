@@ -143,7 +143,7 @@ export const createWindow = (givenPath?: string) => {
 
     const dispatch = createDispatchForWindow(win);
 
-    subscribeToStoreStateChanges(win.webContents, storeState => {
+    subscribeToStoreStateChanges(win.webContents, ['state.ui.isStartProjectPaneVisible'], storeState => {
       createMenu(storeState, dispatch);
       let projectName = activeProjectSelector(storeState)?.name;
       setWindowTitle(storeState, win, projectName);

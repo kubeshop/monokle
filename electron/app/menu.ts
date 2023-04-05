@@ -1,5 +1,7 @@
 import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
+import {DeepPartial} from 'redux';
+
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {hotkeys} from '@shared/constants/hotkeys';
 import {NewVersionCode, Project} from '@shared/models/config';
@@ -27,7 +29,7 @@ const getUpdateMonokleText = (newVersion: {code: NewVersionCode; data: any}) => 
   return 'Check for Update';
 };
 
-const checkForUpdateMenu = (state: RootState, dispatch: MainDispatch) => {
+const checkForUpdateMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch) => {
   return {
     label: getUpdateMonokleText(state.config.newVersion),
     enabled: state.config.newVersion.code !== NewVersionCode.Downloading,
@@ -37,7 +39,7 @@ const checkForUpdateMenu = (state: RootState, dispatch: MainDispatch) => {
   };
 };
 
-const appMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
+const appMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
     label: `Monokle${state.config.newVersion.code > NewVersionCode.Checking ? ' ⬆️' : ''}`,
     submenu: [
@@ -74,7 +76,7 @@ function openProjectInRendererThread(project: Project) {
   }
 }
 
-const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
+const fileMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
     label: 'File',
     submenu: [
@@ -101,7 +103,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
           {
             label: 'Tutorial Page',
             click: () => {
-              if (!state.ui.isStartProjectPaneVisible) {
+              if (!state?.ui?.isStartProjectPaneVisible) {
                 dispatch({type: 'ui/toggleStartProjectPane', payload: undefined});
               }
             },
@@ -167,7 +169,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
   };
 };
 
-const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
+const editMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuItemConstructorOptions => {
   const isKubeConfigPathValid = kubeConfigPathValidSelector(state);
   const isMonacoActionEnabled =
     Boolean(state.main.selection?.type === 'resource' || state.main.selection?.type === 'file') &&
@@ -235,7 +237,7 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
   };
 };
 
-const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
+const viewMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuItemConstructorOptions => {
   const isPreviousResourceEnabled =
     state.main.selectionHistory.current.length > 1 &&
     (state.main.selectionHistory.index === undefined ||
@@ -341,7 +343,7 @@ const windowMenu = (): MenuItemConstructorOptions => {
 };
 
 const helpMenu = (
-  state: RootState,
+  state: DeepPartial<RootState>,
   dispatch: MainDispatch,
   includeUpdateMenu?: boolean
 ): MenuItemConstructorOptions => {
@@ -381,7 +383,7 @@ const helpMenu = (
   };
 };
 
-export const createMenu = (state: RootState, dispatch: MainDispatch) => {
+export const createMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch) => {
   const template: MenuItemConstructorOptions[] = [
     fileMenu(state, dispatch),
     editMenu(state, dispatch),

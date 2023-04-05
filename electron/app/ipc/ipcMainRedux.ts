@@ -1,6 +1,6 @@
 import {BrowserWindow, WebContents, ipcMain, webContents} from 'electron';
 
-import {AnyAction} from 'redux';
+import {AnyAction, DeepPartial} from 'redux';
 
 import type {RootState} from '@shared/models/rootState';
 
@@ -53,11 +53,15 @@ export const fetchFocusedWindowStoreState = () => {
   return fetchStoreState(focusedWebContents);
 };
 
-export const subscribeToStoreStateChanges = (contents: WebContents, callback: (state: RootState) => void) => {
-  contents.send('redux-subscribe', contents.id);
+export const subscribeToStoreStateChanges = (
+  contents: WebContents,
+  propertiesToPick: string[],
+  callback: (state: DeepPartial<RootState>) => void
+) => {
+  contents.send('redux-subscribe', {webContentsId: contents.id, propertiesToPick});
   ipcMain.on(
     'redux-subscribe-triggered',
-    (_, {webContentsId, storeState}: {webContentsId: number; storeState: RootState}) => {
+    (_, {webContentsId, storeState}: {webContentsId: number; storeState: DeepPartial<RootState>}) => {
       if (contents.id === webContentsId) {
         callback(storeState);
       }
