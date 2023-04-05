@@ -28,6 +28,7 @@ import {
 
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {updateShouldOptionalIgnoreUnsatisfiedRefs} from '@redux/reducers/main';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -83,6 +84,13 @@ export const Settings = ({
   const [selectedK8SVersion, setSelectedK8SVersion] = useState<string>(String(config?.k8sVersion));
   const [isSchemaDownloading, setIsSchemaDownloading] = useState<boolean>(false);
   const [localConfig, setLocalConfig, localConfigRef] = useStateWithRef<ProjectConfig | null | undefined>(config);
+  const shouldIgnoreOptionalUnsatisfiedRefs = useAppSelector(
+    state => state.main.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs
+  );
+
+  useEffect(() => {
+    console.log('shouldIgnoreOptionalUnsatisfiedRefs', shouldIgnoreOptionalUnsatisfiedRefs);
+  }, [shouldIgnoreOptionalUnsatisfiedRefs]);
 
   const handleConfigChange = () => {
     if (onConfigChange && !isEqual(localConfigRef.current, config)) {
@@ -98,6 +106,7 @@ export const Settings = ({
   }, [config?.kubeConfig]);
 
   useEffect(() => {
+    console.log('config', config);
     // If config prop is changed externally, This code will make localConfig even with config prop
     setLocalConfig(config);
     setSelectedK8SVersion(String(config?.k8sVersion));
@@ -161,9 +170,9 @@ export const Settings = ({
   };
 
   // TODO: revisit this after @monokle/validation is integrated
-  // const setShouldIgnoreOptionalUnsatisfiedRefs = (e: any) => {
-  //   dispatch(updateShouldOptionalIgnoreUnsatisfiedRefs(e.target.checked));
-  // };
+  const setShouldIgnoreOptionalUnsatisfiedRefs = (e: any) => {
+    dispatch(updateShouldOptionalIgnoreUnsatisfiedRefs(!shouldIgnoreOptionalUnsatisfiedRefs));
+  };
 
   const onChangeEnableHelmWithKustomize = (e: any) => {
     setLocalConfig({
@@ -461,18 +470,13 @@ export const Settings = ({
             }}
           />
         </S.Div>
-        {/* <S.Div>
-          <S.Span>Resource links processing</S.Span> */}
+        <S.Div>
+          <S.Span>Resource links processing</S.Span>
 
-        {/*
-            // TODO: revisit this after @monokle/validation is integrated
-          <Checkbox
-            checked={resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs}
-            onChange={setShouldIgnoreOptionalUnsatisfiedRefs}
-          >
+          <Checkbox checked={shouldIgnoreOptionalUnsatisfiedRefs} onChange={setShouldIgnoreOptionalUnsatisfiedRefs}>
             Ignore optional unsatisfied links
-          </Checkbox> */}
-        {/* </S.Div> */}
+          </Checkbox>
+        </S.Div>
         <S.Div>
           <S.Span>Form Editor</S.Span>
           <S.Div>

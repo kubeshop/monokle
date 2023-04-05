@@ -1,4 +1,4 @@
-import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 import path from 'path';
@@ -50,6 +50,7 @@ import {
 import {PreviewType} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {AppSelection} from '@shared/models/selection';
+import {ThunkApi} from '@shared/models/thunk';
 import electronStore from '@shared/utils/electronStore';
 import {isEqual} from '@shared/utils/isEqual';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -115,10 +116,17 @@ export const performResourceContentUpdate = (resource: K8sResource, newText: str
 };
 
 // TODO: @monokle/validation - use the shouldIgnoreOptionalUnsatisfiedRefs setting and reprocess all refs
-// export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk<AppState, boolean, ThunkApi>(
-//   'main/resourceRefsProcessingOptions/shouldIgnoreOptionalUnsatisfiedRefs',
-//   async (shouldIgnore, thunkAPI) => {}
-// );
+export const updateShouldOptionalIgnoreUnsatisfiedRefs = createAsyncThunk<AppState, boolean, ThunkApi>(
+  'main/resourceRefsProcessingOptions/shouldIgnoreOptionalUnsatisfiedRefs',
+  async (shouldIgnore, thunkAPI) => {
+    return {
+      ...thunkAPI.getState().main,
+      resourceRefsProcessingOptions: {
+        shouldIgnoreOptionalUnsatisfiedRefs: shouldIgnore,
+      },
+    };
+  }
+);
 
 /**
  * The main reducer slice
@@ -530,6 +538,11 @@ export const mainSlice = createSlice({
           resourceContentMap[resource.id] = content;
         }
       });
+    });
+
+    builder.addCase(updateShouldOptionalIgnoreUnsatisfiedRefs.fulfilled, (state, action) => {
+      state.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs =
+        action.payload.resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs;
     });
 
     // TODO: 2.0+ how do we make this work with the new resource storage?
