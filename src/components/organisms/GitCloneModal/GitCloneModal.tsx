@@ -95,7 +95,20 @@ const GitCloneModal: React.FC = () => {
             },
           ]}
         >
-          <Input placeholder={DEFAULT_GIT_REPO_PLACEHOLDER} />
+          <Input
+            onKeyDown={e => {
+              if (form.getFieldValue('repoURL')) {
+                return;
+              }
+
+              if (e.key === 'Tab') {
+                e.preventDefault();
+                form.setFieldValue('repoURL', DEFAULT_GIT_REPO_PLACEHOLDER);
+                form.validateFields();
+              }
+            }}
+            placeholder={DEFAULT_GIT_REPO_PLACEHOLDER}
+          />
         </Form.Item>
 
         <Form.Item label="Location" required>
