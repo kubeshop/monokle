@@ -1,4 +1,4 @@
-import {readFileSync, writeFileSync} from 'fs';
+import {readFileSync, statSync, writeFileSync} from 'fs';
 import _, {isArray, mergeWith} from 'lodash';
 import log from 'loglevel';
 import {sep} from 'path';
@@ -10,6 +10,7 @@ import {updateProjectConfig} from '@redux/appConfig';
 import {K8S_VERSIONS, PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
 import {AppConfig, ProjectConfig} from '@shared/models/config';
 import {isEqual} from '@shared/utils/isEqual';
+import {updateProjectConfigTimestamp} from '@shared/utils/projectConfig';
 
 export interface SerializableObject {
   [name: string]: any;
@@ -38,6 +39,8 @@ export const writeProjectConfigFile = (state: AppConfig | SerializableObject) =>
     } else {
       writeFileSync(absolutePath, ``, 'utf-8');
     }
+
+    updateProjectConfigTimestamp(statSync(absolutePath).mtimeMs);
   } catch (error) {
     log.error(error);
   }
@@ -119,6 +122,7 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
       savedCommandMap,
     }: ProjectConfig = JSON.parse(readFileSync(CONFIG_PATH(projectRootPath), 'utf8'));
     const projectConfig: ProjectConfig = {};
+
     projectConfig.settings = settings
       ? {
           helmPreviewMode: _.includes(['template', 'install'], settings.helmPreviewMode)
@@ -174,6 +178,7 @@ export const updateProjectSettings = (dispatch: (action: AnyAction) => void, pro
     dispatch(updateProjectConfig({config: projectConfig, fromConfigFile: true}));
     return;
   }
+
   dispatch(updateProjectConfig({config: null, fromConfigFile: true}));
 };
 

@@ -53,14 +53,12 @@ const HelmChartRenderer: React.FC<IProps> = props => {
     >
       <S.PrefixContainer>
         <HelmChartCollapse id={id} isSelected={isSelected} />
-        <Icon name="helm" style={{color: isSelected ? Colors.blackPure : Colors.grey9, fontSize: '18px'}} />
+        <Icon name="helm" style={{color: isSelected ? Colors.blackPure : Colors.grey9, fontSize: '16px'}} />
       </S.PrefixContainer>
 
-      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={helmChart.name}>
-        <S.ItemName isDisabled={isDisabled} isSelected={isSelected}>
-          {helmChart.name}
-        </S.ItemName>
-      </Tooltip>
+      <S.ItemName isDisabled={isDisabled} isSelected={isSelected}>
+        {helmChart.name}
+      </S.ItemName>
 
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={helmChart.filePath}>
         <S.SuffixContainer isSelected={isSelected}>{dirname(helmChart.filePath)}</S.SuffixContainer>

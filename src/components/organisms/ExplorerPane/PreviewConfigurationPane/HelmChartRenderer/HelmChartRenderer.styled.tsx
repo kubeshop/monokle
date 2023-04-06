@@ -10,14 +10,14 @@ export const ItemContainer = styled.span`
   > {
     min-width: 0;
   }
-  padding-left: 20px;
+  padding-left: 26px;
   padding-right: 20px;
   margin-bottom: 2px;
 `;
 
 export const ItemName = styled.div`
   padding: 2px 0;
-  font-size: 14px;
+  font-size: 12px;
   white-space: nowrap;
   color: ${Colors.grey9};
 `;

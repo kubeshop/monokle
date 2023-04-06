@@ -2,7 +2,7 @@ import {memo, useMemo} from 'react';
 
 import {CollapsePanelProps} from 'antd';
 
-import {size} from 'lodash';
+import {isEmpty, size} from 'lodash';
 import styled from 'styled-components';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
@@ -26,7 +26,11 @@ const PreviewConfigurationPane: React.FC<InjectedPanelProps> = props => {
   const count = useMemo(
     () =>
       isDefined(previewConfigurationMap)
-        ? size(Object.values(previewConfigurationMap).filter(previewConfiguration => isDefined(previewConfiguration)))
+        ? size(
+            Object.values(previewConfigurationMap).filter(
+              previewConfiguration => isDefined(previewConfiguration) && !isEmpty(previewConfiguration)
+            )
+          )
         : 0,
     [previewConfigurationMap]
   );

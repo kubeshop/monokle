@@ -400,7 +400,7 @@ export const configSlice = createSlice({
 
       if (
         !action.payload.fromConfigFile &&
-        (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder)))
+        (keys.length > 0 || deletedKeys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder)))
       ) {
         writeProjectConfigFile(state);
       }
