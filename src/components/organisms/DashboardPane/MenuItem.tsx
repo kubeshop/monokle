@@ -7,6 +7,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
+import {useRefSelector} from '@utils/hooks';
+
 import {DashboardMenu} from '@shared/models/dashboard';
 import {ResourceMeta} from '@shared/models/k8sResource';
 import {trackEvent} from '@shared/utils';
@@ -25,7 +27,7 @@ export const MenuItem = ({
   onActiveMenuItem?: Function;
 }) => {
   const clusterResourceMeta = useResourceMetaMap('cluster');
-  const clusterConnectionOptions = useAppSelector(state => state.main.clusterConnectionOptions);
+  const clusterConnectionOptions = useRefSelector(state => state.main.clusterConnectionOptions);
   const problems = useValidationSelector(state => problemsSelector(state));
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const dispatch = useAppDispatch();
@@ -35,13 +37,13 @@ export const MenuItem = ({
 
   const compareNamespaces = useCallback(
     (namespace?: string) => {
-      if (clusterConnectionOptions.lastNamespaceLoaded === '<all>') {
+      if (clusterConnectionOptions.current.lastNamespaceLoaded === '<all>') {
         return true;
       }
-      if (clusterConnectionOptions.lastNamespaceLoaded === '<not-namespaced>') {
+      if (clusterConnectionOptions.current.lastNamespaceLoaded === '<not-namespaced>') {
         return !namespace;
       }
-      return clusterConnectionOptions.lastNamespaceLoaded === namespace;
+      return clusterConnectionOptions.current.lastNamespaceLoaded === namespace;
     },
     [clusterConnectionOptions]
   );
@@ -50,7 +52,7 @@ export const MenuItem = ({
     if (onActiveMenuItem && activeMenu.key === menuItem.key && menuItemRef && menuItemRef.current) {
       onActiveMenuItem(menuItemRef.current);
     }
-  }, [activeMenu]);
+  }, [activeMenu, onActiveMenuItem, menuItem.key]);
 
   const getResources = useCallback(
     (kind: string) => {
