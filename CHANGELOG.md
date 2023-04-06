@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.7](https://github.com/kubeshop/monokle/compare/v2.0.7-nightly-2023-04-06.0...v2.0.7) (2023-04-06)
+
+
+### Features
+
+* add ipc framework ([449b3b7](https://github.com/kubeshop/monokle/commit/449b3b7c09c5d9b9143c19be08612ddc7f6d0653))
+* add resource popover ([d5a58e6](https://github.com/kubeshop/monokle/commit/d5a58e6bf27a860936c57b002a60a5de8eb0a3bf))
+* follow dashboard left menu item on select ([5eba987](https://github.com/kubeshop/monokle/commit/5eba98770e09a9ef3abffe686607deeb05bc1b1f))
+* helm chart renderer ([49e6bda](https://github.com/kubeshop/monokle/commit/49e6bda966a170d15be37a2fb4344c25fa868a48))
+* match selected resource colors of cluster pane with navigator pane ([f65af4e](https://github.com/kubeshop/monokle/commit/f65af4ea608db29f482dcf86cc7291e53ed0587d))
+* redesign refs popover ([e6ab1fd](https://github.com/kubeshop/monokle/commit/e6ab1fd2ff520e58cca0b4bb8f08e714300b5486))
+* toggle/collapse ([0661f95](https://github.com/kubeshop/monokle/commit/0661f951eaac350df66aed4790a88c904789d3ec))
+* use monokle sample repo button ([113f29a](https://github.com/kubeshop/monokle/commit/113f29a503da88637730346b717e1084b15978dc))
+
+
+### Bug Fixes
+
+* add appVersion to all telemetry events ([8200fee](https://github.com/kubeshop/monokle/commit/8200fee64059c27641ab34d9dc197e71aeaf2bd1))
+* change table height according to terminal ([daa68e3](https://github.com/kubeshop/monokle/commit/daa68e3a94c595bedc6437e0ba1cd7106d5c6b4e))
+* clean code ([43014c7](https://github.com/kubeshop/monokle/commit/43014c7a5fc43204f308954f133b7f7fee4f4af6))
+* delete preview configuration ([0b6d979](https://github.com/kubeshop/monokle/commit/0b6d9795b308b5e176fc8eb27ac4cf197514da23))
+* duplicate extra reducer ([e8ab995](https://github.com/kubeshop/monokle/commit/e8ab995e5ff5fa99aa8a131b97655a62cff95bc9))
+* fixed deselection of deleted resource ([9fce6fb](https://github.com/kubeshop/monokle/commit/9fce6fbcf4c2896ff8c80da6abc7a577777e56e5))
+* improved algorithm for excluding resources ([a25c752](https://github.com/kubeshop/monokle/commit/a25c752343de1d5cab57fb0e9d9c7c41df05a4a8))
+* improved algorithm for excluding resources ([175cbf7](https://github.com/kubeshop/monokle/commit/175cbf74ec95d573d5a031b310cb16e2b30e3a62))
+* increase error badge size & add text next to it ([ed2f9e2](https://github.com/kubeshop/monokle/commit/ed2f9e2974ccc5887bfd73e5b42f36b162c61ca0))
+* listener for removing terminal ([201fe74](https://github.com/kubeshop/monokle/commit/201fe742052db550e71521dee7270587bc88ca07))
+* null/empty entries ([02ca4e0](https://github.com/kubeshop/monokle/commit/02ca4e071f72d76f459421d22c5ef9971cd6e7b9))
+* resource highlights after processing refs ([3faa772](https://github.com/kubeshop/monokle/commit/3faa77247045d9b903560c945962e72c1ce7c7c6))
+* unused import ([34538b7](https://github.com/kubeshop/monokle/commit/34538b75617c54a3c1c2ade462279090ff2f21f6))
+* update menu items ([3656633](https://github.com/kubeshop/monokle/commit/3656633e0747de58f8548d540ef9f4893ed9ef38))
+* update project config ([9147cde](https://github.com/kubeshop/monokle/commit/9147cdeb44621ffbd9b144d5dd1a97711c308598))
+
 ### [2.0.6](https://github.com/kubeshop/monokle/compare/v2.0.6-nightly-2023-03-31.0...v2.0.6) (2023-03-31)
 
 
