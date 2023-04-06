@@ -29,7 +29,7 @@ export const deletePreviewConfiguration = createAsyncThunk<void, string, {dispat
     }
 
     const previewConfigurationMapCopy = cloneDeep(previewConfigurationMap);
-    previewConfigurationMapCopy[previewConfigurationId] = null;
+    delete previewConfigurationMapCopy[previewConfigurationId];
 
     const updatedHelmConfig = {
       helm: {
