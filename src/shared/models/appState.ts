@@ -166,4 +166,4 @@ export type {
   ResourceRefsProcessingOptions,
 };
 
-export type ActionPaneTab = 'source' | 'form' | 'graph' | 'logs';
+export type ActionPaneTab = 'source' | 'form' | 'graph' | 'logs' | 'metadataForm';

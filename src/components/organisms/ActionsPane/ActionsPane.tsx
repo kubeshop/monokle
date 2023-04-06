@@ -25,7 +25,7 @@ import {
 } from '@redux/appConfig';
 import {toggleForm} from '@redux/forms/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openResourceDiffModal} from '@redux/reducers/main';
+import {openResourceDiffModal, setActiveEditorTab} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
@@ -59,6 +59,7 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {Icon} from '@monokle/components';
+import {ActionPaneTab} from '@shared/models/appState';
 import {HelmChart} from '@shared/models/helm';
 import {isHelmChartFile} from '@shared/utils/helm';
 import {openExternalResourceKindDocumentation} from '@shared/utils/shell';
@@ -92,9 +93,9 @@ const ActionsPane: React.FC = () => {
 
   const selection = useAppSelector(state => state.main.selection);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
+  const activeEditorTab = useAppSelector(state => state.main.activeEditorTab);
   const [isInClusterMode, isInClusterModeRef] = useSelectorWithRef(isInClusterModeSelector);
 
-  const [activeTabKey, setActiveTabKey] = useState('source');
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
   const [isButtonShrinked, setButtonShrinkedState] = useState<boolean>(true);
   const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
@@ -255,22 +256,30 @@ const ActionsPane: React.FC = () => {
 
   useEffect(() => {
     if (
-      activeTabKey === 'form' &&
+      activeEditorTab === 'form' &&
       (!selectedFilePath || !schemaForSelectedPath) &&
       !isKustomization &&
       !resourceKindHandler?.formEditorOptions?.editorSchema
     ) {
-      setActiveTabKey('source');
+      dispatch(setActiveEditorTab('source'));
     }
 
-    if (activeTabKey === 'metadataForm' && (!resourceKindHandler || isKustomization)) {
-      setActiveTabKey('source');
+    if (activeEditorTab === 'metadataForm' && (!resourceKindHandler || isKustomization)) {
+      dispatch(setActiveEditorTab('source'));
     }
 
-    if (activeTabKey === 'logs' && selectedResource?.kind !== 'Pod') {
-      setActiveTabKey('source');
+    if (activeEditorTab === 'logs' && selectedResource?.kind !== 'Pod') {
+      dispatch(setActiveEditorTab('source'));
     }
-  }, [selectedResource, activeTabKey, resourceKindHandler, isKustomization, selectedFilePath, schemaForSelectedPath]);
+  }, [
+    selectedResource,
+    activeEditorTab,
+    resourceKindHandler,
+    isKustomization,
+    selectedFilePath,
+    schemaForSelectedPath,
+    dispatch,
+  ]);
 
   useEffect(() => {
     if (tabsList && tabsList.length && extraButton.current) {
@@ -291,7 +300,7 @@ const ActionsPane: React.FC = () => {
           <>
             {isFolderLoading || isPreviewLoading || isClusterModeLoading ? (
               <S.Skeleton active />
-            ) : activeTabKey === 'source' ? (
+            ) : activeEditorTab === 'source' ? (
               (selectedResourceRef.current || selectedFilePath || selectedHelmValuesId) && (
                 <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
               )
@@ -309,7 +318,7 @@ const ActionsPane: React.FC = () => {
                 <>
                   {isFolderLoading || isPreviewLoading || isClusterModeLoading ? (
                     <S.Skeleton active />
-                  ) : activeTabKey === 'form' ? (
+                  ) : activeEditorTab === 'form' ? (
                     selectedFilePath && schemaForSelectedPath && !selectedResourceRef.current ? (
                       <FormEditor
                         formSchema={extractFormSchema(schemaForSelectedPath)}
@@ -344,7 +353,7 @@ const ActionsPane: React.FC = () => {
                 <>
                   {isFolderLoading || isPreviewLoading || isClusterModeLoading ? (
                     <S.Skeleton active />
-                  ) : activeTabKey === 'logs' ? (
+                  ) : activeEditorTab === 'logs' ? (
                     <Logs />
                   ) : null}
                 </>
@@ -356,7 +365,7 @@ const ActionsPane: React.FC = () => {
     ],
     [
       selectedResourceId,
-      activeTabKey,
+      activeEditorTab,
       applySelection,
       diffSelectedResource,
       isFolderLoading,
@@ -391,9 +400,9 @@ const ActionsPane: React.FC = () => {
         <S.Tabs
           $height={height - DEFAULT_PANE_TITLE_HEIGHT}
           defaultActiveKey="source"
-          activeKey={activeTabKey}
+          activeKey={activeEditorTab}
           items={tabItems}
-          onChange={k => setActiveTabKey(k)}
+          onChange={k => dispatch(setActiveEditorTab(k as ActionPaneTab))}
           tabBarExtraContent={
             selectedResource && resourceKindHandler?.helpLink ? (
               <>
