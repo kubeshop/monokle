@@ -28,4 +28,15 @@ type RootState = {
   dashboard: DashboardState;
 };
 
-export type {RootState};
+type ElectronMenuDataType = Pick<RootState, 'config'> & {
+  config: Pick<RootState['config'], 'projects' | 'newVersion' | 'selectedProjectRootFolder'>;
+} & Pick<RootState, 'main'> & {
+    main: Pick<RootState['main'], 'selection' | 'preview' | 'resourceContentMapByStorage'>;
+  } & Pick<RootState, 'ui'> & {
+    main: Pick<
+      RootState['ui'],
+      'isStartProjectPaneVisible' | 'isInQuickClusterMode' | 'isStartProjectPaneVisible' | 'monacoEditor'
+    >;
+  };
+
+export type {RootState, ElectronMenuDataType};

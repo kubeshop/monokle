@@ -1,14 +1,10 @@
 import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
-import {DeepPartial} from 'redux';
-
-import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {hotkeys} from '@shared/constants/hotkeys';
 import {NewVersionCode, Project} from '@shared/models/config';
-import type {RootState} from '@shared/models/rootState';
+import type {ElectronMenuDataType} from '@shared/models/rootState';
 import {defineHotkey} from '@shared/utils/hotkey';
-import {selectFromHistory} from '@shared/utils/selectionHistory';
-import {isInPreviewModeSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 import {openDiscord, openDocumentation, openGitHub, openLogs} from '@shared/utils/shell';
 
 import {checkNewVersion} from './commands';
@@ -16,6 +12,21 @@ import {MainDispatch, dispatchToFocusedWindow} from './ipc/ipcMainRedux';
 import {openApplication} from './openApplication';
 
 const isMac = process.platform === 'darwin';
+
+export const menuStatePropertiesToPick = [
+  'config.projects',
+  'config.selectedProjectRootFolder',
+  'config.newVersion',
+
+  'ui.isStartProjectPaneVisible',
+  'ui.isInQuickClusterMode',
+  'ui.isStartProjectPaneVisible',
+  'ui.monacoEditor',
+
+  'main.selection',
+  'main.preview',
+  'main.resourceContentMapByStorage',
+];
 
 const getUpdateMonokleText = (newVersion: {code: NewVersionCode; data: any}) => {
   if (newVersion.code > NewVersionCode.Checking) {
@@ -29,19 +40,19 @@ const getUpdateMonokleText = (newVersion: {code: NewVersionCode; data: any}) => 
   return 'Check for Update';
 };
 
-const checkForUpdateMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch) => {
+const checkForUpdateMenu = (state: ElectronMenuDataType, dispatch: MainDispatch) => {
   return {
-    label: getUpdateMonokleText(state.config.newVersion),
-    enabled: state.config.newVersion.code !== NewVersionCode.Downloading,
+    label: getUpdateMonokleText(state?.config?.newVersion),
+    enabled: state?.config?.newVersion?.code !== NewVersionCode.Downloading,
     click: async () => {
       await checkNewVersion(dispatch);
     },
   };
 };
 
-const appMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuItemConstructorOptions => {
+const appMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
-    label: `Monokle${state.config.newVersion.code > NewVersionCode.Checking ? ' ⬆️' : ''}`,
+    label: `Monokle${state?.config?.newVersion?.code > NewVersionCode.Checking ? ' ⬆️' : ''}`,
     submenu: [
       {
         label: 'About Monokle',
@@ -76,7 +87,7 @@ function openProjectInRendererThread(project: Project) {
   }
 }
 
-const fileMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuItemConstructorOptions => {
+const fileMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
     label: 'File',
     submenu: [
@@ -91,9 +102,11 @@ const fileMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuIt
       {
         label: 'Refresh Folder',
         accelerator: defineHotkey(hotkeys.REFRESH_FOLDER.key),
-        enabled: !isInPreviewModeSelector(state) && Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
+        enabled: !isInPreviewModeSelector(state) && Boolean(state?.config?.selectedProjectRootFolder),
         click: () => {
-          setRootFolderInRendererThread(state.main.fileMap[ROOT_FILE_ENTRY].filePath);
+          if (state?.config?.selectedProjectRootFolder) {
+            setRootFolderInRendererThread(state?.config?.selectedProjectRootFolder);
+          }
         },
       },
       {type: 'separator'},
@@ -131,7 +144,7 @@ const fileMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuIt
       },
       {
         label: 'Recent Projects',
-        submenu: state.config.projects.map((project: Project) => ({
+        submenu: state?.config?.projects.map((project: Project) => ({
           label: `${project.name} - ${project.rootFolder}`,
           click: () => {
             openProjectInRendererThread(project);
@@ -141,7 +154,7 @@ const fileMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuIt
       {type: 'separator'},
       {
         label: 'New Resource',
-        enabled: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
+        enabled: Boolean(state?.config?.selectedProjectRootFolder),
         click: () => {
           dispatch({type: 'ui/openNewResourceWizard', payload: undefined});
         },
@@ -169,30 +182,14 @@ const fileMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuIt
   };
 };
 
-const editMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuItemConstructorOptions => {
-  const isKubeConfigPathValid = kubeConfigPathValidSelector(state);
+const editMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItemConstructorOptions => {
   const isMonacoActionEnabled =
-    Boolean(state.main.selection?.type === 'resource' || state.main.selection?.type === 'file') &&
-    state.ui.monacoEditor.focused;
+    Boolean(state?.main?.selection?.type === 'resource' || state?.main?.selection?.type === 'file') &&
+    state?.ui?.monacoEditor?.focused;
   return {
     label: 'Edit',
 
     submenu: [
-      {
-        enabled: isMonacoActionEnabled,
-        label: 'Undo',
-        click: () => {
-          dispatch({type: 'ui/setMonacoEditor', payload: {undo: true}});
-        },
-      },
-      {
-        enabled: isMonacoActionEnabled,
-        label: 'Redo',
-        click: () => {
-          dispatch({type: 'ui/setMonacoEditor', payload: {redo: true}});
-        },
-      },
-      {type: 'separator'},
       {role: 'copy'},
       {role: 'cut'},
       {role: 'paste'},
@@ -213,80 +210,16 @@ const editMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuIt
         },
       },
       {type: 'separator'},
-      {
-        label: 'Apply',
-        accelerator: hotkeys.APPLY_SELECTION.key,
-        enabled: Boolean(state.main.selection?.type === 'resource') && Boolean(isKubeConfigPathValid),
-        click: () => {
-          dispatch({type: 'ui/setMonacoEditor', payload: {apply: true}});
-        },
-      },
-      {
-        label: 'Diff',
-        accelerator: hotkeys.DIFF_RESOURCE.key,
-        enabled: Boolean(state.main.selection?.type === 'resource') && Boolean(isKubeConfigPathValid),
-        click: () => {
-          if (state.main.selection?.type !== 'resource') {
-            return;
-          }
-          // TODO: the openResourceDiffModal will have to get the origin as well
-          dispatch({type: 'main/openResourceDiffModal', payload: state.main.selection.resourceIdentifier});
-        },
-      },
     ],
   };
 };
 
-const viewMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch): MenuItemConstructorOptions => {
-  const isPreviousResourceEnabled =
-    state.main.selectionHistory.current.length > 1 &&
-    (state.main.selectionHistory.index === undefined ||
-      (state.main.selectionHistory.index && state.main.selectionHistory.index > 0));
-
-  const isNextResourceEnabled =
-    state.main.selectionHistory.current.length > 1 &&
-    state.main.selectionHistory.index !== undefined &&
-    state.main.selectionHistory.index < state.main.selectionHistory.current.length - 1;
-
+const viewMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
     label: 'View',
     submenu: [
       {
         role: 'forceReload',
-      },
-      {
-        label: 'Previous Resource',
-        accelerator: hotkeys.SELECT_FROM_HISTORY_BACK.key,
-        enabled: Boolean(isPreviousResourceEnabled),
-        click: () => {
-          selectFromHistory(
-            'left',
-            state.main.selectionHistory.index,
-            state.main.selectionHistory.current,
-            state.main.resourceMetaMapByStorage,
-            state.main.fileMap,
-            state.main.imageMap,
-            dispatch,
-            state.ui.explorerSelectedSection
-          );
-        },
-      },
-      {
-        label: 'Next Resource',
-        accelerator: hotkeys.SELECT_FROM_HISTORY_FORWARD.key,
-        enabled: Boolean(isNextResourceEnabled),
-        click: () => {
-          selectFromHistory(
-            'right',
-            state.main.selectionHistory.index,
-            state.main.selectionHistory.current,
-            state.main.resourceMetaMapByStorage,
-            state.main.fileMap,
-            state.main.imageMap,
-            dispatch,
-            state.ui.explorerSelectedSection
-          );
-        },
       },
       {type: 'separator'},
       {
@@ -343,7 +276,7 @@ const windowMenu = (): MenuItemConstructorOptions => {
 };
 
 const helpMenu = (
-  state: DeepPartial<RootState>,
+  state: ElectronMenuDataType,
   dispatch: MainDispatch,
   includeUpdateMenu?: boolean
 ): MenuItemConstructorOptions => {
@@ -383,7 +316,7 @@ const helpMenu = (
   };
 };
 
-export const createMenu = (state: DeepPartial<RootState>, dispatch: MainDispatch) => {
+export const createMenu = (state: ElectronMenuDataType, dispatch: MainDispatch) => {
   const template: MenuItemConstructorOptions[] = [
     fileMenu(state, dispatch),
     editMenu(state, dispatch),

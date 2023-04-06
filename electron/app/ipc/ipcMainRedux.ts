@@ -2,7 +2,7 @@ import {BrowserWindow, WebContents, ipcMain, webContents} from 'electron';
 
 import {AnyAction, DeepPartial} from 'redux';
 
-import type {RootState} from '@shared/models/rootState';
+import type {ElectronMenuDataType, RootState} from '@shared/models/rootState';
 
 import {promiseTimeout} from '../utils/promises';
 
@@ -56,14 +56,16 @@ export const fetchFocusedWindowStoreState = () => {
 export const subscribeToStoreStateChanges = (
   contents: WebContents,
   propertiesToPick: string[],
-  callback: (state: DeepPartial<RootState>) => void
+  callback: (state: ElectronMenuDataType, title: string) => void
 ) => {
   contents.send('redux-subscribe', {webContentsId: contents.id, propertiesToPick});
   ipcMain.on(
     'redux-subscribe-triggered',
-    (_, {webContentsId, storeState}: {webContentsId: number; storeState: DeepPartial<RootState>}) => {
+    (_, {webContentsId, storeState, windowTitle}: {webContentsId: number; storeState: any; windowTitle: string}) => {
       if (contents.id === webContentsId) {
-        callback(storeState);
+        Promise.resolve().then(() => {
+          callback(JSON.parse(storeState), windowTitle);
+        });
       }
     }
   );

@@ -30,8 +30,9 @@ import {
 } from '@shared/models/extension';
 import type {FileExplorerOptions, FileOptions} from '@shared/models/fileExplorer';
 import {AnyPlugin} from '@shared/models/plugin';
+import {DISABLED_TELEMETRY} from '@shared/models/telemetry';
 import {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@shared/models/template';
-import {getSegmentClient} from '@shared/utils/segment';
+import {disableSegment, enableSegment, getSegmentClient} from '@shared/utils/segment';
 
 import {startKubeConfigService, stopKubeConfigService} from '../KubeConfigManager';
 import autoUpdater from '../autoUpdater';
@@ -421,3 +422,17 @@ ipcMain.on('pod.terminal.init', (event, args) => {
 
 ipcMain.handle('kubeService:start', () => startKubeConfigService());
 ipcMain.handle('kubeService:stop', () => stopKubeConfigService());
+
+ipcMain.handle('analytics:toggleTracking', async (_event, {disableEventTracking}) => {
+  const segmentClient = getSegmentClient();
+
+  if (disableEventTracking) {
+    segmentClient?.track({
+      userId: machineId,
+      event: DISABLED_TELEMETRY,
+    });
+    disableSegment();
+  } else {
+    enableSegment();
+  }
+});
