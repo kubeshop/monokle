@@ -51,6 +51,7 @@ const RefsPopoverContent = (props: {
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selection = useAppSelector(state => state.main.selection);
   const preview = useAppSelector(state => state.main.preview);
+  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
 
   const isRefLinkDisabled = useCallback(
     (ref: ResourceRef) => {
@@ -258,11 +259,15 @@ const RefsPopoverContent = (props: {
           </S.RefDiv>
         ))}
       </S.RefsContainer>
-      <S.Divider />
-      <S.PopoverFooter>
-        <S.Image alt="Cluster Indication" src={GraphIcon} />
-        <span onClick={handleOnClickGraphView}>View Graph</span>
-      </S.PopoverFooter>
+      {leftMenuSelection !== 'dashboard' && (
+        <>
+          <S.Divider />
+          <S.PopoverFooter>
+            <S.Image alt="Cluster Indication" src={GraphIcon} />
+            <span onClick={handleOnClickGraphView}>View Graph</span>
+          </S.PopoverFooter>
+        </>
+      )}
     </S.Container>
   );
 };
