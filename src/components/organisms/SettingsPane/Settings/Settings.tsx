@@ -5,8 +5,6 @@ import {Button, Checkbox, Form, Input, InputNumber, InputRef, Select, Tooltip} f
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {useForm} from 'antd/lib/form/Form';
 
-import {ReloadOutlined} from '@ant-design/icons';
-
 import _ from 'lodash';
 import log from 'loglevel';
 
@@ -309,23 +307,20 @@ export const Settings = ({
           </S.Heading>
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KubeconfigPathTooltip}>
-            <Input
+            <Input.Search
               ref={inputRef}
               onClick={() => focusInput()}
               value={currentKubeConfig}
               onChange={onUpdateKubeconfig}
               disabled={isEditingDisabled}
+              loading={!isKubeConfigBrowseSettingsOpen}
             />
           </Tooltip>
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
-            {isKubeConfigBrowseSettingsOpen ? (
-              <S.Button onClick={openFileSelect} disabled={isEditingDisabled}>
-                Browse
-              </S.Button>
-            ) : (
-              <ReloadOutlined style={{padding: '1em'}} spin />
-            )}
+            <S.Button onClick={openFileSelect} disabled={isEditingDisabled || !isKubeConfigBrowseSettingsOpen}>
+              Browse
+            </S.Button>
           </Tooltip>
           <S.HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
         </S.Div>

@@ -5,6 +5,7 @@ import {useForm} from 'antd/lib/form/Form';
 
 import fs from 'fs';
 import {sep} from 'path';
+import styled from 'styled-components';
 
 import {DEFAULT_GIT_REPO_PLACEHOLDER, VALID_URL_REGEX} from '@constants/constants';
 
@@ -82,6 +83,7 @@ const GitCloneModal: React.FC = () => {
     <Modal open confirmLoading={loading} onCancel={onCancel} onOk={onOk}>
       <Form form={form} initialValues={{repoURL: '', localPath: projectsRootPath}} layout="vertical">
         <Form.Item
+          style={{marginBottom: '0px'}}
           name="repoURL"
           label="Repository URL"
           rules={[
@@ -95,8 +97,31 @@ const GitCloneModal: React.FC = () => {
             },
           ]}
         >
-          <Input placeholder={DEFAULT_GIT_REPO_PLACEHOLDER} />
+          <Input
+            onKeyDown={e => {
+              if (form.getFieldValue('repoURL')) {
+                return;
+              }
+
+              if (e.key === 'Tab') {
+                e.preventDefault();
+                form.setFieldValue('repoURL', DEFAULT_GIT_REPO_PLACEHOLDER);
+                form.validateFields();
+              }
+            }}
+            placeholder={DEFAULT_GIT_REPO_PLACEHOLDER}
+          />
         </Form.Item>
+
+        <SampleButton
+          type="link"
+          onClick={() => {
+            form.setFieldValue('repoURL', DEFAULT_GIT_REPO_PLACEHOLDER);
+            onOk();
+          }}
+        >
+          Use Monokle Sample Repo
+        </SampleButton>
 
         <Form.Item label="Location" required>
           <Input.Group compact>
@@ -146,3 +171,10 @@ const GitCloneModal: React.FC = () => {
 };
 
 export default GitCloneModal;
+
+// Styled Components
+
+const SampleButton = styled(Button)`
+  padding: 4px 0px 4px 0px;
+  margin: 8px 0px;
+`;
