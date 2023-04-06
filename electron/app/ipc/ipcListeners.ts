@@ -103,10 +103,11 @@ const killTerminal = (id: string) => {
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   const segmentClient = getSegmentClient();
   if (segmentClient) {
+    const properties: any = {appVersion: app.getVersion(), ...payload};
     segmentClient.track({
       event: eventName,
       userId: machineId,
-      properties: payload,
+      properties,
     });
   }
 });
