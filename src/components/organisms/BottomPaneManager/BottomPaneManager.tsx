@@ -93,12 +93,10 @@ const BottomPaneManager: React.FC = () => {
 
   useDebounce(
     () => {
-      if (height && tabsContainerHeight) {
-        dispatch(setTerminalHeight(height - tabsContainerHeight));
-      }
+      dispatch(setTerminalHeight(height - tabsContainerHeight));
     },
-    500,
-    [tabsContainerHeight, height]
+    100,
+    [tabsContainerHeight, height, tabsContainerRef]
   );
 
   return (
@@ -187,7 +185,7 @@ const BottomPaneManager: React.FC = () => {
       {Object.values(terminalsMap).map(terminal => (
         <TerminalPane
           key={terminal.id}
-          height={height - tabsContainerHeight}
+          height={terminalHeight || 0}
           terminal={terminal}
           terminalToKill={terminalToKill}
         />
