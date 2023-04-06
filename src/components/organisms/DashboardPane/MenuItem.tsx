@@ -32,6 +32,7 @@ export const MenuItem = ({
   const [counts, setCounts] = useState({resourceCount: 0, errorCount: 0, warningCount: 0});
   const menuItemRef = useRef(null);
   const [menuItemClicked, setMenuItemClicked] = useState(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const compareNamespaces = useCallback(
     (namespace?: string) => {
@@ -102,6 +103,9 @@ export const MenuItem = ({
     return (
       <S.MainSection
         ref={menuItemRef}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        $isHovered={isHovered}
         $clickable={['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === menuItem.key) > -1}
         $active={activeMenu.key === menuItem.key}
         onClick={() =>
@@ -118,7 +122,14 @@ export const MenuItem = ({
 
   if (type === 'child' && counts.resourceCount) {
     return (
-      <S.SubSection ref={menuItemRef} $active={activeMenu.key === menuItem.key} onClick={() => setActiveMenu(menuItem)}>
+      <S.SubSection
+        ref={menuItemRef}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        $isHovered={isHovered}
+        $active={activeMenu.key === menuItem.key}
+        onClick={() => setActiveMenu(menuItem)}
+      >
         <span style={{marginRight: '4px'}}>{menuItem.label}</span>
         {counts.resourceCount ? <Resource>{counts.resourceCount}</Resource> : null}
         {counts.errorCount ? <ErrorCell>{counts.errorCount}</ErrorCell> : null}
