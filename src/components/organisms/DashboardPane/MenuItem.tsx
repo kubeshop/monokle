@@ -31,7 +31,6 @@ export const MenuItem = ({
   const dispatch = useAppDispatch();
   const [counts, setCounts] = useState({resourceCount: 0, errorCount: 0, warningCount: 0});
   const menuItemRef = useRef(null);
-  const [menuItemClicked, setMenuItemClicked] = useState(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   const compareNamespaces = useCallback(
@@ -48,9 +47,8 @@ export const MenuItem = ({
   );
 
   useEffect(() => {
-    if (onActiveMenuItem && !menuItemClicked && activeMenu.key === menuItem.key && menuItemRef && menuItemRef.current) {
+    if (onActiveMenuItem && activeMenu.key === menuItem.key && menuItemRef && menuItemRef.current) {
       onActiveMenuItem(menuItemRef.current);
-      setMenuItemClicked(false);
     }
   }, [activeMenu]);
 
@@ -86,7 +84,6 @@ export const MenuItem = ({
       trackEvent('dashboard/selectKind', {kind: item.key});
       dispatch(setActiveDashboardMenu(item));
       dispatch(setDashboardSelectedResourceId());
-      setMenuItemClicked(true);
     },
     [dispatch]
   );
