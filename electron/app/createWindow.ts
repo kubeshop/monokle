@@ -11,7 +11,6 @@ import type {AlertType} from '@shared/models/alert';
 import {NewVersionCode} from '@shared/models/config';
 import {StartupFlags} from '@shared/models/startupFlag';
 import utilsElectronStore from '@shared/utils/electronStore';
-import {transientResourceCountSelector} from '@shared/utils/selectors';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import autoUpdater from './autoUpdater';
@@ -139,14 +138,18 @@ export const createWindow = (givenPath?: string) => {
 
     const dispatch = createDispatchForWindow(win);
 
-    subscribeToStoreStateChanges(win.webContents, menuStatePropertiesToPick, (storeState, title) => {
-      console.log('@@@ storeState changed', storeState);
-      if (storeState) {
-        createMenu(storeState, dispatch);
-        setWindowTitle(title, win);
-        unsavedResourceCount = transientResourceCountSelector(storeState);
+    subscribeToStoreStateChanges(
+      win.webContents,
+      menuStatePropertiesToPick,
+      (storeState, title, _unsavedResourceCount) => {
+        if (storeState) {
+          createMenu(storeState, dispatch);
+          setWindowTitle(title, win);
+
+          unsavedResourceCount = _unsavedResourceCount;
+        }
       }
-    });
+    );
 
     dispatch({type: 'main/setAppRehydrating', payload: true});
 

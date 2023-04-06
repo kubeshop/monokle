@@ -31,7 +31,7 @@ type RootState = {
 type ElectronMenuDataType = Pick<RootState, 'config'> & {
   config: Pick<RootState['config'], 'projects' | 'newVersion' | 'selectedProjectRootFolder'>;
 } & Pick<RootState, 'main'> & {
-    main: Pick<RootState['main'], 'selection' | 'preview' | 'resourceContentMapByStorage'>;
+    main: Pick<RootState['main'], 'selection' | 'preview'>;
   } & Pick<RootState, 'ui'> & {
     main: Pick<
       RootState['ui'],

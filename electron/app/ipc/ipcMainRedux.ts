@@ -56,16 +56,22 @@ export const fetchFocusedWindowStoreState = () => {
 export const subscribeToStoreStateChanges = (
   contents: WebContents,
   propertiesToPick: string[],
-  callback: (state: ElectronMenuDataType, title: string) => void
+  callback: (state: ElectronMenuDataType, title: string, unsavedResourceCount: number) => void
 ) => {
   contents.send('redux-subscribe', {webContentsId: contents.id, propertiesToPick});
   ipcMain.on(
     'redux-subscribe-triggered',
-    (_, {webContentsId, storeState, windowTitle}: {webContentsId: number; storeState: any; windowTitle: string}) => {
+    (
+      _,
+      {
+        webContentsId,
+        storeState,
+        windowTitle,
+        unsavedResourceCount,
+      }: {webContentsId: number; storeState: ElectronMenuDataType; windowTitle: string; unsavedResourceCount: number}
+    ) => {
       if (contents.id === webContentsId) {
-        Promise.resolve().then(() => {
-          callback(JSON.parse(storeState), windowTitle);
-        });
+        callback(storeState, windowTitle, unsavedResourceCount);
       }
     }
   );

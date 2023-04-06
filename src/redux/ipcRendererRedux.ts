@@ -1,11 +1,12 @@
 import {ipcRenderer} from 'electron';
 
-import {cloneDeep, debounce, pick} from 'lodash';
+import {debounce, pick} from 'lodash';
 import log from 'loglevel';
 import {AnyAction} from 'redux';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {RootState} from '@shared/models/rootState';
+import {transientResourceCountSelector} from '@shared/utils';
 
 import {activeProjectSelector} from './appConfig';
 import store from './store';
@@ -33,8 +34,9 @@ ipcRenderer.on(
     const sendTrigger = debounce(() => {
       ipcRenderer.send('redux-subscribe-triggered', {
         webContentsId,
-        storeState: JSON.stringify(cloneDeep(pick(store.getState(), propertiesToPick))),
+        storeState: pick(store.getState(), propertiesToPick),
         windowTitle: getWindowTitle(store.getState()),
+        unsavedResourceCount: transientResourceCountSelector(store.getState()),
       });
     }, 500);
     store.subscribe(() => {

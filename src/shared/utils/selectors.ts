@@ -8,7 +8,6 @@ export const transientResourceCountSelector = createSelector(
   (state: Pick<RootState, 'main'> & {main: Pick<RootState['main'], 'resourceMetaMapByStorage'>}) =>
     state.main.resourceMetaMapByStorage.transient,
   transientMetaStorage => {
-    console.log('@@@ transientResourceCountSelector', transientMetaStorage);
     return size(transientMetaStorage);
   }
 );

@@ -25,7 +25,6 @@ export const menuStatePropertiesToPick = [
 
   'main.selection',
   'main.preview',
-  'main.resourceContentMapByStorage',
 ];
 
 const getUpdateMonokleText = (newVersion: {code: NewVersionCode; data: any}) => {
