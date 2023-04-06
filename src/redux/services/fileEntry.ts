@@ -42,13 +42,7 @@ import {
 import {AppSelection, ResourceSelection} from '@shared/models/selection';
 import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
 
-import {
-  deleteResource,
-  extractK8sResources,
-  hasSupportedResourceContent,
-  joinK8sResource,
-  splitK8sResource,
-} from './resource';
+import {deleteResource, extractK8sResources, isSupportedResource, joinK8sResource, splitK8sResource} from './resource';
 
 type PathRemovalSideEffect = {
   removedResources: ResourceIdentifier[];
@@ -141,7 +135,7 @@ export function extractResourcesForFileEntry(fileEntry: FileEntry, rootFolderPat
     fileEntry.isSupported = true;
     extractK8sResourcesFromFile(fileEntry.filePath, rootFolderPath).forEach(resource => {
       // TODO: shouldn't we filter out resources that are not supported?
-      if (!hasSupportedResourceContent(resource)) {
+      if (!isSupportedResource(resource)) {
         fileEntry.isSupported = false;
         return;
       }
