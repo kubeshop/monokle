@@ -1,6 +1,6 @@
 import {BrowserWindow, WebContents, ipcMain, webContents} from 'electron';
 
-import {AnyAction, DeepPartial} from 'redux';
+import {AnyAction} from 'redux';
 
 import type {ElectronMenuDataType, RootState} from '@shared/models/rootState';
 
