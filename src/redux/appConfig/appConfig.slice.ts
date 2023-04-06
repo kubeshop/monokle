@@ -1,3 +1,5 @@
+import {ipcRenderer} from 'electron';
+
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import flatten from 'flat';
@@ -108,6 +110,15 @@ export const setOpenProject = createAsyncThunk(
 export const setLoadingProject = createAsyncThunk('config/loadingProject', async (loading: boolean, thunkAPI: any) => {
   thunkAPI.dispatch(configSlice.actions.setLoadingProject(loading));
 });
+
+export const toggleEventTracking = createAsyncThunk(
+  'config/toggleEventTracking',
+  async (disableEventTracking: boolean, thunkAPI: any) => {
+    thunkAPI.dispatch(setEventTracking(disableEventTracking));
+    electronStore.set('appConfig.disableEventTracking', disableEventTracking);
+    ipcRenderer.invoke('analytics:toggleTracking', {disableEventTracking});
+  }
+);
 
 export const updateClusterNamespaces = createAsyncThunk(
   'config/updateClusterNamespaces',
@@ -459,13 +470,8 @@ export const configSlice = createSlice({
       else state.favoriteTemplates = state.favoriteTemplates.filter(template => template !== action.payload);
       electronStore.set('appConfig.favoriteTemplates', state.favoriteTemplates);
     },
-    toggleEventTracking: (state: Draft<AppConfig>, action: PayloadAction<boolean | undefined>) => {
-      if (action.payload !== undefined) {
-        state.disableEventTracking = action.payload;
-      } else {
-        state.disableEventTracking = !state.disableEventTracking;
-      }
-      electronStore.set('appConfig.disableEventTracking', state.disableEventTracking);
+    setEventTracking: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.disableEventTracking = action.payload;
     },
     toggleErrorReporting: (state: Draft<AppConfig>, action: PayloadAction<boolean | undefined>) => {
       if (action.payload !== undefined) {
@@ -595,7 +601,7 @@ export const {
   setUserDirs,
   toggleEditorPlaceholderVisiblity,
   toggleErrorReporting,
-  toggleEventTracking,
+  setEventTracking,
   toggleProjectPin,
   updateApplicationSettings,
   updateFileExplorerSortOrder,
