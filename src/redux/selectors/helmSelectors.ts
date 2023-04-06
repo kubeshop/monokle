@@ -1,6 +1,6 @@
 import {createSelector} from '@reduxjs/toolkit';
 
-import {orderBy} from 'lodash';
+import {isEmpty, orderBy} from 'lodash';
 
 import {HelmListNode, PreviewConfigurationListNode} from '@shared/models/helm';
 import {RootState} from '@shared/models/rootState';
@@ -54,7 +54,9 @@ export const previewConfigurationListSelector = createSelector(
       chart => !chart.name.includes('Unnamed Chart:')
     );
 
-    const filteredPreviewConfigurations = Object.values(previewConfigurationMap).filter(entry => isDefined(entry));
+    const filteredPreviewConfigurations = Object.values(previewConfigurationMap).filter(
+      entry => isDefined(entry) && !isEmpty(entry)
+    );
 
     for (const helmChart of ordererHelmChartMap) {
       const previewConfigurations = orderBy(
