@@ -33,7 +33,6 @@ const BottomPaneManager: React.FC = () => {
   const settings = useAppSelector(state => state.terminal.settings);
   const shellsMap = useAppSelector(state => state.terminal.shellsMap);
   const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
-  const terminalHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
 
   const [terminalToKill, setTerminalToKill] = useState<string>('');
   const [openTerminalOptions, setOpenTerminalOptions] = useState<boolean>(false);
