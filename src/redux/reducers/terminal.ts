@@ -2,6 +2,8 @@ import {ipcRenderer} from 'electron';
 
 import {Draft, PayloadAction, createSlice, isAnyOf} from '@reduxjs/toolkit';
 
+import {size} from 'lodash';
+
 import {setOpenProject} from '@redux/appConfig';
 import initialState from '@redux/initialState';
 import {AppListenerFn} from '@redux/listeners/base';
@@ -9,7 +11,7 @@ import {AppListenerFn} from '@redux/listeners/base';
 import {ShellsMapType, TerminalSettingsType, TerminalState, TerminalType} from '@shared/models/terminal';
 import electronStore from '@shared/utils/electronStore';
 
-import {toggleStartProjectPane} from './ui';
+import {setLeftBottomMenuSelection, toggleStartProjectPane} from './ui';
 
 export const terminalSlice = createSlice({
   name: 'terminal',
@@ -79,6 +81,20 @@ export const killTerminalProcessesListener: AppListenerFn = listen => {
 
       ipcRenderer.send('shell.ptyProcessKillAll');
       dispatch(setSelectedTerminal(undefined));
+    },
+  });
+};
+
+export const removeTerminalListener: AppListenerFn = listen => {
+  listen({
+    actionCreator: removeTerminal,
+    effect: async (action, {dispatch, getState}) => {
+      const state = getState();
+
+      if (!size(state.terminal.terminalsMap)) {
+        dispatch(setSelectedTerminal(undefined));
+        dispatch(setLeftBottomMenuSelection(undefined));
+      }
     },
   });
 };
