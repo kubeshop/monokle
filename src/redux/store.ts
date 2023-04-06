@@ -15,7 +15,7 @@ import {extensionSlice} from './reducers/extension';
 import {mainSlice} from './reducers/main';
 import {retryClusterConnectionListener} from './reducers/main/clusterListeners';
 import {imageListParserListener} from './reducers/main/mainListeners';
-import {killTerminalProcessesListener, terminalSlice} from './reducers/terminal';
+import {killTerminalProcessesListener, removeTerminalListener, terminalSlice} from './reducers/terminal';
 import {stopClusterConnectionListener, uiSlice} from './reducers/ui';
 import {validationListeners} from './validation/validation.listeners';
 import {validationSlice} from './validation/validation.slice';
@@ -38,6 +38,7 @@ combineListeners([
   compareListeners.compareListener,
   compareListeners.filterListener,
   killTerminalProcessesListener,
+  removeTerminalListener,
   ...validationListeners,
   ...appConfigListeners,
   imageListParserListener,

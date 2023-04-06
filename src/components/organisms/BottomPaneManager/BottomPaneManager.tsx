@@ -3,7 +3,6 @@ import {useMeasure} from 'react-use';
 
 import {Dropdown, Popconfirm, Tooltip} from 'antd';
 
-import {size} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
@@ -114,11 +113,6 @@ const BottomPaneManager: React.FC = () => {
                   onConfirm={e => {
                     e?.stopPropagation();
                     setTerminalToKill(terminal.id);
-
-                    if (size(terminalsMap) === 1) {
-                      dispatch(setLeftBottomMenuSelection(undefined));
-                      dispatch(setSelectedTerminal(undefined));
-                    }
                   }}
                   onCancel={e => {
                     e?.stopPropagation();
