@@ -26,7 +26,6 @@ type TerminalState = {
   terminalsMap: Record<string, TerminalType>;
   selectedTerminal?: string;
   webContentsId?: number;
-  height?: number;
 };
 
 export type {ShellType, ShellsMapType, TerminalSettingsType, TerminalState, TerminalType};
