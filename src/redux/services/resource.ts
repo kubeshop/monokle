@@ -464,12 +464,9 @@ export function deleteResource<Storage extends ResourceStorage>(
  * (for example helm templates with template syntax in any of these)
  */
 
-const unsupportedCharactersRegEx = /[{}[]]*/;
+const unsupportedCharactersRegEx = /[{}\[\]]+/;
 
-export function isSupportedResource(resource: K8sResource): boolean {
-  // const helmVariableRegex = /{{.*}}/g;
-  // const vanillaTemplateVariableRegex = /\[\[.*]]/g;
-
+export function isSupportedResource(resource: ResourceMeta): boolean {
   return (
     !unsupportedCharactersRegEx.test(resource.apiVersion) &&
     !unsupportedCharactersRegEx.test(resource.kind) &&

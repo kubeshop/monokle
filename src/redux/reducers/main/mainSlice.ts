@@ -10,7 +10,13 @@ import {setAlert} from '@redux/reducers/alert';
 import {getResourceContentMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
-import {isResourceSelected, saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
+import {
+  isResourceSelected,
+  isSupportedResource,
+  saveResource,
+  splitK8sResource,
+  splitK8sResourceMap,
+} from '@redux/services/resource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
@@ -421,7 +427,7 @@ export const mainSlice = createSlice({
           const extension = path.extname(relativeFilePath);
           const newFileEntry: FileEntry = {
             ...createFileEntry({fileEntryPath: relativeFilePath, fileMap: state.fileMap, extension}),
-            isSupported: true,
+            isSupported: isSupportedResource(resourceMeta),
             timestamp: resourcePayload.fileTimestamp,
           };
           state.fileMap[relativeFilePath] = newFileEntry;
