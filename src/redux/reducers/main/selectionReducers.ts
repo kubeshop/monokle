@@ -1,12 +1,13 @@
 import {Draft, PayloadAction} from '@reduxjs/toolkit';
 
+import {processResourceRefs} from '@redux/parsing/parser.thunks';
 import {highlightResourcesFromFile} from '@redux/services/fileEntry';
 
 import {AppState} from '@shared/models/appState';
 import {ImageType} from '@shared/models/image';
-import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
+import {ResourceIdentifier, ResourceMeta, ResourceStorage, isLocalResourceMeta} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
-import {createSliceReducers} from '@shared/utils/redux';
+import {createSliceExtraReducers, createSliceReducers} from '@shared/utils/redux';
 
 export const selectFileReducer = (state: AppState, payload: {filePath: string; isVirtualSelection?: boolean}) => {
   clearSelectionAndHighlights(state);
@@ -22,6 +23,43 @@ export const selectFileReducer = (state: AppState, payload: {filePath: string; i
 
     updateSelectionHistory(state.selection, Boolean(payload.isVirtualSelection), state);
   }
+};
+
+export const createResourceHighlights = (resourceMeta: ResourceMeta): AppSelection[] => {
+  const newHighlights: AppSelection[] = [];
+
+  resourceMeta.refs?.forEach(ref => {
+    if (ref.target?.type === 'resource' && ref.target.resourceId) {
+      newHighlights.push({
+        type: 'resource',
+        resourceIdentifier: {
+          id: ref.target.resourceId,
+          storage: resourceMeta.storage,
+        },
+      });
+    }
+    if (ref.target?.type === 'file' && ref.target.filePath) {
+      newHighlights.push({
+        type: 'file',
+        filePath: ref.target.filePath,
+      });
+    }
+    if (ref.target?.type === 'image' && ref.target.tag) {
+      newHighlights.push({
+        type: 'image',
+        imageId: `${ref.name}:${ref.target.tag}`,
+      });
+    }
+  });
+
+  if (isLocalResourceMeta(resourceMeta)) {
+    newHighlights.push({
+      type: 'file',
+      filePath: resourceMeta.origin.filePath,
+    });
+  }
+
+  return newHighlights;
 };
 
 export const selectResourceReducer = (
@@ -47,40 +85,7 @@ export const selectResourceReducer = (
     },
   };
 
-  const newHighlights: AppSelection[] = [];
-
-  resource.refs?.forEach(ref => {
-    if (ref.target?.type === 'resource' && ref.target.resourceId) {
-      newHighlights.push({
-        type: 'resource',
-        resourceIdentifier: {
-          id: ref.target.resourceId,
-          storage: resource.storage,
-        },
-      });
-    }
-    if (ref.target?.type === 'file' && ref.target.filePath) {
-      newHighlights.push({
-        type: 'file',
-        filePath: ref.target.filePath,
-      });
-    }
-    if (ref.target?.type === 'image' && ref.target.tag) {
-      newHighlights.push({
-        type: 'image',
-        imageId: `${ref.name}:${ref.target.tag}`,
-      });
-    }
-  });
-
-  if (resource.storage === 'local') {
-    newHighlights.push({
-      type: 'file',
-      filePath: resource.origin.filePath,
-    });
-  }
-
-  state.highlights = newHighlights;
+  state.highlights = createResourceHighlights(resource);
 
   updateSelectionHistory(state.selection, Boolean(payload.isVirtualSelection), state);
 };
@@ -200,3 +205,19 @@ export const clearSelectedResourceOnPreviewExit = (state: AppState) => {
     state.selection = undefined;
   }
 };
+
+export const selectionExtraReducers = createSliceExtraReducers('main', builder => {
+  builder.addCase(processResourceRefs.fulfilled, (state, action) => {
+    const selection = state.selection;
+    if (selection?.type === 'resource') {
+      const resourceIdentifier = selection.resourceIdentifier;
+      // TODO: 2.0+ should processResourceRefs return the storage as well so we can first check if the selection matches it?
+      const resource = action.payload.find(
+        r => r.id === resourceIdentifier.id && r.storage === resourceIdentifier.storage
+      );
+      if (resource) {
+        state.highlights = createResourceHighlights(resource);
+      }
+    }
+  });
+});

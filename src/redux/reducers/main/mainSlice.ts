@@ -58,7 +58,12 @@ import {trackEvent} from '@shared/utils/telemetry';
 import {filterReducers} from './filterReducers';
 import {imageReducers} from './imageReducers';
 import {clearPreviewReducer, previewExtraReducers, previewReducers} from './previewReducers';
-import {clearSelectionReducer, selectResourceReducer, selectionReducers} from './selectionReducers';
+import {
+  clearSelectionReducer,
+  selectResourceReducer,
+  selectionExtraReducers,
+  selectionReducers,
+} from './selectionReducers';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
@@ -312,6 +317,7 @@ export const mainSlice = createSlice({
       state.notifications = [notification, ...state.notifications];
     });
 
+    selectionExtraReducers(builder);
     previewExtraReducers(builder);
 
     builder
