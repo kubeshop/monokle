@@ -29,14 +29,20 @@ export const deletePreviewConfiguration = createAsyncThunk<void, string, {dispat
     }
 
     const previewConfigurationMapCopy = cloneDeep(previewConfigurationMap);
-    delete previewConfigurationMapCopy[previewConfigurationId];
+    previewConfigurationMapCopy[previewConfigurationId] = null;
 
-    const updatedHelmConfig = {
-      helm: {
-        previewConfigurationMap: previewConfigurationMapCopy,
-      },
-    };
+    const projectConfig = state.config.projectConfig;
 
-    thunkAPI.dispatch(updateProjectConfig({config: updatedHelmConfig, fromConfigFile: false}));
+    thunkAPI.dispatch(
+      updateProjectConfig({
+        config: {
+          ...projectConfig,
+          helm: {
+            previewConfigurationMap: previewConfigurationMapCopy,
+          },
+        },
+        fromConfigFile: false,
+      })
+    );
   }
 );
