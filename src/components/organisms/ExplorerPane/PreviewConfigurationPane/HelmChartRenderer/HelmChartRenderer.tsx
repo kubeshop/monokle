@@ -28,9 +28,7 @@ const HelmChartRenderer: React.FC<IProps> = props => {
         <Icon name="helm" style={{color: Colors.grey9, fontSize: '18px'}} />
       </S.PrefixContainer>
 
-      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={helmChart.name}>
-        <S.ItemName>{helmChart.name}</S.ItemName>
-      </Tooltip>
+      <S.ItemName>{helmChart.name}</S.ItemName>
 
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={helmChart.filePath}>
         <S.SuffixContainer>{dirname(helmChart.filePath)}</S.SuffixContainer>

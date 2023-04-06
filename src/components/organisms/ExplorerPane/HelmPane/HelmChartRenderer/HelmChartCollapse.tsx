@@ -33,11 +33,19 @@ const HelmChartCollapse: React.FC<IProps> = props => {
 
   if (isSectionCollapsed) {
     return (
-      <PlusSquareOutlined style={{color: isSelected ? Colors.blackPure : Colors.grey9}} onClick={onClickHandler} />
+      <PlusSquareOutlined
+        style={{color: isSelected ? Colors.blackPure : Colors.grey9, fontSize: '12px'}}
+        onClick={onClickHandler}
+      />
     );
   }
 
-  return <MinusSquareOutlined style={{color: isSelected ? Colors.blackPure : Colors.grey9}} onClick={onClickHandler} />;
+  return (
+    <MinusSquareOutlined
+      style={{color: isSelected ? Colors.blackPure : Colors.grey9, fontSize: '12px'}}
+      onClick={onClickHandler}
+    />
+  );
 };
 
 export default HelmChartCollapse;

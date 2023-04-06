@@ -10,7 +10,7 @@ export const ItemContainer = styled.span`
   > {
     min-width: 0;
   }
-  padding-left: 20px;
+  padding-left: 26px;
   padding-right: 20px;
   margin-bottom: 2px;
 `;

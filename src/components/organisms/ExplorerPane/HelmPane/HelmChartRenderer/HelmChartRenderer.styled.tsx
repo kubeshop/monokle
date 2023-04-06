@@ -23,7 +23,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   > {
     min-width: 0;
   }
-  padding-left: 20px;
+  padding-left: 28px;
   padding-right: 8px;
   margin-bottom: 2px;
   cursor: pointer;
@@ -49,7 +49,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
 
 export const ItemName = styled.div<ItemNameProps>`
   padding: 2px 0;
-  font-size: 14px;
+  font-size: 12px;
   white-space: nowrap;
 
   ${props => {
