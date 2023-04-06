@@ -238,6 +238,16 @@ export const uiSlice = createSlice({
 
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
     },
+    collapsePreviewConfigurationsHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.collapsedPreviewConfigurationsHelmCharts.push(action.payload);
+    },
+
+    togglePreviewConfigurationsHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.collapsedPreviewConfigurationsHelmCharts = state.collapsedPreviewConfigurationsHelmCharts.filter(
+        chart => chart !== action.payload
+      );
+    },
+
     collapseHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.collapsedHelmCharts.push(action.payload);
     },
@@ -435,6 +445,7 @@ export const {
   closeWelcomePopup,
   collapseHelmChart,
   collapseKustomizeKinds,
+  collapsePreviewConfigurationsHelmChart,
   collapseResourceKinds,
   expandKustomizeKinds,
   expandResourceKinds,
@@ -480,6 +491,7 @@ export const {
   toggleHelmChart,
   toggleLeftMenu,
   toggleNotifications,
+  togglePreviewConfigurationsHelmChart,
   toggleResourceFilters,
   toggleRightMenu,
   toggleStartProjectPane,
