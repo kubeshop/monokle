@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {useMeasure} from 'react-use';
+import {useDebounce, useMeasure} from 'react-use';
 
 import {Dropdown, Popconfirm, Tooltip} from 'antd';
 
@@ -10,7 +10,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {AddTerminalTooltip, KillTerminalTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
+import {addTerminal, setSelectedTerminal, setTerminalHeight} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
 import {setTerminalShells} from '@redux/services/terminalShells';
 
@@ -33,6 +33,7 @@ const BottomPaneManager: React.FC = () => {
   const settings = useAppSelector(state => state.terminal.settings);
   const shellsMap = useAppSelector(state => state.terminal.shellsMap);
   const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
+  const terminalHeight = useAppSelector(state => state.terminal.height);
 
   const [terminalToKill, setTerminalToKill] = useState<string>('');
   const [openTerminalOptions, setOpenTerminalOptions] = useState<boolean>(false);
@@ -89,6 +90,16 @@ const BottomPaneManager: React.FC = () => {
 
     setTerminalShells(osPlatform, settings, dispatch);
   }, [dispatch, osPlatform, settings, shellsMap]);
+
+  useDebounce(
+    () => {
+      if (height && tabsContainerHeight) {
+        dispatch(setTerminalHeight(height - tabsContainerHeight));
+      }
+    },
+    500,
+    [tabsContainerHeight, height]
+  );
 
   return (
     <S.BottomPaneManagerContainer ref={bottomPaneManagerRef} $isLeftMenuActive={isLeftMenuActive}>

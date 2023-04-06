@@ -51,6 +51,9 @@ export const terminalSlice = createSlice({
     setWebContentsId: (state: Draft<TerminalState>, action: PayloadAction<number>) => {
       state.webContentsId = action.payload;
     },
+    setTerminalHeight: (state: Draft<TerminalState>, action: PayloadAction<number>) => {
+      state.height = action.payload;
+    },
   },
 });
 
@@ -62,6 +65,7 @@ export const {
   setShells,
   setTerminalSettings,
   setWebContentsId,
+  setTerminalHeight,
 } = terminalSlice.actions;
 export default terminalSlice.reducer;
 

@@ -21,6 +21,7 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
   const [filterText, setFilterText] = useState<string>('');
   const selectedResourceId = useAppSelector((state: RootState) => state.dashboard.tableDrawer.selectedResourceId);
   const clusterConnectionOptions = useAppSelector(state => state.main.clusterConnectionOptions);
+  const terminalHeight = useAppSelector(state => state.terminal.height);
 
   useEffect(() => {
     if (!filterText) {
@@ -56,7 +57,7 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
           dataSource={filteredDataSource}
           columns={columns}
           rowKey="id"
-          scroll={{y: height - 212}}
+          scroll={{y: height - 212 - (terminalHeight ? terminalHeight + 45 : 0)}}
           rowClassName={(record: ResourceMeta | any) => (record.id === selectedResourceId ? 'selected' : '')}
           pagination={false}
           sticky
