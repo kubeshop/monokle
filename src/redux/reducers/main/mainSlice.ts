@@ -66,8 +66,8 @@ import {imageReducers} from './imageReducers';
 import {clearPreviewReducer, previewExtraReducers, previewReducers} from './previewReducers';
 import {
   clearSelectionReducer,
+  createResourceHighlights,
   selectResourceReducer,
-  selectionExtraReducers,
   selectionReducers,
 } from './selectionReducers';
 
@@ -323,7 +323,6 @@ export const mainSlice = createSlice({
       state.notifications = [notification, ...state.notifications];
     });
 
-    selectionExtraReducers(builder);
     previewExtraReducers(builder);
 
     builder
@@ -546,6 +545,18 @@ export const mainSlice = createSlice({
           resourceContentMap[resource.id] = content;
         }
       });
+
+      const selection = state.selection;
+      if (selection?.type === 'resource') {
+        const resourceIdentifier = selection.resourceIdentifier;
+        // TODO: 2.0+ should processResourceRefs return the storage as well so we can first check if the selection matches it?
+        const resource = action.payload.find(
+          r => r.id === resourceIdentifier.id && r.storage === resourceIdentifier.storage
+        );
+        if (resource) {
+          state.highlights = createResourceHighlights(resource);
+        }
+      }
     });
 
     // TODO: 2.0+ how do we make this work with the new resource storage?

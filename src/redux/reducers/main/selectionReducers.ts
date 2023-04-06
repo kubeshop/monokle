@@ -1,13 +1,12 @@
 import {Draft, PayloadAction} from '@reduxjs/toolkit';
 
-import {processResourceRefs} from '@redux/parsing/parser.thunks';
 import {highlightResourcesFromFile} from '@redux/services/fileEntry';
 
 import {AppState} from '@shared/models/appState';
 import {ImageType} from '@shared/models/image';
 import {ResourceIdentifier, ResourceMeta, ResourceStorage, isLocalResourceMeta} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
-import {createSliceExtraReducers, createSliceReducers} from '@shared/utils/redux';
+import {createSliceReducers} from '@shared/utils/redux';
 
 export const selectFileReducer = (state: AppState, payload: {filePath: string; isVirtualSelection?: boolean}) => {
   clearSelectionAndHighlights(state);
@@ -205,19 +204,3 @@ export const clearSelectedResourceOnPreviewExit = (state: AppState) => {
     state.selection = undefined;
   }
 };
-
-export const selectionExtraReducers = createSliceExtraReducers('main', builder => {
-  builder.addCase(processResourceRefs.fulfilled, (state, action) => {
-    const selection = state.selection;
-    if (selection?.type === 'resource') {
-      const resourceIdentifier = selection.resourceIdentifier;
-      // TODO: 2.0+ should processResourceRefs return the storage as well so we can first check if the selection matches it?
-      const resource = action.payload.find(
-        r => r.id === resourceIdentifier.id && r.storage === resourceIdentifier.storage
-      );
-      if (resource) {
-        state.highlights = createResourceHighlights(resource);
-      }
-    }
-  });
-});
