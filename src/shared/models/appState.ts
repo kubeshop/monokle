@@ -83,6 +83,7 @@ type AppState = {
     };
   };
   lastChangedLine: number;
+  activeEditorTab: ActionPaneTab;
 };
 
 /**
@@ -164,3 +165,5 @@ export type {
   PreviewLoaderType,
   ResourceRefsProcessingOptions,
 };
+
+export type ActionPaneTab = 'source' | 'form' | 'graph' | 'logs';

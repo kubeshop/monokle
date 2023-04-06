@@ -27,6 +27,7 @@ import {parseYamlDocument} from '@utils/yaml';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AlertType} from '@shared/models/alert';
 import {
+  ActionPaneTab,
   AppState,
   FileMapType,
   HelmChartMapType,
@@ -294,6 +295,9 @@ export const mainSlice = createSlice({
         delete state.resourceMetaMapByStorage.cluster[r.id];
         delete state.resourceContentMapByStorage.cluster[r.id];
       });
+    },
+    setActiveEditorTab: (state: Draft<AppState>, action: PayloadAction<ActionPaneTab>) => {
+      state.activeEditorTab = action.payload;
     },
   },
   extraReducers: builder => {
@@ -610,5 +614,6 @@ export const {
   setLastChangedLine,
   updateMultipleClusterResources,
   deleteMultipleClusterResources,
+  setActiveEditorTab,
 } = mainSlice.actions;
 export default mainSlice.reducer;

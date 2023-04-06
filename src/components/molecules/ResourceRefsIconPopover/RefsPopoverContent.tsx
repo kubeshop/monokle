@@ -2,7 +2,7 @@ import React, {useCallback, useMemo} from 'react';
 
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile, selectResource} from '@redux/reducers/main';
+import {selectFile, selectResource, setActiveEditorTab} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {
   activeResourceStorageSelector,
@@ -12,6 +12,8 @@ import {
 import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {getRefRange} from '@utils/refs';
+
+import GraphIcon from '@assets/GraphIcon.svg';
 
 import {ResourceRef, ResourceRefType, areRefPosEqual} from '@monokle/validation';
 import {ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
@@ -228,27 +230,39 @@ const RefsPopoverContent = (props: {
     );
   };
 
+  const handleOnClickGraphView = () => {
+    triggerSelectResource(resource.id);
+    dispatch(setActiveEditorTab('graph'));
+  };
+
   return (
     <S.Container>
       <S.PopoverTitle>{children}</S.PopoverTitle>
 
       <S.Divider />
 
-      {processedRefsWithKeys.map(({ref, key}) => (
-        <S.RefDiv key={key}>
-          <RefLink
-            isDisabled={isRefLinkDisabled(ref)}
-            resourceRef={ref}
-            resourceMetaMap={activeResourceMetaMap}
-            onClick={(e: Event) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onLinkClick(ref);
-              handleLinkClickForDashboard(ref);
-            }}
-          />
-        </S.RefDiv>
-      ))}
+      <S.RefsContainer>
+        {processedRefsWithKeys.map(({ref, key}) => (
+          <S.RefDiv key={key}>
+            <RefLink
+              isDisabled={isRefLinkDisabled(ref)}
+              resourceRef={ref}
+              resourceMetaMap={activeResourceMetaMap}
+              onClick={(e: Event) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onLinkClick(ref);
+                handleLinkClickForDashboard(ref);
+              }}
+            />
+          </S.RefDiv>
+        ))}
+      </S.RefsContainer>
+      <S.Divider />
+      <S.PopoverFooter>
+        <S.Image alt="Cluster Indication" src={GraphIcon} />
+        <span onClick={handleOnClickGraphView}>View Graph</span>
+      </S.PopoverFooter>
     </S.Container>
   );
 };

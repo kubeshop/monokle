@@ -66,6 +66,7 @@ const initialAppState: AppState = {
   validationIntegration: undefined,
   autosaving: {},
   lastChangedLine: 0,
+  activeEditorTab: 'source',
 };
 
 const initialAppConfigState: AppConfig = {
