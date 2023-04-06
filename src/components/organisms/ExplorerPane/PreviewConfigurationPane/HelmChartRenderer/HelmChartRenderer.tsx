@@ -25,7 +25,7 @@ const HelmChartRenderer: React.FC<IProps> = props => {
     <S.ItemContainer>
       <S.PrefixContainer>
         <HelmChartCollapse id={id} />
-        <Icon name="helm" style={{color: Colors.grey9, fontSize: '18px'}} />
+        <Icon name="helm" style={{color: Colors.grey9, fontSize: '16px'}} />
       </S.PrefixContainer>
 
       <S.ItemName>{helmChart.name}</S.ItemName>

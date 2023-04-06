@@ -17,7 +17,7 @@ export const ItemContainer = styled.span`
 
 export const ItemName = styled.div`
   padding: 2px 0;
-  font-size: 14px;
+  font-size: 12px;
   white-space: nowrap;
   color: ${Colors.grey9};
 `;
