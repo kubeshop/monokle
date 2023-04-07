@@ -18,7 +18,6 @@ import {
   getRemotePath,
   initGitRepo,
   isFolderGitRepo,
-  isGitInstalled,
   publishLocalBranch,
   pullChanges,
   pushChanges,
@@ -42,15 +41,6 @@ ipcMain.on('git.isFolderGitRepo', async (event, path: string) => {
     event.sender.send('git.isFolderGitRepo.result', result);
   } catch (e: any) {
     event.sender.send('git.isFolderGitRepo.result', {error: e.message});
-  }
-});
-
-ipcMain.on('git.isGitInstalled', async (event, path: string) => {
-  try {
-    const result = await isGitInstalled(path);
-    event.sender.send('git.isGitInstalled.result', result);
-  } catch (e: any) {
-    event.sender.send('git.isGitInstalled.result', {error: e.message});
   }
 });
 

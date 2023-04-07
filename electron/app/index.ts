@@ -14,6 +14,7 @@ import './KubeConfigManager';
 import './git/ipc';
 import './ipc/ipcListeners';
 import {openApplication} from './openApplication';
+import './services/git/ipc';
 import {initTelemetry, saveInitialK8sSchema, setProjectsRootFolder} from './utils';
 import {fixPath} from './utils/path';
 

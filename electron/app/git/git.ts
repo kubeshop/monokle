@@ -10,17 +10,6 @@ import {trackEvent} from '@shared/utils/telemetry';
 
 import {formatGitChangedFiles} from '../utils/git';
 
-export async function isGitInstalled(path: string) {
-  const git: SimpleGit = simpleGit({baseDir: path});
-
-  try {
-    const result = await git.version();
-    return result.installed;
-  } catch (e) {
-    return false;
-  }
-}
-
 export async function getGitRemoteUrl(path: string) {
   const git: SimpleGit = simpleGit({baseDir: path});
 
