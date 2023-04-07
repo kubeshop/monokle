@@ -101,7 +101,11 @@ const Monaco: React.FC<IProps> = props => {
   const stateSelectedResource = useSelectedResource();
   const providedResource = useResource(providedResourceSelection?.resourceIdentifier);
 
-  const selectedResource = providedResourceSelection ? providedResource : stateSelectedResource;
+  const selectedResource = providedResourceSelection
+    ? providedResource
+    : providedFilePath
+    ? undefined
+    : stateSelectedResource;
   const selectedResourceRef = useRef(selectedResource);
   selectedResourceRef.current = selectedResource;
 
@@ -393,13 +397,13 @@ const Monaco: React.FC<IProps> = props => {
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all - or allowEditInClusterMode is false
   const isReadOnlyMode = useMemo(() => {
-    if (!selection) {
+    if (!selection && !selectedFilePath && !selectedResource) {
       return true;
     }
 
     if (
       (isInClusterMode && !settings.allowEditInClusterMode) ||
-      (isInPreviewMode && selection.type === 'resource' && selection.resourceIdentifier.storage === 'preview')
+      (isInPreviewMode && selection?.type === 'resource' && selection.resourceIdentifier.storage === 'preview')
     ) {
       return true;
     }

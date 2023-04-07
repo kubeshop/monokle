@@ -73,7 +73,7 @@ const GitCloneModal: React.FC = () => {
             fs.rmdirSync(localGitPath, {recursive: true});
           }
         } else {
-          dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName}`}));
+          dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName.replace('.git', '')}`}));
         }
       });
     });
