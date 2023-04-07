@@ -4,6 +4,7 @@ import log from 'loglevel';
 
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
+import {isFolderGitRepo} from '@redux/git/service';
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
@@ -102,13 +103,15 @@ export const setRootFolder = createAsyncThunk<
     silent: true,
   };
 
-  const isFolderGitRepo = await promiseFromIpcRenderer<boolean>(
-    'git.isFolderGitRepo',
-    'git.isFolderGitRepo.result',
-    rootFolder
-  );
+  let isGitRepo: boolean;
 
-  if (isFolderGitRepo) {
+  try {
+    isGitRepo = await isFolderGitRepo({path: rootFolder});
+  } catch (err) {
+    isGitRepo = false;
+  }
+
+  if (isGitRepo) {
     thunkAPI.dispatch(setGitLoading(true));
 
     Promise.all([
@@ -157,6 +160,6 @@ export const setRootFolder = createAsyncThunk<
     isScanExcludesUpdated: 'applied',
     isScanIncludesUpdated: 'applied',
     alert: rootFolder ? generatedAlert : undefined,
-    isGitRepo: isFolderGitRepo,
+    isGitRepo,
   };
 });

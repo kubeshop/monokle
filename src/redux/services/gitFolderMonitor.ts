@@ -1,8 +1,10 @@
 import {FSWatcher, watch} from 'chokidar';
+import log from 'loglevel';
 import {sep} from 'path';
 
 import {updateProjectsGitRepo} from '@redux/appConfig';
 import {setBranchCommits, setChangedFiles, setCommits, setRepo} from '@redux/git';
+import {isFolderGitRepo} from '@redux/git/service';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
@@ -18,13 +20,15 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
     return;
   }
 
-  const isFolderGitRepo = await promiseFromIpcRenderer<boolean>(
-    'git.isFolderGitRepo',
-    'git.isFolderGitRepo.result',
-    rootFolderPath
-  );
+  let isGitRepo: boolean;
 
-  if (!isFolderGitRepo) {
+  try {
+    isGitRepo = await isFolderGitRepo({path: rootFolderPath});
+  } catch (err) {
+    isGitRepo = false;
+  }
+
+  if (!isGitRepo) {
     return;
   }
 
@@ -73,16 +77,19 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
       }
     })
     .on('unlinkDir', () => {
-      promiseFromIpcRenderer(
-        'git.isFolderGitRepo',
-        'git.isFolderGitRepo.result',
-        thunkAPI.getState().config.selectedProjectRootFolder
-      ).then(isGitRepo => {
-        if (!isGitRepo && thunkAPI.getState().git.repo) {
-          thunkAPI.dispatch(setChangedFiles([]));
-          thunkAPI.dispatch(setRepo(undefined));
-          thunkAPI.dispatch(updateProjectsGitRepo([{path: rootFolderPath || '', isGitRepo: false}]));
-        }
-      });
+      const rootFolder = thunkAPI.getState().config.selectedProjectRootFolder;
+      const repo = thunkAPI.getState().git.repo;
+
+      try {
+        isFolderGitRepo({path: rootFolder}).then(isRepo => {
+          if (!isRepo && repo) {
+            thunkAPI.dispatch(setChangedFiles([]));
+            thunkAPI.dispatch(setRepo(undefined));
+            thunkAPI.dispatch(updateProjectsGitRepo([{path: rootFolderPath || '', isGitRepo: false}]));
+          }
+        });
+      } catch (err) {
+        log.error(err);
+      }
     });
 }

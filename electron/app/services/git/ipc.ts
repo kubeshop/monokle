@@ -1,4 +1,5 @@
 import {handleIpc} from '../../utils/ipc';
-import {isGitInstalled} from './handlers';
+import {isFolderGitRepo, isGitInstalled} from './handlers';
 
+handleIpc('git:isFolderGitRepo', isFolderGitRepo);
 handleIpc('git:isGitInstalled', isGitInstalled);

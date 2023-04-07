@@ -3,7 +3,6 @@ import {ipcMain} from 'electron';
 import type {FileMapType} from '@shared/models/appState';
 
 import {
-  areFoldersGitRepos,
   checkoutGitBranch,
   cloneGitRepo,
   commitChanges,
@@ -17,7 +16,6 @@ import {
   getGitRepoInfo,
   getRemotePath,
   initGitRepo,
-  isFolderGitRepo,
   publishLocalBranch,
   pullChanges,
   pushChanges,
@@ -25,24 +23,6 @@ import {
   stageChangedFiles,
   unstageFiles,
 } from './git';
-
-ipcMain.on('git.areFoldersGitRepos', async (event, paths: string[]) => {
-  try {
-    const result = await areFoldersGitRepos(paths);
-    event.sender.send('git.areFoldersGitRepos.result', result);
-  } catch (e: any) {
-    event.sender.send('git.areFoldersGitRepos.result', {error: e.message});
-  }
-});
-
-ipcMain.on('git.isFolderGitRepo', async (event, path: string) => {
-  try {
-    const result = await isFolderGitRepo(path);
-    event.sender.send('git.isFolderGitRepo.result', result);
-  } catch (e: any) {
-    event.sender.send('git.isFolderGitRepo.result', {error: e.message});
-  }
-});
 
 ipcMain.on('git.cloneGitRepo', async (event, payload: {localPath: string; repoPath: string}) => {
   try {
