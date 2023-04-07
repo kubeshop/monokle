@@ -43,14 +43,18 @@ export class KubeConfigManager {
 
   getV1ApiClient(): k8s.CoreV1Api | undefined {
     if (this.kubeConfig) {
-      return this.kubeConfig.makeApiClient(k8s.CoreV1Api);
+      const client = this.kubeConfig.makeApiClient(k8s.CoreV1Api);
+      client.setDefaultAuthentication(new k8s.VoidAuth());
+      return client;
     }
     return undefined;
   }
 
   getStorageApiClient(): k8s.StorageV1Api | undefined {
     if (this.kubeConfig) {
-      return this.kubeConfig.makeApiClient(k8s.StorageV1Api);
+      const client = this.kubeConfig.makeApiClient(k8s.StorageV1Api);
+      client.setDefaultAuthentication(new k8s.VoidAuth());
+      return client;
     }
     return undefined;
   }

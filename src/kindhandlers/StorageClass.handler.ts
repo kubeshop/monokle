@@ -15,15 +15,18 @@ const StorageClassHandler: ResourceKindHandler = {
   isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const storageV1Api = kubeconfig.makeApiClient(k8s.StorageV1Api);
+    storageV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     return storageV1Api.readStorageClass(resource.name, 'true');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const storageV1Api = kubeconfig.makeApiClient(k8s.StorageV1Api);
+    storageV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     const response = await storageV1Api.listStorageClass();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const storageV1Api = kubeconfig.makeApiClient(k8s.StorageV1Api);
+    storageV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     await storageV1Api.deleteStorageClass(resource.name);
   },
   helpLink: 'https://kubernetes.io/docs/concepts/storage/storage-classes/',
