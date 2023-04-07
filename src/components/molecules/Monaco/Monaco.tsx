@@ -101,7 +101,11 @@ const Monaco: React.FC<IProps> = props => {
   const stateSelectedResource = useSelectedResource();
   const providedResource = useResource(providedResourceSelection?.resourceIdentifier);
 
-  const selectedResource = providedResourceSelection ? providedResource : stateSelectedResource;
+  const selectedResource = providedResourceSelection
+    ? providedResource
+    : providedFilePath
+    ? undefined
+    : stateSelectedResource;
   const selectedResourceRef = useRef(selectedResource);
   selectedResourceRef.current = selectedResource;
 
