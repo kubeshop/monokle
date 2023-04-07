@@ -154,9 +154,6 @@ const Monaco: React.FC<IProps> = props => {
     });
   }, [selectedFilePath, localResourceMetaMapRef, localResourceContentMapRef]);
 
-  console.log(selectedResource);
-  console.log(selectedFilePath);
-
   const [containerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
   const [code, setCode, codeRef] = useStateWithRef('');

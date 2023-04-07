@@ -194,7 +194,11 @@ const FileList: React.FC<IProps> = props => {
         >
           <Checkbox
             onChange={e => handleSelect(e, item)}
-            checked={Boolean(selectedFiles.find(searchItem => searchItem.name === item.name))}
+            checked={Boolean(
+              selectedFiles.find(
+                searchItem => searchItem.name === item.name && searchItem.displayPath === item.displayPath
+              )
+            )}
           />
 
           <S.FileItem>
