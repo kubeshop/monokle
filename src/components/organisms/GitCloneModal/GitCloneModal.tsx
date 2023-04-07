@@ -11,6 +11,7 @@ import {DEFAULT_GIT_REPO_PLACEHOLDER, VALID_URL_REGEX} from '@constants/constant
 
 import {setCreateProject} from '@redux/appConfig';
 import {closeGitCloneModal} from '@redux/git';
+import {cloneGitRepo} from '@redux/git/service';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {FileExplorer} from '@atoms';
@@ -18,7 +19,6 @@ import {FileExplorer} from '@atoms';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {doesPathExist} from '@utils/files';
-import {promiseFromIpcRenderer} from '@utils/promises';
 
 const GitCloneModal: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -44,38 +44,36 @@ const GitCloneModal: React.FC = () => {
   };
 
   const onOk = () => {
-    form.validateFields().then(values => {
+    form.validateFields().then(async values => {
       setLoading(true);
 
       const {localPath, repoURL} = values;
       const repoName = repoURL.split('/').pop();
-      const localGitPath = `${localPath}${sep}${repoName}`;
+      const localGitPath = `${localPath}${sep}${repoName.replace('.git', '')}`;
 
       if (!doesPathExist(localPath)) {
         fs.mkdirSync(localPath, {recursive: true});
       }
 
-      promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
-        localPath: localGitPath,
-        repoPath: repoURL,
-      }).then(result => {
+      try {
+        await cloneGitRepo({localPath: localGitPath, repoPath: repoURL});
+        setLoading(false);
+        dispatch(closeGitCloneModal());
+        dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName.replace('.git', '')}`}));
+      } catch (error: any) {
         setLoading(false);
         dispatch(closeGitCloneModal());
 
-        if (result.error) {
-          Modal.warning({
-            title: 'Clone failed!',
-            content: <div>{result.error}</div>,
-            zIndex: 100000,
-          });
+        Modal.warning({
+          title: 'Clone failed!',
+          content: <div>{error.message}</div>,
+          zIndex: 100000,
+        });
 
-          if (doesPathExist(localGitPath)) {
-            fs.rmdirSync(localGitPath, {recursive: true});
-          }
-        } else {
-          dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName.replace('.git', '')}`}));
+        if (doesPathExist(localGitPath)) {
+          fs.rmdirSync(localGitPath, {recursive: true});
         }
-      });
+      }
     });
   };
 

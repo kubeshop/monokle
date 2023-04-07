@@ -4,7 +4,6 @@ import type {FileMapType} from '@shared/models/appState';
 
 import {
   checkoutGitBranch,
-  cloneGitRepo,
   commitChanges,
   createLocalBranch,
   deleteLocalBranch,
@@ -23,15 +22,6 @@ import {
   stageChangedFiles,
   unstageFiles,
 } from './git';
-
-ipcMain.on('git.cloneGitRepo', async (event, payload: {localPath: string; repoPath: string}) => {
-  try {
-    const result = await cloneGitRepo(payload);
-    event.sender.send('git.cloneGitRepo.result', result);
-  } catch (e: any) {
-    event.sender.send('git.cloneGitRepo.result', {error: e.message});
-  }
-});
 
 ipcMain.on('git.getGitRepoInfo', async (event, localPath: string) => {
   try {

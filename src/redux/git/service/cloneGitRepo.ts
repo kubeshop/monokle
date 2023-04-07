@@ -1,0 +1,16 @@
+import {invokeIpc} from '@utils/ipc';
+
+import {GitCloneRepoParams} from '@shared/ipc';
+
+/**
+ * Example usage:
+ *
+ * ```
+ * try {
+ *   await cloneGitRepo({localPath: 'some/path', repoPath: 'some/repo/path'});
+ * } catch (err) {
+ *   console.log(err);
+ * }
+ * ```
+ */
+export const cloneGitRepo = invokeIpc<GitCloneRepoParams, boolean>('git:cloneGitRepo');

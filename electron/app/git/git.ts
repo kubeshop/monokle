@@ -1,4 +1,3 @@
-import {promises as fs} from 'fs';
 import {orderBy} from 'lodash';
 import {SimpleGit, simpleGit} from 'simple-git';
 
@@ -30,30 +29,6 @@ export async function getRemotePath(localPath: string) {
   } catch (e: any) {
     return {error: e.message};
   }
-}
-
-export async function cloneGitRepo(payload: {localPath: string; repoPath: string}) {
-  const {localPath, repoPath} = payload;
-  try {
-    const stat = await fs.stat(localPath);
-    if (!stat.isDirectory()) {
-      throw new Error(`${localPath} is not a directory`);
-    }
-  } catch (e: any) {
-    if (e.code === 'ENOENT') {
-      await fs.mkdir(localPath);
-    } else {
-      throw e;
-    }
-  }
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-  try {
-    await git.clone(repoPath, localPath);
-  } catch (e: any) {
-    return {error: e.message};
-  }
-
-  return {};
 }
 
 export async function getGitRepoInfo(localPath: string) {
