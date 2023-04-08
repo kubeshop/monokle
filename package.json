@@ -103,7 +103,7 @@
     "@monokle/validation": "0.15.4",
     "@open-policy-agent/opa-wasm": "1.8.0",
     "@reduxjs/toolkit": "1.9.3",
-    "@rjsf/antd": "5.1.0",
+    "@rjsf/antd": "5.3.0",
     "@rjsf/core": "5.1.0",
     "@rjsf/utils": "5.1.0",
     "@rjsf/validator-ajv8": "5.1.0",
