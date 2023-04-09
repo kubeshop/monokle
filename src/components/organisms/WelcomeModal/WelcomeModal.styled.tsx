@@ -23,8 +23,8 @@ export const Content = styled.div`
 `;
 
 export const Image = styled.img`
-  width: 265px;
-  max-width: 265px;
+  width: 330;
+  max-width: 330;
   margin: 15px auto 20px auto;
 `;
 
