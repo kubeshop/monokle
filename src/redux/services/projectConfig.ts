@@ -54,6 +54,8 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     fileIncludes: state.projectConfig?.fileIncludes,
     folderReadsMaxDepth: state.projectConfig?.folderReadsMaxDepth,
     k8sVersion: state.projectConfig?.k8sVersion,
+    helm: state.projectConfig?.helm,
+    savedCommandMap: state.projectConfig?.savedCommandMap,
   };
   applicationConfig.settings = {
     helmPreviewMode: state.projectConfig?.settings?.helmPreviewMode,
@@ -69,9 +71,7 @@ export const populateProjectConfigToWrite = (state: AppConfig | SerializableObje
     path: state.projectConfig?.kubeConfig?.path,
     currentContext: state.projectConfig?.kubeConfig?.currentContext,
   };
-  applicationConfig.k8sVersion = state.projectConfig?.k8sVersion;
-  applicationConfig.helm = state.projectConfig?.helm;
-  applicationConfig.savedCommandMap = state.projectConfig?.savedCommandMap;
+
   return applicationConfig;
 };
 
