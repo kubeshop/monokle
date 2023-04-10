@@ -67,6 +67,8 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
 
   useEffect(() => {
     try {
+      setIsLoading(true);
+      setFormData(defaultFormData);
       const schemas = readTemplateFormSchemas(templateForm);
       setSchema(JSON.parse(schemas.schema));
       setUiSchema(JSON.parse(schemas.uiSchema));
