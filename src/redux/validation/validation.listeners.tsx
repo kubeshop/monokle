@@ -77,6 +77,10 @@ const validateListener: AppListenerFn = listen => {
       previewHelmValuesFile.fulfilled,
       runPreviewConfiguration.fulfilled,
       previewSavedCommand.fulfilled,
+      previewKustomization.rejected,
+      previewHelmValuesFile.rejected,
+      runPreviewConfiguration.rejected,
+      previewSavedCommand.rejected,
       stopClusterConnection.fulfilled,
       clearPreviewAndSelectionHistory,
       clearPreview
@@ -111,7 +115,17 @@ const validateListener: AppListenerFn = listen => {
         resourceStorage = 'preview';
       }
 
-      if (isAnyOf(stopClusterConnection.fulfilled, clearPreviewAndSelectionHistory, clearPreview)(_action)) {
+      if (
+        isAnyOf(
+          stopClusterConnection.fulfilled,
+          clearPreviewAndSelectionHistory,
+          clearPreview,
+          previewKustomization.rejected,
+          previewHelmValuesFile.rejected,
+          runPreviewConfiguration.rejected,
+          previewSavedCommand.rejected
+        )(_action)
+      ) {
         resourceStorage = 'local';
       }
 
