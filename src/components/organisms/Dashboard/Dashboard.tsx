@@ -1,5 +1,7 @@
 import {useCallback, useMemo} from 'react';
 
+import {Skeleton} from 'antd';
+
 import {useAppSelector} from '@redux/hooks';
 import {useResourceContentMap, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 
@@ -123,6 +125,14 @@ const Dashboard: React.FC = () => {
       );
     }
   }, [activeMenu.key, activeMenu.label, filteredResources, menuList]);
+
+  if (clusterConnectionOptions.isLoading) {
+    return (
+      <S.Container $paneHeight={height} style={{padding: '16px'}}>
+        <Skeleton />
+      </S.Container>
+    );
+  }
 
   return (
     <S.Container $paneHeight={height}>
