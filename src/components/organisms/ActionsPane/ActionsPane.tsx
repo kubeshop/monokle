@@ -165,6 +165,17 @@ const ActionsPane: React.FC = () => {
     [isKustomization, resourceKindHandler?.formEditorOptions?.editorSchema, schemaForSelectedPath, selectedResource]
   );
 
+  const isGraphViewVisible = useMemo(() => {
+    if (selection?.type !== 'file') {
+      return true;
+    }
+    if (isInClusterMode) {
+      return false;
+    }
+
+    return Object.values(localResourceMetaMap).some(r => r.origin.filePath === selection.filePath);
+  }, [selection, localResourceMetaMap, isInClusterMode]);
+
   const applySelection = useCallback(() => {
     if (selectedHelmValuesId) {
       setIsHelmChartApplyModalVisible(true);
@@ -273,6 +284,10 @@ const ActionsPane: React.FC = () => {
     if (activeEditorTab === 'logs' && selectedResource?.kind !== 'Pod') {
       dispatch(setActiveEditorTab('source'));
     }
+
+    if (!isGraphViewVisible) {
+      dispatch(setActiveEditorTab('source'));
+    }
   }, [
     selectedResource,
     activeEditorTab,
@@ -280,6 +295,7 @@ const ActionsPane: React.FC = () => {
     isKustomization,
     selectedFilePath,
     schemaForSelectedPath,
+    isGraphViewVisible,
     dispatch,
   ]);
 
@@ -292,17 +308,6 @@ const ActionsPane: React.FC = () => {
   useEffect(() => {
     setSchemaForSelectedPath(selectedFilePath ? getSchemaForPath(selectedFilePath, fileMap) : undefined);
   }, [selectedFilePath, fileMap]);
-
-  const isGraphViewVisible = useMemo(() => {
-    if (selection?.type !== 'file') {
-      return true;
-    }
-    if (isInClusterMode) {
-      return false;
-    }
-
-    return Object.values(localResourceMetaMap).some(r => r.origin.filePath === selection.filePath);
-  }, [selection, localResourceMetaMap, isInClusterMode]);
 
   const tabItems = useMemo(
     () => [
