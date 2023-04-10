@@ -13,6 +13,8 @@ import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {joinK8sResourceMap} from '@redux/services/resource';
 import {problemsByResourceSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
+import {useSelectorWithRef} from '@utils/hooks';
+
 import {ResourceGraph} from '@monokle/components';
 import {RuleLevel} from '@monokle/validation';
 
@@ -22,7 +24,7 @@ const ResourceGraphTab: React.FC = () => {
   const selectedResource = useSelectedResource();
   const activeResoureMetaMap = useActiveResourceMetaMap();
   const activeResoureContentMap = useActiveResourceContentMap();
-  const selection = useAppSelector(state => state.main.selection);
+  const [selection, selectionRef] = useSelectorWithRef(state => state.main.selection);
   const localResourceMetaMap = useResourceMetaMap('local');
 
   // TODO: computing this is expensive, but the Graph is from core and it needs the resource map...
@@ -46,20 +48,20 @@ const ResourceGraphTab: React.FC = () => {
 
   const onSelectResource = useCallback(
     (resource: any) => {
-      if (selection?.type !== 'file') {
+      if (selectionRef.current?.type !== 'file') {
         dispatch(selectResource({resourceIdentifier: {id: resource.id, storage: activeStorage}}));
       }
     },
-    [activeStorage, dispatch, selection]
+    [activeStorage, dispatch, selectionRef]
   );
   const onSelectImage = useCallback(
     (imageId: string) => {
-      if (selection?.type !== 'file') {
+      if (selectionRef.current?.type !== 'file') {
         dispatch(setExplorerSelectedSection('images'));
         dispatch(selectImage({imageId}));
       }
     },
-    [dispatch, selection]
+    [dispatch, selectionRef]
   );
 
   const elkWorker = useMemo(() => {
