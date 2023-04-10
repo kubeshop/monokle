@@ -5,6 +5,7 @@ import {sep} from 'path';
 import {updateProjectsGitRepo} from '@redux/appConfig';
 import {setBranchCommits, setChangedFiles, setCommits, setRepo} from '@redux/git';
 import {isFolderGitRepo} from '@redux/git/service';
+import {getGitRemotePath} from '@redux/git/service/getGitRemotePath';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
@@ -36,14 +37,19 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
     watcher.close();
   }
 
-  const result = await promiseFromIpcRenderer('git.getRemotePath', 'git.getRemotePath.result', rootFolderPath);
+  let absolutePath: string;
 
-  if (result.error) {
+  try {
+    absolutePath = await getGitRemotePath({path: rootFolderPath});
+    absolutePath = `${absolutePath.replaceAll('/', sep)}`;
+  } catch (e) {
     showGitErrorModal('Failed to get remote!', 'git rev-parse --show-toplevel', thunkAPI.dispatch);
     return;
   }
 
-  const absolutePath = `${result.replaceAll('/', sep)}${sep}.git`;
+  if (!absolutePath) {
+    return;
+  }
 
   watcher = watch(absolutePath, {persistent: true, usePolling: true, interval: 1000});
 

@@ -20,17 +20,6 @@ export async function getGitRemoteUrl(path: string) {
   }
 }
 
-export async function getRemotePath(localPath: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    const gitFolderPath = await git.revparse({'--show-toplevel': null});
-    return gitFolderPath;
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
 export async function getGitRepoInfo(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 

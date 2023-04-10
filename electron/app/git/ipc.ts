@@ -13,7 +13,6 @@ import {
   getCommitResources,
   getCommitsCount,
   getGitRepoInfo,
-  getRemotePath,
   initGitRepo,
   publishLocalBranch,
   pullChanges,
@@ -132,15 +131,6 @@ ipcMain.on('git.setRemote', async (event, payload: {localPath: string; remoteURL
     event.sender.send('git.setRemote.result', result);
   } catch (e: any) {
     event.sender.send('git.setRemote.result', {error: e.message});
-  }
-});
-
-ipcMain.on('git.getRemotePath', async (event, localPath: string) => {
-  try {
-    const result = await getRemotePath(localPath);
-    event.sender.send('git.getRemotePath.result', result);
-  } catch (e: any) {
-    event.sender.send('git.getRemotePath.result', {error: e.message});
   }
 });
 
