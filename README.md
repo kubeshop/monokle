@@ -87,7 +87,7 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
       <a href="https://github.com/kubeshop/monokle/releases/download/downloads/Monokle-mac-universal.dmg">Download .dmg</a>
     </td>
     <td>
-      <a href="https://github.com/kubeshop/monokle/releases/">Download .appImage</a>
+      <a href="https://github.com/kubeshop/monokle/releases/">Download .rpm/.deb/.appImage </a>
     </td>
   </tr>
 </table>
