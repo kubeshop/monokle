@@ -7,6 +7,7 @@ import {
   activeResourceStorageSelector,
   useActiveResourceContentMap,
   useActiveResourceMetaMap,
+  useResourceMetaMap,
 } from '@redux/selectors/resourceMapSelectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {joinK8sResourceMap} from '@redux/services/resource';
@@ -19,15 +20,24 @@ const ResourceGraphTab: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeStorage = useAppSelector(activeResourceStorageSelector);
   const selectedResource = useSelectedResource();
-  const resources = useMemo(() => (selectedResource ? [selectedResource] : []), [selectedResource]);
   const activeResoureMetaMap = useActiveResourceMetaMap();
   const activeResoureContentMap = useActiveResourceContentMap();
+  const selection = useAppSelector(state => state.main.selection);
+  const localResourceMetaMap = useResourceMetaMap('local');
+
   // TODO: computing this is expensive, but the Graph is from core and it needs the resource map...
   const resourceMap = useMemo(
     () => joinK8sResourceMap(activeResoureMetaMap, activeResoureContentMap),
     [activeResoureMetaMap, activeResoureContentMap]
   );
   const validationState = useValidationSelector(state => state);
+
+  const resources = useMemo(() => {
+    if (selection?.type === 'file') {
+      return Object.values(localResourceMetaMap).filter(r => r.origin.filePath === selection.filePath);
+    }
+    return selectedResource ? [selectedResource] : [];
+  }, [selectedResource, selection, localResourceMetaMap]);
 
   const getProblemsForResource = useCallback(
     (id: string, level: RuleLevel) => problemsByResourceSelector(validationState, id, level),

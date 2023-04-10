@@ -28,6 +28,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openResourceDiffModal, setActiveEditorTab} from '@redux/reducers/main';
 import {setMonacoEditor} from '@redux/reducers/ui';
 import {selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
+import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -101,6 +102,7 @@ const ActionsPane: React.FC = () => {
   const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
   const [schemaForSelectedPath, setSchemaForSelectedPath] = useState<any>();
   const settings = useAppSelector(settingsSelector);
+  const localResourceMetaMap = useResourceMetaMap('local');
 
   const {diffSelectedResource} = useDiff();
   const height = usePaneHeight();
@@ -291,6 +293,17 @@ const ActionsPane: React.FC = () => {
     setSchemaForSelectedPath(selectedFilePath ? getSchemaForPath(selectedFilePath, fileMap) : undefined);
   }, [selectedFilePath, fileMap]);
 
+  const isGraphViewVisible = useMemo(() => {
+    if (selection?.type !== 'file') {
+      return true;
+    }
+    if (isInClusterMode) {
+      return false;
+    }
+
+    return Object.values(localResourceMetaMap).some(r => r.origin.filePath === selection.filePath);
+  }, [selection, localResourceMetaMap, isInClusterMode]);
+
   const tabItems = useMemo(
     () => [
       {
@@ -343,7 +356,16 @@ const ActionsPane: React.FC = () => {
             },
           ]
         : []),
-      {key: 'graph', label: <TabHeader>Graph</TabHeader>, children: <ResourceGraphTab />, style: {height: '100%'}},
+      ...(isGraphViewVisible
+        ? [
+            {
+              key: 'graph',
+              label: <TabHeader>Graph</TabHeader>,
+              children: <ResourceGraphTab />,
+              style: {height: '100%'},
+            },
+          ]
+        : []),
       ...(selectedResourceId && selectedResourceRef.current?.kind === 'Pod' && isInClusterMode
         ? [
             {
@@ -364,6 +386,7 @@ const ActionsPane: React.FC = () => {
         : []),
     ],
     [
+      isGraphViewVisible,
       selectedResourceId,
       activeEditorTab,
       applySelection,
