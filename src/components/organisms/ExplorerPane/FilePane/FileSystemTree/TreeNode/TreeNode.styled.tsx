@@ -55,20 +55,24 @@ export const TitleContainer = styled.div<{$actionButtonsWidth: number; $isHovere
   width: ${({$actionButtonsWidth, $isHovered}) => ($isHovered ? `calc(100% - ${$actionButtonsWidth}px)` : '100%')};
 `;
 
-export const TitleText = styled.span<{$isSelected?: boolean; $isHighlighted?: boolean; $isExcluded?: boolean}>(
-  props => ({
-    overflow: 'hidden',
-    position: 'relative',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    color:
-      (props.$isSelected && Colors.blackPure) ||
-      (props.$isHighlighted && Colors.cyan7) ||
-      (props.$isExcluded && Colors.grey7) ||
-      Colors.blue10,
-    fontStyle: props.$isExcluded ? `italic` : 'inherit',
-  })
-);
+export const TitleText = styled.span<{
+  $isSelected?: boolean;
+  $isHighlighted?: boolean;
+  $isExcluded?: boolean;
+  $isSupported?: boolean;
+}>(props => ({
+  overflow: 'hidden',
+  position: 'relative',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  color:
+    (props.$isSelected && Colors.blackPure) ||
+    (props.$isHighlighted && Colors.cyan7) ||
+    (props.$isExcluded && Colors.grey7) ||
+    (!props.$isSupported && Colors.grey7) ||
+    Colors.blue10,
+  fontStyle: props.$isExcluded ? `italic` : 'inherit',
+}));
 
 export const NodeContainer = styled.div<{$isDisabled: boolean}>`
   position: relative;

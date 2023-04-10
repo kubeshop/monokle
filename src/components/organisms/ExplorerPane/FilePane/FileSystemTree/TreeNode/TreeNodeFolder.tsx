@@ -58,7 +58,7 @@ const TreeNodeFolder: React.FC<Props> = props => {
       onContextMenu={onContextMenu}
     >
       <S.TitleContainer $actionButtonsWidth={actionButtonsWidth} $isHovered={isHovered}>
-        <S.TitleText $isExcluded={folderEntry.isExcluded}>
+        <S.TitleText $isExcluded={folderEntry.isExcluded} $isSupported>
           <Tooltip
             overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
             mouseEnterDelay={TOOLTIP_DELAY}
