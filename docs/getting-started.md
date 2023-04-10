@@ -14,7 +14,7 @@ Download and install the latest version from GitHub below
 
 ### **Linux (since Monokle 1.3.0)**
 
-[**Download**](https://github.com/kubeshop/monokle/releases/latest) the `.appImage`/`.deb` file for your platform.
+[**Download**](https://github.com/kubeshop/monokle/releases/latest) the `.appImage`/`.deb`/`.rpm` file for your platform.
 
 
 ### **Run from Source**
@@ -45,6 +45,6 @@ Check out one of our tutorials to get started:
 
 ## **Get in Touch!**
 
-Have problems? Suggestions? Feature requests? Please join our [Discord Server](https://discord.gg/uNuhy6GDyn) and let us know - or 
-open an issue on [GitHub](https://github.com/kubeshop/monokle/issues/new/choose). 
+Have problems? Suggestions? Feature requests? Please join our [Discord Server](https://discord.gg/uNuhy6GDyn) and let us know - or
+open an issue on [GitHub](https://github.com/kubeshop/monokle/issues/new/choose).
 
