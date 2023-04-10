@@ -81,7 +81,7 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
       setErrorMessage("Couldn't read the schemas for this template form.");
       setIsLoading(false);
     }
-  }, [templateForm]);
+  }, [defaultFormData, templateForm]);
 
   if (isLoading) {
     return <Skeleton active />;
