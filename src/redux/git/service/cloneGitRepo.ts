@@ -13,4 +13,4 @@ import {GitCloneRepoParams} from '@shared/ipc';
  * }
  * ```
  */
-export const cloneGitRepo = invokeIpc<GitCloneRepoParams, boolean>('git:cloneGitRepo');
+export const cloneGitRepo = invokeIpc<GitCloneRepoParams, void>('git:cloneGitRepo');

@@ -8,6 +8,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
 
 import {addGitBranch, setGitLoading} from '@redux/git';
+import {pullChanges} from '@redux/git/service';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
@@ -52,38 +53,45 @@ const BottomActions: React.FC = () => {
 
   const pullPushChangesHandler = useCallback(
     async (type: 'pull' | 'push') => {
-      if (!gitRepo) {
+      if (!gitRepo || !selectedProjectRootFolder) {
         return;
       }
 
       let result: any;
 
       if (type === 'pull') {
-        result = await promiseFromIpcRenderer('git.pullChanges', 'git.pushChanges.result', selectedProjectRootFolder);
-      } else if (type === 'push') {
+        try {
+          await pullChanges({path: selectedProjectRootFolder});
+        } catch (e) {
+          showGitErrorModal('Pull failed', `git pull origin ${gitRepo.currentBranch}`, dispatch);
+          return {error: true};
+        }
+      }
+
+      if (type === 'push') {
         result = await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
           localPath: selectedProjectRootFolder,
           branchName: currentBranch || 'main',
         });
       }
 
-      if (result.error) {
+      if (result?.error) {
         showGitErrorModal(
           `${type === 'pull' ? 'Pull' : 'Push'} failed`,
           `git ${type} origin ${gitRepo.currentBranch}`,
           dispatch
         );
-      } else {
-        dispatch(
-          setAlert({
-            title: `${type === 'pull' ? 'Pulled' : 'Pushed'} changes successfully`,
-            message: '',
-            type: AlertEnum.Success,
-          })
-        );
       }
 
-      return result.error;
+      dispatch(
+        setAlert({
+          title: `${type === 'pull' ? 'Pulled' : 'Pushed'} changes successfully`,
+          message: '',
+          type: AlertEnum.Success,
+        })
+      );
+
+      return result?.error;
     },
     [currentBranch, dispatch, gitRepo, selectedProjectRootFolder]
   );

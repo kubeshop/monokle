@@ -13,4 +13,4 @@ import {GitCheckoutBranchParams} from '@shared/ipc';
  * }
  * ```
  */
-export const checkoutGitBranch = invokeIpc<GitCheckoutBranchParams, boolean>('git:checkoutGitBranch');
+export const checkoutGitBranch = invokeIpc<GitCheckoutBranchParams, void>('git:checkoutGitBranch');
