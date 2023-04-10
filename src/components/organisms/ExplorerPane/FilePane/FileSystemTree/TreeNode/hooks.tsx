@@ -30,7 +30,6 @@ import {useOpenOnGithub} from '@utils/git';
 import {useRefSelector} from '@utils/hooks';
 
 import {isYamlFile} from '@monokle/validation';
-import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AlertEnum} from '@shared/models/alert';
 import {FileEntry} from '@shared/models/fileEntry';
 import {isDefined} from '@shared/utils/filter';
@@ -353,8 +352,6 @@ export const useFileMenuItems = (
   const createNewResource = useCreateResource();
   const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
 
-  const isRoot = useMemo(() => fileEntry?.filePath === ROOT_FILE_ENTRY, [fileEntry]);
-
   const preview = usePreview();
   const duplicate = useDuplicate();
 
@@ -427,7 +424,7 @@ export const useFileMenuItems = (
           : 'Filter on this file',
       disabled: isNonResourceFile,
       onClick: () => {
-        if (isRoot || (fileOrFolderContainedInFilter && fileEntry.filePath === fileOrFolderContainedInFilter)) {
+        if (fileOrFolderContainedInFilter && fileEntry.filePath === fileOrFolderContainedInFilter) {
           onFilterByFileOrFolder(undefined);
         } else {
           onFilterByFileOrFolder(fileEntry.filePath);
@@ -464,7 +461,6 @@ export const useFileMenuItems = (
     preview,
     dispatch,
     createNewResource,
-    isRoot,
     fileOrFolderContainedInFilter,
     onFilterByFileOrFolder,
     duplicate,
@@ -479,8 +475,10 @@ export const useFolderMenuItems = (
 ) => {
   const {deleteEntry, isInClusterMode, isInPreviewMode} = stateArgs;
   const dispatch = useAppDispatch();
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const commonMenuItems = useCommonMenuItems({deleteEntry}, fileEntry);
   const createNewResource = useCreateResource();
+  const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
 
   const menuItems = useMemo(() => {
     const isFolder = isDefined(fileEntry?.children);
@@ -519,10 +517,34 @@ export const useFolderMenuItems = (
       },
     });
 
+    newMenuItems.push({
+      key: 'filter_on_folder',
+      label:
+        fileOrFolderContainedInFilter && fileEntry.filePath === fileOrFolderContainedInFilter
+          ? 'Remove from filter'
+          : 'Filter on this folder',
+      onClick: () => {
+        if (fileOrFolderContainedInFilter && fileEntry.filePath === fileOrFolderContainedInFilter) {
+          onFilterByFileOrFolder(undefined);
+        } else {
+          onFilterByFileOrFolder(fileEntry.filePath);
+        }
+      },
+    });
+
     newMenuItems.push(...commonMenuItems);
 
     return newMenuItems;
-  }, [fileEntry, commonMenuItems, isInClusterMode, isInPreviewMode, createNewResource, dispatch]);
+  }, [
+    fileEntry,
+    isInClusterMode,
+    isInPreviewMode,
+    fileOrFolderContainedInFilter,
+    commonMenuItems,
+    dispatch,
+    createNewResource,
+    onFilterByFileOrFolder,
+  ]);
 
   return menuItems;
 };
