@@ -1,5 +1,7 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
+import {Skeleton} from 'antd';
+
 import navSectionNames from '@constants/navSectionNames';
 
 import {currentKubeContextSelector} from '@redux/appConfig';
@@ -138,20 +140,28 @@ const DashboardPane = () => {
   const getProblemCount = useCallback(
     (kind: string, level: 'error' | 'warning') => {
       return getResources(kind).reduce((total: number, resource: ResourceMeta) => {
-        const problemCount = problems
-          .filter(p => p.level === level)
-          .filter(p =>
+        const problemCount = problems.filter(
+          p =>
+            p.level === level &&
             p.locations.find(
               l =>
                 l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
                 l.physicalLocation.artifactLocation.uri === resource.id
             )
-          );
+        );
         return total + problemCount.length;
       }, 0);
     },
     [getResources, problems]
   );
+
+  if (clusterConnectionOptions.current.isLoading) {
+    return (
+      <S.Container style={{padding: '16px'}}>
+        <Skeleton />
+      </S.Container>
+    );
+  }
 
   return (
     <S.Container>
