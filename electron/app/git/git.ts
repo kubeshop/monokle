@@ -105,19 +105,6 @@ export async function getGitRepoInfo(localPath: string) {
   return gitRepo;
 }
 
-export async function checkoutGitBranch(payload: {localPath: string; branchName: string}) {
-  const {localPath, branchName} = payload;
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    await git.checkout(branchName);
-    trackEvent('git/branch_checkout');
-    return {};
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
 export async function initGitRepo(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 

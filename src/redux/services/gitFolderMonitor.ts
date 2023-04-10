@@ -4,8 +4,7 @@ import {sep} from 'path';
 
 import {updateProjectsGitRepo} from '@redux/appConfig';
 import {setBranchCommits, setChangedFiles, setCommits, setRepo} from '@redux/git';
-import {isFolderGitRepo} from '@redux/git/service';
-import {getGitRemotePath} from '@redux/git/service/getGitRemotePath';
+import {getGitRemotePath, isFolderGitRepo} from '@redux/git/service';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';

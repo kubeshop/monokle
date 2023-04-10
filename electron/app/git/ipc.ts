@@ -3,7 +3,6 @@ import {ipcMain} from 'electron';
 import type {FileMapType} from '@shared/models/appState';
 
 import {
-  checkoutGitBranch,
   commitChanges,
   createLocalBranch,
   deleteLocalBranch,
@@ -28,15 +27,6 @@ ipcMain.on('git.getGitRepoInfo', async (event, localPath: string) => {
     event.sender.send('git.getGitRepoInfo.result', result);
   } catch (e: any) {
     event.sender.send('git.getGitRepoInfo.result', {error: e.message});
-  }
-});
-
-ipcMain.on('git.checkoutGitBranch', async (event, payload: {localPath: string; branchName: string}) => {
-  try {
-    const result = await checkoutGitBranch(payload);
-    event.sender.send('git.checkoutGitBranch.result', result);
-  } catch (e: any) {
-    event.sender.send('git.checkoutGitBranch.result', {error: e.message});
   }
 });
 

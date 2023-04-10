@@ -1,3 +1,4 @@
+export * from './checkoutGitBranch';
 export * from './cloneGitRepo';
 export * from './getGitRemotePath';
 export * from './isFolderGitRepo';

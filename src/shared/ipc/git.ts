@@ -6,3 +6,8 @@ export type GitCloneRepoParams = {
 export type GitPathParams = {
   path: string;
 };
+
+export type GitCheckoutBranchParams = {
+  localPath: string;
+  branchName: string;
+};
