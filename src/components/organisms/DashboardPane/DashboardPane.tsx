@@ -10,13 +10,15 @@ import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 
 import {useSelectorWithRef} from '@utils/hooks';
 
+import EventHandler from '@src/kindhandlers/EventHandler';
+
 import {DashboardMenu} from '@shared/models/dashboard';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 import * as S from './DashboardPane.style';
 import {MenuItem} from './MenuItem';
 
-const ignoredResourceVersions = ['events.k8s.io/v1'];
+const ignoredResourceVersions = [EventHandler.clusterApiVersion];
 
 const DashboardPane = () => {
   const dispatch = useAppDispatch();
