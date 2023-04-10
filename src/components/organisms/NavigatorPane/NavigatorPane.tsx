@@ -74,6 +74,7 @@ const NavPane: React.FC = () => {
                     trigger={['click']}
                     menu={{items: newResourceMenuItems}}
                     overlayClassName="dropdown-secondary"
+                    disabled={!isFolderOpen || isInPreviewMode}
                   >
                     <S.PlusButton
                       id="create-resource-button"

@@ -4,13 +4,8 @@ import {FundProjectionScreenOutlined} from '@ant-design/icons';
 
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
-import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
-
-import {useRefSelector} from '@utils/hooks';
 
 import {DashboardMenu} from '@shared/models/dashboard';
-import {ResourceMeta} from '@shared/models/k8sResource';
 import {trackEvent} from '@shared/utils';
 
 import {CLICKAKBLE_RESOURCE_GROUPS} from '../Dashboard';
@@ -26,60 +21,16 @@ export const MenuItem = ({
   menuItem: DashboardMenu;
   onActiveMenuItem?: Function;
 }) => {
-  const clusterResourceMeta = useResourceMetaMap('cluster');
-  const clusterConnectionOptions = useRefSelector(state => state.main.clusterConnectionOptions);
-  const problems = useValidationSelector(state => problemsSelector(state));
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const dispatch = useAppDispatch();
-  const [counts, setCounts] = useState({resourceCount: 0, errorCount: 0, warningCount: 0});
   const menuItemRef = useRef(null);
   const [isHovered, setIsHovered] = useState<boolean>(false);
-
-  const compareNamespaces = useCallback(
-    (namespace?: string) => {
-      if (clusterConnectionOptions.current.lastNamespaceLoaded === '<all>') {
-        return true;
-      }
-      if (clusterConnectionOptions.current.lastNamespaceLoaded === '<not-namespaced>') {
-        return !namespace;
-      }
-      return clusterConnectionOptions.current.lastNamespaceLoaded === namespace;
-    },
-    [clusterConnectionOptions]
-  );
 
   useEffect(() => {
     if (onActiveMenuItem && activeMenu.key === menuItem.key && menuItemRef && menuItemRef.current) {
       onActiveMenuItem(menuItemRef.current);
     }
   }, [activeMenu, onActiveMenuItem, menuItem.key]);
-
-  const getResources = useCallback(
-    (kind: string) => {
-      return Object.values(clusterResourceMeta).filter(r => r.kind === kind && compareNamespaces(r.namespace));
-    },
-    [clusterResourceMeta, compareNamespaces]
-  );
-
-  const getResourceCount = useCallback((kind: string) => getResources(kind).length, [getResources]);
-
-  const getProblemCount = useCallback(
-    (kind: string, level: 'error' | 'warning') => {
-      return getResources(kind).reduce((total: number, resource: ResourceMeta) => {
-        const problemCount = problems
-          .filter(p => p.level === level)
-          .filter(p =>
-            p.locations.find(
-              l =>
-                l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
-                l.physicalLocation.artifactLocation.uri === resource.id
-            )
-          );
-        return total + problemCount.length;
-      }, 0);
-    },
-    [getResources, problems]
-  );
 
   const setActiveMenu = useCallback(
     (item: DashboardMenu) => {
@@ -89,14 +40,6 @@ export const MenuItem = ({
     },
     [dispatch]
   );
-
-  useEffect(() => {
-    setCounts({
-      resourceCount: getResourceCount(menuItem.label),
-      errorCount: getProblemCount(menuItem.label, 'error'),
-      warningCount: getProblemCount(menuItem.label, 'warning'),
-    });
-  }, [getResourceCount, getProblemCount, menuItem.label]);
 
   if (type === 'parent') {
     return (
@@ -119,7 +62,7 @@ export const MenuItem = ({
     );
   }
 
-  if (type === 'child' && counts.resourceCount) {
+  if (type === 'child' && menuItem.resourceCount) {
     return (
       <S.SubSection
         ref={menuItemRef}
@@ -130,9 +73,9 @@ export const MenuItem = ({
         onClick={() => setActiveMenu(menuItem)}
       >
         <span style={{marginRight: '4px'}}>{menuItem.label}</span>
-        {counts.resourceCount ? <Resource>{counts.resourceCount}</Resource> : null}
-        {counts.errorCount ? <ErrorCell>{counts.errorCount}</ErrorCell> : null}
-        {counts.warningCount ? <Warning style={{marginLeft: '8px'}}>{counts.warningCount}</Warning> : null}
+        {menuItem.resourceCount ? <Resource>{menuItem.resourceCount}</Resource> : null}
+        {menuItem.errorCount ? <ErrorCell>{menuItem.errorCount}</ErrorCell> : null}
+        {menuItem.warningCount ? <Warning style={{marginLeft: '8px'}}>{menuItem.warningCount}</Warning> : null}
       </S.SubSection>
     );
   }
