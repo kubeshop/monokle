@@ -8,7 +8,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
 
 import {addGitBranch, setGitLoading} from '@redux/git';
-import {pullChanges} from '@redux/git/service';
+import {pullChanges, pushChanges} from '@redux/git/service';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
@@ -57,8 +57,6 @@ const BottomActions: React.FC = () => {
         return;
       }
 
-      let result: any;
-
       if (type === 'pull') {
         try {
           await pullChanges({path: selectedProjectRootFolder});
@@ -66,21 +64,13 @@ const BottomActions: React.FC = () => {
           showGitErrorModal('Pull failed', `git pull origin ${gitRepo.currentBranch}`, dispatch);
           return {error: true};
         }
-      }
-
-      if (type === 'push') {
-        result = await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
-          localPath: selectedProjectRootFolder,
-          branchName: currentBranch || 'main',
-        });
-      }
-
-      if (result?.error) {
-        showGitErrorModal(
-          `${type === 'pull' ? 'Pull' : 'Push'} failed`,
-          `git ${type} origin ${gitRepo.currentBranch}`,
-          dispatch
-        );
+      } else if (type === 'push') {
+        try {
+          await pushChanges({localPath: selectedProjectRootFolder, branchName: currentBranch || 'main'});
+        } catch (e) {
+          showGitErrorModal('Push failed', `git push origin ${gitRepo.currentBranch}`, dispatch);
+          return {error: true};
+        }
       }
 
       dispatch(
@@ -90,8 +80,6 @@ const BottomActions: React.FC = () => {
           type: AlertEnum.Success,
         })
       );
-
-      return result?.error;
     },
     [currentBranch, dispatch, gitRepo, selectedProjectRootFolder]
   );
@@ -185,20 +173,25 @@ const BottomActions: React.FC = () => {
     dispatch(setGitLoading(true));
 
     if (gitRepo.commits.behind) {
-      const error = await pullPushChangesHandler('pull');
+      const result = await pullPushChangesHandler('pull');
 
-      if (error) {
+      if (result?.error) {
         dispatch(setGitLoading(false));
         return;
       }
     }
 
     if (gitRepo.commits.ahead) {
-      const error = await pullPushChangesHandler('push');
+      const result = await pullPushChangesHandler('push');
 
-      if (error) {
+      if (result?.error) {
         dispatch(setGitLoading(false));
+        return;
       }
+    }
+
+    if (!gitRepo.commits.ahead && !gitRepo.commits.behind) {
+      dispatch(setGitLoading(false));
     }
   };
 

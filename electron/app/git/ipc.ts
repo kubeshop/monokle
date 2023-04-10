@@ -14,8 +14,6 @@ import {
   getGitRepoInfo,
   initGitRepo,
   publishLocalBranch,
-  pullChanges,
-  pushChanges,
   setRemote,
   stageChangedFiles,
   unstageFiles,
@@ -106,15 +104,6 @@ ipcMain.on('git.publishLocalBranch', async (event, payload: {localPath: string; 
   }
 });
 
-ipcMain.on('git.pushChanges', async (event, payload: {localPath: string; branchName: string}) => {
-  try {
-    const result = await pushChanges(payload.localPath, payload.branchName);
-    event.sender.send('git.pushChanges.result', result);
-  } catch (e: any) {
-    event.sender.send('git.pushChanges.result', {error: e.message});
-  }
-});
-
 ipcMain.on('git.setRemote', async (event, payload: {localPath: string; remoteURL: string}) => {
   try {
     const result = await setRemote(payload.localPath, payload.remoteURL);
@@ -139,15 +128,6 @@ ipcMain.on('git.fetchRepo', async (event, localPath: string) => {
     event.sender.send('git.fetchRepo.result', result);
   } catch (e: any) {
     event.sender.send('git.fetchRepo.result', {error: e.message});
-  }
-});
-
-ipcMain.on('git.pullChanges', async (event, localPath: string) => {
-  try {
-    const result = await pullChanges(localPath);
-    event.sender.send('git.pullChanges.result', result);
-  } catch (e: any) {
-    event.sender.send('git.pullChanges.result', {error: e.message});
   }
 });
 

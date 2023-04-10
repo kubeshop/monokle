@@ -4,6 +4,8 @@ import {useHotkeys} from 'react-hotkeys-hook';
 import {Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
+import {setCommitsCount} from '@redux/git';
+import {getAheadBehindCommitsCount} from '@redux/git/service';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
@@ -36,6 +38,10 @@ const CommitModal: React.FC<IProps> = props => {
   };
 
   const commitHandler = async () => {
+    if (!selectedProjectRootFolder || !currentBranch) {
+      return;
+    }
+
     setCommitLoading(true);
     setLoading(true);
 
@@ -49,6 +55,16 @@ const CommitModal: React.FC<IProps> = props => {
         showGitErrorModal('Commit failed', `git commit -m "${values.message}"`, dispatch);
       } else {
         dispatch(setAlert({title: 'Committed successfully', message: '', type: AlertEnum.Success}));
+
+        try {
+          const {aheadCount, behindCount} = await getAheadBehindCommitsCount({
+            localPath: selectedProjectRootFolder,
+            currentBranch,
+          });
+          dispatch(setCommitsCount({aheadCount, behindCount}));
+        } catch (e) {
+          dispatch(setCommitsCount({aheadCount: 0, behindCount: 0}));
+        }
       }
 
       form.resetFields();

@@ -20,6 +20,22 @@ export async function getGitRemoteUrl(path: string) {
   }
 }
 
+export async function getAheadBehindCommitsCount(localPath: string, currentBranch: string) {
+  const git: SimpleGit = simpleGit({baseDir: localPath});
+
+  try {
+    const [aheadCommits, behindCommits] = (
+      await git.raw('rev-list', '--left-right', '--count', `${currentBranch}...origin/${currentBranch}`)
+    )
+      .trim()
+      .split('\t');
+
+    return {aheadCount: parseInt(aheadCommits, 10), behindCount: parseInt(behindCommits, 10)};
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+}
+
 export async function getGitRepoInfo(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
@@ -90,14 +106,9 @@ export async function getGitRepoInfo(localPath: string) {
   }
 
   try {
-    const [aheadCommits, behindCommits] = (
-      await git.raw('rev-list', '--left-right', '--count', `${gitRepo.currentBranch}...origin/${gitRepo.currentBranch}`)
-    )
-      .trim()
-      .split('\t');
-
-    gitRepo.commits.ahead = parseInt(aheadCommits, 10);
-    gitRepo.commits.behind = parseInt(behindCommits, 10);
+    const {aheadCount, behindCount} = await getAheadBehindCommitsCount(localPath, gitRepo.currentBranch);
+    gitRepo.commits.ahead = aheadCount;
+    gitRepo.commits.behind = behindCount;
   } catch (e) {
     return gitRepo;
   }
@@ -182,7 +193,7 @@ export async function commitChanges(localPath: string, message: string) {
 
   try {
     await git.commit(message);
-    trackEvent('git/commit');
+    await trackEvent('git/commit');
     return {};
   } catch (e: any) {
     return {error: e.message};
@@ -222,18 +233,6 @@ export async function publishLocalBranch(localPath: string, branchName: string) 
   }
 }
 
-export async function pushChanges(localPath: string, branchName: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    await git.push('origin', branchName);
-    trackEvent('git/push');
-    return {};
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
 export async function setRemote(localPath: string, remoteURL: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
@@ -267,17 +266,6 @@ export async function fetchRepo(localPath: string) {
 
   try {
     await git.fetch();
-    return {};
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
-export async function pullChanges(localPath: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    await git.pull();
     return {};
   } catch (e: any) {
     return {error: e.message};
