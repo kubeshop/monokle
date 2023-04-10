@@ -13,13 +13,16 @@ import {ResourceMetaMap} from '@shared/models/k8sResource';
 const debouncedCodeSave = debounce(
   (payload: {
     code: string;
-    resourceMetaMap: ResourceMetaMap;
+    localResourceMetaMap: ResourceMetaMap;
+    activeResourceMetaMap: ResourceMetaMap;
     selectedResourceId: string | undefined;
     selectedPath: string | undefined;
     dispatch: AppDispatch;
   }) => {
-    const {code, resourceMetaMap, selectedPath, selectedResourceId, dispatch} = payload;
-    const resourceMeta = selectedResourceId ? resourceMetaMap[selectedResourceId] : undefined;
+    const {code, activeResourceMetaMap, localResourceMetaMap, selectedPath, selectedResourceId, dispatch} = payload;
+    const resourceMeta = selectedResourceId
+      ? activeResourceMetaMap[selectedResourceId] || localResourceMetaMap[selectedResourceId]
+      : undefined;
 
     // is a file and no resource selected?
     if (selectedPath && !resourceMeta) {
@@ -45,7 +48,8 @@ const debouncedCodeSave = debounce(
 
 function useDebouncedCodeSave(
   originalCodeRef: React.MutableRefObject<string>,
-  resourceMetaMapRef: React.MutableRefObject<ResourceMetaMap>,
+  localResourceMetaMapRef: React.MutableRefObject<ResourceMetaMap>,
+  activeResourceMetaMapRef: React.MutableRefObject<ResourceMetaMap>,
   selectedResourceIdRef: React.MutableRefObject<string | undefined>,
   selectedPathRef: React.MutableRefObject<string | undefined>
 ) {
@@ -54,7 +58,8 @@ function useDebouncedCodeSave(
     (code: string) => {
       const success = debouncedCodeSave({
         code,
-        resourceMetaMap: resourceMetaMapRef.current,
+        localResourceMetaMap: localResourceMetaMapRef.current,
+        activeResourceMetaMap: activeResourceMetaMapRef.current,
         selectedResourceId: selectedResourceIdRef.current,
         selectedPath: selectedPathRef.current,
         dispatch,
@@ -63,7 +68,14 @@ function useDebouncedCodeSave(
         originalCodeRef.current = code;
       }
     },
-    [dispatch, originalCodeRef, resourceMetaMapRef, selectedPathRef, selectedResourceIdRef]
+    [
+      localResourceMetaMapRef,
+      activeResourceMetaMapRef,
+      selectedResourceIdRef,
+      selectedPathRef,
+      dispatch,
+      originalCodeRef,
+    ]
   );
 
   return debouncedSaveContent;

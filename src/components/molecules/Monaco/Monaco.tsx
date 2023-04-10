@@ -247,6 +247,7 @@ const Monaco: React.FC<IProps> = props => {
 
   const debouncedSaveContent = useDebouncedCodeSave(
     originalCodeRef,
+    localResourceMetaMapRef,
     activeResourceMetaMapRef,
     selectedResourceIdRef,
     selectedFilePathRef
