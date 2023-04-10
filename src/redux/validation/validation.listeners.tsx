@@ -82,6 +82,10 @@ const validateListener: AppListenerFn = listen => {
       clearPreview
     ),
     async effect(_action, {dispatch, getState, cancelActiveListeners, signal, delay}) {
+      if (_action.type === 'main/clearPreviewAndSelectionHistory' && _action.payload.revalidate === false) {
+        return;
+      }
+
       cancelActiveListeners();
 
       const validatorsLoading = getState().validation.status === 'loading';
