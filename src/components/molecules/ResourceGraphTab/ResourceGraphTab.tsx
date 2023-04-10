@@ -46,16 +46,20 @@ const ResourceGraphTab: React.FC = () => {
 
   const onSelectResource = useCallback(
     (resource: any) => {
-      dispatch(selectResource({resourceIdentifier: {id: resource.id, storage: activeStorage}}));
+      if (selection?.type !== 'file') {
+        dispatch(selectResource({resourceIdentifier: {id: resource.id, storage: activeStorage}}));
+      }
     },
-    [activeStorage, dispatch]
+    [activeStorage, dispatch, selection]
   );
   const onSelectImage = useCallback(
     (imageId: string) => {
-      dispatch(setExplorerSelectedSection('images'));
-      dispatch(selectImage({imageId}));
+      if (selection?.type !== 'file') {
+        dispatch(setExplorerSelectedSection('images'));
+        dispatch(selectImage({imageId}));
+      }
     },
-    [dispatch]
+    [dispatch, selection]
   );
 
   const elkWorker = useMemo(() => {
