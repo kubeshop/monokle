@@ -3,14 +3,14 @@ import simpleGit from 'simple-git';
 import {GitAheadBehindCommitsCountParams, GitAheadBehindCommitsCountResult} from '@shared/ipc/git';
 
 export async function getAheadBehindCommitsCount({
-  currentBranch,
+  branchName,
   localPath,
 }: GitAheadBehindCommitsCountParams): Promise<GitAheadBehindCommitsCountResult> {
   const git = simpleGit({baseDir: localPath});
 
   try {
     const [aheadCommits, behindCommits] = (
-      await git.raw('rev-list', '--left-right', '--count', `${currentBranch}...origin/${currentBranch}`)
+      await git.raw('rev-list', '--left-right', '--count', `${branchName}...origin/${branchName}`)
     )
       .trim()
       .split('\t');

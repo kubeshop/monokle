@@ -245,22 +245,6 @@ export async function setRemote(localPath: string, remoteURL: string) {
   }
 }
 
-export async function getCommitsCount(localPath: string, branchName: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    const [aheadCommits, behindCommits] = (
-      await git.raw('rev-list', '--left-right', '--count', `${branchName}...origin/${branchName}`)
-    )
-      .trim()
-      .split('\t');
-
-    return {aheadCommits, behindCommits};
-  } catch (e) {
-    return {aheadCommits: 0, behindCommits: 0};
-  }
-}
-
 export async function fetchRepo(localPath: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
@@ -304,19 +288,4 @@ export async function getCommitResources(localPath: string, commitHash: string) 
   }
 
   return filesContent;
-}
-
-export async function getBranchCommits(localPath: string, branchName: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    const commits = [
-      // eslint-disable-next-line no-await-in-loop
-      ...(await git.log({[branchName]: null})).all,
-    ];
-
-    return orderBy(commits, ['date'], ['desc']);
-  } catch (e) {
-    return [];
-  }
 }

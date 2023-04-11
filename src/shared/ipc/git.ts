@@ -14,18 +14,14 @@ export type GitPathParams = {
   path: string;
 };
 
-export type GitAheadBehindCommitsCountParams = {
-  localPath: string;
-  currentBranch: string;
-};
+export type GitAheadBehindCommitsCountParams = LocalPathBranchNameParams;
+export type GitBranchCommitsParams = LocalPathBranchNameParams;
+export type GitCheckoutBranchParams = LocalPathBranchNameParams;
+export type GitPushChangesParams = LocalPathBranchNameParams;
 
 export type GitAheadBehindCommitsCountResult = {
   aheadCount: number;
   behindCount: number;
 };
-
-export type GitCheckoutBranchParams = LocalPathBranchNameParams;
-export type GitPushChangesParams = LocalPathBranchNameParams;
-export type GitBranchCommitsParams = LocalPathBranchNameParams;
 
 export type GitBranchCommitsResult = (DefaultLogFields & ListLogLine)[];

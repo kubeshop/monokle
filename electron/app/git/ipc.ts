@@ -7,10 +7,8 @@ import {
   createLocalBranch,
   deleteLocalBranch,
   fetchRepo,
-  getBranchCommits,
   getChangedFiles,
   getCommitResources,
-  getCommitsCount,
   getGitRepoInfo,
   initGitRepo,
   publishLocalBranch,
@@ -113,15 +111,6 @@ ipcMain.on('git.setRemote', async (event, payload: {localPath: string; remoteURL
   }
 });
 
-ipcMain.on('git.getCommitsCount', async (event, payload: {localPath: string; branchName: string}) => {
-  try {
-    const result = await getCommitsCount(payload.localPath, payload.branchName);
-    event.sender.send('git.getCommitsCount.result', result);
-  } catch (e: any) {
-    event.sender.send('git.getCommitsCount.result', {error: e.message});
-  }
-});
-
 ipcMain.on('git.fetchRepo', async (event, localPath: string) => {
   try {
     const result = await fetchRepo(localPath);
@@ -137,14 +126,5 @@ ipcMain.on('git.getCommitResources', async (event, payload: {localPath: string; 
     event.sender.send('git.getCommitResources.result', result);
   } catch (e: any) {
     event.sender.send('git.getCommitResources.result', {error: e.message});
-  }
-});
-
-ipcMain.on('git.getBranchCommits', async (event, payload: {localPath: string; branchName: string}) => {
-  try {
-    const result = await getBranchCommits(payload.localPath, payload.branchName);
-    event.sender.send('git.getBranchCommits.result', result);
-  } catch (e: any) {
-    event.sender.send('git.getBranchCommits.result', {error: e.message});
   }
 });

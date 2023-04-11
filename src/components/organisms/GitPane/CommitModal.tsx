@@ -59,7 +59,7 @@ const CommitModal: React.FC<IProps> = props => {
         try {
           const {aheadCount, behindCount} = await getAheadBehindCommitsCount({
             localPath: selectedProjectRootFolder,
-            currentBranch,
+            branchName: currentBranch,
           });
           dispatch(setCommitsCount({aheadCount, behindCount}));
         } catch (e) {

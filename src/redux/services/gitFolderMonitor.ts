@@ -3,11 +3,10 @@ import log from 'loglevel';
 import {sep} from 'path';
 
 import {updateProjectsGitRepo} from '@redux/appConfig';
-import {setBranchCommits, setChangedFiles, setCommits, setRepo} from '@redux/git';
-import {getGitRemotePath, isFolderGitRepo} from '@redux/git/service';
+import {setBranchCommits, setChangedFiles, setCommitsCount, setRepo} from '@redux/git';
+import {getAheadBehindCommitsCount, getGitRemotePath, isFolderGitRepo} from '@redux/git/service';
 import {getBranchCommits} from '@redux/git/service/getBranchCommits';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
 
 let watcher: FSWatcher;
@@ -65,14 +64,13 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
       if (path.startsWith(`${absolutePath}${sep}.git${sep}logs${sep}refs`)) {
         const branchName = path.includes('heads') ? gitRepo.currentBranch : `origin/${gitRepo.currentBranch}`;
 
-        promiseFromIpcRenderer('git.getCommitsCount', 'git.getCommitsCount.result', {
-          localPath: rootFolderPath,
-          branchName: gitRepo.currentBranch,
-        }).then(commits => {
-          thunkAPI.dispatch(
-            setCommits({ahead: parseInt(commits.aheadCommits, 10), behind: parseInt(commits.behindCommits, 10)})
-          );
-        });
+        try {
+          getAheadBehindCommitsCount({localPath: rootFolderPath, branchName}).then(({aheadCount, behindCount}) => {
+            thunkAPI.dispatch(setCommitsCount({aheadCount, behindCount}));
+          });
+        } catch (e) {
+          thunkAPI.dispatch(setCommitsCount({aheadCount: 0, behindCount: 0}));
+        }
 
         try {
           getBranchCommits({localPath: rootFolderPath, branchName}).then(commits => {

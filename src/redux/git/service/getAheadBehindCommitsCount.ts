@@ -7,7 +7,7 @@ import {GitAheadBehindCommitsCountParams, GitAheadBehindCommitsCountResult} from
  *
  * ```
  * try {
- *  const {aheadCount, behindCount} = await getAheadBehindCommitsCount({localPath: 'some/local/path', currentBranch: 'currentBranchName'});
+ *  const {aheadCount, behindCount} = await getAheadBehindCommitsCount({localPath: 'some/local/path', branchName: 'some/branch/name'});
  * } catch (err) {
  *   console.log(err);
  * }

@@ -46,13 +46,6 @@ export const gitSlice = createSlice({
       state.changedFiles = action.payload;
     },
 
-    setCommits: (state: Draft<GitSliceState>, action: PayloadAction<{ahead: number; behind: number}>) => {
-      if (state.repo) {
-        state.repo.commits.ahead = action.payload.ahead;
-        state.repo.commits.behind = action.payload.behind;
-      }
-    },
-
     setCurrentBranch: (state: Draft<GitSliceState>, action: PayloadAction<string>) => {
       if (state.repo) {
         state.loading = true;
@@ -112,7 +105,6 @@ export const {
   openGitCloneModal,
   setBranchCommits,
   setChangedFiles,
-  setCommits,
   setCommitsCount,
   setCurrentBranch,
   setGitLoading,
