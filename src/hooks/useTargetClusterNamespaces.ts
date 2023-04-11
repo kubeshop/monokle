@@ -16,7 +16,7 @@ export function useTargetClusterNamespaces(): [string[], Dispatch<SetStateAction
 
   useEffect(() => {
     const setClusterNamespaces = async () => {
-      if (!kubeConfigPath.trim().length) {
+      if (!kubeConfigPath?.trim().length) {
         setNamespaces([]);
         return;
       }

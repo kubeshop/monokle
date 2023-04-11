@@ -71,7 +71,7 @@ export const kubeConfigPathSelector = createSelector(
     (state: RootState) => state.config.projectConfig?.kubeConfig?.path,
     (state: RootState) => state.config.kubeConfig.path,
   ],
-  (projectKubeConfigPath, kubeConfigPath) => projectKubeConfigPath || kubeConfigPath || ''
+  (projectKubeConfigPath, kubeConfigPath) => projectKubeConfigPath ?? kubeConfigPath ?? undefined
 );
 
 export const currentConfigSelector = createDeepEqualSelector(
