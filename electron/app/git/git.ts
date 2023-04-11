@@ -245,17 +245,6 @@ export async function setRemote(localPath: string, remoteURL: string) {
   }
 }
 
-export async function fetchRepo(localPath: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    await git.fetch();
-    return {};
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
 export async function getCommitResources(localPath: string, commitHash: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
   let filesContent: Record<string, string> = {};

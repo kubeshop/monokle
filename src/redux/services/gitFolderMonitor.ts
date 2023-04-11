@@ -4,8 +4,7 @@ import {sep} from 'path';
 
 import {updateProjectsGitRepo} from '@redux/appConfig';
 import {setBranchCommits, setChangedFiles, setCommitsCount, setRepo} from '@redux/git';
-import {getAheadBehindCommitsCount, getGitRemotePath, isFolderGitRepo} from '@redux/git/service';
-import {getBranchCommits} from '@redux/git/service/getBranchCommits';
+import {getAheadBehindCommitsCount, getBranchCommits, getGitRemotePath, isFolderGitRepo} from '@redux/git/service';
 
 import {showGitErrorModal} from '@utils/terminal';
 

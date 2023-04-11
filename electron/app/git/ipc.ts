@@ -6,7 +6,6 @@ import {
   commitChanges,
   createLocalBranch,
   deleteLocalBranch,
-  fetchRepo,
   getChangedFiles,
   getCommitResources,
   getGitRepoInfo,
@@ -108,15 +107,6 @@ ipcMain.on('git.setRemote', async (event, payload: {localPath: string; remoteURL
     event.sender.send('git.setRemote.result', result);
   } catch (e: any) {
     event.sender.send('git.setRemote.result', {error: e.message});
-  }
-});
-
-ipcMain.on('git.fetchRepo', async (event, localPath: string) => {
-  try {
-    const result = await fetchRepo(localPath);
-    event.sender.send('git.fetchRepo.result', result);
-  } catch (e: any) {
-    event.sender.send('git.fetchRepo.result', {error: e.message});
   }
 });
 

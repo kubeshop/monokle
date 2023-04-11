@@ -8,7 +8,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
 
 import {addGitBranch, setGitLoading} from '@redux/git';
-import {pullChanges, pushChanges} from '@redux/git/service';
+import {fetchRepo, pullChanges, pushChanges} from '@redux/git/service';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
@@ -138,9 +138,19 @@ const BottomActions: React.FC = () => {
         key: 'fetch',
         label: 'Fetch',
         onClick: async () => {
+          if (!selectedProjectRootFolder) {
+            return;
+          }
+
           dispatch(setGitLoading(true));
-          await promiseFromIpcRenderer('git.fetchRepo', 'git.fetchRepo.result', selectedProjectRootFolder);
-          dispatch(setAlert({title: 'Repository fetched successfully', message: '', type: AlertEnum.Success}));
+
+          try {
+            await fetchRepo({path: selectedProjectRootFolder});
+            dispatch(setAlert({title: 'Repository fetched successfully', message: '', type: AlertEnum.Success}));
+          } catch (e) {
+            showGitErrorModal('Fetch failed', `git fetch`, dispatch);
+            dispatch(setGitLoading(false));
+          }
         },
       },
       {

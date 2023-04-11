@@ -1,5 +1,6 @@
 export * from './checkoutGitBranch';
 export * from './cloneGitRepo';
+export * from './fetchRepo';
 export * from './getAheadBehindCommitsCount';
 export * from './getBranchCommits';
 export * from './getGitRemotePath';
