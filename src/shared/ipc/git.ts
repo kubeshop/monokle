@@ -1,3 +1,10 @@
+import {DefaultLogFields, ListLogLine} from 'simple-git';
+
+type LocalPathBranchNameParams = {
+  localPath: string;
+  branchName: string;
+};
+
 export type GitCloneRepoParams = {
   localPath: string;
   repoPath: string;
@@ -5,16 +12,6 @@ export type GitCloneRepoParams = {
 
 export type GitPathParams = {
   path: string;
-};
-
-export type GitCheckoutBranchParams = {
-  localPath: string;
-  branchName: string;
-};
-
-export type GitPushChangesParams = {
-  localPath: string;
-  branchName: string;
 };
 
 export type GitAheadBehindCommitsCountParams = {
@@ -26,3 +23,9 @@ export type GitAheadBehindCommitsCountResult = {
   aheadCount: number;
   behindCount: number;
 };
+
+export type GitCheckoutBranchParams = LocalPathBranchNameParams;
+export type GitPushChangesParams = LocalPathBranchNameParams;
+export type GitBranchCommitsParams = LocalPathBranchNameParams;
+
+export type GitBranchCommitsResult = (DefaultLogFields & ListLogLine)[];

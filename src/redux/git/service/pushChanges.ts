@@ -1,6 +1,6 @@
 import {invokeIpc} from '@utils/ipc';
 
-import {GitPushChangesParams} from '@shared/ipc';
+import {GitPushChangesParams} from '@shared/ipc/git';
 
 /**
  * Example usage:

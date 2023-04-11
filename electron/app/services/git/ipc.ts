@@ -3,6 +3,7 @@ import {
   checkoutGitBranch,
   cloneGitRepo,
   getAheadBehindCommitsCount,
+  getBranchCommits,
   getGitRemotePath,
   isFolderGitRepo,
   isGitInstalled,
@@ -13,6 +14,7 @@ import {
 handleIpc('git:checkoutGitBranch', checkoutGitBranch);
 handleIpc('git:cloneGitRepo', cloneGitRepo);
 handleIpc('git:getAheadBehindCommitsCount', getAheadBehindCommitsCount);
+handleIpc('git:getBranchCommits', getBranchCommits);
 handleIpc('git:getGitRemotePath', getGitRemotePath);
 handleIpc('git:isFolderGitRepo', isFolderGitRepo);
 handleIpc('git:isGitInstalled', isGitInstalled);

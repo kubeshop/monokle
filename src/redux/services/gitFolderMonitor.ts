@@ -5,6 +5,7 @@ import {sep} from 'path';
 import {updateProjectsGitRepo} from '@redux/appConfig';
 import {setBranchCommits, setChangedFiles, setCommits, setRepo} from '@redux/git';
 import {getGitRemotePath, isFolderGitRepo} from '@redux/git/service';
+import {getBranchCommits} from '@redux/git/service/getBranchCommits';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
@@ -61,7 +62,7 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
       }
 
       // commit was made/undoed or push was made
-      if (path.startsWith(`${absolutePath}${sep}logs${sep}refs`)) {
+      if (path.startsWith(`${absolutePath}${sep}.git${sep}logs${sep}refs`)) {
         const branchName = path.includes('heads') ? gitRepo.currentBranch : `origin/${gitRepo.currentBranch}`;
 
         promiseFromIpcRenderer('git.getCommitsCount', 'git.getCommitsCount.result', {
@@ -73,12 +74,13 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
           );
         });
 
-        promiseFromIpcRenderer('git.getBranchCommits', 'git.getBranchCommits.result', {
-          localPath: rootFolderPath,
-          branchName,
-        }).then(commits => {
-          thunkAPI.dispatch(setBranchCommits({branchName, commits}));
-        });
+        try {
+          getBranchCommits({localPath: rootFolderPath, branchName}).then(commits => {
+            thunkAPI.dispatch(setBranchCommits({branchName, commits}));
+          });
+        } catch (e) {
+          thunkAPI.dispatch(setBranchCommits({branchName, commits: []}));
+        }
       }
     })
     .on('unlinkDir', () => {

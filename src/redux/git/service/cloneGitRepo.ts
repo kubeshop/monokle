@@ -1,6 +1,6 @@
 import {invokeIpc} from '@utils/ipc';
 
-import {GitCloneRepoParams} from '@shared/ipc';
+import {GitCloneRepoParams} from '@shared/ipc/git';
 
 /**
  * Example usage:

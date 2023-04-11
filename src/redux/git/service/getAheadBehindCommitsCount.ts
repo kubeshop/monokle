@@ -1,6 +1,6 @@
 import {invokeIpc} from '@utils/ipc';
 
-import {GitAheadBehindCommitsCountParams, GitAheadBehindCommitsCountResult} from '@shared/ipc';
+import {GitAheadBehindCommitsCountParams, GitAheadBehindCommitsCountResult} from '@shared/ipc/git';
 
 /**
  * Example usage:
