@@ -5,14 +5,12 @@ import type {FileMapType} from '@shared/models/appState';
 import {
   commitChanges,
   createLocalBranch,
-  deleteLocalBranch,
   getChangedFiles,
   getCommitResources,
   getGitRepoInfo,
   initGitRepo,
   publishLocalBranch,
   setRemote,
-  unstageFiles,
 } from './git';
 
 ipcMain.on('git.getGitRepoInfo', async (event, localPath: string) => {
@@ -42,32 +40,12 @@ ipcMain.on('git.getChangedFiles', async (event, payload: {localPath: string; fil
   }
 });
 
-ipcMain.on('git.unstageFiles', async (event, payload: {localPath: string; filePaths: string[]}) => {
-  const {filePaths, localPath} = payload;
-
-  try {
-    const result = await unstageFiles(localPath, filePaths);
-    event.sender.send('git.unstageFiles.result', result);
-  } catch (e: any) {
-    event.sender.send('git.unstageFiles.result', {error: e.message});
-  }
-});
-
 ipcMain.on('git.commitChanges', async (event, payload: {localPath: string; message: string}) => {
   try {
     const result = await commitChanges(payload.localPath, payload.message);
     event.sender.send('git.commitChanges.result', result);
   } catch (e: any) {
     event.sender.send('git.commitChanges.result', {error: e.message});
-  }
-});
-
-ipcMain.on('git.deleteLocalBranch', async (event, payload: {localPath: string; branchName: string}) => {
-  try {
-    const result = await deleteLocalBranch(payload.localPath, payload.branchName);
-    event.sender.send('git.deleteLocalBranch.result', result);
-  } catch (e: any) {
-    event.sender.send('git.deleteLocalBranch.result', {error: e.message});
   }
 });
 

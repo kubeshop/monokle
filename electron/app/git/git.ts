@@ -162,38 +162,12 @@ export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
   }
 }
 
-export async function unstageFiles(localPath: string, filePaths: string[]) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  const unstageProperties = filePaths.reduce((prev, current) => {
-    return {...prev, [current]: null};
-  }, {} as any);
-
-  try {
-    await git.reset({'-q': null, HEAD: null, '--': null, ...unstageProperties});
-    return {};
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
 export async function commitChanges(localPath: string, message: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
   try {
     await git.commit(message);
     await trackEvent('git/commit');
-    return {};
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
-export async function deleteLocalBranch(localPath: string, branchName: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    await git.deleteLocalBranch(branchName);
     return {};
   } catch (e: any) {
     return {error: e.message};

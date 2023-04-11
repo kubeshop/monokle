@@ -2,6 +2,7 @@ import {handleIpc} from '../../utils/ipc';
 import {
   checkoutGitBranch,
   cloneGitRepo,
+  deleteLocalBranch,
   fetchRepo,
   getAheadBehindCommitsCount,
   getBranchCommits,
@@ -16,6 +17,7 @@ import {
 
 handleIpc('git:checkoutGitBranch', checkoutGitBranch);
 handleIpc('git:cloneGitRepo', cloneGitRepo);
+handleIpc('git:deleteLocalBranch', deleteLocalBranch);
 handleIpc('git:fetchRepo', fetchRepo);
 handleIpc('git:getAheadBehindCommitsCount', getAheadBehindCommitsCount);
 handleIpc('git:getBranchCommits', getBranchCommits);
