@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
 import {Checkbox, Form, Input, Modal, Select, TreeSelect} from 'antd';
@@ -688,4 +688,4 @@ const NewResourceWizard = () => {
   );
 };
 
-export default NewResourceWizard;
+export default memo(NewResourceWizard);
