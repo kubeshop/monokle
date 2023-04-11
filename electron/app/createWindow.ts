@@ -87,6 +87,8 @@ export const createWindow = (givenPath?: string) => {
 
   // Hot Reloading
   if (isDev) {
+    win.webContents.setVisualZoomLevelLimits(1, 5);
+
     // eslint-disable-next-line global-require
     require('electron-reload')(__dirname, {
       electron: path.join(
@@ -99,7 +101,7 @@ export const createWindow = (givenPath?: string) => {
         `electron${process.platform === 'win32' ? '.cmd' : ''}`
       ),
       forceHardReset: true,
-      hardResetMethod: 'exit',
+      hardResetMethod: 'quit',
     });
   }
 
