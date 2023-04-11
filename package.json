@@ -160,7 +160,7 @@
     "redux-logger": "3.0.6",
     "redux-thunk": "2.4.2",
     "reselect": "4.1.7",
-    "rooks": "7.6.1",
+    "rooks": "7.8.4",
     "runtypes": "6.6.0",
     "semver": "7.3.8",
     "simple-git": "3.16.1",
