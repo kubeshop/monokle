@@ -503,8 +503,6 @@ const NewResourceWizard = () => {
     [setGenerateRandom]
   );
 
-  console.log('render');
-
   return (
     <Modal
       title="Create Resource"

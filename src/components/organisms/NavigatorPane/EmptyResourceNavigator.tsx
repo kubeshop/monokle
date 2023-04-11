@@ -43,15 +43,13 @@ function EmptyResourceNavigator() {
   const handleClick = (itemToHighlight: string) => {
     dispatch(highlightItem(itemToHighlight));
 
-    setTimeout(() => {
-      if (itemToHighlight === HighlightItems.BROWSE_TEMPLATES) {
-        dispatch(openTemplateExplorer());
-      } else if (itemToHighlight === HighlightItems.CREATE_RESOURCE) {
-        dispatch(openNewResourceWizard());
-      } else if (itemToHighlight === HighlightItems.CONNECT_TO_CLUSTER) {
-        dispatch(startClusterConnection({context: kubeConfigContext, namespace: lastNamespaceLoaded || 'default'}));
-      }
-    }, 1000);
+    if (itemToHighlight === HighlightItems.BROWSE_TEMPLATES) {
+      dispatch(openTemplateExplorer());
+    } else if (itemToHighlight === HighlightItems.CREATE_RESOURCE) {
+      dispatch(openNewResourceWizard());
+    } else if (itemToHighlight === HighlightItems.CONNECT_TO_CLUSTER) {
+      dispatch(startClusterConnection({context: kubeConfigContext, namespace: lastNamespaceLoaded || 'default'}));
+    }
 
     setTimeout(() => {
       dispatch(highlightItem(null));
