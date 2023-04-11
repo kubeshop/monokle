@@ -16,14 +16,11 @@ const WelcomeModal = () => {
   };
 
   return (
-    <Modal open centered width={400} onCancel={handleClose} footer="" wrapClassName="welcome-modal">
+    <Modal open centered width={500} onCancel={handleClose} footer="" wrapClassName="welcome-modal">
       <S.Container>
         <S.Image src={WelcomeImage} />
         <S.Title>Welcome!</S.Title>
         <S.Content>
-          {/* <b>Click on Learn</b> to take a quick ride through Monokle&rsquo;s main features.{' '}
-          <Link onClick={() => dispatch(closeWelcomePopup())}>Dismiss this</Link> if you feel confident enough - you can
-          come back here any time! */}
           <p>
             Check out the{' '}
             <Link
@@ -51,7 +48,9 @@ const WelcomeModal = () => {
             </Link>
             .
           </p>
-          <p>Ready to create your first project?</p>
+          <p>
+            <b>Ready to create your first project?</b>
+          </p>
           <Button
             type="primary"
             onClick={() => {

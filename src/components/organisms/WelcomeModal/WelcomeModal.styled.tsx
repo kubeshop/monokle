@@ -15,6 +15,8 @@ export const CloseOutlined = styled(RawCloseOutlined)`
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  padding: 28px 58px;
 `;
 
 export const Content = styled.div`
@@ -23,8 +25,8 @@ export const Content = styled.div`
 `;
 
 export const Image = styled.img`
-  width: 330;
-  max-width: 330;
+  width: 330px;
+  max-width: 330px;
   margin: 15px auto 20px auto;
 `;
 
