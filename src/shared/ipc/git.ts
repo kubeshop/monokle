@@ -22,8 +22,8 @@ export type GitStageUnstageFilesParams = {
 export type GitAheadBehindCommitsCountParams = LocalPathBranchNameParams;
 export type GitBranchCommitsParams = LocalPathBranchNameParams;
 export type GitCheckoutBranchParams = LocalPathBranchNameParams;
+export type GitCreateDeleteLocalBranchParams = LocalPathBranchNameParams;
 export type GitPushChangesParams = LocalPathBranchNameParams;
-export type GitDeleteLocalBranchParams = LocalPathBranchNameParams;
 
 export type GitAheadBehindCommitsCountResult = {
   aheadCount: number;

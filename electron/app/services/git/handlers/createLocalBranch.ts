@@ -2,11 +2,11 @@ import simpleGit from 'simple-git';
 
 import {GitCreateDeleteLocalBranchParams} from '@shared/ipc/git';
 
-export async function deleteLocalBranch({branchName, localPath}: GitCreateDeleteLocalBranchParams): Promise<void> {
+export async function createLocalBranch({branchName, localPath}: GitCreateDeleteLocalBranchParams): Promise<void> {
   const git = simpleGit({baseDir: localPath});
 
   try {
-    await git.deleteLocalBranch(branchName);
+    await git.checkoutLocalBranch(branchName);
   } catch (e: any) {
     throw new Error(e.message);
   }

@@ -7,10 +7,10 @@ import {GitCreateDeleteLocalBranchParams} from '@shared/ipc/git';
  *
  * ```
  * try {
- *   await deleteLocalBranch({localPath: 'some/path', branchName: 'some/branch/name'});
+ *   await createLocalBranch({localPath: 'some/path', branchName: 'some/branch/name'});
  * } catch (err) {
  *   console.log(err);
  * }
  * ```
  */
-export const deleteLocalBranch = invokeIpc<GitCreateDeleteLocalBranchParams, void>('git:deleteLocalBranch');
+export const createLocalBranch = invokeIpc<GitCreateDeleteLocalBranchParams, void>('git:createLocalBranch');
