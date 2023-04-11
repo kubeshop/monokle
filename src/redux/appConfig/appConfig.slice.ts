@@ -20,7 +20,6 @@ import {
 } from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
 
@@ -43,11 +42,9 @@ import {
 import {UiState} from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
 import {isEqual} from '@shared/utils/isEqual';
-import {createKubeClient, getKubeAccess} from '@shared/utils/kubeclient';
 
 import initialState from '../initialState';
 import {setLeftMenuSelection, toggleStartProjectPane} from '../reducers/ui';
-import {kubeConfigPathSelector} from './appConfig.selectors';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
   const isGitRepo = await promiseFromIpcRenderer(
@@ -118,40 +115,6 @@ export const toggleEventTracking = createAsyncThunk(
     thunkAPI.dispatch(setEventTracking(disableEventTracking));
     electronStore.set('appConfig.disableEventTracking', disableEventTracking);
     ipcRenderer.invoke('analytics:toggleTracking', {disableEventTracking});
-  }
-);
-
-export const updateClusterNamespaces = createAsyncThunk(
-  'config/updateClusterNamespaces',
-  async (values: {namespace: string; cluster: string}[], thunkAPI: any) => {
-    thunkAPI.dispatch(configSlice.actions.setAccessLoading(true));
-
-    let accesses: ClusterAccess[] = thunkAPI.getState().config.clusterAccess;
-    const newNamespaces = values.filter(
-      v => accesses.findIndex(a => v.cluster === a.context && v.namespace === a.namespace) === -1
-    );
-    const removedNamespaces = accesses
-      .filter(a => values.findIndex(v => a.context === v.cluster) > -1)
-      .filter(a => values.findIndex(v => a.namespace === v.namespace) === -1);
-    accesses = accesses.filter(a => a.context !== values[0].cluster);
-
-    newNamespaces.forEach(({namespace, cluster}) => {
-      const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
-      const kubeClient = createKubeClient(kubeConfigPath, cluster);
-      createNamespace(kubeClient, namespace);
-    });
-
-    removedNamespaces.forEach(({namespace, context}) => {
-      const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
-      removeNamespaceFromCluster(namespace, kubeConfigPath, context);
-    });
-
-    const results: ClusterAccess[] = await Promise.all(
-      values.map(value => getKubeAccess(value.namespace, value.cluster))
-    );
-
-    thunkAPI.dispatch(configSlice.actions.updateClusterAccess([...accesses, ...results]));
-    thunkAPI.dispatch(configSlice.actions.setAccessLoading(false));
   }
 );
 
@@ -604,7 +567,7 @@ export const {
   setAutoZoom,
   setCurrentContext,
   setFilterObjects,
-  setKubeConfig,
+  setKubeConfig, // bookmark
   setKubeConfigContextColor,
   setUserDirs,
   toggleEditorPlaceholderVisiblity,
@@ -621,8 +584,8 @@ export const {
   updateNewVersion,
   updateProjectConfig,
   updateProjectK8sVersion,
-  updateProjectKubeConfig,
-  loadProjectKubeConfig,
+  updateProjectKubeConfig, // bookmark
+  loadProjectKubeConfig, // bookmark
   updateProjectsGitRepo,
   updateScanExcludes,
   updateTelemetry,
