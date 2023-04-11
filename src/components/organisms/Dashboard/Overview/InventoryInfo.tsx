@@ -5,7 +5,6 @@ import {CLUSTER_DASHBOARD_HELP_URL} from '@constants/constants';
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch} from '@redux/hooks';
 import {useResourceContentMap} from '@redux/selectors/resourceMapSelectors';
-import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
@@ -99,10 +98,6 @@ export const InventoryInfo = () => {
       </S.NodesInformation>
       <S.HorizontalLine />
       <S.ClusterInfoContainer>
-        <S.ClusterInfoRow>
-          <S.Title>Cluster API address</S.Title>
-          <S.Description>{new KubeConfigManager().getV1ApiClient()?.basePath || '-'}</S.Description>
-        </S.ClusterInfoRow>
         <S.ClusterInfoRow>
           <S.Title>Kubernetes Version</S.Title>
           <S.Description>{getNodes()[0]?.object?.status?.nodeInfo?.kubeletVersion || '-'}</S.Description>
