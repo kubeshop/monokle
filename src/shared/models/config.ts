@@ -1,3 +1,5 @@
+import {Cluster, Context, User} from '@kubernetes/client-node';
+
 import {ClusterColors} from './cluster';
 import {KustomizeCommandType} from './kustomize';
 
@@ -98,9 +100,38 @@ type HelmPreviewConfiguration = {
 
 type KubeConfig = {
   path?: string; // It can be `undefined` until refactor
+
+  /**
+   * @deprecated
+   */
   isPathValid?: boolean; // It can be `undefined` until refactor
+
+  /**
+   * @deprecated
+   */
   contexts?: Array<KubeConfigContext>;
+
+  /**
+   * @deprecated
+   */
   currentContext?: string;
+};
+
+export type ModernKubeConfig = InvalidKubeConfig | ValidKubeConfig;
+
+type ValidKubeConfig = {
+  isValid: true;
+  path: string;
+  currentContext: string;
+  contexts: Context[];
+  clusters: Cluster[];
+  users: User[];
+};
+
+type InvalidKubeConfig = {
+  isValid: false;
+  path: string;
+  reason: string; // either not_found or malformed
 };
 
 // Parsed from kubernetes config file

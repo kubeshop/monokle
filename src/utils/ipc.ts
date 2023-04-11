@@ -14,9 +14,9 @@ export function getChannelName(name: string, hasAutomationFlag = StartupFlag.get
 }
 
 export function invokeIpc<Params, Result>(channel: string) {
-  return async (params: Params): Promise<Result> => {
+  return async (...params: Params extends undefined ? [undefined?] : [Params]): Promise<Result> => {
     try {
-      const result: IpcResult = await ipcRenderer.invoke(channel, params);
+      const result: IpcResult = await ipcRenderer.invoke(channel, params[0]);
       if (!result.success) throw new Error(result.reason);
       return result.payload;
     } catch (err) {

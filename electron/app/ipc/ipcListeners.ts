@@ -46,6 +46,7 @@ import {
 } from '../commands';
 import {killKubectlProxyProcess, startKubectlProxyProcess} from '../kubectl';
 import {ProjectNameChange, StorePropagation} from '../models';
+import '../services/cluster/ipc';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
   downloadTemplate,

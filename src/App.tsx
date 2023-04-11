@@ -8,6 +8,7 @@ import log from 'loglevel';
 import path from 'path';
 
 import {activeProjectSelector, setCreateProject, setLoadingProject, setOpenProject} from '@redux/appConfig';
+import {startWatchingKubeconfig} from '@redux/cluster/listeners/kubeconfig';
 import {setIsGitInstalled} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -85,6 +86,10 @@ const App = () => {
   useEffect(() => {
     ipcRenderer.invoke('kubeService:start');
   }, []);
+
+  useEffect(() => {
+    dispatch(startWatchingKubeconfig());
+  }, [dispatch]);
 
   useEffect(() => {
     ipcRenderer.on('executed-from', onExecutedFrom);

@@ -2,13 +2,23 @@ import {ipcMain} from 'electron';
 
 import {IpcResult} from '@shared/ipc';
 
-export async function handleIpc<Params, Result>(channel: string, handler: (params: Params) => Result) {
-  ipcMain.handle(channel, async (_, params: Params): Promise<IpcResult> => {
+export type RendererMetadata = {
+  rendererId: number;
+};
+
+export async function handleIpc<Params, Result>(
+  channel: string,
+  handler: (params: Params, metadata: RendererMetadata) => Result,
+  debug = false
+) {
+  ipcMain.handle(channel, async (event, params: Params): Promise<IpcResult> => {
     try {
-      const payload = await handler(params);
+      event.processId;
+      const payload = await handler(params, {rendererId: event.processId});
       return {success: true, payload};
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'error_unknown';
+      if (debug) console.error('ipc_failed', msg);
       return {success: false, reason: msg};
     }
   });
