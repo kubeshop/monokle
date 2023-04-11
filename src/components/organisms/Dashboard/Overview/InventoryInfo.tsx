@@ -1,5 +1,7 @@
 import {useCallback} from 'react';
 
+import {CLUSTER_DASHBOARD_HELP_URL} from '@constants/constants';
+
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch} from '@redux/hooks';
 import {useResourceContentMap} from '@redux/selectors/resourceMapSelectors';
@@ -13,6 +15,7 @@ import PodHandler from '@src/kindhandlers/Pod.handler';
 import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {openDocumentation, openUrlInExternalBrowser} from '@shared/utils';
 
 import * as S from './InventoryInfo.styled';
 
@@ -111,9 +114,13 @@ export const InventoryInfo = () => {
       </S.ClusterInfoContainer>
       <S.HorizontalLine />
       <S.UsefulLinksContainer>
-        <S.Title>Useful links</S.Title>
-        <S.Link>Getting started</S.Link>
-        <S.Link>Documentation</S.Link>
+        <S.Title>Documentation links</S.Title>
+        <S.Link>
+          <span onClick={() => openUrlInExternalBrowser(CLUSTER_DASHBOARD_HELP_URL)}>Cluster Dashboard</span>
+        </S.Link>
+        <S.Link>
+          <span onClick={() => openDocumentation()}>Monokle Getting Started</span>
+        </S.Link>
       </S.UsefulLinksContainer>
     </S.Container>
   );

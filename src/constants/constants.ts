@@ -74,3 +74,5 @@ export const ADDITIONAL_SUPPORTED_FILES = [
   '.env.production',
   '.env.development',
 ];
+
+export const CLUSTER_DASHBOARD_HELP_URL: string = 'https://kubeshop.github.io/monokle/cluster-mode';
