@@ -28,6 +28,7 @@ export type GitAheadBehindCommitsCountParams = LocalPathBranchNameParams;
 export type GitBranchCommitsParams = LocalPathBranchNameParams;
 export type GitCheckoutBranchParams = LocalPathBranchNameParams;
 export type GitCreateDeleteLocalBranchParams = LocalPathBranchNameParams;
+export type GitPublishLocalBranchParams = LocalPathBranchNameParams;
 export type GitPushChangesParams = LocalPathBranchNameParams;
 
 export type GitAheadBehindCommitsCountResult = {

@@ -161,17 +161,6 @@ export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
   }
 }
 
-export async function publishLocalBranch(localPath: string, branchName: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    await git.push({'-u': null, origin: null, [branchName]: null});
-    return {};
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
 export async function setRemote(localPath: string, remoteURL: string) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 

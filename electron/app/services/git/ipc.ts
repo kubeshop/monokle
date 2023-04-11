@@ -11,6 +11,7 @@ import {
   getGitRemotePath,
   isFolderGitRepo,
   isGitInstalled,
+  publishLocalBranch,
   pullChanges,
   pushChanges,
   stageChangedFiles,
@@ -28,6 +29,7 @@ handleIpc('git:getBranchCommits', getBranchCommits);
 handleIpc('git:getGitRemotePath', getGitRemotePath);
 handleIpc('git:isFolderGitRepo', isFolderGitRepo);
 handleIpc('git:isGitInstalled', isGitInstalled);
+handleIpc('git:publishLocalBranch', publishLocalBranch);
 handleIpc('git:pullChanges', pullChanges);
 handleIpc('git:pushChanges', pushChanges);
 handleIpc('git:stageChangedFiles', stageChangedFiles);
