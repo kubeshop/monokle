@@ -127,12 +127,12 @@ export const setRootFolder = createAsyncThunk<
         thunkAPI.dispatch(setGitLoading(false));
 
         if (repo.remoteRepo.authRequired) {
-          showGitErrorModal('Authentication failed', `git remote show origin`, thunkAPI.dispatch);
+          showGitErrorModal('Authentication failed', undefined, `git remote show origin`, thunkAPI.dispatch);
         }
       })
       .catch(err => {
         log.error(err.message);
-        showGitErrorModal(err.message);
+        showGitErrorModal('Git error', err.message);
         thunkAPI.dispatch(setGitLoading(false));
       });
   }

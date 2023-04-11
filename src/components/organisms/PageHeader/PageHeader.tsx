@@ -19,6 +19,7 @@ import {
   updateProjectsGitRepo,
 } from '@redux/appConfig';
 import {setCurrentBranch, setRepo} from '@redux/git';
+import {initGitRepo} from '@redux/git/service';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setIsInQuickClusterMode, setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
@@ -113,7 +114,7 @@ const PageHeader = () => {
     shell.openExternal(url);
   }, [autosavingError]);
 
-  const initGitRepo = async () => {
+  const initGitRepoHandler = async () => {
     if (!projectRootFolder) {
       return;
     }
@@ -121,10 +122,10 @@ const PageHeader = () => {
     trackEvent('git/initialize');
     setIsInitializingGitRepo(true);
 
-    const result = await promiseFromIpcRenderer('git.initGitRepo', 'git.initGitRepo.result', projectRootFolder);
-
-    if (result.error) {
-      showGitErrorModal('Failed to initialize git repo');
+    try {
+      await initGitRepo({path: projectRootFolder});
+    } catch (e: any) {
+      showGitErrorModal('Failed to initialize git repo', e.message);
       setIsInitializingGitRepo(false);
       return;
     }
@@ -228,7 +229,7 @@ const PageHeader = () => {
                     loading={isInitializingGitRepo || gitLoading}
                     type="primary"
                     size="small"
-                    onClick={initGitRepo}
+                    onClick={initGitRepoHandler}
                   >
                     Initialize Git
                   </S.InitButton>

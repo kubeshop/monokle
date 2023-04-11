@@ -50,7 +50,7 @@ const CommitModal: React.FC<IProps> = props => {
         dispatch(setAlert({title: 'Committed successfully', message: '', type: AlertEnum.Success}));
         form.resetFields();
       } catch (e) {
-        showGitErrorModal('Commit failed', `git commit -m "${values.message}"`, dispatch);
+        showGitErrorModal('Commit failed', undefined, `git commit -m "${values.message}"`, dispatch);
         form.resetFields();
         return;
       }

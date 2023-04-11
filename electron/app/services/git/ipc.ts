@@ -9,6 +9,7 @@ import {
   getAheadBehindCommitsCount,
   getBranchCommits,
   getGitRemotePath,
+  initGitRepo,
   isFolderGitRepo,
   isGitInstalled,
   publishLocalBranch,
@@ -27,6 +28,7 @@ handleIpc('git:fetchRepo', fetchRepo);
 handleIpc('git:getAheadBehindCommitsCount', getAheadBehindCommitsCount);
 handleIpc('git:getBranchCommits', getBranchCommits);
 handleIpc('git:getGitRemotePath', getGitRemotePath);
+handleIpc('git:initGitRepo', initGitRepo);
 handleIpc('git:isFolderGitRepo', isFolderGitRepo);
 handleIpc('git:isGitInstalled', isGitInstalled);
 handleIpc('git:publishLocalBranch', publishLocalBranch);

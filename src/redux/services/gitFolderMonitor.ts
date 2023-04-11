@@ -41,7 +41,7 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
     absolutePath = await getGitRemotePath({path: rootFolderPath});
     absolutePath = `${absolutePath.replaceAll('/', sep)}`;
   } catch (e) {
-    showGitErrorModal('Failed to get remote!', 'git rev-parse --show-toplevel', thunkAPI.dispatch);
+    showGitErrorModal('Failed to get remote!', undefined, 'git rev-parse --show-toplevel', thunkAPI.dispatch);
     return;
   }
 

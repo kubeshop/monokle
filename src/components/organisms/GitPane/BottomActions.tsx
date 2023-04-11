@@ -60,14 +60,14 @@ const BottomActions: React.FC = () => {
         try {
           await pullChanges({path: selectedProjectRootFolder});
         } catch (e) {
-          showGitErrorModal('Pull failed', `git pull origin ${gitRepo.currentBranch}`, dispatch);
+          showGitErrorModal('Pull failed', undefined, `git pull origin ${gitRepo.currentBranch}`, dispatch);
           return {error: true};
         }
       } else if (type === 'push') {
         try {
           await pushChanges({localPath: selectedProjectRootFolder, branchName: currentBranch || 'main'});
         } catch (e) {
-          showGitErrorModal('Push failed', `git push origin ${gitRepo.currentBranch}`, dispatch);
+          showGitErrorModal('Push failed', undefined, `git push origin ${gitRepo.currentBranch}`, dispatch);
           return {error: true};
         }
       }
@@ -94,7 +94,12 @@ const BottomActions: React.FC = () => {
       await publishLocalBranch({localPath: selectedProjectRootFolder, branchName: currentBranch || 'main'});
       dispatch(setAlert({title: 'Branch published successfully', message: '', type: AlertEnum.Success}));
     } catch (e) {
-      showGitErrorModal('Publishing local branch failed', `git push -u origin ${currentBranch || 'main'}`, dispatch);
+      showGitErrorModal(
+        'Publishing local branch failed',
+        undefined,
+        `git push -u origin ${currentBranch || 'main'}`,
+        dispatch
+      );
       setGitLoading(false);
       return;
     }
@@ -143,7 +148,7 @@ const BottomActions: React.FC = () => {
             await fetchRepo({path: selectedProjectRootFolder});
             dispatch(setAlert({title: 'Repository fetched successfully', message: '', type: AlertEnum.Success}));
           } catch (e) {
-            showGitErrorModal('Fetch failed', `git fetch`, dispatch);
+            showGitErrorModal('Fetch failed', undefined, `git fetch`, dispatch);
             dispatch(setGitLoading(false));
           }
         },

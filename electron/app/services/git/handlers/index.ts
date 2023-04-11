@@ -7,6 +7,7 @@ export * from './fetchRepo';
 export * from './getAheadBehindCommitsCount';
 export * from './getBranchCommits';
 export * from './getGitRemotePath';
+export * from './initGitRepo';
 export * from './isFolderGitRepo';
 export * from './isGitInstalled';
 export * from './publishLocalBranch';

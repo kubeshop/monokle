@@ -97,8 +97,8 @@ const GitPane: React.FC = () => {
           filePaths: selectedUnstagedFiles.map(item => item.fullGitPath),
         });
         setSelectedUnstagedFiles([]);
-      } catch (e) {
-        showGitErrorModal('Staging changes failed!');
+      } catch (e: any) {
+        showGitErrorModal('Staging changes failed!', e.message);
         setGitLoading(false);
       }
     } else {
@@ -109,8 +109,8 @@ const GitPane: React.FC = () => {
         });
 
         setSelectedStagedFiles([]);
-      } catch (e) {
-        showGitErrorModal('Unstaging changes failed!');
+      } catch (e: any) {
+        showGitErrorModal('Unstaging changes failed!', e.message);
         setGitLoading(false);
       }
     }

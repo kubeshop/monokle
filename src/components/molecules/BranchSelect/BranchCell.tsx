@@ -36,7 +36,7 @@ const BranchCell: React.FC<IProps> = props => {
             setAlert({type: AlertEnum.Success, title: `Branch ${branch.name} deleted successfully`, message: ''})
           );
         } catch (err) {
-          showGitErrorModal(`Deleting ${branch.name} failed`, `git branch -d ${branch.name}`, dispatch);
+          showGitErrorModal(`Deleting ${branch.name} failed`, undefined, `git branch -d ${branch.name}`, dispatch);
         }
       },
       onCancel() {},

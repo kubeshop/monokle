@@ -73,14 +73,24 @@ const FileList: React.FC<IProps> = props => {
             try {
               stageChangedFiles({localPath: selectedProjectRootFolder, filePaths: [item.fullGitPath]});
             } catch (e) {
-              showGitErrorModal('Staging changes failed!', `git add ${[item.fullGitPath].join(' ')}`, dispatch);
+              showGitErrorModal(
+                'Staging changes failed!',
+                undefined,
+                `git add ${[item.fullGitPath].join(' ')}`,
+                dispatch
+              );
               setGitLoading(false);
             }
           } else {
             try {
               unstageFiles({localPath: selectedProjectRootFolder, filePaths: [item.fullGitPath]});
             } catch (e) {
-              showGitErrorModal('Unstage changes failed!', `git reset ${[item.fullGitPath].join(' ')}`, dispatch);
+              showGitErrorModal(
+                'Unstage changes failed!',
+                undefined,
+                `git reset ${[item.fullGitPath].join(' ')}`,
+                dispatch
+              );
               setGitLoading(false);
             }
           }

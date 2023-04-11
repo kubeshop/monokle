@@ -47,7 +47,7 @@ const CreateBranchInput: React.FC<IProps> = props => {
     try {
       await createLocalBranch({localPath: selectedProjectRootFolder, branchName});
     } catch (e) {
-      showGitErrorModal(`Creating ${branchName} failed`, `git checkout -b ${branchName}`, dispatch);
+      showGitErrorModal(`Creating ${branchName} failed`, undefined, `git checkout -b ${branchName}`, dispatch);
       setBranchName('');
       setLoading(false);
       return;
