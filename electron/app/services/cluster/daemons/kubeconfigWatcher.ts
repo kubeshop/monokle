@@ -6,7 +6,7 @@ import {FSWatcher, watch} from 'chokidar';
 import fs from 'fs/promises';
 import {uniq} from 'lodash';
 
-import {ModernKubeConfig} from '@shared/models/config';
+import {InvalidKubeConfig, ValidKubeConfig} from '@shared/models/config';
 
 import {getDefaultKubeConfig} from '../utils/getDefaultKubeConfig';
 
@@ -44,6 +44,7 @@ export class KubeConfigWatcher {
       const stats = await fs.stat(kubeconfigPath);
 
       if (!stats.isFile()) {
+        this.broadcastError(kubeconfigPath, 'not_found');
         return;
       }
 
@@ -63,30 +64,49 @@ export class KubeConfigWatcher {
           return;
         }
 
-        const config = new k8s.KubeConfig();
-        config.loadFromFile(kubeconfigPath);
-        this.broadcast(kubeconfigPath, config);
+        try {
+          const config = new k8s.KubeConfig();
+          config.loadFromFile(kubeconfigPath);
+          this.broadcastSuccess(kubeconfigPath, config);
+        } catch {
+          this.broadcastError(kubeconfigPath, 'malformed');
+        }
       });
 
       // Run once manually to get started
-      const config = new k8s.KubeConfig();
-      config.loadFromFile(kubeconfigPath);
-      this.broadcast(kubeconfigPath, config);
+      try {
+        const config = new k8s.KubeConfig();
+        config.loadFromFile(kubeconfigPath);
+        this.broadcastSuccess(kubeconfigPath, config);
+      } catch {
+        this.broadcastError(kubeconfigPath, 'malformed');
+      }
     } catch (e: any) {
       // eslint-disable-next-line no-console
       console.log('monitorKubeConfigError', e.message);
+      this.broadcastError(kubeconfigPath, 'unknown');
     }
   }
 
-  private broadcast(kubeconfigPath: string, config: k8s.KubeConfig) {
-    const kc: ModernKubeConfig = {
+  private broadcastSuccess(kubeconfigPath: string, config: k8s.KubeConfig) {
+    const kc: ValidKubeConfig = {
       path: kubeconfigPath,
+      isValid: true,
       currentContext: config.getCurrentContext(),
       contexts: config.getContexts(),
       clusters: config.getClusters(),
       users: config.getUsers(),
     };
 
+    BrowserWindow.getAllWindows().forEach(w => w.webContents.send('kubeconfig:update', kc));
+  }
+
+  private broadcastError(kubeconfigPath: string, reason: string) {
+    const kc: InvalidKubeConfig = {
+      isValid: false,
+      path: kubeconfigPath,
+      reason,
+    };
     BrowserWindow.getAllWindows().forEach(w => w.webContents.send('kubeconfig:update', kc));
   }
 

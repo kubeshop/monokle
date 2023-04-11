@@ -119,7 +119,7 @@ type KubeConfig = {
 
 export type ModernKubeConfig = InvalidKubeConfig | ValidKubeConfig;
 
-type ValidKubeConfig = {
+export type ValidKubeConfig = {
   isValid: true;
   path: string;
   currentContext: string;
@@ -128,7 +128,7 @@ type ValidKubeConfig = {
   users: User[];
 };
 
-type InvalidKubeConfig = {
+export type InvalidKubeConfig = {
   isValid: false;
   path: string;
   reason: string; // either not_found or malformed
