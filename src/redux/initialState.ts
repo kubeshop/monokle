@@ -181,6 +181,7 @@ const initialUiState: UiState = {
     expandedSearchedFiles: ['filter'],
     isValidationDrawerVisible: false,
     selection: uiLeftMenuSelection,
+    activityBeforeClusterConnect: undefined,
     isActive:
       !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
     activeTab: null,

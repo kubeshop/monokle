@@ -39,7 +39,8 @@ import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 import {Icon} from '@monokle/components';
 import {trackEvent} from '@shared/utils/telemetry';
 
-import ClusterSelection from './ClusterSelection';
+import {ClusterControls} from './ClusterControl/ClusterControls';
+import {IndicatorPreview} from './IndicatorPreview';
 import {K8sVersionSelection} from './K8sVersionSelection';
 import * as S from './PageHeader.styled';
 
@@ -190,7 +191,7 @@ const PageHeader = () => {
 
   return (
     <S.PageHeaderContainer ref={pageHeaderRef}>
-      {(isInPreviewMode || isInClusterMode) && (
+      {isInPreviewMode && (
         <S.PreviewRow
           $previewType={previewType}
           $kubeConfigContextColor={kubeConfigContextColor}
@@ -264,7 +265,7 @@ const PageHeader = () => {
 
         <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
           <K8sVersionSelection />
-          <ClusterSelection />
+          {isInPreviewMode ? <IndicatorPreview /> : <ClusterControls />}
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
             <Badge count={unseenNotificationsCount} size="small">

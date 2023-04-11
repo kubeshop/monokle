@@ -66,7 +66,7 @@ export const NamespacesTooltipContainer = styled.div`
 `;
 
 export const Table = styled(props => <RawTable {...props} />)`
-  width: 840px;
+  width: 600px;
   border-top: 1px solid ${Colors.grey3};
 
   tbody {

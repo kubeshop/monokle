@@ -127,7 +127,7 @@
     "execa": "5.1.1",
     "fast-json-stable-stringify": "2.1.0",
     "flat": "5.0.2",
-    "framer-motion": "9.1.7",
+    "framer-motion": "10.10.0",
     "git-url-parse": "13.1.0",
     "html-to-image": "1.11.11",
     "json-schema-faker": "0.5.0-rcv.46",

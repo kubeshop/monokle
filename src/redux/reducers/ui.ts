@@ -7,10 +7,10 @@ import {Entries} from 'type-fest';
 
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
-import {activeProjectSelector} from '@redux/appConfig';
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import initialState from '@redux/initialState';
 import {AppListenerFn} from '@redux/listeners/base';
-import {loadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
+import {stopClusterConnection} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -418,9 +418,17 @@ export const uiSlice = createSlice({
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;
       })
-      .addCase(loadClusterResources.fulfilled, state => {
+      .addCase(connectCluster.fulfilled, state => {
+        state.leftMenu.activityBeforeClusterConnect = state.leftMenu.selection;
         state.leftMenu.selection = 'dashboard';
         state.leftMenu.isActive = true;
+      })
+      .addCase(stopClusterConnection.fulfilled, state => {
+        state.leftMenu.selection = state.leftMenu.activityBeforeClusterConnect ?? 'explorer';
+        state.leftMenu.activityBeforeClusterConnect = undefined;
+      })
+      .addCase(connectCluster.rejected, state => {
+        state.leftMenu.selection = 'dashboard';
       });
   },
 });
@@ -512,17 +520,14 @@ export const stopClusterConnectionListener: AppListenerFn = listen => {
   listen({
     matcher: isAnyOf(stopClusterConnection.fulfilled),
     effect: async (action, {getState, dispatch}) => {
-      const activeProject = activeProjectSelector(getState());
-
-      if (activeProject) {
-        return;
-      }
-
-      const leftMenuSelection = getState().ui.leftMenu.selection;
-
-      if (leftMenuSelection === 'validation') {
-        dispatch(setLeftMenuSelection('dashboard'));
-      }
+      // const activeProject = activeProjectSelector(getState());
+      // if (activeProject) {
+      //   return;
+      // }
+      // const leftMenuSelection = getState().ui.leftMenu.selection;
+      // if (leftMenuSelection === 'validation') {
+      //   dispatch(setLeftMenuSelection('dashboard'));
+      // }
     },
   });
 };
