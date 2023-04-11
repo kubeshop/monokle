@@ -14,7 +14,7 @@ export type GitPathParams = {
   path: string;
 };
 
-export type GitStageChangedFilesParams = {
+export type GitStageUnstageFilesParams = {
   localPath: string;
   filePaths: string[];
 };

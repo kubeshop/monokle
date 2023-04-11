@@ -1,6 +1,6 @@
 import {invokeIpc} from '@utils/ipc';
 
-import {GitStageChangedFilesParams} from '@shared/ipc/git';
+import {GitStageUnstageFilesParams} from '@shared/ipc/git';
 
 /**
  * Example usage:
@@ -13,4 +13,4 @@ import {GitStageChangedFilesParams} from '@shared/ipc/git';
  * }
  * ```
  */
-export const stageChangedFiles = invokeIpc<GitStageChangedFilesParams, void>('git:stageChangedFiles');
+export const stageChangedFiles = invokeIpc<GitStageUnstageFilesParams, void>('git:stageChangedFiles');

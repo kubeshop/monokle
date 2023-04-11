@@ -7,14 +7,13 @@ import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {setGitLoading} from '@redux/git';
-import {stageChangedFiles} from '@redux/git/service';
+import {stageChangedFiles, unstageFiles} from '@redux/git/service';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
 
 import {TitleBar} from '@monokle/components';
@@ -103,12 +102,17 @@ const GitPane: React.FC = () => {
         setGitLoading(false);
       }
     } else {
-      await promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
-        localPath: selectedProjectRootFolder,
-        filePaths: selectedStagedFiles.map(item => item.fullGitPath),
-      });
+      try {
+        await unstageFiles({
+          localPath: selectedProjectRootFolder,
+          filePaths: selectedStagedFiles.map(item => item.fullGitPath),
+        });
 
-      setSelectedStagedFiles([]);
+        setSelectedStagedFiles([]);
+      } catch (e) {
+        showGitErrorModal('Unstaging changes failed!');
+        setGitLoading(false);
+      }
     }
   };
 

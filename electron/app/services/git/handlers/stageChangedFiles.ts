@@ -1,8 +1,8 @@
 import simpleGit from 'simple-git';
 
-import {GitStageChangedFilesParams} from '@shared/ipc/git';
+import {GitStageUnstageFilesParams} from '@shared/ipc/git';
 
-export async function stageChangedFiles({filePaths, localPath}: GitStageChangedFilesParams): Promise<void> {
+export async function stageChangedFiles({filePaths, localPath}: GitStageUnstageFilesParams): Promise<void> {
   const git = simpleGit({baseDir: localPath});
 
   try {

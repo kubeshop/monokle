@@ -5,7 +5,7 @@ import {GitPathParams} from '@shared/ipc/git';
 export async function fetchRepo({path}: GitPathParams): Promise<void> {
   const git = simpleGit({baseDir: path});
 
-  console.log('Path: ', path);
+  console.log('Path checK: ', path);
 
   try {
     await git.fetch();

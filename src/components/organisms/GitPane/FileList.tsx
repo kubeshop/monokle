@@ -6,7 +6,7 @@ import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {setGitLoading, setSelectedItem} from '@redux/git';
-import {stageChangedFiles} from '@redux/git/service';
+import {stageChangedFiles, unstageFiles} from '@redux/git/service';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {clearSelection, selectFile} from '@redux/reducers/main';
@@ -16,7 +16,6 @@ import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {Dots} from '@components/atoms';
 
 import {createFileWithContent} from '@utils/files';
-import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
 
 import {AlertEnum} from '@shared/models/alert';
@@ -78,15 +77,12 @@ const FileList: React.FC<IProps> = props => {
               setGitLoading(false);
             }
           } else {
-            promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
-              localPath: selectedProjectRootFolder,
-              filePaths: [item.fullGitPath],
-            }).then(result => {
-              if (result.error) {
-                showGitErrorModal('Unstage changes failed!', `git reset ${[item.fullGitPath].join(' ')}`, dispatch);
-                setGitLoading(false);
-              }
-            });
+            try {
+              unstageFiles({localPath: selectedProjectRootFolder, filePaths: [item.fullGitPath]});
+            } catch (e) {
+              showGitErrorModal('Unstage changes failed!', `git reset ${[item.fullGitPath].join(' ')}`, dispatch);
+              setGitLoading(false);
+            }
           }
         },
       },
