@@ -1,3 +1,5 @@
+import {Button as RawButton} from 'antd';
+
 import {CloseOutlined as RawCloseOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
@@ -35,4 +37,9 @@ export const Title = styled.h1`
   font-weight: 700;
   font-size: 40px;
   line-height: 40px;
+`;
+
+export const Button = styled(RawButton)`
+  height: 38px;
+  margin-top: 8px;
 `;

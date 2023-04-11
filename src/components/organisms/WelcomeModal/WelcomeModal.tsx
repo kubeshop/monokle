@@ -1,4 +1,4 @@
-import {Button, Modal} from 'antd';
+import {Modal} from 'antd';
 import Link from 'antd/lib/typography/Link';
 
 import {useAppDispatch} from '@redux/hooks';
@@ -51,7 +51,7 @@ const WelcomeModal = () => {
           <p>
             <b>Ready to create your first project?</b>
           </p>
-          <Button
+          <S.Button
             type="primary"
             onClick={() => {
               dispatch(setShowStartPageLearn(false));
@@ -60,7 +60,7 @@ const WelcomeModal = () => {
             }}
           >
             Yes, take me there!
-          </Button>
+          </S.Button>
         </S.Content>
       </S.Container>
     </Modal>
