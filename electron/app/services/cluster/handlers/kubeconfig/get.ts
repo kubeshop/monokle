@@ -15,6 +15,7 @@ export async function getKubeConfig(options: KubeConfigGet): Promise<ModernKubeC
 
   return {
     path,
+    isValid: true,
     currentContext: config.getCurrentContext(),
     contexts: config.getContexts(),
     clusters: config.getClusters(),
