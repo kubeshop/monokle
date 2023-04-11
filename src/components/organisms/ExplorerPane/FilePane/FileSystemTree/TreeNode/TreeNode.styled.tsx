@@ -65,6 +65,7 @@ export const TitleText = styled.span<{
   position: 'relative',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
+  paddingRight: '2px',
   color:
     (props.$isSelected && Colors.blackPure) ||
     (props.$isHighlighted && Colors.cyan7) ||
