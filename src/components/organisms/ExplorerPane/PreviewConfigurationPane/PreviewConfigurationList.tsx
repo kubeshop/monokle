@@ -1,5 +1,7 @@
 import {useRef} from 'react';
 
+import {Skeleton} from 'antd';
+
 import {size} from 'lodash';
 import styled from 'styled-components';
 
@@ -17,6 +19,7 @@ const ROW_HEIGHT = 26;
 const PreviewConfigurationList: React.FC = () => {
   const list = useAppSelector(previewConfigurationListSelector);
   const ref = useRef<HTMLUListElement>(null);
+  const isLoading = useAppSelector(state => state.ui.isFolderLoading);
 
   const rowVirtualizer = useVirtualizer({
     count: list.length,
@@ -24,6 +27,14 @@ const PreviewConfigurationList: React.FC = () => {
     getScrollElement: () => ref.current,
     scrollToFn: elementScroll,
   });
+
+  if (isLoading) {
+    return (
+      <div style={{padding: '16px'}}>
+        <Skeleton active />
+      </div>
+    );
+  }
 
   if (!size(list)) {
     return <EmptyText>No Preview Configurations found in the current project.</EmptyText>;

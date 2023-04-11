@@ -17,7 +17,7 @@ type IProps = {
 };
 
 type FiltersType = 'all' | 'local' | 'git';
-type CreationFiltersType = 'last-created' | 'first-created';
+type CreationFiltersType = 'last-created' | 'first-created' | 'name-asc' | 'name-desc' | 'last-opened';
 
 const ProjectsList: React.FC<IProps> = props => {
   const {type} = props;
@@ -41,7 +41,18 @@ const ProjectsList: React.FC<IProps> = props => {
       return currentProjects;
     }
 
-    let projects = orderBy(currentProjects, 'created', creationFilter === 'last-created' ? 'desc' : 'asc');
+    let projects = orderBy(
+      currentProjects,
+      creationFilter === 'last-created' || creationFilter === 'first-created'
+        ? 'created'
+        : creationFilter === 'name-asc' || creationFilter === 'name-desc'
+        ? project => (project.name ? project.name.toLowerCase() : project.rootFolder)
+        : 'lastOpened',
+
+      creationFilter === 'last-created' || creationFilter === 'name-desc' || creationFilter === 'last-opened'
+        ? 'desc'
+        : 'asc'
+    );
 
     if (typeFilter === 'all') {
       return projects;
@@ -103,6 +114,15 @@ const ProjectsList: React.FC<IProps> = props => {
             </Select.Option>
             <Select.Option key="first-created" value="first-created">
               Sort by first created
+            </Select.Option>
+            <Select.Option key="name-asc" value="name-asc">
+              Sort by name A-Z
+            </Select.Option>
+            <Select.Option key="name-desc" value="name-desc">
+              Sort by name Z-A
+            </Select.Option>
+            <Select.Option key="last-opened" value="last-opened">
+              Sort by last opened
             </Select.Option>
           </S.Select>
         </S.SortAndFiltersContainer>

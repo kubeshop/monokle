@@ -77,11 +77,19 @@ const validateListener: AppListenerFn = listen => {
       previewHelmValuesFile.fulfilled,
       runPreviewConfiguration.fulfilled,
       previewSavedCommand.fulfilled,
+      previewKustomization.rejected,
+      previewHelmValuesFile.rejected,
+      runPreviewConfiguration.rejected,
+      previewSavedCommand.rejected,
       stopClusterConnection.fulfilled,
       clearPreviewAndSelectionHistory,
       clearPreview
     ),
     async effect(_action, {dispatch, getState, cancelActiveListeners, signal, delay}) {
+      if (_action.type === 'main/clearPreviewAndSelectionHistory' && _action.payload.revalidate === false) {
+        return;
+      }
+
       cancelActiveListeners();
 
       const validatorsLoading = getState().validation.status === 'loading';
@@ -107,7 +115,17 @@ const validateListener: AppListenerFn = listen => {
         resourceStorage = 'preview';
       }
 
-      if (isAnyOf(stopClusterConnection.fulfilled, clearPreviewAndSelectionHistory, clearPreview)(_action)) {
+      if (
+        isAnyOf(
+          stopClusterConnection.fulfilled,
+          clearPreviewAndSelectionHistory,
+          clearPreview,
+          previewKustomization.rejected,
+          previewHelmValuesFile.rejected,
+          runPreviewConfiguration.rejected,
+          previewSavedCommand.rejected
+        )(_action)
+      ) {
         resourceStorage = 'local';
       }
 

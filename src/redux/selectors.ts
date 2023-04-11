@@ -1,4 +1,7 @@
+import path from 'path';
 import {createSelector} from 'reselect';
+
+import {createFileNodes, createFolderTree, sortNodes} from '@utils/fileExplorer';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppState} from '@shared/models/appState';
@@ -6,6 +9,7 @@ import {FileEntry} from '@shared/models/fileEntry';
 import {HelmValuesFile} from '@shared/models/helm';
 import {RootState} from '@shared/models/rootState';
 import {isFileSelection, isPreviewConfigurationSelection} from '@shared/models/selection';
+import {isDefined} from '@shared/utils/filter';
 
 import {getResourceMetaMapFromState} from './selectors/resourceMapGetters';
 import {isKustomizationResource} from './services/kustomize';
@@ -147,5 +151,19 @@ export const kustomizationResourcesSelectors = createSelector(
     return Object.values(localResourceMetaMap)
       .filter(i => isKustomizationResource(i))
       .sort((a, b) => a.name.localeCompare(b.name));
+  }
+);
+
+export const projectFileTreeSelector = createSelector(
+  [(state: RootState) => state.main.fileMap, (state: RootState) => state.config.fileExplorerSortOrder],
+  (fileMap, fileExplorerSortOrder) => {
+    const rootEntry = fileMap[ROOT_FILE_ENTRY];
+
+    const rootFileNodes = createFileNodes(path.sep, fileMap);
+    const rootFolderNodes =
+      rootEntry?.children
+        ?.map(folderPath => createFolderTree(`${path.sep}${folderPath}`, fileMap, fileExplorerSortOrder))
+        .filter(isDefined) || [];
+    return sortNodes(rootFolderNodes, rootFileNodes, fileExplorerSortOrder);
   }
 );
