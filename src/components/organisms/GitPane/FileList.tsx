@@ -6,6 +6,7 @@ import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {setGitLoading, setSelectedItem} from '@redux/git';
+import {stageChangedFiles} from '@redux/git/service';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {clearSelection, selectFile} from '@redux/reducers/main';
@@ -65,18 +66,17 @@ const FileList: React.FC<IProps> = props => {
         key: 'stage_unstage_changes',
         label: item.status === 'staged' ? 'Unstage changes' : 'Stage changes',
         onClick: () => {
+          if (!selectedProjectRootFolder) return;
+
           dispatch(setGitLoading(true));
 
           if (item.status === 'unstaged') {
-            promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
-              localPath: selectedProjectRootFolder,
-              filePaths: [item.fullGitPath],
-            }).then(result => {
-              if (result.error) {
-                showGitErrorModal('Stage changes failed!', `git add ${[item.fullGitPath].join(' ')}`, dispatch);
-                setGitLoading(false);
-              }
-            });
+            try {
+              stageChangedFiles({localPath: selectedProjectRootFolder, filePaths: [item.fullGitPath]});
+            } catch (e) {
+              showGitErrorModal('Staging changes failed!', `git add ${[item.fullGitPath].join(' ')}`, dispatch);
+              setGitLoading(false);
+            }
           } else {
             promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
               localPath: selectedProjectRootFolder,

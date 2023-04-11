@@ -10,6 +10,7 @@ import {
   isGitInstalled,
   pullChanges,
   pushChanges,
+  stageChangedFiles,
 } from './handlers';
 
 handleIpc('git:checkoutGitBranch', checkoutGitBranch);
@@ -22,3 +23,4 @@ handleIpc('git:isFolderGitRepo', isFolderGitRepo);
 handleIpc('git:isGitInstalled', isGitInstalled);
 handleIpc('git:pullChanges', pullChanges);
 handleIpc('git:pushChanges', pushChanges);
+handleIpc('git:stageChangedFiles', stageChangedFiles);

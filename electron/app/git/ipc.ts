@@ -12,7 +12,6 @@ import {
   initGitRepo,
   publishLocalBranch,
   setRemote,
-  stageChangedFiles,
   unstageFiles,
 } from './git';
 
@@ -40,17 +39,6 @@ ipcMain.on('git.getChangedFiles', async (event, payload: {localPath: string; fil
     event.sender.send('git.getChangedFiles.result', result);
   } catch (e: any) {
     event.sender.send('git.getChangedFiles.result', {error: e.message});
-  }
-});
-
-ipcMain.on('git.stageChangedFiles', async (event, payload: {localPath: string; filePaths: string[]}) => {
-  const {filePaths, localPath} = payload;
-
-  try {
-    const result = await stageChangedFiles(localPath, filePaths);
-    event.sender.send('git.stageChangedFiles.result', result);
-  } catch (e: any) {
-    event.sender.send('git.stageChangedFiles.result', {error: e.message});
   }
 });
 

@@ -8,3 +8,4 @@ export * from './isFolderGitRepo';
 export * from './isGitInstalled';
 export * from './pullChanges';
 export * from './pushChanges';
+export * from './stageChangedFiles';

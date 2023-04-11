@@ -162,17 +162,6 @@ export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
   }
 }
 
-export async function stageChangedFiles(localPath: string, filePaths: string[]) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    await git.add(filePaths);
-    return {};
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
 export async function unstageFiles(localPath: string, filePaths: string[]) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
