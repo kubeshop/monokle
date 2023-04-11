@@ -15,6 +15,7 @@ import {
   publishLocalBranch,
   pullChanges,
   pushChanges,
+  setRemote,
   stageChangedFiles,
   unstageFiles,
 } from './handlers';
@@ -34,5 +35,6 @@ handleIpc('git:isGitInstalled', isGitInstalled);
 handleIpc('git:publishLocalBranch', publishLocalBranch);
 handleIpc('git:pullChanges', pullChanges);
 handleIpc('git:pushChanges', pushChanges);
+handleIpc('git:setRemote', setRemote);
 handleIpc('git:stageChangedFiles', stageChangedFiles);
 handleIpc('git:unstageFiles', unstageFiles);

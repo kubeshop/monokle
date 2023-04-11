@@ -6,7 +6,10 @@ import {updateProjectsGitRepo} from '@redux/appConfig';
 import {setBranchCommits, setChangedFiles, setCommitsCount, setRepo} from '@redux/git';
 import {getAheadBehindCommitsCount, getBranchCommits, getGitRemotePath, isFolderGitRepo} from '@redux/git/service';
 
+import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
+
+import {GitRepo} from '@shared/models/git';
 
 let watcher: FSWatcher;
 
@@ -60,6 +63,14 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
       }
 
       const absolutePathEndsWithGit = absolutePath.endsWith(`${sep}.git`);
+
+      if (path.startsWith(`${absolutePath}${absolutePathEndsWithGit ? '' : `${sep}.git`}${sep}FETCH_HEAD`)) {
+        promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolderPath).then(
+          repo => {
+            thunkAPI.dispatch(setRepo(repo));
+          }
+        );
+      }
 
       // commit was made/undoed or push was made
       if (path.startsWith(`${absolutePath}${absolutePathEndsWithGit ? '' : `${sep}.git`}${sep}logs${sep}refs`)) {

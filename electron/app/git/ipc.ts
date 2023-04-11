@@ -2,7 +2,7 @@ import {ipcMain} from 'electron';
 
 import type {FileMapType} from '@shared/models/appState';
 
-import {getChangedFiles, getCommitResources, getGitRepoInfo, initGitRepo, setRemote} from './git';
+import {getChangedFiles, getCommitResources, getGitRepoInfo} from './git';
 
 ipcMain.on('git.getGitRepoInfo', async (event, localPath: string) => {
   try {
@@ -13,30 +13,12 @@ ipcMain.on('git.getGitRepoInfo', async (event, localPath: string) => {
   }
 });
 
-ipcMain.on('git.initGitRepo', async (event, localPath: string) => {
-  try {
-    const result = await initGitRepo(localPath);
-    event.sender.send('git.initGitRepo.result', result);
-  } catch (e: any) {
-    event.sender.send('git.initGitRepo.result', {error: e.message});
-  }
-});
-
 ipcMain.on('git.getChangedFiles', async (event, payload: {localPath: string; fileMap: FileMapType}) => {
   try {
     const result = await getChangedFiles(payload.localPath, payload.fileMap);
     event.sender.send('git.getChangedFiles.result', result);
   } catch (e: any) {
     event.sender.send('git.getChangedFiles.result', {error: e.message});
-  }
-});
-
-ipcMain.on('git.setRemote', async (event, payload: {localPath: string; remoteURL: string}) => {
-  try {
-    const result = await setRemote(payload.localPath, payload.remoteURL);
-    event.sender.send('git.setRemote.result', result);
-  } catch (e: any) {
-    event.sender.send('git.setRemote.result', {error: e.message});
   }
 });
 

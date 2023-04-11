@@ -24,6 +24,11 @@ export type GitCommitChangesParams = {
   message: string;
 };
 
+export type GitSetRemoteParams = {
+  localPath: string;
+  remoteURL: string;
+};
+
 export type GitAheadBehindCommitsCountParams = LocalPathBranchNameParams;
 export type GitBranchCommitsParams = LocalPathBranchNameParams;
 export type GitCheckoutBranchParams = LocalPathBranchNameParams;

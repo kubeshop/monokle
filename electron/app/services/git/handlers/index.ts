@@ -13,5 +13,6 @@ export * from './isGitInstalled';
 export * from './publishLocalBranch';
 export * from './pullChanges';
 export * from './pushChanges';
+export * from './setRemote';
 export * from './stageChangedFiles';
 export * from './unstageFiles';

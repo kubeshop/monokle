@@ -115,17 +115,6 @@ export async function getGitRepoInfo(localPath: string) {
   return gitRepo;
 }
 
-export async function initGitRepo(localPath: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    await git.init();
-    await git.commit('Initial commit', undefined, {'--allow-empty': null});
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
 export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
   const git: SimpleGit = simpleGit({baseDir: localPath});
 
@@ -156,18 +145,6 @@ export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
     }
 
     return changedFiles;
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
-export async function setRemote(localPath: string, remoteURL: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    await git.addRemote('origin', remoteURL);
-    await git.fetch();
-    return {};
   } catch (e: any) {
     return {error: e.message};
   }
