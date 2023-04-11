@@ -12,6 +12,7 @@ import {
   YAML_DOCUMENT_DELIMITER,
 } from '@constants/constants';
 
+import {setup} from '@redux/cluster/service/kube-control';
 import {getAbsoluteResourcePath, getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 
 // import {VALIDATOR} from '@redux/validation/validation.services';
@@ -119,7 +120,9 @@ export async function getTargetClusterNamespaces(
   }
 
   try {
-    const kubeClient = createKubeClient(kubeconfigPath, context);
+    const pingResponse = await setup({context, kubeconfig: kubeconfigPath});
+    if (!pingResponse.success) throw new Error(pingResponse.code);
+    const kubeClient = createKubeClient(kubeconfigPath, context, pingResponse.port);
     const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient, {});
 
     const ns: string[] = [];

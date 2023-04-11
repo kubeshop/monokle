@@ -2,6 +2,7 @@ import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 
+import {setup} from '@redux/cluster/service/kube-control';
 import {clearSelectionReducer} from '@redux/reducers/main/selectionReducers';
 import {deleteResource, isResourceSelected, removeResourceFromFile} from '@redux/services/resource';
 
@@ -19,10 +20,10 @@ export const removeResources = createAsyncThunk<
 >('main/removeResources', async (resourceIdentifiers, thunkAPI: {getState: Function; dispatch: Function}) => {
   const state: RootState = thunkAPI.getState();
 
-  const nextMainState = createNextState(state.main, mainState => {
+  const nextMainState = await createNextState(state.main, async mainState => {
     let deletedCheckedResourcesIdentifiers: ResourceIdentifier[] = [];
 
-    resourceIdentifiers.forEach(resourceIdentifier => {
+    for (const resourceIdentifier of resourceIdentifiers) {
       const resourceMeta = mainState.resourceMetaMapByStorage[resourceIdentifier.storage][resourceIdentifier.id];
       if (!resourceMeta) {
         return original(mainState);
@@ -54,10 +55,11 @@ export const removeResources = createAsyncThunk<
 
       if (mainState.clusterConnection && isClusterResourceMeta(resourceMeta)) {
         try {
-          const kubeClient = createKubeClient(
-            mainState.clusterConnection.kubeConfigPath,
-            mainState.clusterConnection.context
-          );
+          const kubeconfig = mainState.clusterConnection.kubeConfigPath;
+          const context = mainState.clusterConnection.context;
+          const setupResponse = await setup({context, kubeconfig});
+          if (!setupResponse.success) throw new Error(setupResponse.code);
+          const kubeClient = createKubeClient(kubeconfig, context, setupResponse.port);
 
           const kindHandler = getResourceKindHandler(resourceMeta.kind);
           if (kindHandler?.deleteResourceInCluster) {
@@ -72,7 +74,7 @@ export const removeResources = createAsyncThunk<
           return original(mainState);
         }
       }
-    });
+    }
 
     mainState.checkedResourceIdentifiers = mainState.checkedResourceIdentifiers.filter(
       id => !deletedCheckedResourcesIdentifiers.find(identifier => isEqual(identifier, id))

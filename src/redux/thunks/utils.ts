@@ -5,6 +5,8 @@ import {stringify} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
+import {setup} from '@redux/cluster/service/kube-control';
+
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AlertEnum} from '@shared/models/alert';
@@ -46,20 +48,28 @@ export function createRejectionWithAlert(thunkAPI: any, title: string, message: 
 
 export async function getResourceFromCluster(
   resourceMeta: ResourceMeta,
-  kubeconfigPath: string,
-  context?: string
+  kubeconfigPath: string | undefined,
+  context: string
 ): Promise<K8sObject | undefined> {
   const resourceKindHandler = getResourceKindHandler(resourceMeta.kind);
 
   if (resourceKindHandler) {
+    const setupResponse = await setup({kubeconfig: kubeconfigPath, context, skipHealthCheck: true});
+    if (!setupResponse.success) throw new Error(setupResponse.code);
     const kubeClient = createKubeClient(kubeconfigPath, context);
     const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kubeClient, resourceMeta);
     return toPojo(resourceFromCluster.body);
   }
 }
 
-export async function removeNamespaceFromCluster(namespace: string, kubeconfigPath: string, context?: string) {
-  const kubeClient = createKubeClient(kubeconfigPath, context);
+export async function removeNamespaceFromCluster(
+  namespace: string,
+  kubeconfigPath: string | undefined,
+  context: string
+) {
+  const setupResponse = await setup({kubeconfig: kubeconfigPath, context, skipHealthCheck: true});
+  if (!setupResponse.success) throw new Error(setupResponse.code);
+  const kubeClient = createKubeClient(kubeconfigPath, context, setupResponse.port);
   const k8sCoreV1Api = kubeClient.makeApiClient(k8s.CoreV1Api);
   await k8sCoreV1Api.deleteNamespace(namespace);
 }

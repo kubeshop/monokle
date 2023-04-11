@@ -5,6 +5,7 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Input, Modal, Radio, Select} from 'antd';
 
 import {currentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {setup} from '@redux/cluster/service/kube-control';
 import {useAppSelector} from '@redux/hooks';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
@@ -49,21 +50,26 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
         return;
       }
 
-      const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
-      const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
-
-      k8sCoreV1Api
-        .createNamespace({metadata: {name: createNamespaceName}})
-        .then(() => {
+      (async () => {
+        try {
+          const setupResponse = await setup({
+            context: kubeConfigContext,
+            kubeconfig: kubeConfigPath,
+            skipHealthCheck: true,
+          });
+          if (!setupResponse.success) throw new Error(setupResponse.code);
+          const kc = createKubeClient(kubeConfigPath, kubeConfigContext, setupResponse.port);
+          const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+          await k8sCoreV1Api.createNamespace({metadata: {name: createNamespaceName}});
           onOk({name: createNamespaceName, new: true});
-        })
-        .catch(err => {
+        } catch (err: any) {
           if (err.statusCode === 409) {
             setErrorMessage('Namespace already exists in the cluster!');
           } else {
             setErrorMessage(err.message);
           }
-        });
+        }
+      })();
     } else if (selectedOption === 'existing') {
       onOk({name: selectedNamespace, new: false});
     } else if (!selectedOption || selectedOption === 'none') {

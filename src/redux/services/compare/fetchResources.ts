@@ -8,6 +8,7 @@ import {v4 as uuid} from 'uuid';
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {setup} from '@redux/cluster/service/kube-control';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
 import {buildHelmCommand} from '@utils/helm';
@@ -124,7 +125,9 @@ async function fetchResourcesFromCluster(
     const kubeConfigPath = kubeConfigPathSelector(state);
     const currentContext = options.context;
     const clusterAccess = state.config?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
-    const kc = createKubeClient(kubeConfigPath, currentContext);
+    const setupResponse = await setup({context: currentContext, kubeconfig: kubeConfigPath, skipHealthCheck: true});
+    if (!setupResponse.success) throw new Error(setupResponse.code);
+    const kc = createKubeClient(kubeConfigPath, currentContext, setupResponse.port);
 
     const res = clusterAccess.length
       ? await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)))

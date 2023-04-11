@@ -25,6 +25,7 @@ import {
   kubeConfigContextSelector,
   kubeConfigPathSelector,
 } from '@redux/appConfig';
+import {setup} from '@redux/cluster/service/kube-control';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal} from '@redux/reducers/main';
@@ -228,7 +229,11 @@ const DiffModal = () => {
     }
 
     const getClusterResources = async () => {
-      const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
+      const context = kubeConfigContext;
+      const kubeconfig = kubeConfigPath;
+      const setupResponse = await setup({context, kubeconfig, skipHealthCheck: true});
+      if (!setupResponse.success) throw new Error(setupResponse.code);
+      const kc = createKubeClient(kubeConfigPath, kubeConfigContext, setupResponse.port);
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
       const getResources = async () => {

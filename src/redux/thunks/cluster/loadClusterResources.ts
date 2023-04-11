@@ -15,7 +15,6 @@ import {createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ClusterAccess} from '@shared/models/config';
 import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
@@ -56,19 +55,7 @@ const loadClusterResourcesHandler = async (
   trackEvent('preview/cluster/start');
 
   try {
-    let kc = createKubeClient(kubeConfigPath, context);
-
-    if (port) {
-      const proxyKubeConfig = new KubeConfig();
-      proxyKubeConfig.loadFromOptions({
-        currentContext: kc.getCurrentContext(),
-        clusters: kc.getClusters().map(c => ({...c, server: `http://127.0.0.1:${port}`, skipTLSVerify: true})),
-        users: kc.getUsers(),
-        contexts: kc.getContexts(),
-      });
-      kc = proxyKubeConfig;
-    }
-
+    let kc = createKubeClient(kubeConfigPath, context, port);
     let foundNamespace: ClusterAccess | undefined;
     let results: PromiseSettledResult<string>[] | PromiseSettledResult<string>[][];
 
@@ -154,16 +141,8 @@ const loadClusterResourcesHandler = async (
 
     startWatchingResources(thunkAPI.dispatch, kc, clusterResourceMap, currentNamespace);
 
-    const alert: AlertType = {
-      type: AlertEnum.Success,
-      title: 'Cluster Resources Loaded',
-      message: `Processed ${Object.keys(clusterResourceMap).length} resources from ${context}}`,
-      silent: true,
-    };
-
     return {
       resources: Object.values(clusterResourceMap),
-      alert,
       context,
       kubeConfigPath,
       namespace: currentNamespace,
