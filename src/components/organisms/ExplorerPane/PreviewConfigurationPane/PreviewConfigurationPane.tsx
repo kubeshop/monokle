@@ -21,6 +21,7 @@ const PreviewConfigurationPane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const fileMap = useAppSelector(state => state.main.fileMap);
   const previewConfigurationMap = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap);
 
   const count = useMemo(
@@ -28,11 +29,14 @@ const PreviewConfigurationPane: React.FC<InjectedPanelProps> = props => {
       isDefined(previewConfigurationMap)
         ? size(
             Object.values(previewConfigurationMap).filter(
-              previewConfiguration => isDefined(previewConfiguration) && !isEmpty(previewConfiguration)
+              previewConfiguration =>
+                isDefined(previewConfiguration) &&
+                !isEmpty(previewConfiguration) &&
+                fileMap[previewConfiguration.helmChartFilePath]
             )
           )
         : 0,
-    [previewConfigurationMap]
+    [fileMap, previewConfigurationMap]
   );
 
   return (
