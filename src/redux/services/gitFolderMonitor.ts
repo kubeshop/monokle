@@ -59,8 +59,10 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
         return;
       }
 
+      const absolutePathEndsWithGit = absolutePath.endsWith(`${sep}.git`);
+
       // commit was made/undoed or push was made
-      if (path.startsWith(`${absolutePath}${sep}.git${sep}logs${sep}refs`)) {
+      if (path.startsWith(`${absolutePath}${absolutePathEndsWithGit ? '' : `${sep}.git`}${sep}logs${sep}refs`)) {
         const branchName = path.includes('heads') ? gitRepo.currentBranch : `origin/${gitRepo.currentBranch}`;
 
         try {

@@ -19,6 +19,11 @@ export type GitStageUnstageFilesParams = {
   filePaths: string[];
 };
 
+export type GitCommitChangesParams = {
+  localPath: string;
+  message: string;
+};
+
 export type GitAheadBehindCommitsCountParams = LocalPathBranchNameParams;
 export type GitBranchCommitsParams = LocalPathBranchNameParams;
 export type GitCheckoutBranchParams = LocalPathBranchNameParams;

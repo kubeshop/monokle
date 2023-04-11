@@ -1,5 +1,6 @@
 export * from './checkoutGitBranch';
 export * from './cloneGitRepo';
+export * from './commitChanges';
 export * from './createLocalBranch';
 export * from './deleteLocalBranch';
 export * from './fetchRepo';

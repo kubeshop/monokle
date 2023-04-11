@@ -2,16 +2,7 @@ import {ipcMain} from 'electron';
 
 import type {FileMapType} from '@shared/models/appState';
 
-import {
-  commitChanges,
-  createLocalBranch,
-  getChangedFiles,
-  getCommitResources,
-  getGitRepoInfo,
-  initGitRepo,
-  publishLocalBranch,
-  setRemote,
-} from './git';
+import {getChangedFiles, getCommitResources, getGitRepoInfo, initGitRepo, publishLocalBranch, setRemote} from './git';
 
 ipcMain.on('git.getGitRepoInfo', async (event, localPath: string) => {
   try {
@@ -37,24 +28,6 @@ ipcMain.on('git.getChangedFiles', async (event, payload: {localPath: string; fil
     event.sender.send('git.getChangedFiles.result', result);
   } catch (e: any) {
     event.sender.send('git.getChangedFiles.result', {error: e.message});
-  }
-});
-
-ipcMain.on('git.commitChanges', async (event, payload: {localPath: string; message: string}) => {
-  try {
-    const result = await commitChanges(payload.localPath, payload.message);
-    event.sender.send('git.commitChanges.result', result);
-  } catch (e: any) {
-    event.sender.send('git.commitChanges.result', {error: e.message});
-  }
-});
-
-ipcMain.on('git.createLocalBranch', async (event, payload: {localPath: string; branchName: string}) => {
-  try {
-    const result = await createLocalBranch(payload.localPath, payload.branchName);
-    event.sender.send('git.createLocalBranch.result', result);
-  } catch (e: any) {
-    event.sender.send('git.createLocalBranch.result', {error: e.message});
   }
 });
 

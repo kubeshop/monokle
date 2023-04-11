@@ -5,7 +5,6 @@ import type {FileMapType} from '@shared/models/appState';
 import type {GitRepo} from '@shared/models/git';
 import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
 import {isKustomizationFilePath} from '@shared/utils/kustomize';
-import {trackEvent} from '@shared/utils/telemetry';
 
 import {formatGitChangedFiles} from '../utils/git';
 
@@ -157,29 +156,6 @@ export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
     }
 
     return changedFiles;
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
-export async function commitChanges(localPath: string, message: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    await git.commit(message);
-    await trackEvent('git/commit');
-    return {};
-  } catch (e: any) {
-    return {error: e.message};
-  }
-}
-
-export async function createLocalBranch(localPath: string, branchName: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  try {
-    await git.checkoutLocalBranch(branchName);
-    return {};
   } catch (e: any) {
     return {error: e.message};
   }
