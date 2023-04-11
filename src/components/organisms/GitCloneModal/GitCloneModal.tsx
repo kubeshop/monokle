@@ -49,7 +49,7 @@ const GitCloneModal: React.FC = () => {
 
       const {localPath, repoURL} = values;
       const repoName = repoURL.split('/').pop();
-      const localGitPath = `${localPath}${sep}${repoName}`;
+      const localGitPath = `${localPath}${sep}${repoName.replace('.git', '')}`;
 
       if (!doesPathExist(localPath)) {
         fs.mkdirSync(localPath, {recursive: true});

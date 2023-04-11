@@ -8,21 +8,19 @@ import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import {AppDispatch} from '@shared/models/appDispatch';
-import {ResourceMetaMap} from '@shared/models/k8sResource';
+import {K8sResource} from '@shared/models/k8sResource';
 
 const debouncedCodeSave = debounce(
   (payload: {
     code: string;
-    resourceMetaMap: ResourceMetaMap;
-    selectedResourceId: string | undefined;
+    selectedResource: K8sResource | undefined;
     selectedPath: string | undefined;
     dispatch: AppDispatch;
   }) => {
-    const {code, resourceMetaMap, selectedPath, selectedResourceId, dispatch} = payload;
-    const resourceMeta = selectedResourceId ? resourceMetaMap[selectedResourceId] : undefined;
+    const {code, selectedResource, selectedPath, dispatch} = payload;
 
     // is a file and no resource selected?
-    if (selectedPath && !resourceMeta) {
+    if (selectedPath && !selectedResource) {
       try {
         dispatch(updateFileEntry({path: selectedPath, text: code}));
         return true;
@@ -30,9 +28,9 @@ const debouncedCodeSave = debounce(
         log.warn(`Failed to update file ${e}`, dispatch);
         return false;
       }
-    } else if (selectedResourceId && resourceMeta) {
+    } else if (selectedResource) {
       try {
-        dispatch(updateResource({resourceIdentifier: resourceMeta, text: code}));
+        dispatch(updateResource({resourceIdentifier: selectedResource, text: code}));
         return true;
       } catch (e) {
         log.warn(`Failed to update resource ${e}`, dispatch);
@@ -45,8 +43,7 @@ const debouncedCodeSave = debounce(
 
 function useDebouncedCodeSave(
   originalCodeRef: React.MutableRefObject<string>,
-  resourceMetaMapRef: React.MutableRefObject<ResourceMetaMap>,
-  selectedResourceIdRef: React.MutableRefObject<string | undefined>,
+  selectedResource: K8sResource | undefined,
   selectedPathRef: React.MutableRefObject<string | undefined>
 ) {
   const dispatch = useAppDispatch();
@@ -54,8 +51,7 @@ function useDebouncedCodeSave(
     (code: string) => {
       const success = debouncedCodeSave({
         code,
-        resourceMetaMap: resourceMetaMapRef.current,
-        selectedResourceId: selectedResourceIdRef.current,
+        selectedResource,
         selectedPath: selectedPathRef.current,
         dispatch,
       });
@@ -63,7 +59,7 @@ function useDebouncedCodeSave(
         originalCodeRef.current = code;
       }
     },
-    [dispatch, originalCodeRef, resourceMetaMapRef, selectedPathRef, selectedResourceIdRef]
+    [selectedResource, selectedPathRef, dispatch, originalCodeRef]
   );
 
   return debouncedSaveContent;
