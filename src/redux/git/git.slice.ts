@@ -87,6 +87,11 @@ export const gitSlice = createSlice({
     },
   },
   extraReducers: builder => {
+    builder.addCase(setRootFolder.pending, state => {
+      state.repo = undefined;
+      state.changedFiles = [];
+    });
+
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
       if (!action.payload.isGitRepo) {
         state.repo = undefined;
