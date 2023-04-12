@@ -2,14 +2,20 @@ import {ipcRenderer} from 'electron';
 
 import {createAction, isAnyOf} from '@reduxjs/toolkit';
 
-import {setCurrentContext, setKubeConfig, setOpenProject, updateProjectConfig} from '@redux/appConfig';
+import {
+  loadProjectKubeConfig,
+  setCurrentContext,
+  setKubeConfig,
+  setOpenProject,
+  updateProjectConfig,
+} from '@redux/appConfig';
 import {AppListenerFn} from '@redux/listeners/base';
 
 import {ModernKubeConfig} from '@shared/models/config';
 
 import {selectKubeconfigPaths} from '../selectors';
 import {stopWatchKubeconfig, watchKubeconfig} from '../service/kube-control';
-import {kubeconfigUpdated} from '../slice';
+import {kubeconfigPathsUpdated, kubeconfigUpdated} from '../slice';
 
 export const startWatchingKubeconfig = createAction('cluster/startKubeConfigWatch');
 export const stopWatchingKubeconfig = createAction('cluster/stopKubeConfigWatch');
@@ -26,38 +32,70 @@ export const kubeConfigListener: AppListenerFn = listen => {
         dispatch(kubeconfigUpdated({config}));
 
         // start legacy actions of main slice
-        if (config?.isValid) {
-          dispatch(
-            setKubeConfig({
-              contexts:
-                config?.contexts.map(c => ({
-                  cluster: c.cluster,
-                  name: c.name,
-                  namespace: c.namespace ?? null,
-                  user: c.user,
-                })) ?? [],
-              currentContext: config?.currentContext,
-              isPathValid: true,
-              path: config?.path,
-            })
-          );
-
-          if (config?.currentContext) {
-            dispatch(setCurrentContext(config.currentContext));
+        const isGlobalKubeconfig = getState().config.kubeConfig.path === config?.path;
+        if (isGlobalKubeconfig) {
+          if (config?.isValid) {
+            dispatch(
+              setKubeConfig({
+                contexts:
+                  config?.contexts.map(c => ({
+                    cluster: c.cluster,
+                    name: c.name,
+                    namespace: c.namespace ?? null,
+                    user: c.user,
+                  })) ?? [],
+                currentContext: config?.currentContext,
+                isPathValid: true,
+                path: config?.path,
+              })
+            );
+          } else {
+            dispatch(
+              setKubeConfig({
+                path: config?.path,
+                isPathValid: false,
+                contexts: [],
+              })
+            );
           }
-        } else {
-          dispatch(
-            setKubeConfig({
-              path: config?.path,
-              isPathValid: false,
-              contexts: [],
-            })
-          );
+        }
+
+        const isProjectKubeconfig = getState().config.projectConfig?.kubeConfig?.path === config?.path;
+        if (isProjectKubeconfig) {
+          if (config?.isValid) {
+            dispatch(
+              loadProjectKubeConfig({
+                contexts:
+                  config?.contexts.map(c => ({
+                    cluster: c.cluster,
+                    name: c.name,
+                    namespace: c.namespace ?? null,
+                    user: c.user,
+                  })) ?? [],
+                currentContext: config?.currentContext,
+                isPathValid: true,
+                path: config?.path,
+              })
+            );
+          } else {
+            dispatch(
+              loadProjectKubeConfig({
+                path: config?.path,
+                isPathValid: false,
+                contexts: [],
+              })
+            );
+          }
+        }
+
+        if (config?.isValid && config?.currentContext) {
+          dispatch(setCurrentContext(config.currentContext));
         }
         // end legacy actions
       };
 
       try {
+        dispatch(kubeconfigPathsUpdated({kubeconfigs}));
         ipcRenderer.on('kubeconfig:update', listener);
         await watchKubeconfig({kubeconfigs});
         await condition(stopWatchingKubeconfig.match);
@@ -75,12 +113,13 @@ export const kubeConfigListener: AppListenerFn = listen => {
 export const kubeconfigPathUpdateListener: AppListenerFn = listen => {
   listen({
     matcher: isAnyOf(setKubeConfig, updateProjectConfig, setOpenProject.fulfilled),
-    effect: async (_, {getState}) => {
+    effect: async (_, {getState, dispatch}) => {
       if (!getState().cluster.watching) {
         return;
       }
 
       const kubeconfigs = selectKubeconfigPaths(getState());
+      dispatch(kubeconfigPathsUpdated({kubeconfigs}));
       await watchKubeconfig({kubeconfigs});
     },
   });

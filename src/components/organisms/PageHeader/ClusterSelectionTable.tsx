@@ -5,12 +5,8 @@ import Column from 'antd/lib/table/Column';
 
 import {CLUSTER_AVAILABLE_COLORS} from '@constants/constants';
 
-import {
-  kubeConfigContextSelector,
-  kubeConfigContextsSelector,
-  setCurrentContext,
-  setKubeConfigContextColor,
-} from '@redux/appConfig';
+import {setCurrentContext, setKubeConfigContextColor} from '@redux/appConfig';
+import {selectKubeContext, selectKubeconfig} from '@redux/cluster/selectors';
 import {KUBECTL} from '@redux/cluster/service/kube-control';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -39,8 +35,8 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
   const dispatch = useAppDispatch();
   const notify = useNotifications();
   const clusterAccess = useAppSelector(state => state.config?.clusterAccess);
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigContexts = useAppSelector(kubeConfigContextsSelector);
+  const kubeconfig = useAppSelector(selectKubeconfig);
+  const currentContext = useAppSelector(selectKubeContext);
   const kubeConfigContextsColors = useAppSelector(state => state.config.kubeConfigContextsColors);
 
   const [changeClusterColor, setChangeClusterColor] = useState('');
@@ -54,7 +50,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
     (cluster: ClusterTableRow) => {
       let className = '';
 
-      if (kubeConfigContext === cluster.name) {
+      if (currentContext?.name === cluster.name) {
         className += 'table-active-row ';
       }
 
@@ -64,7 +60,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
 
       return className.trim();
     },
-    [changeClusterColor, kubeConfigContext]
+    [changeClusterColor, currentContext]
   );
 
   const edit = (record: Partial<ClusterTableRow>) => {
@@ -84,7 +80,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
     (contextName: string) => {
       setIsClusterDropdownOpen(false);
 
-      if (contextName === kubeConfigContext) {
+      if (contextName === currentContext?.name) {
         return;
       }
 
@@ -95,7 +91,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
           notify.error(err.message, {description: cause});
         });
     },
-    [dispatch, kubeConfigContext, notify, setIsClusterDropdownOpen]
+    [dispatch, currentContext, notify, setIsClusterDropdownOpen]
   );
 
   const updateClusterColor = (name: string, color: ClusterColors) => {
@@ -125,7 +121,12 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
   );
 
   useEffect(() => {
-    const clusterTableRows: ClusterTableRow[] = kubeConfigContexts.map(context => {
+    if (!kubeconfig?.isValid) {
+      setLocalClusters([]);
+      return;
+    }
+
+    const clusterTableRows: ClusterTableRow[] = kubeconfig.contexts.map(context => {
       const contextNamespaces = clusterAccess.filter(appNs => appNs.context === context.name);
       const clusterSpecificAccess = clusterAccess?.filter(ca => ca.context === context.name) || [];
       const hasFullAccess = clusterSpecificAccess.length
@@ -142,7 +143,7 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
     });
 
     setLocalClusters(clusterTableRows);
-  }, [kubeConfigContexts, clusterAccess, kubeConfigContextsColors]);
+  }, [kubeconfig, clusterAccess, kubeConfigContextsColors]);
 
   return (
     <Form form={form} component={false}>

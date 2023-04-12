@@ -6,7 +6,8 @@ import {DownOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {isInClusterModeSelector, kubeConfigContextSelector} from '@redux/appConfig';
+import {isInClusterModeSelector} from '@redux/appConfig';
+import {selectKubeconfig} from '@redux/cluster/selectors';
 import {useAppSelector} from '@redux/hooks';
 
 import {Colors} from '@shared/styles';
@@ -15,7 +16,11 @@ import * as S from '../ClusterSelection.styled';
 import {ClusterSelectionTable} from '../ClusterSelectionTable';
 
 export function ContextSelect() {
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeconfig = useAppSelector(selectKubeconfig);
+
+  if (!kubeconfig?.isValid) {
+    return <div>KUBECONFIG_INVALID</div>; // TODO design this
+  }
 
   return (
     <Dropdown
@@ -33,7 +38,7 @@ export function ContextSelect() {
       trigger={['hover']}
     >
       <div>
-        <Trigger icon={<S.ClusterOutlined />} value={kubeConfigContext} />
+        <Trigger icon={<S.ClusterOutlined />} value={kubeconfig.currentContext} />
       </div>
     </Dropdown>
   );

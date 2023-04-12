@@ -1,7 +1,7 @@
 import {groupBy} from 'lodash';
 import {createSelector} from 'reselect';
 
-import {selectCurrentKubeConfig} from '@redux/appConfig';
+import {kubeConfigContextsSelector} from '@redux/appConfig';
 import {kustomizationsSelector} from '@redux/selectors/resourceSelectors';
 import {canTransfer} from '@redux/services/compare/transferResource';
 import {joinK8sResource} from '@redux/services/resource';
@@ -49,8 +49,7 @@ export const selectClusterResourceSet = (state: RootState, side: CompareSide) =>
   if (resourceSet?.type !== 'cluster') return undefined;
   const {context} = resourceSet;
 
-  const kubeConfig = selectCurrentKubeConfig(state);
-  const allContexts = kubeConfig.contexts ?? [];
+  const allContexts = kubeConfigContextsSelector(state);
   const currentContext = allContexts.find(c => c.name === context);
 
   return {

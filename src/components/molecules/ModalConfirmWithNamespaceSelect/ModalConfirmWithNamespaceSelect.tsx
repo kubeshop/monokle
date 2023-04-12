@@ -4,7 +4,8 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Input, Modal, Radio, Select} from 'antd';
 
-import {currentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {currentClusterAccessSelector} from '@redux/appConfig';
+import {selectKubeconfig} from '@redux/cluster/selectors';
 import {setup} from '@redux/cluster/service/kube-control';
 import {useAppSelector} from '@redux/hooks';
 
@@ -31,8 +32,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const clusterNamespaces = clusterAccess?.map(cl => cl.namespace);
   const defaultClusterNamespace = clusterNamespaces && clusterNamespaces.length ? clusterNamespaces[0] : 'default';
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const kubeconfig = useAppSelector(selectKubeconfig);
 
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resourceMetaList, defaultClusterNamespace);
 
@@ -44,6 +44,10 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const [selectedOption, setSelectedOption] = useState<'existing' | 'create' | 'none'>();
 
   const onClickOk = useCallback(() => {
+    if (!kubeconfig?.isValid) {
+      return setErrorMessage('Cannot use invalid kubeconfig');
+    }
+
     if (selectedOption === 'create') {
       if (!createNamespaceName) {
         setErrorMessage('Namespace name must not be empty!');
@@ -53,12 +57,12 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
       (async () => {
         try {
           const setupResponse = await setup({
-            context: kubeConfigContext,
-            kubeconfig: kubeConfigPath,
+            context: kubeconfig.currentContext,
+            kubeconfig: kubeconfig.path,
             skipHealthCheck: true,
           });
           if (!setupResponse.success) throw new Error(setupResponse.code);
-          const kc = createKubeClient(kubeConfigPath, kubeConfigContext, setupResponse.port);
+          const kc = createKubeClient(kubeconfig.path, kubeconfig.currentContext, setupResponse.port);
           const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
           await k8sCoreV1Api.createNamespace({metadata: {name: createNamespaceName}});
           onOk({name: createNamespaceName, new: true});
@@ -75,7 +79,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
     } else if (!selectedOption || selectedOption === 'none') {
       onOk();
     }
-  }, [selectedOption, createNamespaceName, kubeConfigPath, kubeConfigContext, onOk, selectedNamespace]);
+  }, [selectedOption, createNamespaceName, kubeconfig, onOk, selectedNamespace]);
 
   const clusterScopedResourcesCount = useMemo(
     () => resourceMetaList.filter(r => r.isClusterScoped).length,

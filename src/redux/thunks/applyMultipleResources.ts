@@ -4,6 +4,7 @@ import {stringify} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
+import {selectKubeconfig} from '@redux/cluster/selectors';
 import {setAlert} from '@redux/reducers/alert';
 import {doesTextStartWithYamlDocumentDelimiter} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
@@ -11,18 +12,24 @@ import {removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {AppConfig} from '@shared/models/config';
 import {K8sResource} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
 
 const applyMultipleResources = async (
-  config: AppConfig,
+  state: RootState,
   resourcesToApply: K8sResource[],
   dispatch: AppDispatch,
   namespace?: {name: string; new: boolean},
   onSuccessCallback?: () => void
 ) => {
-  const kubeConfigPath = config.kubeConfig.path;
-  const currentContext = config.kubeConfig.currentContext;
+  const kubeconfig = selectKubeconfig(state);
+
+  if (!kubeconfig?.isValid) {
+    return;
+  }
+
+  const kubeConfigPath = kubeconfig.path;
+  const currentContext = kubeconfig.currentContext;
 
   if (!kubeConfigPath || !currentContext || !resourcesToApply.length) {
     return;

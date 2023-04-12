@@ -26,7 +26,7 @@ export const selectKubeconfig = (
   return kubeconfig;
 };
 
-export const selectContext = (
+export const selectKubeContext = (
   state: RootState,
   options: {kubeconfig?: string; context?: string} = {}
 ): Context | undefined => {

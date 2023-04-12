@@ -4,7 +4,7 @@ import {loadClusterResources, reloadClusterResources} from '@redux/thunks/cluste
 
 import {ThunkApi} from '@shared/models/thunk';
 
-import {selectContext, selectCurrentContextId} from '../selectors';
+import {selectCurrentContextId, selectKubeContext} from '../selectors';
 import {setup} from '../service/kube-control';
 import {pingCluster} from './ping';
 
@@ -41,7 +41,7 @@ export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, Thu
 
     // Create connection as before
     // Connection will listen to resource updates
-    const context = selectContext(getState());
+    const context = selectKubeContext(getState());
     if (!context) {
       throw new Error('no_cluster_context_found');
     }

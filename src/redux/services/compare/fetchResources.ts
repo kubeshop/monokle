@@ -8,6 +8,7 @@ import {v4 as uuid} from 'uuid';
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {selectKubeconfig} from '@redux/cluster/selectors';
 import {setup} from '@redux/cluster/service/kube-control';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
@@ -163,8 +164,13 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
   try {
     const {chartId, valuesId} = options;
     const projectConfig = currentConfigSelector(state);
-    const kubeconfig = projectConfig.kubeConfig?.path;
-    const currentContext = projectConfig.kubeConfig?.currentContext;
+    const kubeconfig = selectKubeconfig(state);
+
+    if (!kubeconfig?.isValid) {
+      throw new Error('Kubeconfig is invalid');
+    }
+
+    const currentContext = kubeconfig.currentContext;
     const helmPreviewMode = projectConfig.settings ? projectConfig.settings.helmPreviewMode : 'template';
 
     const chart = state.main.helmChartMap[chartId];
@@ -181,7 +187,7 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
 
     let command: CommandOptions;
     if (helmPreviewMode === 'install') {
-      if (!kubeconfig || !currentContext) {
+      if (!kubeconfig.path || !currentContext) {
         throw new Error('Kube context not found');
       }
 
@@ -193,7 +199,7 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
           chart: chart.name,
         },
         {
-          KUBECONFIG: kubeconfig,
+          KUBECONFIG: kubeconfig.path,
         }
       );
     } else {
@@ -204,7 +210,7 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
           name: folder,
         },
         {
-          KUBECONFIG: kubeconfig,
+          KUBECONFIG: kubeconfig.path,
         }
       );
     }
@@ -234,9 +240,14 @@ async function previewCustomHelmResources(
 ): Promise<K8sResource<'preview'>[]> {
   try {
     const {chartId, configId} = options;
-    const projectConfig = currentConfigSelector(state);
-    const kubeconfig = projectConfig.kubeConfig?.path;
-    const currentContext = projectConfig.kubeConfig?.currentContext;
+    const kubeconfig = selectKubeconfig(state);
+
+    if (!kubeconfig?.isValid) {
+      throw new Error('Kubeconfig is invalid');
+    }
+
+    const currentContext = kubeconfig.currentContext;
+
     const rootFolder = state.main.fileMap[ROOT_FILE_ENTRY].filePath;
 
     const chart = state.main.helmChartMap[chartId];
@@ -265,7 +276,7 @@ async function previewCustomHelmResources(
       commandId: uuid(),
       cmd: 'helm',
       args: args.splice(1),
-      env: {KUBECONFIG: kubeconfig},
+      env: {KUBECONFIG: kubeconfig.path},
     };
 
     const result = await runCommandInMainThread(command);

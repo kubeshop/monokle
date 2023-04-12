@@ -18,6 +18,10 @@ export const clusterSlice = createSlice({
   name: 'cluster',
   initialState,
   reducers: {
+    // Currently this is only used to debug the actively watched kubeconfigs.
+    kubeconfigPathsUpdated(state, action: PayloadAction<{kubeconfigs: string[]}>) {
+      state.configPaths = action.payload.kubeconfigs;
+    },
     kubeconfigUpdated(state, action: PayloadAction<{config: ModernKubeConfig | undefined}>) {
       const config = action.payload.config;
       if (config) {
@@ -43,4 +47,4 @@ export const clusterSlice = createSlice({
   },
 });
 
-export const {kubeconfigUpdated} = clusterSlice.actions;
+export const {kubeconfigPathsUpdated, kubeconfigUpdated} = clusterSlice.actions;

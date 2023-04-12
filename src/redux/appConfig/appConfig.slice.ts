@@ -265,15 +265,6 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.projects', state.projects);
     },
     loadProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
-      if (state.projectConfig?.kubeConfig) {
-        state.projectConfig.kubeConfig = {...state.projectConfig.kubeConfig, ...action.payload};
-      }
-    },
-    updateProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
-      if (!state.selectedProjectRootFolder) {
-        return;
-      }
-
       if (!state.projectConfig) {
         state.projectConfig = {};
       }
@@ -282,29 +273,10 @@ export const configSlice = createSlice({
         state.projectConfig.kubeConfig = {};
       }
 
-      const kubeConfig = state.projectConfig?.kubeConfig;
-
-      const serializedIncomingConfig = flatten<any, any>(action.payload, {safe: true});
-      const serializedState = flatten<any, any>(state.projectConfig.kubeConfig, {safe: true});
-      const keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
-
-      keys.forEach(key => {
-        if (kubeConfig) {
-          _.set(kubeConfig, key, serializedIncomingConfig[key]);
-          _.set(state.kubeConfig, key, serializedIncomingConfig[key]);
-        }
-      });
-
-      const currentLength = kubeConfig?.contexts?.length;
-      const newLength = action.payload?.contexts?.length;
-      // means we are updating/removing at least one of the contexts
-      if (currentLength && newLength && currentLength > newLength) {
-        kubeConfig?.contexts?.splice(newLength - 1, currentLength - newLength);
-      }
-
-      if (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder))) {
-        writeProjectConfigFile(state);
-      }
+      state.projectConfig.kubeConfig = {
+        ...state.projectConfig.kubeConfig,
+        ...action.payload,
+      };
     },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<UpdateProjectConfigPayload>) => {
       if (!state.selectedProjectRootFolder) {
@@ -578,8 +550,7 @@ export const {
   updateNewVersion,
   updateProjectConfig,
   updateProjectK8sVersion,
-  updateProjectKubeConfig, // bookmark
-  loadProjectKubeConfig, // bookmark
+  loadProjectKubeConfig,
   updateProjectsGitRepo,
   updateScanExcludes,
   updateTelemetry,
