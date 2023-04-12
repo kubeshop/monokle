@@ -1,8 +1,11 @@
 import {ipcRenderer} from 'electron';
 
+import isEqual from 'react-fast-compare';
+
 import {createAction, isAnyOf} from '@reduxjs/toolkit';
 
 import {
+  kubeConfigPathSelector,
   loadProjectKubeConfig,
   setCurrentContext,
   setKubeConfig,
@@ -11,7 +14,7 @@ import {
 } from '@redux/appConfig';
 import {AppListenerFn} from '@redux/listeners/base';
 
-import {ModernKubeConfig} from '@shared/models/config';
+import {KubeConfig, ModernKubeConfig} from '@shared/models/config';
 
 import {selectKubeconfigPaths} from '../selectors';
 import {stopWatchKubeconfig, watchKubeconfig} from '../service/kube-control';
@@ -29,67 +32,59 @@ export const kubeConfigListener: AppListenerFn = listen => {
       const kubeconfigs = selectKubeconfigPaths(getState());
 
       const listener = (_event: any, config: ModernKubeConfig | undefined) => {
-        dispatch(kubeconfigUpdated({config}));
+        const oldConfig = config ? getState().cluster.kubeconfigs[config.path] : undefined;
+        const hasChanged = !isEqual(oldConfig, config);
+        if (hasChanged) {
+          dispatch(kubeconfigUpdated({config}));
+        }
 
         // start legacy actions of main slice
+        const newKubeconfig: KubeConfig = config?.isValid
+          ? {
+              contexts:
+                config?.contexts.map(c => ({
+                  cluster: c.cluster,
+                  name: c.name,
+                  namespace: c.namespace ?? null,
+                  user: c.user,
+                })) ?? [],
+              currentContext: config?.currentContext,
+              isPathValid: true,
+              path: config?.path,
+            }
+          : {
+              path: config?.path,
+              isPathValid: false,
+              contexts: [],
+            };
+
+        const isInitKubeconfig = getState().config.kubeConfig.path === undefined;
+        if (isInitKubeconfig) {
+          dispatch(setKubeConfig(newKubeconfig));
+        }
+
         const isGlobalKubeconfig = getState().config.kubeConfig.path === config?.path;
         if (isGlobalKubeconfig) {
-          if (config?.isValid) {
-            dispatch(
-              setKubeConfig({
-                contexts:
-                  config?.contexts.map(c => ({
-                    cluster: c.cluster,
-                    name: c.name,
-                    namespace: c.namespace ?? null,
-                    user: c.user,
-                  })) ?? [],
-                currentContext: config?.currentContext,
-                isPathValid: true,
-                path: config?.path,
-              })
-            );
-          } else {
-            dispatch(
-              setKubeConfig({
-                path: config?.path,
-                isPathValid: false,
-                contexts: [],
-              })
-            );
-          }
+          const oldKubeconfig = getState().config.kubeConfig;
+          const changed = !isEqual(newKubeconfig, oldKubeconfig);
+          if (changed) dispatch(setKubeConfig(newKubeconfig));
         }
 
         const isProjectKubeconfig = getState().config.projectConfig?.kubeConfig?.path === config?.path;
         if (isProjectKubeconfig) {
-          if (config?.isValid) {
-            dispatch(
-              loadProjectKubeConfig({
-                contexts:
-                  config?.contexts.map(c => ({
-                    cluster: c.cluster,
-                    name: c.name,
-                    namespace: c.namespace ?? null,
-                    user: c.user,
-                  })) ?? [],
-                currentContext: config?.currentContext,
-                isPathValid: true,
-                path: config?.path,
-              })
-            );
-          } else {
-            dispatch(
-              loadProjectKubeConfig({
-                path: config?.path,
-                isPathValid: false,
-                contexts: [],
-              })
-            );
-          }
+          const oldKubeconfig: KubeConfig | undefined = getState().config.projectConfig?.kubeConfig;
+          const changed = !isEqual(newKubeconfig, oldKubeconfig);
+          if (changed) dispatch(loadProjectKubeConfig(newKubeconfig));
         }
 
         if (config?.isValid && config?.currentContext) {
-          dispatch(setCurrentContext(config.currentContext));
+          const currentPath = kubeConfigPathSelector(getState());
+          const isCurrentConfig = config.path === currentPath;
+          if (isCurrentConfig) {
+            // WARNING: this might be incorrect.
+            // setCurrentContext always updates global kubeconfig and not project kubeconfig.
+            dispatch(setCurrentContext(config.currentContext));
+          }
         }
         // end legacy actions
       };

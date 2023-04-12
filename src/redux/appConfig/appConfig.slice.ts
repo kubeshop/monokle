@@ -533,7 +533,7 @@ export const {
   setAutoZoom,
   setCurrentContext,
   setFilterObjects,
-  setKubeConfig, // bookmark
+  setKubeConfig,
   setKubeConfigContextColor,
   setUserDirs,
   toggleEditorPlaceholderVisiblity,

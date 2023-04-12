@@ -84,10 +84,6 @@ const App = () => {
   );
 
   useEffect(() => {
-    ipcRenderer.invoke('kubeService:start');
-  }, []);
-
-  useEffect(() => {
     dispatch(startWatchingKubeconfig());
   }, [dispatch]);
 

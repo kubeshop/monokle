@@ -10,8 +10,6 @@ import {InvalidKubeConfig, ValidKubeConfig} from '@shared/models/config';
 
 import {getDefaultKubeConfig} from '../utils/getDefaultKubeConfig';
 
-// TODO: validate whether this only dispatches when there are
-// no changes to avoid unnecessary dispatches in renderer.
 // TODO: Dispatch delete event so slices can remove stale kubeconfigs.
 export class KubeConfigWatcher {
   private watchers: Map<string, FSWatcher> = new Map();
@@ -35,6 +33,18 @@ export class KubeConfigWatcher {
 
       if (shouldAdd) {
         await this.watchFile(kubeconfig);
+        // Dispatch events a first time.
+        this.parse(kubeconfig);
+      }
+    }
+
+    // Already existing watchers.
+    for (const kubeconfig of newKubeconfigs) {
+      const alreadyExists = oldKubeconfigs.includes(kubeconfig);
+
+      if (alreadyExists) {
+        // Dispatch events once more to ensure proper state.
+        this.parse(kubeconfig);
       }
     }
   }
@@ -64,27 +74,22 @@ export class KubeConfigWatcher {
           return;
         }
 
-        try {
-          const config = new k8s.KubeConfig();
-          config.loadFromFile(kubeconfigPath);
-          this.broadcastSuccess(kubeconfigPath, config);
-        } catch {
-          this.broadcastError(kubeconfigPath, 'malformed');
-        }
+        this.parse(kubeconfigPath);
       });
-
-      // Run once manually to get started
-      try {
-        const config = new k8s.KubeConfig();
-        config.loadFromFile(kubeconfigPath);
-        this.broadcastSuccess(kubeconfigPath, config);
-      } catch {
-        this.broadcastError(kubeconfigPath, 'malformed');
-      }
     } catch (e: any) {
       // eslint-disable-next-line no-console
       console.log('monitorKubeConfigError', e.message);
       this.broadcastError(kubeconfigPath, 'unknown');
+    }
+  }
+
+  private parse(kubeconfigPath: string) {
+    try {
+      const config = new k8s.KubeConfig();
+      config.loadFromFile(kubeconfigPath);
+      this.broadcastSuccess(kubeconfigPath, config);
+    } catch {
+      this.broadcastError(kubeconfigPath, 'malformed');
     }
   }
 
