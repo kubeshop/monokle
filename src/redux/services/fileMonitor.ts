@@ -2,6 +2,7 @@ import {FSWatcher, watch} from 'chokidar';
 import log from 'loglevel';
 
 import {setChangedFiles, setCurrentBranch, setGitLoading, setRepo} from '@redux/git';
+import {getChangedFiles} from '@redux/git/service';
 import {multiplePathsRemoved} from '@redux/reducers/main';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
@@ -66,16 +67,14 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
             thunkAPI.dispatch(setRepo(repo));
             thunkAPI.dispatch(setCurrentBranch(repo.currentBranch));
 
-            promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-              localPath: folder,
-              fileMap: thunkAPI.getState().main.fileMap,
-            }).then(result => {
-              if (!result?.error) {
-                thunkAPI.dispatch(setChangedFiles(result));
-              }
-
+            try {
+              getChangedFiles({localPath: folder, fileMap: thunkAPI.getState().main.fileMap}).then(changedFiles => {
+                thunkAPI.dispatch(setChangedFiles(changedFiles));
+                thunkAPI.dispatch(setGitLoading(false));
+              });
+            } catch (e) {
               thunkAPI.dispatch(setGitLoading(false));
-            });
+            }
           }
         });
       }, 1000)
@@ -95,16 +94,14 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
             thunkAPI.dispatch(setRepo(repo));
             thunkAPI.dispatch(setCurrentBranch(repo.currentBranch));
 
-            promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-              localPath: folder,
-              fileMap: thunkAPI.getState().main.fileMap,
-            }).then(result => {
-              if (!result?.error) {
-                thunkAPI.dispatch(setChangedFiles(result));
-              }
-
+            try {
+              getChangedFiles({localPath: folder, fileMap: thunkAPI.getState().main.fileMap}).then(changedFiles => {
+                thunkAPI.dispatch(setChangedFiles(changedFiles));
+                thunkAPI.dispatch(setGitLoading(false));
+              });
+            } catch (e) {
               thunkAPI.dispatch(setGitLoading(false));
-            });
+            }
           }
         });
       }, 1000)

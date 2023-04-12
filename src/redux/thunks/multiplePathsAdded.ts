@@ -5,10 +5,10 @@ import micromatch from 'micromatch';
 
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading} from '@redux/git';
+import {getChangedFiles} from '@redux/git/service';
 import {addPath, getFileEntryForAbsolutePath, reloadFile} from '@redux/services/fileEntry';
 
 import {getFileStats} from '@utils/files';
-import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {AppState} from '@shared/models/appState';
 import {FileSideEffect} from '@shared/models/fileEntry';
@@ -46,16 +46,16 @@ export const multiplePathsAdded = createAsyncThunk<
       thunkAPI.dispatch(setGitLoading(true));
     }
 
-    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-      localPath: projectRootFolder,
-      fileMap: nextMainState.fileMap,
-    }).then(result => {
-      if (!result?.error) {
-        thunkAPI.dispatch(setChangedFiles(result));
-      }
-
+    try {
+      getChangedFiles({localPath: projectRootFolder || '', fileMap: thunkAPI.getState().main.fileMap}).then(
+        changedFiles => {
+          thunkAPI.dispatch(setChangedFiles(changedFiles));
+          thunkAPI.dispatch(setGitLoading(false));
+        }
+      );
+    } catch (e) {
       thunkAPI.dispatch(setGitLoading(false));
-    });
+    }
   }
 
   return {

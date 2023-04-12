@@ -1,10 +1,7 @@
 import {orderBy} from 'lodash';
 import {SimpleGit, simpleGit} from 'simple-git';
 
-import type {FileMapType} from '@shared/models/appState';
 import type {GitRepo} from '@shared/models/git';
-
-import {formatGitChangedFiles} from '../utils/git';
 
 export async function getGitRemoteUrl(path: string) {
   const git: SimpleGit = simpleGit({baseDir: path});
@@ -111,39 +108,4 @@ export async function getGitRepoInfo(localPath: string) {
   }
 
   return gitRepo;
-}
-
-export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-
-  const projectFolderPath = fileMap['<root>'].filePath;
-
-  try {
-    const gitFolderPath = await git.revparse({'--show-toplevel': null});
-    const currentBranch = (await git.branch()).current;
-
-    const branchStatus = await git.status({'-z': null, '-uall': null});
-    const files = branchStatus.files;
-
-    const changedFiles = formatGitChangedFiles(files, fileMap, projectFolderPath, gitFolderPath, git);
-
-    for (let i = 0; i < changedFiles.length; i += 1) {
-      if (!changedFiles[i].originalContent) {
-        let originalContent: string = '';
-
-        try {
-          // eslint-disable-next-line no-await-in-loop
-          originalContent = await git.show(`${currentBranch}:${changedFiles[i].gitPath}`);
-        } catch (error) {
-          originalContent = '';
-        }
-
-        changedFiles[i].originalContent = originalContent;
-      }
-    }
-
-    return changedFiles;
-  } catch (e: any) {
-    return {error: e.message};
-  }
 }

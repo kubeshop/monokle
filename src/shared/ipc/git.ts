@@ -1,4 +1,6 @@
-import {DefaultLogFields, ListLogLine} from 'simple-git';
+import type {DefaultLogFields, ListLogLine} from 'simple-git';
+
+import type {FileMapType} from '@shared/models/appState';
 
 type LocalPathBranchNameParams = {
   localPath: string;
@@ -32,6 +34,11 @@ export type GitSetRemoteParams = {
 export type GitCommitResourcesParams = {
   localPath: string;
   commitHash: string;
+};
+
+export type GitChangedFilesParams = {
+  localPath: string;
+  fileMap: FileMapType;
 };
 
 export type GitAheadBehindCommitsCountParams = LocalPathBranchNameParams;

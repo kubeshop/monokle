@@ -4,7 +4,7 @@ import log from 'loglevel';
 
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
-import {isFolderGitRepo} from '@redux/git/service';
+import {getChangedFiles, isFolderGitRepo} from '@redux/git/service';
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
@@ -18,7 +18,7 @@ import {showGitErrorModal} from '@utils/terminal';
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
-import {GitChangedFile, GitRepo} from '@shared/models/git';
+import {GitRepo} from '@shared/models/git';
 import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -116,10 +116,7 @@ export const setRootFolder = createAsyncThunk<
 
     Promise.all([
       promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder),
-      promiseFromIpcRenderer<GitChangedFile[]>('git.getChangedFiles', 'git.getChangedFiles.result', {
-        localPath: rootFolder,
-        fileMap,
-      }),
+      getChangedFiles({localPath: rootFolder, fileMap}),
     ])
       .then(([repo, changedFiles]) => {
         thunkAPI.dispatch(setRepo(repo));
