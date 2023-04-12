@@ -19,7 +19,7 @@ import {
   updateProjectsGitRepo,
 } from '@redux/appConfig';
 import {setCurrentBranch, setRepo} from '@redux/git';
-import {initGitRepo} from '@redux/git/service';
+import {getRepoInfo, initGitRepo} from '@redux/git/service';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setIsInQuickClusterMode, setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
@@ -32,7 +32,6 @@ import BranchSelect from '@components/molecules/BranchSelect';
 
 import {useHelpMenuItems} from '@hooks/menuItemsHooks';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
@@ -132,12 +131,16 @@ const PageHeader = () => {
 
     monitorGitFolder(projectRootFolder, store);
 
-    promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', projectRootFolder).then(repo => {
-      dispatch(setRepo(repo));
-      dispatch(setCurrentBranch(repo.currentBranch));
-      setIsInitializingGitRepo(false);
-      dispatch(updateProjectsGitRepo([{path: projectRootFolder, isGitRepo: true}]));
-    });
+    try {
+      getRepoInfo({path: projectRootFolder || ''}).then(repo => {
+        dispatch(setRepo(repo));
+        dispatch(setCurrentBranch(repo.currentBranch));
+        setIsInitializingGitRepo(false);
+        dispatch(updateProjectsGitRepo([{path: projectRootFolder, isGitRepo: true}]));
+      });
+    } catch (e: any) {
+      showGitErrorModal('Git repo error', e.message);
+    }
   };
 
   const onClickProjectHandler = () => {

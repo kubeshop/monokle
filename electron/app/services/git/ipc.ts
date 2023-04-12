@@ -11,6 +11,7 @@ import {
   getChangedFiles,
   getCommitResources,
   getGitRemotePath,
+  getRepoInfo,
   initGitRepo,
   isFolderGitRepo,
   isGitInstalled,
@@ -33,6 +34,7 @@ handleIpc('git:getBranchCommits', getBranchCommits);
 handleIpc('git:getChangedFiles', getChangedFiles);
 handleIpc('git:getCommitResources', getCommitResources);
 handleIpc('git:getGitRemotePath', getGitRemotePath);
+handleIpc('git:getRepoInfo', getRepoInfo);
 handleIpc('git:initGitRepo', initGitRepo);
 handleIpc('git:isFolderGitRepo', isFolderGitRepo);
 handleIpc('git:isGitInstalled', isGitInstalled);

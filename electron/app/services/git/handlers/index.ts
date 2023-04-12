@@ -9,6 +9,7 @@ export * from './getBranchCommits';
 export * from './getChangedFiles';
 export * from './getCommitResources';
 export * from './getGitRemotePath';
+export * from './getRepoInfo';
 export * from './initGitRepo';
 export * from './isFolderGitRepo';
 export * from './isGitInstalled';

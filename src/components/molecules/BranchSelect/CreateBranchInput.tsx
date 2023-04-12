@@ -8,10 +8,9 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {CommitTooltip} from '@constants/tooltips';
 
 import {setCurrentBranch, setGitLoading, setRepo} from '@redux/git';
-import {createLocalBranch} from '@redux/git/service';
+import {createLocalBranch, getRepoInfo} from '@redux/git/service';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
 
 import * as S from './CreateBranchInput.styled';
@@ -55,11 +54,15 @@ const CreateBranchInput: React.FC<IProps> = props => {
 
     setBranchName('');
     setLoading(false);
-    await promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', projectRootFolder).then(repo => {
+
+    try {
+      const repo = await getRepoInfo({path: projectRootFolder || ''});
       dispatch(setRepo(repo));
       dispatch(setCurrentBranch(branchName));
       dispatch(setGitLoading(false));
-    });
+    } catch (e: any) {
+      showGitErrorModal('Git repo error', e.message);
+    }
 
     hideCreateBranchInputHandler();
   };
