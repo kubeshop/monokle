@@ -5,11 +5,6 @@ import {trackEvent} from '@shared/utils/telemetry';
 
 export async function checkoutGitBranch({branchName, localPath}: GitCheckoutBranchParams): Promise<void> {
   const git = simpleGit({baseDir: localPath});
-
-  try {
-    await git.checkout(branchName);
-    trackEvent('git/branch_checkout');
-  } catch (e: any) {
-    throw new Error(e.message);
-  }
+  await git.checkout(branchName);
+  trackEvent('git/branch_checkout');
 }

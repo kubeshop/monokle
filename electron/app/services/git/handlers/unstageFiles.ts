@@ -9,9 +9,5 @@ export async function unstageFiles({filePaths, localPath}: GitStageUnstageFilesP
     return {...prev, [current]: null};
   }, {} as any);
 
-  try {
-    await git.reset({'-q': null, HEAD: null, '--': null, ...unstageProperties});
-  } catch (e: any) {
-    throw new Error(e.message);
-  }
+  await git.reset({'-q': null, HEAD: null, '--': null, ...unstageProperties});
 }

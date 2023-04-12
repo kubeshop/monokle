@@ -9,11 +9,6 @@ export async function getBranchCommits({
 }: GitBranchCommitsParams): Promise<GitBranchCommitsResult> {
   const git = simpleGit({baseDir: localPath});
 
-  try {
-    const commits = [...(await git.log({[branchName]: null})).all];
-
-    return orderBy(commits, ['date'], ['desc']);
-  } catch (e: any) {
-    throw new Error(e.message);
-  }
+  const commits = [...(await git.log({[branchName]: null})).all];
+  return orderBy(commits, ['date'], ['desc']);
 }

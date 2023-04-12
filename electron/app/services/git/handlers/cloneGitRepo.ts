@@ -19,10 +19,5 @@ export async function cloneGitRepo({localPath, repoPath}: GitCloneRepoParams): P
   }
 
   const git = simpleGit({baseDir: localPath});
-
-  try {
-    await git.clone(repoPath, localPath);
-  } catch (e: any) {
-    throw new Error(e.message);
-  }
+  await git.clone(repoPath, localPath);
 }

@@ -8,15 +8,11 @@ export async function getAheadBehindCommitsCount({
 }: GitAheadBehindCommitsCountParams): Promise<GitAheadBehindCommitsCountResult> {
   const git = simpleGit({baseDir: localPath});
 
-  try {
-    const [aheadCommits, behindCommits] = (
-      await git.raw('rev-list', '--left-right', '--count', `${branchName}...origin/${branchName}`)
-    )
-      .trim()
-      .split('\t');
+  const [aheadCommits, behindCommits] = (
+    await git.raw('rev-list', '--left-right', '--count', `${branchName}...origin/${branchName}`)
+  )
+    .trim()
+    .split('\t');
 
-    return {aheadCount: parseInt(aheadCommits, 10), behindCount: parseInt(behindCommits, 10)};
-  } catch (e: any) {
-    throw new Error(e.message);
-  }
+  return {aheadCount: parseInt(aheadCommits, 10), behindCount: parseInt(behindCommits, 10)};
 }

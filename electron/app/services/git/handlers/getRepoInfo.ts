@@ -9,12 +9,8 @@ import {getAheadBehindCommitsCount} from './getAheadBehindCommitsCount';
 async function getGitRemoteUrl(path: string) {
   const git = simpleGit({baseDir: path});
 
-  try {
-    const result = await git.raw('config', '--get', 'remote.origin.url');
-    return result;
-  } catch (e: any) {
-    throw new Error(e.message);
-  }
+  const result = await git.raw('config', '--get', 'remote.origin.url');
+  return result;
 }
 
 export async function getRepoInfo({path}: GitPathParams): Promise<GitRepo> {
@@ -22,44 +18,40 @@ export async function getRepoInfo({path}: GitPathParams): Promise<GitRepo> {
 
   let gitRepo: GitRepo;
 
-  try {
-    const [remoteBranchSummary, localBranches, remoteUrl] = await Promise.all([
-      git.branch({'-r': null}),
-      git.branchLocal(),
-      getGitRemoteUrl(path),
-    ]);
+  const [remoteBranchSummary, localBranches, remoteUrl] = await Promise.all([
+    git.branch({'-r': null}),
+    git.branchLocal(),
+    getGitRemoteUrl(path),
+  ]);
 
-    gitRepo = {
-      branches: [...localBranches.all, ...remoteBranchSummary.all],
-      currentBranch: localBranches.current || remoteBranchSummary.current,
-      branchMap: {},
-      commits: {ahead: 0, behind: 0},
-      remoteRepo: {exists: false, authRequired: false},
-    };
+  gitRepo = {
+    branches: [...localBranches.all, ...remoteBranchSummary.all],
+    currentBranch: localBranches.current || remoteBranchSummary.current,
+    branchMap: {},
+    commits: {ahead: 0, behind: 0},
+    remoteRepo: {exists: false, authRequired: false},
+  };
 
-    if (typeof remoteUrl === 'string') {
-      gitRepo.remoteUrl = remoteUrl.replaceAll('.git', '');
-    }
-
-    gitRepo.branchMap = Object.fromEntries(
-      Object.entries({...localBranches.branches}).map(([key, value]) => [
-        key,
-        {name: value.name, commitSha: value.commit, type: 'local'},
-      ])
-    );
-
-    gitRepo.branchMap = {
-      ...gitRepo.branchMap,
-      ...Object.fromEntries(
-        Object.entries({...remoteBranchSummary.branches}).map(([key, value]) => [
-          key,
-          {name: value.name.replace('remotes/', ''), commitSha: value.commit, type: 'remote'},
-        ])
-      ),
-    };
-  } catch (e: any) {
-    throw new Error(e.message);
+  if (typeof remoteUrl === 'string') {
+    gitRepo.remoteUrl = remoteUrl.replaceAll('.git', '');
   }
+
+  gitRepo.branchMap = Object.fromEntries(
+    Object.entries({...localBranches.branches}).map(([key, value]) => [
+      key,
+      {name: value.name, commitSha: value.commit, type: 'local'},
+    ])
+  );
+
+  gitRepo.branchMap = {
+    ...gitRepo.branchMap,
+    ...Object.fromEntries(
+      Object.entries({...remoteBranchSummary.branches}).map(([key, value]) => [
+        key,
+        {name: value.name.replace('remotes/', ''), commitSha: value.commit, type: 'remote'},
+      ])
+    ),
+  };
 
   const branchMapValues = Object.values(gitRepo.branchMap);
 
