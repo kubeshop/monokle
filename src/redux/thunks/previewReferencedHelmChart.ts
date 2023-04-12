@@ -74,6 +74,7 @@ export const previewReferencedHelmChart = async (
           apiVersion: obj.apiVersion,
         },
         dispatch,
+        'local',
         obj
       );
       createdResources.push(resource);

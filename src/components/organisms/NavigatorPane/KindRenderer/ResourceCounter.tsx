@@ -1,10 +1,7 @@
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {getActiveResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
-import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
-
-import {isResourcePassingFilter} from '@utils/resources';
+import {navigatorResourcesSelector} from '@redux/selectors/resourceSelectors';
 
 import {Colors, FontColors} from '@shared/styles';
 
@@ -16,26 +13,11 @@ type Props = {
 
 function ResourceCounter({kind, isSelected, onClick}: Props) {
   const isCollapsed = useAppSelector(state => state.ui.navigator.collapsedResourceKinds.includes(kind));
-  const resourceFilter = useAppSelector(state => state.main.resourceFilter);
-
-  const resourceCount = useAppSelector(
-    state =>
-      Object.values(getActiveResourceMetaMapFromState(state)).filter(
-        r =>
-          r.kind === kind &&
-          isResourcePassingFilter(r, resourceFilter) &&
-          !isKustomizationResource(r) &&
-          !isKustomizationPatch(r)
-      ).length
-  );
-
-  if (resourceCount === undefined) {
-    return null;
-  }
+  const navigatorResources = useAppSelector(state => navigatorResourcesSelector(state));
 
   return (
     <Counter selected={isSelected && isCollapsed} onClick={onClick}>
-      {resourceCount}
+      {navigatorResources.filter(r => r.kind === kind).length}
     </Counter>
   );
 }

@@ -65,7 +65,7 @@ const TemplateForm: React.FC<IProps> = props => {
       if (isVanillaTemplate(template)) {
         trackEvent('edit/template_use', {templateID: template.id});
         setLoading(true);
-        createTransientResourcesFromVanillaTemplate(template, formDataList, dispatch)
+        createTransientResourcesFromVanillaTemplate(template, formDataList, 'local', dispatch)
           .then(({message, resources}) => {
             setResultMessage(message);
             setCreatedResources(resources);
