@@ -1,5 +1,6 @@
 import {Modal, Space} from 'antd';
 
+import {setGitLoading} from '@redux/git';
 import {deleteLocalBranch} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -30,12 +31,15 @@ const BranchCell: React.FC<IProps> = props => {
     Modal.confirm({
       title: `Are you sure you want to delete ${branch.name}?`,
       onOk() {
+        dispatch(setGitLoading(true));
+
         try {
           deleteLocalBranch({localPath: selectedProjectRootFolder, branchName: branch.name});
           dispatch(
             setAlert({type: AlertEnum.Success, title: `Branch ${branch.name} deleted successfully`, message: ''})
           );
         } catch (err) {
+          dispatch(setGitLoading(false));
           showGitErrorModal(`Deleting ${branch.name} failed`, undefined, `git branch -d ${branch.name}`, dispatch);
         }
       },

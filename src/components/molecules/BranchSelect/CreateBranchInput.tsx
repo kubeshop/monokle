@@ -22,12 +22,12 @@ type IProps = {
 const CreateBranchInput: React.FC<IProps> = props => {
   const dispatch = useAppDispatch();
   const {hideCreateBranchInputHandler} = props;
+  const isLoading = useAppSelector(state => state.git.loading);
   const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
   const gitRepoBranches = useAppSelector(state => state.git.repo?.branches || []);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder) || '';
 
   const [errorMessage, setErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
   const [branchName, setBranchName] = useState('');
 
   const handleCommit = async () => {
@@ -41,19 +41,17 @@ const CreateBranchInput: React.FC<IProps> = props => {
       return;
     }
 
-    setLoading(true);
+    dispatch(setGitLoading(true));
 
     try {
       await createLocalBranch({localPath: selectedProjectRootFolder, branchName});
     } catch (e) {
       showGitErrorModal(`Creating ${branchName} failed`, undefined, `git checkout -b ${branchName}`, dispatch);
       setBranchName('');
-      setLoading(false);
       return;
     }
 
     setBranchName('');
-    setLoading(false);
 
     try {
       const repo = await getRepoInfo({path: projectRootFolder || ''});
@@ -89,7 +87,7 @@ const CreateBranchInput: React.FC<IProps> = props => {
         />
 
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={CommitTooltip}>
-          <Button loading={loading} type="primary" onClick={handleCommit}>
+          <Button loading={isLoading} type="primary" onClick={handleCommit}>
             <CheckOutlined />
           </Button>
         </Tooltip>
