@@ -29,6 +29,11 @@ export type GitSetRemoteParams = {
   remoteURL: string;
 };
 
+export type GitCommitResourcesParams = {
+  localPath: string;
+  commitHash: string;
+};
+
 export type GitAheadBehindCommitsCountParams = LocalPathBranchNameParams;
 export type GitBranchCommitsParams = LocalPathBranchNameParams;
 export type GitCheckoutBranchParams = LocalPathBranchNameParams;
@@ -42,3 +47,4 @@ export type GitAheadBehindCommitsCountResult = {
 };
 
 export type GitBranchCommitsResult = (DefaultLogFields & ListLogLine)[];
+export type GitCommitResourcesResult = Record<string, string>;

@@ -1,6 +1,6 @@
 import simpleGit from 'simple-git';
 
-import {GitPublishLocalBranchParams} from '@shared/ipc/git';
+import type {GitPublishLocalBranchParams} from '@shared/ipc/git';
 
 export async function publishLocalBranch({branchName, localPath}: GitPublishLocalBranchParams): Promise<void> {
   const git = simpleGit({baseDir: localPath});

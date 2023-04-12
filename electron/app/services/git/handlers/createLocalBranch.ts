@@ -1,6 +1,6 @@
 import simpleGit from 'simple-git';
 
-import {GitCreateDeleteLocalBranchParams} from '@shared/ipc/git';
+import type {GitCreateDeleteLocalBranchParams} from '@shared/ipc/git';
 
 export async function createLocalBranch({branchName, localPath}: GitCreateDeleteLocalBranchParams): Promise<void> {
   const git = simpleGit({baseDir: localPath});

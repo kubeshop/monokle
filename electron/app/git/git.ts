@@ -3,8 +3,6 @@ import {SimpleGit, simpleGit} from 'simple-git';
 
 import type {FileMapType} from '@shared/models/appState';
 import type {GitRepo} from '@shared/models/git';
-import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
-import {isKustomizationFilePath} from '@shared/utils/kustomize';
 
 import {formatGitChangedFiles} from '../utils/git';
 
@@ -148,38 +146,4 @@ export async function getChangedFiles(localPath: string, fileMap: FileMapType) {
   } catch (e: any) {
     return {error: e.message};
   }
-}
-
-export async function getCommitResources(localPath: string, commitHash: string) {
-  const git: SimpleGit = simpleGit({baseDir: localPath});
-  let filesContent: Record<string, string> = {};
-
-  const filesPaths = (await git.raw('ls-tree', '-r', '--name-only', commitHash))
-    .split('\n')
-    .filter(
-      el =>
-        (el.includes('.yaml') || el.includes('.yml')) &&
-        !isKustomizationFilePath(el) &&
-        !isHelmTemplateFile(el) &&
-        !isHelmChartFile(el) &&
-        !isHelmValuesFile(el)
-    );
-
-  for (let i = 0; i < filesPaths.length; i += 1) {
-    let content: string;
-
-    // get the content of the file found in current branch
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      content = await git.show(`${commitHash}:${filesPaths[i]}`);
-    } catch (e) {
-      content = '';
-    }
-
-    if (content) {
-      filesContent[filesPaths[i]] = content;
-    }
-  }
-
-  return filesContent;
 }

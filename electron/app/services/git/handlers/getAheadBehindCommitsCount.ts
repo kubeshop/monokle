@@ -1,6 +1,6 @@
 import simpleGit from 'simple-git';
 
-import {GitAheadBehindCommitsCountParams, GitAheadBehindCommitsCountResult} from '@shared/ipc/git';
+import type {GitAheadBehindCommitsCountParams, GitAheadBehindCommitsCountResult} from '@shared/ipc/git';
 
 export async function getAheadBehindCommitsCount({
   branchName,

@@ -8,6 +8,7 @@ import {
   fetchRepo,
   getAheadBehindCommitsCount,
   getBranchCommits,
+  getCommitResources,
   getGitRemotePath,
   initGitRepo,
   isFolderGitRepo,
@@ -28,6 +29,7 @@ handleIpc('git:deleteLocalBranch', deleteLocalBranch);
 handleIpc('git:fetchRepo', fetchRepo);
 handleIpc('git:getAheadBehindCommitsCount', getAheadBehindCommitsCount);
 handleIpc('git:getBranchCommits', getBranchCommits);
+handleIpc('git:getCommitResources', getCommitResources);
 handleIpc('git:getGitRemotePath', getGitRemotePath);
 handleIpc('git:initGitRepo', initGitRepo);
 handleIpc('git:isFolderGitRepo', isFolderGitRepo);

@@ -1,6 +1,6 @@
 import simpleGit from 'simple-git';
 
-import {GitPushChangesParams} from '@shared/ipc/git';
+import type {GitPushChangesParams} from '@shared/ipc/git';
 import {trackEvent} from '@shared/utils/telemetry';
 
 export async function pushChanges({branchName, localPath}: GitPushChangesParams): Promise<void> {

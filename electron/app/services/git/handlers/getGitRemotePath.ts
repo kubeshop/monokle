@@ -1,6 +1,6 @@
 import simpleGit from 'simple-git';
 
-import {GitPathParams} from '@shared/ipc/git';
+import type {GitPathParams} from '@shared/ipc/git';
 
 export async function getGitRemotePath({path}: GitPathParams): Promise<string> {
   const git = simpleGit({baseDir: path});

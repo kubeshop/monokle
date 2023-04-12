@@ -1,6 +1,6 @@
 import simpleGit from 'simple-git';
 
-import {GitCommitChangesParams} from '@shared/ipc/git';
+import type {GitCommitChangesParams} from '@shared/ipc/git';
 import {trackEvent} from '@shared/utils/telemetry';
 
 export async function commitChanges({localPath, message}: GitCommitChangesParams): Promise<void> {

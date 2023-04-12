@@ -6,6 +6,7 @@ export * from './deleteLocalBranch';
 export * from './fetchRepo';
 export * from './getAheadBehindCommitsCount';
 export * from './getBranchCommits';
+export * from './getCommitResources';
 export * from './getGitRemotePath';
 export * from './initGitRepo';
 export * from './isFolderGitRepo';

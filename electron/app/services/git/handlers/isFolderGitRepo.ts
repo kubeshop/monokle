@@ -1,7 +1,7 @@
 import {existsSync} from 'fs';
 import simpleGit from 'simple-git';
 
-import {GitPathParams} from '@shared/ipc/git';
+import type {GitPathParams} from '@shared/ipc/git';
 
 export async function isFolderGitRepo({path}: GitPathParams): Promise<boolean> {
   if (!existsSync(path)) {

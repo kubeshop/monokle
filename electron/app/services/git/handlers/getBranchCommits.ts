@@ -1,7 +1,7 @@
 import {orderBy} from 'lodash';
 import simpleGit from 'simple-git';
 
-import {GitBranchCommitsParams, GitBranchCommitsResult} from '@shared/ipc/git';
+import type {GitBranchCommitsParams, GitBranchCommitsResult} from '@shared/ipc/git';
 
 export async function getBranchCommits({
   branchName,

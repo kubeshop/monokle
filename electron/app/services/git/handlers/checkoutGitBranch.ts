@@ -1,6 +1,6 @@
 import simpleGit from 'simple-git';
 
-import {GitCheckoutBranchParams} from '@shared/ipc/git';
+import type {GitCheckoutBranchParams} from '@shared/ipc/git';
 import {trackEvent} from '@shared/utils/telemetry';
 
 export async function checkoutGitBranch({branchName, localPath}: GitCheckoutBranchParams): Promise<void> {

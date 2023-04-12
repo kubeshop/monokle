@@ -1,7 +1,7 @@
 import {promises as fs} from 'fs';
 import simpleGit from 'simple-git';
 
-import {GitCloneRepoParams} from '@shared/ipc/git';
+import type {GitCloneRepoParams} from '@shared/ipc/git';
 
 export async function cloneGitRepo({localPath, repoPath}: GitCloneRepoParams): Promise<void> {
   try {
