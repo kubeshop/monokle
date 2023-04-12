@@ -169,12 +169,9 @@ const ActionsPane: React.FC = () => {
     if (selection?.type !== 'file') {
       return true;
     }
-    if (selection?.type === 'file' && !isInClusterMode) {
-      return true;
-    }
 
     return Object.values(localResourceMetaMap).some(r => r.origin.filePath === selection.filePath);
-  }, [selection, localResourceMetaMap, isInClusterMode]);
+  }, [selection, localResourceMetaMap]);
 
   const applySelection = useCallback(() => {
     if (selectedHelmValuesId) {
