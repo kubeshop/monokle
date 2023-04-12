@@ -11,7 +11,7 @@ import {DEFAULT_GIT_REPO_PLACEHOLDER, VALID_URL_REGEX} from '@constants/constant
 
 import {setCreateProject} from '@redux/appConfig';
 import {closeGitCloneModal} from '@redux/git';
-import {cloneGitRepo} from '@redux/git/service';
+import {cloneGitRepo} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {FileExplorer} from '@atoms';

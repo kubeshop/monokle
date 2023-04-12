@@ -6,7 +6,7 @@ import {useForm} from 'antd/es/form/Form';
 import {CheckOutlined} from '@ant-design/icons';
 
 import {updateRemoteRepo} from '@redux/git';
-import {setRemote} from '@redux/git/service';
+import {setRemote} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {showGitErrorModal} from '@utils/terminal';

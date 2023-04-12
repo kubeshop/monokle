@@ -9,7 +9,7 @@ import path from 'path';
 
 import {activeProjectSelector, setCreateProject, setLoadingProject, setOpenProject} from '@redux/appConfig';
 import {setIsGitInstalled} from '@redux/git';
-import {isGitInstalled} from '@redux/git/service';
+import {isGitInstalled} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reducers/main';

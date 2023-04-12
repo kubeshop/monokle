@@ -8,7 +8,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {CommitTooltip} from '@constants/tooltips';
 
 import {setCurrentBranch, setGitLoading, setRepo} from '@redux/git';
-import {createLocalBranch, getRepoInfo} from '@redux/git/service';
+import {createLocalBranch, getRepoInfo} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {showGitErrorModal} from '@utils/terminal';

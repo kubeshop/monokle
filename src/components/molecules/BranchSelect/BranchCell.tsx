@@ -1,6 +1,6 @@
 import {Modal, Space} from 'antd';
 
-import {deleteLocalBranch} from '@redux/git/service';
+import {deleteLocalBranch} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 

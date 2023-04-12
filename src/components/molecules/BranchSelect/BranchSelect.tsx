@@ -3,7 +3,7 @@ import {useCallback, useState} from 'react';
 import {BranchesOutlined} from '@ant-design/icons';
 
 import {setCurrentBranch} from '@redux/git';
-import {checkoutGitBranch} from '@redux/git/service';
+import {checkoutGitBranch} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {rootFolderSelector} from '@redux/selectors';
 

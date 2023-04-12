@@ -8,7 +8,7 @@ import {v4 as uuid} from 'uuid';
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/appConfig';
-import {getCommitResources} from '@redux/git/service';
+import {getCommitResources} from '@redux/git/git.ipc';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
 import {buildHelmCommand} from '@utils/helm';

@@ -19,7 +19,7 @@ import {
   updateProjectsGitRepo,
 } from '@redux/appConfig';
 import {setCurrentBranch, setRepo} from '@redux/git';
-import {getRepoInfo, initGitRepo} from '@redux/git/service';
+import {getRepoInfo, initGitRepo} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setIsInQuickClusterMode, setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';

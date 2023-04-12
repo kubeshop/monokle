@@ -7,7 +7,7 @@ import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {setGitLoading} from '@redux/git';
-import {stageChangedFiles, unstageFiles} from '@redux/git/service';
+import {stageChangedFiles, unstageFiles} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';

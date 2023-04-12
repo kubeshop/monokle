@@ -6,7 +6,7 @@ import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {setGitLoading, setSelectedItem} from '@redux/git';
-import {stageChangedFiles, unstageFiles} from '@redux/git/service';
+import {stageChangedFiles, unstageFiles} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {clearSelection, selectFile} from '@redux/reducers/main';

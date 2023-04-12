@@ -8,7 +8,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
 
 import {addGitBranch, setGitLoading} from '@redux/git';
-import {fetchRepo, publishLocalBranch, pullChanges, pushChanges} from '@redux/git/service';
+import {fetchRepo, publishLocalBranch, pullChanges, pushChanges} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 

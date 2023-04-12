@@ -8,7 +8,7 @@ import _ from 'lodash';
 import log from 'loglevel';
 import path, {join} from 'path';
 
-import {isFolderGitRepo} from '@redux/git/service';
+import {isFolderGitRepo} from '@redux/git/git.ipc';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {

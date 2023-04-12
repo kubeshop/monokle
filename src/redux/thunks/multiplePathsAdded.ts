@@ -5,7 +5,7 @@ import micromatch from 'micromatch';
 
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading} from '@redux/git';
-import {getChangedFiles} from '@redux/git/service';
+import {getChangedFiles} from '@redux/git/git.ipc';
 import {addPath, getFileEntryForAbsolutePath, reloadFile} from '@redux/services/fileEntry';
 
 import {getFileStats} from '@utils/files';

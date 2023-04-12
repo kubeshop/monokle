@@ -2,7 +2,7 @@ import {FSWatcher, watch} from 'chokidar';
 import log from 'loglevel';
 
 import {setChangedFiles, setCurrentBranch, setGitLoading, setRepo} from '@redux/git';
-import {getChangedFiles, getRepoInfo} from '@redux/git/service';
+import {getChangedFiles, getRepoInfo} from '@redux/git/git.ipc';
 import {multiplePathsRemoved} from '@redux/reducers/main';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';

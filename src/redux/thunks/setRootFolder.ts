@@ -4,7 +4,7 @@ import log from 'loglevel';
 
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
-import {getChangedFiles, getRepoInfo, isFolderGitRepo} from '@redux/git/service';
+import {getChangedFiles, getRepoInfo, isFolderGitRepo} from '@redux/git/git.ipc';
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';

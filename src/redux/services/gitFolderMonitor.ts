@@ -10,7 +10,7 @@ import {
   getGitRemotePath,
   getRepoInfo,
   isFolderGitRepo,
-} from '@redux/git/service';
+} from '@redux/git/git.ipc';
 
 import {showGitErrorModal} from '@utils/terminal';
 

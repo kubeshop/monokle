@@ -5,7 +5,7 @@ import {Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
 import {setCommitsCount} from '@redux/git';
-import {commitChanges, getAheadBehindCommitsCount} from '@redux/git/service';
+import {commitChanges, getAheadBehindCommitsCount} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
