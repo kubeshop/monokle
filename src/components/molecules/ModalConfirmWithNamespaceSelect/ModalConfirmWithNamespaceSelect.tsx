@@ -6,7 +6,7 @@ import {Input, Modal, Radio, Select} from 'antd';
 
 import {currentClusterAccessSelector} from '@redux/appConfig';
 import {selectKubeconfig} from '@redux/cluster/selectors';
-import {setup} from '@redux/cluster/service/kube-control';
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {useAppSelector} from '@redux/hooks';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
@@ -14,7 +14,6 @@ import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 import {getDefaultNamespaceForApply} from '@utils/resources';
 
 import {ResourceMeta} from '@shared/models/k8sResource';
-import {createKubeClient} from '@shared/utils/kubeclient';
 
 import * as S from './ModalConfirmWithNamespaceSelect.styled';
 
@@ -56,13 +55,11 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
 
       (async () => {
         try {
-          const setupResponse = await setup({
+          const kc = await createKubeClientWithSetup({
             context: kubeconfig.currentContext,
             kubeconfig: kubeconfig.path,
             skipHealthCheck: true,
           });
-          if (!setupResponse.success) throw new Error(setupResponse.code);
-          const kc = createKubeClient(kubeconfig.path, kubeconfig.currentContext, setupResponse.port);
           const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
           await k8sCoreV1Api.createNamespace({metadata: {name: createNamespaceName}});
           onOk({name: createNamespaceName, new: true});

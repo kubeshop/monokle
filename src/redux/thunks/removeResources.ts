@@ -2,7 +2,7 @@ import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 
-import {setup} from '@redux/cluster/service/kube-control';
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {clearSelectionReducer} from '@redux/reducers/main/selectionReducers';
 import {deleteResource, isResourceSelected, removeResourceFromFile} from '@redux/services/resource';
 
@@ -12,7 +12,6 @@ import {AppState} from '@shared/models/appState';
 import {ResourceIdentifier, isClusterResourceMeta, isLocalResourceMeta} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {isEqual} from '@shared/utils/isEqual';
-import {createKubeClient} from '@shared/utils/kubeclient';
 
 export const removeResources = createAsyncThunk<
   {nextMainState: AppState; affectedResourceIdentifiers?: ResourceIdentifier[]},
@@ -57,9 +56,11 @@ export const removeResources = createAsyncThunk<
         try {
           const kubeconfig = mainState.clusterConnection.kubeConfigPath;
           const context = mainState.clusterConnection.context;
-          const setupResponse = await setup({context, kubeconfig});
-          if (!setupResponse.success) throw new Error(setupResponse.code);
-          const kubeClient = createKubeClient(kubeconfig, context, setupResponse.port);
+          const kubeClient = await createKubeClientWithSetup({
+            context,
+            kubeconfig,
+            skipHealthCheck: true,
+          });
 
           const kindHandler = getResourceKindHandler(resourceMeta.kind);
           if (kindHandler?.deleteResourceInCluster) {

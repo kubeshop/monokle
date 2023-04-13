@@ -4,7 +4,7 @@ import {cloneDeep, noop} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
-import {setup} from '@redux/cluster/service/kube-control';
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {updateResource} from '@redux/thunks/updateResource';
 import {createNamespace, getNamespace, getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
@@ -18,7 +18,6 @@ import {K8sResource} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {execute} from '@shared/utils/commands';
 import {createKubectlApplyCommand} from '@shared/utils/commands/kubectl';
-import {createKubeClient} from '@shared/utils/kubeclient';
 
 type Type = ResourceSet['type'];
 
@@ -60,10 +59,11 @@ async function deployResourceToCluster(
   const currentContext = options.context ?? kubeConfigContextSelector(state);
   const kubeConfigPath = kubeConfigPathSelector(state);
   const namespace = source.namespace ?? options.namespace ?? 'default';
-
-  const setupResponse = await setup({context: currentContext, kubeconfig: kubeConfigPath, skipHealthCheck: true});
-  if (!setupResponse.success) throw new Error(setupResponse.code);
-  const kubeClient = createKubeClient(kubeConfigPath, currentContext, setupResponse.port);
+  const kubeClient = await createKubeClientWithSetup({
+    context: currentContext,
+    kubeconfig: kubeConfigPath,
+    skipHealthCheck: true,
+  });
   const hasNamespace = await getNamespace(kubeClient, namespace);
 
   try {

@@ -1,15 +1,11 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {setup} from '@redux/cluster/service/kube-control';
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 
 import {cpuParser, memoryParser} from '@utils/unit-converter';
 
-import {createKubeClient} from '@shared/utils/kubeclient';
-
 export const getClusterUtilization = async (kubeconfig: string, context: string): Promise<NodeMetric[]> => {
-  const setupResponse = await setup({context, kubeconfig});
-  if (!setupResponse.success) throw new Error(setupResponse.code);
-  const kc = createKubeClient(kubeconfig, context, setupResponse.port);
+  const kc = await createKubeClientWithSetup({context, kubeconfig, skipHealthCheck: true});
 
   const metricClient = new k8s.Metrics(kc); // No VoidAuth available - might need workaround.
   const k8sApiClient = kc.makeApiClient(k8s.CoreV1Api);

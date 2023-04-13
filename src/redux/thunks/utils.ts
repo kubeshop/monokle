@@ -5,14 +5,13 @@ import {stringify} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {setup} from '@redux/cluster/service/kube-control';
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AlertEnum} from '@shared/models/alert';
 import {K8sObject} from '@shared/models/k8s';
 import {ResourceMeta} from '@shared/models/k8sResource';
-import {createKubeClient} from '@shared/utils/kubeclient';
 
 /**
  * Utility to convert list of objects returned by k8s api to a single YAML document
@@ -54,9 +53,11 @@ export async function getResourceFromCluster(
   const resourceKindHandler = getResourceKindHandler(resourceMeta.kind);
 
   if (resourceKindHandler) {
-    const setupResponse = await setup({kubeconfig: kubeconfigPath, context, skipHealthCheck: true});
-    if (!setupResponse.success) throw new Error(setupResponse.code);
-    const kubeClient = createKubeClient(kubeconfigPath, context);
+    const kubeClient = await createKubeClientWithSetup({
+      kubeconfig: kubeconfigPath,
+      context,
+      skipHealthCheck: true,
+    });
     const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kubeClient, resourceMeta);
     return toPojo(resourceFromCluster.body);
   }
@@ -67,9 +68,11 @@ export async function removeNamespaceFromCluster(
   kubeconfigPath: string | undefined,
   context: string
 ) {
-  const setupResponse = await setup({kubeconfig: kubeconfigPath, context, skipHealthCheck: true});
-  if (!setupResponse.success) throw new Error(setupResponse.code);
-  const kubeClient = createKubeClient(kubeconfigPath, context, setupResponse.port);
+  const kubeClient = await createKubeClientWithSetup({
+    kubeconfig: kubeconfigPath,
+    context,
+    skipHealthCheck: true,
+  });
   const k8sCoreV1Api = kubeClient.makeApiClient(k8s.CoreV1Api);
   await k8sCoreV1Api.deleteNamespace(namespace);
 }

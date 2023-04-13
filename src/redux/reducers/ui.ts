@@ -1,6 +1,6 @@
 import {webFrame} from 'electron';
 
-import {Draft, PayloadAction, createSlice, isAnyOf} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
 import {Entries} from 'type-fest';
@@ -9,7 +9,6 @@ import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import initialState from '@redux/initialState';
-import {AppListenerFn} from '@redux/listeners/base';
 import {stopClusterConnection} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -513,21 +512,3 @@ export const {
   setIsInQuickClusterMode,
 } = uiSlice.actions;
 export default uiSlice.reducer;
-
-// Listeners
-
-export const stopClusterConnectionListener: AppListenerFn = listen => {
-  listen({
-    matcher: isAnyOf(stopClusterConnection.fulfilled),
-    effect: async (action, {getState, dispatch}) => {
-      // const activeProject = activeProjectSelector(getState());
-      // if (activeProject) {
-      //   return;
-      // }
-      // const leftMenuSelection = getState().ui.leftMenu.selection;
-      // if (leftMenuSelection === 'validation') {
-      //   dispatch(setLeftMenuSelection('dashboard'));
-      // }
-    },
-  });
-};

@@ -9,7 +9,7 @@ import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {selectKubeconfig} from '@redux/cluster/selectors';
-import {setup} from '@redux/cluster/service/kube-control';
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
 import {buildHelmCommand} from '@utils/helm';
@@ -37,7 +37,6 @@ import {
   runCommandInMainThread,
 } from '@shared/utils/commands';
 import {isDefined} from '@shared/utils/filter';
-import {createKubeClient} from '@shared/utils/kubeclient';
 
 import getClusterObjects from '../getClusterObjects';
 import {extractK8sResources, joinK8sResource, joinK8sResourceMap} from '../resource';
@@ -126,9 +125,11 @@ async function fetchResourcesFromCluster(
     const kubeConfigPath = kubeConfigPathSelector(state);
     const currentContext = options.context;
     const clusterAccess = state.config?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
-    const setupResponse = await setup({context: currentContext, kubeconfig: kubeConfigPath, skipHealthCheck: true});
-    if (!setupResponse.success) throw new Error(setupResponse.code);
-    const kc = createKubeClient(kubeConfigPath, currentContext, setupResponse.port);
+    const kc = await createKubeClientWithSetup({
+      context: currentContext,
+      kubeconfig: kubeConfigPath,
+      skipHealthCheck: true,
+    });
 
     const res = clusterAccess.length
       ? await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)))
