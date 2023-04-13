@@ -1,3 +1,5 @@
+import {useEffect} from 'react';
+
 import {setActiveTab, setDashboardSelectedResourceId} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
@@ -43,6 +45,10 @@ export const Drawer = () => {
       );
     }
   };
+
+  useEffect(() => {
+    console.log('selectedResourceId', selectedResourceId);
+  }, [selectedResourceId]);
 
   return (
     <S.Drawer
