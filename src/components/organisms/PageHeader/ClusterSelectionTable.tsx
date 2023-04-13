@@ -182,13 +182,6 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
 
             return (
               <S.ActionsContainer className="cluster-actions-container">
-                <S.EditOutlined
-                  onClick={e => {
-                    e.stopPropagation();
-                    edit(record);
-                  }}
-                />
-
                 <Popover
                   content={
                     <S.ClusterColorsContainer>
