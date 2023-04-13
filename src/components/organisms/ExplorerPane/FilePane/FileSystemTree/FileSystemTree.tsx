@@ -4,14 +4,15 @@ import {useMeasure} from 'react-use';
 import {isString} from 'lodash';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile} from '@redux/reducers/main';
+import {selectFile, selectHelmValuesFile} from '@redux/reducers/main';
 import {setFileExplorerExpandedFolders} from '@redux/reducers/ui';
-import {projectFileTreeSelector, selectedFilePathSelector} from '@redux/selectors';
+import {helmValuesMapByFilePathSelector, projectFileTreeSelector, selectionFilePathSelector} from '@redux/selectors';
 
 import {getAllParentFolderPaths} from '@utils/files';
 import {useSelectorWithRef} from '@utils/hooks';
 
 import {isFileSelection} from '@shared/models/selection';
+import {isHelmValuesFile} from '@shared/utils';
 
 import * as S from './FileSystemTree.styled';
 import FileSystemTreeNode from './TreeNode';
@@ -21,7 +22,8 @@ const FileSystemTree: React.FC = () => {
   const [fileExplorerExpandedFolders, fileExplorerExpandedFoldersRef] = useSelectorWithRef(
     state => state.ui.fileExplorerExpandedFolders
   );
-  const selectedFilePath = useAppSelector(selectedFilePathSelector);
+  const [helmValuesMapByFilePath] = useSelectorWithRef(helmValuesMapByFilePathSelector);
+  const selectedFilePath = useAppSelector(selectionFilePathSelector);
   const [firstHighlightedFile, firstHighlightedFileRef] = useSelectorWithRef(state =>
     state.main.highlights.find(isFileSelection)
   );
@@ -90,7 +92,12 @@ const FileSystemTree: React.FC = () => {
             return;
           }
           if (typeof nodeEvent.key === 'string' && !nodeEvent.disabled) {
-            dispatch(selectFile({filePath: nodeEvent.key}));
+            if (isHelmValuesFile(nodeEvent.key)) {
+              const valuesFileId = helmValuesMapByFilePath[nodeEvent.key].id;
+              dispatch(selectHelmValuesFile({valuesFileId}));
+            } else {
+              dispatch(selectFile({filePath: nodeEvent.key}));
+            }
           }
         }}
       />
