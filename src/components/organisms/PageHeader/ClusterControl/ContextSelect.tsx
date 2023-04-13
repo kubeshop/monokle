@@ -11,10 +11,10 @@ import {selectKubeconfig} from '@redux/cluster/selectors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 
+import {Icon} from '@monokle/components';
 import {Colors} from '@shared/styles';
 
 import {ClusterSelectionTable} from '../ClusterSelectionTable';
-import * as S from '../Controls.styled';
 
 export function ContextSelect() {
   const kubeconfig = useAppSelector(selectKubeconfig);
@@ -39,7 +39,10 @@ export function ContextSelect() {
       trigger={['hover']}
     >
       <div>
-        <Trigger icon={<S.ClusterOutlined />} value={kubeconfig.currentContext} />
+        <Trigger
+          icon={<Icon name="cluster-dashboard" style={{fontSize: '14px', marginTop: 4}} />}
+          value={kubeconfig.currentContext}
+        />
       </div>
     </Dropdown>
   );
@@ -90,7 +93,7 @@ function InvalidKubeconfigButton() {
   return (
     <TriggerBtn onClick={handleClick}>
       <Spacer>
-        <S.ClusterOutlined />
+        <Icon name="cluster-dashboard" style={{fontSize: '14px', marginTop: 4}} />
         <span>No cluster found</span>
       </Spacer>
     </TriggerBtn>
@@ -100,5 +103,5 @@ function InvalidKubeconfigButton() {
 const Spacer = styled.div`
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 `;

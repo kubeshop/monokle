@@ -84,14 +84,14 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
         return;
       }
 
-      KUBECTL.updateContext(contextName)
+      KUBECTL.updateContext(contextName, {kubeconfig: kubeconfig?.path})
         .then(() => dispatch(setCurrentContext(contextName)))
         .catch((err: Error) => {
           const cause = err.cause instanceof Error ? err.cause.message : 'The cause is unknown.';
           notify.error(err.message, {description: cause});
         });
     },
-    [dispatch, currentContext, notify, setIsClusterDropdownOpen]
+    [setIsClusterDropdownOpen, currentContext?.name, kubeconfig?.path, dispatch, notify]
   );
 
   const updateClusterColor = (name: string, color: ClusterColors) => {

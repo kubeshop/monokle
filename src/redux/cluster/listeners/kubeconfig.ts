@@ -67,7 +67,9 @@ export const kubeConfigListener: AppListenerFn = listen => {
         if (isGlobalKubeconfig) {
           const oldKubeconfig = getState().config.kubeConfig;
           const changed = !isEqual(newKubeconfig, oldKubeconfig);
-          if (changed || !config?.isValid) dispatch(setKubeConfig(newKubeconfig));
+          if (changed) {
+            dispatch(setKubeConfig(newKubeconfig));
+          }
         }
 
         const isProjectKubeconfig = getState().config.projectConfig?.kubeConfig?.path === config?.path;

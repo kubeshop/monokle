@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {QuestionCircleFilled} from '@ant-design/icons';
@@ -5,16 +7,17 @@ import {QuestionCircleFilled} from '@ant-design/icons';
 import {motion, useAnimationControls} from 'framer-motion';
 import styled from 'styled-components';
 
+import {activeProjectSelector} from '@redux/appConfig';
 import {startWatchingKubeconfig, stopWatchingKubeconfig} from '@redux/cluster/listeners/kubeconfig';
 import {selectCurrentContextId, selectKubeconfig, useClusterSelector} from '@redux/cluster/selectors';
 import {pingCluster} from '@redux/cluster/thunks/ping';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setLeftMenuSelection} from '@redux/reducers/ui';
+import {setActiveSettingsPanel, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {ContextId, MonokleClusterError} from '@shared/ipc';
-import {ModernKubeConfig} from '@shared/models/config';
+import {ModernKubeConfig, SettingsPanel} from '@shared/models/config';
 import {Colors} from '@shared/styles';
-import {openUrlInExternalBrowser} from '@shared/utils/shell';
+import {openDiscord, openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import {ClusterIndication} from './Disconnected/ClusterIndication';
 import ClusterFigure from './Disconnected/ConnectIcon.svg';
@@ -25,6 +28,7 @@ export const EmptyDashboard = () => {
   const dispatch = useAppDispatch();
   const contextId = useAppSelector(selectCurrentContextId);
   const [debug, setDebug] = useState(false);
+  const activeProject = useAppSelector(activeProjectSelector);
 
   const toggleDebug = useCallback(
     (newDebug?: boolean) => {
@@ -40,6 +44,23 @@ export const EmptyDashboard = () => {
   const closeDebug = useCallback(() => {
     toggleDebug(false);
   }, [toggleDebug]);
+
+  const goToSettings = useCallback(() => {
+    dispatch(
+      setActiveSettingsPanel(
+        activeProject ? SettingsPanel.CurrentProjectSettings : SettingsPanel.DefaultProjectSettings
+      )
+    );
+    dispatch(setLeftMenuSelection('settings'));
+  }, [activeProject, dispatch]);
+
+  const goToDiscord = useCallback(() => {
+    openDiscord();
+  }, []);
+
+  const goToDocs = useCallback(() => {
+    shell.openExternal('https://kubeshop.github.io/monokle/cluster-mode');
+  }, []);
 
   useEffect(() => {
     dispatch(pingCluster());
@@ -57,8 +78,8 @@ export const EmptyDashboard = () => {
         <Header>Connect to your cluster</Header>
 
         <p>
-          Monokle automatically detects and updates your Kubeconfig file. You can also go to your <a>Settings</a> to
-          declare them manually.
+          Monokle automatically detects and updates your Kubeconfig file. You can also go to your{' '}
+          <a onClick={goToSettings}>Settings</a> to declare them manually.
         </p>
 
         <HelpMessage>
@@ -66,8 +87,8 @@ export const EmptyDashboard = () => {
             <QuestionCircleFilled /> Help & Tips
           </p>
           <p>
-            <a>Learn more</a> about cluster insights. Looking for help? Reach out to us in <a>our Discord channel</a> -
-            we are glad to help you.
+            <a onClick={goToDocs}>Learn more</a> about cluster insights. Looking for help? Reach out to us in{' '}
+            <a onClick={goToDiscord}>our Discord channel</a> - we are glad to help you.
           </p>
         </HelpMessage>
 

@@ -16,13 +16,19 @@ export const getKubeconfig = invokeIpc<{path: string | undefined}, ModernKubeCon
 export const watchKubeconfig = invokeIpc<{kubeconfigs: string[]}, void>('kubeconfig:watch');
 export const stopWatchKubeconfig = invokeIpc<undefined, void>('kubeconfig:watch:stop');
 
+type KubectlGlobal = {
+  kubeconfig?: string;
+  context?: string;
+};
+
 export const KUBECTL = {
-  async updateContext(context: string) {
+  async updateContext(context: string, globals: KubectlGlobal = {}) {
     try {
+      const globalArgs = createGlobalArgs(globals);
       const arg = await runCommandInMainThread({
         commandId: uuid(),
         cmd: `kubectl`,
-        args: ['config', 'use-context', context],
+        args: [...globalArgs, 'config', 'use-context', context],
       });
 
       if (arg.exitCode !== 0) {
@@ -33,3 +39,10 @@ export const KUBECTL = {
     }
   },
 };
+
+function createGlobalArgs(globals: KubectlGlobal) {
+  const globalArgs = [];
+  if (globals.kubeconfig) globalArgs.push(`--kubeconfig=${globals.kubeconfig}`);
+  if (globals.context) globalArgs.push(`--context=${globals.context}`);
+  return globalArgs;
+}
