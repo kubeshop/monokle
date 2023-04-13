@@ -1,5 +1,4 @@
 import {FSWatcher, watch} from 'chokidar';
-import log from 'loglevel';
 import {sep} from 'path';
 
 import {updateProjectsGitRepo} from '@redux/appConfig';
@@ -111,8 +110,10 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
             thunkAPI.dispatch(updateProjectsGitRepo([{path: rootFolderPath || '', isGitRepo: false}]));
           }
         })
-        .catch(err => {
-          log.error(err);
+        .catch(() => {
+          thunkAPI.dispatch(setChangedFiles([]));
+          thunkAPI.dispatch(setRepo(undefined));
+          thunkAPI.dispatch(updateProjectsGitRepo([{path: rootFolderPath || '', isGitRepo: false}]));
         });
     });
 }
