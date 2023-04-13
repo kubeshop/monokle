@@ -12,12 +12,7 @@ import newGithubIssueUrl from 'new-github-issue-url';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {InitializeGitTooltip, InstallGitTooltip, NotificationsTooltip} from '@constants/tooltips';
 
-import {
-  activeProjectSelector,
-  isInClusterModeSelector,
-  kubeConfigContextColorSelector,
-  updateProjectsGitRepo,
-} from '@redux/appConfig';
+import {activeProjectSelector, isInClusterModeSelector, updateProjectsGitRepo} from '@redux/appConfig';
 import {setCurrentBranch, setRepo} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError} from '@redux/reducers/main';
@@ -40,9 +35,9 @@ import {Icon} from '@monokle/components';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {ClusterControls} from './ClusterControl/ClusterControls';
-import {IndicatorPreview} from './IndicatorPreview';
 import {K8sVersionSelection} from './K8sVersionSelection';
 import * as S from './PageHeader.styled';
+import {PreviewControls} from './PreviewControl/PreviewControls';
 
 const PageHeader = () => {
   const dispatch = useAppDispatch();
@@ -59,9 +54,6 @@ const PageHeader = () => {
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
-  const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
-  const previewType = useAppSelector(state => state.main.preview?.type);
-  // const resourceMap = useAppSelector(state => state.main.resourceMap);
 
   let timeoutRef = useRef<any>(null);
 
@@ -70,14 +62,6 @@ const PageHeader = () => {
   const [showAutosaving, setShowAutosaving] = useState(false);
 
   const helpMenuItems = useHelpMenuItems();
-
-  // const runningPreviewConfiguration = useAppSelector(state => {
-  //   if (!state.main.previewConfigurationId) {
-  //     return undefined;
-  //   }
-  //   return state.config.projectConfig?.helm?.previewConfigurationMap?.[state.main.previewConfigurationId];
-  // });
-
   const [pageHeaderRef, {height: pageHeaderHeight}] = useMeasure<HTMLDivElement>();
 
   const toggleNotificationsDrawer = () => {
@@ -191,15 +175,6 @@ const PageHeader = () => {
 
   return (
     <S.PageHeaderContainer ref={pageHeaderRef}>
-      {isInPreviewMode && (
-        <S.PreviewRow
-          $previewType={previewType}
-          $kubeConfigContextColor={kubeConfigContextColor}
-          $isInClusterMode={isInClusterMode}
-          $isInPreviewMode={isInPreviewMode}
-        />
-      )}
-
       <S.Header>
         <div style={{display: 'flex', alignItems: 'center'}}>
           <S.LogoContainer>
@@ -265,7 +240,7 @@ const PageHeader = () => {
 
         <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
           <K8sVersionSelection />
-          {isInPreviewMode ? <IndicatorPreview /> : <ClusterControls />}
+          {isInPreviewMode ? <PreviewControls /> : <ClusterControls />}
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
             <Badge count={unseenNotificationsCount} size="small">

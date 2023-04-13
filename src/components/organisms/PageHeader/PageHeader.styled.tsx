@@ -13,7 +13,7 @@ import {PreviewType} from '@shared/models/preview';
 import {AnimationDurations} from '@shared/styles';
 import {Colors, FontColors, PanelColors} from '@shared/styles/colors';
 
-import {getPreviewTheme} from './ClusterSelection.styled';
+import {getPreviewTheme} from './Controls.styled';
 
 export const AutosavingContainer = styled.div`
   margin-left: 10px;

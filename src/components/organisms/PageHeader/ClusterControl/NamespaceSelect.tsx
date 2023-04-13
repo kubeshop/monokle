@@ -13,7 +13,7 @@ import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
 import {Colors} from '@shared/styles';
 
-import * as S from '../ClusterSelection.styled';
+import * as S from '../Controls.styled';
 
 export function NamespaceSelect() {
   const dispatch = useAppDispatch();

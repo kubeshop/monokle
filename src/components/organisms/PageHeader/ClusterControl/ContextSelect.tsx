@@ -13,8 +13,8 @@ import {setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {Colors} from '@shared/styles';
 
-import * as S from '../ClusterSelection.styled';
 import {ClusterSelectionTable} from '../ClusterSelectionTable';
+import * as S from '../Controls.styled';
 
 export function ContextSelect() {
   const kubeconfig = useAppSelector(selectKubeconfig);

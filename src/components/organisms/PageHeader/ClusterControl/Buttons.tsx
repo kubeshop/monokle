@@ -79,7 +79,7 @@ export function ExitButton() {
 
   return (
     <CloseBtn onClick={onClickExit}>
-      <CloseCircleFilled />
+      <CloseCircleFilled style={{fontSize: 16, display: 'block', textAlign: 'center', paddingTop: 4}} />
     </CloseBtn>
   );
 }
@@ -97,6 +97,7 @@ const ConnectBtn = styled(SquareBtn)`
 `;
 
 const CloseBtn = styled(SquareBtn)`
+  min-width: 20px;
   border: none;
   color: ${Colors.geekblue7};
 `;
