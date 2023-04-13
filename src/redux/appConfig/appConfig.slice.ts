@@ -85,20 +85,21 @@ export const setOpenProject = createAsyncThunk(
 
     monitorGitFolder(projectRootPath, thunkAPI);
 
-    const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
+    const projectConfig = readProjectConfig(projectRootPath);
+
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
     // First open the project so state.selectedProjectRootFolder is set
     thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
-    const config: ProjectConfig | null = projectConfig || populateProjectConfig(appConfig);
+    const config = projectConfig || populateProjectConfig(appConfig);
 
     if (
-      projectConfig &&
+      config &&
       !(
-        projectConfig.k8sVersion &&
-        existsSync(join(String(appConfig.userDataDir), path.sep, 'schemas', `${projectConfig?.k8sVersion}.json`))
+        config.k8sVersion &&
+        existsSync(join(String(appConfig.userDataDir), path.sep, 'schemas', `${config?.k8sVersion}.json`))
       )
     ) {
-      projectConfig.k8sVersion = PREDEFINED_K8S_VERSION;
+      config.k8sVersion = PREDEFINED_K8S_VERSION;
     }
 
     // Then set project config by reading .monokle or populating it
@@ -394,6 +395,13 @@ export const configSlice = createSlice({
         state.projectConfig.kubeConfig = {
           ...state.projectConfig.kubeConfig,
           ...action.payload.config.kubeConfig,
+        };
+      }
+
+      if (action.payload?.config?.helm && !action.payload.fromConfigFile) {
+        state.projectConfig.helm = {
+          ...state.projectConfig.helm,
+          ...action.payload.config.helm,
         };
       }
 
