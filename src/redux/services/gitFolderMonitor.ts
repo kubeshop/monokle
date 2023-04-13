@@ -68,51 +68,51 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
       const absolutePathEndsWithGit = absolutePath.endsWith(`${sep}.git`);
 
       if (path.startsWith(`${absolutePath}${absolutePathEndsWithGit ? '' : `${sep}.git`}${sep}FETCH_HEAD`)) {
-        try {
-          getRepoInfo({path: rootFolderPath}).then(repo => {
+        getRepoInfo({path: rootFolderPath})
+          .then(repo => {
             thunkAPI.dispatch(setRepo(repo));
+          })
+          .catch((err: any) => {
+            thunkAPI.dispatch(setRepo(undefined));
+            showGitErrorModal('Git repository error', err.message);
           });
-        } catch (e: any) {
-          thunkAPI.dispatch(setRepo(undefined));
-          showGitErrorModal('Git repository error', e.message);
-        }
       }
 
       // commit was made/undoed or push was made
       if (path.startsWith(`${absolutePath}${absolutePathEndsWithGit ? '' : `${sep}.git`}${sep}logs${sep}refs`)) {
         const branchName = path.includes('heads') ? gitRepo.currentBranch : `origin/${gitRepo.currentBranch}`;
 
-        try {
-          getAheadBehindCommitsCount({localPath: rootFolderPath, branchName}).then(({aheadCount, behindCount}) => {
+        getAheadBehindCommitsCount({localPath: rootFolderPath, branchName})
+          .then(({aheadCount, behindCount}) => {
             thunkAPI.dispatch(setCommitsCount({aheadCount, behindCount}));
+          })
+          .catch(() => {
+            thunkAPI.dispatch(setCommitsCount({aheadCount: 0, behindCount: 0}));
           });
-        } catch (e) {
-          thunkAPI.dispatch(setCommitsCount({aheadCount: 0, behindCount: 0}));
-        }
 
-        try {
-          getBranchCommits({localPath: rootFolderPath, branchName}).then(commits => {
+        getBranchCommits({localPath: rootFolderPath, branchName})
+          .then(commits => {
             thunkAPI.dispatch(setBranchCommits({branchName, commits}));
+          })
+          .catch(() => {
+            thunkAPI.dispatch(setBranchCommits({branchName, commits: []}));
           });
-        } catch (e) {
-          thunkAPI.dispatch(setBranchCommits({branchName, commits: []}));
-        }
       }
     })
     .on('unlinkDir', () => {
       const rootFolder = thunkAPI.getState().config.selectedProjectRootFolder;
       const repo = thunkAPI.getState().git.repo;
 
-      try {
-        isFolderGitRepo({path: rootFolder}).then(isRepo => {
+      isFolderGitRepo({path: rootFolder})
+        .then(isRepo => {
           if (!isRepo && repo) {
             thunkAPI.dispatch(setChangedFiles([]));
             thunkAPI.dispatch(setRepo(undefined));
             thunkAPI.dispatch(updateProjectsGitRepo([{path: rootFolderPath || '', isGitRepo: false}]));
           }
+        })
+        .catch(err => {
+          log.error(err);
         });
-      } catch (err) {
-        log.error(err);
-      }
     });
 }

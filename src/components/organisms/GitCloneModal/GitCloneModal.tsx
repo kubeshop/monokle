@@ -4,6 +4,7 @@ import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
 import fs from 'fs';
+import {rm} from 'fs/promises';
 import {sep} from 'path';
 import styled from 'styled-components';
 
@@ -71,7 +72,7 @@ const GitCloneModal: React.FC = () => {
         });
 
         if (doesPathExist(localGitPath)) {
-          fs.rmdirSync(localGitPath, {recursive: true});
+          rm(localGitPath, {recursive: true});
         }
       }
     });

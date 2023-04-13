@@ -36,20 +36,6 @@ export async function getGitRepoInfo(localPath: string) {
   let gitRepo: GitRepo;
 
   try {
-    const [remoteBranchSummary, localBranches, remoteUrl] = await Promise.all([
-      git.branch({'-r': null}),
-      git.branchLocal(),
-      getGitRemoteUrl(localPath),
-    ]);
-
-    console.log('remoteBranchSummary', remoteBranchSummary);
-    console.log('localBranches', localBranches);
-    console.log('remoteUrl', remoteUrl);
-  } catch (e: any) {
-    throw new Error(e.message);
-  }
-
-  try {
     const remoteBranchSummary = await git.branch({'-r': null});
     const localBranches = await git.branchLocal();
     const remoteUrl = await getGitRemoteUrl(localPath);

@@ -64,14 +64,14 @@ const FileList: React.FC<IProps> = props => {
       {
         key: 'stage_unstage_changes',
         label: item.status === 'staged' ? 'Unstage changes' : 'Stage changes',
-        onClick: () => {
+        onClick: async () => {
           if (!selectedProjectRootFolder) return;
 
           dispatch(setGitLoading(true));
 
           if (item.status === 'unstaged') {
             try {
-              stageChangedFiles({localPath: selectedProjectRootFolder, filePaths: [item.fullGitPath]});
+              await stageChangedFiles({localPath: selectedProjectRootFolder, filePaths: [item.fullGitPath]});
             } catch (e) {
               showGitErrorModal(
                 'Staging changes failed!',
@@ -83,7 +83,7 @@ const FileList: React.FC<IProps> = props => {
             }
           } else {
             try {
-              unstageFiles({localPath: selectedProjectRootFolder, filePaths: [item.fullGitPath]});
+              await unstageFiles({localPath: selectedProjectRootFolder, filePaths: [item.fullGitPath]});
             } catch (e) {
               showGitErrorModal(
                 'Unstage changes failed!',
@@ -104,14 +104,14 @@ const FileList: React.FC<IProps> = props => {
               onClick: () => {
                 Modal.confirm({
                   title: discardTitle(item),
-                  onOk() {
+                  async onOk() {
                     dispatch(setGitLoading(true));
 
                     try {
                       if (item.type === 'modified') {
                         dispatch(updateFileEntry({path: item.path, text: item.originalContent}));
                       } else if (item.type === 'added' || item.type === 'untracked') {
-                        deleteFile(item.fullGitPath);
+                        await deleteFile(item.fullGitPath);
                       } else if (item.type === 'deleted') {
                         createFileWithContent(item.fullGitPath, item.originalContent);
                       }

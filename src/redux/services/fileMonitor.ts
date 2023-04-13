@@ -58,8 +58,8 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
         const paths: Array<string> = args.map(arg => arg[0]);
         thunkAPI.dispatch(multiplePathsRemoved(filterGitFolder(paths)));
 
-        try {
-          getRepoInfo({path: folder}).then(repo => {
+        getRepoInfo({path: folder})
+          .then(repo => {
             if (!thunkAPI.getState().git.loading) {
               thunkAPI.dispatch(setGitLoading(true));
             }
@@ -67,19 +67,19 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
             thunkAPI.dispatch(setRepo(repo));
             thunkAPI.dispatch(setCurrentBranch(repo.currentBranch));
 
-            try {
-              getChangedFiles({localPath: folder, fileMap: thunkAPI.getState().main.fileMap}).then(changedFiles => {
+            getChangedFiles({localPath: folder, fileMap: thunkAPI.getState().main.fileMap})
+              .then(changedFiles => {
                 thunkAPI.dispatch(setChangedFiles(changedFiles));
                 thunkAPI.dispatch(setGitLoading(false));
+              })
+              .catch(() => {
+                thunkAPI.dispatch(setGitLoading(false));
               });
-            } catch (e) {
-              thunkAPI.dispatch(setGitLoading(false));
-            }
+          })
+          .catch((err: any) => {
+            showGitErrorModal('Git repository error', err.message);
+            thunkAPI.dispatch(setRepo(undefined));
           });
-        } catch (e: any) {
-          showGitErrorModal('Git repository error', e.message);
-          thunkAPI.dispatch(setRepo(undefined));
-        }
       }, 1000)
     )
     .on(
@@ -88,8 +88,8 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
         const paths: Array<string> = args.map(arg => arg[0]);
         thunkAPI.dispatch(multiplePathsRemoved(filterGitFolder(paths)));
 
-        try {
-          getRepoInfo({path: folder}).then(repo => {
+        getRepoInfo({path: folder})
+          .then(repo => {
             if (!thunkAPI.getState().git.loading) {
               thunkAPI.dispatch(setGitLoading(true));
             }
@@ -97,19 +97,19 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
             thunkAPI.dispatch(setRepo(repo));
             thunkAPI.dispatch(setCurrentBranch(repo.currentBranch));
 
-            try {
-              getChangedFiles({localPath: folder, fileMap: thunkAPI.getState().main.fileMap}).then(changedFiles => {
+            getChangedFiles({localPath: folder, fileMap: thunkAPI.getState().main.fileMap})
+              .then(changedFiles => {
                 thunkAPI.dispatch(setChangedFiles(changedFiles));
                 thunkAPI.dispatch(setGitLoading(false));
+              })
+              .catch(() => {
+                thunkAPI.dispatch(setGitLoading(false));
               });
-            } catch (e) {
-              thunkAPI.dispatch(setGitLoading(false));
-            }
+          })
+          .catch((err: any) => {
+            showGitErrorModal('Git repository error', err.message);
+            thunkAPI.dispatch(setRepo(undefined));
           });
-        } catch (e: any) {
-          showGitErrorModal('Git repository error', e.message);
-          thunkAPI.dispatch(setRepo(undefined));
-        }
       }, 1000)
     );
 

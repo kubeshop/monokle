@@ -33,15 +33,16 @@ const BranchCell: React.FC<IProps> = props => {
       onOk() {
         dispatch(setGitLoading(true));
 
-        try {
-          deleteLocalBranch({localPath: selectedProjectRootFolder, branchName: branch.name});
-          dispatch(
-            setAlert({type: AlertEnum.Success, title: `Branch ${branch.name} deleted successfully`, message: ''})
-          );
-        } catch (err) {
-          dispatch(setGitLoading(false));
-          showGitErrorModal(`Deleting ${branch.name} failed`, undefined, `git branch -d ${branch.name}`, dispatch);
-        }
+        deleteLocalBranch({localPath: selectedProjectRootFolder, branchName: branch.name})
+          .then(() => {
+            dispatch(
+              setAlert({type: AlertEnum.Success, title: `Branch ${branch.name} deleted successfully`, message: ''})
+            );
+          })
+          .catch(() => {
+            dispatch(setGitLoading(false));
+            showGitErrorModal(`Deleting ${branch.name} failed`, undefined, `git branch -d ${branch.name}`, dispatch);
+          });
       },
       onCancel() {},
       zIndex: 100000,

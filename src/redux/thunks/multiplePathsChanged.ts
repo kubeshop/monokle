@@ -43,16 +43,14 @@ export const multiplePathsChanged = createAsyncThunk<
       thunkAPI.dispatch(setGitLoading(true));
     }
 
-    try {
-      getChangedFiles({localPath: projectRootFolder || '', fileMap: thunkAPI.getState().main.fileMap}).then(
-        changedFiles => {
-          thunkAPI.dispatch(setChangedFiles(changedFiles));
-          thunkAPI.dispatch(setGitLoading(false));
-        }
-      );
-    } catch (e) {
-      thunkAPI.dispatch(setGitLoading(false));
-    }
+    getChangedFiles({localPath: projectRootFolder || '', fileMap: thunkAPI.getState().main.fileMap})
+      .then(changedFiles => {
+        thunkAPI.dispatch(setChangedFiles(changedFiles));
+        thunkAPI.dispatch(setGitLoading(false));
+      })
+      .catch(() => {
+        thunkAPI.dispatch(setGitLoading(false));
+      });
   }
 
   return {

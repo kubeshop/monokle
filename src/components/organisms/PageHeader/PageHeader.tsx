@@ -132,7 +132,7 @@ const PageHeader = () => {
     monitorGitFolder(projectRootFolder, store);
 
     try {
-      getRepoInfo({path: projectRootFolder || ''}).then(repo => {
+      await getRepoInfo({path: projectRootFolder || ''}).then(repo => {
         dispatch(setRepo(repo));
         dispatch(setCurrentBranch(repo.currentBranch));
         setIsInitializingGitRepo(false);

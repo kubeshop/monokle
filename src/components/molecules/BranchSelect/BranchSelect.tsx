@@ -34,14 +34,14 @@ function BranchSelect() {
     (branch: GitBranch) => {
       const branchName = branch.type === 'local' ? branch.name : branch.name.replace('origin/', '');
 
-      try {
-        checkoutGitBranch({localPath: rootFolderPath, branchName}).then(() => {
+      checkoutGitBranch({localPath: rootFolderPath, branchName})
+        .then(() => {
           dispatch(setCurrentBranch(branchName));
           setVisible(false);
+        })
+        .catch(() => {
+          showGitErrorModal('Checkout failed', undefined, `git checkout -b ${branchName}`, dispatch);
         });
-      } catch (e) {
-        showGitErrorModal('Checkout failed', undefined, `git checkout -b ${branchName}`, dispatch);
-      }
     },
     [rootFolderPath, dispatch]
   );
