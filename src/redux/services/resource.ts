@@ -12,7 +12,7 @@ import {
   YAML_DOCUMENT_DELIMITER,
 } from '@constants/constants';
 
-import {setup} from '@redux/cluster/service/kube-control';
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {getAbsoluteResourcePath, getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 
 // import {VALIDATOR} from '@redux/validation/validation.services';
@@ -43,7 +43,6 @@ import {
 import {isLocalOrigin} from '@shared/models/origin';
 import {AnyPreview, isKustomizePreview} from '@shared/models/preview';
 import {AppSelection, isResourceSelection} from '@shared/models/selection';
-import {createKubeClient} from '@shared/utils/kubeclient';
 import {isKustomizationFilePath} from '@shared/utils/kustomize';
 import {AllKeysRequired} from '@shared/utils/types';
 
@@ -120,9 +119,7 @@ export async function getTargetClusterNamespaces(
   }
 
   try {
-    const pingResponse = await setup({context, kubeconfig: kubeconfigPath});
-    if (!pingResponse.success) throw new Error(pingResponse.code);
-    const kubeClient = createKubeClient(kubeconfigPath, context, pingResponse.port);
+    const kubeClient = await createKubeClientWithSetup({context, kubeconfig: kubeconfigPath});
     const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient, {});
 
     const ns: string[] = [];

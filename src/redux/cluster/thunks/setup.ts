@@ -6,21 +6,21 @@ import {ThunkApi} from '@shared/models/thunk';
 import {selectCurrentContextId} from '../selectors';
 import {setup} from '../service/kube-control';
 
-type PingArgs = undefined;
+type SetupArgs = undefined;
 
-type PingResponse = {
+type SetupResponse = {
   proxyPort: number;
 };
 
-type PingFailure = MonokleClusterError;
+type SetupFailure = MonokleClusterError;
 
 /**
- * Pings the current context which will
+ * Prepares the current context which will
  * - Prepare the proxy
  * - Check for connectivity problems.
  */
-export const pingCluster = createAsyncThunk<PingResponse, PingArgs, ThunkApi & {rejectValue: PingFailure}>(
-  'cluster/ping',
+export const setupCluster = createAsyncThunk<SetupResponse, SetupArgs, ThunkApi & {rejectValue: SetupFailure}>(
+  'cluster/setup',
   async (_, {getState, rejectWithValue}) => {
     // Ping for healthy connection
     const state = getState();
@@ -30,12 +30,12 @@ export const pingCluster = createAsyncThunk<PingResponse, PingArgs, ThunkApi & {
       throw new Error('no_cluster_context_found');
     }
 
-    const pingResponse = await setup(contextId);
+    const setupResponse = await setup(contextId);
 
-    if (!pingResponse.success) {
-      return rejectWithValue(pingResponse);
+    if (!setupResponse.success) {
+      return rejectWithValue(setupResponse);
     }
 
-    return {proxyPort: pingResponse.port};
+    return {proxyPort: setupResponse.port};
   }
 );

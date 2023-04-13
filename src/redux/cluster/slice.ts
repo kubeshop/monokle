@@ -4,7 +4,7 @@ import type {ClusterState} from '@shared/models/clusterState';
 import {ModernKubeConfig} from '@shared/models/config';
 
 import {startWatchingKubeconfig, stopWatchingKubeconfig} from './listeners/kubeconfig';
-import {pingCluster} from './thunks/ping';
+import {setupCluster} from './thunks/setup';
 
 const initialState: ClusterState = {
   watching: false,
@@ -30,11 +30,11 @@ export const clusterSlice = createSlice({
     },
   },
   extraReducers(builder) {
-    builder.addCase(pingCluster.rejected, (state, action) => {
+    builder.addCase(setupCluster.rejected, (state, action) => {
       state.proxyError = action.payload;
       state.proxyPort = undefined;
     });
-    builder.addCase(pingCluster.fulfilled, (state, action) => {
+    builder.addCase(setupCluster.fulfilled, (state, action) => {
       state.proxyError = undefined;
       state.proxyPort = action.payload.proxyPort;
     });

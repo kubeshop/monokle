@@ -6,12 +6,12 @@ import {ContextId, MonokleClusterError} from '@shared/ipc';
 
 type Status = 'idle' | 'error' | 'loading' | 'success';
 
-type PingResponse = {
+type SetupResponse = {
   status: Status;
   error?: MonokleClusterError;
 };
 
-export function useClusterPing(contextId?: ContextId): PingResponse {
+export function useClusterSetup(contextId?: ContextId): SetupResponse {
   const [previousContext, setPreviousContext] = useState<ContextId | undefined>(contextId);
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<MonokleClusterError | undefined>(undefined);

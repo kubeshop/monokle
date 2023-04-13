@@ -6,7 +6,7 @@ import {ThunkApi} from '@shared/models/thunk';
 
 import {selectCurrentContextId, selectKubeContext} from '../selectors';
 import {setup} from '../service/kube-control';
-import {pingCluster} from './ping';
+import {setupCluster} from './setup';
 
 type ConnectArgs = {
   kubeconfig?: string;
@@ -26,17 +26,17 @@ export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, Thu
   'cluster/connect',
   async (payload, {getState, dispatch}) => {
     // Ping for healthy connection
-    await dispatch(pingCluster());
+    await dispatch(setupCluster());
     const contextId = selectCurrentContextId(getState());
 
     if (!contextId) {
       throw new Error('no_cluster_context_found');
     }
 
-    const pingResponse = await setup(contextId);
+    const setupResponse = await setup(contextId);
 
-    if (!pingResponse.success) {
-      throw new Error(pingResponse.code);
+    if (!setupResponse.success) {
+      throw new Error(setupResponse.code);
     }
 
     // Create connection as before
@@ -51,7 +51,7 @@ export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, Thu
         reloadClusterResources({
           context: context.name,
           namespace: context.namespace ?? 'default',
-          port: pingResponse.port,
+          port: setupResponse.port,
         })
       );
     } else {
@@ -59,11 +59,11 @@ export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, Thu
         loadClusterResources({
           context: context.name,
           namespace: context.namespace ?? 'default',
-          port: pingResponse.port,
+          port: setupResponse.port,
         })
       );
     }
 
-    return {proxyPort: pingResponse.port};
+    return {proxyPort: setupResponse.port};
   }
 );

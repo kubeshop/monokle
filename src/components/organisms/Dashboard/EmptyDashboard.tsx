@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import {activeProjectSelector} from '@redux/appConfig';
 import {startWatchingKubeconfig, stopWatchingKubeconfig} from '@redux/cluster/listeners/kubeconfig';
 import {selectCurrentContextId, selectKubeconfig, useClusterSelector} from '@redux/cluster/selectors';
-import {pingCluster} from '@redux/cluster/thunks/ping';
+import {setupCluster} from '@redux/cluster/thunks/setup';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setActiveSettingsPanel, setLeftMenuSelection} from '@redux/reducers/ui';
 
@@ -63,7 +63,7 @@ export const EmptyDashboard = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(pingCluster());
+    dispatch(setupCluster());
   }, [contextId, dispatch]);
 
   return (
