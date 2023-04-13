@@ -37,11 +37,14 @@ function determineError(reason: string, contextId: ContextId): MonokleClusterErr
   // Monokle Proxy startup errors.
   // These happen locally while spawning the kube-proxy.
   // Most often inferred within our ProxyInstance.ts.
-  if (reason.includes('MONOKLE_PROXY_GCP_LEGACY_PLUGIN')) {
+  if (reason === 'MONOKLE_PROXY_GCP_LEGACY_PLUGIN') {
     return getMonokleClusterError('gcp-legacy-plugin', contextId);
   }
-  if (reason.includes('MONOKLE_PROXY_TIMEOUT')) {
+  if (reason === 'MONOKLE_PROXY_TIMEOUT') {
     return getMonokleClusterError('proxy-timeout', contextId);
+  }
+  if (reason === 'MONOKLE_PROXY_EMPTY_CONTEXT') {
+    return getMonokleClusterError('proxy-empty-context', contextId);
   }
 
   // Kubectl user authentication error.

@@ -10,6 +10,10 @@ const errors = createErrors({
     title: 'Cannot connect to the cluster',
     description: 'The proxy could not be started.',
   },
+  'proxy-empty-context': {
+    title: 'Cannot connect to the cluster',
+    description: 'There is no current context selected.',
+  },
   'local-connection-refused': {
     title: 'Cannot connect to the cluster',
     description: 'The connection was refused - is your Docker Engine or VM running?',

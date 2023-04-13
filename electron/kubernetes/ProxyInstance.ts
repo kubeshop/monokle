@@ -44,6 +44,10 @@ export class ProxyInstance {
   }
 
   async start(): Promise<void> {
+    if (this.context === '') {
+      throw new Error('MONOKLE_PROXY_EMPTY_CONTEXT');
+    }
+
     const globalOptions = [`--context=${this.context}`];
     if (this.kubeconfig) globalOptions.push(`--kubeconfig=${this.kubeconfig}`);
     if (this.verbosity) globalOptions.push(`-v=${this.verbosity}`);
