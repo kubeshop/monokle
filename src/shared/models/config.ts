@@ -131,7 +131,8 @@ export type ValidKubeConfig = {
 export type InvalidKubeConfig = {
   isValid: false;
   path: string;
-  reason: string; // either not_found or malformed
+  code: 'not_found' | 'malformed' | 'unknown';
+  reason: string;
 };
 
 // Parsed from kubernetes config file

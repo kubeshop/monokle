@@ -1,6 +1,6 @@
-import {ReactNode} from 'react';
+import {ReactNode, useCallback} from 'react';
 
-import {Button, Dropdown, Space} from 'antd';
+import {Button, Dropdown} from 'antd';
 
 import {DownOutlined} from '@ant-design/icons';
 
@@ -8,7 +8,8 @@ import styled from 'styled-components';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {selectKubeconfig} from '@redux/cluster/selectors';
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {Colors} from '@shared/styles';
 
@@ -19,7 +20,7 @@ export function ContextSelect() {
   const kubeconfig = useAppSelector(selectKubeconfig);
 
   if (!kubeconfig?.isValid) {
-    return <div>KUBECONFIG_INVALID</div>; // TODO design this
+    return <InvalidKubeconfigButton />;
   }
 
   return (
@@ -49,16 +50,16 @@ function Trigger({icon, value}: {icon?: ReactNode; value: string}) {
 
   return (
     <TriggerBtn $connected={isInClusterMode}>
-      <Space>
+      <Spacer>
         {icon}
         <span>{value}</span>
         <DownOutlined style={{fontSize: '75%'}} />
-      </Space>
+      </Spacer>
     </TriggerBtn>
   );
 }
 
-const TriggerBtn = styled(Button)<{$connected: boolean}>`
+const TriggerBtn = styled(Button)<{$connected?: boolean}>`
   display: flex;
   align-items: center;
   border-radius: 4px;
@@ -77,4 +78,27 @@ const TriggerBtn = styled(Button)<{$connected: boolean}>`
     background-color: ${({$connected}) => ($connected ? Colors.geekblue7 : Colors.grey3b)};
     color: ${Colors.whitePure};
   }
+`;
+
+function InvalidKubeconfigButton() {
+  const dispatch = useAppDispatch();
+
+  const handleClick = useCallback(() => {
+    dispatch(setLeftMenuSelection('dashboard'));
+  }, [dispatch]);
+
+  return (
+    <TriggerBtn onClick={handleClick}>
+      <Spacer>
+        <S.ClusterOutlined />
+        <span>No cluster found</span>
+      </Spacer>
+    </TriggerBtn>
+  );
+}
+
+const Spacer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
 `;

@@ -3,8 +3,9 @@ import * as k8s from '@kubernetes/client-node';
 import {BrowserWindow} from 'electron';
 
 import {FSWatcher, watch} from 'chokidar';
-import fs from 'fs/promises';
+import fs from 'fs-extra';
 import {uniq} from 'lodash';
+import log from 'loglevel';
 
 import {InvalidKubeConfig, ValidKubeConfig} from '@shared/models/config';
 
@@ -32,9 +33,12 @@ export class KubeConfigWatcher {
       const shouldAdd = !oldKubeconfigs.includes(kubeconfig);
 
       if (shouldAdd) {
-        await this.watchFile(kubeconfig);
-        // Dispatch events a first time.
-        this.parse(kubeconfig);
+        const success = await this.watchFile(kubeconfig);
+
+        if (success) {
+          // Dispatch events a first time.
+          this.parse(kubeconfig);
+        }
       }
     }
 
@@ -49,13 +53,17 @@ export class KubeConfigWatcher {
     }
   }
 
-  private async watchFile(kubeconfigPath: string) {
+  private async watchFile(kubeconfigPath: string): Promise<boolean> {
     try {
-      const stats = await fs.stat(kubeconfigPath);
+      const pathExists = await fs.pathExists(kubeconfigPath);
 
-      if (!stats.isFile()) {
-        this.broadcastError(kubeconfigPath, 'not_found');
-        return;
+      if (!pathExists) {
+        this.broadcastError({
+          path: kubeconfigPath,
+          code: 'not_found',
+          reason: 'There is no kubeconfig found here.',
+        });
+        return false;
       }
 
       const watcher = watch(kubeconfigPath, {
@@ -76,10 +84,16 @@ export class KubeConfigWatcher {
 
         this.parse(kubeconfigPath);
       });
-    } catch (e: any) {
-      // eslint-disable-next-line no-console
-      console.log('monitorKubeConfigError', e.message);
-      this.broadcastError(kubeconfigPath, 'unknown');
+
+      return true;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'unknown problem';
+      this.broadcastError({
+        path: kubeconfigPath,
+        code: 'unknown',
+        reason: `The kubeconfig has a problem: ${msg}`,
+      });
+      return false;
     }
   }
 
@@ -88,8 +102,12 @@ export class KubeConfigWatcher {
       const config = new k8s.KubeConfig();
       config.loadFromFile(kubeconfigPath);
       this.broadcastSuccess(kubeconfigPath, config);
-    } catch {
-      this.broadcastError(kubeconfigPath, 'malformed');
+    } catch (err) {
+      this.broadcastError({
+        path: kubeconfigPath,
+        code: 'malformed',
+        reason: '',
+      });
     }
   }
 
@@ -106,11 +124,11 @@ export class KubeConfigWatcher {
     BrowserWindow.getAllWindows().forEach(w => w.webContents.send('kubeconfig:update', kc));
   }
 
-  private broadcastError(kubeconfigPath: string, reason: string) {
+  private broadcastError(config: Omit<InvalidKubeConfig, 'isValid'>) {
+    log.warn('[kubeconfig-watcher] error', config.path, config.code);
     const kc: InvalidKubeConfig = {
       isValid: false,
-      path: kubeconfigPath,
-      reason,
+      ...config,
     };
     BrowserWindow.getAllWindows().forEach(w => w.webContents.send('kubeconfig:update', kc));
   }

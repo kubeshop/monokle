@@ -34,7 +34,7 @@ export const kubeConfigListener: AppListenerFn = listen => {
       const listener = (_event: any, config: ModernKubeConfig | undefined) => {
         const oldConfig = config ? getState().cluster.kubeconfigs[config.path] : undefined;
         const hasChanged = !isEqual(oldConfig, config);
-        if (hasChanged) {
+        if (hasChanged || !config?.isValid) {
           dispatch(kubeconfigUpdated({config}));
         }
 
@@ -67,14 +67,14 @@ export const kubeConfigListener: AppListenerFn = listen => {
         if (isGlobalKubeconfig) {
           const oldKubeconfig = getState().config.kubeConfig;
           const changed = !isEqual(newKubeconfig, oldKubeconfig);
-          if (changed) dispatch(setKubeConfig(newKubeconfig));
+          if (changed || !config?.isValid) dispatch(setKubeConfig(newKubeconfig));
         }
 
         const isProjectKubeconfig = getState().config.projectConfig?.kubeConfig?.path === config?.path;
         if (isProjectKubeconfig) {
           const oldKubeconfig: KubeConfig | undefined = getState().config.projectConfig?.kubeConfig;
           const changed = !isEqual(newKubeconfig, oldKubeconfig);
-          if (changed) dispatch(loadProjectKubeConfig(newKubeconfig));
+          if (changed || !config?.isValid) dispatch(loadProjectKubeConfig(newKubeconfig));
         }
 
         if (config?.isValid && config?.currentContext) {
@@ -101,6 +101,7 @@ export const kubeConfigListener: AppListenerFn = listen => {
       }
 
       subscribe();
+      console.log('watch - subscribe');
     },
   });
 };

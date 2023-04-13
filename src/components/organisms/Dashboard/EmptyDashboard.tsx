@@ -5,11 +5,14 @@ import {QuestionCircleFilled} from '@ant-design/icons';
 import {motion, useAnimationControls} from 'framer-motion';
 import styled from 'styled-components';
 
-import {selectCurrentContextId, useClusterSelector} from '@redux/cluster/selectors';
+import {startWatchingKubeconfig, stopWatchingKubeconfig} from '@redux/cluster/listeners/kubeconfig';
+import {selectCurrentContextId, selectKubeconfig, useClusterSelector} from '@redux/cluster/selectors';
 import {pingCluster} from '@redux/cluster/thunks/ping';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {ContextId, MonokleClusterError} from '@shared/ipc';
+import {ModernKubeConfig} from '@shared/models/config';
 import {Colors} from '@shared/styles';
 import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
@@ -68,7 +71,8 @@ export const EmptyDashboard = () => {
           </p>
         </HelpMessage>
 
-        <ErrorMessage contextId={contextId} onDebug={() => toggleDebug(true)} />
+        <KubeconfigErrorMessage />
+        <ClusterErrorMessage contextId={contextId} onDebug={() => toggleDebug(true)} />
       </Center>
 
       <DebugClusterDrawer contextId={contextId} open={debug} onClose={closeDebug} />
@@ -76,7 +80,52 @@ export const EmptyDashboard = () => {
   );
 };
 
-function ErrorMessage({onDebug}: {contextId?: ContextId; onDebug: () => void}) {
+function KubeconfigErrorMessage() {
+  const dispatch = useAppDispatch();
+  const controls = useAnimationControls();
+  const previousErrorRef = useRef<ModernKubeConfig | undefined>(undefined);
+  const kubeconfig = useAppSelector(selectKubeconfig);
+
+  const handleTryAgain = useCallback(() => {
+    dispatch(stopWatchingKubeconfig());
+    setTimeout(() => {
+      dispatch(startWatchingKubeconfig());
+    }, 500);
+  }, [dispatch]);
+
+  const handleReconfigure = useCallback(() => {
+    dispatch(setLeftMenuSelection('settings'));
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (
+      kubeconfig &&
+      !kubeconfig.isValid &&
+      previousErrorRef.current &&
+      !previousErrorRef.current.isValid &&
+      previousErrorRef.current?.path === kubeconfig.path &&
+      previousErrorRef.current?.reason === kubeconfig?.reason
+    ) {
+      controls.start({scale: 1.04}).then(() => controls.start({scale: 1}));
+    }
+    previousErrorRef.current = kubeconfig;
+  }, [controls, kubeconfig]);
+
+  if (!kubeconfig || kubeconfig.isValid) {
+    return null;
+  }
+
+  return (
+    <motion.div animate={controls}>
+      <ErrorContent>
+        The kubeconfig located at {kubeconfig.path} has problems. {kubeconfig.reason}{' '}
+        <a onClick={handleTryAgain}>Try again</a> or <a onClick={handleReconfigure}>reconfigure</a>
+      </ErrorContent>
+    </motion.div>
+  );
+}
+
+function ClusterErrorMessage({onDebug}: {contextId?: ContextId; onDebug: () => void}) {
   const controls = useAnimationControls();
   const previousErrorRef = useRef<MonokleClusterError | undefined>(undefined);
   const proxyError = useClusterSelector(s => s.proxyError);
