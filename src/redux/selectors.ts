@@ -55,9 +55,27 @@ export const previewedValuesFileSelector = createSelector(
   }
 );
 
+export const helmValuesMapByFilePathSelector = createSelector(
+  [(state: RootState) => state.main.helmValuesMap],
+  helmValuesMap => {
+    return Object.values(helmValuesMap).reduce((acc, helmValuesFile) => {
+      acc[helmValuesFile.filePath] = helmValuesFile;
+      return acc;
+    }, {} as Record<string, HelmValuesFile>);
+  }
+);
+
 export const selectedHelmValuesSelector = createSelector(
-  [(state: RootState) => state.main.selection, (state: RootState) => state.main.helmValuesMap],
-  (selection, helmValuesMap) => {
+  [
+    (state: RootState) => state.main.selection,
+    (state: RootState) => state.main.helmValuesMap,
+    helmValuesMapByFilePathSelector,
+  ],
+  (selection, helmValuesMap, helmValuesMapByFilePath) => {
+    if (selection?.type === 'file') {
+      return helmValuesMapByFilePath[selection.filePath];
+    }
+
     if (selection?.type !== 'helm.values.file') {
       return undefined;
     }
