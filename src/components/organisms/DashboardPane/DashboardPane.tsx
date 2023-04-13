@@ -20,8 +20,6 @@ import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import * as S from './DashboardPane.style';
 import {MenuItem} from './MenuItem';
 
-const ignoredResourceVersions = ['events.k8s.io/v1'];
-
 const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const [menuList, menuListRef] = useSelectorWithRef(state => state.dashboard.ui.menuList);
@@ -76,9 +74,6 @@ const DashboardPane = () => {
     });
 
     registeredKindHandlers.forEach((kindHandler: ResourceKindHandler) => {
-      if (ignoredResourceVersions.find(v => v === kindHandler.clusterApiVersion)) {
-        return;
-      }
       const parent: DashboardMenu | undefined = tempMenu.find(m => m.key === kindHandler.navigatorPath[1]);
       if (parent) {
         const child: DashboardMenu | undefined = parent.children?.find(m => m.key === kindHandler.navigatorPath[2]);
