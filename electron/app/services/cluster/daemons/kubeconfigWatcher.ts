@@ -103,10 +103,11 @@ export class KubeConfigWatcher {
       config.loadFromFile(kubeconfigPath);
       this.broadcastSuccess(kubeconfigPath, config);
     } catch (err) {
+      const msg = err instanceof Error ? err.message : undefined;
       this.broadcastError({
         path: kubeconfigPath,
         code: 'malformed',
-        reason: '',
+        reason: `The kubeconfig is incorrectled formatted${msg ? `: ${msg}` : ''}.`,
       });
     }
   }
