@@ -261,6 +261,6 @@ export const resourceNavigatorSelector = createSelector(
 );
 
 export const navigatorResourcesCountSelector = createSelector(
-  resourceNavigatorSelector,
+  navigatorResourcesSelector,
   navigatorResources => navigatorResources.length
 );

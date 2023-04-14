@@ -1,7 +1,9 @@
+import {useMemo} from 'react';
+
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {navigatorResourcesCountSelector} from '@redux/selectors/resourceSelectors';
+import {navigatorResourcesSelector} from '@redux/selectors/resourceSelectors';
 
 import {Colors, FontColors} from '@shared/styles';
 
@@ -13,11 +15,12 @@ type Props = {
 
 function ResourceCounter({kind, isSelected, onClick}: Props) {
   const isCollapsed = useAppSelector(state => state.ui.navigator.collapsedResourceKinds.includes(kind));
-  const navigatorResourcesCount = useAppSelector(navigatorResourcesCountSelector);
+  const navigatorResources = useAppSelector(navigatorResourcesSelector);
+  const count = useMemo(() => navigatorResources.filter(r => r.kind === kind).length, [navigatorResources]);
 
   return (
     <Counter selected={isSelected && isCollapsed} onClick={onClick}>
-      {navigatorResourcesCount}
+      {count}
     </Counter>
   );
 }
