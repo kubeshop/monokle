@@ -56,7 +56,7 @@ function Trigger({icon, value}: {icon?: ReactNode; value: string}) {
     <TriggerBtn $connected={isInClusterMode}>
       <Spacer>
         {icon}
-        <span>{hasNoCurrentContext ? 'no context selected' : value}</span>
+        <TriggerContent>{hasNoCurrentContext ? 'no context selected' : value}</TriggerContent>
         <DownOutlined style={{fontSize: '75%'}} />
       </Spacer>
     </TriggerBtn>
@@ -65,6 +65,8 @@ function Trigger({icon, value}: {icon?: ReactNode; value: string}) {
 
 const TriggerBtn = styled(Button)<{$connected?: boolean}>`
   display: flex;
+  flex: 0 1 auto;
+  overflow: hidden;
   align-items: center;
   border-radius: 4px;
   padding: 0 1rem;
@@ -105,4 +107,11 @@ const Spacer = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+`;
+
+const TriggerContent = styled.div`
+  max-width: 380px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 `;

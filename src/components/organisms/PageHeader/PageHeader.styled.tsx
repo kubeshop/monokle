@@ -78,6 +78,7 @@ export const Header = styled(Layout.Header)`
 
 export const InitButton = styled(RawButton)`
   margin-left: 10px;
+  margin-right: 6px;
   font-size: 12px;
   border-radius: 4px;
   display: flex;
@@ -180,6 +181,9 @@ export const BackProjectsButton = styled(Button)`
   color: #ffffff;
   line-height: 20px;
   font-weight: 400;
+  border-radius: 4px;
+  height: 30px;
   padding-left: 16px;
   padding-right: 16px;
+  margin-right: 8px;
 `;
