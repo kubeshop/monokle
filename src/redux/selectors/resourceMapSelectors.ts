@@ -19,12 +19,12 @@ import {knownResourceKindsSelector} from './resourceKindSelectors';
 import {createDeepEqualSelector} from './utils';
 
 export const activeResourceStorageSelector = createSelector(
-  (state: RootState) => state.main,
-  (mainState): ResourceStorage => {
-    if (mainState.clusterConnection) {
+  [(state: RootState) => state.main.clusterConnection, (state: RootState) => state.main.preview],
+  (clusterConnection, preview): ResourceStorage => {
+    if (clusterConnection) {
       return 'cluster';
     }
-    if (mainState.preview) {
+    if (preview) {
       return 'preview';
     }
     return 'local';
