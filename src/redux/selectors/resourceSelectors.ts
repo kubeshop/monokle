@@ -21,6 +21,7 @@ import {
 import {ResourceNavigatorNode} from '@shared/models/navigator';
 import {RootState} from '@shared/models/rootState';
 
+import {getActiveResourceMetaMapFromState} from './resourceMapGetters';
 import {
   activeResourceMetaMapSelector,
   activeResourceStorageSelector,
@@ -245,4 +246,18 @@ export const resourceNavigatorSelector = createSelector(
 
     return list;
   }
+);
+
+export const filteredResourcesIdsSelector = createSelector(
+  [getActiveResourceMetaMapFromState, state => state.main.resourceFilter],
+  (resources, resourceFilter) =>
+    Object.values(resources)
+      .filter(
+        r =>
+          r.kind &&
+          isResourcePassingFilter(r, resourceFilter) &&
+          !isKustomizationResource(r) &&
+          !isKustomizationPatch(r)
+      )
+      .map(r => r.id)
 );

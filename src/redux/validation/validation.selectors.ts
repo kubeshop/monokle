@@ -67,6 +67,9 @@ export const problemsByResourcesSelector = createDeepEqualSelector(
 export const errorsByResourcesSelector = (state: ValidationState) => problemsByResourcesSelector(state, 'error');
 export const warningsByResourcesSelector = (state: ValidationState) => problemsByResourcesSelector(state, 'warning');
 
+export const errorsResourcesIdsSelector = (state: ValidationState) => Object.keys(errorsByResourcesSelector(state));
+export const warningsResourcesIdsSelector = (state: ValidationState) => Object.keys(warningsByResourcesSelector(state));
+
 export const problemsByResourceSelector = createDeepEqualSelector(
   [
     (state: ValidationState, _resource?: string, level?: RuleLevel) => {
