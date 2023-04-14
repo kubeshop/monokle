@@ -50,7 +50,7 @@ export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, Thu
       await dispatch(
         reloadClusterResources({
           context: context.name,
-          namespace: context.namespace ?? 'default',
+          namespace: payload.namespace ?? context.namespace ?? 'default',
           port: setupResponse.port,
         })
       );
@@ -58,7 +58,7 @@ export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, Thu
       await dispatch(
         loadClusterResources({
           context: context.name,
-          namespace: context.namespace ?? 'default',
+          namespace: payload.namespace ?? context.namespace ?? 'default',
           port: setupResponse.port,
         })
       );

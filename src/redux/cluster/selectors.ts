@@ -37,6 +37,12 @@ export const selectKubeContext = (
   return context;
 };
 
+export function getContext(kubeconfig: ModernKubeConfig | undefined, context?: string): Context | undefined {
+  if (!kubeconfig?.isValid) return undefined;
+  const contextName = context ?? kubeconfig.currentContext;
+  return kubeconfig.contexts.find(c => c.name === contextName);
+}
+
 export const selectKubeconfigPaths = (state: RootState): string[] => {
   const configsFromClusterSlice = state.cluster.configPaths;
   const globalConfig = state.config.kubeConfig.path;

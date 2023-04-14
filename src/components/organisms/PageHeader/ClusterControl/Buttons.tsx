@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback} from 'react';
 
 import {Button, Spin} from 'antd';
 
@@ -6,7 +6,7 @@ import {ApiOutlined, CloseCircleFilled, LoadingOutlined} from '@ant-design/icons
 
 import styled from 'styled-components';
 
-import {kubeConfigContextSelector, kubeConfigPathSelector, kubeConfigPathValidSelector} from '@redux/appConfig';
+import {getContext, selectKubeconfig} from '@redux/cluster/selectors';
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleStartProjectPane} from '@redux/reducers/ui';
@@ -18,25 +18,16 @@ import {Colors} from '@shared/styles';
 
 export function ConnectButton() {
   const dispatch = useAppDispatch();
-  const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const kubeConfig = useAppSelector(selectKubeconfig);
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const clusterConnection = useAppSelector(state => state.main.clusterConnection);
   const clusterConnectionOptions = useAppSelector(state => state.main.clusterConnectionOptions);
-  const lastNamespaceLoaded = clusterConnectionOptions.lastNamespaceLoaded;
-  const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
-    Boolean(!kubeConfigPath) || !isKubeConfigPathValid
-  );
   const loading = Boolean(clusterConnectionOptions.isLoading);
 
-  useEffect(() => {
-    setIsClusterActionDisabled(Boolean(!kubeConfigPath) || !isKubeConfigPathValid);
-  }, [kubeConfigPath, isKubeConfigPathValid]);
-
-  const loadOrReload = async () => {
-    if (isClusterActionDisabled && loading) {
+  const loadOrReload = useCallback(() => {
+    const context = getContext(kubeConfig);
+    if (!context || loading) {
       return;
     }
 
@@ -44,14 +35,15 @@ export function ConnectButton() {
       dispatch(toggleStartProjectPane());
     }
 
+    console.log('TEST WITO', context);
     dispatch(
       connectCluster({
-        context: kubeConfigContext,
-        namespace: lastNamespaceLoaded,
+        context: context.name,
+        namespace: context.namespace,
         reload: clusterConnection !== undefined,
       })
     );
-  };
+  }, [clusterConnection, dispatch, isStartProjectPaneVisible, kubeConfig, loading]);
 
   if (loading) {
     return (
