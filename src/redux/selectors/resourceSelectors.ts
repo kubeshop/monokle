@@ -259,3 +259,8 @@ export const resourceNavigatorSelector = createSelector(
     return list;
   }
 );
+
+export const navigatorResourcesCountSelector = createSelector(
+  resourceNavigatorSelector,
+  navigatorResources => navigatorResources.length
+);

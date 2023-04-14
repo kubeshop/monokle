@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {navigatorResourcesSelector} from '@redux/selectors/resourceSelectors';
+import {navigatorResourcesCountSelector} from '@redux/selectors/resourceSelectors';
 
 import {Colors, FontColors} from '@shared/styles';
 
@@ -13,11 +13,11 @@ type Props = {
 
 function ResourceCounter({kind, isSelected, onClick}: Props) {
   const isCollapsed = useAppSelector(state => state.ui.navigator.collapsedResourceKinds.includes(kind));
-  const navigatorResources = useAppSelector(state => navigatorResourcesSelector(state));
+  const navigatorResourcesCount = useAppSelector(navigatorResourcesCountSelector);
 
   return (
     <Counter selected={isSelected && isCollapsed} onClick={onClick}>
-      {navigatorResources.filter(r => r.kind === kind).length}
+      {navigatorResourcesCount}
     </Counter>
   );
 }
