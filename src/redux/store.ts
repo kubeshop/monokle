@@ -15,7 +15,6 @@ import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
 import {extensionSlice} from './reducers/extension';
 import {mainSlice} from './reducers/main';
-import {retryClusterConnectionListener} from './reducers/main/clusterListeners';
 import {imageListParserListener} from './reducers/main/mainListeners';
 import {killTerminalProcessesListener, removeTerminalListener, terminalSlice} from './reducers/terminal';
 import {uiSlice} from './reducers/ui';
@@ -45,7 +44,6 @@ combineListeners([
   ...appConfigListeners,
   ...clusterListeners,
   imageListParserListener,
-  retryClusterConnectionListener,
 ]);
 
 const appReducer = combineReducers({

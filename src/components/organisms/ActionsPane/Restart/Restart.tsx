@@ -8,10 +8,10 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {RestartTooltip} from '@constants/tooltips';
 
 import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import restartDeployment from '@redux/services/restartDeployment';
-import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {PrimaryButton} from '@atoms';
 
@@ -34,7 +34,7 @@ const Restart: React.FC = () => {
         if (name && namespace) {
           restartDeployment({currentContext, kubeConfigPath, name, namespace});
           // TODO: we should have a way of updating a single resource instead of restarting the whole cluster
-          dispatch(startClusterConnection({context: currentContext, namespace, isRestart: true}));
+          dispatch(connectCluster({context: currentContext, namespace, reload: true}));
         }
       },
       onCancel() {},
