@@ -186,7 +186,14 @@ export const configSlice = createSlice({
       state.isAccessLoading = action.payload;
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
+      const changed = !isEqual(action.payload, state.kubeConfig);
+      const pathChanged = action.payload.path !== state.kubeConfig.path;
+      if (!changed) return;
       state.kubeConfig = action.payload;
+
+      if (pathChanged) {
+        electronStore.set('appConfig.kubeConfig', action.payload.path);
+      }
     },
     createProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
       const project: Project = action.payload;
@@ -261,6 +268,9 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.projects', state.projects);
     },
     loadProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
+      const changed = !isEqual(action.payload, state.projectConfig?.kubeConfig);
+      if (!changed) return;
+
       if (!state.projectConfig) {
         state.projectConfig = {};
       }

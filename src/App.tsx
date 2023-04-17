@@ -7,7 +7,13 @@ import lodash from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 
-import {activeProjectSelector, setCreateProject, setLoadingProject, setOpenProject} from '@redux/appConfig';
+import {
+  activeProjectSelector,
+  setCreateProject,
+  setKubeConfig,
+  setLoadingProject,
+  setOpenProject,
+} from '@redux/appConfig';
 import {startWatchingKubeconfig} from '@redux/cluster/listeners/kubeconfig';
 import {setIsGitInstalled} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -84,6 +90,8 @@ const App = () => {
   );
 
   useEffect(() => {
+    const kubeconfig = electronStore.get('appConfig.kubeConfig');
+    dispatch(setKubeConfig({path: kubeconfig}));
     dispatch(startWatchingKubeconfig());
   }, [dispatch]);
 

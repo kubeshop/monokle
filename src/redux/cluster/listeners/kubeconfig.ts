@@ -76,7 +76,7 @@ export const kubeConfigListener: AppListenerFn = listen => {
         if (isProjectKubeconfig) {
           const oldKubeconfig: KubeConfig | undefined = getState().config.projectConfig?.kubeConfig;
           const changed = !isEqual(newKubeconfig, oldKubeconfig);
-          if (changed || !config?.isValid) dispatch(loadProjectKubeConfig(newKubeconfig));
+          if (changed) dispatch(loadProjectKubeConfig(newKubeconfig));
         }
 
         if (config?.isValid && config?.currentContext) {
@@ -99,11 +99,10 @@ export const kubeConfigListener: AppListenerFn = listen => {
         await stopWatchKubeconfig();
         ipcRenderer.off('kubeconfig:update', listener);
       } catch (err) {
-        console.error('fail listen kubeconfig', err);
+        console.error('Cannot watch kubeconfigs.', err);
       }
 
       subscribe();
-      console.log('watch - subscribe');
     },
   });
 };
