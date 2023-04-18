@@ -27,6 +27,7 @@ const FileSystemTree: React.FC = () => {
   const [firstHighlightedFile, firstHighlightedFileRef] = useSelectorWithRef(state =>
     state.main.highlights.find(isFileSelection)
   );
+  const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
 
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -63,8 +64,8 @@ const FileSystemTree: React.FC = () => {
   }, [fileExplorerExpandedFolders, firstHighlightedFileRef]);
 
   useEffect(() => {
-    console.log('treeData', treeData);
-  }, [treeData]);
+    console.log('fileMapRef', fileMapRef);
+  }, [fileMapRef]);
 
   return (
     <S.TreeContainer ref={containerRef}>
@@ -92,10 +93,16 @@ const FileSystemTree: React.FC = () => {
         virtual
         onClick={(mouseEvent, nodeEvent) => {
           mouseEvent.preventDefault();
-          console.log('nodeEvent', nodeEvent);
           if (nodeEvent.selectable === false) {
             return;
           }
+
+          const fileEntry = fileMapRef.current[nodeEvent.key];
+
+          if (fileEntry.isExcluded) {
+            return;
+          }
+
           if (typeof nodeEvent.key === 'string') {
             if (isHelmValuesFile(nodeEvent.key)) {
               const valuesFileId = helmValuesMapByFilePath[nodeEvent.key].id;

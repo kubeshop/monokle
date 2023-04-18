@@ -262,7 +262,7 @@ export function readFiles(
           helmValuesMap,
           fileMap,
         });
-      } else if (fileIsIncluded(fileEntry.filePath, projectConfig)) {
+      } else if (fileIsIncluded(fileEntry.filePath, projectConfig) && Boolean(!isPathExcluded)) {
         // log.info('Extracting resources for file entry: ', fileEntry.name);
         const resourcesFromFile = extractResourcesForFileEntry(fileEntry, rootFolder);
         resourcesFromFile.forEach(resource => {
