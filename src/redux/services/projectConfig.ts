@@ -82,6 +82,9 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     scanExcludes: state.scanExcludes,
     fileIncludes: state.fileIncludes,
     folderReadsMaxDepth: state.folderReadsMaxDepth,
+    helm: state.projectConfig?.helm,
+    k8sVersion: state.k8sVersion,
+    savedCommandMap: state.projectConfig?.savedCommandMap,
   };
   applicationConfig.settings = {
     helmPreviewMode: state.settings.helmPreviewMode,
@@ -99,9 +102,7 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
     contexts: state.kubeConfig.contexts,
     currentContext: state.kubeConfig.currentContext,
   };
-  applicationConfig.k8sVersion = state.k8sVersion;
-  applicationConfig.helm = state.projectConfig?.helm;
-  applicationConfig.savedCommandMap = state.projectConfig?.savedCommandMap;
+
   return applicationConfig;
 };
 

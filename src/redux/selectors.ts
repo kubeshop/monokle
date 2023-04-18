@@ -55,6 +55,16 @@ export const previewedValuesFileSelector = createSelector(
   }
 );
 
+export const helmValuesMapByFilePathSelector = createSelector(
+  [(state: RootState) => state.main.helmValuesMap],
+  helmValuesMap => {
+    return Object.values(helmValuesMap).reduce<Record<string, HelmValuesFile>>((acc, helmValuesFile) => {
+      acc[helmValuesFile.filePath] = helmValuesFile;
+      return acc;
+    }, {});
+  }
+);
+
 export const selectedHelmValuesSelector = createSelector(
   [(state: RootState) => state.main.selection, (state: RootState) => state.main.helmValuesMap],
   (selection, helmValuesMap) => {
@@ -135,6 +145,13 @@ export const selectHelmValues = (state: AppState, id?: string): HelmValuesFile |
   if (!id) return undefined;
   return state.helmValuesMap[id];
 };
+
+export const selectionFilePathSelector = createSelector(
+  [selectedHelmValuesSelector, selectedFilePathSelector],
+  (selectedHelm, selectedFilePath) => {
+    return selectedHelm?.filePath || selectedFilePath;
+  }
+);
 
 // TODO: rename this after finishing refactoring all places where the old `isInPreviewModeSelector` is used
 // the previous selector returned `true` even if you were in ClusterMode but that's no longer desired

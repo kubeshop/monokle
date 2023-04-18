@@ -188,7 +188,7 @@ type UiState = {
   collapsedKustomizeKinds: string[];
   collapsedHelmCharts: string[];
   collapsedPreviewConfigurationsHelmCharts: string[];
-  welcomePopup: {
+  welcomeModal: {
     isVisible: boolean;
   };
   fileCompareModal: {

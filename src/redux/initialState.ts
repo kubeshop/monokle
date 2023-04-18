@@ -225,7 +225,7 @@ const initialUiState: UiState = {
   templateExplorer: {
     isVisible: false,
   },
-  welcomePopup: {
+  welcomeModal: {
     isVisible: false,
   },
   activeSettingsPanel: SettingsPanel.GlobalSettings,

@@ -9,7 +9,7 @@ import {isInClusterModeSelector, setDeleteProject} from '@redux/appConfig';
 import {toggleForm} from '@redux/forms';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {openWelcomePopup} from '@redux/reducers/ui';
+import {openWelcomeModal} from '@redux/reducers/ui';
 
 import {fetchAppVersion} from '@utils/appVersion';
 
@@ -42,6 +42,7 @@ const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'
 const SaveEditCommandModal = React.lazy(() => import('@organisms/SaveEditCommandModal'));
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const TemplateExplorer = React.lazy(() => import('@organisms/TemplateExplorer'));
+const WelcomeModal = React.lazy(() => import('@organisms/WelcomeModal'));
 
 const GlobalModals = () => {
   const dispatch = useAppDispatch();
@@ -72,6 +73,7 @@ const GlobalModals = () => {
   const newVersion = useAppSelector(state => state.config.newVersion);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
+  const isWelcomeModalVisible = useAppSelector(state => state.ui.welcomeModal.isVisible);
 
   const isClusterResourceDiffModalVisible = useMemo(
     () => Boolean(targetResourceId) && isInClusterMode,
@@ -131,7 +133,7 @@ const GlobalModals = () => {
 
       // new user
       if (!semver.valid(lastSeenReleaseNotesVersion)) {
-        dispatch(openWelcomePopup());
+        dispatch(openWelcomeModal());
         electronStore.set('appConfig.lastSeenReleaseNotesVersion', version);
       } else if (
         // check if the current version is the next big release version for showing the modal with release notes
@@ -215,6 +217,7 @@ const GlobalModals = () => {
           </Modal>
         )}
         {isTemplateExplorerVisible && <TemplateExplorer />}
+        {isWelcomeModalVisible && <WelcomeModal />}
       </Suspense>
     </>
   );

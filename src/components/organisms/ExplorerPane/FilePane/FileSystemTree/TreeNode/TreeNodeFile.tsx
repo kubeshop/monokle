@@ -9,7 +9,7 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
+import {isInPreviewModeSelectorNew, selectionFilePathSelector} from '@redux/selectors';
 
 import {ContextMenu, Dots} from '@components/atoms';
 
@@ -30,9 +30,8 @@ const TreeNodeFile: React.FC<Props> = props => {
   const fileEntry: FileEntry | undefined = useAppSelector(state => state.main.fileMap[filePath]);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
-  const isSelected = useAppSelector(
-    state => state.main.selection?.type === 'file' && state.main.selection.filePath === filePath
-  );
+  const selectedFilePath = useAppSelector(selectionFilePathSelector);
+  const isSelected = selectedFilePath === filePath;
   const isDisabled = useIsDisabled(fileEntry);
   const canBePreviewed = useCanPreview(fileEntry, isDisabled);
   const {deleteEntry, isDeleteLoading} = useDelete();
