@@ -1,13 +1,12 @@
 import {Modal, Typography} from 'antd';
 
-import hotkeys from '@constants/hotkeys';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeKeyboardShortcutsModal} from '@redux/reducers/ui';
 
-import {defineHotkey} from '@utils/defineHotkey';
-
 import Keyboard from '@assets/Keyboard.svg';
+
+import {hotkeys} from '@shared/constants/hotkeys';
+import {defineHotkey} from '@shared/utils/hotkey';
 
 import BoardKeys from './BoardKeys';
 import * as S from './KeyboardShortcuts.styled';

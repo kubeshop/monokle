@@ -1,40 +1,46 @@
 import {app} from 'electron';
-import unhandled from 'electron-unhandled';
 
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
-import Nucleus from 'nucleus-nodejs';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
-import {fixPath} from '@utils/path';
-import '@utils/segment';
-
 import terminal from '@root/cli/terminal';
+import {init as sentryInit} from '@sentry/electron/main';
+import electronStore from '@shared/utils/electronStore';
+import '@shared/utils/segment';
 
+import './KubeConfigManager';
 import './git/ipc';
 import './ipc/ipcListeners';
 import {openApplication} from './openApplication';
-import {initNucleus, saveInitialK8sSchema, setDeviceID, setProjectsRootFolder} from './utils';
-
-const isDev = process.env.NODE_ENV === 'development';
+import {initTelemetry, saveInitialK8sSchema, setProjectsRootFolder} from './utils';
+import {fixPath} from './utils/path';
 
 const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
+// Bottom 2 lines prevent SSL errors that throws from browser
+app.commandLine.appendSwitch('ignore-certificate-errors');
+app.commandLine.appendSwitch('ignore-ssl-errors');
 
-let {disableErrorReports, disableTracking} = initNucleus(isDev, app);
-unhandled({
-  logger: error => {
-    if (!disableErrorReports) {
-      Nucleus.trackError((error && error.name) || 'Unnamed error', error);
-    }
-  },
-  showDialog: false,
-});
+const disableEventTracking = Boolean(electronStore.get('appConfig.disableEventTracking'));
+
+if (process.env.SENTRY_DSN) {
+  sentryInit({
+    dsn: process.env.SENTRY_DSN,
+    beforeSend: event => {
+      const disableErrorReporting = Boolean(electronStore.get('appConfig.disableErrorReporting'));
+      if (disableErrorReporting) {
+        return null;
+      }
+      return event;
+    },
+  });
+}
 
 setProjectsRootFolder(userHomeDir);
 saveInitialK8sSchema(userDataDir);
-setDeviceID(machineIdSync(), disableTracking, app.getVersion());
+initTelemetry(machineIdSync(), disableEventTracking, app);
 fixPath();
 
 if (process.env.MONOKLE_RUN_AS_NODE) {

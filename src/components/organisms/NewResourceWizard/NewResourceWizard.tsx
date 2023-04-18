@@ -1,34 +1,41 @@
 /* eslint-disable react/no-unescaped-entities */
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
-import {Form, Input, Modal, Select} from 'antd';
+import {Checkbox, Form, Input, Modal, Select, TreeSelect} from 'antd';
 
 import {InfoCircleOutlined} from '@ant-design/icons';
 
 import fs from 'fs';
+import {JSONSchemaFaker} from 'json-schema-faker';
+import {first} from 'lodash';
 import path from 'path';
-
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
-
-import {FileMapType} from '@models/appstate';
-import {FileEntry} from '@models/fileentry';
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
-import {NewResourceWizardInput} from '@models/ui';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
-import {registeredKindHandlersSelector} from '@redux/selectors';
-import {createUnsavedResource} from '@redux/services/unsavedResource';
-import {saveUnsavedResources} from '@redux/thunks/saveUnsavedResources';
+import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
+import {useResourceContentMapRef, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
+import {joinK8sResource} from '@redux/services/resource';
+import {getResourceKindSchema} from '@redux/services/schema';
+import {createTransientResource} from '@redux/services/transientResource';
+import {saveTransientResources} from '@redux/thunks/saveTransientResources';
 
+import {useFileSelectOptions} from '@hooks/useFileSelectOptions';
+import {useFileFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 import {useNamespaces} from '@hooks/useNamespaces';
 
-import {openNamespaceTopic, openUniqueObjectNameTopic} from '@utils/shell';
+import {useRefSelector, useSelectorWithRef, useStateWithRef} from '@utils/hooks';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {FileMapType} from '@shared/models/appState';
+import {FileEntry} from '@shared/models/fileEntry';
+import {K8sResource, ResourceMeta} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {NewResourceWizardInput} from '@shared/models/ui';
+import {openNamespaceTopic, openUniqueObjectNameTopic} from '@shared/utils/shell';
 
 import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 
@@ -68,23 +75,33 @@ const generateFullFileName = (
 
 const NewResourceWizard = () => {
   const dispatch = useAppDispatch();
-  const fileMap = useAppSelector(state => state.main.fileMap);
   const newResourceWizardState = useAppSelector(state => state.ui.newResourceWizard);
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
-  const resourceFilterNamespace = useAppSelector(state => state.main.resourceFilter.namespace);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const resourceFilterNamespaces = useAppSelector(state => state.main.resourceFilter.namespaces);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
+  const localResourceMetaMap = useResourceMetaMap('local');
+  const localResourceMetaMapRef = useRef(localResourceMetaMap);
+  localResourceMetaMapRef.current = localResourceMetaMap;
+  const localResourceContentMapRef = useResourceContentMapRef('local');
+  const fileMapRef = useRefSelector(state => state.main.fileMap);
+  const [rootFolderEntry, rootFolderEntryRef] = useSelectorWithRef(state => state.main.fileMap[ROOT_FILE_ENTRY]);
+  const userDataDirRef = useRefSelector(state => state.config.userDataDir);
+  const k8sVersionRef = useRefSelector(state => state.config.k8sVersion);
 
-  const [namespaces] = useNamespaces({extra: ['none', 'default']});
-
-  const [filteredResources, setFilteredResources] = useState<K8sResource[]>([]);
+  const [filteredResources, setFilteredResources] = useState<ResourceMeta[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
   const [isResourceKindNamespaced, setIsResourceKindNamespaced] = useState<boolean>(true);
   const [isSubmitDisabled, setSubmitDisabled] = useState(true);
-  const [savingDestination, setSavingDestination] = useState<string>('doNotSave');
-  const [selectedFolder, setSelectedFolder] = useState(ROOT_FILE_ENTRY);
-  const [selectedFile, setSelectedFile] = useState<string | undefined>();
   const [exportFileName, setExportFileName] = useState<string | undefined>('');
+  const [savingDestination, setSavingDestination, savingDestinationRef] = useStateWithRef<string>('doNotSave');
+  const [selectedFile, setSelectedFile, selectedFileRef] = useStateWithRef<string | undefined>(undefined);
+  const [selectedFolder, setSelectedFolder, selectedFolderRef] = useStateWithRef(ROOT_FILE_ENTRY);
+  const [generateRandom, setGenerateRandom, generateRandomRef] = useStateWithRef<boolean>(false);
+
+  const [namespaces] = useNamespaces({extra: ['none', 'default']});
+  const getDirname = useMemo(() => (osPlatform === 'win32' ? path.win32.dirname : path.dirname), [osPlatform]);
+
+  const treeData = useFileFolderTreeSelectData('folder');
 
   const lastApiVersionRef = useRef<string>();
   const lastKindRef = useRef<string>();
@@ -93,7 +110,9 @@ const NewResourceWizard = () => {
   lastKindRef.current = form.getFieldValue('kind');
   lastApiVersionRef.current = form.getFieldValue('apiVersion');
 
-  const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
+  const isFolderOpen = useMemo(() => Boolean(rootFolderEntry), [rootFolderEntry]);
+
+  const fileSelectOptions = useFileSelectOptions();
 
   const defaultInput = newResourceWizardState.defaultInput;
   const defaultValues = useMemo(
@@ -101,13 +120,13 @@ const NewResourceWizard = () => {
       defaultInput
         ? {
             ...defaultInput,
-            namespace: resourceFilterNamespace || defaultInput.namespace || SELECT_OPTION_NONE,
+            namespace: first(resourceFilterNamespaces) || defaultInput.namespace || SELECT_OPTION_NONE,
             selectedResourceId: defaultInput.selectedResourceId || SELECT_OPTION_NONE,
           }
-        : resourceFilterNamespace
-        ? ({namespace: resourceFilterNamespace} as NewResourceWizardInput)
+        : first(resourceFilterNamespaces)
+        ? ({namespace: first(resourceFilterNamespaces)} as NewResourceWizardInput)
         : ({namespace: SELECT_OPTION_NONE} as NewResourceWizardInput),
-    [defaultInput, resourceFilterNamespace]
+    [defaultInput, resourceFilterNamespaces]
   );
 
   const kindsByApiVersion = useMemo(
@@ -121,17 +140,17 @@ const NewResourceWizard = () => {
 
         return result;
       }, {} as Record<string, ResourceKindHandler[]>),
-    // depend on resourceMap since newly loaded resources could have contained CRDs that resulted in dynamically
-    // created kindHandlers
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [registeredKindHandlers, resourceMap]
+    [registeredKindHandlers]
   );
+  const kindsByApiVersionRef = useRef(kindsByApiVersion);
+  kindsByApiVersionRef.current = kindsByApiVersion;
 
-  const getDirname = osPlatform === 'win32' ? path.win32.dirname : path.dirname;
+  const [resourceKindOptions, setResourceKindOptions] =
+    useState<Record<string, ResourceKindHandler[]>>(kindsByApiVersion);
 
-  const generateExportFileName = async () => {
-    if (fileMap[ROOT_FILE_ENTRY] && selectedFolder.startsWith(fileMap[ROOT_FILE_ENTRY].filePath)) {
-      const currentFolder = selectedFolder.split(fileMap[ROOT_FILE_ENTRY].filePath).pop();
+  const generateExportFileName = useCallback(async () => {
+    if (rootFolderEntryRef.current && selectedFolderRef.current.startsWith(rootFolderEntryRef.current.filePath)) {
+      const currentFolder = selectedFolderRef.current.split(rootFolderEntryRef.current.filePath).pop();
 
       if (currentFolder) {
         setSelectedFolder(currentFolder.slice(1));
@@ -142,14 +161,15 @@ const NewResourceWizard = () => {
     }
 
     let selectedFolderResources;
-    if (selectedFolder === ROOT_FILE_ENTRY) {
-      selectedFolderResources = Object.values(resourceMap).filter(
-        resource => resource.filePath.split(path.sep).length === 2
+    if (selectedFolderRef.current === ROOT_FILE_ENTRY) {
+      selectedFolderResources = Object.values(localResourceMetaMapRef.current).filter(
+        resource => resource.origin.filePath.split(path.sep).length === 2
       );
     } else {
-      selectedFolderResources = Object.values(resourceMap).filter(
+      selectedFolderResources = Object.values(localResourceMetaMapRef.current).filter(
         resource =>
-          resource.filePath.split(path.sep).length > 2 && getDirname(resource.filePath).endsWith(selectedFolder)
+          resource.origin.filePath.split(path.sep).length > 2 &&
+          getDirname(resource.origin.filePath).endsWith(selectedFolderRef.current)
       );
     }
     const hasNameClash = selectedFolderResources.some(resource => resource.name === form.getFieldValue('name'));
@@ -157,16 +177,13 @@ const NewResourceWizard = () => {
     let fullFileName = generateFullFileName(
       form.getFieldValue('name'),
       form.getFieldValue('kind'),
-      selectedFolder,
-      fileMap,
+      selectedFolderRef.current,
+      fileMapRef.current,
       0,
       hasNameClash
     );
     setExportFileName(fullFileName);
-  };
-
-  const [resourceKindOptions, setResourceKindOptions] =
-    useState<Record<string, ResourceKindHandler[]>>(kindsByApiVersion);
+  }, [form, localResourceMetaMapRef, selectedFolderRef, rootFolderEntryRef, fileMapRef, setSelectedFolder, getDirname]);
 
   useEffect(() => {
     const visible = newResourceWizardState.isOpen;
@@ -183,7 +200,7 @@ const NewResourceWizard = () => {
 
         if (kindHandler) {
           setResourceKindOptions({[kindHandler.clusterApiVersion]: kindsByApiVersion[kindHandler.clusterApiVersion]});
-          const newFilteredResources = Object.values(resourceMap).filter(
+          const newFilteredResources = Object.values(localResourceMetaMapRef.current).filter(
             resource => resource.kind === defaultValues.kind
           );
           setFilteredResources(newFilteredResources);
@@ -194,17 +211,16 @@ const NewResourceWizard = () => {
     } else if (visible && !defaultValues) {
       setResourceKindOptions(kindsByApiVersion);
     }
-  }, [defaultValues, form, kindsByApiVersion, newResourceWizardState.isOpen, resourceMap]);
+  }, [defaultValues, form, kindsByApiVersion, newResourceWizardState.isOpen, localResourceMetaMapRef]);
 
   useEffect(() => {
     const currentKind = form.getFieldValue('kind');
     if (!currentKind) {
-      setFilteredResources(Object.values(resourceMap));
+      setFilteredResources(Object.values(localResourceMetaMap));
       return;
     }
-    setFilteredResources(Object.values(resourceMap).filter(resource => resource.kind === currentKind));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resourceMap]);
+    setFilteredResources(Object.values(localResourceMetaMap).filter(resource => resource.kind === currentKind));
+  }, [form, localResourceMetaMap]);
 
   useEffect(() => {
     if (defaultInput?.targetFolder && isFolderOpen) {
@@ -218,7 +234,7 @@ const NewResourceWizard = () => {
     }
 
     setSubmitDisabled(!defaultValues?.name && !defaultValues?.kind && !defaultValues?.apiVersion);
-  }, [defaultInput, defaultValues, isFolderOpen]);
+  }, [defaultInput, defaultValues, isFolderOpen, setSelectedFolder, setSelectedFile, setSavingDestination]);
 
   useEffect(() => {
     if (savingDestination !== 'saveToFolder') {
@@ -226,138 +242,173 @@ const NewResourceWizard = () => {
     }
 
     generateExportFileName();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFolder, savingDestination]);
+  }, [selectedFolder, savingDestination, generateExportFileName]);
 
-  const closeWizard = () => {
+  const closeWizard = useCallback(() => {
     setSubmitDisabled(true);
-    setResourceKindOptions(kindsByApiVersion);
-    setFilteredResources(Object.values(resourceMap));
+    setResourceKindOptions(kindsByApiVersionRef.current);
+    setFilteredResources(Object.values(localResourceMetaMapRef.current));
     dispatch(closeNewResourceWizard());
-  };
+  }, [dispatch, kindsByApiVersionRef, localResourceMetaMapRef]);
 
-  const onOk = () => {
+  const onOk = useCallback(() => {
     form.submit();
-  };
+  }, [form]);
 
-  const onCancel = () => {
+  const onCancel = useCallback(() => {
     closeWizard();
-  };
+  }, [closeWizard]);
 
-  const onFormValuesChange = async (data: any) => {
-    let shouldFilterResources = false;
+  const onFormValuesChange = useCallback(
+    async (data: any) => {
+      let shouldFilterResources = false;
 
-    if (data.kind && data.kind !== lastKindRef.current) {
-      // set api version when selecting kind
-      const kindHandler = getResourceKindHandler(data.kind);
-
-      if (kindHandler) {
-        form.setFieldsValue({apiVersion: kindHandler.clusterApiVersion});
-
-        if (!kindHandler.isNamespaced) {
-          form.setFieldsValue({namespace: SELECT_OPTION_NONE});
-        }
-
-        setIsResourceKindNamespaced(kindHandler.isNamespaced || false);
-      }
-
-      shouldFilterResources = true;
-    }
-
-    if (data.apiVersion && data.apiVersion !== lastApiVersionRef.current && resourceKindOptions) {
-      const kindOptionsByApiVersion = kindsByApiVersion[data.apiVersion];
-
-      // filter resource kind dropdown options
-      if (kindOptionsByApiVersion) {
-        setResourceKindOptions({[data.apiVersion]: kindOptionsByApiVersion});
-      }
-
-      // deselect kind option if its api version is different than the selected one
-      if (lastKindRef.current) {
-        const kindHandler = getResourceKindHandler(lastKindRef.current);
-
-        if (kindHandler && kindHandler.clusterApiVersion !== data.apiVersion) {
-          if (kindOptionsByApiVersion && kindOptionsByApiVersion.length > 0) {
-            form.setFieldsValue({kind: undefined});
-            shouldFilterResources = true;
-          } else {
-            form.setFieldsValue({kind: ''});
-          }
-        }
-      }
-    }
-
-    if (data.selectedResourceId && data.selectedResourceId !== SELECT_OPTION_NONE && !data.kind) {
-      const selectedResource = resourceMap[data.selectedResourceId];
-
-      if (selectedResource && lastKindRef.current !== selectedResource.kind) {
-        const kindHandler = getResourceKindHandler(selectedResource.kind);
+      if (data.kind && data.kind !== lastKindRef.current) {
+        // set api version when selecting kind
+        const kindHandler = getResourceKindHandler(data.kind);
 
         if (kindHandler) {
-          form.setFieldsValue({apiVersion: kindHandler.clusterApiVersion, kind: selectedResource.kind});
+          form.setFieldsValue({apiVersion: kindHandler.clusterApiVersion});
 
           if (!kindHandler.isNamespaced) {
             form.setFieldsValue({namespace: SELECT_OPTION_NONE});
           }
 
-          setResourceKindOptions({[kindHandler.clusterApiVersion]: kindsByApiVersion[kindHandler.clusterApiVersion]});
+          setIsResourceKindNamespaced(kindHandler.isNamespaced || false);
+        }
 
-          setIsResourceKindNamespaced(kindHandler.isNamespaced);
-          shouldFilterResources = true;
+        shouldFilterResources = true;
+      }
+
+      if (data.apiVersion && data.apiVersion !== lastApiVersionRef.current && resourceKindOptions) {
+        const kindOptionsByApiVersion = kindsByApiVersionRef.current[data.apiVersion];
+
+        // filter resource kind dropdown options
+        if (kindOptionsByApiVersion) {
+          setResourceKindOptions({[data.apiVersion]: kindOptionsByApiVersion});
+        }
+
+        // deselect kind option if its api version is different than the selected one
+        if (lastKindRef.current) {
+          const kindHandler = getResourceKindHandler(lastKindRef.current);
+
+          if (kindHandler && kindHandler.clusterApiVersion !== data.apiVersion) {
+            if (kindOptionsByApiVersion && kindOptionsByApiVersion.length > 0) {
+              form.setFieldsValue({kind: undefined});
+              shouldFilterResources = true;
+            } else {
+              form.setFieldsValue({kind: ''});
+            }
+          }
         }
       }
-    }
 
-    if (shouldFilterResources) {
-      const currentKind = form.getFieldValue('kind');
+      if (data.selectedResourceId && data.selectedResourceId !== SELECT_OPTION_NONE && !data.kind) {
+        const selectedResource = localResourceMetaMapRef.current[data.selectedResourceId];
 
-      if (!currentKind) {
-        setFilteredResources(Object.values(resourceMap));
-        return;
+        if (selectedResource && lastKindRef.current !== selectedResource.kind) {
+          const kindHandler = getResourceKindHandler(selectedResource.kind);
+
+          if (kindHandler) {
+            form.setFieldsValue({apiVersion: kindHandler.clusterApiVersion, kind: selectedResource.kind});
+
+            if (!kindHandler.isNamespaced) {
+              form.setFieldsValue({namespace: SELECT_OPTION_NONE});
+            }
+
+            setResourceKindOptions({
+              [kindHandler.clusterApiVersion]: kindsByApiVersionRef.current[kindHandler.clusterApiVersion],
+            });
+
+            setIsResourceKindNamespaced(kindHandler.isNamespaced);
+            shouldFilterResources = true;
+          }
+        }
       }
 
-      const newFilteredResources = Object.values(resourceMap).filter(resource => resource.kind === currentKind);
-      setFilteredResources(newFilteredResources);
-      const currentSelectedResourceId = form.getFieldValue('selectedResourceId');
+      if (shouldFilterResources) {
+        const currentKind = form.getFieldValue('kind');
 
-      if (currentSelectedResourceId && !newFilteredResources.some(res => res.id === currentSelectedResourceId)) {
-        form.setFieldsValue({selectedResourceId: SELECT_OPTION_NONE});
+        if (!currentKind) {
+          setFilteredResources(Object.values(localResourceMetaMapRef.current));
+          return;
+        }
+
+        const newFilteredResources = Object.values(localResourceMetaMapRef.current).filter(
+          resource => resource.kind === currentKind
+        );
+        setFilteredResources(newFilteredResources);
+        const currentSelectedResourceId = form.getFieldValue('selectedResourceId');
+
+        if (currentSelectedResourceId && !newFilteredResources.some(res => res.id === currentSelectedResourceId)) {
+          form.setFieldsValue({selectedResourceId: SELECT_OPTION_NONE});
+        }
       }
-    }
 
-    if (savingDestination === 'saveToFolder') {
-      generateExportFileName();
-    }
-  };
+      if (savingDestination === 'saveToFolder') {
+        generateExportFileName();
+      }
+    },
+    [
+      form,
+      generateExportFileName,
+      kindsByApiVersionRef,
+      localResourceMetaMapRef,
+      resourceKindOptions,
+      savingDestination,
+    ]
+  );
 
-  const onFinish = (data: any) => {
-    if (!data.name || !data.kind) {
-      return;
-    }
-
-    createResourceProcessing();
-
-    closeWizard();
-  };
-
-  const getFullFileName = (filename: string) => {
+  const getFullFileName = useCallback((filename: string) => {
     if (filename.endsWith('.yaml') || filename.endsWith('.yml')) {
       return filename;
     }
 
     return `${filename}.yaml`;
-  };
+  }, []);
 
-  const createResourceProcessing = () => {
+  const createResourceProcessing = useCallback(() => {
     const formValues = form.getFieldsValue();
 
-    const selectedResource =
+    const selectedResourceMeta =
       formValues.selectedResourceId && formValues.selectedResourceId !== SELECT_OPTION_NONE
-        ? resourceMap[formValues.selectedResourceId]
+        ? localResourceMetaMapRef.current[formValues.selectedResourceId]
         : undefined;
-    const jsonTemplate = selectedResource?.content;
 
-    const newResource = createUnsavedResource(
+    const selectedResourceContent =
+      formValues.selectedResourceId && formValues.selectedResourceId !== SELECT_OPTION_NONE
+        ? localResourceContentMapRef.current[formValues.selectedResourceId]
+        : undefined;
+
+    const selectedResource =
+      selectedResourceMeta && selectedResourceContent
+        ? joinK8sResource(selectedResourceMeta, selectedResourceContent)
+        : undefined;
+
+    let jsonTemplate = selectedResource?.object;
+    if (generateRandomRef.current) {
+      const schema = getResourceKindSchema(formValues.kind, k8sVersionRef.current, String(userDataDirRef.current));
+      if (schema) {
+        JSONSchemaFaker.option('failOnInvalidTypes', false);
+        JSONSchemaFaker.option('failOnInvalidFormat', false);
+        JSONSchemaFaker.option('useExamplesValue', true);
+        JSONSchemaFaker.option('useDefaultValue', true);
+        JSONSchemaFaker.option('maxItems', 1);
+        JSONSchemaFaker.option('alwaysFakeOptionals', true);
+
+        const value: any = JSONSchemaFaker.generate(schema);
+        if (value) {
+          delete value.status;
+          delete value.metadata;
+          delete value.kind;
+          delete value.apiVersion;
+
+          jsonTemplate = value;
+        }
+      }
+    }
+
+    const newResource = createTransientResource(
       {
         name: formValues.name,
         kind: formValues.kind,
@@ -371,72 +422,69 @@ const NewResourceWizard = () => {
       jsonTemplate
     );
 
-    if (savingDestination !== 'doNotSave') {
+    if (savingDestinationRef.current !== 'doNotSave') {
       let absolutePath;
 
       const fullFileName = getFullFileName(formValues.name);
-      if (savingDestination === 'saveToFolder' && selectedFolder) {
+      if (savingDestinationRef.current === 'saveToFolder' && selectedFolderRef.current) {
         absolutePath =
-          selectedFolder === ROOT_FILE_ENTRY
-            ? path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName)
-            : path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFolder, path.sep, fullFileName);
-      } else if (savingDestination === 'saveToFile' && selectedFile) {
-        absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedFile);
+          selectedFolderRef.current === ROOT_FILE_ENTRY
+            ? path.join(rootFolderEntryRef.current.filePath, path.sep, fullFileName)
+            : path.join(rootFolderEntryRef.current.filePath, selectedFolderRef.current, path.sep, fullFileName);
+      } else if (savingDestinationRef.current === 'saveToFile' && selectedFileRef.current) {
+        absolutePath = path.join(rootFolderEntryRef.current.filePath, selectedFileRef.current);
       } else {
-        absolutePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, path.sep, fullFileName);
+        absolutePath = path.join(rootFolderEntryRef.current.filePath, path.sep, fullFileName);
       }
 
       dispatch(
-        saveUnsavedResources({
+        saveTransientResources({
           resourcePayloads: [{resource: newResource, absolutePath}],
-          saveMode: savingDestination === 'saveToFolder' ? savingDestination : 'appendToFile',
+          saveMode: savingDestinationRef.current === 'saveToFolder' ? savingDestinationRef.current : 'appendToFile',
         })
       );
     }
 
     setSavingDestination('doNotSave');
     closeWizard();
-  };
+  }, [
+    dispatch,
+    getFullFileName,
+    form,
+    closeWizard,
+    savingDestinationRef,
+    setSavingDestination,
+    rootFolderEntryRef,
+    generateRandomRef,
+    k8sVersionRef,
+    localResourceMetaMapRef,
+    localResourceContentMapRef,
+    selectedFileRef,
+    selectedFolderRef,
+    userDataDirRef,
+  ]);
 
-  const [foldersList, filesList]: [string[], string[]] = useMemo(() => {
-    const folders: string[] = [];
-    const files: string[] = [];
-
-    Object.entries(fileMap).forEach(([key, value]) => {
-      if (value.children) {
-        folders.push(key.replace(path.sep, ''));
-      } else {
-        if (!value.isSupported || value.isExcluded) {
-          return;
-        }
-        files.push(key.replace(path.sep, ''));
+  const onFinish = useCallback(
+    (data: any) => {
+      if (!data.name || !data.kind) {
+        return;
       }
-    });
 
-    return [folders, files];
-  }, [fileMap]);
+      createResourceProcessing();
 
-  const renderFileSelectOptions = useCallback(() => {
-    return filesList.map(fileName => (
-      <Option key={fileName} value={fileName}>
-        {fileName}
-      </Option>
-    ));
-  }, [filesList]);
+      closeWizard();
+    },
+    [createResourceProcessing, closeWizard]
+  );
 
-  const renderFolderSelectOptions = useCallback(() => {
-    return foldersList.map(folderName => (
-      <Option key={folderName} value={folderName}>
-        {folderName}
-      </Option>
-    ));
-  }, [foldersList]);
-
-  const onSelectChange = () => {
+  const onSelectChange = useCallback(() => {
     setInputValue('');
-  };
+  }, []);
 
-  const handleSavingDestinationChange = (value: any) => setSavingDestination(value);
+  const handleSavingDestinationChange = useCallback(
+    (value: any) => setSavingDestination(value),
+    [setSavingDestination]
+  );
 
   useHotkeys(
     hotkeys.CREATE_NEW_RESOURCE.key,
@@ -446,6 +494,13 @@ const NewResourceWizard = () => {
       }
     },
     [newResourceWizardState.isOpen]
+  );
+
+  const onGenerateRandomChange = useCallback(
+    (e: any) => {
+      setGenerateRandom(e.target.checked);
+    },
+    [setGenerateRandom]
   );
 
   return (
@@ -541,7 +596,7 @@ const NewResourceWizard = () => {
               ),
               icon: <InfoCircleOutlined />,
             }}
-            initialValue={resourceFilterNamespace || SELECT_OPTION_NONE}
+            initialValue={first(resourceFilterNamespaces) || SELECT_OPTION_NONE}
           >
             <Select
               showSearch
@@ -567,12 +622,18 @@ const NewResourceWizard = () => {
           </Form.Item>
         )}
 
+        <Form.Item name="generateRandomContent" label="Generate Random" initialValue={false}>
+          <Checkbox onChange={onGenerateRandomChange} checked={generateRandom === true}>
+            Generate random resource content based on schema definition.
+          </Checkbox>
+        </Form.Item>
+
         <Form.Item
           name="selectedResourceId"
           label="Select existing resource as template"
           initialValue={SELECT_OPTION_NONE}
         >
-          <Select showSearch>
+          <Select showSearch disabled={generateRandom}>
             <Option key={SELECT_OPTION_NONE} value={SELECT_OPTION_NONE}>
               {SELECT_OPTION_NONE}
             </Option>
@@ -591,14 +652,17 @@ const NewResourceWizard = () => {
             <Option value="doNotSave">Don't save</Option>
           </StyledSelect>
           {savingDestination === 'saveToFolder' && (
-            <StyledSelect
-              showSearch
-              onChange={(value: any) => setSelectedFolder(value)}
+            <TreeSelect
+              treeDefaultExpandedKeys={['<root>']}
+              dropdownMatchSelectWidth={false}
               value={selectedFolder}
+              onChange={value => setSelectedFolder(value)}
+              showSearch
+              treeDefaultExpandAll
+              treeData={[treeData]}
               style={{flex: 2}}
-            >
-              {renderFolderSelectOptions()}
-            </StyledSelect>
+              treeNodeLabelProp="label"
+            />
           )}
           {savingDestination === 'saveToFile' && (
             <StyledSelect
@@ -608,7 +672,7 @@ const NewResourceWizard = () => {
               placeholder="Select a destination file"
               style={{flex: 3}}
             >
-              {renderFileSelectOptions()}
+              {fileSelectOptions}
             </StyledSelect>
           )}
         </SaveDestinationWrapper>
@@ -624,4 +688,4 @@ const NewResourceWizard = () => {
   );
 };
 
-export default NewResourceWizard;
+export default memo(NewResourceWizard);

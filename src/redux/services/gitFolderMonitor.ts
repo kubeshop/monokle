@@ -1,10 +1,11 @@
 import {FSWatcher, watch} from 'chokidar';
 import {sep} from 'path';
 
+import {updateProjectsGitRepo} from '@redux/appConfig';
 import {setBranchCommits, setChangedFiles, setCommits, setRepo} from '@redux/git';
-import {updateProjectsGitRepo} from '@redux/reducers/appConfig';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
 
 let watcher: FSWatcher;
 
@@ -31,11 +32,14 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
     watcher.close();
   }
 
-  const gitRootPath = (
-    await promiseFromIpcRenderer('git.getRemotePath', 'git.getRemotePath.result', rootFolderPath)
-  ).replaceAll('/', sep);
+  const result = await promiseFromIpcRenderer('git.getRemotePath', 'git.getRemotePath.result', rootFolderPath);
 
-  const absolutePath = `${gitRootPath}${sep}.git`;
+  if (result.error) {
+    showGitErrorModal('Failed to get remote!', 'git rev-parse --show-toplevel', thunkAPI.dispatch);
+    return;
+  }
+
+  const absolutePath = `${result.replaceAll('/', sep)}${sep}.git`;
 
   watcher = watch(absolutePath, {persistent: true, usePolling: true, interval: 1000});
 

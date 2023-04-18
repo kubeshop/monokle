@@ -2,8 +2,8 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
+import {ResourceMeta} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 const NamespaceHandler: ResourceKindHandler = {
   kind: 'Namespace',
@@ -13,7 +13,7 @@ const NamespaceHandler: ResourceKindHandler = {
   clusterApiVersion: 'v1',
   validationSchemaPrefix: 'io.k8s.api.core.v1',
   isCustom: false,
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     return k8sCoreV1Api.readNamespace(resource.name, 'true');
   },
@@ -22,7 +22,7 @@ const NamespaceHandler: ResourceKindHandler = {
     const response = await k8sCoreV1Api.listNamespace();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
     await k8sCoreV1Api.deleteNamespace(resource.name);
   },

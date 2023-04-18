@@ -5,24 +5,24 @@ import {TreeNodeProps} from 'antd';
 
 import path from 'path';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setExpandedFolders} from '@redux/reducers/ui';
-
-import {TreeNode} from '@components/organisms/FileTreePane/types';
+import {selectedFilePathSelector} from '@redux/selectors';
 
 import {uniqueArr} from '@utils/index';
 
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {TreeNode} from '@shared/models/explorer';
+
 export const useHighlightNode = (tree: TreeNode | null, treeRef: TreeNodeProps, expandedFolders: React.Key[]) => {
   const [highlightNode, setHighlightNode] = useState<TreeNode>();
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
+  const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     // removes any highlight when a file is selected
-    if (selectedPath && highlightNode) {
+    if (selectedFilePath && highlightNode) {
       highlightNode.highlight = false;
     }
 
@@ -30,12 +30,12 @@ export const useHighlightNode = (tree: TreeNode | null, treeRef: TreeNodeProps, 
   }, [highlightNode]);
 
   useUpdateEffect(() => {
-    if (leftMenuSelection !== 'search' && leftMenuSelection !== 'file-explorer') {
+    if (leftMenuSelection !== 'search' && leftMenuSelection !== 'explorer') {
       return;
     }
 
-    if (selectedPath) {
-      treeRef?.current?.scrollTo({key: selectedPath});
+    if (selectedFilePath) {
+      treeRef?.current?.scrollTo({key: selectedFilePath});
       return;
     }
 

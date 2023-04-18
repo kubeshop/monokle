@@ -3,17 +3,19 @@ import {cloneDeep} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 
-import {FileMapType} from '@models/appstate';
-import {K8sResource} from '@models/k8sresource';
+import {KUSTOMIZATION_KIND} from '@constants/constants';
 
-import {loadResource} from '@redux/services';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
-import {isHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 
 import {getFileStats} from '@utils/files';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {FileMapType} from '@shared/models/appState';
+import {ResourceMeta} from '@shared/models/k8sResource';
+import {isHelmValuesFile} from '@shared/utils/helm';
+import {loadResource} from '@shared/utils/resource';
 
 // @ts-ignore
 const objectMetadataSchema = JSON.parse(loadResource('schemas/objectmetadata.json'));
@@ -30,10 +32,19 @@ let k8sSchemaCache = new Map<string, any | undefined>();
 /**
  * Returns a JSON Schema for the specified resource kind
  */
-export function getResourceSchema(resource: K8sResource, schemaVersion: string, userDataDir: string) {
+export function getResourceSchema(resource: ResourceMeta, schemaVersion: string, userDataDir: string) {
+  if (isKustomizationResource(resource)) {
+    return kustomizeSchema;
+  }
+
+  return getResourceKindSchema(resource.kind, schemaVersion, userDataDir);
+}
+
+// needs to be improved to include the apiVersion - since the same kind can be under different versions...
+export function getResourceKindSchema(resourceKind: string, schemaVersion: string, userDataDir: string) {
   let k8sSchema: any;
 
-  if (isKustomizationResource(resource)) {
+  if (resourceKind === KUSTOMIZATION_KIND) {
     return kustomizeSchema;
   }
 
@@ -53,12 +64,12 @@ export function getResourceSchema(resource: K8sResource, schemaVersion: string, 
     }
   }
 
-  const resourceKindHandler = getResourceKindHandler(resource.kind);
+  const resourceKindHandler = getResourceKindHandler(resourceKind);
   const prefix = resourceKindHandler?.validationSchemaPrefix;
 
   if (prefix) {
-    const schemaKey = `${prefix}.${resource.kind}`;
-    const schemaCacheKey = `${schemaVersion}-${prefix}.${resource.kind}`;
+    const schemaKey = `${prefix}.${resourceKind}`;
+    const schemaCacheKey = `${schemaVersion}-${prefix}.${resourceKind}`;
     if (!schemaCache.has(schemaCacheKey)) {
       const kindSchema = k8sSchema?.definitions?.[schemaKey];
       if (kindSchema) {
@@ -87,13 +98,13 @@ export function getResourceSchema(resource: K8sResource, schemaVersion: string, 
     if (schemaCache.has(schemaCacheKey)) {
       return schemaCache.get(schemaCacheKey);
     }
-  } else if (!schemaCache.has(`${schemaVersion}-${resource.kind}`)) {
+  } else if (!schemaCache.has(`${schemaVersion}-${resourceKind}`)) {
     if (resourceKindHandler?.sourceEditorOptions?.editorSchema) {
-      schemaCache.set(`${schemaVersion}-${resource.kind}`, resourceKindHandler?.sourceEditorOptions?.editorSchema);
+      schemaCache.set(`${schemaVersion}-${resourceKind}`, resourceKindHandler?.sourceEditorOptions?.editorSchema);
     }
   }
 
-  return schemaCache.get(`${schemaVersion}-${resource.kind}`);
+  return schemaCache.get(`${schemaVersion}-${resourceKind}`);
 }
 
 export function getSchemaForPath(filePath: string, fileMap: FileMapType): any | undefined {

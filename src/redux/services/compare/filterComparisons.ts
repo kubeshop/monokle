@@ -1,10 +1,8 @@
-import {K8sResource} from '@models/k8sresource';
-
-import {CompareFilter, ResourceComparison} from '@redux/compare';
-
-import {isPassingKeyValueFilter} from '@utils/filter';
-
 import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {CompareFilter, ResourceComparison} from '@shared/models/compare';
+import {K8sResource} from '@shared/models/k8sResource';
+import {isPassingKeyValueFilter} from '@shared/utils/filter';
 
 type FilterOptions = {
   search?: string;
@@ -45,11 +43,11 @@ export function createResourceFilters(options: FilterOptions) {
 
   if (options.labels && Object.keys(options.labels).length > 0) {
     filters.push(comparison => {
-      const labels = getResource(comparison).content?.metadata?.labels;
+      const labels = getResource(comparison).labels;
       const labelsPass = isPassingKeyValueFilter(labels, options.labels!);
       if (labelsPass) return true;
 
-      const templateLabels = getResource(comparison).content?.spec?.template?.metadata?.labels;
+      const templateLabels = getResource(comparison).templateLabels;
       const templateLabelsPass = isPassingKeyValueFilter(templateLabels, options.labels!);
       return templateLabelsPass;
     });
@@ -57,7 +55,7 @@ export function createResourceFilters(options: FilterOptions) {
 
   if (options.annotations && Object.keys(options.annotations).length > 0) {
     filters.push(comparison => {
-      const annotations = getResource(comparison).content?.metadata?.annotations;
+      const annotations = getResource(comparison).annotations;
       return isPassingKeyValueFilter(annotations, options.annotations!);
     });
   }

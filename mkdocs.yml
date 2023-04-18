@@ -16,6 +16,7 @@ theme:
     - navigation.expand
 nav:
   - Welcome: index.md
+  - Introducing Monokle Desktop and Monokle Cloud: desktop-v-SAAS.md
   - Getting Started: getting-started.md
   - Feature Overview: features.md
   - UI Overview: overview.md
@@ -35,7 +36,11 @@ nav:
   - Working with Helm Charts: helm.md
   - Working with Clusters:
     - Cluster Integration: cluster-integration.md
-  - Resource Compare: compare-sync.md
+    - Cluster Mode: cluster-mode.md
+    - Troubleshooting Connections: cluster-issues.md
+  - Compare & Sync:
+    - Resource Compare: compare-sync.md
+    - Compare Subfolders: compare-subfolders.md
   - Deploy/Diff: apply-and-diff.md
   - Development:
     - Development: development.md

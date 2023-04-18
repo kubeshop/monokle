@@ -1,13 +1,46 @@
-const CracoAlias = require('craco-alias');
+const {CracoAliasPlugin} = require('react-app-alias-ex');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CracoLessPlugin = require('craco-less');
 const {getThemeVariables} = require('antd/dist/theme');
 const lodash = require('lodash');
 const path = require('path');
+const SentryWebpackPlugin = require('@sentry/webpack-plugin');
+
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
+const additionalWebpackPlugins = isDevelopment
+  ? []
+  : [
+      new SentryWebpackPlugin({
+        org: 'kubeshop',
+        project: 'monokle-desktop',
+        include: './build',
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+      }),
+    ];
 
 module.exports = {
   webpack: {
-    plugins: [new MonacoWebpackPlugin({languages: ['yaml'], globalAPI: true})],
+    plugins: {
+      add: [
+        new MonacoWebpackPlugin({
+          languages: ['yaml'],
+          globalAPI: true,
+          customLanguages: [
+            {
+              label: 'yaml',
+              entry: 'monaco-yaml',
+              worker: {
+                id: 'monaco-yaml/yamlWorker',
+                entry: 'monaco-yaml/yaml.worker',
+              },
+            },
+          ],
+        }),
+        ...additionalWebpackPlugins,
+      ],
+    },
+    devtool: 'source-map',
     configure: webpackConfig => {
       webpackConfig.node = {__dirname: false};
       webpackConfig.target = 'electron-renderer';
@@ -18,6 +51,9 @@ module.exports = {
       webpackConfig.output = {
         filename: 'bundle.[name].js',
         path: path.resolve(__dirname, 'build'),
+      };
+      webpackConfig.externals = {
+        'fsevents': "require('fsevents')",
       };
       // Temporary solution until react-scripts 5.0.1 is released
       webpackConfig.ignoreWarnings = [/Failed to parse source map/];
@@ -44,14 +80,8 @@ module.exports = {
   },
   plugins: [
     {
-      plugin: CracoAlias,
-      options: {
-        source: 'tsconfig',
-        baseUrl: './',
-        tsConfigPath: './paths.json',
-        unsafeAllowModulesOutsideOfSrc: false,
-        debug: false,
-      },
+      plugin: CracoAliasPlugin,
+      options: {},
     },
     {
       plugin: CracoLessPlugin,

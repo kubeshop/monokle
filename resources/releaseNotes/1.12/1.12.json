@@ -1,0 +1,9 @@
+{
+  "title": "Monokle 1.12 brings Git time travel!",
+  "learnMoreUrl": "https://kubeshop.io/blog/monokle-1-12-0-release",
+  "about": {
+    "when": "Oct 2022",
+    "title": "In this release, we bring you:",
+    "features": ["Compare git commits from any branch", "Preview any shell command", "Compare command previews"]
+  }
+}

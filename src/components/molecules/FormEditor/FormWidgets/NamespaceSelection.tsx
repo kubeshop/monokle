@@ -1,14 +1,10 @@
 import {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
 
 import {Select} from 'antd';
 
 import {uniq} from 'lodash';
 
-import {K8sResource} from '@models/k8sresource';
-
-import {useAppSelector} from '@redux/hooks';
-import {selectedResourceSelector} from '@redux/selectors';
+import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
@@ -21,59 +17,40 @@ const EMPTY_VALUE = 'NONE';
 
 export const NamespaceSelection = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedResource = useSelector(selectedResourceSelector);
+  const resourceMetaMap = useResourceMetaMap('local');
   const [namespaces, setNamespaces] = useState<(string | undefined)[]>([]);
-  const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
   const [clusterNamespaces] = useTargetClusterNamespaces();
 
   const handleChange = (providedValue: string) => {
     if (providedValue === NEW_ITEM) {
-      setSelectValue(inputValue);
+      onChange(inputValue);
       if (!namespaces.includes(inputValue)) {
         setNamespaces([...namespaces, inputValue]);
       }
       setInputValue('');
+    } else if (providedValue === EMPTY_VALUE) {
+      onChange(undefined);
     } else {
-      setSelectValue(providedValue);
+      onChange(providedValue);
     }
   };
 
   useEffect(() => {
-    setInputValue('');
-    if (!value) {
-      setSelectValue(EMPTY_VALUE);
-    } else {
-      setSelectValue(value);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResource, value]);
-
-  useEffect(() => {
-    if (selectValue === EMPTY_VALUE) {
-      onChange(undefined);
-    } else {
-      onChange(selectValue);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectValue]);
-
-  useEffect(() => {
-    if (resourceMap) {
-      const items = Object.values(resourceMap)
-        .map((resource: K8sResource) => resource.namespace)
+    if (resourceMetaMap) {
+      const items = Object.values(resourceMetaMap)
+        .map(resource => resource.namespace)
         .filter(namespace => Boolean(namespace));
       items.push(...clusterNamespaces);
       setNamespaces(uniq(items).sort());
     } else {
       setNamespaces(clusterNamespaces);
     }
-  }, [resourceMap, clusterNamespaces]);
+  }, [resourceMetaMap, clusterNamespaces]);
 
   return (
     <S.SelectStyled
-      value={selectValue}
+      value={value}
       showSearch
       optionFilterProp="children"
       onChange={handleChange}

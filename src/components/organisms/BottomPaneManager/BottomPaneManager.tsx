@@ -8,20 +8,19 @@ import {v4 as uuidv4} from 'uuid';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {AddTerminalTooltip, KillTerminalTooltip} from '@constants/tooltips';
 
-import {TerminalType} from '@models/terminal';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 import {setLeftBottomMenuSelection} from '@redux/reducers/ui';
 import {setTerminalShells} from '@redux/services/terminalShells';
 
-import {Icon} from '@atoms';
-
 import {PreviewSavedCommand, SaveCommand} from '@components/molecules/CommandPreview';
 
+import {useNewTerminalMenuItems, useTerminalOptionsMenuItems} from '@hooks/menuItemsHooks';
+
+import {Icon} from '@monokle/components';
+import {TerminalType} from '@shared/models/terminal';
+
 import TerminalPane from '../TerminalPane';
-import NewTerminalOptions from '../TerminalPane/NewTerminalOptions';
-import TerminalOptions from '../TerminalPane/TerminalOptions';
 import * as S from './BottomPaneManager.styled';
 
 const BottomPaneManager: React.FC = () => {
@@ -35,9 +34,12 @@ const BottomPaneManager: React.FC = () => {
   const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
 
   const [terminalToKill, setTerminalToKill] = useState<string>('');
-
+  const [openTerminalOptions, setOpenTerminalOptions] = useState<boolean>(false);
   const [bottomPaneManagerRef, {height}] = useMeasure<HTMLDivElement>();
   const [tabsContainerRef, {height: tabsContainerHeight}] = useMeasure<HTMLDivElement>();
+
+  const {items: newTerminalMenuItems, onClick: onAddNewTerminalHandler} = useNewTerminalMenuItems();
+  const terminalOptionsMenuItems = useTerminalOptionsMenuItems();
 
   const onAddTerminalHandler = () => {
     const newTerminalId = uuidv4();
@@ -131,7 +133,11 @@ const BottomPaneManager: React.FC = () => {
               <S.PlusCircleFilled onClick={onAddTerminalHandler} />
             </Tooltip>
 
-            <Dropdown overlay={<NewTerminalOptions />} placement="bottomLeft" trigger={['click']}>
+            <Dropdown
+              menu={{items: newTerminalMenuItems, onClick: menuItem => onAddNewTerminalHandler(menuItem.key)}}
+              placement="bottomLeft"
+              trigger={['click']}
+            >
               <S.DownOutlined />
             </Dropdown>
           </S.NewTabActions>
@@ -142,11 +148,22 @@ const BottomPaneManager: React.FC = () => {
 
           <PreviewSavedCommand />
 
-          <Dropdown mouseEnterDelay={0.5} placement="bottomRight" overlay={<TerminalOptions />}>
+          <Dropdown
+            mouseEnterDelay={0.5}
+            placement="bottomRight"
+            menu={{
+              items: terminalOptionsMenuItems,
+              className: 'terminal-options-menu',
+              onBlur: () => setOpenTerminalOptions(false),
+            }}
+            open={openTerminalOptions}
+            trigger={['hover']}
+            onOpenChange={() => setOpenTerminalOptions(true)}
+          >
             <S.EllipsisOutlined />
           </Dropdown>
 
-          <S.CaretDownFilled onClick={() => dispatch(setLeftBottomMenuSelection(null))} />
+          <S.CaretDownFilled onClick={() => dispatch(setLeftBottomMenuSelection(undefined))} />
         </S.TabsActions>
       </S.TabsContainer>
 

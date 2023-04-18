@@ -1,6 +1,6 @@
 import path from 'path';
 
-import {HelmChart} from '@models/helm';
+import {HelmChart} from '@shared/models/helm';
 
 export function buildHelmCommand(
   helmChart: HelmChart,
@@ -18,10 +18,15 @@ export function buildHelmCommand(
     ...valuesFilePaths.map(filePath => ['-f', `"${path.join(rootFolderPath, filePath)}"`]).flat(),
     helmChart.name,
     `"${chartFolderPath}"`,
-    ...Object.entries(options)
-      .map(([key, value]) => (!value ? [key] : [key, `"${value}"`]))
-      .flat(),
   ];
+
+  if (options) {
+    args.push(
+      ...Object.entries(options)
+        .map(([key, value]) => (!value ? [key] : [key, `"${value}"`]))
+        .flat()
+    );
+  }
 
   if (command === 'install') {
     if (clusterContext) {

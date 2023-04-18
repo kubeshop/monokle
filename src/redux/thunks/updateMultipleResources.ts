@@ -2,54 +2,46 @@ import {createAsyncThunk, createNextState, original} from '@reduxjs/toolkit';
 
 import log from 'loglevel';
 
-import {RootState} from '@models/rootstate';
+import {UpdateMultipleResourcesPayload, performResourceContentUpdate} from '@redux/reducers/main';
+import {getResourceFromState} from '@redux/selectors/resourceGetters';
+import {extractResourceMeta} from '@redux/services/resource';
 
-import {UpdateMultipleResourcesPayload, getActiveResourceMap, performResourceContentUpdate} from '@redux/reducers/main';
-import {currentConfigSelector} from '@redux/selectors';
-import {getK8sVersion} from '@redux/services/projectConfig';
-import {reprocessResources} from '@redux/services/resource';
-import {findResourcesToReprocess} from '@redux/services/resourceRefs';
+import {AppState} from '@shared/models/appState';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
+import {isEqual} from '@shared/utils/isEqual';
 
-export const updateMultipleResources = createAsyncThunk(
-  'main/updateMultipleResources',
-  async (payload: UpdateMultipleResourcesPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const state: RootState = thunkAPI.getState();
-    const projectConfig = currentConfigSelector(state);
-    const schemaVersion = getK8sVersion(projectConfig);
-    const userDataDir = String(state.config.userDataDir);
+export const updateMultipleResources = createAsyncThunk<
+  {nextMainState: AppState; affectedResourceIdentifiers?: ResourceIdentifier[]},
+  UpdateMultipleResourcesPayload
+>('main/updateMultipleResources', async (payload, thunkAPI: {getState: Function; dispatch: Function}) => {
+  const state: RootState = thunkAPI.getState();
 
-    const nextMainState = createNextState(state.main, mainState => {
-      try {
-        let resourceIdsToReprocess: string[] = [];
-        const activeResources = getActiveResourceMap(mainState);
+  const nextMainState = createNextState(state.main, mainState => {
+    try {
+      payload.forEach(({resourceIdentifier, content}) => {
+        const resource = getResourceFromState(state, resourceIdentifier);
 
-        payload.forEach(({resourceId, content}) => {
-          const resource = activeResources[resourceId];
-          if (resource) {
-            performResourceContentUpdate(resource, content, mainState.fileMap, mainState.resourceMap);
-            let resourceIds = findResourcesToReprocess(resource, mainState.resourceMap);
-            resourceIdsToReprocess = [...new Set(resourceIdsToReprocess.concat(...resourceIds))];
+        if (resource) {
+          const {text, object} = performResourceContentUpdate(resource, content, mainState.fileMap);
+          const updatedResourceMeta = extractResourceMeta(object, resource.storage, resource.origin, resource.id);
+          if (!isEqual(resource, updatedResourceMeta)) {
+            // @ts-ignore-next-line
+            mainState.resourceMetaMapByStorage[resource.storage][resource.id] = updatedResourceMeta;
           }
-        });
-        reprocessResources(
-          schemaVersion,
-          userDataDir,
-          resourceIdsToReprocess,
-          activeResources,
-          mainState.fileMap,
-          mainState.resourceRefsProcessingOptions
-        );
-
-        // relaod cluster diff if that's where we are
-        if (state.ui.isClusterDiffVisible) {
-          mainState.clusterDiff.shouldReload = true;
+          if (resource.text !== text) {
+            mainState.resourceContentMapByStorage[resource.storage][resource.id].text = text;
+          }
+          if (!isEqual(resource.object, object)) {
+            mainState.resourceContentMapByStorage[resource.storage][resource.id].object = object;
+          }
         }
-      } catch (e) {
-        log.error(e);
-        return original(mainState);
-      }
-    });
+      });
+    } catch (e) {
+      log.error(e);
+      return original(mainState);
+    }
+  });
 
-    return nextMainState;
-  }
-);
+  return {nextMainState, affectedResourceIdentifiers: payload.map(({resourceIdentifier}) => resourceIdentifier)};
+});

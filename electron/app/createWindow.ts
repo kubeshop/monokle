@@ -1,46 +1,27 @@
 import {BrowserWindow, app, nativeImage} from 'electron';
 
-import {indexOf} from 'lodash';
-import {machineIdSync} from 'node-machine-id';
-import Nucleus from 'nucleus-nodejs';
+import indexOf from 'lodash/indexOf';
 import * as path from 'path';
 
-import {
-  APP_MIN_HEIGHT,
-  APP_MIN_WIDTH,
-  DEFAULT_PLUGINS,
-  DEFAULT_TEMPLATES_PLUGIN_URL,
-  DEPENDENCIES_HELP_URL,
-  NEW_VERSION_CHECK_INTERVAL,
-} from '@constants/constants';
-
-import {AlertEnum, AlertType} from '@models/alert';
-import {NewVersionCode} from '@models/appconfig';
-
-import {setAlert} from '@redux/reducers/alert';
-import {setUserDirs, updateNewVersion} from '@redux/reducers/appConfig';
-import {setExtensionsDirs, setPluginMap, setTemplateMap, setTemplatePackMap} from '@redux/reducers/extension';
-import {setAppRehydrating} from '@redux/reducers/main';
-import {setWebContentsId} from '@redux/reducers/terminal';
-import {activeProjectSelector, unsavedResourcesSelector} from '@redux/selectors';
-
-import utilsElectronStore from '@utils/electronStore';
-import {disableSegment, enableSegment, getSegmentClient} from '@utils/segment';
-import {StartupFlags} from '@utils/startupFlag';
-import {DISABLED_TELEMETRY} from '@utils/telemetry';
-
+import {APP_MIN_HEIGHT, APP_MIN_WIDTH, NEW_VERSION_CHECK_INTERVAL} from '@shared/constants/app';
+import {DEFAULT_PLUGINS} from '@shared/constants/plugin';
+import {DEFAULT_TEMPLATES_PLUGIN_URL, DEPENDENCIES_HELP_URL} from '@shared/constants/urls';
+import {AlertEnum} from '@shared/models/alert';
+import type {AlertType} from '@shared/models/alert';
+import {NewVersionCode} from '@shared/models/config';
+import {StartupFlags} from '@shared/models/startupFlag';
+import utilsElectronStore from '@shared/utils/electronStore';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import autoUpdater from './autoUpdater';
 import {checkNewVersion} from './commands';
-import initKubeconfig from './initKubeconfig';
 import {
   createDispatchForWindow,
   dispatchToAllWindows,
   dispatchToWindow,
   subscribeToStoreStateChanges,
 } from './ipc/ipcMainRedux';
-import {createMenu} from './menu';
+import {createMenu, menuStatePropertiesToPick} from './menu';
 import {downloadPlugin, loadPluginMap} from './services/pluginService';
 import {loadTemplateMap, loadTemplatePackMap} from './services/templateService';
 import {setWindowTitle} from './setWindowTitle';
@@ -61,10 +42,10 @@ const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const crdsDir = path.join(userDataDir, 'savedCRDs');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize', 'git'];
-const machineId = machineIdSync();
 
 export const createWindow = (givenPath?: string) => {
-  const image = nativeImage.createFromPath(path.join(app.getAppPath(), '/public/icon.ico'));
+  const iconPath = isDev ? path.join('resources', 'icon.ico') : path.join(process.resourcesPath, 'icon.ico');
+  const image = nativeImage.createFromPath(iconPath);
   const mainBrowserWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 1200,
     height: 800,
@@ -73,12 +54,12 @@ export const createWindow = (givenPath?: string) => {
     title: 'Monokle',
     icon: image,
     webPreferences: {
+      preload: path.normalize(`${__dirname}/preload.js`),
       zoomFactor: utilsElectronStore.get('ui.zoomFactor'),
       webSecurity: false,
       contextIsolation: false,
       nodeIntegration: true, // <--- flag
       nodeIntegrationInWorker: true, // <---  for web workers
-      preload: path.join(__dirname, 'preload.js'),
     },
   };
   const splashscreenConfig: Splashscreen.Config = {
@@ -122,16 +103,12 @@ export const createWindow = (givenPath?: string) => {
     });
   }
 
-  if (isDev) {
-    win.webContents.openDevTools();
-  }
-
   autoUpdater.on('update-available', () => {
-    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Available, data: null}));
+    dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.Available, data: null}});
   });
 
   autoUpdater.on('update-not-available', () => {
-    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.NotAvailable, data: null}));
+    dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.NotAvailable, data: null}});
   });
 
   autoUpdater.on('download-progress', (progressObj: any) => {
@@ -139,68 +116,79 @@ export const createWindow = (givenPath?: string) => {
     if (progressObj && progressObj.percent) {
       percent = progressObj.percent;
     }
-    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Downloading, data: {percent: percent.toFixed(2)}}));
+    dispatchToAllWindows({
+      type: 'config/updateNewVersion',
+      payload: {code: NewVersionCode.Downloading, data: {percent: percent.toFixed(2)}},
+    });
   });
 
   autoUpdater.on('update-downloaded', () => {
-    dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Downloaded, data: null}));
+    dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.Downloaded, data: null}});
+  });
+
+  win.webContents.on('certificate-error', (event, url, error, certificate, callback) => {
+    event.preventDefault();
+    callback(true);
   });
 
   win.webContents.on('dom-ready', async () => {
+    if (isDev) {
+      win.webContents.openDevTools();
+    }
+
     const dispatch = createDispatchForWindow(win);
 
-    subscribeToStoreStateChanges(win.webContents, storeState => {
-      createMenu(storeState, dispatch);
-      let projectName = activeProjectSelector(storeState)?.name;
-      setWindowTitle(storeState, win, projectName);
-      unsavedResourceCount = unsavedResourcesSelector(storeState).length;
-      const segmentClient = getSegmentClient();
+    subscribeToStoreStateChanges(
+      win.webContents,
+      menuStatePropertiesToPick,
+      (storeState, title, _unsavedResourceCount) => {
+        if (storeState) {
+          createMenu(storeState, dispatch);
+          setWindowTitle(title, win);
 
-      if (storeState.config.disableEventTracking) {
-        Nucleus.track(DISABLED_TELEMETRY);
-        Nucleus.disableTracking();
-        segmentClient?.track({
-          userId: machineId,
-          event: DISABLED_TELEMETRY,
-        });
-        disableSegment();
-      } else {
-        Nucleus.enableTracking();
-        if (!segmentClient) {
-          enableSegment();
+          unsavedResourceCount = _unsavedResourceCount;
         }
       }
-    });
+    );
 
-    dispatch(setAppRehydrating(true));
+    dispatch({type: 'main/setAppRehydrating', payload: true});
+
     if (process.argv.includes(StartupFlags.AUTOMATION)) {
       win.webContents.send('set-automation');
     }
 
-    dispatch(
-      setUserDirs({
+    dispatch({
+      type: 'config/setUserDirs',
+      payload: {
         homeDir: userHomeDir,
         tempDir: userTempDir,
         dataDir: userDataDir,
         crdsDir,
-      })
-    );
+      },
+    });
 
-    dispatch(
-      setExtensionsDirs({
+    dispatch({
+      type: 'extension/setExtensionsDirs',
+      payload: {
         templatesDir,
         templatePacksDir,
         pluginsDir,
-      })
-    );
+      },
+    });
+
+    if (process.env.SENTRY_DSN) {
+      const SENTRY_DSN = process.env.SENTRY_DSN;
+      if (typeof SENTRY_DSN === 'string' && SENTRY_DSN.trim().length) {
+        dispatch({type: 'config/initRendererSentry', payload: {SENTRY_DSN}});
+      }
+    }
 
     await checkNewVersion(dispatch, true);
     setInterval(async () => {
       await checkNewVersion(dispatch, true);
     }, NEW_VERSION_CHECK_INTERVAL);
 
-    initKubeconfig(dispatch, userHomeDir);
-    dispatch(setAppRehydrating(false));
+    dispatch({type: 'main/setAppRehydrating', payload: false});
 
     const missingDependencies = checkMissingDependencies(APP_DEPENDENCIES);
     const isUserAbleToRunKubectlKustomize = checkMissingDependencies(['kubectl kustomize --help']);
@@ -216,7 +204,7 @@ export const createWindow = (givenPath?: string) => {
         message: `${missingDependencies.toString()} must be installed for all Monokle functionality to be available.
         [Read more](${DEPENDENCIES_HELP_URL})`,
       };
-      dispatchToWindow(win, setAlert(alert));
+      dispatchToWindow(win, {type: 'alert/setAlert', payload: alert});
     }
     win.webContents.send('executed-from', {path: givenPath});
     win.webContents.send('set-main-process-env', {serializedMainProcessEnv: getSerializedProcessEnv()});
@@ -248,10 +236,10 @@ export const createWindow = (givenPath?: string) => {
       templatePacks: Object.values(templatePackMap),
     });
 
-    dispatch(setPluginMap(pluginMap));
-    dispatch(setTemplatePackMap(templatePackMap));
-    dispatch(setTemplateMap(templateMap));
-    dispatch(setWebContentsId(win.webContents.id));
+    dispatch({type: 'extension/setPluginMap', payload: pluginMap});
+    dispatch({type: 'extension/setTemplatePackMap', payload: templatePackMap});
+    dispatch({type: 'extension/setTemplateMap', payload: templateMap});
+    dispatch({type: 'terminal/setWebContentsId', payload: win.webContents.id});
     convertRecentFilesToRecentProjects(dispatch);
   });
 

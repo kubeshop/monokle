@@ -4,9 +4,7 @@ import {Select} from 'antd';
 
 import {uniq} from 'lodash';
 
-import {K8sResource} from '@models/k8sresource';
-
-import {useAppSelector} from '@redux/hooks';
+import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 
 import * as S from './styled';
 
@@ -21,59 +19,58 @@ ResourceSelection.defaultProps = {
 
 export function ResourceSelection(props: any) {
   const {value, onChange, disabled, options, readonly} = props;
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const resourceMetaMap = useResourceMetaMap('local');
   const [resourceNames, setResourceNames] = useState<(string | undefined)[]>([]);
-  const [selectValue, setSelectValue] = useState<string | undefined>();
   const [inputValue, setInputValue] = useState<string>();
 
   const handleChange = (providedValue: string) => {
     if (providedValue === NEW_ITEM) {
-      setSelectValue(inputValue);
+      onChange(inputValue);
       if (!resourceNames.includes(inputValue)) {
         setResourceNames([...resourceNames, inputValue]);
       }
       setInputValue('');
     } else {
-      setSelectValue(providedValue);
+      onChange(providedValue);
     }
   };
 
   useEffect(() => {
     if (!value) {
-      setSelectValue(EMPTY_VALUE);
+      onChange(EMPTY_VALUE);
     } else {
-      setSelectValue(value);
+      onChange(value);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   useEffect(() => {
-    if (selectValue === EMPTY_VALUE) {
+    if (value === EMPTY_VALUE) {
       onChange(undefined);
     } else {
-      onChange(selectValue);
+      onChange(value);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectValue]);
+  }, [value]);
 
   useEffect(() => {
-    if (resourceMap) {
+    if (resourceMetaMap) {
       const resourceKinds: string[] | undefined = options?.resourceKinds ? options.resourceKinds.split('|') : undefined;
       setResourceNames(
         uniq(
-          Object.values(resourceMap)
+          Object.values(resourceMetaMap)
             .filter(resource => !resourceKinds || resourceKinds.includes(resource.kind))
-            .map((resource: K8sResource) => resource.name)
+            .map(resource => resource.name)
         ).sort()
       );
     } else {
       setResourceNames([]);
     }
-  }, [resourceMap, options.resourceKinds]);
+  }, [resourceMetaMap, options.resourceKinds]);
 
   return (
     <S.SelectStyled
-      value={selectValue}
+      value={value}
       showSearch
       onSearch={(e: string) => setInputValue(e)}
       optionFilterProp="children"

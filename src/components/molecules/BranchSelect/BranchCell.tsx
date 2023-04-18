@@ -1,12 +1,13 @@
 import {Modal, Space} from 'antd';
 
-import {GitBranch} from '@models/git';
-
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {CopyButton} from '@components/atoms';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
+
+import {GitBranch} from '@shared/models/git';
 
 import * as S from './BranchCell.styled';
 
@@ -17,6 +18,7 @@ type IProps = {
 const BranchCell: React.FC<IProps> = props => {
   const {branch} = props;
 
+  const dispatch = useAppDispatch();
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
@@ -29,6 +31,10 @@ const BranchCell: React.FC<IProps> = props => {
         promiseFromIpcRenderer('git.deleteLocalBranch', 'git.deleteLocalBranch.result', {
           localPath: selectedProjectRootFolder,
           branchName: branch.name,
+        }).then(result => {
+          if (result.error) {
+            showGitErrorModal(`Deleting ${branch.name} failed`, `git branch -d ${branch.name}`, dispatch);
+          }
         });
       },
       onCancel() {},

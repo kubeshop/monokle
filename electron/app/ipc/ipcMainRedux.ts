@@ -2,9 +2,9 @@ import {BrowserWindow, WebContents, ipcMain, webContents} from 'electron';
 
 import {AnyAction} from 'redux';
 
-import {RootState} from '@models/rootstate';
+import type {ElectronMenuDataType, RootState} from '@shared/models/rootState';
 
-import {promiseTimeout} from '@utils/promises';
+import {promiseTimeout} from '../utils/promises';
 
 const FETCH_STORE_STATE_TIMEOUT = 10000;
 
@@ -53,13 +53,25 @@ export const fetchFocusedWindowStoreState = () => {
   return fetchStoreState(focusedWebContents);
 };
 
-export const subscribeToStoreStateChanges = (contents: WebContents, callback: (state: RootState) => void) => {
-  contents.send('redux-subscribe', contents.id);
+export const subscribeToStoreStateChanges = (
+  contents: WebContents,
+  propertiesToPick: string[],
+  callback: (state: ElectronMenuDataType, title: string, unsavedResourceCount: number) => void
+) => {
+  contents.send('redux-subscribe', {webContentsId: contents.id, propertiesToPick});
   ipcMain.on(
     'redux-subscribe-triggered',
-    (_, {webContentsId, storeState}: {webContentsId: number; storeState: RootState}) => {
+    (
+      _,
+      {
+        webContentsId,
+        storeState,
+        windowTitle,
+        unsavedResourceCount,
+      }: {webContentsId: number; storeState: ElectronMenuDataType; windowTitle: string; unsavedResourceCount: number}
+    ) => {
       if (contents.id === webContentsId) {
-        callback(storeState);
+        callback(storeState, windowTitle, unsavedResourceCount);
       }
     }
   );

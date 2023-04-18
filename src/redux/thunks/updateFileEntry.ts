@@ -5,28 +5,35 @@ import log from 'loglevel';
 import path from 'path';
 import {parse} from 'yaml';
 
-import {HELM_CHART_ENTRY_FILE, ROOT_FILE_ENTRY} from '@constants/constants';
+import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 
-import {RootState} from '@models/rootstate';
-
-import {UpdateFileEntryPayload, UpdateFilesEntryPayload} from '@redux/reducers/main';
-import {currentConfigSelector} from '@redux/selectors';
-import {getResourcesForPath} from '@redux/services/fileEntry';
-import {isHelmTemplateFile, isHelmValuesFile, reprocessHelm} from '@redux/services/helm';
-import {getK8sVersion} from '@redux/services/projectConfig';
-import {deleteResource, extractK8sResources, reprocessResources} from '@redux/services/resource';
+import {UpdateFileEntryPayload} from '@redux/reducers/main';
+import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
+import {reprocessHelm} from '@redux/services/helm';
+import {deleteResource, extractK8sResources, splitK8sResource} from '@redux/services/resource';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
 
-export const updateFileEntry = createAsyncThunk(
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AppState} from '@shared/models/appState';
+import {FileSideEffect} from '@shared/models/fileEntry';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
+import {isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
+
+export const updateFileEntry = createAsyncThunk<
+  {nextMainState: AppState; affectedResourceIdentifiers?: ResourceIdentifier[]},
+  UpdateFileEntryPayload
+>(
   'main/updateFileEntry',
   async (payload: UpdateFileEntryPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
     const state: RootState = thunkAPI.getState();
-    const projectConfig = currentConfigSelector(state);
-    const schemaVersion = getK8sVersion(projectConfig);
-    const userDataDir = String(state.config.userDataDir);
 
     let error: any;
+
+    const fileSideEffect: FileSideEffect = {
+      affectedResourceIds: [],
+    };
 
     const nextMainState = createNextState(state.main, mainState => {
       try {
@@ -42,7 +49,6 @@ export const updateFileEntry = createAsyncThunk(
         if (getFileStats(filePath)?.isDirectory() === false) {
           fs.writeFileSync(filePath, payload.text);
           fileEntry.timestamp = getFileTimestamp(filePath);
-          fileEntry.text = payload.text;
 
           if (path.basename(fileEntry.filePath) === HELM_CHART_ENTRY_FILE) {
             try {
@@ -62,42 +68,39 @@ export const updateFileEntry = createAsyncThunk(
                 log.warn(`[updateFileEntry]: ${e.message}`);
               }
             }
+          } else if (isHelmTemplateFile(fileEntry.filePath) || isHelmValuesFile(fileEntry.filePath)) {
+            // TODO: 2.0+ move the reprocessing of helm files to a redux listener, triggered after we save the file
+            reprocessHelm(fileEntry.filePath, mainState.fileMap, mainState.helmTemplatesMap, mainState.helmValuesMap);
           } else {
-            getResourcesForPath(fileEntry.filePath, mainState.resourceMap).forEach(r => {
-              deleteResource(r, mainState.resourceMap);
+            getLocalResourceMetasForPath(fileEntry.filePath, mainState.resourceMetaMapByStorage.local).forEach(r => {
+              // TODO: 2.0+ do we have to pass the deleted resources to validation?
+              fileSideEffect.affectedResourceIds.push(r.id);
+              deleteResource(r, {
+                resourceMetaMap: mainState.resourceMetaMapByStorage.local,
+                resourceContentMap: mainState.resourceContentMapByStorage.local,
+              });
             });
 
-            const extractedResources = extractK8sResources(payload.text, filePath.substring(rootFolder.length));
-
-            let resourceIds: string[] = [];
-
-            // only recalculate refs for resources that already have refs
-            Object.values(mainState.resourceMap)
-              .filter(r => r.refs)
-              .forEach(r => resourceIds.push(r.id));
+            const extractedResources = extractK8sResources(payload.text, 'local', {
+              filePath: filePath.substring(rootFolder.length),
+              fileOffset: 0,
+            });
 
             Object.values(extractedResources).forEach(r => {
-              mainState.resourceMap[r.id] = r;
-              r.isHighlighted = true;
-              resourceIds.push(r.id);
+              fileSideEffect.affectedResourceIds.push(r.id);
+              const {meta, content} = splitK8sResource(r);
+              mainState.resourceMetaMapByStorage.local[meta.id] = meta;
+              mainState.resourceContentMapByStorage.local[content.id] = content;
+              mainState.highlights = [
+                {
+                  type: 'resource',
+                  resourceIdentifier: {
+                    id: r.id,
+                    storage: r.storage,
+                  },
+                },
+              ];
             });
-
-            reprocessResources(
-              schemaVersion,
-              userDataDir,
-              resourceIds,
-              mainState.resourceMap,
-              mainState.fileMap,
-              mainState.resourceRefsProcessingOptions,
-              {
-                resourceKinds: extractedResources.map(r => r.kind),
-                policyPlugins: [],
-              }
-            );
-
-            if (isHelmTemplateFile(fileEntry.filePath) || isHelmValuesFile(fileEntry.filePath)) {
-              reprocessHelm(fileEntry.filePath, mainState.fileMap, mainState.helmTemplatesMap, mainState.helmValuesMap);
-            }
           }
         }
 
@@ -112,27 +115,12 @@ export const updateFileEntry = createAsyncThunk(
     });
 
     if (error) {
-      return {...state.main, autosaving: {status: false, error}};
+      return {nextMainState: {...state.main, autosaving: {status: false, error}}};
     }
 
-    return nextMainState;
-  }
-);
-
-export const updateFileEntries = createAsyncThunk(
-  'main/updateFileEntries',
-  async (payload: UpdateFilesEntryPayload, thunkAPI: {getState: Function; dispatch: Function}) => {
-    const state: RootState = thunkAPI.getState();
-
-    const nextMainState: any = createNextState(state.main, mainState => {
-      payload.pathes.forEach(ps => {
-        const fileEntry = mainState.fileMap[ps.relativePath];
-        const content = fs.readFileSync(ps.absolutePath, 'utf8');
-        fileEntry.text = content;
-        return {...mainState.fileMap, fileEntry};
-      });
-    });
-
-    return nextMainState;
+    return {
+      nextMainState,
+      affectedResourceIdentifiers: fileSideEffect.affectedResourceIds.map(id => ({id, storage: 'local'})),
+    };
   }
 );

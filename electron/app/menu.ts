@@ -1,36 +1,31 @@
 import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
-
-import {NewVersionCode, Project} from '@models/appconfig';
-import {RootState} from '@models/rootstate';
-
-import {clearPreviewAndSelectionHistory, openResourceDiffModal, stopPreviewLoader} from '@redux/reducers/main';
-import {
-  openAboutModal,
-  openCreateProjectModal,
-  openFolderExplorer,
-  openKeyboardShortcutsModal,
-  openNewResourceWizard,
-  resetLayout,
-  setMonacoEditor,
-  toggleLeftMenu,
-  toggleStartProjectPane,
-  zoomIn,
-  zoomOut,
-} from '@redux/reducers/ui';
-import {isInPreviewModeSelector,kubeConfigPathValidSelector} from '@redux/selectors';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
-
-import {defineHotkey} from '@utils/defineHotkey';
-import {openDiscord, openDocumentation, openGitHub, openLogs} from '@utils/shell';
+import {hotkeys} from '@shared/constants/hotkeys';
+import {NewVersionCode, Project} from '@shared/models/config';
+import type {ElectronMenuDataType} from '@shared/models/rootState';
+import {defineHotkey} from '@shared/utils/hotkey';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {openDiscord, openDocumentation, openGitHub, openLogs} from '@shared/utils/shell';
 
 import {checkNewVersion} from './commands';
 import {MainDispatch, dispatchToFocusedWindow} from './ipc/ipcMainRedux';
 import {openApplication} from './openApplication';
 
 const isMac = process.platform === 'darwin';
+
+export const menuStatePropertiesToPick = [
+  'config.projects',
+  'config.selectedProjectRootFolder',
+  'config.newVersion',
+
+  'ui.isStartProjectPaneVisible',
+  'ui.isInQuickClusterMode',
+  'ui.isStartProjectPaneVisible',
+  'ui.monacoEditor',
+
+  'main.selection',
+  'main.preview',
+];
 
 const getUpdateMonokleText = (newVersion: {code: NewVersionCode; data: any}) => {
   if (newVersion.code > NewVersionCode.Checking) {
@@ -44,24 +39,24 @@ const getUpdateMonokleText = (newVersion: {code: NewVersionCode; data: any}) => 
   return 'Check for Update';
 };
 
-const checkForUpdateMenu = (state: RootState, dispatch: MainDispatch) => {
+const checkForUpdateMenu = (state: ElectronMenuDataType, dispatch: MainDispatch) => {
   return {
-    label: getUpdateMonokleText(state.config.newVersion),
-    enabled: state.config.newVersion.code !== NewVersionCode.Downloading,
+    label: getUpdateMonokleText(state?.config?.newVersion),
+    enabled: state?.config?.newVersion?.code !== NewVersionCode.Downloading,
     click: async () => {
       await checkNewVersion(dispatch);
     },
   };
 };
 
-const appMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
+const appMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
-    label: `Monokle${state.config.newVersion.code > NewVersionCode.Checking ? ' ⬆️' : ''}`,
+    label: `Monokle${state?.config?.newVersion?.code > NewVersionCode.Checking ? ' ⬆️' : ''}`,
     submenu: [
       {
         label: 'About Monokle',
         click: () => {
-          dispatch(openAboutModal());
+          dispatch({type: 'ui/openAboutModal', payload: undefined});
         },
       },
       checkForUpdateMenu(state, dispatch),
@@ -91,7 +86,7 @@ function openProjectInRendererThread(project: Project) {
   }
 }
 
-const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
+const fileMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
     label: 'File',
     submenu: [
@@ -106,9 +101,11 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {
         label: 'Refresh Folder',
         accelerator: defineHotkey(hotkeys.REFRESH_FOLDER.key),
-        enabled: !isInPreviewModeSelector(state) && Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
+        enabled: !isInPreviewModeSelector(state) && Boolean(state?.config?.selectedProjectRootFolder),
         click: () => {
-          setRootFolderInRendererThread(state.main.fileMap[ROOT_FILE_ENTRY].filePath);
+          if (state?.config?.selectedProjectRootFolder) {
+            setRootFolderInRendererThread(state?.config?.selectedProjectRootFolder);
+          }
         },
       },
       {type: 'separator'},
@@ -116,10 +113,10 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'New Project',
         submenu: [
           {
-            label: 'Getting Started Page',
+            label: 'Tutorial Page',
             click: () => {
-              if (!state.ui.isStartProjectPaneVisible) {
-                dispatch(toggleStartProjectPane());
+              if (!state?.ui?.isStartProjectPaneVisible) {
+                dispatch({type: 'ui/toggleStartProjectPane', payload: undefined});
               }
             },
           },
@@ -127,26 +124,26 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
           {
             label: 'Select Folder',
             click: () => {
-              dispatchToFocusedWindow(openFolderExplorer());
+              dispatchToFocusedWindow({type: 'ui/openFolderExplorer', payload: undefined});
             },
           },
           {
             label: 'Empty Project',
             click: () => {
-              dispatchToFocusedWindow(openCreateProjectModal({fromTemplate: false}));
+              dispatchToFocusedWindow({type: 'ui/openCreateProjectModal', payload: {fromTemplate: false}});
             },
           },
           {
             label: 'From Template',
             click: () => {
-              dispatchToFocusedWindow(openCreateProjectModal({fromTemplate: true}));
+              dispatchToFocusedWindow({type: 'ui/openCreateProjectModal', payload: {fromTemplate: true}});
             },
           },
         ],
       },
       {
         label: 'Recent Projects',
-        submenu: state.config.projects.map((project: Project) => ({
+        submenu: state?.config?.projects.map((project: Project) => ({
           label: `${project.name} - ${project.rootFolder}`,
           click: () => {
             openProjectInRendererThread(project);
@@ -156,9 +153,9 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
       {type: 'separator'},
       {
         label: 'New Resource',
-        enabled: Boolean(state.main.fileMap[ROOT_FILE_ENTRY]),
-        click: async () => {
-          dispatch(openNewResourceWizard());
+        enabled: Boolean(state?.config?.selectedProjectRootFolder),
+        click: () => {
+          dispatch({type: 'ui/openNewResourceWizard', payload: undefined});
         },
       },
 
@@ -167,8 +164,7 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'Exit Preview',
         enabled: isInPreviewModeSelector(state),
         click: () => {
-          dispatch(stopPreviewLoader());
-          dispatch(clearPreviewAndSelectionHistory());
+          dispatch({type: 'main/clearPreviewAndSelectionHistory', payload: undefined});
         },
       },
       {type: 'separator'},
@@ -185,28 +181,14 @@ const fileMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
   };
 };
 
-const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
-  const isKubeConfigPathValid = kubeConfigPathValidSelector(state);
-  const isMonacoActionEnabled = Boolean(state.main.selectedResourceId) && state.ui.monacoEditor.focused;
+const editMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItemConstructorOptions => {
+  const isMonacoActionEnabled =
+    Boolean(state?.main?.selection?.type === 'resource' || state?.main?.selection?.type === 'file') &&
+    state?.ui?.monacoEditor?.focused;
   return {
     label: 'Edit',
 
     submenu: [
-      {
-        enabled: isMonacoActionEnabled,
-        label: 'Undo',
-        click: () => {
-          dispatch(setMonacoEditor({undo: true}));
-        },
-      },
-      {
-        enabled: isMonacoActionEnabled,
-        label: 'Redo',
-        click: () => {
-          dispatch(setMonacoEditor({redo: true}));
-        },
-      },
-      {type: 'separator'},
       {role: 'copy'},
       {role: 'cut'},
       {role: 'paste'},
@@ -216,101 +198,43 @@ const editMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         enabled: isMonacoActionEnabled,
         label: 'Find',
         click: () => {
-          dispatch(setMonacoEditor({find: true}));
+          dispatch({type: 'ui/setMonacoEditor', payload: {find: true}});
         },
       },
       {
         enabled: isMonacoActionEnabled,
         label: 'Replace',
         click: () => {
-          dispatch(setMonacoEditor({replace: true}));
+          dispatch({type: 'ui/setMonacoEditor', payload: {replace: true}});
         },
       },
       {type: 'separator'},
-      {
-        label: 'Apply',
-        accelerator: hotkeys.APPLY_SELECTION.key,
-        enabled: Boolean(state.main.selectedResourceId) && Boolean(isKubeConfigPathValid),
-        click: () => {
-          dispatch(setMonacoEditor({apply: true}));
-        },
-      },
-      {
-        label: 'Diff',
-        accelerator: hotkeys.DIFF_RESOURCE.key,
-        enabled: Boolean(state.main.selectedResourceId) && Boolean(isKubeConfigPathValid),
-        click: () => {
-          if (!state.main.selectedResourceId) {
-            return;
-          }
-          dispatch(openResourceDiffModal(state.main.selectedResourceId));
-        },
-      },
     ],
   };
 };
 
-const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructorOptions => {
-  const isPreviousResourceEnabled =
-    state.main.selectionHistory.length > 1 &&
-    (state.main.currentSelectionHistoryIndex === undefined ||
-      (state.main.currentSelectionHistoryIndex && state.main.currentSelectionHistoryIndex > 0));
-  const isNextResourceEnabled =
-    state.main.selectionHistory.length > 1 &&
-    state.main.currentSelectionHistoryIndex !== undefined &&
-    state.main.currentSelectionHistoryIndex < state.main.selectionHistory.length - 1;
-
+const viewMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
     label: 'View',
     submenu: [
       {
         role: 'forceReload',
       },
-      {
-        label: 'Previous Resource',
-        accelerator: hotkeys.SELECT_FROM_HISTORY_BACK.key,
-        enabled: Boolean(isPreviousResourceEnabled),
-        click: () => {
-          selectFromHistory(
-            'left',
-            state.main.currentSelectionHistoryIndex,
-            state.main.selectionHistory,
-            state.main.resourceMap,
-            state.main.fileMap,
-            state.main.imagesList,
-            dispatch
-          );
-        },
-      },
-      {
-        label: 'Next Resource',
-        accelerator: hotkeys.SELECT_FROM_HISTORY_FORWARD.key,
-        enabled: Boolean(isNextResourceEnabled),
-        click: () => {
-          selectFromHistory(
-            'right',
-            state.main.currentSelectionHistoryIndex,
-            state.main.selectionHistory,
-            state.main.resourceMap,
-            state.main.fileMap,
-            state.main.imagesList,
-            dispatch
-          );
-        },
-      },
       {type: 'separator'},
       {
         label: 'Toggle Left Menu',
         accelerator: defineHotkey(hotkeys.TOGGLE_LEFT_PANE.key),
         click: () => {
-          dispatch(toggleLeftMenu());
+          if (!state.ui.isInQuickClusterMode) {
+            dispatch({type: 'ui/toggleLeftMenu', payload: undefined});
+          }
         },
       },
       {role: 'toggleDevTools'},
       {
         label: 'Reset Layout',
         click: () => {
-          dispatch(resetLayout());
+          dispatch({type: 'ui/resetLayout', payload: undefined});
         },
       },
       {type: 'separator'},
@@ -320,14 +244,14 @@ const viewMenu = (state: RootState, dispatch: MainDispatch): MenuItemConstructor
         label: 'Zoom in',
         accelerator: defineHotkey(hotkeys.ZOOM_IN.key),
         click: () => {
-          dispatch(zoomIn());
+          dispatch({type: 'ui/zoomIn', payload: undefined});
         },
       },
       {
         label: 'Zoom out',
         accelerator: defineHotkey(hotkeys.ZOOM_OUT.key),
         click: () => {
-          dispatch(zoomOut());
+          dispatch({type: 'ui/zoomOut', payload: undefined});
         },
       },
     ],
@@ -351,7 +275,7 @@ const windowMenu = (): MenuItemConstructorOptions => {
 };
 
 const helpMenu = (
-  state: RootState,
+  state: ElectronMenuDataType,
   dispatch: MainDispatch,
   includeUpdateMenu?: boolean
 ): MenuItemConstructorOptions => {
@@ -363,7 +287,7 @@ const helpMenu = (
     {
       accelerator: defineHotkey(hotkeys.OPEN_SHORTCUTS.key),
       label: 'Keyboard Shortcuts',
-      click: () => dispatch(openKeyboardShortcutsModal()),
+      click: () => dispatch({type: 'ui/openKeyboardShortcutsModal', payload: undefined}),
     },
     {
       label: 'Logs',
@@ -391,7 +315,7 @@ const helpMenu = (
   };
 };
 
-export const createMenu = (state: RootState, dispatch: MainDispatch) => {
+export const createMenu = (state: ElectronMenuDataType, dispatch: MainDispatch) => {
   const template: MenuItemConstructorOptions[] = [
     fileMenu(state, dispatch),
     editMenu(state, dispatch),

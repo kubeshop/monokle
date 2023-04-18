@@ -3,7 +3,7 @@ import {Drawer as RawDrawer} from 'antd';
 import styled from 'styled-components';
 
 export const Drawer = styled(RawDrawer)`
-  z-index: 100;
+  z-index: 1000;
 
   & .ant-drawer-close {
     position: absolute;

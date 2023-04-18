@@ -5,11 +5,13 @@ import {isEmpty} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {TitleBar} from '@components/molecules';
+import {SelectItemImage, TitleBarWrapper} from '@atoms';
+
+import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
-import GitSelectItem from '@assets/GitSelectItem.svg';
+import {TitleBar} from '@monokle/components';
 
 import * as S from './GitView.styled';
 
@@ -23,20 +25,18 @@ const options: monaco.editor.IDiffEditorConstructionOptions = {
   },
 };
 
-type IProps = {
-  height: number;
-};
-
-const GitView: React.FC<IProps> = props => {
-  const {height} = props;
-
+const GitView: React.FC = () => {
   const selectedItem = useAppSelector(state => state.git.selectedItem);
+
+  const height = usePaneHeight();
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
 
   return (
     <S.GitPaneMainContainer id="GitOpsPane">
-      <TitleBar title="Editor" />
+      <TitleBarWrapper>
+        <TitleBar type="secondary" title="Editor" />
+      </TitleBarWrapper>
       <S.GitFileBar>
         <S.GitRefFile>
           <S.FileType>Original</S.FileType>
@@ -76,7 +76,7 @@ const GitView: React.FC<IProps> = props => {
         {isEmpty(selectedItem) && (
           <S.EmptyStateContainer>
             <S.EmptyStateItem>
-              <S.GitEmptyImage src={GitSelectItem} />
+              <SelectItemImage text="Select a file in the left to diff changes." />
             </S.EmptyStateItem>
           </S.EmptyStateContainer>
         )}

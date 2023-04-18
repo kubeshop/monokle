@@ -6,30 +6,27 @@ import path from 'path';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource} from '@models/k8sresource';
-import {RefMapper, ResourceKindHandler} from '@models/resourcekindhandler';
-
-import {loadResource} from '@redux/services';
 import {extractSchema} from '@redux/services/schema';
-import {findDefaultVersion} from '@redux/thunks/previewCluster';
+import {findDefaultVersionForCRD} from '@redux/thunks/cluster';
 
-import {
-  explicitNamespaceMatcher,
-  implicitNamespaceMatcher,
-  optionalExplicitNamespaceMatcher,
-  targetGroupMatcher,
-  targetKindMatcher,
-} from '@src/kindhandlers/common/customMatchers';
-import {createPodSelectorOutgoingRefMappers} from '@src/kindhandlers/common/outgoingRefMappers';
+import {K8sResource, ResourceMeta} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {loadResource} from '@shared/utils/resource';
+
+/**
+ * The logic for these custom kind handlers will have to be revisited after we integrate @monokle/validation
+ * I'm thinking that we will have to find a way to extend the 'resource-link' plugin of the validation to include more ref mappers
+ * The custom matchers like "implicitNamespaceMatcher", "optionalExplicitNamespaceMatcher" or "targetKindMatcher" should probably be exported by the validation package
+ */
 
 /**
  * extract the version from the apiVersion string of the specified resource
  */
 
-function extractResourceVersion(resource: K8sResource, kindVersion: string, kindGroup: string) {
-  const ix = resource.version.lastIndexOf('/');
-  const version = ix > 0 ? resource.version.substring(ix + 1) : kindVersion;
-  const group = ix > 0 ? resource.version.substring(0, ix) : kindGroup;
+function extractResourceVersion(resource: ResourceMeta, kindVersion: string, kindGroup: string) {
+  const ix = resource.apiVersion.lastIndexOf('/');
+  const version = ix > 0 ? resource.apiVersion.substring(ix + 1) : kindVersion;
+  const group = ix > 0 ? resource.apiVersion.substring(0, ix) : kindGroup;
   return {version, group};
 }
 
@@ -57,51 +54,6 @@ export function extractFormSchema(editorSchema: any) {
   return schema;
 }
 
-function extractNamespaceMatchers(refMapper: any) {
-  switch (refMapper.source?.namespaceRef) {
-    case 'Implicit':
-      refMapper.source.siblingMatchers = {
-        namespace: implicitNamespaceMatcher,
-      };
-      break;
-    case 'Explicit':
-      refMapper.source.siblingMatchers = {
-        namespace: explicitNamespaceMatcher,
-      };
-      break;
-    case 'OptionalExplicit':
-      refMapper.source.siblingMatchers = {
-        namespace: optionalExplicitNamespaceMatcher,
-      };
-      break;
-    default:
-  }
-}
-
-function extractSiblingMatchers(refMapper: any) {
-  if (!refMapper.source.siblingMatchers) {
-    refMapper.source.siblingMatchers = {};
-  }
-
-  refMapper.source.matchers.forEach((m: any) => {
-    switch (m) {
-      case 'kindMatcher':
-        refMapper.source.siblingMatchers['kind'] = targetKindMatcher;
-        break;
-      case 'groupMatcher':
-        refMapper.source.siblingMatchers['group'] = targetGroupMatcher;
-
-        // groupMatcher supports a defaultGroup configuration property - copy if specified
-        if (refMapper.source.matcherProperties && refMapper.source.matcherProperties['groupMatcher']) {
-          refMapper.source.matcherProperties['group'] = refMapper.source.matcherProperties['groupMatcher'];
-        }
-        break;
-      default:
-        break;
-    }
-  });
-}
-
 export function extractKindHandler(crd: any, handlerPath?: string) {
   if (!crd?.spec) {
     return;
@@ -110,14 +62,13 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
   const spec = crd.spec;
   const kind = spec.names.kind;
   const kindGroup = spec.group;
-  const kindVersion = findDefaultVersion(crd);
+  const kindVersion = findDefaultVersionForCRD(crd);
 
   if (kindVersion) {
     const kindPlural = spec.names.plural;
     let editorSchema = kindVersion ? extractSchema(crd, kindVersion) : undefined;
     let kindHandler: ResourceKindHandler | undefined;
     let helpLink: string | undefined;
-    let refMappers: any[] = [];
     let subsectionName = spec.group;
     let kindSectionName = spec.names.plural;
 
@@ -131,27 +82,6 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
             helpLink = handler.helpLink;
             subsectionName = handler.sectionName || subsectionName;
             kindSectionName = handler.kindSectionName || kindSectionName;
-
-            if (handler.refMappers) {
-              handler.refMappers.forEach((refMapper: any) => {
-                if (refMapper.source?.namespaceRef) {
-                  extractNamespaceMatchers(refMapper);
-                }
-
-                if (refMapper.source?.matchers) {
-                  extractSiblingMatchers(refMapper);
-                }
-
-                refMappers.push(refMapper);
-              });
-            }
-
-            if (handler.podSelectors) {
-              handler.podSelectors.forEach((selector: string[]) => {
-                refMappers.push(...createPodSelectorOutgoingRefMappers(selector));
-              });
-            }
-
             if (handler.editorSchema) {
               editorSchema = handler.editorSchema;
             }
@@ -171,8 +101,7 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
         kindVersion,
         kindPlural,
         editorSchema,
-        helpLink,
-        refMappers
+        helpLink
       );
     } else if (spec.scope === 'Cluster') {
       kindHandler = createClusterCustomObjectKindHandler(
@@ -183,8 +112,7 @@ export function extractKindHandler(crd: any, handlerPath?: string) {
         kindVersion,
         kindPlural,
         editorSchema,
-        helpLink,
-        refMappers
+        helpLink
       );
     }
 
@@ -200,8 +128,7 @@ const createNamespacedCustomObjectKindHandler = (
   kindVersion: string,
   kindPlural: string,
   editorSchema?: any,
-  helpLink?: string,
-  outgoingRefMappers?: RefMapper[]
+  helpLink?: string
 ): ResourceKindHandler => {
   return {
     kind,
@@ -210,8 +137,8 @@ const createNamespacedCustomObjectKindHandler = (
     navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     isCustom: true,
+    kindPlural,
     helpLink,
-    outgoingRefMappers,
     sourceEditorOptions: editorSchema ? {editorSchema} : undefined,
     formEditorOptions: editorSchema ? {editorSchema: extractFormSchema(editorSchema)} : undefined,
     getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
@@ -230,7 +157,7 @@ const createNamespacedCustomObjectKindHandler = (
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
       if (crd) {
-        const defaultVersion = findDefaultVersion(crd.content);
+        const defaultVersion = findDefaultVersionForCRD(crd.object);
         if (defaultVersion) {
           return options.namespace
             ? customObjectsApi.listNamespacedCustomObject(
@@ -249,7 +176,7 @@ const createNamespacedCustomObjectKindHandler = (
       try {
         const result = await k8sCoreV1Api.readCustomResourceDefinition(crdName).then(
           response => {
-            const defaultVersion = findDefaultVersion(response.body);
+            const defaultVersion = findDefaultVersionForCRD(response.body);
             return options.namespace
               ? customObjectsApi.listNamespacedCustomObject(
                   kindGroup,
@@ -272,7 +199,7 @@ const createNamespacedCustomObjectKindHandler = (
         return [];
       }
     },
-    async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
+    async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
       const {version, group} = extractResourceVersion(resource, kindVersion, kindGroup);
 
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
@@ -295,8 +222,7 @@ const createClusterCustomObjectKindHandler = (
   kindVersion: string,
   kindPlural: string,
   editorSchema?: any,
-  helpLink?: string,
-  outgoingRefMappers?: RefMapper[]
+  helpLink?: string
 ): ResourceKindHandler => {
   return {
     kind,
@@ -305,8 +231,8 @@ const createClusterCustomObjectKindHandler = (
     navigatorPath: [navSectionNames.K8S_RESOURCES, subsectionName, kindSectionName],
     clusterApiVersion: `${kindGroup}/${kindVersion}`,
     helpLink,
-    outgoingRefMappers,
     isCustom: true,
+    kindPlural,
     sourceEditorOptions: editorSchema ? {editorSchema} : undefined,
     formEditorOptions: editorSchema ? {editorSchema: extractFormSchema(editorSchema)} : undefined,
     getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
@@ -319,7 +245,7 @@ const createClusterCustomObjectKindHandler = (
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
 
       if (crd) {
-        const defaultVersion = findDefaultVersion(crd.content);
+        const defaultVersion = findDefaultVersionForCRD(crd.object);
         if (defaultVersion) {
           return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
         }
@@ -330,7 +256,7 @@ const createClusterCustomObjectKindHandler = (
       try {
         const result = await k8sCoreV1Api.readCustomResourceDefinition(crdName).then(
           response => {
-            const defaultVersion = findDefaultVersion(response.body);
+            const defaultVersion = findDefaultVersionForCRD(response.body);
             return customObjectsApi.listClusterCustomObject(kindGroup, defaultVersion || kindVersion, kindPlural);
           },
           () => {
@@ -346,7 +272,7 @@ const createClusterCustomObjectKindHandler = (
         return [];
       }
     },
-    async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
+    async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
       const {version, group} = extractResourceVersion(resource, kindVersion, kindGroup);
 
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);

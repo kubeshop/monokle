@@ -2,28 +2,28 @@ import {Middleware, combineReducers, configureStore, createAction} from '@reduxj
 
 import {createLogger} from 'redux-logger';
 
-import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
-
+import {configSlice} from './appConfig';
+import {appConfigListeners} from './appConfig/appConfig.listeners';
 import * as compareListeners from './compare/listeners';
 import {compareSlice} from './compare/slice';
+import {dashboardSlice} from './dashboard';
 import {formSlice} from './forms';
 import {gitSlice} from './git';
 import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
-import {configSlice, crdsPathChangedListener} from './reducers/appConfig';
 import {extensionSlice} from './reducers/extension';
-import {logsSlice} from './reducers/logs';
-import {imageSelectedListener, mainSlice, resourceMapChangedListener} from './reducers/main';
-import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
-import {removedTerminalListener, terminalSlice} from './reducers/terminal';
-import {uiSlice} from './reducers/ui';
-import {uiCoachSlice} from './reducers/uiCoach';
+import {mainSlice} from './reducers/main';
+import {retryClusterConnectionListener} from './reducers/main/clusterListeners';
+import {imageListParserListener} from './reducers/main/mainListeners';
+import {killTerminalProcessesListener, removeTerminalListener, terminalSlice} from './reducers/terminal';
+import {stopClusterConnectionListener, uiSlice} from './reducers/ui';
+import {validationListeners} from './validation/validation.listeners';
+import {validationSlice} from './validation/validation.slice';
 
 const middlewares: Middleware[] = [];
 
 if (process.env.NODE_ENV === `development`) {
   const reduxLoggerMiddleware = createLogger({
-    predicate: (getState, action) => action.type !== updateNavigatorInstanceState.type,
     collapsed: (getState, action, logEntry) => !logEntry?.error,
   });
 
@@ -37,10 +37,13 @@ combineListeners([
   compareListeners.resourceFetchListener('right'),
   compareListeners.compareListener,
   compareListeners.filterListener,
-  resourceMapChangedListener,
-  imageSelectedListener,
-  removedTerminalListener,
-  crdsPathChangedListener,
+  killTerminalProcessesListener,
+  removeTerminalListener,
+  ...validationListeners,
+  ...appConfigListeners,
+  imageListParserListener,
+  stopClusterConnectionListener,
+  retryClusterConnectionListener,
 ]);
 
 const appReducer = combineReducers({
@@ -48,14 +51,13 @@ const appReducer = combineReducers({
   compare: compareSlice.reducer,
   config: configSlice.reducer,
   extension: extensionSlice.reducer,
-  logs: logsSlice.reducer,
   main: mainSlice.reducer,
-  navigator: navigatorSlice.reducer,
   terminal: terminalSlice.reducer,
   ui: uiSlice.reducer,
-  uiCoach: uiCoachSlice.reducer,
   git: gitSlice.reducer,
   form: formSlice.reducer,
+  validation: validationSlice.reducer,
+  dashboard: dashboardSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {
@@ -71,10 +73,12 @@ const rootReducer: typeof appReducer = (state, action) => {
 const store = configureStore({
   reducer: rootReducer,
   middleware: getDefaultMiddleware =>
-    getDefaultMiddleware()
+    getDefaultMiddleware({
+      serializableCheck: false,
+      immutableCheck: false,
+    })
       .prepend(listenerMiddleware.middleware)
-      .concat(middlewares)
-      .concat(sectionBlueprintMiddleware),
+      .concat(middlewares),
 });
 
 export default store;

@@ -1,11 +1,15 @@
 import {useCallback, useMemo, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
-import {useSelector} from 'react-redux';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-import hotkeys from '@constants/hotkeys';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
+import {
+  isInClusterModeSelector,
+  kubeConfigContextColorSelector,
+  kubeConfigContextSelector,
+  kubeConfigPathSelector,
+  kubeConfigPathValidSelector,
+} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openResourceDiffModal, resetResourceFilter} from '@redux/reducers/main';
 import {
@@ -16,23 +20,15 @@ import {
   setLeftBottomMenuSelection,
   setLeftMenuSelection,
   toggleRightMenu,
-  toggleSettings,
-  toggleStartProjectPane,
 } from '@redux/reducers/ui';
-import {
-  currentConfigSelector,
-  isInPreviewModeSelector,
-  kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
-  kubeConfigPathSelector,
-  kubeConfigPathValidSelector,
-  selectedResourceSelector,
-} from '@redux/selectors';
+import {isInPreviewModeSelectorNew, rootFilePathSelector, selectedFilePathSelector} from '@redux/selectors';
+import {useSelectedResource} from '@redux/selectors/resourceSelectors';
+import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
-import {startPreview, stopPreview} from '@redux/services/preview';
-import {applyFileWithConfirm} from '@redux/support/applyFileWithConfirm';
-import {applyResource} from '@redux/thunks/applyResource';
-import {selectFromHistory} from '@redux/thunks/selectionHistory';
+import {stopPreview} from '@redux/services/preview';
+import {applyResourceToCluster} from '@redux/thunks/applyResource';
+import {startClusterConnection} from '@redux/thunks/cluster';
+import {selectFromHistory} from '@redux/thunks/selectFromHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ModalConfirmWithNamespaceSelect} from '@molecules';
@@ -42,19 +38,28 @@ import FileExplorer from '@atoms/FileExplorer';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFeatureFlags} from '@utils/features';
+import {useRefSelector} from '@utils/hooks';
+
+import {hotkeys} from '@shared/constants/hotkeys';
 
 const HotKeysHandler = () => {
   const {ShowRightMenu} = useFeatureFlags();
   const dispatch = useAppDispatch();
-  const mainState = useAppSelector(state => state.main);
-  const uiState = useAppSelector(state => state.ui);
-  const isInPreviewMode = useSelector(isInPreviewModeSelector);
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isNewResourceWizardOpened = useAppSelector(state => state.ui.newResourceWizard.isOpen);
+  const isQuickSearchActionsPopupOpened = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const projectConfig = useAppSelector(currentConfigSelector);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
-  const currentResource = useAppSelector(selectedResourceSelector);
+  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
+  const rootFilePath = useAppSelector(rootFilePathSelector);
+  const selectedFilePath = useAppSelector(selectedFilePathSelector);
+  const selectedResource = useSelectedResource();
+
+  const fileMapRef = useRefSelector(state => state.main.fileMap);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
@@ -77,90 +82,57 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.SCALE.key,
     () => {
-      if (currentResource?.kind === 'Deployment' && isInPreviewMode) {
+      if (selectedResource?.kind === 'Deployment' && isInClusterMode) {
         dispatch(openScaleModal());
       }
     },
-    [currentResource, isInPreviewMode]
+    [selectedResource, isInClusterMode]
   );
 
   useHotkeys(
     hotkeys.REFRESH_FOLDER.key,
     () => {
-      if (mainState.fileMap && mainState.fileMap[ROOT_FILE_ENTRY] && mainState.fileMap[ROOT_FILE_ENTRY].filePath) {
-        dispatch(setRootFolder(mainState.fileMap[ROOT_FILE_ENTRY].filePath));
+      if (rootFilePath) {
+        dispatch(setRootFolder(rootFilePath));
       }
     },
-    [mainState]
+    [rootFilePath]
   );
 
   useHotkeys(hotkeys.TOGGLE_SETTINGS.key, () => {
-    dispatch(toggleSettings());
+    if (!isInQuickClusterMode) {
+      dispatch(setLeftMenuSelection('settings'));
+    }
   });
 
   const applySelection = useCallback(() => {
-    if (!mainState.selectedResourceId) {
-      return;
-    }
-    const selectedResource = mainState.resourceMap[mainState.selectedResourceId];
     if (selectedResource) {
       setIsApplyModalVisible(true);
-    } else if (mainState.selectedPath) {
-      applyFileWithConfirm(mainState.selectedPath, mainState.fileMap, dispatch, kubeConfigPath, kubeConfigContext);
+    } else if (selectedFilePath) {
+      applyFileWithConfirm(selectedFilePath, fileMapRef.current, dispatch, kubeConfigPath, kubeConfigContext);
     }
-  }, [
-    mainState.selectedResourceId,
-    mainState.resourceMap,
-    mainState.fileMap,
-    kubeConfigPath,
-    kubeConfigContext,
-    mainState.selectedPath,
-    dispatch,
-  ]);
-
-  const applySelectedResource = useMemo(() => {
-    if (!mainState.selectedResourceId) {
-      return [];
-    }
-    const resource = mainState.resourceMap[mainState.selectedResourceId];
-    return resource ? [resource] : [];
-  }, [mainState.resourceMap, mainState.selectedResourceId]);
+  }, [selectedResource, fileMapRef, kubeConfigPath, kubeConfigContext, selectedFilePath, dispatch]);
 
   const onClickApplyResource = (namespace?: {name: string; new: boolean}) => {
-    if (!mainState.selectedResourceId) {
-      setIsApplyModalVisible(false);
-      return;
-    }
-    const selectedResource = mainState.resourceMap[mainState.selectedResourceId];
-
     if (!selectedResource) {
       setIsApplyModalVisible(false);
       return;
     }
 
-    const isClusterPreview = mainState.previewType === 'cluster';
-
-    applyResource(
-      selectedResource.id,
-      mainState.resourceMap,
-      mainState.fileMap,
-      dispatch,
-      projectConfig,
-      kubeConfigContext,
-      namespace,
-      {
-        isClusterPreview,
-      }
+    dispatch(
+      applyResourceToCluster({
+        resourceIdentifier: selectedResource,
+        namespace,
+        options: {
+          isInClusterMode,
+        },
+      })
     );
+
     setIsApplyModalVisible(false);
   };
 
   const confirmModalTitle = useMemo(() => {
-    if (!mainState.selectedResourceId) {
-      return '';
-    }
-    const selectedResource = mainState.resourceMap[mainState.selectedResourceId];
-
     if (!selectedResource) {
       return '';
     }
@@ -168,7 +140,7 @@ const HotKeysHandler = () => {
     return isKustomizationResource(selectedResource)
       ? makeApplyKustomizationText(selectedResource.name, kubeConfigContext, kubeConfigContextColor)
       : makeApplyResourceText(selectedResource.name, kubeConfigContext, kubeConfigContextColor);
-  }, [mainState.resourceMap, mainState.selectedResourceId, kubeConfigContext, kubeConfigContextColor]);
+  }, [selectedResource, kubeConfigContext, kubeConfigContextColor]);
 
   useHotkeys(
     hotkeys.APPLY_SELECTION.key,
@@ -183,10 +155,10 @@ const HotKeysHandler = () => {
   );
 
   const diffSelectedResource = useCallback(() => {
-    if (mainState.selectedResourceId) {
-      dispatch(openResourceDiffModal(mainState.selectedResourceId));
+    if (selectedResource) {
+      dispatch(openResourceDiffModal(selectedResource.id));
     }
-  }, [mainState.selectedResourceId, dispatch]);
+  }, [selectedResource, dispatch]);
 
   useHotkeys(
     hotkeys.DIFF_RESOURCE.key,
@@ -203,20 +175,20 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.TOGGLE_TERMINAL_PANE.key,
     () => {
-      if (uiState.leftMenu.bottomSelection === 'terminal') {
-        dispatch(setLeftBottomMenuSelection(null));
+      if (bottomSelection === 'terminal') {
+        dispatch(setLeftBottomMenuSelection(undefined));
       } else {
         dispatch(setLeftBottomMenuSelection('terminal'));
       }
     },
-    {enableOnTags: ['TEXTAREA']},
-    [uiState.leftMenu.bottomSelection]
+    {enableOnFormTags: ['TEXTAREA']},
+    [bottomSelection]
   );
 
   useHotkeys(
-    hotkeys.PREVIEW_CLUSTER.key,
+    hotkeys.LOAD_CLUSTER.key,
     () => {
-      startPreview(kubeConfigContext, 'cluster', dispatch);
+      startClusterConnection({context: kubeConfigContext});
     },
     [kubeConfigContext]
   );
@@ -224,7 +196,7 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.EXIT_PREVIEW_MODE.key,
     () => {
-      if (isInPreviewMode) {
+      if (isInPreviewMode && !isInClusterMode) {
         stopPreview(dispatch);
       }
     },
@@ -237,53 +209,33 @@ const HotKeysHandler = () => {
   });
 
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK.key, () => {
-    selectFromHistory(
-      'left',
-      mainState.currentSelectionHistoryIndex,
-      mainState.selectionHistory,
-      mainState.resourceMap,
-      mainState.fileMap,
-      mainState.imagesList,
-      dispatch
-    );
+    dispatch(selectFromHistory('left'));
   });
 
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_FORWARD.key, () => {
-    selectFromHistory(
-      'right',
-      mainState.currentSelectionHistoryIndex,
-      mainState.selectionHistory,
-      mainState.resourceMap,
-      mainState.fileMap,
-      mainState.imagesList,
-      dispatch
-    );
+    dispatch(selectFromHistory('right'));
   });
 
   useHotkeys(
     hotkeys.OPEN_NEW_RESOURCE_WIZARD.key,
     () => {
-      if (!uiState.newResourceWizard.isOpen && mainState.fileMap[ROOT_FILE_ENTRY]) {
+      if (!isNewResourceWizardOpened && rootFilePath) {
         dispatch(openNewResourceWizard());
       }
     },
-    [mainState.fileMap[ROOT_FILE_ENTRY]]
+    [isNewResourceWizardOpened, rootFilePath]
   );
 
   useHotkeys(hotkeys.OPEN_EXPLORER_TAB.key, () => {
-    dispatch(setLeftMenuSelection('file-explorer'));
-  });
-
-  useHotkeys(hotkeys.OPEN_KUSTOMIZATION_TAB.key, () => {
-    dispatch(setLeftMenuSelection('kustomize-pane'));
-  });
-
-  useHotkeys(hotkeys.OPEN_HELM_TAB.key, () => {
-    dispatch(setLeftMenuSelection('helm-pane'));
+    if (!isInQuickClusterMode) {
+      dispatch(setLeftMenuSelection('explorer'));
+    }
   });
 
   useHotkeys(hotkeys.OPEN_VALIDATION_TAB.key, () => {
-    dispatch(setLeftMenuSelection('validation-pane'));
+    if (!isInQuickClusterMode) {
+      dispatch(setLeftMenuSelection('validation'));
+    }
   });
 
   useHotkeys(hotkeys.RESET_RESOURCE_FILTERS.key, () => {
@@ -293,31 +245,25 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.OPEN_QUICK_SEARCH.key,
     () => {
-      if (!uiState.quickSearchActionsPopup.isOpen) {
+      if (!isQuickSearchActionsPopupOpened) {
         dispatch(openQuickSearchActionsPopup());
       }
     },
-    [uiState.quickSearchActionsPopup.isOpen]
-  );
-
-  useHotkeys(
-    hotkeys.OPEN_GETTING_STARTED_PAGE.key,
-    () => {
-      if (!uiState.isStartProjectPaneVisible) {
-        dispatch(toggleStartProjectPane());
-      }
-    },
-    [uiState.isStartProjectPaneVisible]
+    [isQuickSearchActionsPopupOpened]
   );
 
   useHotkeys(hotkeys.FIND.key, () => {
-    dispatch(setLeftMenuSelection('search'));
-    dispatch(setActiveTab('search'));
+    if (!isInQuickClusterMode) {
+      dispatch(setLeftMenuSelection('search'));
+      dispatch(setActiveTab('search'));
+    }
   });
 
   useHotkeys(hotkeys.REPLACE.key, () => {
-    dispatch(setLeftMenuSelection('search'));
-    dispatch(setActiveTab('findReplace'));
+    if (!isInQuickClusterMode) {
+      dispatch(setLeftMenuSelection('search'));
+      dispatch(setActiveTab('findReplace'));
+    }
   });
 
   return (
@@ -327,7 +273,7 @@ const HotKeysHandler = () => {
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
           isVisible={isApplyModalVisible}
-          resources={applySelectedResource}
+          resourceMetaList={selectedResource ? [selectedResource] : undefined}
           title={confirmModalTitle}
           onOk={namespace => onClickApplyResource(namespace)}
           onCancel={() => setIsApplyModalVisible(false)}

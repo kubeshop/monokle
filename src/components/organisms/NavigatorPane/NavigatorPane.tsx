@@ -1,140 +1,144 @@
-import {useMemo} from 'react';
-import {ReflexContainer, ReflexElement, ReflexSplitter} from 'react-reflex';
+import {useCallback, useMemo} from 'react';
 import {useMeasure} from 'react-use';
 
-import {Badge, Button, Tooltip} from 'antd';
+import {Dropdown, Tooltip} from 'antd';
 
-import {FilterOutlined, PlusOutlined} from '@ant-design/icons';
+import {PlusOutlined} from '@ant-design/icons';
 
-import {GUTTER_SPLIT_VIEW_PANE_WIDTH, ROOT_FILE_ENTRY, TOOLTIP_DELAY} from '@constants/constants';
-import {NewResourceTooltip, QuickFilterTooltip} from '@constants/tooltips';
+import styled from 'styled-components';
 
-import {ResourceFilterType} from '@models/appstate';
+import {TOOLTIP_DELAY} from '@constants/constants';
+import {NewResourceTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openNewResourceWizard, toggleResourceFilters} from '@redux/reducers/ui';
-import {activeResourcesSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@redux/selectors';
+import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
+import {resourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
 
-import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
+import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
-import {MonoPaneTitle} from '@atoms';
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
-import {FeatureFlag} from '@utils/features';
+import {useNewResourceMenuItems} from '@hooks/menuItemsHooks';
+import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import Colors from '@styles/Colors';
+import {Icon, ResizableRowsPanel, TitleBar} from '@monokle/components';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {Colors} from '@shared/styles';
 
-import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
-import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
-
-import ClusterCompareButton from './ClusterCompareButton';
-import {CompareButton} from './CompareButton';
+import NavigatorDescription from './NavigatorDescription';
 import * as S from './NavigatorPane.styled';
-import OPAValidationStatus from './OPAValidationStatus';
-import WarningsAndErrorsDisplay from './WarningsAndErrorsDisplay';
+import ResourceNavigator from './ResourceNavigator';
 
-type Props = {
-  height: number;
-};
-
-const NavPane: React.FC<Props> = ({height}) => {
+const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
-  const activeResources = useAppSelector(activeResourcesSelector);
-  const checkedResourceIds = useAppSelector(state => state.main.checkedResourceIds);
-  const fileMap = useAppSelector(state => state.main.fileMap);
+
+  const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
+  const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const isPreviewLoading = useAppSelector(state => state.main.previewLoader.isLoading);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
-  const resourceFilters: ResourceFilterType = useAppSelector(state => state.main.resourceFilter);
 
-  const [navigatorPaneRef, {width}] = useMeasure<HTMLDivElement>();
+  const [resourceFilterRef, {height: resourceFilterHeight}] = useMeasure<HTMLDivElement>();
 
-  const appliedFilters = useMemo(
-    () =>
-      Object.entries(resourceFilters)
-        .map(([key, value]) => {
-          return {filterName: key, filterValue: value};
-        })
-        .filter(filter => filter.filterValue && Object.values(filter.filterValue).length),
-    [resourceFilters]
+  const height = usePaneHeight();
+  const newResourceMenuItems = useNewResourceMenuItems();
+
+  const resourceFilterButtonHandler = useCallback(() => {
+    dispatch(toggleResourceFilters());
+  }, [dispatch]);
+
+  const isHighlighted = useMemo(
+    () => Boolean(highlightedItems.createResource || highlightedItems.browseTemplates),
+    [highlightedItems.browseTemplates, highlightedItems.createResource]
   );
 
-  const isFolderOpen = useMemo(() => Boolean(fileMap[ROOT_FILE_ENTRY]), [fileMap]);
-
-  const onClickNewResource = () => {
-    dispatch(openNewResourceWizard());
-  };
-
-  const resourceFilterButtonHandler = () => {
-    dispatch(toggleResourceFilters());
-  };
-
   return (
-    <S.NavigatorPaneContainer ref={navigatorPaneRef}>
-      {checkedResourceIds.length && !isPreviewLoading ? (
+    <S.NavigatorPaneContainer>
+      {checkedResourceIdentifiers.length && !isPreviewLoading ? (
         <S.SelectionBar>
           <CheckedResourcesActionsMenu />
         </S.SelectionBar>
       ) : (
-        <S.TitleBar>
-          <MonoPaneTitle>
-            <div style={{display: 'flex', alignItems: 'center'}}>
-              Navigator <WarningsAndErrorsDisplay /> <OPAValidationStatus />
-            </div>
-          </MonoPaneTitle>
-          <S.TitleBarRightButtons>
-            <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
-              <S.PlusButton
-                id="create-resource-button"
-                $disabled={!isFolderOpen || isInPreviewMode}
-                $highlighted={highlightedItems.createResource}
-                className={highlightedItems.createResource ? 'animated-highlight' : ''}
-                disabled={!isFolderOpen || isInPreviewMode}
-                icon={<PlusOutlined />}
-                size="small"
-                type="link"
-                onClick={onClickNewResource}
-              />
-            </Tooltip>
-
-            <Badge count={appliedFilters.length} size="small" offset={[-2, 2]} color={Colors.greenOkay}>
-              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={QuickFilterTooltip}>
-                <Button
-                  disabled={(!isFolderOpen && !isInClusterMode && !isInPreviewMode) || activeResources.length === 0}
-                  type="link"
-                  size="small"
-                  icon={<FilterOutlined style={appliedFilters.length ? {color: Colors.greenOkay} : {}} />}
-                  onClick={resourceFilterButtonHandler}
-                />
-              </Tooltip>
-            </Badge>
-
-            <FeatureFlag name="CompareEverything" fallback={<ClusterCompareButton />}>
-              <CompareButton width={width} />
-            </FeatureFlag>
-          </S.TitleBarRightButtons>
-        </S.TitleBar>
+        <TitleBarWrapper $navigator>
+          <TitleBar
+            type="secondary"
+            title="Kubernetes Resources"
+            description={<NavigatorDescription />}
+            actions={
+              <S.TitleBarRightButtons>
+                <CollapseAction />
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
+                  <Dropdown
+                    trigger={['click']}
+                    menu={{items: newResourceMenuItems}}
+                    overlayClassName="dropdown-secondary"
+                    disabled={!isFolderOpen || isInPreviewMode}
+                  >
+                    <S.PlusButton
+                      id="create-resource-button"
+                      $disabled={!isFolderOpen || isInPreviewMode}
+                      $highlighted={isHighlighted}
+                      className={isHighlighted ? 'animated-highlight' : ''}
+                      disabled={!isFolderOpen || isInPreviewMode}
+                      icon={<PlusOutlined />}
+                      size="small"
+                      type="link"
+                    />
+                  </Dropdown>
+                </Tooltip>
+              </S.TitleBarRightButtons>
+            }
+          />
+        </TitleBarWrapper>
       )}
 
-      <ReflexContainer orientation="horizontal" style={{height: height - 40}}>
-        {isResourceFiltersOpen && (
-          <ReflexElement style={{background: Colors.black9}} flex={0.4} minSize={100}>
-            <ResourceFilter />
-          </ReflexElement>
-        )}
-
-        {isResourceFiltersOpen && <ReflexSplitter />}
-
-        <ReflexElement minSize={GUTTER_SPLIT_VIEW_PANE_WIDTH}>
+      <ResizableRowsPanel
+        layout={{top: isResourceFiltersOpen ? 0.34 : resourceFilterHeight / height + (height < 800 ? 0.014 : 0.004)}}
+        splitterStyle={{display: isResourceFiltersOpen ? 'block' : 'none'}}
+        top={
+          <div ref={resourceFilterRef}>
+            <ResourceFilter active={isResourceFiltersOpen} onToggle={resourceFilterButtonHandler} />
+          </div>
+        }
+        bottom={
           <S.List id="navigator-sections-container">
-            <SectionRenderer sectionBlueprint={K8sResourceSectionBlueprint} level={0} isLastSection={false} />
-            <SectionRenderer sectionBlueprint={UnknownResourceSectionBlueprint} level={0} isLastSection={false} />
+            <ResourceNavigator />
           </S.List>
-        </ReflexElement>
-      </ReflexContainer>
+        }
+        height={height - 40}
+        bottomPaneMaxSize={isResourceFiltersOpen ? height - (height < 1000 ? 200 : 400) : height - 100}
+        bottomPaneMinSize={500}
+      />
     </S.NavigatorPaneContainer>
   );
 };
 
 export default NavPane;
+
+function CollapseAction() {
+  const dispatch = useAppDispatch();
+  const allKinds = useAppSelector(resourceKindsSelector);
+  const collapsedKinds = useAppSelector(s => s.ui.navigator.collapsedResourceKinds);
+
+  const onClick = useCallback(() => {
+    if (collapsedKinds.length === allKinds.length) {
+      dispatch(expandResourceKinds(allKinds));
+      return;
+    }
+    dispatch(collapseResourceKinds(allKinds));
+  }, [dispatch, collapsedKinds, allKinds]);
+
+  return (
+    <CollapseIconWrapper onClick={onClick}>
+      <Icon name="collapse" />
+    </CollapseIconWrapper>
+  );
+}
+
+const CollapseIconWrapper = styled.div`
+  color: ${Colors.blue6};
+  cursor: pointer;
+  padding-right: 8px;
+`;

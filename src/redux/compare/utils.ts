@@ -1,11 +1,10 @@
-import {isDefined} from '@utils/filter';
-
-import {PartialResourceSet, ResourceSet} from './state';
+import {PartialResourceSet, ResourceSet} from '@shared/models/compare';
+import {isDefined} from '@shared/utils/filter';
 
 export function isCompleteResourceSet(options: PartialResourceSet | undefined): options is ResourceSet {
   switch (options?.type) {
     case 'local':
-      return true;
+      return isDefined(options.folder);
     case 'cluster':
       return isDefined(options.context);
     case 'kustomize':

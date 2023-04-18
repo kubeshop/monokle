@@ -1,13 +1,17 @@
-import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
+import {ipcRenderer} from 'electron';
 
-import {ShellsMapType, TerminalSettingsType, TerminalState, TerminalType} from '@models/terminal';
+import {Draft, PayloadAction, createSlice, isAnyOf} from '@reduxjs/toolkit';
 
+import {size} from 'lodash';
+
+import {setOpenProject} from '@redux/appConfig';
 import initialState from '@redux/initialState';
 import {AppListenerFn} from '@redux/listeners/base';
 
-import electronStore from '@utils/electronStore';
+import {ShellsMapType, TerminalSettingsType, TerminalState, TerminalType} from '@shared/models/terminal';
+import electronStore from '@shared/utils/electronStore';
 
-import {setLeftBottomMenuSelection} from './ui';
+import {setLeftBottomMenuSelection, toggleStartProjectPane} from './ui';
 
 export const terminalSlice = createSlice({
   name: 'terminal',
@@ -67,15 +71,29 @@ export default terminalSlice.reducer;
  * Listeners
  * * * * * * * * * * * * * */
 
-export const removedTerminalListener: AppListenerFn = listen => {
+export const killTerminalProcessesListener: AppListenerFn = listen => {
   listen({
-    type: removeTerminal.type,
+    matcher: isAnyOf(toggleStartProjectPane, setOpenProject.pending),
     effect: async (_action, {dispatch, getState}) => {
-      const terminalsMap = getState().terminal.terminalsMap;
+      const terminalsIds = Object.keys(getState().terminal.terminalsMap);
 
-      if (!Object.keys(terminalsMap).length) {
-        dispatch(setLeftBottomMenuSelection(null));
+      if (!terminalsIds.length) return;
+
+      ipcRenderer.send('shell.ptyProcessKillAll');
+      dispatch(setSelectedTerminal(undefined));
+    },
+  });
+};
+
+export const removeTerminalListener: AppListenerFn = listen => {
+  listen({
+    actionCreator: removeTerminal,
+    effect: async (action, {dispatch, getState}) => {
+      const state = getState();
+
+      if (!size(state.terminal.terminalsMap)) {
         dispatch(setSelectedTerminal(undefined));
+        dispatch(setLeftBottomMenuSelection(undefined));
       }
     },
   });

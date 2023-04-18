@@ -6,26 +6,29 @@ import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
-import {GitChangedFile} from '@models/git';
-
 import {setGitLoading} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {TitleBar} from '@molecules';
+import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
+
+import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {TitleBar} from '@monokle/components';
+import {GitChangedFile} from '@shared/models/git';
 
 import BottomActions from './BottomActions';
 import FileList from './FileList';
 import * as S from './GitPane.styled';
 import RemoteInput from './RemoteInput';
 
-const GitPane: React.FC<{height: number}> = ({height}) => {
+const GitPane: React.FC = () => {
   const dispatch = useAppDispatch();
   const changedFiles = useAppSelector(state => state.git.changedFiles);
   const gitLoading = useAppSelector(state => state.git.loading);
   const gitRepo = useAppSelector(state => state.git.repo);
-  const hasRemoteRepo = useAppSelector(state => state.git.repo?.hasRemoteRepo);
+  const remoteRepo = useAppSelector(state => state.git.repo?.remoteRepo);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [selectedStagedFiles, setSelectedStagedFiles] = useState<GitChangedFile[]>([]);
@@ -36,20 +39,22 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
   const [remoteInputRef, {height: remoteInputHeight}] = useMeasure<HTMLDivElement>();
   const [bottomActionsRef, {height: bottomActionsHeight}] = useMeasure<HTMLDivElement>();
 
+  const height = usePaneHeight();
+
   const fileContainerHeight = useMemo(() => {
-    let h: number = height - DEFAULT_PANE_TITLE_HEIGHT;
+    let h: number = height - DEFAULT_PANE_TITLE_HEIGHT - 12;
 
     // 12 is the margin top of the git pane content
     if (gitRepo) {
       h -= bottomActionsHeight + 12;
     }
 
-    if (!hasRemoteRepo) {
+    if (!remoteRepo?.exists) {
       h -= remoteInputHeight;
     }
 
     return h;
-  }, [bottomActionsHeight, gitRepo, hasRemoteRepo, height, remoteInputHeight]);
+  }, [bottomActionsHeight, gitRepo, remoteRepo, height, remoteInputHeight]);
 
   const handleSelect = (event: CheckboxChangeEvent, item: GitChangedFile) => {
     if (event.target.checked) {
@@ -112,13 +117,22 @@ const GitPane: React.FC<{height: number}> = ({height}) => {
 
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
-      <TitleBar title="Git" closable />
+      <TitleBarWrapper $closable>
+        <TitleBar title="Git" />
+      </TitleBarWrapper>
 
       {gitLoading ? (
         <S.Skeleton active />
+      ) : remoteRepo?.authRequired ? (
+        <S.AuthRequiredContainer>
+          <S.CloseOutlined />
+          <div>
+            <b>{remoteRepo.errorMessage}</b>. Please sign in using the terminal.
+          </div>
+        </S.AuthRequiredContainer>
       ) : changedFiles.length ? (
         <>
-          {!hasRemoteRepo ? (
+          {!remoteRepo?.exists ? (
             <S.RemoteInputContainer ref={remoteInputRef}>
               <RemoteInput />
             </S.RemoteInputContainer>

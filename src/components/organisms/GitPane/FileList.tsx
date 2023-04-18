@@ -1,28 +1,28 @@
 import {useCallback, useEffect, useState} from 'react';
 
-import {Checkbox, Dropdown, List, Menu, Modal, Space, Tooltip} from 'antd';
+import {Checkbox, Dropdown, List, Modal, Space, Tooltip} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
-import {isEqual} from 'lodash';
-
 import {TOOLTIP_DELAY} from '@constants/constants';
-
-import {AlertEnum} from '@models/alert';
-import {GitChangedFile} from '@models/git';
 
 import {setGitLoading, setSelectedItem} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {clearSelectedPath, selectFile} from '@redux/reducers/main';
+import {clearSelection, selectFile} from '@redux/reducers/main';
+import {selectedFilePathSelector} from '@redux/selectors';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 
 import {Dots} from '@components/atoms';
 
-import {deleteFile} from '@utils/fileSystem';
 import {createFileWithContent} from '@utils/files';
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
 
-import Colors from '@styles/Colors';
+import {AlertEnum} from '@shared/models/alert';
+import {GitChangedFile} from '@shared/models/git';
+import {Colors} from '@shared/styles/colors';
+import {deleteFile} from '@shared/utils/fileSystem';
+import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './FileList.styled';
 
@@ -39,8 +39,8 @@ const FileList: React.FC<IProps> = props => {
   const changedFiles = useAppSelector(state => state.git.changedFiles);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
+  const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const selectedGitFile = useAppSelector(state => state.git.selectedItem);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const [hovered, setHovered] = useState<GitChangedFile | null>(null);
@@ -71,11 +71,21 @@ const FileList: React.FC<IProps> = props => {
             promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
               localPath: selectedProjectRootFolder,
               filePaths: [item.fullGitPath],
+            }).then(result => {
+              if (result.error) {
+                showGitErrorModal('Stage changes failed!', `git add ${[item.fullGitPath].join(' ')}`, dispatch);
+                setGitLoading(false);
+              }
             });
           } else {
             promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
               localPath: selectedProjectRootFolder,
               filePaths: [item.fullGitPath],
+            }).then(result => {
+              if (result.error) {
+                showGitErrorModal('Unstage changes failed!', `git reset ${[item.fullGitPath].join(' ')}`, dispatch);
+                setGitLoading(false);
+              }
             });
           }
         },
@@ -130,8 +140,8 @@ const FileList: React.FC<IProps> = props => {
       fileMap[item.path].filePath.startsWith(fileOrFolderContainedInFilter || '')
     ) {
       dispatch(selectFile({filePath: item.path}));
-    } else if (selectedPath) {
-      dispatch(clearSelectedPath());
+    } else if (selectedFilePath) {
+      dispatch(clearSelection());
     }
   };
 
@@ -184,7 +194,11 @@ const FileList: React.FC<IProps> = props => {
         >
           <Checkbox
             onChange={e => handleSelect(e, item)}
-            checked={Boolean(selectedFiles.find(searchItem => searchItem.name === item.name))}
+            checked={Boolean(
+              selectedFiles.find(
+                searchItem => searchItem.name === item.name && searchItem.displayPath === item.displayPath
+              )
+            )}
           />
 
           <S.FileItem>
@@ -207,7 +221,7 @@ const FileList: React.FC<IProps> = props => {
               }}
             >
               {hovered?.name === item.name && hovered?.path === item.path && (
-                <Dropdown overlay={<Menu items={renderMenuItems(item)} />} trigger={['click']}>
+                <Dropdown menu={{items: renderMenuItems(item)}} trigger={['click']}>
                   <Space>
                     <Dots color={isSelected(item) ? Colors.blackPure : Colors.blue6} />
                   </Space>

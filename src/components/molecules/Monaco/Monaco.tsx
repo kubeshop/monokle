@@ -1,126 +1,171 @@
 /* eslint-disable import/order */
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
-import {useMeasure} from 'react-use';
+import {useMeasure, useUnmount} from 'react-use';
 
 import fs from 'fs';
 import log from 'loglevel';
+// eslint-disable-next-line import/no-duplicates
 import 'monaco-editor';
-import {Uri, languages} from 'monaco-editor/esm/vs/editor/editor.api';
+// eslint-disable-next-line import/no-duplicates
+import {Uri} from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-yaml';
 import path from 'path';
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worker';
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import YamlWorker from 'worker-loader!monaco-yaml/lib/esm/yaml.worker';
 import {Document, ParsedNode, isMap} from 'yaml';
 
-import {ROOT_FILE_ENTRY} from '@constants/constants';
-
-import {ResourceFilterType} from '@models/appstate';
-import {ResourceRef} from '@models/k8sresource';
-import {NewResourceWizardInput} from '@models/ui';
-
+import {isInClusterModeSelector, settingsSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   editorHasReloadedSelectedPath,
   extendResourceFilter,
   selectFile,
   selectImage,
-  selectK8sResource,
-  setAutosavingStatus,
-  setLastChangedLine,
+  selectResource,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {isInPreviewModeSelector, settingsSelector} from '@redux/selectors';
-import {getResourcesForPath} from '@redux/services/fileEntry';
-import {isKustomizationPatch} from '@redux/services/kustomize';
+import {isInPreviewModeSelectorNew, selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
+import {
+  activeResourceStorageSelector,
+  useActiveResourceContentMapRef,
+  useActiveResourceMetaMap,
+  useResourceContentMapRef,
+  useResourceMetaMapRef,
+} from '@redux/selectors/resourceMapSelectors';
+import {useResource, useSelectedResource} from '@redux/selectors/resourceSelectors';
+import {getLocalResourcesForPath} from '@redux/services/fileEntry';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
 import {getFileStats} from '@utils/files';
+import {useRefSelector, useSelectorWithRef, useStateWithRef} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
+import {ResourceRef} from '@monokle/validation';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {ResourceFilterType} from '@shared/models/appState';
+import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {ResourceSelection} from '@shared/models/selection';
+import {MonacoRange, NewResourceWizardInput} from '@shared/models/ui';
+
 import * as S from './Monaco.styled';
+import {EDITOR_DISPOSABLES} from './disposables';
 import useCodeIntel from './useCodeIntel';
 import useDebouncedCodeSave from './useDebouncedCodeSave';
 import useEditorKeybindings from './useEditorKeybindings';
 import useMonacoUiState from './useMonacoUiState';
 
-// @ts-ignore
-window.MonacoEnvironment = {
-  // @ts-ignore
-  getWorker(workerId, label) {
-    if (label === 'yaml') {
-      return new YamlWorker();
-    }
-    return new EditorWorker();
-  },
+type IProps = {
+  diffSelectedResource: () => void;
+  applySelection: () => void;
+  height?: number;
+  providedResourceSelection?: ResourceSelection;
+  providedFilePath?: string;
+  providedRange?: MonacoRange;
 };
 
-const {yaml} = languages || {};
+window.MonacoEnvironment = {
+  getWorker(moduleId, label) {
+    switch (label) {
+      case 'editorWorkerService':
+        return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url));
+      case 'json':
+        return new Worker(new URL('monaco-editor/esm/vs/language/json/json.worker.js', import.meta.url));
+      case 'yaml':
+        return new Worker(new URL('monaco-yaml/yaml.worker.js', import.meta.url));
+      default:
+        throw new Error(`Unknown label ${label}`);
+    }
+  },
+};
 
 function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
   return d.errors.length === 0 && isMap(d.contents);
 }
 
-const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => void}) => {
-  const {diffSelectedResource, applySelection} = props;
+const Monaco: React.FC<IProps> = props => {
+  const {diffSelectedResource, applySelection, height, providedResourceSelection, providedFilePath, providedRange} =
+    props;
   const dispatch = useAppDispatch();
-  const fileMap = useAppSelector(state => state.main.fileMap);
+
+  const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+
+  const activeResourceMetaMap = useActiveResourceMetaMap();
+  const activeResourceMetaMapRef = useRef(activeResourceMetaMap);
+  activeResourceMetaMapRef.current = activeResourceMetaMap;
+  const activeResourceContentMapRef = useActiveResourceContentMapRef();
+  const transientResourceContentMapRef = useResourceContentMapRef('transient');
+
+  const stateSelectedResource = useSelectedResource();
+  const providedResource = useResource(providedResourceSelection?.resourceIdentifier);
+
+  const selectedResource = providedResourceSelection
+    ? providedResource
+    : providedFilePath
+    ? undefined
+    : stateSelectedResource;
+  const selectedResourceRef = useRef(selectedResource);
+  selectedResourceRef.current = selectedResource;
+
+  const activeResourceStorageRef = useRefSelector(activeResourceStorageSelector);
+
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const imagesList = useAppSelector(state => state.main.imagesList);
-  const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const imageMap = useAppSelector(state => state.main.imageMap);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
-  const previewResourceId = useAppSelector(state => state.main.previewResourceId);
-  const previewType = useAppSelector(state => state.main.previewType);
-  const previewValuesFileId = useAppSelector(state => state.main.previewValuesFileId);
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const matchOptions = useAppSelector(state => state.main.search?.currentMatch);
+
+  const localResourceMetaMapRef = useResourceMetaMapRef('local');
+  const localResourceContentMapRef = useResourceContentMapRef('local');
+  // TODO: 2.0+ as a quick fix for Monaco, we're including the selectedHelmValuesFile in this selector
+  const [selectedFilePath, selectedFilePathRef] = useSelectorWithRef(state => {
+    if (providedFilePath) {
+      return providedFilePath;
+    }
+
+    const _selectedFilePath = selectedFilePathSelector(state);
+    if (_selectedFilePath) {
+      return _selectedFilePath;
+    }
+    const _selectedHelmValues = selectedHelmValuesSelector(state);
+    return _selectedHelmValues?.filePath;
+  });
+
   const lastChangedLine = useAppSelector(state => state.main.lastChangedLine);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const selectedValuesFileId = useAppSelector(state => state.main.selectedValuesFileId);
+  const selection = useAppSelector(state => state.main.selection);
   const settings = useAppSelector(settingsSelector);
-  const shouldEditorReloadSelectedPath = useAppSelector(state => state.main.shouldEditorReloadSelectedPath);
+  const shouldEditorReloadSelection = useAppSelector(state => state.main.selectionOptions.shouldEditorReload);
   const userDataDir = useAppSelector(state => state.config.userDataDir);
 
+  const selectedResourceIdRef = useRef(selectedResource?.id);
+  selectedResourceIdRef.current = selectedResource?.id;
+
   const resourcesFromSelectedPath = useMemo(() => {
-    if (!selectedPath) {
+    if (!selectedFilePath) {
       return [];
     }
-    return getResourcesForPath(selectedPath, resourceMap);
-  }, [selectedPath, resourceMap]);
+    return getLocalResourcesForPath(selectedFilePath, {
+      resourceMetaMap: localResourceMetaMapRef.current,
+      resourceContentMap: localResourceContentMapRef.current,
+    });
+  }, [selectedFilePath, localResourceMetaMapRef, localResourceContentMapRef]);
 
   const [containerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
-  const [code, setCode] = useState('');
-  const [orgCode, setOrgCode] = useState<string>('');
-  const [isDirty, setDirty] = useState(false);
-  const [isValid, setValid] = useState(true);
-  const [firstCodeLoadedOnEditor, setFirstCodeLoadedOnEditor] = useState(false);
-  const [isEditorMounted, setEditorMounted] = useState(false);
-
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [code, setCode, codeRef] = useStateWithRef('');
+  const isDirtyRef = useRef(false);
+  const isValidRef = useRef(true);
+  const firstCodeLoadedOnEditorRef = useRef(false);
   const hiddenInputRef = useRef<HTMLInputElement>(null);
-  const [editor, setEditor] = useState(editorRef.current);
+  const originalCodeRef = useRef<string>('');
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
-  const selectedResource = useMemo(() => {
-    return selectedResourceId ? resourceMap[selectedResourceId] : undefined;
-  }, [selectedResourceId, resourceMap]);
-
-  const selectResource = (resourceId: string) => {
-    if (resourceMap[resourceId]) {
-      dispatch(selectK8sResource({resourceId}));
-    }
+  const triggerSelectResource = (resourceIdentifier: ResourceIdentifier) => {
+    dispatch(selectResource({resourceIdentifier}));
   };
 
   const selectFilePath = (filePath: string) => {
@@ -134,10 +179,10 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
   };
 
   const selectImageHandler = (imageId: string) => {
-    const image = imagesList.find(im => im.id === imageId);
+    const image = imageMap[imageId];
 
     if (image) {
-      dispatch(selectImage({image}));
+      dispatch(selectImage({imageId: image.id}));
     }
   };
 
@@ -157,194 +202,215 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     }
   };
 
+  useUnmount(() => {
+    EDITOR_DISPOSABLES.forEach(disposable => disposable.dispose());
+  });
+
   useCodeIntel({
-    editor,
+    editorRef,
     selectedResource:
       selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
     code,
-    resourceMap,
+    resourceMetaMap: activeResourceMetaMap,
     fileMap,
-    imagesList,
-    isEditorMounted,
-    selectResource,
+    imageMap,
+    selectResource: triggerSelectResource,
     selectFilePath,
     createResource: isInPreviewMode ? undefined : createResource,
     filterResources,
     selectImageHandler,
-    selectedPath,
+    selectedPath: selectedFilePath,
     helmValuesMap,
     helmChartMap,
     helmTemplatesMap,
-    matchOptions,
-    isDirty,
+    isDirty: isDirtyRef.current,
+    activeResourceStorage: activeResourceStorageRef.current,
+    selection,
   });
 
   const {registerStaticActions} = useEditorKeybindings(
-    editor,
+    editorRef,
     hiddenInputRef,
-    fileMap,
+    fileMapRef,
     applySelection,
     diffSelectedResource
   );
 
   useResourceYamlSchema(
-    yaml,
     String(userDataDir),
     String(k8sVersion),
-    selectedResource || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0] : undefined),
-    selectedPath,
-    fileMap
+    selectedResource?.id || (resourcesFromSelectedPath.length === 1 ? resourcesFromSelectedPath[0]?.id : undefined),
+    selectedResourceRef,
+    selectedFilePath,
+    fileMapRef
   );
 
-  useDebouncedCodeSave(
-    editor,
-    orgCode,
-    code,
-    isDirty,
-    isValid,
-    resourceMap,
-    selectedResourceId,
-    selectedPath,
-    setOrgCode
+  const debouncedSaveContent = useDebouncedCodeSave(originalCodeRef, selectedResource, selectedFilePathRef);
+
+  useMonacoUiState(editorRef.current, selectedResourceIdRef.current, selectedFilePath);
+
+  const editorDidMount = useCallback(
+    (e: monaco.editor.IStandaloneCodeEditor) => {
+      registerStaticActions(e);
+
+      editorRef.current = e;
+
+      e.updateOptions({tabSize: 2, scrollBeyondLastLine: false});
+      e.revealLineNearTop(1);
+      e.setSelection(new monaco.Selection(0, 0, 0, 0));
+    },
+    [registerStaticActions]
   );
 
-  useMonacoUiState(editor, selectedResourceId, selectedPath);
+  const onChange = useCallback(
+    (newValue: any) => {
+      if (!newValue || typeof newValue !== 'string') {
+        return;
+      }
+      // dispatch(setLastChangedLine(0)); // TODO: why do we set this to 0? shouldn't we set it to the current line?
+      isDirtyRef.current = originalCodeRef.current !== newValue;
+      setCode(newValue);
 
-  const editorDidMount = (e: monaco.editor.IStandaloneCodeEditor) => {
-    registerStaticActions(e);
+      if (selectedResourceIdRef.current) {
+        // this will slow things down if document gets large - need to find a better solution...
+        const documents = parseAllYamlDocuments(newValue);
+        // only accept single document changes for now
+        isValidRef.current = documents.length === 1 && isValidResourceDocument(documents[0]);
+      } else {
+        isValidRef.current = true;
+      }
 
-    editorRef.current = e as monaco.editor.IStandaloneCodeEditor;
-    setEditor(e);
+      // try to save
+      if (!isDirtyRef.current || !isValidRef.current) {
+        return;
+      }
 
-    e.updateOptions({tabSize: 2, scrollBeyondLastLine: false});
-    e.revealLineNearTop(1);
-    e.setSelection(new monaco.Selection(0, 0, 0, 0));
-    setEditorMounted(true);
-  };
-
-  const onChange = (newValue: any) => {
-    dispatch(setLastChangedLine(0));
-    setDirty(orgCode !== newValue);
-    setCode(newValue);
-
-    if (!autosavingStatus) {
-      dispatch(setAutosavingStatus(true));
-    }
-
-    if (selectedResourceId) {
-      // this will slow things down if document gets large - need to find a better solution...
-      const documents = parseAllYamlDocuments(newValue);
-      // only accept single document changes for now
-      setValid(documents.length === 1 && isValidResourceDocument(documents[0]));
-    } else {
-      setValid(true);
-    }
-  };
+      if (originalCodeRef.current !== undefined && originalCodeRef.current !== newValue) {
+        debouncedSaveContent(newValue);
+      }
+    },
+    [debouncedSaveContent, setCode]
+  );
 
   useEffect(() => {
-    if (!firstCodeLoadedOnEditor && code) {
-      setFirstCodeLoadedOnEditor(true);
+    if (!firstCodeLoadedOnEditorRef.current) {
+      firstCodeLoadedOnEditorRef.current = true;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, selectedResourceId, resourceMap]);
+  }, [code]);
+
+  useEffect(() => {
+    if (selectedResource?.text && codeRef.current !== selectedResource.text) {
+      setCode(selectedResource.text);
+      originalCodeRef.current = selectedResource.text;
+    }
+  }, [selectedResource?.text, setCode, codeRef]);
 
   useEffect(() => {
     let newCode = '';
-    if (selectedResourceId) {
-      const resource = resourceMap[selectedResourceId];
-      if (resource) {
-        newCode = resource.text;
+    const rootFilePath = fileMapRef.current?.[ROOT_FILE_ENTRY]?.filePath;
+    if (selectedResource?.id) {
+      const resourceContent =
+        selectedResource.storage === 'transient'
+          ? transientResourceContentMapRef.current[selectedResource.id]
+          : selectedResource.kind === 'Kustomization'
+          ? localResourceContentMapRef.current?.[selectedResource.id]
+          : activeResourceContentMapRef.current?.[selectedResource.id];
+      if (resourceContent) {
+        if (codeRef.current === resourceContent.text) {
+          return;
+        }
+        newCode = resourceContent.text;
         monaco.editor?.getModels()?.forEach(model => {
-          if (!model.isAttachedToEditor()) {
-            model.dispose();
-          }
+          model.dispose();
         });
-        editor?.setModel(monaco.editor.createModel(newCode, 'yaml'));
+        editorRef.current?.setModel(monaco.editor.createModel(newCode, 'yaml'));
       }
-    } else if (selectedPath && selectedPath !== fileMap[ROOT_FILE_ENTRY].filePath) {
-      const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
+    } else if (rootFilePath && selectedFilePath && selectedFilePath !== rootFilePath) {
+      const filePath = path.join(rootFilePath, selectedFilePath);
       const fileStats = getFileStats(filePath);
       if (fileStats && fileStats.isFile()) {
         newCode = fs.readFileSync(filePath, 'utf8');
         monaco.editor?.getModels()?.forEach(model => {
-          if (!model.isAttachedToEditor()) {
-            model.dispose();
-          }
+          model.dispose();
         });
 
         // monaco has no language registered for tpl extension so use yaml instead (as these could be Helm templates)
         if (filePath.toLowerCase().endsWith('.tpl')) {
-          editor?.setModel(monaco.editor.createModel(newCode, 'yaml'));
+          editorRef.current?.setModel(monaco.editor.createModel(newCode, 'yaml'));
         } else {
-          editor?.setModel(monaco.editor.createModel(newCode, undefined, Uri.file(filePath)));
+          editorRef.current?.setModel(monaco.editor.createModel(newCode, undefined, Uri.file(filePath)));
         }
       }
     }
 
     setCode(newCode);
-    setOrgCode(newCode);
-    setDirty(false);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPath, selectedResourceId]);
+    originalCodeRef.current = newCode;
+    isDirtyRef.current = false;
+  }, [
+    selectedFilePath,
+    selectedResource,
+    codeRef,
+    activeResourceContentMapRef,
+    transientResourceContentMapRef,
+    fileMapRef,
+    setCode,
+    localResourceContentMapRef,
+  ]);
 
   useEffect(() => {
-    if (!selectedPath || !shouldEditorReloadSelectedPath) {
+    if (!selectedFilePathRef.current || !shouldEditorReloadSelection) {
       return;
     }
     log.info('[Monaco]: selected file was updated outside Monokle - reading file...');
-    const filePath = path.join(fileMap[ROOT_FILE_ENTRY].filePath, selectedPath);
+    const notFoundWarning = '[Monaco]: selected file was updated outside Monokle - unable to read file';
+    const rootFilePath = fileMapRef.current?.[ROOT_FILE_ENTRY].filePath;
+    if (!rootFilePath) {
+      log.warn(notFoundWarning);
+      return;
+    }
+    const filePath = path.join(rootFilePath, selectedFilePathRef.current);
     const fileStats = getFileStats(filePath);
     if (fileStats && fileStats.isFile()) {
       const newCode = fs.readFileSync(filePath, 'utf8');
       setCode(newCode);
-      setOrgCode(newCode);
-      setDirty(false);
+      originalCodeRef.current = newCode;
+      isDirtyRef.current = false;
       dispatch(editorHasReloadedSelectedPath(false));
     } else {
-      log.warn('[Monaco]: selected file was updated outside Monokle - unable to read file');
+      log.warn(notFoundWarning);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPath, shouldEditorReloadSelectedPath]);
+  }, [shouldEditorReloadSelection, selectedFilePathRef, fileMapRef, setCode, dispatch]);
 
   useEffect(() => {
-    if (selectedResource && selectedResource.text !== code) {
-      setCode(selectedResource.text);
+    if (editorRef.current && lastChangedLine) {
+      editorRef.current.revealLineInCenter(lastChangedLine);
+    } else if (editorRef.current) {
+      editorRef.current.revealLineNearTop(1);
+      editorRef.current.setSelection(new monaco.Selection(0, 0, 0, 0));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedResource]);
-
-  useEffect(() => {
-    if (editor && lastChangedLine) {
-      editor.revealLineInCenter(lastChangedLine);
-    } else if (editor) {
-      editor.revealLineNearTop(1);
-      editor.setSelection(new monaco.Selection(0, 0, 0, 0));
-    }
-  }, [editor, selectedResourceId, firstCodeLoadedOnEditor, lastChangedLine]);
+  }, [lastChangedLine]);
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all - or allowEditInClusterMode is false
   const isReadOnlyMode = useMemo(() => {
-    if (isInPreviewMode && previewType === 'cluster' && !settings.allowEditInClusterMode) {
+    if (!selection && !selectedFilePath && !selectedResource) {
       return true;
     }
-    if (isInPreviewMode && selectedResourceId !== previewResourceId && previewType !== 'cluster') {
-      return previewType !== 'kustomization' || !isKustomizationPatch(selectedResource);
-    }
-    if (isInPreviewMode && selectedValuesFileId !== previewValuesFileId) {
+
+    if (
+      (isInClusterMode && !settings.allowEditInClusterMode) ||
+      (isInPreviewMode && selection?.type === 'resource' && selection.resourceIdentifier.storage === 'preview')
+    ) {
       return true;
     }
-    return !selectedPath && !selectedResourceId;
+
+    return !selectedFilePath && !selectedResource;
   }, [
-    isInPreviewMode,
-    selectedResourceId,
-    selectedResource,
-    previewResourceId,
-    selectedValuesFileId,
-    previewValuesFileId,
-    selectedPath,
-    previewType,
+    isInClusterMode,
     settings.allowEditInClusterMode,
+    isInPreviewMode,
+    selection,
+    selectedFilePath,
+    selectedResource,
   ]);
 
   const options = useMemo(() => {
@@ -361,23 +427,31 @@ const Monaco = (props: {diffSelectedResource: () => void; applySelection: () => 
     return editorOptions;
   }, [isReadOnlyMode]);
 
+  useEffect(() => {
+    if (!providedRange || !editorRef.current) return;
+
+    setImmediate(() => {
+      editorRef.current?.setSelection(providedRange);
+      editorRef.current?.revealLineInCenter(providedRange.startLineNumber);
+    });
+  }, [dispatch, providedRange]);
+
   return (
-    <S.MonacoContainer ref={containerRef}>
+    <S.MonacoContainer ref={containerRef} $height={height}>
       <S.HiddenInputContainer>
         <S.HiddenInput ref={hiddenInputRef} type="text" />
       </S.HiddenInputContainer>
-      {firstCodeLoadedOnEditor && (
-        <MonacoEditor
-          width={containerWidth}
-          height={containerHeight}
-          language="yaml"
-          theme={KUBESHOP_MONACO_THEME}
-          value={code}
-          options={options}
-          onChange={onChange}
-          editorDidMount={editorDidMount}
-        />
-      )}
+
+      <MonacoEditor
+        width={containerWidth}
+        height={containerHeight}
+        language="yaml"
+        theme={KUBESHOP_MONACO_THEME}
+        value={code}
+        options={options}
+        onChange={onChange}
+        editorDidMount={editorDidMount}
+      />
     </S.MonacoContainer>
   );
 };

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const List = styled.ol`
   padding: 0;
@@ -24,7 +24,7 @@ export const DragHandle = styled.div`
 
 export const ItemOrder = styled.span`
   padding: 0 8px;
-  marginright: 8px;
+  margin-right: 8px;
   cursor: move;
   border-right: 1px solid ${Colors.grey4};
 `;

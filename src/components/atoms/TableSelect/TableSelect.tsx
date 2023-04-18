@@ -8,7 +8,8 @@ import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 
-import Colors from '@styles/Colors';
+import {AnimationDurations} from '@shared/styles';
+import {Colors} from '@shared/styles/colors';
 
 type Props = {
   value: string;
@@ -21,17 +22,20 @@ type Props = {
 
 function TableSelect({value, icon, table, tablePlacement, tableVisible, onTableToggle}: Props) {
   const gitLoading = useAppSelector(state => state.git.loading);
+  const remoteRepo = useAppSelector(state => state.git.repo?.remoteRepo);
 
   return (
     <Dropdown
       open={tableVisible}
       onOpenChange={onTableToggle}
-      overlay={table}
+      menu={{items: [{key: 'table', label: table}]}}
       placement={tablePlacement}
       arrow
       trigger={['click']}
+      disabled={remoteRepo?.authRequired}
+      overlayClassName="dropdown-custom-styling"
     >
-      <Button loading={gitLoading}>
+      <Button loading={gitLoading} type="text">
         <Space>
           {icon}
           <span>{value}</span>
@@ -48,10 +52,23 @@ const Button = styled(RawButton)`
   border: none;
   border-radius: 4px;
   height: 28px;
-  background: ${Colors.grey3b};
+  background-color: transparent;
+
   :hover,
   :focus {
-    background: ${Colors.grey3b};
-    color: ${Colors.lightSeaGreen};
+    background-color: transparent;
+
+    span {
+      color: ${Colors.geekblue9};
+    }
+  }
+
+  svg {
+    transition: all ${AnimationDurations.base} ease-in;
+  }
+
+  span {
+    transition: all ${AnimationDurations.base} ease-in;
+    color: ${Colors.grey7};
   }
 `;

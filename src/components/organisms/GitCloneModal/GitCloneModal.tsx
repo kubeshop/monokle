@@ -3,13 +3,15 @@ import {useState} from 'react';
 import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
+import fs from 'fs';
 import {sep} from 'path';
+import styled from 'styled-components';
 
 import {DEFAULT_GIT_REPO_PLACEHOLDER, VALID_URL_REGEX} from '@constants/constants';
 
+import {setCreateProject} from '@redux/appConfig';
 import {closeGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCreateProject} from '@redux/reducers/appConfig';
 
 import {FileExplorer} from '@atoms';
 
@@ -47,9 +49,14 @@ const GitCloneModal: React.FC = () => {
 
       const {localPath, repoURL} = values;
       const repoName = repoURL.split('/').pop();
+      const localGitPath = `${localPath}${sep}${repoName.replace('.git', '')}`;
+
+      if (!doesPathExist(localPath)) {
+        fs.mkdirSync(localPath, {recursive: true});
+      }
 
       promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
-        localPath: `${localPath}${sep}${repoName}`,
+        localPath: localGitPath,
         repoPath: repoURL,
       }).then(result => {
         setLoading(false);
@@ -61,8 +68,12 @@ const GitCloneModal: React.FC = () => {
             content: <div>{result.error}</div>,
             zIndex: 100000,
           });
+
+          if (doesPathExist(localGitPath)) {
+            fs.rmdirSync(localGitPath, {recursive: true});
+          }
         } else {
-          dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName}`}));
+          dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName.replace('.git', '')}`}));
         }
       });
     });
@@ -72,6 +83,7 @@ const GitCloneModal: React.FC = () => {
     <Modal open confirmLoading={loading} onCancel={onCancel} onOk={onOk}>
       <Form form={form} initialValues={{repoURL: '', localPath: projectsRootPath}} layout="vertical">
         <Form.Item
+          style={{marginBottom: '0px'}}
           name="repoURL"
           label="Repository URL"
           rules={[
@@ -85,8 +97,31 @@ const GitCloneModal: React.FC = () => {
             },
           ]}
         >
-          <Input placeholder={DEFAULT_GIT_REPO_PLACEHOLDER} />
+          <Input
+            onKeyDown={e => {
+              if (form.getFieldValue('repoURL')) {
+                return;
+              }
+
+              if (e.key === 'Tab') {
+                e.preventDefault();
+                form.setFieldValue('repoURL', DEFAULT_GIT_REPO_PLACEHOLDER);
+                form.validateFields();
+              }
+            }}
+            placeholder={DEFAULT_GIT_REPO_PLACEHOLDER}
+          />
         </Form.Item>
+
+        <SampleButton
+          type="link"
+          onClick={() => {
+            form.setFieldValue('repoURL', DEFAULT_GIT_REPO_PLACEHOLDER);
+            onOk();
+          }}
+        >
+          Use Monokle Sample Repo
+        </SampleButton>
 
         <Form.Item label="Location" required>
           <Input.Group compact>
@@ -103,11 +138,6 @@ const GitCloneModal: React.FC = () => {
 
                       if (!localPath) {
                         reject(new Error('Please provide your local path!'));
-                        return;
-                      }
-
-                      if (!doesPathExist(localPath)) {
-                        reject(new Error('Provided path does not exist!'));
                         return;
                       }
 
@@ -141,3 +171,10 @@ const GitCloneModal: React.FC = () => {
 };
 
 export default GitCloneModal;
+
+// Styled Components
+
+const SampleButton = styled(Button)`
+  padding: 4px 0px 4px 0px;
+  margin: 8px 0px;
+`;

@@ -10,10 +10,9 @@ export const HiddenInput = styled.input`
   opacity: 0;
 `;
 
-export const MonacoContainer = styled.div`
+export const MonacoContainer = styled.div<{$height?: number}>`
   width: 100%;
-  height: 100%;
+  height: ${({$height}) => ($height ? `${$height}px` : '100%')};
   padding-left: 0px;
-  padding-right: 8px;
   margin: 0px;
 `;

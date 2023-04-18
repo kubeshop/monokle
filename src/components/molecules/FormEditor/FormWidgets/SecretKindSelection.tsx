@@ -4,9 +4,9 @@ import {Select} from 'antd';
 
 import styled from 'styled-components';
 
-import {K8sResource} from '@models/k8sresource';
+import {useResourceContentMapRef, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 
-import {useAppSelector} from '@redux/hooks';
+import {ResourceMeta} from '@shared/models/k8sResource';
 
 import * as S from './styled';
 
@@ -19,7 +19,8 @@ const FormContainer = styled.div`
 
 export const SecretKindSelection = ({schema, onChange, formData, disabled}: any) => {
   const {secretType} = schema;
-  const resourceMap = useAppSelector(state => state.main.resourceMap);
+  const resourceMetaMap = useResourceMetaMap('local');
+  const resourceContentMapRef = useResourceContentMapRef('local');
   const [refs, setRefs] = useState<string[]>([]);
   const [properties, setProperties] = useState<string[]>([]);
   const [selectedRef, setSelectedRef] = useState<string | undefined>(
@@ -40,29 +41,32 @@ export const SecretKindSelection = ({schema, onChange, formData, disabled}: any)
   }, [secretType]);
 
   useEffect(() => {
-    if (resourceMap) {
+    if (resourceMetaMap) {
       setRefs(
-        Object.values(resourceMap)
-          .filter(
-            (resource: K8sResource) => resource.kind === 'Secret' && allowedSecretTypes.includes(resource.content.type)
-          )
-          .map((resource: K8sResource) => resource.name)
+        Object.values(resourceMetaMap)
+          .filter(resourceMeta => {
+            const content = resourceContentMapRef.current[resourceMeta.id];
+
+            return resourceMeta.kind === 'Secret' && content && allowedSecretTypes.includes(content.object.type);
+          })
+          .map(resourceMeta => resourceMeta.name)
       );
     } else {
       setRefs([]);
     }
-  }, [resourceMap, allowedSecretTypes]);
+  }, [resourceMetaMap, allowedSecretTypes, resourceContentMapRef]);
 
   useEffect(() => {
-    if (secretType === 'Opaque' && resourceMap && selectedRef) {
-      const selectedResource: K8sResource | undefined = Object.values(resourceMap).find(
-        (resource: K8sResource) => resource.kind === 'Secret' && resource.name === selectedRef
+    if (secretType === 'Opaque' && resourceMetaMap && selectedRef) {
+      const selectedResource: ResourceMeta | undefined = Object.values(resourceMetaMap).find(
+        resource => resource.kind === 'Secret' && resource.name === selectedRef
       );
-      setProperties(selectedResource ? Object.keys(selectedResource.content.data) : []);
+      const content = selectedResource ? resourceContentMapRef.current[selectedResource.id] : undefined;
+      setProperties(content ? Object.keys(content.object.data) : []);
     } else {
       setProperties([]);
     }
-  }, [selectedRef, resourceMap, secretType]);
+  }, [selectedRef, resourceMetaMap, secretType, resourceContentMapRef]);
 
   useEffect(() => {
     if (secretType === 'Opaque') {

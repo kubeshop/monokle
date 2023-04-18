@@ -1,3 +1,10 @@
-import unhandled from 'electron-unhandled';
+import {contextBridge, ipcRenderer} from 'electron';
 
-unhandled();
+contextBridge.exposeInMainWorld('api', {
+  startKubeConfigService: () => {
+    ipcRenderer.invoke('kubeService:start');
+  },
+  stopKubeConfigService: () => {
+    ipcRenderer.invoke('kubeService:stop');
+  },
+});

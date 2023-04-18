@@ -1,10 +1,13 @@
+import * as k8s from '@kubernetes/client-node';
+
 import {BrowserWindow, app, ipcMain} from 'electron';
 
 import asyncLib from 'async';
+import {spawn} from 'child_process';
 import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
-import Nucleus from 'nucleus-nodejs';
 import * as path from 'path';
+import stream from 'stream';
 
 import {
   DOWNLOAD_PLUGIN,
@@ -15,29 +18,23 @@ import {
   DOWNLOAD_TEMPLATE_RESULT,
   UPDATE_EXTENSIONS,
   UPDATE_EXTENSIONS_RESULT,
-} from '@constants/ipcEvents';
-
-import {NewVersionCode} from '@models/appconfig';
+} from '@shared/constants/ipcEvents';
+import type {CommandOptions} from '@shared/models/commands';
+import {NewVersionCode} from '@shared/models/config';
 import {
   AnyExtension,
   DownloadPluginResult,
   DownloadTemplatePackResult,
   DownloadTemplateResult,
   UpdateExtensionsResult,
-} from '@models/extension';
-import {AnyPlugin} from '@models/plugin';
-import {AnyTemplate, TemplatePack} from '@models/template';
+} from '@shared/models/extension';
+import type {FileExplorerOptions, FileOptions} from '@shared/models/fileExplorer';
+import {AnyPlugin} from '@shared/models/plugin';
+import {DISABLED_TELEMETRY} from '@shared/models/telemetry';
+import {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@shared/models/template';
+import {disableSegment, enableSegment, getSegmentClient} from '@shared/utils/segment';
 
-import {changeCurrentProjectName, updateNewVersion} from '@redux/reducers/appConfig';
-import {InterpolateTemplateOptions} from '@redux/services/templates';
-
-import {FileExplorerOptions, FileOptions} from '@atoms/FileExplorer/FileExplorerOptions';
-
-import {CommandOptions} from '@utils/commands';
-import {ProjectNameChange, StorePropagation} from '@utils/global-electron-store';
-import {getSegmentClient} from '@utils/segment';
-import {UPDATE_APPLICATION, trackEvent} from '@utils/telemetry';
-
+import {startKubeConfigService, stopKubeConfigService} from '../KubeConfigManager';
 import autoUpdater from '../autoUpdater';
 import {
   checkNewVersion,
@@ -47,6 +44,8 @@ import {
   saveFileDialog,
   selectFileDialog,
 } from '../commands';
+import {killKubectlProxyProcess, startKubectlProxyProcess} from '../kubectl';
+import {ProjectNameChange, StorePropagation} from '../models';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
   downloadTemplate,
@@ -59,13 +58,20 @@ import {
 import {askActionConfirmation} from '../utils';
 import {dispatchToAllWindows} from './ipcMainRedux';
 
-const userHomeDir = app.getPath('home');
 const userDataDir = app.getPath('userData');
 const userTempDir = app.getPath('temp');
 const pluginsDir = path.join(userDataDir, 'monoklePlugins');
 const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const machineId = machineIdSync();
+
+let commandStream: stream.Readable = new stream.Readable();
+commandStream._read = () => {};
+let outputStream: stream.Writable | null = null;
+
+if (outputStream) {
+  (outputStream as stream.Writable).end();
+}
 
 // string is the terminal id
 let ptyProcessMap: Record<string, any> = {};
@@ -77,24 +83,31 @@ const killTerminal = (id: string) => {
     return;
   }
 
-  try {
-    ptyProcess.kill();
-    process.kill(ptyProcess.pid);
-  } catch (e) {
-    log.error(e);
+  if (process.platform === 'win32') {
+    try {
+      spawn('taskkill', ['/pid', ptyProcess.pid.toString(), '/f', '/t']);
+    } catch (e) {
+      log.error(e);
+    }
+  } else {
+    try {
+      ptyProcess.kill();
+    } catch (e) {
+      log.error(e);
+    }
   }
 
   delete ptyProcessMap[id];
 };
 
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
-  Nucleus.track(eventName, {...payload});
   const segmentClient = getSegmentClient();
   if (segmentClient) {
+    const properties: any = {appVersion: app.getVersion(), ...payload};
     segmentClient.track({
       event: eventName,
       userId: machineId,
-      properties: payload,
+      properties,
     });
   }
 });
@@ -249,6 +262,14 @@ ipcMain.on('run-command', (event, args: CommandOptions) => {
   runCommand(args, event);
 });
 
+ipcMain.on('kubectl-proxy-open', event => {
+  startKubectlProxyProcess(event);
+});
+
+ipcMain.on('kubectl-proxy-close', () => {
+  killKubectlProxyProcess();
+});
+
 ipcMain.on('app-version', event => {
   event.sender.send('app-version', {version: app.getVersion()});
 });
@@ -258,9 +279,8 @@ ipcMain.on('check-update-available', async () => {
 });
 
 ipcMain.on('quit-and-install', () => {
-  trackEvent(UPDATE_APPLICATION);
   autoUpdater.quitAndInstall();
-  dispatchToAllWindows(updateNewVersion({code: NewVersionCode.Idle, data: null}));
+  dispatchToAllWindows({type: 'config/updateNewVersion', payload: {code: NewVersionCode.Idle, data: null}});
 });
 
 ipcMain.on('force-reload', async (event: any) => {
@@ -274,7 +294,7 @@ ipcMain.on('confirm-action', (event: any, args) => {
 ipcMain.on('global-electron-store-update', (event, args: any) => {
   if (args.eventType === StorePropagation.ChangeProjectName) {
     const payload: ProjectNameChange = args.payload;
-    dispatchToAllWindows(changeCurrentProjectName(payload.newName));
+    dispatchToAllWindows({type: 'config/changeCurrentProjectName', payload: payload.newName});
   } else {
     log.warn(`received invalid event type for global electron store update ${args.eventType}`);
   }
@@ -347,4 +367,73 @@ ipcMain.on('shell.ptyProcessKill', (event, data) => {
   const {terminalId} = data;
 
   killTerminal(terminalId);
+});
+
+ipcMain.on('shell.ptyProcessKillAll', () => {
+  Object.keys(ptyProcessMap).forEach(id => {
+    killTerminal(id);
+  });
+});
+
+ipcMain.on('pod.terminal.command', (event, command) => {
+  commandStream.push(`${command}`);
+});
+
+ipcMain.on('pod.terminal.close', () => {
+  if (outputStream) {
+    outputStream.end();
+  }
+});
+
+ipcMain.on('pod.terminal.init', (event, args) => {
+  const {podNamespace, podName, containerName, webContentsId} = args;
+  if (!webContentsId) {
+    return;
+  }
+
+  outputStream = new stream.Writable();
+
+  const currentWebContents = BrowserWindow.fromId(webContentsId)?.webContents;
+  outputStream._write = (chunk, encoding, next) => {
+    if (chunk && currentWebContents) {
+      currentWebContents.send('pod.terminal.output', chunk.toString());
+    }
+    next();
+  };
+
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+  const exec = new k8s.Exec(kc);
+  exec.exec(
+    podNamespace,
+    podName,
+    containerName,
+    ['/bin/sh'],
+    outputStream,
+    outputStream,
+    commandStream,
+    true,
+    (status: k8s.V1Status) => {
+      if (currentWebContents) {
+        currentWebContents.send('pod.terminal.output', status.message);
+      }
+    }
+  );
+});
+
+ipcMain.handle('kubeService:start', () => startKubeConfigService());
+ipcMain.handle('kubeService:stop', () => stopKubeConfigService());
+
+ipcMain.handle('analytics:toggleTracking', async (_event, {disableEventTracking}) => {
+  const segmentClient = getSegmentClient();
+
+  if (disableEventTracking) {
+    segmentClient?.track({
+      userId: machineId,
+      event: DISABLED_TELEMETRY,
+    });
+    disableSegment();
+  } else {
+    enableSegment();
+  }
 });

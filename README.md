@@ -6,12 +6,12 @@
 <p align="center">
   <a href="https://monokle.io">Website</a> |
   <a href="https://kubeshop.github.io/monokle/">Documentation</a> |
-  <a href="https://discord.gg/uNuhy6GDyn">Discord</a> |
-  <a href="https://kubeshop.io/blog-projects/monokle">Blog</a>
+  <a href="https://discord.com/invite/6zupCZFQbe">Discord</a> |
+  <a href="https://monokle.io/blog">Blog</a>
 </p>
 
 <p align="center">
-  Welcome to Monokle Desktop 🧐 - K8s configuration analysis and version control editor!
+  🧐 Monokle streamlines the process of creating, analyzing, and deploying Kubernetes configurations by providing a unified visual tool for authoring YAML manifests, validating policies, and managing live clusters. 
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
   <a href="https://github.com/kubeshop/monokle/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/kubeshop/monokle" alt="License" />
   </a>
-  <a href="https://discord.gg/kMJxmuYTMu">
+  <a href="https://discord.gg/CzpqtfPjXV">
     <img src="https://badgen.net/badge/icon/discord?icon=discord&label" alt="Discord" />
   </a>
   <a href="https://github.com/kubeshop/monokle/tags">
@@ -33,18 +33,21 @@
 </p>
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=wkFWg_S8eUA">
-    <img src="docs/img/monokle-intro-thumbnail.png" alt="Monokle Desktop Overview" />
-    <p align="center">Click on the image or this link to watch the "Intro to Monokle Dekstop" short video (3 mins)</p>
+  <a href="http://youtu.be/y3GLmTsna1M">
+    <img src="https://res.cloudinary.com/duczlt4nw/image/upload/v1677516135/YouTube_Thumbnail_17_hxccnv.png">
+    <p align="center">Click on the image or <a href="http://youtu.be/y3GLmTsna1M">this link</a> to watch the "Intro to Monokle" short video (4 mins)</p>
   </a>
 </p>
 
 ## Core Features
 
-- ⚡ Quickly get a high-level view of your manifests, their contained resources and relationships
+- 👩‍💻 Single IDE for your configuration files, manifests, resources and cluster management
+- 🌤️ Connect to your clusters and see real time state and resources
+-  ⚡ Quickly get a high-level view of your manifests, their contained resources and relationships
 - 📇 Leverage Git to manage the lifecycle of your configuration
-- ✅ Validate resources using OPA policy rules
-- 🖊️ Easily edit resources without having to learn or look up yaml syntax and see the changes applied
+- 👌 Validate your manifests in real time against YAML formatting, K8s schemas including CRD installed,  and easily follow links
+- ✅ Validate resources using OPA policy rules or define your own
+- 🖊️ Easily edit and create resources without having to learn or look up yaml syntax and see the changes applied
 - 🔨 Refactor resources with maintained integrity of names and references
 - 📷 Preview and debug resources generated with kustomize or helm
 - ➕ Visualize extended resources defined in CRD
@@ -64,18 +67,18 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
   </tr>
   <tr>
     <td>
-      <div align="center">
-        <img src="docs/img/windows.svg" height="50" width="50" />
+      <div align="center"><a href="https://github.com/kubeshop/monokle/releases/download/downloads/Monokle-win-x64.exe">
+        <img src="docs/docs/img/windows.svg" height="50" width="50" /></a>
       </div>
     </td>
     <td>
       <div align="center">
-        <img src="docs/img/macos.svg" height="50" width="50" />
+         <a href="https://github.com/kubeshop/monokle/releases/download/downloads/Monokle-mac-universal.dmg"><img src="docs/docs/img/macos.svg" height="50" width="50" /></a>
       </div>
     </td>
     <td>
       <div align="center">
-        <img src="docs/img/linux.svg" height="50" width="50" />
+       <a href="https://github.com/kubeshop/monokle/releases/download/downloads/Monokle-linux-x86_64.AppImage"><img src="docs/docs/img/linux.svg" height="50" width="50" /></a>
       </div>
     </td>
   </tr>
@@ -94,20 +97,20 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
 
 ## Roadmap
 
-There is a lot of functionality currently being considered:
+Our roadmap is always being updated and improved:
 
-- A new streamlined interface that works better for git flows and complex configuration scenarios, where congnitive load is high
+- A new streamlined interface that works better for git flows and complex configuration scenarios, where cognitive load is high
 - Additional work on the git and gitops flows, including conflict management and pull request creation
 - Better CRD management
 - A CLI
-- Remote management
+- Advanced features for cluster management
 - Drift analysis
-- Integration to other open source projects around K8s
-- Advanced creator mode
+- Integration to other open source projects about configuration for K8s
+- Improved templates for K8s resources, CRD, and Helm and Kustomize
 
 Don't hesitate to provide any feedback you might have to help us prioritize and improve our backlog!
 
 ## Getting involved
 
-- Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.gg/uNuhy6GDyn).
+- Share ideas, suggestions, bug-reports or complaints on our [Discord server](https://discord.com/invite/6zupCZFQbe).
 - Read about how to contribute [in our Documentation](https://kubeshop.github.io/monokle/contributing).

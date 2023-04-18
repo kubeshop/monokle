@@ -6,13 +6,12 @@ import {Modal} from 'antd';
 
 import _ from 'lodash';
 
-import {AlertType, ExtraContentType} from '@models/alert';
-
 import store from '@redux/store';
 
 import {TelemetryButtons} from '@molecules/NotificationMarkdown/TelemetryButtons';
 
-import {openUrlInExternalBrowser} from '@utils/shell';
+import {AlertType, ExtraContentType} from '@shared/models/alert';
+import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import NotificationModalTitle from './NotificationModalTitle';
 
@@ -38,7 +37,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
       return message;
     }
 
-    return _.truncate(message, {length: 200});
+    return _.truncate(message, {length: 240});
   }, [message]);
 
   const handleSeeMore = () => {
@@ -46,7 +45,19 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
     Modal[type]({
       content: (
         <S.NotificationModalContent>
-          <ReactMarkdown>{message}</ReactMarkdown>
+          <ReactMarkdown
+            components={{
+              a({href, children, ...restProps}) {
+                return (
+                  <a onClick={() => openUrlInExternalBrowser(href)} {...restProps}>
+                    {children}
+                  </a>
+                );
+              },
+            }}
+          >
+            {message}
+          </ReactMarkdown>
         </S.NotificationModalContent>
       ),
       title: (
@@ -63,6 +74,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
     <S.NotificationMarkdownContainer>
       <ReactMarkdown
         components={{
+          p: 'pre',
           a({href, children, ...restProps}) {
             return (
               <a onClick={() => openUrlInExternalBrowser(href)} {...restProps}>

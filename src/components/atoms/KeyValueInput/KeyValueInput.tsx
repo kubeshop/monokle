@@ -4,12 +4,12 @@ import {Button} from 'antd';
 
 import {PlusOutlined} from '@ant-design/icons';
 
-import isDeepEqual from 'fast-deep-equal/es6/react';
 import {v4 as uuidv4} from 'uuid';
 
 import {ANY_VALUE} from '@constants/form';
 
-import {openUrlInExternalBrowser} from '@utils/shell';
+import {isEqual} from '@shared/utils/isEqual';
+import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import KeyValueEntryRenderer from './KeyValueEntryRenderer';
 import * as S from './KeyValueInput.styled';
@@ -151,7 +151,7 @@ const KeyValueInput: React.FC<KeyValueInputProps> = props => {
   );
 
   useEffect(() => {
-    if (!isDeepEqual(parentKeyValueData, currentKeyValueData)) {
+    if (!isEqual(parentKeyValueData, currentKeyValueData)) {
       setCurrentKeyValueData(parentKeyValueData);
       const newEntries = createEntriesFromParentKeyValueData(parentKeyValueData, availableValuesByKey);
       setEntries(newEntries);

@@ -4,12 +4,13 @@ import {useHotkeys} from 'react-hotkeys-hook';
 import {Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
-import {AlertEnum} from '@models/alert';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
 import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
+
+import {AlertEnum} from '@shared/models/alert';
 
 type IProps = {
   visible: boolean;
@@ -39,12 +40,16 @@ const CommitModal: React.FC<IProps> = props => {
     setLoading(true);
 
     form.validateFields().then(async values => {
-      await promiseFromIpcRenderer('git.commitChanges', 'git.commitChanges.result', {
+      const result = await promiseFromIpcRenderer('git.commitChanges', 'git.commitChanges.result', {
         localPath: selectedProjectRootFolder,
         message: values.message,
       });
 
-      dispatch(setAlert({title: 'Committed successfully', message: '', type: AlertEnum.Success}));
+      if (result.error) {
+        showGitErrorModal('Commit failed', `git commit -m "${values.message}"`, dispatch);
+      } else {
+        dispatch(setAlert({title: 'Committed successfully', message: '', type: AlertEnum.Success}));
+      }
 
       form.resetFields();
     });
@@ -62,7 +67,7 @@ const CommitModal: React.FC<IProps> = props => {
 
       commitHandler();
     },
-    {enableOnTags: ['TEXTAREA']},
+    {enableOnFormTags: ['TEXTAREA']},
     [isFocused]
   );
 

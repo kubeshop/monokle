@@ -2,8 +2,8 @@ import * as k8s from '@kubernetes/client-node';
 
 import navSectionNames from '@constants/navSectionNames';
 
-import {K8sResource} from '@models/k8sresource';
-import {ResourceKindHandler} from '@models/resourcekindhandler';
+import {ResourceMeta} from '@shared/models/k8sResource';
+import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
 const CustomResourceDefinitionHandler: ResourceKindHandler = {
   kind: 'CustomResourceDefinition',
@@ -13,7 +13,7 @@ const CustomResourceDefinitionHandler: ResourceKindHandler = {
   clusterApiVersion: 'apiextensions.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1',
   isCustom: false,
-  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource): Promise<any> {
+  getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sExtensionsV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
     return k8sExtensionsV1Api.readCustomResourceDefinition(resource.name);
   },
@@ -22,7 +22,7 @@ const CustomResourceDefinitionHandler: ResourceKindHandler = {
     const response = await k8sExtensionsV1Api.listCustomResourceDefinition();
     return response.body.items;
   },
-  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: K8sResource) {
+  async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sExtensionsV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
     await k8sExtensionsV1Api.deleteCustomResourceDefinition(resource.name);
   },

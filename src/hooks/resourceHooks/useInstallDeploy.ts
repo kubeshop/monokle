@@ -3,31 +3,35 @@ import {useMemo} from 'react';
 import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 import {ApplyFileTooltip, ApplyTooltip, InstallValuesFileTooltip, KubeConfigNoValid} from '@constants/tooltips';
 
-import {K8sResource} from '@models/k8sresource';
-
+import {kubeConfigPathValidSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
-import {knownResourceKindsSelector, kubeConfigPathValidSelector} from '@redux/selectors';
-import {isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
+import {selectionFilePathSelector} from '@redux/selectors';
+import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
+import {useSelectedResourceMeta} from '@redux/selectors/resourceSelectors';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 
-export const useInstallDeploy = (resource?: K8sResource) => {
+import {ResourceMeta} from '@shared/models/k8sResource';
+import {isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
+
+export const useInstallDeploy = (resourceMeta?: ResourceMeta) => {
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
-  const selectedPath = useAppSelector(state => state.main.selectedPath);
-  const selectedResourceId = useAppSelector(state => state.main.selectedResourceId);
-  const selectedResource = useAppSelector(state =>
-    selectedResourceId ? state.main.resourceMap[selectedResourceId] : undefined
-  );
+  const selectedFilePath = useAppSelector(selectionFilePathSelector);
+  const selectedResourceMeta = useSelectedResourceMeta();
 
-  const currentResource = resource || selectedResource;
+  const currentResourceMeta = resourceMeta || selectedResourceMeta;
 
   const deployTooltip = useMemo(() => {
-    return selectedPath ? (isHelmValuesFile(selectedPath) ? InstallValuesFileTooltip : ApplyFileTooltip) : ApplyTooltip;
-  }, [selectedPath]);
+    return selectedFilePath
+      ? isHelmValuesFile(selectedFilePath)
+        ? InstallValuesFileTooltip
+        : ApplyFileTooltip
+      : ApplyTooltip;
+  }, [selectedFilePath]);
 
   const buttonText = useMemo(
-    () => (selectedPath && isHelmValuesFile(selectedPath) ? 'Install' : 'Deploy'),
-    [selectedPath]
+    () => (selectedFilePath && isHelmValuesFile(selectedFilePath) ? 'Install' : 'Deploy'),
+    [selectedFilePath]
   );
 
   const isDisabled = useMemo(() => {
@@ -35,26 +39,26 @@ export const useInstallDeploy = (resource?: K8sResource) => {
       return true;
     }
 
-    if (!currentResource && !selectedPath) {
+    if (!currentResourceMeta && !selectedFilePath) {
       return true;
     }
 
-    if (selectedPath && selectedPath.endsWith(HELM_CHART_ENTRY_FILE)) {
+    if (selectedFilePath && selectedFilePath.endsWith(HELM_CHART_ENTRY_FILE)) {
       return true;
     }
 
-    if (selectedPath && isHelmTemplateFile(selectedPath)) {
+    if (selectedFilePath && isHelmTemplateFile(selectedFilePath)) {
       return true;
     }
 
     if (
-      currentResource &&
-      !isKustomizationResource(currentResource) &&
-      (isKustomizationPatch(currentResource) || !knownResourceKinds.includes(currentResource.kind))
+      currentResourceMeta &&
+      !isKustomizationResource(currentResourceMeta) &&
+      (isKustomizationPatch(currentResourceMeta) || !knownResourceKinds.includes(currentResourceMeta.kind))
     ) {
       return true;
     }
-  }, [currentResource, isKubeConfigPathValid, knownResourceKinds, selectedPath]);
+  }, [currentResourceMeta, isKubeConfigPathValid, knownResourceKinds, selectedFilePath]);
 
   const tooltipTitle = useMemo(
     () => (isKubeConfigPathValid ? deployTooltip : KubeConfigNoValid),

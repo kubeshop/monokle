@@ -2,7 +2,7 @@ import log from 'loglevel';
 import fetch from 'node-fetch';
 import path from 'path';
 
-import {createFolder, createOrRecreateFolder, deleteFile, doesPathExist, writeFile} from '@utils/fileSystem';
+import {createFolder, createOrRecreateFolder, deleteFile, doesPathExist, writeFile} from '@shared/utils/fileSystem';
 
 import {DownloadExtensionEntryOptions} from './types';
 

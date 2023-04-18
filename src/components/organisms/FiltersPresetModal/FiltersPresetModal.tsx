@@ -2,12 +2,12 @@ import React, {useState} from 'react';
 
 import {Form, Input, Modal, Select} from 'antd';
 
-import {AlertEnum} from '@models/alert';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {deleteFilterPreset, loadFilterPreset, saveFilterPreset} from '@redux/reducers/main';
 import {closeFiltersPresetModal} from '@redux/reducers/ui';
+
+import {AlertEnum} from '@shared/models/alert';
 
 import * as S from './FiltersPresetModal.styled';
 

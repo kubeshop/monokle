@@ -1,57 +1,38 @@
-import {AppDispatch} from '@models/appdispatch';
-import {PreviewType} from '@models/appstate';
-
-import {
-  clearPreview,
-  clearPreviewAndSelectionHistory,
-  startPreviewLoader,
-  stopPreviewLoader,
-} from '@redux/reducers/main';
-import {previewCluster, repreviewCluster} from '@redux/thunks/previewCluster';
+import {clearPreviewAndSelectionHistory} from '@redux/reducers/main';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
+import {AppDispatch} from '@shared/models/appDispatch';
+import {AnyPreview} from '@shared/models/preview';
+import {trackEvent} from '@shared/utils/telemetry';
+
 import {previewSavedCommand} from './previewCommand';
 
-export const startPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
-  dispatch(clearPreviewAndSelectionHistory());
-  dispatch(startPreviewLoader({previewType: type, targetId}));
-  if (type === 'kustomization') {
-    dispatch(previewKustomization(targetId));
+export const startPreview = (preview: AnyPreview, dispatch: AppDispatch) => {
+  dispatch(clearPreviewAndSelectionHistory({revalidate: false}));
+
+  if (preview.type === 'kustomize') {
+    dispatch(previewKustomization(preview.kustomizationId));
   }
-  if (type === 'cluster') {
-    dispatch(previewCluster(targetId));
+  if (preview.type === 'helm') {
+    dispatch(previewHelmValuesFile(preview.valuesFileId));
   }
-  if (type === 'helm') {
-    dispatch(previewHelmValuesFile(targetId));
+  if (preview.type === 'helm-config') {
+    dispatch(runPreviewConfiguration(preview.configId));
   }
-  if (type === 'helm-preview-config') {
-    dispatch(runPreviewConfiguration(targetId));
-  }
-  if (type === 'command') {
-    dispatch(previewSavedCommand(targetId));
+  if (preview.type === 'command') {
+    dispatch(previewSavedCommand(preview.commandId));
   }
 };
 
-export const restartPreview = (targetId: string, type: PreviewType, dispatch: AppDispatch) => {
-  dispatch(clearPreview({type: 'restartPreview'}));
-  dispatch(startPreviewLoader({previewType: type, targetId}));
-  if (type === 'kustomization') {
-    dispatch(previewKustomization(targetId));
-  }
-  if (type === 'cluster') {
-    dispatch(repreviewCluster(targetId));
-  }
-  if (type === 'helm') {
-    dispatch(previewHelmValuesFile(targetId));
-  }
-  if (type === 'helm-preview-config') {
-    dispatch(runPreviewConfiguration(targetId));
-  }
+export const restartPreview = (preview: AnyPreview, dispatch: AppDispatch) => {
+  trackEvent('preview/restart', {type: preview.type});
+
+  // delegate to the startPreview method - which does all the same stuff
+  startPreview(preview, dispatch);
 };
 
 export const stopPreview = (dispatch: AppDispatch) => {
-  dispatch(stopPreviewLoader());
-  dispatch(clearPreviewAndSelectionHistory());
+  dispatch(clearPreviewAndSelectionHistory({revalidate: true}));
 };

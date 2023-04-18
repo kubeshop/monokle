@@ -2,6 +2,8 @@ import {useEffect, useState} from 'react';
 
 import {Select} from 'antd';
 
+import {size} from 'lodash';
+
 import {useAppSelector} from '@redux/hooks';
 
 import * as S from './styled';
@@ -13,62 +15,44 @@ const NEW_ITEM = 'CREATE_NEW_ITEM';
 export const ImageSelection: React.FC = (params: any) => {
   const {value, onChange, disabled, readonly} = params;
 
-  const imagesList = useAppSelector(state => state.main.imagesList);
+  const imageMap = useAppSelector(state => state.main.imageMap);
 
   const [images, setImages] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
-  const [selectValue, setSelectValue] = useState<string | undefined>();
 
   const handleChange = (providedValue: string) => {
     if (providedValue === NEW_ITEM) {
-      setSelectValue(inputValue);
+      onChange(inputValue);
       if (!images.includes(inputValue)) {
         setImages([...images, inputValue]);
       }
       setInputValue('');
     } else {
-      setSelectValue(providedValue);
+      onChange(providedValue);
     }
   };
 
   useEffect(() => {
-    if (!value) {
-      setSelectValue(undefined);
-    } else {
-      setSelectValue(value);
-    }
-  }, [value]);
-
-  useEffect(() => {
-    if (!selectValue) {
-      onChange(undefined);
-    } else {
-      onChange(selectValue);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectValue]);
-
-  useEffect(() => {
-    if (!imagesList.length) {
+    if (!size(imageMap)) {
       return;
     }
 
-    setImages(imagesList.map(image => image.id));
-  }, [imagesList]);
+    setImages(Object.keys(imageMap));
+  }, [imageMap]);
 
   return (
     <S.SelectStyled
       disabled={disabled || readonly}
       optionFilterProp="children"
       showSearch
-      value={selectValue}
+      value={value}
       onChange={handleChange}
       onSearch={(e: string) => setInputValue(e)}
       placeholder="Select or create your image"
     >
       {inputValue && images.filter(image => image === inputValue).length === 0 && (
         <Option key={inputValue} value={NEW_ITEM}>
-          {`Create '${inputValue}'`}
+          {inputValue}
         </Option>
       )}
       {images.map(image => (

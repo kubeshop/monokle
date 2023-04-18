@@ -1,15 +1,12 @@
 import {groupBy} from 'lodash';
 import {createSelector} from 'reselect';
 
-import {SavedCommand} from '@models/appconfig';
-import {RootState} from '@models/rootstate';
-
-import {kustomizationsSelector, selectCurrentKubeConfig} from '@redux/selectors';
+import {selectCurrentKubeConfig} from '@redux/appConfig';
+import {kustomizationsSelector} from '@redux/selectors/resourceSelectors';
 import {canTransfer} from '@redux/services/compare/transferResource';
+import {joinK8sResource} from '@redux/services/resource';
 
-import {ComparisonListItem} from '@components/organisms/CompareModal/types';
-
-import {isDefined} from '@utils/filter';
+import {getApiVersionGroup} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -17,10 +14,14 @@ import {
   CompareSide,
   CompareState,
   CompareStatus,
+  ComparisonListItem,
   PartialResourceSet,
   ResourceComparison,
   TransferDirection,
-} from './state';
+} from '@shared/models/compare';
+import {SavedCommand} from '@shared/models/config';
+import {RootState} from '@shared/models/rootState';
+import {isDefined} from '@shared/utils/filter';
 
 export const selectCompareStatus = (state: CompareState): CompareStatus => {
   const c = state.current;
@@ -70,8 +71,9 @@ export const selectGitResourceSet = (state: RootState, side: CompareSide) => {
   const currentGitBranch = branchName ? state.git.repo.branchMap[branchName] : undefined;
   const currentGitBranchCommits = currentGitBranch?.commits || [];
   const currentCommit = currentGitBranchCommits.find(c => c.hash === resourceSet.commitHash);
+  const currentFolder = resourceSet.folder;
 
-  return {allGitBranches, currentCommit, currentGitBranch, currentGitBranchCommits};
+  return {allGitBranches, currentCommit, currentFolder, currentGitBranch, currentGitBranchCommits};
 };
 
 export const selectCommandResourceSet = (state: RootState, side: CompareSide) => {
@@ -125,7 +127,12 @@ export const selectKustomizeResourceSet = (state: RootState, side: CompareSide) 
   if (resourceSet?.type !== 'kustomize') return undefined;
   const {kustomizationId} = resourceSet;
 
-  const currentKustomization = kustomizationId ? state.main.resourceMap[kustomizationId] : undefined;
+  const currentKustomization = kustomizationId
+    ? joinK8sResource(
+        state.main.resourceMetaMapByStorage.local[kustomizationId],
+        state.main.resourceContentMapByStorage.local[kustomizationId]
+      )
+    : undefined;
   const allKustomizations = kustomizationsSelector(state);
 
   return {allKustomizations, currentKustomization};
@@ -191,12 +198,22 @@ export const selectComparisonListItems = createSelector(
     const rightTransferable = canTransfer(rightType, leftType);
 
     const groups = groupBy(comparisons, r => {
-      if (r.isMatch) return r.left.kind;
-      return r.left ? r.left.kind : r.right.kind;
+      if (r.isMatch) return `${r.left.kind}--${getApiVersionGroup(r.left)}`;
+      return r.left
+        ? `${r.left.kind}--${getApiVersionGroup(r.left)}`
+        : `${r.right.kind}--${getApiVersionGroup(r.right)}`;
     });
 
-    Object.entries(groups).forEach(([kind, comps]) => {
-      result.push({type: 'header', kind, count: comps.length});
+    Object.entries(groups).forEach(([key, comps]) => {
+      const [kind, apiVersionGroup] = key.split('--');
+
+      result.push({
+        type: 'header',
+        kind,
+        apiVersionGroup,
+        countLeft: comps.filter(c => c.left).length,
+        countRight: comps.filter(c => c.right).length,
+      });
       const isNamespaced = getResourceKindHandler(kind)?.isNamespaced ?? true;
 
       comps.forEach(comparison => {
@@ -205,12 +222,14 @@ export const selectComparisonListItems = createSelector(
             type: 'comparison',
             id: comparison.id,
             name: comparison.left.name,
-            namespace: isNamespaced ? comparison.left.namespace ?? defaultNamespace ?? 'default' : undefined,
+            leftNamespace: isNamespaced ? comparison.left.namespace ?? defaultNamespace : undefined,
+            rightNamespace: isNamespaced ? comparison.right.namespace ?? defaultNamespace : undefined,
             leftActive: true,
             rightActive: true,
             leftTransferable: leftTransferable && comparison.isDifferent,
             rightTransferable: rightTransferable && comparison.isDifferent,
             canDiff: comparison.isDifferent,
+            kind,
           });
         } else {
           result.push({
@@ -218,13 +237,14 @@ export const selectComparisonListItems = createSelector(
             id: comparison.id,
             name: comparison.left?.name ?? comparison.right?.name ?? 'unknown',
             namespace: isNamespaced
-              ? comparison.left?.namespace ?? comparison.right?.namespace ?? defaultNamespace ?? 'default'
+              ? comparison.left?.namespace ?? comparison.right?.namespace ?? defaultNamespace
               : undefined,
             leftActive: isDefined(comparison.left),
             rightActive: isDefined(comparison.right),
             leftTransferable: leftTransferable && isDefined(comparison.left),
             rightTransferable: rightTransferable && isDefined(comparison.right),
             canDiff: false,
+            kind,
           });
         }
       });

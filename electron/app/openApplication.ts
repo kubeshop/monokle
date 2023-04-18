@@ -1,11 +1,12 @@
-import {BrowserWindow, app, globalShortcut, nativeImage} from 'electron';
+import {BrowserWindow, Menu, app, globalShortcut, nativeImage} from 'electron';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
 import ElectronStore from 'electron-store';
 
 import log from 'loglevel';
 import * as path from 'path';
 
-import {logToFile} from '@utils/logToFile';
+import {trackEvent} from '@shared/utils';
+import {logToFile} from '@shared/utils/logs';
 
 import {createWindow} from './createWindow';
 import {getDockMenu} from './menu';
@@ -15,6 +16,7 @@ Object.assign(console, logToFile.functions);
 const isDev = process.env.NODE_ENV === 'development';
 
 export const openApplication = async (givenPath?: string) => {
+  Menu.setApplicationMenu(null);
   await app.whenReady();
 
   if (isDev) {
@@ -64,5 +66,9 @@ export const openApplication = async (givenPath?: string) => {
   app.on('browser-window-blur', () => {
     globalShortcut.unregister('CommandOrControl+R');
     globalShortcut.unregister('CommandOrControl+Shift+R');
+  });
+
+  app.on('quit', (event, exitCode) => {
+    trackEvent('APP_QUIT', {exitCode});
   });
 };

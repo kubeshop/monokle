@@ -6,10 +6,6 @@ const FEATURES = createFeatureFlags(featureJson, {
   ShowGraphView: false,
   ShowRightMenu: false,
   ActionsPaneFooter: false,
-  ImagesPane: true,
-  CompareEverything: false,
-  Terminal: true,
-  GitOps: false,
 });
 
 function createFeatureFlags<TFeature extends string>(

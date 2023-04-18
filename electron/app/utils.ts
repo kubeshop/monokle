@@ -7,23 +7,16 @@ import {existsSync, mkdirSync, writeFileSync} from 'fs';
 import gitUrlParse from 'git-url-parse';
 import _ from 'lodash';
 import log from 'loglevel';
-import fetch from 'node-fetch';
-import {machineIdSync} from 'node-machine-id';
-import Nucleus from 'nucleus-nodejs';
+import os from 'os';
 import path, {join} from 'path';
+import semver from 'semver';
 
-import {PREDEFINED_K8S_VERSION} from '@constants/constants';
-
-import {AnyExtension} from '@models/extension';
-
-import {createProject} from '@redux/reducers/appConfig';
-import {loadResource} from '@redux/services';
-
-import electronStore from '@utils/electronStore';
-import {getSegmentClient} from '@utils/segment';
-import {APP_INSTALLED} from '@utils/telemetry';
-
-const {NUCLEUS_SH_APP_ID, MONOKLE_INSTALLS_URL} = process.env;
+import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
+import type {AnyExtension} from '@shared/models/extension';
+import {APP_DOWNGRADED, APP_INSTALLED, APP_SESSION, APP_UPDATED} from '@shared/models/telemetry';
+import electronStore from '@shared/utils/electronStore';
+import {loadResource} from '@shared/utils/resource';
+import {getSegmentClient} from '@shared/utils/segment';
 
 const GITHUB_REPOSITORY_REGEX = /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/i;
 
@@ -88,7 +81,7 @@ export const convertRecentFilesToRecentProjects = (dispatch: (action: AnyAction)
 
   if (recentFolders && recentFolders.length > 0) {
     recentFolders.forEach((folder: string) => {
-      dispatch(createProject({rootFolder: folder}));
+      dispatch({type: 'config/createProject', payload: {rootFolder: folder}});
     });
     electronStore.delete('appConfig.recentFolders');
   }
@@ -102,35 +95,56 @@ export const setProjectsRootFolder = (userHomeDir: string) => {
   }
 };
 
-export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersion: string) => {
+export const initTelemetry = (deviceID: string, disableEventTracking: boolean, app: Electron.App) => {
   const storedDeviceID: string | undefined = electronStore.get('main.deviceID');
   const segmentClient = getSegmentClient();
 
-  const requestArgs = {
-    method: 'post',
-    body: JSON.stringify({
-      machineId: deviceID,
-    }),
-    headers: {'Content-Type': 'application/json'},
-  };
+  let lastSessionVersion = electronStore.get('appConfig.lastSessionVersion');
 
-  if (!disableTracking) {
-    log.info('New Session.');
-    fetch(`${MONOKLE_INSTALLS_URL}/session`, requestArgs);
-    segmentClient?.track({
-      event: 'APP_SESSION',
-      userId: deviceID,
-    });
+  if (!lastSessionVersion) {
+    lastSessionVersion = app.getVersion();
+    electronStore.set('appConfig.lastSessionVersion', lastSessionVersion);
   }
+
+  if (!disableEventTracking) {
+    log.info('New Session.');
+    segmentClient?.track({
+      event: APP_SESSION,
+      userId: deviceID,
+      properties: {
+        appVersion: app.getVersion(),
+      },
+    });
+
+    if (semver.lt(lastSessionVersion, app.getVersion())) {
+      log.info('Application Updated.');
+      segmentClient?.track({
+        event: APP_UPDATED,
+        userId: deviceID,
+        properties: {
+          oldVersion: lastSessionVersion,
+          newVersion: app.getVersion(),
+        },
+      });
+    }
+
+    if (semver.gt(lastSessionVersion, app.getVersion())) {
+      log.info('Application Downgraded.');
+      segmentClient?.track({
+        event: APP_DOWNGRADED,
+        userId: deviceID,
+        properties: {
+          oldVersion: lastSessionVersion,
+          newVersion: app.getVersion(),
+        },
+      });
+    }
+  }
+
+  electronStore.set('appConfig.lastSessionVersion', app.getVersion());
 
   if (!storedDeviceID) {
     log.info('New Installation.');
-    if (NUCLEUS_SH_APP_ID) {
-      Nucleus.track(APP_INSTALLED, {appVersion});
-    }
-    if (MONOKLE_INSTALLS_URL) {
-      fetch(`${MONOKLE_INSTALLS_URL}/install`, requestArgs);
-    }
     segmentClient?.identify({
       userId: deviceID,
     });
@@ -138,7 +152,9 @@ export const setDeviceID = (deviceID: string, disableTracking: boolean, appVersi
       event: APP_INSTALLED,
       userId: deviceID,
       properties: {
-        appVersion,
+        appVersion: app.getVersion(),
+        deviceOS: os.platform(),
+        deviceLocale: app.getLocale(),
       },
     });
     electronStore.set('main.deviceID', deviceID);
@@ -188,13 +204,20 @@ export function askActionConfirmation({
   action: string;
   unsavedResourceCount: number;
 }): boolean {
-  if (unsavedResourceCount === 0) {
+  if (!unsavedResourceCount) {
     return true;
   }
 
+  let message: string = '';
+
   const shortAction = _.capitalize(action.split(' ')[0]);
-  const message =
-    unsavedResourceCount === 1 ? 'You have an unsaved resource' : `You have ${unsavedResourceCount} unsaved resources`;
+
+  if (unsavedResourceCount) {
+    message +=
+      unsavedResourceCount === 1
+        ? 'You have an unsaved resource.\n'
+        : `You have ${unsavedResourceCount} unsaved resources.\n`;
+  }
 
   const choice = dialog.showMessageBoxSync({
     type: 'info',
@@ -224,38 +247,4 @@ export const checkMissingDependencies = (dependencies: Array<string>): Array<str
       return true;
     }
   });
-};
-
-export const initNucleus = (isDev: boolean, app: any) => {
-  if (NUCLEUS_SH_APP_ID) {
-    Nucleus.init(NUCLEUS_SH_APP_ID, {
-      disableInDev: isDev,
-      disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
-      disableErrorReports: true,
-      debug: false,
-    });
-
-    // This has to run after Nucleus.init but before tracking any events.
-    Nucleus.appStarted();
-
-    Nucleus.setUserId(machineIdSync());
-
-    Nucleus.setProps(
-      {
-        os: process.platform,
-        version: app.getVersion(),
-        language: app.getLocale(),
-      },
-      true
-    );
-    return {
-      disableTracking: Boolean(electronStore.get('appConfig.disableEventTracking')),
-      disableErrorReports: Boolean(electronStore.get('appConfig.disableErrorReporting')),
-    };
-  }
-
-  return {
-    disableTracking: true,
-    disableErrorReports: true,
-  };
 };

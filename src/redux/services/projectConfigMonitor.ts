@@ -1,7 +1,9 @@
 import {FSWatcher, watch} from 'chokidar';
+import {statSync} from 'fs';
 import log from 'loglevel';
 
-import {AppDispatch} from '@models/appdispatch';
+import {AppDispatch} from '@shared/models/appDispatch';
+import {getProjectConfigTimestamp} from '@shared/utils/projectConfig';
 
 import {CONFIG_PATH, updateProjectSettings} from './projectConfig';
 
@@ -29,13 +31,20 @@ export function monitorProjectConfigFile(dispatch: AppDispatch, filePath?: strin
   });
 
   watcher
-    .on('add', () => {
-      updateProjectSettings(dispatch, filePath);
-    })
     .on('change', () => {
-      updateProjectSettings(dispatch, filePath);
+      if (!filePath) {
+        return;
+      }
+
+      if (statSync(absolutePath).mtimeMs !== getProjectConfigTimestamp()) {
+        updateProjectSettings(dispatch, filePath);
+      }
     })
     .on('unlink', () => {
+      if (!filePath) {
+        return;
+      }
+
       updateProjectSettings(dispatch, filePath);
     })
 

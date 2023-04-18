@@ -1,8 +1,8 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {GitBranchCommit, GitChangedFile, GitRepo, GitSliceState} from '@models/git';
-
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+
+import {GitBranchCommit, GitChangedFile, GitRemoteRepo, GitRepo, GitSliceState} from '@shared/models/git';
 
 import {gitInitialState} from './git.initialState';
 
@@ -10,6 +10,14 @@ export const gitSlice = createSlice({
   name: 'git',
   initialState: gitInitialState,
   reducers: {
+    addGitBranch: (state: Draft<GitSliceState>, action: PayloadAction<string>) => {
+      if (!state.repo) {
+        return;
+      }
+
+      state.repo.branches.push(action.payload);
+    },
+
     clearRepo: (state: Draft<GitSliceState>) => {
       state.repo = undefined;
     },
@@ -46,20 +54,13 @@ export const gitSlice = createSlice({
 
     setCurrentBranch: (state: Draft<GitSliceState>, action: PayloadAction<string>) => {
       if (state.repo) {
+        state.loading = true;
         state.repo.currentBranch = action.payload;
       }
     },
 
     setGitLoading: (state: Draft<GitSliceState>, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
-    },
-
-    setHasRemoteRepo: (state: Draft<GitSliceState>, action: PayloadAction<boolean>) => {
-      if (!state.repo) {
-        return;
-      }
-
-      state.repo.hasRemoteRepo = action.payload;
     },
 
     setIsGitInstalled: (state: Draft<GitSliceState>, action: PayloadAction<boolean>) => {
@@ -72,6 +73,14 @@ export const gitSlice = createSlice({
 
     setSelectedItem: (state: Draft<GitSliceState>, action: PayloadAction<GitChangedFile | undefined>) => {
       state.selectedItem = action.payload;
+    },
+
+    updateRemoteRepo: (state: Draft<GitSliceState>, action: PayloadAction<GitRemoteRepo>) => {
+      if (!state.repo) {
+        return;
+      }
+
+      state.repo.remoteRepo = action.payload;
     },
   },
   extraReducers: builder => {
@@ -87,6 +96,7 @@ export const gitSlice = createSlice({
 });
 
 export const {
+  addGitBranch,
   clearRepo,
   closeGitCloneModal,
   openGitCloneModal,
@@ -95,9 +105,9 @@ export const {
   setCommits,
   setCurrentBranch,
   setGitLoading,
-  setHasRemoteRepo,
   setIsGitInstalled,
   setSelectedItem,
   setRepo,
+  updateRemoteRepo,
 } = gitSlice.actions;
 export default gitSlice.reducer;

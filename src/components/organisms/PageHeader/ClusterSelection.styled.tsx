@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {ButtonProps, Button as RawButton, Divider as RawDivider} from 'antd';
+import {ButtonProps, Button as RawButton, Divider as RawDivider, Select as RawSelect} from 'antd';
 
 import {ClusterOutlined as RawClusterOutlined, DownOutlined as RawDownOutlined} from '@ant-design/icons';
 import {
@@ -11,19 +11,20 @@ import {isBoolean} from 'lodash';
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import {PreviewType} from '@models/appstate';
-import {ClusterColors} from '@models/cluster';
-
-import Colors from '@styles/Colors';
-import {Device} from '@styles/Device';
+import {ClusterColors} from '@shared/models/cluster';
+import {PreviewType} from '@shared/models/preview';
+import {Colors} from '@shared/styles/colors';
+import {Device} from '@shared/styles/device';
 
 interface RawButtonProps extends ButtonProps {
   $kubeConfigContextColor?: ClusterColors;
   $isInPreviewMode?: boolean;
+  $isInClusterMode?: boolean;
   $previewType?: PreviewType;
 }
 interface IAntdIconProps extends React.RefAttributes<HTMLSpanElement> {
   $isInPreviewMode?: boolean;
+  $isInClusterMode?: boolean;
   $previewType?: PreviewType;
   $isKubeConfigPathValid?: boolean;
   $kubeConfigContextColor?: ClusterColors;
@@ -34,26 +35,27 @@ export const getPreviewTheme = (
   previewType?: PreviewType,
   rgbaRatio?: number,
   isInPreviewMode?: boolean,
+  isInClusterMode?: boolean,
   clusterColor?: ClusterColors
 ) => {
   let color = fallBackColor;
 
-  if (previewType === 'cluster') {
+  if (isInClusterMode) {
     color = rgbaRatio ? rgba(clusterColor || Colors.volcano8, rgbaRatio) : clusterColor || Colors.volcano8;
   }
   if (previewType === 'helm') {
     color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.yellow5;
   }
-  if (previewType === 'helm-preview-config') {
+  if (previewType === 'helm-config') {
     color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.yellow5;
   }
-  if (previewType === 'kustomization') {
+  if (previewType === 'kustomize') {
     color = rgbaRatio ? rgba(Colors.cyan, rgbaRatio) : Colors.cyan;
   }
   if (previewType === 'command') {
     color = rgbaRatio ? rgba(Colors.purple8, rgbaRatio) : Colors.purple8;
   }
-  return isBoolean(isInPreviewMode) ? (isInPreviewMode ? color : fallBackColor) : color;
+  return isBoolean(isInPreviewMode || isInClusterMode) ? color : fallBackColor;
 };
 
 export const Button = styled(
@@ -64,9 +66,23 @@ export const Button = styled(
   margin: 0 0 0 10px;
   border: 1px solid
     ${props =>
-      getPreviewTheme(Colors.greenOkay, props.$previewType, 0, props.$isInPreviewMode, props.$kubeConfigContextColor)};
+      getPreviewTheme(
+        Colors.greenOkay,
+        props.$previewType,
+        0,
+        props.$isInPreviewMode,
+        props.$isInClusterMode,
+        props.$kubeConfigContextColor
+      )};
   color: ${props =>
-    getPreviewTheme(Colors.greenOkay, props.$previewType, 0, props.$isInPreviewMode, props.$kubeConfigContextColor)};
+    getPreviewTheme(
+      Colors.greenOkay,
+      props.$previewType,
+      0,
+      props.$isInPreviewMode,
+      props.$isInClusterMode,
+      props.$kubeConfigContextColor
+    )};
   border-radius: 4px !important;
   font-weight: 600;
   font-size: 12px;
@@ -85,10 +101,18 @@ export const Button = styled(
           props.$previewType,
           0,
           props.$isInPreviewMode,
+          props.$isInClusterMode,
           props.$kubeConfigContextColor
         )};
     color: ${props =>
-      getPreviewTheme(Colors.greenOkay, props.$previewType, 0, props.$isInPreviewMode, props.$kubeConfigContextColor)};
+      getPreviewTheme(
+        Colors.greenOkay,
+        props.$previewType,
+        0,
+        props.$isInPreviewMode,
+        props.$isInClusterMode,
+        props.$kubeConfigContextColor
+      )};
   }
 `;
 
@@ -98,9 +122,16 @@ export const ExitButton = styled(
   )
 )`
   margin: 0 0 0 10px;
-  color: ${props => (props.$isInPreviewMode && Colors.grey11) || Colors.whitePure};
+  color: ${props => (props.$isInClusterMode || props.$isInPreviewMode ? Colors.grey11 : Colors.whitePure)};
   background-color: ${props =>
-    getPreviewTheme(Colors.grey11, props.$previewType, 0, props.$isInPreviewMode, props.$kubeConfigContextColor)};
+    getPreviewTheme(
+      Colors.grey11,
+      props.$previewType,
+      0,
+      props.$isInPreviewMode,
+      props.$isInClusterMode,
+      props.$kubeConfigContextColor
+    )};
   border-radius: 4px !important;
   font-weight: 600;
   font-size: 12px;
@@ -109,9 +140,16 @@ export const ExitButton = styled(
 
   &:hover,
   &:focus {
-    color: ${props => (props.$isInPreviewMode && Colors.grey11) || Colors.whitePure};
+    color: ${props => (props.$isInClusterMode && Colors.grey11) || Colors.whitePure};
     background-color: ${props =>
-      getPreviewTheme(Colors.grey11, props.$previewType, 0, props.$isInPreviewMode, props.$kubeConfigContextColor)};
+      getPreviewTheme(
+        Colors.grey11,
+        props.$previewType,
+        0,
+        props.$isInPreviewMode,
+        props.$isInClusterMode,
+        props.$kubeConfigContextColor
+      )};
     opacity: 0.8;
   }
 `;
@@ -205,6 +243,7 @@ export const ClusterStatus = styled.div<{isHalfBordered?: boolean}>`
 export const ClusterStatusText = styled.span<{
   $isKubeConfigPathValid?: boolean;
   $isInPreviewMode?: boolean;
+  $isInClusterMode?: boolean;
   $previewType?: PreviewType;
   $kubeConfigContextColor: ClusterColors;
 }>`
@@ -213,7 +252,14 @@ export const ClusterStatusText = styled.span<{
   font-size: 12px;
   color: ${props =>
     (!props.$isKubeConfigPathValid && Colors.grey8) ||
-    getPreviewTheme(Colors.greenOkay, props.$previewType, 0, props.$isInPreviewMode, props.$kubeConfigContextColor)};
+    getPreviewTheme(
+      Colors.greenOkay,
+      props.$previewType,
+      0,
+      props.$isInPreviewMode,
+      props.$isInClusterMode,
+      props.$kubeConfigContextColor
+    )};
 `;
 
 export const Divider = styled(RawDivider)`
@@ -232,7 +278,14 @@ export const CheckCircleOutlined = styled(
 )`
   color: ${props =>
     (!props.$isKubeConfigPathValid && Colors.grey8) ||
-    getPreviewTheme(Colors.greenOkay, props.$previewType, 0, props.$isInPreviewMode, props.$kubeConfigContextColor)};
+    getPreviewTheme(
+      Colors.greenOkay,
+      props.$previewType,
+      0,
+      props.$isInPreviewMode,
+      props.$isInClusterMode,
+      props.$kubeConfigContextColor
+    )};
   font-size: 14px;
 `;
 
@@ -243,6 +296,7 @@ export const ExclamationCircleOutlinedWarning = styled(RawExclamationCircleOutli
 
 export const PreviewMode = styled.div<{
   $isInPreviewMode: boolean;
+  $isInClusterMode: boolean;
   $previewType?: PreviewType;
   $kubeConfigContextColor: ClusterColors;
 }>`
@@ -250,10 +304,41 @@ export const PreviewMode = styled.div<{
   border-radius: 4px 0 0 4px;
   padding: 0 0.5rem;
   color: ${props =>
-    getPreviewTheme(Colors.blackPure, props.$previewType, 0, props.$isInPreviewMode, props.$kubeConfigContextColor)};
+    getPreviewTheme(
+      Colors.blackPure,
+      props.$previewType,
+      0,
+      props.$isInPreviewMode,
+      props.$isInClusterMode,
+      props.$kubeConfigContextColor
+    )};
   background-color: ${props =>
-    getPreviewTheme(Colors.blackPure, props.$previewType, 0.2, props.$isInPreviewMode, props.$kubeConfigContextColor)};
+    getPreviewTheme(
+      Colors.blackPure,
+      props.$previewType,
+      0.2,
+      props.$isInPreviewMode,
+      props.$isInClusterMode,
+      props.$kubeConfigContextColor
+    )};
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.05em;
+`;
+
+export const Select = styled(RawSelect)`
+  margin-left: 10px;
+  background: ${Colors.grey3b};
+  border-radius: 4px;
+  width: 175px;
+  color: ${Colors.whitePure};
+
+  & .ant-select-selector {
+    border: none !important;
+    height: 28px !important;
+
+    & .ant-select-selection-item {
+      pointer-events: none;
+    }
+  }
 `;

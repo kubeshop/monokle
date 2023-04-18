@@ -1,12 +1,13 @@
 import styled from 'styled-components';
 
-import Colors from '@styles/Colors';
+import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
+  background: ${Colors.black100};
 `;
 
 export const Title = styled.p`
@@ -28,14 +29,12 @@ export const Text = styled.p`
   font-size: 0.9rem;
 `;
 
+// text-decoration: underline;
 export const InfoLink = styled.a`
-  text-decoration: underline;
   color: ${Colors.grey7};
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   :hover {
-    opacity: 0.7;
-    color: ${Colors.grey7};
-    text-decoration: underline;
+    color: ${Colors.grey9};
   }
 `;
 

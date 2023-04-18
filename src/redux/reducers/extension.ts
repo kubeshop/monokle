@@ -1,10 +1,10 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {AnyExtension, ExtensionState} from '@models/extension';
-import {AnyPlugin} from '@models/plugin';
-import {AnyTemplate, TemplatePack} from '@models/template';
-
 import initialState from '@redux/initialState';
+
+import {AnyExtension, ExtensionState} from '@shared/models/extension';
+import {AnyPlugin} from '@shared/models/plugin';
+import {AnyTemplate, TemplatePack} from '@shared/models/template';
 
 export const extensionSlice = createSlice({
   name: 'extension',
@@ -39,12 +39,6 @@ export const extensionSlice = createSlice({
     addTemplatePack: (state: Draft<ExtensionState>, action: PayloadAction<AnyExtension<TemplatePack>>) => {
       const {folderPath, extension} = action.payload;
       state.templatePackMap[folderPath] = extension;
-    },
-    closePluginsDrawer: (state: Draft<ExtensionState>) => {
-      state.isPluginsDrawerVisible = false;
-    },
-    openPluginsDrawer: (state: Draft<ExtensionState>) => {
-      state.isPluginsDrawerVisible = true;
     },
     removePlugin: (state: Draft<ExtensionState>, action: PayloadAction<string>) => {
       const folderPath = action.payload;
@@ -100,7 +94,5 @@ export const {
   addMultipleTemplatePacks,
   setTemplatePackMap,
   setExtensionsDirs,
-  openPluginsDrawer,
-  closePluginsDrawer,
 } = extensionSlice.actions;
 export default extensionSlice.reducer;

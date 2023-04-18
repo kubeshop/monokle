@@ -2,12 +2,14 @@ import {useEffect, useMemo} from 'react';
 
 import {notification} from 'antd';
 
-import {AlertEnum} from '@models/alert';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {clearAlert} from '@redux/reducers/alert';
 
 import {NotificationMarkdown} from '@molecules';
+
+import {enhanceErrorMessage} from '@utils/notification';
+
+import {AlertEnum} from '@shared/models/alert';
 
 const MessageBox: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -37,8 +39,15 @@ const MessageBox: React.FC = () => {
       notification[notificationType]({
         key: alert.id,
         message: alert.title,
-        description: <NotificationMarkdown notification={alert} type={notificationType} />,
+        description: (
+          <NotificationMarkdown
+            notification={{...alert, message: enhanceErrorMessage(alert.message)}}
+            type={notificationType}
+          />
+        ),
         duration: alert.duration || 4,
+        style: {zIndex: '10000'},
+        icon: alert.icon,
       });
     }
 
