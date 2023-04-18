@@ -59,15 +59,16 @@ interface CreateFileEntryArgs {
   fileMap: FileMapType;
   helmChartId?: string;
   extension: string;
+  isExcluded: boolean;
 }
 
 // TODO: Maybe text shouldn't be optional
-export function createFileEntry({fileEntryPath, fileMap, helmChartId, extension}: CreateFileEntryArgs) {
+export function createFileEntry({fileEntryPath, fileMap, helmChartId, extension, isExcluded}: CreateFileEntryArgs) {
   const fileEntry: FileEntry = {
     name: path.basename(fileEntryPath),
     filePath: fileEntryPath,
     rootFolderPath: fileMap[ROOT_FILE_ENTRY].filePath,
-    isExcluded: false,
+    isExcluded,
     isSupported: false,
     helmChartId,
     extension,
@@ -170,7 +171,8 @@ export function readFiles(
   },
   depth: number = 1,
   helmChart?: HelmChart,
-  sideEffect?: FileSideEffect
+  sideEffect?: FileSideEffect,
+  isExcluded?: boolean
 ) {
   const {projectConfig, resourceMetaMap, resourceContentMap, fileMap, helmChartMap, helmValuesMap, helmTemplatesMap} =
     stateArgs;
@@ -211,12 +213,18 @@ export function readFiles(
 
       const isDir = getFileStats(filePath)?.isDirectory();
 
-      const isExcluded = fileIsExcluded(fileEntryPath, projectConfig);
+      const isPathExcluded = isExcluded ? Boolean(isExcluded) : fileIsExcluded(fileEntryPath, projectConfig);
       // const isIncluded = fileIsIncluded(fileEntryPath, projectConfig);
 
       let extension = isDir ? '' : path.extname(fileEntryPath);
 
-      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, extension});
+      const fileEntry = createFileEntry({
+        fileEntryPath,
+        fileMap,
+        helmChartId: helmChart?.id,
+        extension,
+        isExcluded: Boolean(isPathExcluded),
+      });
       // TODO: should we handle these differenly?
       // fileEntry.isExcluded = Boolean(isExcluded);
       // fileEntry.isSupported = Boolean(isIncluded);
@@ -225,9 +233,7 @@ export function readFiles(
         createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
       }
 
-      if (isExcluded) {
-        fileEntry.isExcluded = true;
-      } else if (isDir) {
+      if (isDir) {
         const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
         if (depth === folderReadsMaxDepth) {
           log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
@@ -244,7 +250,9 @@ export function readFiles(
               helmTemplatesMap,
             },
             depth + 1,
-            helmChart
+            helmChart,
+            undefined,
+            Boolean(isPathExcluded)
           );
         }
       } else if (helmChart && isHelmValuesFile(fileEntry.name)) {
@@ -622,7 +630,12 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substring(rootFolderEntry.filePath.length);
   const extension = path.extname(absolutePath);
-  const fileEntry = createFileEntry({fileEntryPath: relativePath, fileMap: state.fileMap, extension});
+  const fileEntry = createFileEntry({
+    fileEntryPath: relativePath,
+    fileMap: state.fileMap,
+    extension,
+    isExcluded: false,
+  });
 
   if (!fileIsIncluded(fileEntry.filePath, projectConfig)) {
     return fileEntry;
@@ -662,6 +675,7 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
       fileEntryPath: absolutePath.substring(rootFolder.length),
       fileMap: state.fileMap,
       extension: path.extname(absolutePath),
+      isExcluded: false,
     });
     folderEntry.children = readFiles(
       absolutePath,

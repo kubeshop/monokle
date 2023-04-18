@@ -18,7 +18,7 @@ import {FileEntry} from '@shared/models/fileEntry';
 import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './TreeNode.styled';
-import {useDelete, useFolderMenuItems, useIsDisabled} from './hooks';
+import {useDelete, useFolderMenuItems, useIsDisabled, useIsExcluded} from './hooks';
 
 type Props = {
   folderPath: string;
@@ -34,6 +34,7 @@ const TreeNodeFolder: React.FC<Props> = props => {
 
   const {deleteEntry, isDeleteLoading} = useDelete();
   const isDisabled = useIsDisabled(folderEntry);
+  const isExcluded = useIsExcluded(folderEntry);
 
   const menuItems = useFolderMenuItems({deleteEntry, isInClusterMode, isInPreviewMode}, folderEntry);
   const contextMenuButtonRef = useRef<HTMLDivElement>(null);
@@ -53,6 +54,7 @@ const TreeNodeFolder: React.FC<Props> = props => {
   return (
     <S.NodeContainer
       $isDisabled={isDisabled}
+      $isExcluded={folderEntry.isExcluded}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onContextMenu={onContextMenu}

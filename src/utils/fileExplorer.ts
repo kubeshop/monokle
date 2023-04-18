@@ -3,8 +3,10 @@ import {DataNode} from 'antd/lib/tree';
 import {orderBy} from 'lodash';
 import path from 'path';
 
+import {fileIsExcluded} from '@redux/services/fileEntry';
+
 import {FileMapType} from '@shared/models/appState';
-import {FileExplorerSortOrder} from '@shared/models/config';
+import {FileExplorerSortOrder, ProjectConfig} from '@shared/models/config';
 import {TreeNode} from '@shared/models/explorer';
 import {isDefined} from '@shared/utils/filter';
 
@@ -72,7 +74,8 @@ export function createFileNodes(folderPath: string, fileMap: FileMapType) {
 export function createFolderTree(
   folderPath: string,
   fileMap: FileMapType,
-  fileExplorerSortOrder: FileExplorerSortOrder
+  fileExplorerSortOrder: FileExplorerSortOrder,
+  projectConfig: ProjectConfig
 ) {
   const folderEntry = fileMap[folderPath];
   if (!folderEntry || !isDefined(folderEntry.children)) {
@@ -82,16 +85,20 @@ export function createFolderTree(
   const fileNodes = createFileNodes(folderPath, fileMap);
   const folderNodes =
     folderEntry.children
-      ?.map(childPath => createFolderTree(path.join(folderPath, childPath), fileMap, fileExplorerSortOrder))
+      ?.map(childPath =>
+        createFolderTree(path.join(folderPath, childPath), fileMap, fileExplorerSortOrder, projectConfig)
+      )
       .filter(isDefined) || [];
 
   let children: DataNode[] = sortNodes(folderNodes, fileNodes, fileExplorerSortOrder);
+  const isExcluded = fileIsExcluded(folderEntry.filePath, projectConfig);
 
-  const treeNode: DataNode = {
+  const treeNode: DataNode | any = {
     key: folderEntry.filePath,
     title: path.basename(folderEntry.filePath),
     children,
     selectable: false,
+    isExcluded,
   };
 
   return treeNode;

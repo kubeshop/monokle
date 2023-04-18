@@ -75,12 +75,12 @@ export const TitleText = styled.span<{
   fontStyle: props.$isExcluded ? `italic` : 'inherit',
 }));
 
-export const NodeContainer = styled.div<{$isDisabled: boolean}>`
+export const NodeContainer = styled.div<{$isDisabled: boolean; $isExcluded: boolean}>`
   position: relative;
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: ${({$isDisabled}) => ($isDisabled ? 'default' : 'inherit')};
+  cursor: ${({$isDisabled, $isExcluded}) => ($isDisabled || $isExcluded ? 'default' : 'inherit')};
   height: 100%;
 `;

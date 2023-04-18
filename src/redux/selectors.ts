@@ -172,14 +172,20 @@ export const kustomizationResourcesSelectors = createSelector(
 );
 
 export const projectFileTreeSelector = createSelector(
-  [(state: RootState) => state.main.fileMap, (state: RootState) => state.config.fileExplorerSortOrder],
-  (fileMap, fileExplorerSortOrder) => {
+  [
+    (state: RootState) => state.main.fileMap,
+    (state: RootState) => state.config.fileExplorerSortOrder,
+    (state: RootState) => state.config.projectConfig,
+  ],
+  (fileMap, fileExplorerSortOrder, projectConfig) => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
 
     const rootFileNodes = createFileNodes(path.sep, fileMap);
     const rootFolderNodes =
       rootEntry?.children
-        ?.map(folderPath => createFolderTree(`${path.sep}${folderPath}`, fileMap, fileExplorerSortOrder))
+        ?.map(folderPath =>
+          createFolderTree(`${path.sep}${folderPath}`, fileMap, fileExplorerSortOrder, projectConfig || {})
+        )
         .filter(isDefined) || [];
     return sortNodes(rootFolderNodes, rootFileNodes, fileExplorerSortOrder);
   }

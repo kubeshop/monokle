@@ -1,4 +1,4 @@
-import {useLayoutEffect, useRef} from 'react';
+import {useEffect, useLayoutEffect, useRef} from 'react';
 import {useMeasure} from 'react-use';
 
 import {isString} from 'lodash';
@@ -62,6 +62,10 @@ const FileSystemTree: React.FC = () => {
     }, 50);
   }, [fileExplorerExpandedFolders, firstHighlightedFileRef]);
 
+  useEffect(() => {
+    console.log('treeData', treeData);
+  }, [treeData]);
+
   return (
     <S.TreeContainer ref={containerRef}>
       <S.TreeDirectoryTree
@@ -88,10 +92,11 @@ const FileSystemTree: React.FC = () => {
         virtual
         onClick={(mouseEvent, nodeEvent) => {
           mouseEvent.preventDefault();
+          console.log('nodeEvent', nodeEvent);
           if (nodeEvent.selectable === false) {
             return;
           }
-          if (typeof nodeEvent.key === 'string' && !nodeEvent.disabled) {
+          if (typeof nodeEvent.key === 'string') {
             if (isHelmValuesFile(nodeEvent.key)) {
               const valuesFileId = helmValuesMapByFilePath[nodeEvent.key].id;
               dispatch(selectHelmValuesFile({valuesFileId}));
