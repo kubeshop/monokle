@@ -73,6 +73,7 @@ export const TitleText = styled.span<{
     (!props.$isSupported && Colors.grey7) ||
     Colors.blue10,
   fontStyle: props.$isExcluded ? `italic` : 'inherit',
+  cursor: !props.$isSupported || props.$isExcluded ? 'not-allowed' : 'pointer',
 }));
 
 export const NodeContainer = styled.div<{$isDisabled: boolean; $isExcluded: boolean}>`

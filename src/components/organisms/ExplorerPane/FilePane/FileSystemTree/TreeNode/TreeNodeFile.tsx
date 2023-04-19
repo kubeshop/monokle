@@ -45,11 +45,11 @@ const TreeNodeFile: React.FC<Props> = props => {
   const menuItems = useFileMenuItems({deleteEntry, canBePreviewed}, fileEntry);
 
   const onContextMenu = useCallback(() => {
-    if (isDisabled || !contextMenuButtonRef.current) {
+    if (!fileEntry.isSupported || !contextMenuButtonRef.current) {
       return;
     }
     contextMenuButtonRef.current.click();
-  }, [isDisabled]);
+  }, [fileEntry.isSupported]);
 
   if (!fileEntry) {
     return null;

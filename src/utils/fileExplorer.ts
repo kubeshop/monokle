@@ -65,7 +65,7 @@ export function createFileNodes(folderPath: string, fileMap: FileMapType) {
     isLeaf: true,
     disabled: isFileEntryDisabled(entry),
     isExcluded: entry.isExcluded,
-    isSupoorted: entry.isSupported,
+    isSupported: entry.isSupported,
   }));
 
   return fileNodes;
@@ -98,7 +98,7 @@ export function createFolderTree(
     children,
     selectable: false,
     isExcluded: folderEntry.isExcluded,
-    isSupoorted: folderEntry.isSupported,
+    isSupported: folderEntry.isSupported,
   };
 
   return treeNode;
