@@ -66,7 +66,10 @@ export async function monitorGitFolder(rootFolderPath: string | null, thunkAPI: 
 
       const absolutePathEndsWithGit = absolutePath.endsWith(`${sep}.git`);
 
-      if (path.startsWith(`${absolutePath}${absolutePathEndsWithGit ? '' : `${sep}.git`}${sep}FETCH_HEAD`)) {
+      if (
+        path.startsWith(`${absolutePath}${absolutePathEndsWithGit ? '' : `${sep}.git`}${sep}FETCH_HEAD`) ||
+        path.startsWith(`${absolutePath}${absolutePathEndsWithGit ? '' : `${sep}.git`}${sep}HEAD`)
+      ) {
         getRepoInfo({path: rootFolderPath})
           .then(repo => {
             thunkAPI.dispatch(setRepo(repo));
