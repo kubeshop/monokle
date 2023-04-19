@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import log from 'loglevel';
-import {stringify} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
@@ -8,6 +7,8 @@ import {setAlert} from '@redux/reducers/alert';
 import {doesTextStartWithYamlDocumentDelimiter} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {removeNamespaceFromCluster} from '@redux/thunks/utils';
+
+import {stringifyK8sResource} from '@utils/yaml';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
@@ -35,7 +36,7 @@ const applyMultipleResources = async (
         delete resourceObject.metadata.namespace;
       }
 
-      return stringify(resourceObject);
+      return stringifyK8sResource(resourceObject);
     })
     .reduce<string>((fullYaml, currentText) => {
       if (doesTextStartWithYamlDocumentDelimiter(currentText)) {

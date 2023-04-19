@@ -2,7 +2,6 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import _, {cloneDeep} from 'lodash';
 import log from 'loglevel';
-import {stringify} from 'yaml';
 
 import {currentConfigSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {setAlert} from '@redux/reducers/alert';
@@ -16,6 +15,7 @@ import {updateResource} from '@redux/thunks/updateResource';
 import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
 import {errorAlert, successAlert} from '@utils/alert';
+import {stringifyK8sResource} from '@utils/yaml';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
@@ -48,7 +48,7 @@ function applyK8sResource(
   }
 
   return applyYamlToCluster({
-    yaml: stringify(resourceObject),
+    yaml: stringifyK8sResource(resourceObject),
     context,
     kubeconfig,
     namespace,
@@ -137,7 +137,7 @@ export async function applyResource(
           if (options?.isInClusterMode && kubeconfigPath) {
             getResourceFromCluster(resourceMeta, kubeconfigPath, context).then(resourceFromCluster => {
               delete resourceFromCluster?.metadata?.managedFields;
-              const updatedResourceText = stringify(resourceFromCluster, {sortMapEntries: true});
+              const updatedResourceText = stringifyK8sResource(resourceFromCluster, {sortMapEntries: true});
               if (resourceContentMapByStorage.cluster[resourceFromCluster?.metadata?.uid]) {
                 dispatch(
                   updateResource({
