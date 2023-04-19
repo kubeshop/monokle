@@ -634,7 +634,12 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
     fileEntryPath: relativePath,
     fileMap: state.fileMap,
     extension,
-    isExcluded: false,
+    isExcluded: Array.from({length: relativePath.split(path.sep).length}, (_, i) =>
+      relativePath
+        .split(path.sep)
+        .slice(0, i + 1)
+        .join(path.sep)
+    ).some(p => fileIsExcluded(p, projectConfig)),
   });
 
   if (!fileIsIncluded(fileEntry.filePath, projectConfig)) {
@@ -671,11 +676,17 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
   log.info(`adding folder ${absolutePath}`);
   const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
   if (absolutePath.startsWith(rootFolder)) {
+    const fileEntryPath = absolutePath.substring(rootFolder.length);
     const folderEntry = createFileEntry({
-      fileEntryPath: absolutePath.substring(rootFolder.length),
+      fileEntryPath,
       fileMap: state.fileMap,
       extension: path.extname(absolutePath),
-      isExcluded: false,
+      isExcluded: Array.from({length: fileEntryPath.split(path.sep).length}, (_, i) =>
+        fileEntryPath
+          .split(path.sep)
+          .slice(0, i + 1)
+          .join(path.sep)
+      ).some(p => fileIsExcluded(p, projectConfig)),
     });
     folderEntry.children = readFiles(
       absolutePath,

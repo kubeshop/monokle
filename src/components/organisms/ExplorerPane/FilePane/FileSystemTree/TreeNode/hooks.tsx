@@ -252,10 +252,12 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     }
     const newMenuItems: AntdMenuItem[] = [];
 
-    newMenuItems.push({
-      type: 'divider',
-      key: 'divider-1',
-    });
+    if (!fileEntry.isExcluded) {
+      newMenuItems.push({
+        type: 'divider',
+        key: 'divider-1',
+      });
+    }
 
     newMenuItems.push({
       key: 'update_scanning',
@@ -291,6 +293,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     newMenuItems.push({
       key: 'rename',
       label: 'Rename',
+      disabled: fileEntry.isExcluded,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
         renameFileEntry(fileEntry);
@@ -300,6 +303,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     newMenuItems.push({
       key: 'delete',
       label: 'Delete',
+      disabled: fileEntry.isExcluded,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
         deleteEntry(fileEntry);
@@ -324,6 +328,13 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
         showItemInFolder(join(fileEntry.rootFolderPath, fileEntry.filePath));
       },
     });
+
+    if (fileEntry.isExcluded) {
+      newMenuItems.push({
+        type: 'divider',
+        key: 'divider-1',
+      });
+    }
 
     return newMenuItems;
   }, [
@@ -435,6 +446,7 @@ export const useFileMenuItems = (
     newMenuItems.push({
       key: 'duplicate',
       label: 'Duplicate',
+      disabled: fileEntry.isExcluded,
       onClick: () => {
         duplicate(fileEntry);
       },
@@ -444,13 +456,18 @@ export const useFileMenuItems = (
       newMenuItems.push({
         key: 'compare',
         label: 'Compare with another file',
+        disabled: fileEntry.isExcluded,
         onClick: () => {
           dispatch(openFileCompareModal(fileEntry.filePath));
         },
       });
     }
 
-    newMenuItems.push(...commonMenuItems);
+    if (fileEntry.isExcluded) {
+      newMenuItems.unshift(...commonMenuItems);
+    } else {
+      newMenuItems.push(...commonMenuItems);
+    }
 
     return newMenuItems;
   }, [
@@ -532,7 +549,11 @@ export const useFolderMenuItems = (
       },
     });
 
-    newMenuItems.push(...commonMenuItems);
+    if (fileEntry.isExcluded) {
+      newMenuItems.unshift(...commonMenuItems);
+    } else {
+      newMenuItems.push(...commonMenuItems);
+    }
 
     return newMenuItems;
   }, [

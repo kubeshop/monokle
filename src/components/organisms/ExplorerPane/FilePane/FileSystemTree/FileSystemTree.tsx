@@ -95,7 +95,7 @@ const FileSystemTree: React.FC = () => {
 
           const fileEntry = fileMapRef.current[nodeEvent.key];
 
-          if (fileEntry.isExcluded) {
+          if (!fileEntry.isSupported || fileEntry.isExcluded) {
             return;
           }
 

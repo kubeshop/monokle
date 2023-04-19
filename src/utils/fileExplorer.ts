@@ -3,8 +3,6 @@ import {DataNode} from 'antd/lib/tree';
 import {orderBy} from 'lodash';
 import path from 'path';
 
-import {fileIsExcluded} from '@redux/services/fileEntry';
-
 import {FileMapType} from '@shared/models/appState';
 import {FileExplorerSortOrder, ProjectConfig} from '@shared/models/config';
 import {TreeNode} from '@shared/models/explorer';
@@ -66,6 +64,8 @@ export function createFileNodes(folderPath: string, fileMap: FileMapType) {
     title: path.basename(entry.filePath),
     isLeaf: true,
     disabled: isFileEntryDisabled(entry),
+    isExcluded: entry.isExcluded,
+    isSupoorted: entry.isSupported,
   }));
 
   return fileNodes;
@@ -91,14 +91,14 @@ export function createFolderTree(
       .filter(isDefined) || [];
 
   let children: DataNode[] = sortNodes(folderNodes, fileNodes, fileExplorerSortOrder);
-  const isExcluded = fileIsExcluded(folderEntry.filePath, projectConfig);
 
   const treeNode: DataNode | any = {
     key: folderEntry.filePath,
     title: path.basename(folderEntry.filePath),
     children,
     selectable: false,
-    isExcluded,
+    isExcluded: folderEntry.isExcluded,
+    isSupoorted: folderEntry.isSupported,
   };
 
   return treeNode;
