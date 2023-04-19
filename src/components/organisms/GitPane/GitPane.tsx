@@ -211,7 +211,11 @@ const GitPane: React.FC = () => {
           </S.FileContainer>
         </>
       ) : (
-        <S.NoChangedFilesLabel>There were no changed files found.</S.NoChangedFilesLabel>
+        <S.NoChangedFilesLabel>
+          {!gitRepo
+            ? 'Initialize a new git repository by cliking on the button from the header.'
+            : 'There were no changed files found.'}{' '}
+        </S.NoChangedFilesLabel>
       )}
 
       {gitRepo ? (

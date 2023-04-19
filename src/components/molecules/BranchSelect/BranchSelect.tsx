@@ -40,7 +40,7 @@ function BranchSelect() {
           setVisible(false);
         })
         .catch(() => {
-          showGitErrorModal('Checkout failed', undefined, `git checkout -b ${branchName}`, dispatch);
+          showGitErrorModal('Checkout failed', undefined, `git checkout ${branchName}`, dispatch);
         });
     },
     [rootFolderPath, dispatch]

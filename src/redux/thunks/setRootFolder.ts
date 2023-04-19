@@ -112,27 +112,32 @@ export const setRootFolder = createAsyncThunk<
   if (isGitRepo) {
     thunkAPI.dispatch(setGitLoading(true));
 
-    Promise.all([getRepoInfo({path: rootFolder}), getChangedFiles({localPath: rootFolder, fileMap})])
-      .then(([repo, changedFiles]) => {
-        if (typeof repo !== 'object') {
+    Promise.allSettled([getRepoInfo({path: rootFolder}), getChangedFiles({localPath: rootFolder, fileMap})]).then(
+      ([repo, changedFiles]) => {
+        if (repo.status === 'rejected' || changedFiles.status === 'rejected') {
+          const errorMessage =
+            'reason' in repo ? repo.reason : 'reason' in changedFiles ? changedFiles.reason : undefined;
+          log.error(errorMessage);
+          showGitErrorModal('Git error', errorMessage);
+          thunkAPI.dispatch(setGitLoading(false));
+          return;
+        }
+
+        if (typeof repo.value !== 'object') {
           thunkAPI.dispatch(setRepo(undefined));
           thunkAPI.dispatch(setGitLoading(false));
           return;
         }
 
-        thunkAPI.dispatch(setRepo(repo));
-        thunkAPI.dispatch(setChangedFiles(changedFiles));
+        thunkAPI.dispatch(setRepo(repo.value));
+        thunkAPI.dispatch(setChangedFiles(changedFiles.value));
         thunkAPI.dispatch(setGitLoading(false));
 
-        if (repo.remoteRepo.authRequired) {
+        if (repo.value.remoteRepo.authRequired) {
           showGitErrorModal('Authentication failed', undefined, `git remote show origin`, thunkAPI.dispatch);
         }
-      })
-      .catch(err => {
-        log.error(err.message);
-        showGitErrorModal('Git error', err.message);
-        thunkAPI.dispatch(setGitLoading(false));
-      });
+      }
+    );
   }
 
   const endTime = new Date().getTime();
