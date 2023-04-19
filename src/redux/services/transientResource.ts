@@ -27,6 +27,7 @@ metadata:
 export function createTransientResource(
   input: {name: string; kind: string; apiVersion: string; namespace?: string},
   dispatch: AppDispatch,
+  createdIn: 'local' | 'cluster',
   jsonTemplate?: Partial<K8sObject>
 ) {
   const newResourceId = uuidv4();
@@ -67,7 +68,7 @@ export function createTransientResource(
   const newResource: K8sResource = {
     name: input.name,
     storage: 'transient',
-    origin: {},
+    origin: {createdIn},
     id: newResourceId,
     kind: input.kind,
     apiVersion: input.apiVersion,
@@ -83,6 +84,7 @@ export function createTransientResource(
 
 export function createMultipleTransientResources(
   inputs: {name: string; kind: string; apiVersion: string; namespace?: string; obj?: K8sObject}[],
+  createdIn: 'local' | 'cluster',
   dispatch: AppDispatch
 ) {
   const resources: K8sResource[] = [];
@@ -111,7 +113,7 @@ export function createMultipleTransientResources(
     const newResource: K8sResource = {
       id: uuidv4(),
       storage: 'transient',
-      origin: {},
+      origin: {createdIn},
       name: input.name,
       kind: input.kind,
       namespace: input.namespace,
