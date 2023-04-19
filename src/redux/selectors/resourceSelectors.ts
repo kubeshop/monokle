@@ -206,8 +206,6 @@ export const navigatorResourcesSelector = createSelector(
     (state: RootState) => state.main.resourceFilter,
   ],
   (activeResourceStorage, activeResourceMetaMap, transientResourceMetaMap, resourceFilter) => {
-    const list: ResourceNavigatorNode[] = [];
-
     return Object.values(activeResourceMetaMap)
       .concat(Object.values(transientResourceMetaMap).filter(r => r.origin.createdIn === activeResourceStorage))
       .filter(
@@ -258,6 +256,10 @@ export const resourceNavigatorSelector = createSelector(
 
     return list;
   }
+);
+
+export const filteredResourcesIdsSelector = createSelector(navigatorResourcesSelector, navigatorResources =>
+  navigatorResources.map(r => r.id)
 );
 
 export const navigatorResourcesCountSelector = createSelector(
