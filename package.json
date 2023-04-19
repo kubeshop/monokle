@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
@@ -182,6 +182,7 @@
     "dev": "npm run electron:dev",
     "build": "craco --max_old_space_size=4096 build",
     "test": "craco test --watchAll=false",
+    "path-package": "patch-package",
     "postinstall": "patch-package && electron-builder install-app-deps",
     "electron:dev": "concurrently \"cross-env BROWSER=none npm run start\" \"node ./scripts/wait.js && tsc -p electron -w\" \"node ./scripts/wait.js && tsc -p electron && cross-env NODE_ENV=development electron .\"",
     "electron:debug": "concurrently \"cross-env BROWSER=none npm run start\" \"node ./scripts/wait.js && tsc -p electron -w\" \"node ./scripts/wait.js && tsc -p electron && cross-env NODE_ENV=development electron --remote-debugging-port=9223 .\"",
