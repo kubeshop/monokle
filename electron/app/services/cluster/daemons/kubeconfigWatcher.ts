@@ -78,7 +78,11 @@ export class KubeConfigWatcher {
       watcher?.on('all', (type: string) => {
         if (type === 'unlink') {
           watcher?.close();
-          process.parentPort.postMessage({type: 'config/setKubeConfig', payload: undefined});
+          this.broadcastError({
+            path: kubeconfigPath,
+            code: 'not_found',
+            reason: `The kubeconfig file is deleted.`,
+          });
           return;
         }
 
@@ -107,7 +111,7 @@ export class KubeConfigWatcher {
       this.broadcastError({
         path: kubeconfigPath,
         code: 'malformed',
-        reason: `The kubeconfig is incorrectled formatted${msg ? `: ${msg}` : ''}.`,
+        reason: `The kubeconfig is incorrectly formatted${msg ? `: ${msg}` : ''}.`,
       });
     }
   }

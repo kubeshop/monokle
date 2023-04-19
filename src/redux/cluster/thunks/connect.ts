@@ -24,7 +24,7 @@ type ConnectResponse = {
  */
 export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, ThunkApi>(
   'cluster/connect',
-  async (payload, {getState, dispatch}) => {
+  async (payload, {getState, dispatch, rejectWithValue}) => {
     // Ping for healthy connection
     await dispatch(setupCluster());
     const contextId = selectCurrentContextId(getState());
@@ -36,7 +36,7 @@ export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, Thu
     const setupResponse = await setup(contextId);
 
     if (!setupResponse.success) {
-      throw new Error(setupResponse.code);
+      return rejectWithValue(setupResponse);
     }
 
     // Create connection as before

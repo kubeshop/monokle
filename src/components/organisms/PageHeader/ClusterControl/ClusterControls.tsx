@@ -34,27 +34,6 @@ export function ClusterControls() {
 
   return (
     <Box>
-      {/* <S.ClusterStatus isHalfBordered={!isClusterLoading && isInClusterMode && size.width > 950}>
-        {isKubeConfigPathValid && <ContextSelect />}
-
-        <S.ClusterStatusText
-          $isKubeConfigPathValid={isKubeConfigPathValid}
-          $isInClusterMode={!isClusterLoading && isInClusterMode}
-          $kubeConfigContextColor={kubeConfigContextColor}
-        >
-          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={tooltip}>
-            <S.ClusterAccessContainer>{icon}</S.ClusterAccessContainer>
-          </Tooltip>
-          {!isKubeConfigPathValid && <span>NO CLUSTER CONFIGURED</span>}
-        </S.ClusterStatusText>
-
-        {!isKubeConfigPathValid && (
-          <S.ClusterActionButton type="link" onClick={handleClusterConfigure}>
-            Configure
-          </S.ClusterActionButton>
-        )}
-      </S.ClusterStatus> */}
-
       <ContextSelect />
       {isInClusterMode ? <NamespaceSelect /> : null}
       {isInClusterMode ? <ExitButton /> : <ConnectButton />}

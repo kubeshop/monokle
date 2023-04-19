@@ -1,4 +1,5 @@
 import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
+import log from 'loglevel';
 
 import type {ProxyLog} from '@shared/ipc';
 
@@ -118,7 +119,7 @@ export class ProxyInstance {
   }
 
   private log(entry: ProxyLog) {
-    console.log('[kubectl-proxy]', entry);
+    log.info('[kubectl-proxy]', entry);
     this._logs.push(entry);
     if (this._logs.length > MAX_LOG_LENGTH) this._logs.shift();
   }
