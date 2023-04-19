@@ -114,6 +114,12 @@ export const setRootFolder = createAsyncThunk<
 
     Promise.all([getRepoInfo({path: rootFolder}), getChangedFiles({localPath: rootFolder, fileMap})])
       .then(([repo, changedFiles]) => {
+        if (typeof repo !== 'object') {
+          thunkAPI.dispatch(setRepo(undefined));
+          thunkAPI.dispatch(setGitLoading(false));
+          return;
+        }
+
         thunkAPI.dispatch(setRepo(repo));
         thunkAPI.dispatch(setChangedFiles(changedFiles));
         thunkAPI.dispatch(setGitLoading(false));
