@@ -2,9 +2,9 @@ import {intersection, size} from 'lodash';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
-import {filteredResourcesIdsSelector} from '@redux/selectors/resourceSelectors';
+import {filteredResourcesIdsSelector, navigatorResourcesCountSelector} from '@redux/selectors/resourceSelectors';
 import {
-  errorsResourcesIdsSelector,
+  errorsResourceIdsSelector,
   useValidationSelector,
   warningsResourcesIdsSelector,
 } from '@redux/validation/validation.selectors';
@@ -18,14 +18,16 @@ import * as S from './NavigatorDescription.styled';
 
 const NavigatorDescription: React.FC = () => {
   const dispatch = useAppDispatch();
-  const errorsResourcesIds = useValidationSelector(state => errorsResourcesIdsSelector(state));
-  const warningsResourcesIds = useValidationSelector(state => warningsResourcesIdsSelector(state));
+
+  const errorsResourcesIds = useValidationSelector(errorsResourceIdsSelector);
+  const warningsResourcesIds = useValidationSelector(warningsResourcesIdsSelector);
 
   const filteredResources = useAppSelector(filteredResourcesIdsSelector);
 
   const errorsCount = size(intersection(errorsResourcesIds, filteredResources));
   const warningsCount = size(intersection(warningsResourcesIds, filteredResources));
-  const resourceCount = size(filteredResources);
+
+  const navigatorResourcesCount = useAppSelector(navigatorResourcesCountSelector);
 
   const currentFilters = useRefSelector(state => state.validation.validationOverview.filters);
 
@@ -36,7 +38,7 @@ const NavigatorDescription: React.FC = () => {
 
   return (
     <S.NavigatorDescriptionContainer>
-      <S.ResourcesCount>{resourceCount} objects</S.ResourcesCount>
+      <S.ResourcesCount>{navigatorResourcesCount} objects</S.ResourcesCount>
 
       <S.WarningsErrorsContainer>
         <S.ProblemCountContainer onClick={() => handleSetFilters('error')}>
