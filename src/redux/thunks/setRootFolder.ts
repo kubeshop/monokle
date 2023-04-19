@@ -4,6 +4,7 @@ import log from 'loglevel';
 
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
+import {getChangedFiles, getRepoInfo, isFolderGitRepo} from '@redux/git/git.ipc';
 import {SetRootFolderPayload} from '@redux/reducers/main';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
@@ -11,13 +12,11 @@ import {isKustomizationResource} from '@redux/services/kustomize';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
-import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
 
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
-import {GitChangedFile, GitRepo} from '@shared/models/git';
 import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -102,36 +101,43 @@ export const setRootFolder = createAsyncThunk<
     silent: true,
   };
 
-  const isFolderGitRepo = await promiseFromIpcRenderer<boolean>(
-    'git.isFolderGitRepo',
-    'git.isFolderGitRepo.result',
-    rootFolder
-  );
+  let isGitRepo: boolean;
 
-  if (isFolderGitRepo) {
+  try {
+    isGitRepo = await isFolderGitRepo({path: rootFolder});
+  } catch (err) {
+    isGitRepo = false;
+  }
+
+  if (isGitRepo) {
     thunkAPI.dispatch(setGitLoading(true));
 
-    Promise.all([
-      promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder),
-      promiseFromIpcRenderer<GitChangedFile[]>('git.getChangedFiles', 'git.getChangedFiles.result', {
-        localPath: rootFolder,
-        fileMap,
-      }),
-    ])
-      .then(([repo, changedFiles]) => {
-        thunkAPI.dispatch(setRepo(repo));
-        thunkAPI.dispatch(setChangedFiles(changedFiles));
+    Promise.allSettled([getRepoInfo({path: rootFolder}), getChangedFiles({localPath: rootFolder, fileMap})]).then(
+      ([repo, changedFiles]) => {
+        if (repo.status === 'rejected' || changedFiles.status === 'rejected') {
+          const errorMessage =
+            'reason' in repo ? repo.reason : 'reason' in changedFiles ? changedFiles.reason : undefined;
+          log.error(errorMessage);
+          showGitErrorModal('Git error', errorMessage);
+          thunkAPI.dispatch(setGitLoading(false));
+          return;
+        }
+
+        if (typeof repo.value !== 'object') {
+          thunkAPI.dispatch(setRepo(undefined));
+          thunkAPI.dispatch(setGitLoading(false));
+          return;
+        }
+
+        thunkAPI.dispatch(setRepo(repo.value));
+        thunkAPI.dispatch(setChangedFiles(changedFiles.value));
         thunkAPI.dispatch(setGitLoading(false));
 
-        if (repo.remoteRepo.authRequired) {
-          showGitErrorModal('Authentication failed', `git remote show origin`, thunkAPI.dispatch);
+        if (repo.value.remoteRepo.authRequired) {
+          showGitErrorModal('Authentication failed', undefined, `git remote show origin`, thunkAPI.dispatch);
         }
-      })
-      .catch(err => {
-        log.error(err.message);
-        showGitErrorModal(err.message);
-        thunkAPI.dispatch(setGitLoading(false));
-      });
+      }
+    );
   }
 
   const endTime = new Date().getTime();
@@ -157,6 +163,6 @@ export const setRootFolder = createAsyncThunk<
     isScanExcludesUpdated: 'applied',
     isScanIncludesUpdated: 'applied',
     alert: rootFolder ? generatedAlert : undefined,
-    isGitRepo: isFolderGitRepo,
+    isGitRepo,
   };
 });

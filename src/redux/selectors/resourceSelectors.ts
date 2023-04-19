@@ -195,27 +195,40 @@ export const previewedKustomizationSelector = createDeepEqualSelector(
   }
 );
 
-export const resourceNavigatorSelector = createSelector(
+/**
+ * Selects all resources that should be visible in the navigator, mixing in transient resources and applying filters
+ */
+export const navigatorResourcesSelector = createSelector(
   [
     activeResourceStorageSelector,
     activeResourceMetaMapSelector,
     transientResourceMetaMapSelector,
     (state: RootState) => state.main.resourceFilter,
-    (state: RootState) => state.ui.navigator.collapsedResourceKinds,
   ],
-  (activeResourceStorage, activeResourceMetaMap, transientResourceMetaMap, resourceFilter, collapsedResourceKinds) => {
+  (activeResourceStorage, activeResourceMetaMap, transientResourceMetaMap, resourceFilter) => {
     const list: ResourceNavigatorNode[] = [];
 
-    const resources = Object.values(activeResourceMetaMap)
-      .concat(Object.values(transientResourceMetaMap))
+    return Object.values(activeResourceMetaMap)
+      .concat(Object.values(transientResourceMetaMap).filter(r => r.origin.createdIn === activeResourceStorage))
       .filter(
         resource =>
           isResourcePassingFilter(resource, resourceFilter) &&
           !isKustomizationResource(resource) &&
           !isKustomizationPatch(resource)
       );
+  }
+);
 
-    const groups = groupBy(resources, 'kind');
+export const resourceNavigatorSelector = createSelector(
+  [
+    activeResourceStorageSelector,
+    navigatorResourcesSelector,
+    (state: RootState) => state.ui.navigator.collapsedResourceKinds,
+  ],
+  (activeResourceStorage, navigatorResources, collapsedResourceKinds) => {
+    const list: ResourceNavigatorNode[] = [];
+
+    const groups = groupBy(navigatorResources, 'kind');
     const entries = Object.entries(groups);
     const sortedEntries = entries.sort();
 
@@ -245,4 +258,9 @@ export const resourceNavigatorSelector = createSelector(
 
     return list;
   }
+);
+
+export const navigatorResourcesCountSelector = createSelector(
+  navigatorResourcesSelector,
+  navigatorResources => navigatorResources.length
 );

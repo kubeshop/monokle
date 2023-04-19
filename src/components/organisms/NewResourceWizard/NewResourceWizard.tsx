@@ -419,6 +419,7 @@ const NewResourceWizard = () => {
         apiVersion: formValues.apiVersion,
       },
       dispatch,
+      'local',
       jsonTemplate
     );
 

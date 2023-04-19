@@ -8,6 +8,7 @@ import _ from 'lodash';
 import log from 'loglevel';
 import path, {join} from 'path';
 
+import {isFolderGitRepo} from '@redux/git/git.ipc';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {
@@ -21,8 +22,6 @@ import {
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
-
-import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {init as sentryInit} from '@sentry/electron/renderer';
 import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
@@ -50,11 +49,13 @@ import {setLeftMenuSelection, toggleStartProjectPane} from '../reducers/ui';
 import {kubeConfigPathSelector} from './appConfig.selectors';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
-  const isGitRepo = await promiseFromIpcRenderer(
-    'git.isFolderGitRepo',
-    'git.isFolderGitRepo.result',
-    project.rootFolder
-  );
+  let isGitRepo: boolean;
+
+  try {
+    isGitRepo = await isFolderGitRepo({path: project.rootFolder});
+  } catch (err) {
+    isGitRepo = false;
+  }
 
   thunkAPI.dispatch(configSlice.actions.createProject({...project, isGitRepo}));
   thunkAPI.dispatch(setOpenProject(project.rootFolder));

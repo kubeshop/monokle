@@ -5,6 +5,8 @@ import {stringify} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
+import {stringifyK8sResource} from '@utils/yaml';
+
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AlertEnum} from '@shared/models/alert';
@@ -25,7 +27,7 @@ export function getK8sObjectsAsYaml(items: any[], kind?: string, apiVersion?: st
         return `apiVersion: ${apiVersion}\nkind: ${kind}\n${stringify(item)}`;
       }
 
-      return stringify(item);
+      return stringifyK8sResource(item);
     })
     .join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
 }

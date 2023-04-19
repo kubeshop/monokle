@@ -82,8 +82,7 @@ export const InitButton = styled(RawButton)`
   border-radius: 4px;
   display: flex;
   align-items: center;
-  padding: 4px 16px;
-  height: 28px;
+  color: ${Colors.grey7};
 `;
 
 export const Logo = styled.img`

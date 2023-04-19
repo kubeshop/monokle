@@ -106,6 +106,7 @@ export const interpolateTemplate = async (templateText: string, formsData: any[]
 export const createTransientResourcesFromVanillaTemplate = async (
   template: VanillaTemplate,
   formsData: any[],
+  createdIn: 'local' | 'cluster',
   dispatch: AppDispatch
 ) => {
   const resourceTextList: string[] = [];
@@ -140,7 +141,7 @@ export const createTransientResourcesFromVanillaTemplate = async (
       obj,
     }));
 
-  const createdResources: K8sResource[] = createMultipleTransientResources(inputs, dispatch);
+  const createdResources: K8sResource[] = createMultipleTransientResources(inputs, createdIn, dispatch);
 
   return {message: template.resultMessage || 'Done.', resources: createdResources};
 };
