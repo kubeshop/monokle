@@ -8,9 +8,9 @@ import log from 'loglevel';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {currentClusterAccessSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {currentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
-import {extractK8sResources} from '@redux/services/resource';
+import {extractK8sResources, getTargetClusterNamespaces} from '@redux/services/resource';
 import {createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
@@ -46,35 +46,28 @@ const loadClusterResourcesHandler = async (
 ) => {
   const {context, port, namespace} = payload;
   const startTime = new Date().getTime();
+  const kubeConfigContext = kubeConfigContextSelector(thunkAPI.getState());
   const clusterAccess = currentClusterAccessSelector(thunkAPI.getState());
   const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
   const useKubectlProxy = thunkAPI.getState().config.useKubectlProxy;
 
-  let currentNamespace: string = namespace || '<all>';
+  let currentNamespace: string = namespace ?? 'default';
 
   trackEvent('preview/cluster/start');
 
   try {
     let kc = createKubeClient(kubeConfigPath, context, port);
-    let foundNamespace: ClusterAccess | undefined;
-    let results: PromiseSettledResult<string>[] | PromiseSettledResult<string>[][];
+    let results: PromiseSettledResult<string>[] | PromiseSettledResult<string>[][] = [];
 
-    if (clusterAccess && clusterAccess.length) {
-      foundNamespace = clusterAccess?.find(ca => ca.namespace === currentNamespace);
-
-      if (currentNamespace === '<all>') {
-        results = await Promise.all(
-          clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace, true))
-        );
-      } else {
-        if (currentNamespace !== '<not-namespaced>' && !foundNamespace) {
-          currentNamespace = clusterAccess[0].namespace;
-        }
-
-        results = await getNonCustomClusterObjects(kc, currentNamespace);
+    if (currentNamespace === '<all>') {
+      if (kubeConfigPath?.trim().length) {
+        const namespaces = await getTargetClusterNamespaces(kubeConfigPath, kubeConfigContext, clusterAccess);
+        results = await Promise.all(namespaces.map(ns => getNonCustomClusterObjects(kc, ns, true)));
       }
-    } else {
+    } else if (currentNamespace === '<not-namespaced>') {
       results = await getNonCustomClusterObjects(kc);
+    } else {
+      results = await getNonCustomClusterObjects(kc, currentNamespace);
     }
 
     const flatResults = flatten(results);
