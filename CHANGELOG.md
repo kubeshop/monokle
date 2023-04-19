@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.8](https://github.com/kubeshop/monokle/compare/v2.0.8-prerelease-398a993936618a06c00cb8e6f44bfa1290ae024e.0...v2.0.8) (2023-04-19)
+
+
+### Bug Fixes
+
+* checking out to remote branch ([3b506ee](https://github.com/kubeshop/monokle/commit/3b506ee4e4e3b9bc0513d045223f6e0bd0550faf))
+* checkout command ([db3403a](https://github.com/kubeshop/monokle/commit/db3403a03f5210d131cef398231d0e6815e9e632))
+* consistent YAML parsing/stringification and octal formatting ([95e7042](https://github.com/kubeshop/monokle/commit/95e70426b6a5268dbcfccf12b10cd96192ea344d))
+* **docs:** link for linux release binaries ([36171cb](https://github.com/kubeshop/monokle/commit/36171cb962788e8ea2169c1e6cec13a05e17c492))
+* **docs:** link name for downloading linux bundles ([8d11db5](https://github.com/kubeshop/monokle/commit/8d11db5d2d246cfa90d9571e1fb65966bacdfe3e))
+* **docs:** merge conflict ([a78a709](https://github.com/kubeshop/monokle/commit/a78a709ef7ed61145b96d534f320eacf89ae6730))
+* **docs:** update to include .rpm binaries ([fd128a5](https://github.com/kubeshop/monokle/commit/fd128a5e8e587dd37695f431d67687faa978be0a))
+* getRepoInfo ([4d63d54](https://github.com/kubeshop/monokle/commit/4d63d54f9f047405951e40da302851be206d533d))
+* git log ([816805c](https://github.com/kubeshop/monokle/commit/816805c286c1231a308c34a3fc08e8474c9d9ee6))
+* hide namespace  filter in cluster mode ([4e6a3ad](https://github.com/kubeshop/monokle/commit/4e6a3ad9ddbffad65d8d2c94495c42da8fa7e93d))
+* improved handling of transient resources ([392b8b9](https://github.com/kubeshop/monokle/commit/392b8b9c77e5d61a6e49142b6fc69c05b1a9c77b))
+* isFolderGitRepo catch ([cf52237](https://github.com/kubeshop/monokle/commit/cf522372d1f183f86d1b35a1b05bf4c73e8bcc76))
+* memoize selector ([a993662](https://github.com/kubeshop/monokle/commit/a9936627aa9649ffaec3552e77d3e9e4511a8ece))
+* more fixes ([c11ebf4](https://github.com/kubeshop/monokle/commit/c11ebf4141b2076f1de6c13a99f50922212cb741))
+* Promise.all handle error ([14e87ad](https://github.com/kubeshop/monokle/commit/14e87ad42b89954a0f15d082bbe62bef5ffd2af3))
+* reload namespaces list on cluster connection ([4d11c1c](https://github.com/kubeshop/monokle/commit/4d11c1c82eb32034169456f164e01345652e1144))
+* removed import from old git ipc ([4704979](https://github.com/kubeshop/monokle/commit/4704979a2379c6bfa34c0191d7fc159de0ce3077))
+* resource errors count ([f23ca1d](https://github.com/kubeshop/monokle/commit/f23ca1d665d4a89656c781861c11067f59110302))
+* review comments ([50632e9](https://github.com/kubeshop/monokle/commit/50632e9bb11327dd4ee07c8c95496a47b881398a))
+* set root folder pending git ([b5cca71](https://github.com/kubeshop/monokle/commit/b5cca71909f80013bacc03b4390f09d395989a4a))
+* try/catch ([8672f0e](https://github.com/kubeshop/monokle/commit/8672f0e413c1481dc5e0feddc7799ef6a267cb46))
+* update the count ([0fa0cc7](https://github.com/kubeshop/monokle/commit/0fa0cc7a8e8006d8d5206d1a2fdb1e51484d805b))
+* validation resources count ([401758c](https://github.com/kubeshop/monokle/commit/401758cfa73d356ed3203035f4f050a571433116))
+
 ### [2.0.7](https://github.com/kubeshop/monokle/compare/v2.0.7-nightly-2023-04-06.0...v2.0.7) (2023-04-06)
 
 
