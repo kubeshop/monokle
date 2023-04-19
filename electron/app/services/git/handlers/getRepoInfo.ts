@@ -59,7 +59,7 @@ export async function getRepoInfo({path}: GitPathParams): Promise<GitRepo> {
     const branchName = branchMapValues[i].name;
 
     // get the list of commits for each branch found
-    const commits = [...(await git.log({[branchName]: null})).all];
+    const commits = [...(await git.log({[branchName === gitRepo.currentBranch ? '.' : branchName]: null})).all];
 
     branchMapValues[i].commits = orderBy(commits, ['date'], ['desc']);
   }
