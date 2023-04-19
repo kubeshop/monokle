@@ -1,6 +1,7 @@
 import log from 'loglevel';
 import path from 'path';
-import {parseAllDocuments} from 'yaml';
+
+import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {createFolder, deleteFile, doesPathExist, writeFile} from '@shared/utils/fileSystem';
 
@@ -10,7 +11,7 @@ export async function saveCRD(crdsDir: string, crdContent: string) {
     await createFolder(crdsDir);
   }
   try {
-    const documents = parseAllDocuments(crdContent);
+    const documents = parseAllYamlDocuments(crdContent);
     for (let i = 0; i < documents.length; i += 1) {
       const doc = documents[i];
       const json = doc.toJSON();

@@ -1,7 +1,7 @@
 import log from 'loglevel';
-import {Document, LineCounter, ParsedNode, Scalar, isMap, isPair, isScalar, isSeq, parseDocument, visit} from 'yaml';
+import {Document, LineCounter, ParsedNode, Scalar, isMap, isPair, isScalar, isSeq, visit} from 'yaml';
 
-import {parseAllYamlDocuments} from '@utils/yaml';
+import {parseAllYamlDocuments, parseYamlDocument} from '@utils/yaml';
 
 import {K8sObject} from '@shared/models/k8s';
 
@@ -19,8 +19,8 @@ function copyValueIfMissing(templateDoc: Document.Parsed<ParsedNode>, path: read
  */
 
 export function mergeManifests(template: string, values: string) {
-  const templateDoc = parseDocument(template);
-  const valuesDoc = parseDocument(values);
+  const templateDoc = parseYamlDocument(template);
+  const valuesDoc = parseYamlDocument(values);
 
   const pathsToRemove: any[] = [];
 

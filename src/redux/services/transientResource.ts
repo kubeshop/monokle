@@ -1,9 +1,8 @@
 import {v4 as uuidv4} from 'uuid';
-import {stringify} from 'yaml';
 
 import {addMultipleResources, addResource} from '@redux/reducers/main';
 
-import {parseYamlDocument} from '@utils/yaml';
+import {parseYamlDocument, stringifyK8sResource} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -59,7 +58,7 @@ export function createTransientResource(
       };
     }
 
-    newResourceText = stringify(newResourceObject);
+    newResourceText = stringifyK8sResource(newResourceObject);
   } else {
     newResourceText = createDefaultResourceText(input);
     newResourceObject = parseYamlDocument(newResourceText).toJS();
@@ -104,7 +103,7 @@ export function createMultipleTransientResources(
           namespace: input.namespace,
         },
       };
-      resourceText = stringify(resourceObject);
+      resourceText = stringifyK8sResource(resourceObject);
     } else {
       resourceText = createDefaultResourceText(input);
       resourceObject = parseYamlDocument(resourceText).toJS();
