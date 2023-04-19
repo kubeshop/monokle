@@ -1,4 +1,4 @@
-import {useEffect, useLayoutEffect, useRef} from 'react';
+import {useLayoutEffect, useRef} from 'react';
 import {useMeasure} from 'react-use';
 
 import {isString} from 'lodash';
@@ -9,7 +9,7 @@ import {setFileExplorerExpandedFolders} from '@redux/reducers/ui';
 import {helmValuesMapByFilePathSelector, projectFileTreeSelector, selectionFilePathSelector} from '@redux/selectors';
 
 import {getAllParentFolderPaths} from '@utils/files';
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector, useSelectorWithRef} from '@utils/hooks';
 
 import {isFileSelection} from '@shared/models/selection';
 import {isHelmValuesFile} from '@shared/utils';
@@ -27,7 +27,7 @@ const FileSystemTree: React.FC = () => {
   const [firstHighlightedFile, firstHighlightedFileRef] = useSelectorWithRef(state =>
     state.main.highlights.find(isFileSelection)
   );
-  const [fileMap, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const fileMapRef = useRefSelector(state => state.main.fileMap);
 
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -62,10 +62,6 @@ const FileSystemTree: React.FC = () => {
       treeRef.current?.scrollTo({key: firstHighlightedFileRef.current?.filePath});
     }, 50);
   }, [fileExplorerExpandedFolders, firstHighlightedFileRef]);
-
-  useEffect(() => {
-    console.log('fileMapRef', fileMapRef);
-  }, [fileMapRef]);
 
   return (
     <S.TreeContainer ref={containerRef}>

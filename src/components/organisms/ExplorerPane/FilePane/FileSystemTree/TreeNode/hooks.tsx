@@ -113,13 +113,6 @@ export const useIsDisabled = (fileEntry?: FileEntry) => {
   return isDisabled;
 };
 
-export const useIsExcluded = (fileEntry?: FileEntry) => {
-  const isExcluded = useMemo(() => {
-    return fileEntry?.isExcluded;
-  }, [fileEntry]);
-  return isExcluded;
-};
-
 export const usePreview = () => {
   const localResourceMetaMapRef = useResourceMetaMapRef('local');
   const fileMapRef = useRefSelector(state => state.main.fileMap);
