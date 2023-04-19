@@ -3,6 +3,7 @@ import {TypedUseSelectorHook} from 'react-redux';
 import {createSelector} from 'reselect';
 
 import {useAppSelector} from '@redux/hooks';
+import {filteredResourcesIdsSelector} from '@redux/selectors/resourceSelectors';
 import {createDeepEqualSelector} from '@redux/selectors/utils';
 
 import {
@@ -69,11 +70,6 @@ export const problemsByResourcesSelector = createDeepEqualSelector(
 export const errorsByResourcesSelector = (state: ValidationState) => problemsByResourcesSelector(state, 'error');
 export const warningsByResourcesSelector = (state: ValidationState) => problemsByResourcesSelector(state, 'warning');
 
-export const errorsResourceIdsSelector = createSelector(errorsByResourcesSelector, errors => Object.keys(errors));
-export const warningsResourcesIdsSelector = createSelector(warningsByResourcesSelector, warnings =>
-  Object.keys(warnings)
-);
-
 export const problemsByResourceSelector = createDeepEqualSelector(
   [
     (state: ValidationState, _resource?: string, level?: RuleLevel) => {
@@ -90,6 +86,20 @@ export const errorsByResourceSelector = (state: ValidationState, resource?: stri
 export const warningsByResourceSelector = (state: ValidationState, resource?: string) => {
   return problemsByResourceSelector(state, resource, 'warning');
 };
+
+export const errorsByResourcesFilterCountSelector = createSelector(
+  [filteredResourcesIdsSelector, errorsByResourcesSelector],
+  (filteredResources, errorsByResourceMap) => {
+    return filteredResources.map(id => errorsByResourceMap[id]?.length || 0).reduce((a, b) => a + b, 0);
+  }
+);
+
+export const warningsByResourcesFilterCountSelector = createSelector(
+  [filteredResourcesIdsSelector, warningsByResourcesSelector],
+  (filteredResources, warningsByResourceMap) => {
+    return filteredResources.map(id => warningsByResourceMap[id]?.length || 0).reduce((a, b) => a + b, 0);
+  }
+);
 
 /* * * * * * * * * * * * * * * * * *
  * Problems by file path

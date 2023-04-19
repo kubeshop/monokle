@@ -1,12 +1,10 @@
-import {intersection, size} from 'lodash';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
-import {filteredResourcesIdsSelector, navigatorResourcesCountSelector} from '@redux/selectors/resourceSelectors';
+import {navigatorResourcesCountSelector} from '@redux/selectors/resourceSelectors';
 import {
-  errorsResourceIdsSelector,
+  errorsByResourcesFilterCountSelector,
   useValidationSelector,
-  warningsResourcesIdsSelector,
+  warningsByResourcesFilterCountSelector,
 } from '@redux/validation/validation.selectors';
 import {setValidationFilters} from '@redux/validation/validation.slice';
 
@@ -19,13 +17,8 @@ import * as S from './NavigatorDescription.styled';
 const NavigatorDescription: React.FC = () => {
   const dispatch = useAppDispatch();
 
-  const errorsResourcesIds = useValidationSelector(errorsResourceIdsSelector);
-  const warningsResourcesIds = useValidationSelector(warningsResourcesIdsSelector);
-
-  const filteredResources = useAppSelector(filteredResourcesIdsSelector);
-
-  const errorsCount = size(intersection(errorsResourcesIds, filteredResources));
-  const warningsCount = size(intersection(warningsResourcesIds, filteredResources));
+  const errorsCount = useValidationSelector(errorsByResourcesFilterCountSelector);
+  const warningsCount = useValidationSelector(warningsByResourcesFilterCountSelector);
 
   const navigatorResourcesCount = useAppSelector(navigatorResourcesCountSelector);
 
