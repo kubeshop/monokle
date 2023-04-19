@@ -88,14 +88,14 @@ export const warningsByResourceSelector = (state: ValidationState, resource?: st
 };
 
 export const errorsByResourcesFilterCountSelector = createSelector(
-  [filteredResourcesIdsSelector, errorsByResourcesSelector],
+  [filteredResourcesIdsSelector, state => errorsByResourcesSelector(state.validation)],
   (filteredResources, errorsByResourceMap) => {
     return filteredResources.map(id => errorsByResourceMap[id]?.length || 0).reduce((a, b) => a + b, 0);
   }
 );
 
 export const warningsByResourcesFilterCountSelector = createSelector(
-  [filteredResourcesIdsSelector, warningsByResourcesSelector],
+  [filteredResourcesIdsSelector, state => warningsByResourcesSelector(state.validation)],
   (filteredResources, warningsByResourceMap) => {
     return filteredResources.map(id => warningsByResourceMap[id]?.length || 0).reduce((a, b) => a + b, 0);
   }

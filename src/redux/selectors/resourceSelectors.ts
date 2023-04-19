@@ -258,9 +258,8 @@ export const resourceNavigatorSelector = createSelector(
   }
 );
 
-export const filteredResourcesIdsSelector = createSelector(
-  [navigatorResourcesSelector, state => state.main.resourceFilter],
-  navigatorResources => navigatorResources.map(r => r.id)
+export const filteredResourcesIdsSelector = createSelector(navigatorResourcesSelector, navigatorResources =>
+  navigatorResources.map(r => r.id)
 );
 
 export const navigatorResourcesCountSelector = createSelector(
