@@ -230,7 +230,7 @@ const PageHeader = () => {
                     disabled={!isGitInstalled}
                     icon={<Icon name="git" />}
                     loading={isInitializingGitRepo || gitLoading}
-                    type="primary"
+                    type="text"
                     size="small"
                     onClick={initGitRepoHandler}
                   >
