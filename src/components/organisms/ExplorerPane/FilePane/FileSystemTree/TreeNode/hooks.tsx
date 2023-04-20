@@ -260,12 +260,12 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
       });
     }
 
-    const canBeExcluded = !fileEntry.isExcluded && !fileIsExcluded(fileEntry.filePath, projectConfig || {});
+    const disableForExcluded = fileEntry.isExcluded && !fileIsExcluded(fileEntry.filePath, projectConfig || {});
 
     newMenuItems.push({
       key: 'update_scanning',
       label: `${fileEntry.isExcluded ? 'Remove from' : 'Add to'} Files: Exclude`,
-      disabled: !canBeExcluded,
+      disabled: disableForExcluded,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
         if (fileEntry.isExcluded) {
