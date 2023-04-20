@@ -51,7 +51,7 @@ function setOctalFormatForVolumeModeProperties(volumes: any) {
       let projectedNode = v.get('projected');
       if (projectedNode) {
         setOctalFormat(projectedNode.get('defaultMode', true));
-        projectedNode.get('sources')?.items.forEach((item: any) => {
+        projectedNode.get('sources')?.items.forEach(() => {
           setModePropertiesToOctal(v.get('secret'));
           setModePropertiesToOctal(v.get('configMap'));
           setModePropertiesToOctal(v.get('downwardAPI'));
