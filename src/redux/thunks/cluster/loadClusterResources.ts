@@ -3,7 +3,7 @@ import {KubeConfig} from '@kubernetes/client-node';
 
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {flatten} from 'lodash';
+import {flatten, isArray} from 'lodash';
 import log from 'loglevel';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
@@ -12,6 +12,8 @@ import {currentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathS
 import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
 import {extractK8sResources, getTargetClusterNamespaces} from '@redux/services/resource';
 import {createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
+
+import {isPromiseFulfilledResult} from '@utils/promises';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
@@ -74,14 +76,16 @@ const loadClusterResourcesHandler = async (
 
     const fulfilledResults = flatResults.filter((r: any) => r.status === 'fulfilled' && r.value);
     if (fulfilledResults.length === 0) {
-      // @ts-ignore
-      let message = results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0]);
+      let message =
+        'reason' in results[0] && results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0]);
       trackEvent('preview/cluster/fail', {reason: message});
       return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', message);
     }
 
-    // @ts-ignore
-    const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
+    const allYaml = fulfilledResults
+      .filter(isPromiseFulfilledResult)
+      .map(r => r.value)
+      .join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
 
     const clusterResourceMap = Object.values(
       extractK8sResources(allYaml, 'cluster', {
@@ -209,10 +213,7 @@ async function loadCustomResourceObjects(
             ? !kindHandler.isNamespaced
             : kindHandler.isNamespaced)
         ) {
-          return kindHandler.listResourcesInCluster(kc, {namespace}, crd).then(response =>
-            // @ts-ignore
-            getK8sObjectsAsYaml(response.body.items)
-          );
+          return kindHandler.listResourcesInCluster(kc, {namespace}, crd).then(items => getK8sObjectsAsYaml(items));
         }
 
         // retrieve objects using latest version name
@@ -220,24 +221,25 @@ async function loadCustomResourceObjects(
         return namespace
           ? k8sApi
               .listNamespacedCustomObject(crd.object.spec.group, version, namespace, crd.object.spec.names.plural)
-              .then(response =>
-                // @ts-ignore
-                getK8sObjectsAsYaml(response.body.items)
-              )
+              .then(response => getK8sObjectsAsYaml(getItemsFromResponseBody(response.body)))
           : k8sApi
               .listClusterCustomObject(crd.object.spec.group, version, crd.object.spec.names.plural)
-              .then(response =>
-                // @ts-ignore
-                getK8sObjectsAsYaml(response.body.items)
-              );
+              .then(response => getK8sObjectsAsYaml(getItemsFromResponseBody(response.body)));
       });
 
     const customResults = await Promise.allSettled(customObjects);
-    // @ts-ignore
-    return customResults.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
+
+    return customResults.filter(isPromiseFulfilledResult).map(r => r.value);
   } catch (e) {
     log.warn(e);
   }
 
   return [];
 }
+
+const getItemsFromResponseBody = (body: object) => {
+  if ('items' in body && isArray(body.items)) {
+    return body.items;
+  }
+  return [];
+};
