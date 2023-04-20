@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 
 import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/appConfig';
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {highlightItem, openNewResourceWizard, openTemplateExplorer, setLeftMenuSelection} from '@redux/reducers/ui';
 import {activeResourceCountSelector} from '@redux/selectors/resourceMapSelectors';
-import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {ResourceFilterType} from '@shared/models/appState';
 import {HighlightItems} from '@shared/models/ui';
@@ -43,15 +43,13 @@ function EmptyResourceNavigator() {
   const handleClick = (itemToHighlight: string) => {
     dispatch(highlightItem(itemToHighlight));
 
-    setTimeout(() => {
-      if (itemToHighlight === HighlightItems.BROWSE_TEMPLATES) {
-        dispatch(openTemplateExplorer());
-      } else if (itemToHighlight === HighlightItems.CREATE_RESOURCE) {
-        dispatch(openNewResourceWizard());
-      } else if (itemToHighlight === HighlightItems.CONNECT_TO_CLUSTER) {
-        dispatch(startClusterConnection({context: kubeConfigContext, namespace: lastNamespaceLoaded || 'default'}));
-      }
-    }, 1000);
+    if (itemToHighlight === HighlightItems.BROWSE_TEMPLATES) {
+      dispatch(openTemplateExplorer());
+    } else if (itemToHighlight === HighlightItems.CREATE_RESOURCE) {
+      dispatch(openNewResourceWizard());
+    } else if (itemToHighlight === HighlightItems.CONNECT_TO_CLUSTER) {
+      dispatch(connectCluster({context: kubeConfigContext, namespace: lastNamespaceLoaded || 'default'}));
+    }
 
     setTimeout(() => {
       dispatch(highlightItem(null));

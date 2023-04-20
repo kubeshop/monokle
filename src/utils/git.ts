@@ -1,4 +1,4 @@
-import {ipcRenderer, shell} from 'electron';
+import {shell} from 'electron';
 
 import {useCallback, useMemo} from 'react';
 
@@ -8,15 +8,6 @@ import {useAppSelector} from '@redux/hooks';
 
 export function filterGitFolder(paths: string[]) {
   return paths.filter(p => p !== '.git' && !p.includes(`${path.sep}.git${path.sep}`) && !p.endsWith('.git'));
-}
-
-export function fetchIsGitInstalled() {
-  return new Promise<boolean>(resolve => {
-    ipcRenderer.once('git.isGitInstalled.result', (_, isGitInstalled) => {
-      resolve(isGitInstalled);
-    });
-    ipcRenderer.send('git.isGitInstalled');
-  });
 }
 
 export function gitCommitDate(date: string) {

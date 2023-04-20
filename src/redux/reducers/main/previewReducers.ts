@@ -40,7 +40,7 @@ export const previewReducers = createSliceReducers('main', {
     state.preview = undefined;
     state.previewOptions = {};
   },
-  clearPreviewAndSelectionHistory: (state: Draft<AppState>) => {
+  clearPreviewAndSelectionHistory: (state: Draft<AppState>, action: PayloadAction<{revalidate: boolean}>) => {
     clearPreviewReducer(state);
     resetSelectionHistory(state);
     clearSelectedResourceOnPreviewExit(state);

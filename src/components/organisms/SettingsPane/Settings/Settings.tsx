@@ -1,11 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 import {Button, Checkbox, Form, Input, InputNumber, InputRef, Select, Tooltip} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {useForm} from 'antd/lib/form/Form';
-
-import {ReloadOutlined} from '@ant-design/icons';
 
 import _ from 'lodash';
 import log from 'loglevel';
@@ -84,11 +82,11 @@ export const Settings = ({
   const [isSchemaDownloading, setIsSchemaDownloading] = useState<boolean>(false);
   const [localConfig, setLocalConfig, localConfigRef] = useStateWithRef<ProjectConfig | null | undefined>(config);
 
-  const handleConfigChange = () => {
+  const handleConfigChange = useCallback(() => {
     if (onConfigChange && !isEqual(localConfigRef.current, config)) {
       onConfigChange(localConfig);
     }
-  };
+  }, [config, localConfig, localConfigRef, onConfigChange]);
 
   useEffect(() => {
     setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
@@ -108,7 +106,7 @@ export const Settings = ({
   useEffect(() => {
     handleConfigChange();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [localConfig]);
+  }, [handleConfigChange, localConfig]);
 
   useEffect(() => {
     settingsForm.setFieldsValue({projectName});
@@ -120,7 +118,7 @@ export const Settings = ({
       handleConfigChange();
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [localConfig?.folderReadsMaxDepth]
+    [handleConfigChange, localConfig?.folderReadsMaxDepth]
   );
 
   const onChangeFileIncludes = (patterns: string[]) => {
@@ -309,23 +307,20 @@ export const Settings = ({
           </S.Heading>
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KubeconfigPathTooltip}>
-            <Input
+            <Input.Search
               ref={inputRef}
               onClick={() => focusInput()}
               value={currentKubeConfig}
               onChange={onUpdateKubeconfig}
               disabled={isEditingDisabled}
+              loading={!isKubeConfigBrowseSettingsOpen}
             />
           </Tooltip>
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
-            {isKubeConfigBrowseSettingsOpen ? (
-              <S.Button onClick={openFileSelect} disabled={isEditingDisabled}>
-                Browse
-              </S.Button>
-            ) : (
-              <ReloadOutlined style={{padding: '1em'}} spin />
-            )}
+            <S.Button onClick={openFileSelect} disabled={isEditingDisabled || !isKubeConfigBrowseSettingsOpen}>
+              Browse
+            </S.Button>
           </Tooltip>
           <S.HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
         </S.Div>

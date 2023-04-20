@@ -3,12 +3,12 @@ import {useCallback, useState} from 'react';
 import {BranchesOutlined} from '@ant-design/icons';
 
 import {setCurrentBranch} from '@redux/git';
+import {checkoutGitBranch} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {rootFolderSelector} from '@redux/selectors';
 
 import {TableSelect} from '@atoms';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
 
 import {GitBranch} from '@shared/models/git';
@@ -34,17 +34,14 @@ function BranchSelect() {
     (branch: GitBranch) => {
       const branchName = branch.type === 'local' ? branch.name : branch.name.replace('origin/', '');
 
-      promiseFromIpcRenderer('git.checkoutGitBranch', 'git.checkoutGitBranch.result', {
-        localPath: rootFolderPath,
-        branchName,
-      }).then(result => {
-        if (result.error) {
-          showGitErrorModal('Checkout failed', `git checkout -b ${branchName}`, dispatch);
-        } else {
+      checkoutGitBranch({localPath: rootFolderPath, branchName})
+        .then(() => {
           dispatch(setCurrentBranch(branchName));
           setVisible(false);
-        }
-      });
+        })
+        .catch(() => {
+          showGitErrorModal('Checkout failed', undefined, `git checkout ${branchName}`, dispatch);
+        });
     },
     [rootFolderPath, dispatch]
   );

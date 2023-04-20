@@ -3,7 +3,7 @@ import {createAsyncThunk, createNextState} from '@reduxjs/toolkit';
 import log from 'loglevel';
 
 import {performResourceContentUpdate} from '@redux/reducers/main';
-import {selectResourceReducer} from '@redux/reducers/main/selectionReducers';
+import {clearSelectionReducer, selectFileReducer, selectResourceReducer} from '@redux/reducers/main/selectionReducers';
 import {
   getResourceContentFromState,
   getResourceFromState,
@@ -11,7 +11,7 @@ import {
 } from '@redux/selectors/resourceGetters';
 import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
 import {getLineChanged} from '@redux/services/manifest-utils';
-import {extractResourceMeta} from '@redux/services/resource';
+import {extractResourceMeta, isSupportedResource} from '@redux/services/resource';
 
 import {AppState} from '@shared/models/appState';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
@@ -86,15 +86,27 @@ export const updateResource = createAsyncThunk<
           resourceMeta.id
         );
 
-        if (!isEqual(resourceMeta, updatedResourceMeta)) {
-          // @ts-ignore-next-line
-          mainState.resourceMetaMapByStorage[resourceMeta.storage][resourceMeta.id] = updatedResourceMeta;
-        }
-        if (resourceContent.text !== finalText) {
-          mainState.resourceContentMapByStorage[resourceMeta.storage][resourceMeta.id].text = finalText;
-        }
-        if (!isEqual(resourceContent.object, finalObject)) {
-          mainState.resourceContentMapByStorage[resourceMeta.storage][resourceMeta.id].object = finalObject;
+        // did the change invalidate the resource?
+        if (!isSupportedResource(updatedResourceMeta)) {
+          delete mainState.resourceMetaMapByStorage[resourceMeta.storage][resourceMeta.id];
+          delete mainState.resourceContentMapByStorage[resourceMeta.storage][resourceMeta.id];
+          if (updatedResourceMeta.storage === 'local') {
+            // @ts-ignore
+            selectFileReducer(mainState, {filePath: updatedResourceMeta.origin.filePath});
+          } else {
+            clearSelectionReducer(mainState);
+          }
+        } else {
+          if (!isEqual(resourceMeta, updatedResourceMeta)) {
+            // @ts-ignore-next-line
+            mainState.resourceMetaMapByStorage[resourceMeta.storage][resourceMeta.id] = updatedResourceMeta;
+          }
+          if (resourceContent.text !== finalText) {
+            mainState.resourceContentMapByStorage[resourceMeta.storage][resourceMeta.id].text = finalText;
+          }
+          if (!isEqual(resourceContent.object, finalObject)) {
+            mainState.resourceContentMapByStorage[resourceMeta.storage][resourceMeta.id].object = finalObject;
+          }
         }
       }
 

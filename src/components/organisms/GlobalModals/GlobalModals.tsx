@@ -9,7 +9,7 @@ import {isInClusterModeSelector, setDeleteProject} from '@redux/appConfig';
 import {toggleForm} from '@redux/forms';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {openWelcomePopup} from '@redux/reducers/ui';
+import {openWelcomeModal} from '@redux/reducers/ui';
 
 import {fetchAppVersion} from '@utils/appVersion';
 
@@ -42,6 +42,7 @@ const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'
 const SaveEditCommandModal = React.lazy(() => import('@organisms/SaveEditCommandModal'));
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const TemplateExplorer = React.lazy(() => import('@organisms/TemplateExplorer'));
+const WelcomeModal = React.lazy(() => import('@organisms/WelcomeModal'));
 
 const GlobalModals = () => {
   const dispatch = useAppDispatch();
@@ -72,6 +73,7 @@ const GlobalModals = () => {
   const newVersion = useAppSelector(state => state.config.newVersion);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
+  const isWelcomeModalVisible = useAppSelector(state => state.ui.welcomeModal.isVisible);
 
   const isClusterResourceDiffModalVisible = useMemo(
     () => Boolean(targetResourceId) && isInClusterMode,
@@ -119,7 +121,7 @@ const GlobalModals = () => {
             setAlert({
               id: 'monokle_performance_alert',
               title: 'Improving performance',
-              message: `In version 2.0.0 of Monokle, we have updated the interface and underlying data model to enhance your experience. Despite our best efforts, you may have encountered performance and stability issues that impacted your user experience. We apologize for any inconvenience and appreciate your patience as we are working to resolve these concerns.\n\n We are confident that we have addressed the identified bugs and that your experience should now meet our high standards. However, there may still be room for improvement. Your feedback is crucial to us, and we invite you to share any concerns or suggestions you may have. Please [connect with us on Discord](https://discord.com/invite/6zupCZFQbe) or use the feedback form included in this version. Your input helps us continually refine and improve our product for all users.`,
+              message: `In version 2.0.0 of Monokle, we have updated the interface and underlying data model to enhance your experience. Despite our best efforts, you may have encountered performance and stability issues that impacted your user experience. We apologize for any inconvenience and appreciate your patience as we are working to resolve these concerns.\n\n We are working hard to address identified issues and improve your experience with Monokle. However, there may still be room for improvement. Your feedback is crucial to us, and we invite you to share any concerns or suggestions you may have. Please [connect with us on Discord](https://discord.com/invite/6zupCZFQbe) or use the feedback form included in this version. Your input helps us continually refine and improve our product for all users.`,
               type: AlertEnum.Info,
               icon: <Image src={PerformanceIcon} />,
             })
@@ -131,7 +133,7 @@ const GlobalModals = () => {
 
       // new user
       if (!semver.valid(lastSeenReleaseNotesVersion)) {
-        dispatch(openWelcomePopup());
+        dispatch(openWelcomeModal());
         electronStore.set('appConfig.lastSeenReleaseNotesVersion', version);
       } else if (
         // check if the current version is the next big release version for showing the modal with release notes
@@ -215,6 +217,7 @@ const GlobalModals = () => {
           </Modal>
         )}
         {isTemplateExplorerVisible && <TemplateExplorer />}
+        {isWelcomeModalVisible && <WelcomeModal />}
       </Suspense>
     </>
   );

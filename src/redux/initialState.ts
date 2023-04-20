@@ -66,6 +66,7 @@ const initialAppState: AppState = {
   validationIntegration: undefined,
   autosaving: {},
   lastChangedLine: 0,
+  activeEditorTab: 'source',
 };
 
 const initialAppConfigState: AppConfig = {
@@ -142,6 +143,7 @@ const initialUiState: UiState = {
   isKeyboardShortcutsModalOpen: false,
   collapsedKustomizeKinds: [],
   collapsedHelmCharts: [],
+  collapsedPreviewConfigurationsHelmCharts: [],
   isScaleModalOpen: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
@@ -179,6 +181,7 @@ const initialUiState: UiState = {
     expandedSearchedFiles: ['filter'],
     isValidationDrawerVisible: false,
     selection: uiLeftMenuSelection,
+    activityBeforeClusterConnect: undefined,
     isActive:
       !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
     activeTab: null,
@@ -223,7 +226,7 @@ const initialUiState: UiState = {
   templateExplorer: {
     isVisible: false,
   },
-  welcomePopup: {
+  welcomeModal: {
     isVisible: false,
   },
   activeSettingsPanel: SettingsPanel.GlobalSettings,

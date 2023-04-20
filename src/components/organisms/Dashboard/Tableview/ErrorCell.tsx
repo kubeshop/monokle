@@ -8,9 +8,11 @@ import {setMonacoEditor} from '@redux/reducers/ui';
 
 import {useValidationLevel} from '@hooks/useValidationLevel';
 
-import {ValidationPopover} from '@monokle/components';
+import {ProblemIcon, ValidationPopover} from '@monokle/components';
 import {ValidationResult, getResourceLocation} from '@monokle/validation';
 import {MonacoRange} from '@shared/models/ui';
+
+import * as S from './ErrorCell.styled';
 
 type IProps = {
   resourceId: string;
@@ -51,7 +53,7 @@ const ErrorCell: React.FC<IProps> = props => {
   }
 
   return (
-    <div
+    <S.Container
       onClick={e => {
         e.stopPropagation();
       }}
@@ -60,8 +62,17 @@ const ErrorCell: React.FC<IProps> = props => {
         level={level}
         results={[...errors, ...warnings]}
         onMessageClickHandler={onMessageClickHandler}
+        popoverRenderItem={
+          <S.RenderContainer>
+            <ProblemIcon level={level} />
+            <S.ErrorContainer>
+              {errors.length > 0 && <S.ErrorText $type="error">{errors.length} errors</S.ErrorText>}
+              {warnings.length > 0 && <S.ErrorText $type="warning">{warnings.length} warnings</S.ErrorText>}
+            </S.ErrorContainer>
+          </S.RenderContainer>
+        }
       />
-    </div>
+    </S.Container>
   );
 };
 

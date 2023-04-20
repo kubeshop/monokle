@@ -10,7 +10,13 @@ import {setAlert} from '@redux/reducers/alert';
 import {getResourceContentMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
-import {isResourceSelected, saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
+import {
+  isResourceSelected,
+  isSupportedResource,
+  saveResource,
+  splitK8sResource,
+  splitK8sResourceMap,
+} from '@redux/services/resource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
@@ -27,6 +33,7 @@ import {parseYamlDocument} from '@utils/yaml';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AlertType} from '@shared/models/alert';
 import {
+  ActionPaneTab,
   AppState,
   FileMapType,
   HelmChartMapType,
@@ -57,7 +64,12 @@ import {trackEvent} from '@shared/utils/telemetry';
 import {filterReducers} from './filterReducers';
 import {imageReducers} from './imageReducers';
 import {clearPreviewReducer, previewExtraReducers, previewReducers} from './previewReducers';
-import {clearSelectionReducer, selectResourceReducer, selectionReducers} from './selectionReducers';
+import {
+  clearSelectionReducer,
+  createResourceHighlights,
+  selectResourceReducer,
+  selectionReducers,
+} from './selectionReducers';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
@@ -92,8 +104,6 @@ export type SetPreviewDataPayload = {
   previewResourceMetaMap?: ResourceMetaMap<'preview'>;
   previewResourceContentMap?: ResourceContentMap<'preview'>;
   alert?: AlertType;
-  previewKubeConfigPath?: string;
-  previewKubeConfigContext?: string;
 };
 
 export type SetDiffDataPayload = {
@@ -295,6 +305,9 @@ export const mainSlice = createSlice({
         delete state.resourceContentMapByStorage.cluster[r.id];
       });
     },
+    setActiveEditorTab: (state: Draft<AppState>, action: PayloadAction<ActionPaneTab>) => {
+      state.activeEditorTab = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(setAlert, (state, action) => {
@@ -387,6 +400,8 @@ export const mainSlice = createSlice({
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
       state.resourceMetaMapByStorage.local = action.payload.resourceMetaMap;
       state.resourceContentMapByStorage.local = action.payload.resourceContentMap;
+      state.resourceMetaMapByStorage.transient = {};
+      state.resourceContentMapByStorage.transient = {};
       state.fileMap = action.payload.fileMap;
       state.helmChartMap = action.payload.helmChartMap;
       state.helmValuesMap = action.payload.helmValuesMap;
@@ -421,7 +436,7 @@ export const mainSlice = createSlice({
           const extension = path.extname(relativeFilePath);
           const newFileEntry: FileEntry = {
             ...createFileEntry({fileEntryPath: relativeFilePath, fileMap: state.fileMap, extension}),
-            isSupported: true,
+            isSupported: isSupportedResource(resourceMeta),
             timestamp: resourcePayload.fileTimestamp,
           };
           state.fileMap[relativeFilePath] = newFileEntry;
@@ -530,6 +545,18 @@ export const mainSlice = createSlice({
           resourceContentMap[resource.id] = content;
         }
       });
+
+      const selection = state.selection;
+      if (selection?.type === 'resource') {
+        const resourceIdentifier = selection.resourceIdentifier;
+        // TODO: 2.0+ should processResourceRefs return the storage as well so we can first check if the selection matches it?
+        const resource = action.payload.find(
+          r => r.id === resourceIdentifier.id && r.storage === resourceIdentifier.storage
+        );
+        if (resource) {
+          state.highlights = createResourceHighlights(resource);
+        }
+      }
     });
 
     // TODO: 2.0+ how do we make this work with the new resource storage?
@@ -610,5 +637,6 @@ export const {
   setLastChangedLine,
   updateMultipleClusterResources,
   deleteMultipleClusterResources,
+  setActiveEditorTab,
 } = mainSlice.actions;
 export default mainSlice.reducer;

@@ -25,5 +25,5 @@ export const applyCheckedResources = createAsyncThunk<
     )
     .filter(isDefined);
 
-  applyMultipleResources(state.config, resourcesToApply, thunkAPI.dispatch, namespace);
+  applyMultipleResources(state, resourcesToApply, thunkAPI.dispatch, namespace);
 });

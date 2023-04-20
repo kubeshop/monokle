@@ -4,7 +4,7 @@ import {isInClusterModeSelector, toggleEditorPlaceholderVisiblity} from '@redux/
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setExplorerSelectedSection, setLeftMenuSelection} from '@redux/reducers/ui';
 
-import MonacoPlaceholderImageNew from '@assets/MonacoPlaceholderImageNew.svg';
+import MonacoPlaceholderImage from '@assets/MonacoPlaceholderImage.svg';
 
 import * as S from './MonacoPlaceholder.styled';
 
@@ -53,7 +53,7 @@ export const MonacoPlaceholder: React.FC = () => {
     <S.Container>
       <div>
         <S.ImageContainer>
-          <S.Image src={MonacoPlaceholderImageNew} />
+          <S.Image src={MonacoPlaceholderImage} />
         </S.ImageContainer>
         <S.Title>
           Select a resource on the left to edit

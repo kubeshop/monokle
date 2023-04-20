@@ -4,10 +4,11 @@ import {useHotkeys} from 'react-hotkeys-hook';
 import {Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
+import {setCommitsCount} from '@redux/git';
+import {commitChanges, getAheadBehindCommitsCount} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
 
 import {AlertEnum} from '@shared/models/alert';
@@ -24,7 +25,7 @@ const CommitModal: React.FC<IProps> = props => {
   const dispatch = useAppDispatch();
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
   const osPlatform = useAppSelector(state => state.config.osPlatform);
-  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder) || '';
 
   const [isFocused, setIsFocused] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -36,22 +37,33 @@ const CommitModal: React.FC<IProps> = props => {
   };
 
   const commitHandler = async () => {
+    if (!currentBranch) {
+      return;
+    }
+
     setCommitLoading(true);
     setLoading(true);
 
     form.validateFields().then(async values => {
-      const result = await promiseFromIpcRenderer('git.commitChanges', 'git.commitChanges.result', {
-        localPath: selectedProjectRootFolder,
-        message: values.message,
-      });
-
-      if (result.error) {
-        showGitErrorModal('Commit failed', `git commit -m "${values.message}"`, dispatch);
-      } else {
+      try {
+        await commitChanges({localPath: selectedProjectRootFolder, message: values.message});
         dispatch(setAlert({title: 'Committed successfully', message: '', type: AlertEnum.Success}));
+        form.resetFields();
+      } catch (e) {
+        showGitErrorModal('Commit failed', undefined, `git commit -m "${values.message}"`, dispatch);
+        form.resetFields();
+        return;
       }
 
-      form.resetFields();
+      try {
+        const {aheadCount, behindCount} = await getAheadBehindCommitsCount({
+          localPath: selectedProjectRootFolder,
+          branchName: currentBranch,
+        });
+        dispatch(setCommitsCount({aheadCount, behindCount}));
+      } catch (e) {
+        dispatch(setCommitsCount({aheadCount: 0, behindCount: 0}));
+      }
     });
 
     setLoading(false);

@@ -57,15 +57,7 @@ const ResourceRefsIconPopover = ({
       placement="bottom"
       content={
         <RefsPopoverContent resource={resourceMeta} resourceRefs={resourceRefs}>
-          {type === 'incoming' ? (
-            <>
-              Incoming Links <Icon name="incomingRefs" />
-            </>
-          ) : (
-            <>
-              Outgoing Links <Icon name="outgoingRefs" />
-            </>
-          )}
+          {type === 'incoming' ? <>Incoming Links</> : <>Outgoing Links</>}
         </RefsPopoverContent>
       }
     >

@@ -15,7 +15,7 @@ export type PreviewOrigin<Preview extends AnyPreview = AnyPreview> = {
   preview: Preview;
 };
 export type TransientOrigin = {
-  // TODO: createdFrom?: 'template' | 'cluster'; ? do we need this?
+  createdIn: 'local' | 'cluster';
 };
 
 export type AnyOrigin = LocalOrigin | ClusterOrigin | PreviewOrigin | TransientOrigin;

@@ -1,3 +1,5 @@
+import {ipcRenderer} from 'electron';
+
 import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 import flatten from 'flat';
@@ -6,8 +8,8 @@ import _ from 'lodash';
 import log from 'loglevel';
 import path, {join} from 'path';
 
+import {isFolderGitRepo} from '@redux/git/git.ipc';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
-import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 import {
   CONFIG_PATH,
   keysToDelete,
@@ -18,9 +20,6 @@ import {
 } from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {createNamespace, removeNamespaceFromCluster} from '@redux/thunks/utils';
-
-import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {init as sentryInit} from '@sentry/electron/renderer';
 import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
@@ -41,18 +40,18 @@ import {
 import {UiState} from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
 import {isEqual} from '@shared/utils/isEqual';
-import {createKubeClient, getKubeAccess} from '@shared/utils/kubeclient';
 
 import initialState from '../initialState';
 import {setLeftMenuSelection, toggleStartProjectPane} from '../reducers/ui';
-import {kubeConfigPathSelector} from './appConfig.selectors';
 
 export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
-  const isGitRepo = await promiseFromIpcRenderer(
-    'git.isFolderGitRepo',
-    'git.isFolderGitRepo.result',
-    project.rootFolder
-  );
+  let isGitRepo: boolean;
+
+  try {
+    isGitRepo = await isFolderGitRepo({path: project.rootFolder});
+  } catch (err) {
+    isGitRepo = false;
+  }
 
   thunkAPI.dispatch(configSlice.actions.createProject({...project, isGitRepo}));
   thunkAPI.dispatch(setOpenProject(project.rootFolder));
@@ -82,20 +81,21 @@ export const setOpenProject = createAsyncThunk(
 
     monitorGitFolder(projectRootPath, thunkAPI);
 
-    const projectConfig: ProjectConfig | null = readProjectConfig(projectRootPath);
+    const projectConfig = readProjectConfig(projectRootPath);
+
     monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
     // First open the project so state.selectedProjectRootFolder is set
     thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
-    const config: ProjectConfig | null = projectConfig || populateProjectConfig(appConfig);
+    const config = projectConfig || populateProjectConfig(appConfig);
 
     if (
-      projectConfig &&
+      config &&
       !(
-        projectConfig.k8sVersion &&
-        existsSync(join(String(appConfig.userDataDir), path.sep, 'schemas', `${projectConfig?.k8sVersion}.json`))
+        config.k8sVersion &&
+        existsSync(join(String(appConfig.userDataDir), path.sep, 'schemas', `${config?.k8sVersion}.json`))
       )
     ) {
-      projectConfig.k8sVersion = PREDEFINED_K8S_VERSION;
+      config.k8sVersion = PREDEFINED_K8S_VERSION;
     }
 
     // Then set project config by reading .monokle or populating it
@@ -109,37 +109,12 @@ export const setLoadingProject = createAsyncThunk('config/loadingProject', async
   thunkAPI.dispatch(configSlice.actions.setLoadingProject(loading));
 });
 
-export const updateClusterNamespaces = createAsyncThunk(
-  'config/updateClusterNamespaces',
-  async (values: {namespace: string; cluster: string}[], thunkAPI: any) => {
-    thunkAPI.dispatch(configSlice.actions.setAccessLoading(true));
-
-    let accesses: ClusterAccess[] = thunkAPI.getState().config.clusterAccess;
-    const newNamespaces = values.filter(
-      v => accesses.findIndex(a => v.cluster === a.context && v.namespace === a.namespace) === -1
-    );
-    const removedNamespaces = accesses
-      .filter(a => values.findIndex(v => a.context === v.cluster) > -1)
-      .filter(a => values.findIndex(v => a.namespace === v.namespace) === -1);
-    accesses = accesses.filter(a => a.context !== values[0].cluster);
-
-    newNamespaces.forEach(({namespace, cluster}) => {
-      const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
-      const kubeClient = createKubeClient(kubeConfigPath, cluster);
-      createNamespace(kubeClient, namespace);
-    });
-
-    removedNamespaces.forEach(({namespace, context}) => {
-      const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
-      removeNamespaceFromCluster(namespace, kubeConfigPath, context);
-    });
-
-    const results: ClusterAccess[] = await Promise.all(
-      values.map(value => getKubeAccess(value.namespace, value.cluster))
-    );
-
-    thunkAPI.dispatch(configSlice.actions.updateClusterAccess([...accesses, ...results]));
-    thunkAPI.dispatch(configSlice.actions.setAccessLoading(false));
+export const toggleEventTracking = createAsyncThunk(
+  'config/toggleEventTracking',
+  async (disableEventTracking: boolean, thunkAPI: any) => {
+    thunkAPI.dispatch(setEventTracking(disableEventTracking));
+    electronStore.set('appConfig.disableEventTracking', disableEventTracking);
+    ipcRenderer.invoke('analytics:toggleTracking', {disableEventTracking});
   }
 );
 
@@ -207,17 +182,18 @@ export const configSlice = createSlice({
     setCurrentContext: (state: Draft<AppConfig>, action: PayloadAction<string>) => {
       electronStore.set('kubeConfig.currentContext', action.payload);
       state.kubeConfig.currentContext = action.payload;
-      new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
     },
     setAccessLoading: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
       state.isAccessLoading = action.payload;
     },
     setKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig>) => {
-      state.kubeConfig = {...state.kubeConfig, ...action.payload};
+      const changed = !isEqual(action.payload, state.kubeConfig);
+      const pathChanged = action.payload.path !== state.kubeConfig.path;
+      if (!changed) return;
+      state.kubeConfig = action.payload;
 
-      if (state.kubeConfig.path) {
-        electronStore.set('appConfig.kubeConfig', state.kubeConfig.path);
-        new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
+      if (pathChanged) {
+        electronStore.set('appConfig.kubeConfig', action.payload.path);
       }
     },
     createProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
@@ -293,14 +269,8 @@ export const configSlice = createSlice({
       electronStore.set('appConfig.projects', state.projects);
     },
     loadProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
-      if (state.projectConfig?.kubeConfig) {
-        state.projectConfig.kubeConfig = {...state.projectConfig.kubeConfig, ...action.payload};
-      }
-    },
-    updateProjectKubeConfig: (state: Draft<AppConfig>, action: PayloadAction<KubeConfig | null>) => {
-      if (!state.selectedProjectRootFolder) {
-        return;
-      }
+      const changed = !isEqual(action.payload, state.projectConfig?.kubeConfig);
+      if (!changed) return;
 
       if (!state.projectConfig) {
         state.projectConfig = {};
@@ -310,30 +280,10 @@ export const configSlice = createSlice({
         state.projectConfig.kubeConfig = {};
       }
 
-      const kubeConfig = state.projectConfig?.kubeConfig;
-      new KubeConfigManager().initializeKubeConfig(kubeConfig.path as string, kubeConfig.currentContext);
-
-      const serializedIncomingConfig = flatten<any, any>(action.payload, {safe: true});
-      const serializedState = flatten<any, any>(state.projectConfig.kubeConfig, {safe: true});
-      const keys = keysToUpdateStateBulk(serializedState, serializedIncomingConfig);
-
-      keys.forEach(key => {
-        if (kubeConfig) {
-          _.set(kubeConfig, key, serializedIncomingConfig[key]);
-          _.set(state.kubeConfig, key, serializedIncomingConfig[key]);
-        }
-      });
-
-      const currentLength = kubeConfig?.contexts?.length;
-      const newLength = action.payload?.contexts?.length;
-      // means we are updating/removing at least one of the contexts
-      if (currentLength && newLength && currentLength > newLength) {
-        kubeConfig?.contexts?.splice(newLength - 1, currentLength - newLength);
-      }
-
-      if (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder))) {
-        writeProjectConfigFile(state);
-      }
+      state.projectConfig.kubeConfig = {
+        ...state.projectConfig.kubeConfig,
+        ...action.payload,
+      };
     },
     updateProjectConfig: (state: Draft<AppConfig>, action: PayloadAction<UpdateProjectConfigPayload>) => {
       if (!state.selectedProjectRootFolder) {
@@ -385,11 +335,16 @@ export const configSlice = createSlice({
         };
       }
 
-      new KubeConfigManager().initializeKubeConfig(state.kubeConfig.path as string, state.kubeConfig.currentContext);
+      if (action.payload?.config?.helm && !action.payload.fromConfigFile) {
+        state.projectConfig.helm = {
+          ...state.projectConfig.helm,
+          ...action.payload.config.helm,
+        };
+      }
 
       if (
         !action.payload.fromConfigFile &&
-        (keys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder)))
+        (keys.length > 0 || deletedKeys.length > 0 || !existsSync(CONFIG_PATH(state.selectedProjectRootFolder)))
       ) {
         writeProjectConfigFile(state);
       }
@@ -459,13 +414,8 @@ export const configSlice = createSlice({
       else state.favoriteTemplates = state.favoriteTemplates.filter(template => template !== action.payload);
       electronStore.set('appConfig.favoriteTemplates', state.favoriteTemplates);
     },
-    toggleEventTracking: (state: Draft<AppConfig>, action: PayloadAction<boolean | undefined>) => {
-      if (action.payload !== undefined) {
-        state.disableEventTracking = action.payload;
-      } else {
-        state.disableEventTracking = !state.disableEventTracking;
-      }
-      electronStore.set('appConfig.disableEventTracking', state.disableEventTracking);
+    setEventTracking: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.disableEventTracking = action.payload;
     },
     toggleErrorReporting: (state: Draft<AppConfig>, action: PayloadAction<boolean | undefined>) => {
       if (action.payload !== undefined) {
@@ -595,7 +545,7 @@ export const {
   setUserDirs,
   toggleEditorPlaceholderVisiblity,
   toggleErrorReporting,
-  toggleEventTracking,
+  setEventTracking,
   toggleProjectPin,
   updateApplicationSettings,
   updateFileExplorerSortOrder,
@@ -607,7 +557,6 @@ export const {
   updateNewVersion,
   updateProjectConfig,
   updateProjectK8sVersion,
-  updateProjectKubeConfig,
   loadProjectKubeConfig,
   updateProjectsGitRepo,
   updateScanExcludes,

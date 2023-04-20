@@ -1,0 +1,18 @@
+diff --git a/node_modules/webpack-dev-server/client/overlay.js b/node_modules/webpack-dev-server/client/overlay.js
+index 4751ea1..519b7c9 100644
+--- a/node_modules/webpack-dev-server/client/overlay.js
++++ b/node_modules/webpack-dev-server/client/overlay.js
+@@ -180,6 +180,13 @@ var createOverlay = function createOverlay(options) {
+    * @param {string | null} trustedTypesPolicyName
+    */
+   function show(type, messages, trustedTypesPolicyName) {
++    if (messages.every(reason => {
++      const msg = typeof reason === 'string' ? reason : reason.message;
++      return msg && msg.includes('ResizeObserver');
++    })) {
++      hide();
++      return;
++    }
+     ensureOverlayExists(function () {
+       messages.forEach(function (message) {
+         var entryElement = document.createElement("div");

@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 import {Button, Checkbox, Form, Input, Select, Tooltip} from 'antd';
+import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
@@ -40,8 +41,8 @@ export const GlobalSettings = () => {
 
   const [settingsForm] = useForm();
 
-  const handleToggleEventTracking = () => {
-    dispatch(toggleEventTracking());
+  const handleToggleEventTracking = (e: CheckboxChangeEvent) => {
+    dispatch(toggleEventTracking(e.target.checked));
   };
 
   const handleToggleErrorReporting = () => {

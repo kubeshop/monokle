@@ -16,8 +16,7 @@ import {trackEvent} from '@shared/utils/telemetry';
 /**
  * Invokes kubectl for the content of the specified resource
  */
-
-function applyFileToCluster(filePath: string, kubeconfig: string, context: string) {
+function applyFileToCluster(filePath: string, kubeconfig?: string, context?: string) {
   return applyYamlToCluster({
     yaml: fs.readFileSync(filePath, 'utf8'),
     kubeconfig,
@@ -35,8 +34,8 @@ export async function applyFile(
   filePath: string,
   fileMap: FileMapType,
   dispatch: AppDispatch,
-  kubeconfig: string,
-  context: string
+  kubeconfig?: string,
+  context?: string
 ) {
   dispatch(setApplyingResource(true));
 

@@ -1,9 +1,10 @@
 import {useCallback} from 'react';
 
+import {CLUSTER_DASHBOARD_HELP_URL} from '@constants/constants';
+
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch} from '@redux/hooks';
 import {useResourceContentMap} from '@redux/selectors/resourceMapSelectors';
-import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
@@ -13,6 +14,7 @@ import PodHandler from '@src/kindhandlers/Pod.handler';
 import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
+import {openDocumentation, openUrlInExternalBrowser} from '@shared/utils';
 
 import * as S from './InventoryInfo.styled';
 
@@ -97,10 +99,6 @@ export const InventoryInfo = () => {
       <S.HorizontalLine />
       <S.ClusterInfoContainer>
         <S.ClusterInfoRow>
-          <S.Title>Cluster API address</S.Title>
-          <S.Description>{new KubeConfigManager().getV1ApiClient()?.basePath || '-'}</S.Description>
-        </S.ClusterInfoRow>
-        <S.ClusterInfoRow>
           <S.Title>Kubernetes Version</S.Title>
           <S.Description>{getNodes()[0]?.object?.status?.nodeInfo?.kubeletVersion || '-'}</S.Description>
         </S.ClusterInfoRow>
@@ -111,9 +109,13 @@ export const InventoryInfo = () => {
       </S.ClusterInfoContainer>
       <S.HorizontalLine />
       <S.UsefulLinksContainer>
-        <S.Title>Useful links</S.Title>
-        <S.Link>Getting started</S.Link>
-        <S.Link>Documentation</S.Link>
+        <S.Title>Documentation links</S.Title>
+        <S.Link>
+          <span onClick={() => openUrlInExternalBrowser(CLUSTER_DASHBOARD_HELP_URL)}>Cluster Dashboard</span>
+        </S.Link>
+        <S.Link>
+          <span onClick={() => openDocumentation()}>Monokle Getting Started</span>
+        </S.Link>
       </S.UsefulLinksContainer>
     </S.Container>
   );

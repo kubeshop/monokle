@@ -6,6 +6,8 @@ import {selectResource} from '@redux/reducers/main';
 import {useResourceMeta} from '@redux/selectors/resourceSelectors';
 import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
+import ResourcePopover from '@components/molecules/ResourcePopover/ResourcePopover';
+
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {isEqual} from '@shared/utils/isEqual';
 
@@ -74,7 +76,9 @@ function ResourceRenderer(props: ResourceRendererProps) {
         isDisabled={false}
         onClick={onClick}
       >
-        {resourceMeta.name} {resourceMeta.storage === 'transient' ? '*' : ''}
+        <ResourcePopover resourceMeta={resourceMeta}>
+          {resourceMeta.name} {resourceMeta.storage === 'transient' ? '*' : ''}
+        </ResourcePopover>
       </S.ItemName>
 
       {isInClusterMode && (

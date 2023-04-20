@@ -15,10 +15,12 @@ const DaemonSetHandler: ResourceKindHandler = {
   isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    k8sAppV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     return k8sAppV1Api.readNamespacedDaemonSet(resource.name, resource.namespace || 'default', 'true');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    k8sAppV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     const response = namespace
       ? await k8sAppV1Api.listNamespacedDaemonSet(namespace)
       : await k8sAppV1Api.listDaemonSetForAllNamespaces();
@@ -26,6 +28,7 @@ const DaemonSetHandler: ResourceKindHandler = {
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    k8sAppV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     await k8sAppV1Api.deleteNamespacedDaemonSet(resource.name, resource.namespace || 'default');
   },
   helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/',

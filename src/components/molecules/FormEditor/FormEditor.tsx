@@ -9,7 +9,6 @@ import {TemplatesType} from '@rjsf/utils';
 import validator from '@rjsf/validator-ajv8';
 
 import log from 'loglevel';
-import {stringify} from 'yaml';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
@@ -27,7 +26,7 @@ import {updateResource} from '@redux/thunks/updateResource';
 import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
 import {useStateWithRef} from '@utils/hooks';
-import {parseYamlDocument} from '@utils/yaml';
+import {parseYamlDocument, stringifyK8sResource} from '@utils/yaml';
 
 import {isHelmChartFile} from '@shared/utils';
 import {isEqual} from '@shared/utils/isEqual';
@@ -90,7 +89,7 @@ const FormEditor: React.FC<IProps> = props => {
         return;
       }
 
-      let formString = stringify(formData);
+      let formString = stringifyK8sResource(formData);
 
       if (selectedResource) {
         const content = mergeManifests(selectedResource.text, formString);

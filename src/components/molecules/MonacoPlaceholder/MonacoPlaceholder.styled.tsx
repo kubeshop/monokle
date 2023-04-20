@@ -55,5 +55,6 @@ export const ImageContainer = styled.div`
 `;
 
 export const Image = styled.img`
-  width: 80%;
+  width: 85%;
+  padding-left: 20px;
 `;

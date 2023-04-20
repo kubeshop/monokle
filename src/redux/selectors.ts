@@ -1,4 +1,7 @@
+import path from 'path';
 import {createSelector} from 'reselect';
+
+import {createFileNodes, createFolderTree, sortNodes} from '@utils/fileExplorer';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppState} from '@shared/models/appState';
@@ -6,6 +9,7 @@ import {FileEntry} from '@shared/models/fileEntry';
 import {HelmValuesFile} from '@shared/models/helm';
 import {RootState} from '@shared/models/rootState';
 import {isFileSelection, isPreviewConfigurationSelection} from '@shared/models/selection';
+import {isDefined} from '@shared/utils/filter';
 
 import {getResourceMetaMapFromState} from './selectors/resourceMapGetters';
 import {isKustomizationResource} from './services/kustomize';
@@ -48,6 +52,16 @@ export const previewedValuesFileSelector = createSelector(
     }
 
     return helmValuesMap[preview.valuesFileId];
+  }
+);
+
+export const helmValuesMapByFilePathSelector = createSelector(
+  [(state: RootState) => state.main.helmValuesMap],
+  helmValuesMap => {
+    return Object.values(helmValuesMap).reduce<Record<string, HelmValuesFile>>((acc, helmValuesFile) => {
+      acc[helmValuesFile.filePath] = helmValuesFile;
+      return acc;
+    }, {});
   }
 );
 
@@ -132,6 +146,13 @@ export const selectHelmValues = (state: AppState, id?: string): HelmValuesFile |
   return state.helmValuesMap[id];
 };
 
+export const selectionFilePathSelector = createSelector(
+  [selectedHelmValuesSelector, selectedFilePathSelector],
+  (selectedHelm, selectedFilePath) => {
+    return selectedHelm?.filePath || selectedFilePath;
+  }
+);
+
 // TODO: rename this after finishing refactoring all places where the old `isInPreviewModeSelector` is used
 // the previous selector returned `true` even if you were in ClusterMode but that's no longer desired
 export const isInPreviewModeSelectorNew = createSelector(
@@ -147,5 +168,19 @@ export const kustomizationResourcesSelectors = createSelector(
     return Object.values(localResourceMetaMap)
       .filter(i => isKustomizationResource(i))
       .sort((a, b) => a.name.localeCompare(b.name));
+  }
+);
+
+export const projectFileTreeSelector = createSelector(
+  [(state: RootState) => state.main.fileMap, (state: RootState) => state.config.fileExplorerSortOrder],
+  (fileMap, fileExplorerSortOrder) => {
+    const rootEntry = fileMap[ROOT_FILE_ENTRY];
+
+    const rootFileNodes = createFileNodes(path.sep, fileMap);
+    const rootFolderNodes =
+      rootEntry?.children
+        ?.map(folderPath => createFolderTree(`${path.sep}${folderPath}`, fileMap, fileExplorerSortOrder))
+        .filter(isDefined) || [];
+    return sortNodes(rootFolderNodes, rootFileNodes, fileExplorerSortOrder);
   }
 );

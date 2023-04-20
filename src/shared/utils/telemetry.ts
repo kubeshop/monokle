@@ -1,4 +1,4 @@
-import {ipcRenderer} from 'electron';
+import {app, ipcRenderer} from 'electron';
 
 import {machineIdSync} from 'node-machine-id';
 
@@ -14,21 +14,10 @@ export const trackEvent = <TEvent extends Event>(eventName: TEvent, payload?: Ev
     ipcRenderer.send('track-event', {eventName, payload});
   } else {
     const segmentClient = getSegmentClient();
+    const properties: any = {appVersion: app.getVersion(), ...payload};
     segmentClient?.track({
       event: eventName,
-      properties: payload,
-      userId: machineId,
-    });
-  }
-};
-export const trackError = (error: any) => {
-  if (isRendererThread()) {
-    ipcRenderer.send('track-event', {eventName: 'Error', payload: error});
-  } else {
-    const segmentClient = getSegmentClient();
-    segmentClient?.track({
-      event: 'Error',
-      properties: error,
+      properties,
       userId: machineId,
     });
   }

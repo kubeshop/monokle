@@ -143,6 +143,7 @@ type UiState = {
     isActive: boolean;
     isValidationDrawerVisible: boolean;
     selection: LeftMenuSelectionType;
+    activityBeforeClusterConnect: LeftMenuSelectionType | undefined;
     activeTab: string | null;
   };
   quickSearchActionsPopup: {
@@ -187,7 +188,8 @@ type UiState = {
   isInQuickClusterMode?: boolean;
   collapsedKustomizeKinds: string[];
   collapsedHelmCharts: string[];
-  welcomePopup: {
+  collapsedPreviewConfigurationsHelmCharts: string[];
+  welcomeModal: {
     isVisible: boolean;
   };
   fileCompareModal: {
