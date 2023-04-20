@@ -10,9 +10,10 @@ import {init as sentryInit} from '@sentry/electron/main';
 import electronStore from '@shared/utils/electronStore';
 import '@shared/utils/segment';
 
-import './git/ipc';
+import './KubeConfigManager';
 import './ipc/ipcListeners';
 import {openApplication} from './openApplication';
+import './services/git/ipc';
 import {initTelemetry, saveInitialK8sSchema, setProjectsRootFolder} from './utils';
 import {fixPath} from './utils/path';
 

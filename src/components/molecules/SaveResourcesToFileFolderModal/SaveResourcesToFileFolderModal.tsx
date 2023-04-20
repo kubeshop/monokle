@@ -9,7 +9,6 @@ import {isEmpty} from 'lodash';
 import micromatch from 'micromatch';
 import path from 'path';
 import util from 'util';
-import {stringify} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
@@ -26,6 +25,7 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useRefSelector} from '@utils/hooks';
 import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
+import {stringifyK8sResource} from '@utils/yaml';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AlertEnum} from '@shared/models/alert';
@@ -220,7 +220,7 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
         // TODO: this should probably become a thunk that can get the resource content from the store
         // because it would be nicer to not require us to have the entire resourceContentMapByStorage in this component
         const cleanResourceContent = removeIgnoredPathsFromResourceObject(resource.object);
-        let resourceText = stringify(cleanResourceContent, {sortMapEntries: true});
+        let resourceText = stringifyK8sResource(cleanResourceContent, {sortMapEntries: true});
 
         if (savingDestination === 'appendToFile') {
           if (resourceText.trim().endsWith(YAML_DOCUMENT_DELIMITER)) {

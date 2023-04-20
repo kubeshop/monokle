@@ -16,6 +16,7 @@ import {
 } from '@redux/appConfig';
 import {startWatchingKubeconfig} from '@redux/cluster/listeners/kubeconfig';
 import {setIsGitInstalled} from '@redux/git';
+import {isGitInstalled} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reducers/main';
@@ -29,7 +30,6 @@ import {FileExplorer} from '@atoms';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {getFileStats} from '@utils/files';
-import {fetchIsGitInstalled} from '@utils/git';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
@@ -110,9 +110,16 @@ const App = () => {
   }, []);
 
   useMount(() => {
-    fetchIsGitInstalled().then(isGitInstalled => {
-      dispatch(setIsGitInstalled(isGitInstalled));
-    });
+    const fetchIsGitInstalled = async () => {
+      try {
+        await isGitInstalled({});
+        dispatch(setIsGitInstalled(true));
+      } catch (error) {
+        dispatch(setIsGitInstalled(false));
+      }
+    };
+
+    fetchIsGitInstalled();
   });
 
   // called from main thread because thunks cannot be dispatched by main

@@ -15,6 +15,7 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ResourceSet} from '@shared/models/compare';
 import {K8sResource} from '@shared/models/k8sResource';
+import {ClusterOrigin} from '@shared/models/origin';
 import {RootState} from '@shared/models/rootState';
 import {execute} from '@shared/utils/commands';
 import {createKubectlApplyCommand} from '@shared/utils/commands/kubectl';
@@ -104,12 +105,12 @@ async function deployResourceToCluster(
   }
 
   const id = target?.id ?? uuid();
-  const resource = createResource(updatedContent, {
+  const resource = createResource(updatedContent, 'cluster', {
     id,
     origin: {
       storage: 'cluster',
       context: currentContext,
-    },
+    } as ClusterOrigin,
   });
 
   return resource;
@@ -127,12 +128,16 @@ async function extractResourceToLocal(
     return result;
   }
 
-  return createResource(source.object, {
+  return createResource(source.object, 'local', {
     name: source.name,
   });
 }
 
-function createResource(rawResource: any, overrides?: Partial<K8sResource>): K8sResource {
+function createResource(
+  rawResource: any,
+  createdIn: 'local' | 'cluster',
+  overrides?: Partial<K8sResource>
+): K8sResource {
   const id = uuid();
   const name = rawResource.metadata?.name ?? 'UNKNOWN';
 
@@ -144,7 +149,7 @@ function createResource(rawResource: any, overrides?: Partial<K8sResource>): K8s
     object: cloneDeep(rawResource),
     text: jsonToYaml(rawResource),
     storage: 'transient',
-    origin: {},
+    origin: {createdIn},
     isClusterScoped: getResourceKindHandler(rawResource.kind)?.isNamespaced || false,
     ...overrides,
   };

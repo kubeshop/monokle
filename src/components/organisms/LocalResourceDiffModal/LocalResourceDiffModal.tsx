@@ -9,7 +9,6 @@ import {Button, Select, Skeleton, Switch} from 'antd';
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import {flatten} from 'lodash';
-import {stringify} from 'yaml';
 
 import {
   ClusterName,
@@ -39,6 +38,7 @@ import {ModalConfirm, ModalConfirmWithNamespaceSelect} from '@components/molecul
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
+import {stringifyK8sResource} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -199,7 +199,7 @@ const DiffModal = () => {
     const newDiffContentObject = removeIgnoredPathsFromResourceObject(
       matchingResourcesById[selectedMatchingResourceId]
     );
-    const cleanDiffContentString = stringify(newDiffContentObject, {sortMapEntries: true});
+    const cleanDiffContentString = stringifyK8sResource(newDiffContentObject, {sortMapEntries: true});
     return cleanDiffContentString;
   }, [
     isDiffModalVisible,
@@ -295,7 +295,7 @@ const DiffModal = () => {
           hasClusterMatchingResource = true;
           setSelectedMathingResourceId(foundResourceFromCluster.metadata.uid);
           setDefaultNamespace(foundResourceFromCluster.metadata.namespace);
-          setMatchingResourceText(stringify(foundResourceFromCluster, {sortMapEntries: true}));
+          setMatchingResourceText(stringifyK8sResource(foundResourceFromCluster, {sortMapEntries: true}));
         }
       } else if (resourceFilter.namespaces) {
         const foundResourceFromCluster = resourcesFromCluster.find(r =>
@@ -305,20 +305,20 @@ const DiffModal = () => {
           hasClusterMatchingResource = true;
           setSelectedMathingResourceId(foundResourceFromCluster.metadata.uid);
           setDefaultNamespace(foundResourceFromCluster.metadata.namespace);
-          setMatchingResourceText(stringify(foundResourceFromCluster, {sortMapEntries: true}));
+          setMatchingResourceText(stringifyK8sResource(foundResourceFromCluster, {sortMapEntries: true}));
         }
       }
 
       if (!hasClusterMatchingResource) {
         setSelectedMathingResourceId(resourcesFromCluster[0].metadata.uid);
         setDefaultNamespace(resourcesFromCluster[0].metadata.namespace);
-        setMatchingResourceText(stringify(resourcesFromCluster[0], {sortMapEntries: true}));
+        setMatchingResourceText(stringifyK8sResource(resourcesFromCluster[0], {sortMapEntries: true}));
       }
 
       setHasDiffModalLoaded(true);
     };
 
-    setTargetResourceText(stringify(targetResource.object, {sortMapEntries: true}));
+    setTargetResourceText(stringifyK8sResource(targetResource.object, {sortMapEntries: true}));
     getClusterResources();
   }, [
     kubeConfigContext,

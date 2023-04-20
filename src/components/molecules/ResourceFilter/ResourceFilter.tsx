@@ -67,6 +67,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   const [localResourceFilter, setLocalResourceFilter] = useState<ResourceFilterType>(filtersMap);
   const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
   const folderTree = useFileFolderTreeSelectData('all');
+  const filterBodyHeight = isInClusterMode ? NAVIGATOR_FILTER_BODY_HEIGHT - 56 : NAVIGATOR_FILTER_BODY_HEIGHT;
 
   const autocompleteOptions = useMemo(() => {
     return {
@@ -253,7 +254,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   return (
     <S.Container>
       <Filter
-        height={NAVIGATOR_FILTER_BODY_HEIGHT}
+        height={filterBodyHeight}
         search={localResourceFilter?.name}
         onClear={handleClear}
         onSearch={handleSearched}
@@ -300,18 +301,20 @@ const ResourceFilter = ({active, onToggle}: Props) => {
           />
         </FilterField>
 
-        <FilterField name="Namespace">
-          <Select
-            mode="tags"
-            style={{width: '100%'}}
-            placeholder="Select one or more namespaces.."
-            value={localResourceFilter.namespaces}
-            options={autocompleteOptions.namespaces}
-            onChange={onNamespaceChangeHandler}
-            onClear={onNamespaceClearHandler}
-            allowClear
-          />
-        </FilterField>
+        {!isInClusterMode && (
+          <FilterField name="Namespace">
+            <Select
+              mode="tags"
+              style={{width: '100%'}}
+              placeholder="Select one or more namespaces.."
+              value={localResourceFilter.namespaces}
+              options={autocompleteOptions.namespaces}
+              onChange={onNamespaceChangeHandler}
+              onClear={onNamespaceClearHandler}
+              allowClear
+            />
+          </FilterField>
+        )}
 
         <FilterField name="Labels">
           <NewKeyValueInput onAddKeyValue={handleUpsertLabelFilter} keyOptions={autocompleteOptions.labels} />

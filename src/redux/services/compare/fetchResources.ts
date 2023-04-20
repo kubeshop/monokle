@@ -10,13 +10,14 @@ import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {selectKubeconfig} from '@redux/cluster/selectors';
 import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
+import {getCommitResources} from '@redux/git/git.ipc';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
 import {buildHelmCommand} from '@utils/helm';
-import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {GitCommitResourcesResult} from '@shared/ipc/git';
 import {CommandOptions} from '@shared/models/commands';
 import {
   ClusterResourceSet,
@@ -75,14 +76,13 @@ function fetchLocalResources(state: RootState, options: LocalResourceSet): K8sRe
 async function fetchGitResources(state: RootState, options: GitResourceSet): Promise<K8sResource<'local'>[]> {
   const {commitHash = ''} = options;
 
-  const filesContent: Record<string, string> = await promiseFromIpcRenderer(
-    'git.getCommitResources',
-    'git.getCommitResources.result',
-    {
-      localPath: state.config.selectedProjectRootFolder,
-      commitHash,
-    }
-  );
+  let filesContent: GitCommitResourcesResult;
+
+  try {
+    filesContent = await getCommitResources({localPath: state.config.selectedProjectRootFolder || '', commitHash});
+  } catch (e) {
+    filesContent = {};
+  }
 
   return Object.entries(filesContent)
     .flatMap(([filePath, content]) => extractK8sResources(content, 'local', {filePath, fileOffset: 0}))

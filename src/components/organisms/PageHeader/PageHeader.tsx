@@ -14,6 +14,7 @@ import {InitializeGitTooltip, InstallGitTooltip, NotificationsTooltip} from '@co
 
 import {activeProjectSelector, isInClusterModeSelector, updateProjectsGitRepo} from '@redux/appConfig';
 import {setCurrentBranch, setRepo} from '@redux/git';
+import {getRepoInfo, initGitRepo} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setIsInQuickClusterMode, setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
@@ -26,7 +27,6 @@ import BranchSelect from '@components/molecules/BranchSelect';
 
 import {useHelpMenuItems} from '@hooks/menuItemsHooks';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
 import {showGitErrorModal} from '@utils/terminal';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
@@ -98,7 +98,7 @@ const PageHeader = () => {
     shell.openExternal(url);
   }, [autosavingError]);
 
-  const initGitRepo = async () => {
+  const initGitRepoHandler = async () => {
     if (!projectRootFolder) {
       return;
     }
@@ -106,22 +106,26 @@ const PageHeader = () => {
     trackEvent('git/initialize');
     setIsInitializingGitRepo(true);
 
-    const result = await promiseFromIpcRenderer('git.initGitRepo', 'git.initGitRepo.result', projectRootFolder);
-
-    if (result.error) {
-      showGitErrorModal('Failed to initialize git repo');
+    try {
+      await initGitRepo({path: projectRootFolder});
+    } catch (e: any) {
+      showGitErrorModal('Failed to initialize git repo', e.message);
       setIsInitializingGitRepo(false);
       return;
     }
 
     monitorGitFolder(projectRootFolder, store);
 
-    promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', projectRootFolder).then(repo => {
-      dispatch(setRepo(repo));
-      dispatch(setCurrentBranch(repo.currentBranch));
-      setIsInitializingGitRepo(false);
-      dispatch(updateProjectsGitRepo([{path: projectRootFolder, isGitRepo: true}]));
-    });
+    try {
+      await getRepoInfo({path: projectRootFolder || ''}).then(repo => {
+        dispatch(setRepo(repo));
+        dispatch(setCurrentBranch(repo.currentBranch));
+        setIsInitializingGitRepo(false);
+        dispatch(updateProjectsGitRepo([{path: projectRootFolder, isGitRepo: true}]));
+      });
+    } catch (e: any) {
+      showGitErrorModal('Git repo error', e.message);
+    }
   };
 
   const onClickProjectHandler = () => {
@@ -202,9 +206,9 @@ const PageHeader = () => {
                     disabled={!isGitInstalled}
                     icon={<Icon name="git" />}
                     loading={isInitializingGitRepo || gitLoading}
-                    type="primary"
+                    type="text"
                     size="small"
-                    onClick={initGitRepo}
+                    onClick={initGitRepoHandler}
                   >
                     Initialize Git
                   </S.InitButton>
