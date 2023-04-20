@@ -25,6 +25,8 @@ type ConnectResponse = {
 export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, ThunkApi>(
   'cluster/connect',
   async (payload, {getState, dispatch, rejectWithValue}) => {
+    const lastNamespaceLoaded = getState().main.clusterConnectionOptions?.lastNamespaceLoaded;
+
     // Ping for healthy connection
     await dispatch(setupCluster());
     const contextId = selectCurrentContextId(getState());
@@ -50,7 +52,7 @@ export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, Thu
       await dispatch(
         reloadClusterResources({
           context: context.name,
-          namespace: payload.namespace ?? context.namespace ?? 'default',
+          namespace: payload.namespace ?? context.namespace ?? lastNamespaceLoaded ?? 'default',
           port: setupResponse.port,
         })
       );
@@ -58,7 +60,7 @@ export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, Thu
       await dispatch(
         loadClusterResources({
           context: context.name,
-          namespace: payload.namespace ?? context.namespace ?? 'default',
+          namespace: payload.namespace ?? context.namespace ?? lastNamespaceLoaded ?? 'default',
           port: setupResponse.port,
         })
       );
