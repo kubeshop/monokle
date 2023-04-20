@@ -17,7 +17,7 @@ import {
   openRenameEntityModal,
 } from '@redux/reducers/ui';
 import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
-import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
+import {fileIsExcluded, getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile, isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
@@ -233,6 +233,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
   const {deleteEntry} = props;
   const dispatch = useAppDispatch();
   const osPlatform = useAppSelector(state => state.config.osPlatform);
+  const projectConfig = useAppSelector(state => state.config.projectConfig);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
 
   const {canOpenOnGithub, openOnGithub} = useOpenOnGithub(fileEntry?.filePath);
@@ -259,9 +260,12 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
       });
     }
 
+    const canBeExcluded = !fileEntry.isExcluded && !fileIsExcluded(fileEntry.filePath, projectConfig || {});
+
     newMenuItems.push({
       key: 'update_scanning',
       label: `${fileEntry.isExcluded ? 'Remove from' : 'Add to'} Files: Exclude`,
+      disabled: !canBeExcluded,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
         if (fileEntry.isExcluded) {
@@ -346,6 +350,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     canOpenOnGithub,
     renameFileEntry,
     deleteEntry,
+    projectConfig,
   ]);
 
   return menuItems;
