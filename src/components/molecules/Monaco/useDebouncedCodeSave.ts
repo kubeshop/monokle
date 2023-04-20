@@ -43,7 +43,7 @@ const debouncedCodeSave = debounce(
 
 function useDebouncedCodeSave(
   originalCodeRef: React.MutableRefObject<string>,
-  selectedResource: K8sResource | undefined,
+  selectedResourceRef: React.MutableRefObject<K8sResource | undefined>,
   selectedPathRef: React.MutableRefObject<string | undefined>
 ) {
   const dispatch = useAppDispatch();
@@ -51,7 +51,7 @@ function useDebouncedCodeSave(
     (code: string) => {
       const success = debouncedCodeSave({
         code,
-        selectedResource,
+        selectedResource: selectedResourceRef.current,
         selectedPath: selectedPathRef.current,
         dispatch,
       });
@@ -59,7 +59,7 @@ function useDebouncedCodeSave(
         originalCodeRef.current = code;
       }
     },
-    [selectedResource, selectedPathRef, dispatch, originalCodeRef]
+    [dispatch, originalCodeRef, selectedPathRef, selectedResourceRef]
   );
 
   return debouncedSaveContent;
