@@ -4,6 +4,8 @@ import {Tooltip} from 'antd';
 
 import {DateTime} from 'luxon';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {useResourceContent} from '@redux/selectors/resourceSelectors';
 
 import {ResourceMeta} from '@shared/models/k8sResource';
@@ -42,6 +44,8 @@ export const ResourceInfoIcon = (props: Props) => {
 
   return (
     <Tooltip
+      mouseEnterDelay={TOOLTIP_DELAY}
+      mouseLeaveDelay={0.15}
       placement="top"
       title={
         <S.InfoContainer>
