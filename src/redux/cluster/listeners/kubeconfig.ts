@@ -4,6 +4,8 @@ import isEqual from 'react-fast-compare';
 
 import {createAction, isAnyOf} from '@reduxjs/toolkit';
 
+import log from 'loglevel';
+
 import {
   kubeConfigPathSelector,
   loadProjectKubeConfig,
@@ -99,7 +101,7 @@ export const kubeConfigListener: AppListenerFn = listen => {
         await stopWatchKubeconfig();
         ipcRenderer.off('kubeconfig:update', listener);
       } catch (err) {
-        console.error('Cannot watch kubeconfigs.', err);
+        log.error('Cannot watch kubeconfigs.', err);
       }
 
       subscribe();

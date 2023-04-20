@@ -35,7 +35,6 @@ export function ConnectButton() {
       dispatch(toggleStartProjectPane());
     }
 
-    console.log('TEST WITO', context);
     dispatch(
       connectCluster({
         context: context.name,
@@ -55,7 +54,11 @@ export function ConnectButton() {
 
   return (
     <Tooltip title="Connect to cluster">
-      <ConnectBtn className={highlightedItems.connectToCluster ? 'animated-highlight' : ''} onClick={loadOrReload}>
+      <ConnectBtn
+        disabled={!kubeConfig?.isValid}
+        className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
+        onClick={loadOrReload}
+      >
         <ApiOutlined />
       </ConnectBtn>
     </Tooltip>

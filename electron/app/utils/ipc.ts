@@ -1,5 +1,7 @@
 import {ipcMain} from 'electron';
 
+import log from 'loglevel';
+
 import {IpcResult} from '@shared/ipc';
 
 export type RendererMetadata = {
@@ -18,7 +20,7 @@ export async function handleIpc<Params, Result>(
       return {success: true, payload};
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'error_unknown';
-      if (debug) console.error('ipc_failed', msg);
+      if (debug) log.error('ipc_failed', msg);
       return {success: false, reason: msg};
     }
   });

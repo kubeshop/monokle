@@ -56,7 +56,7 @@ function Trigger({icon, value}: {icon?: ReactNode; value: string}) {
     <TriggerBtn $connected={isInClusterMode}>
       <Spacer>
         {icon}
-        <TriggerContent>{hasNoCurrentContext ? 'no context selected' : value}</TriggerContent>
+        <TriggerContent>{hasNoCurrentContext ? 'No context selected' : value}</TriggerContent>
         <DownOutlined style={{fontSize: '75%'}} />
       </Spacer>
     </TriggerBtn>
@@ -96,8 +96,8 @@ function InvalidKubeconfigButton() {
   return (
     <TriggerBtn onClick={handleClick}>
       <Spacer>
-        <Icon name="cluster-dashboard" style={{fontSize: '14px', marginTop: 4}} />
-        <span>no cluster found</span>
+        <Icon name="cluster-dashboard" />
+        <span>No cluster detected</span>
       </Spacer>
     </TriggerBtn>
   );
