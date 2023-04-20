@@ -41,7 +41,6 @@ import {
   ImageDetails,
   Logs,
   ModalConfirmWithNamespaceSelect,
-  Monaco,
   PreviewConfigurationDetails,
   ResourceGraphTab,
 } from '@molecules';
@@ -55,6 +54,7 @@ import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {useRefSelector, useSelectorWithRef} from '@utils/hooks';
 
+import CodeEditor from '@src/editor/CodeEditor';
 import {getResourceKindHandler} from '@src/kindhandlers';
 import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandler';
 
@@ -293,7 +293,8 @@ const ActionsPane: React.FC = () => {
               <S.Skeleton active />
             ) : activeTabKey === 'source' ? (
               (selectedResourceRef.current || selectedFilePath || selectedHelmValuesId) && (
-                <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
+                <CodeEditor />
+                // <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
               )
             ) : null}
           </>

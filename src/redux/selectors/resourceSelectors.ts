@@ -246,3 +246,13 @@ export const resourceNavigatorSelector = createSelector(
     return list;
   }
 );
+
+export const selectedResourceIdentifierSelector = createSelector(
+  (state: RootState) => state.main.selection,
+  selection => {
+    if (selection?.type === 'resource') {
+      return selection.resourceIdentifier;
+    }
+    return undefined;
+  }
+);
