@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.9](https://github.com/kubeshop/monokle/compare/v2.0.9-nightly-2023-04-20.0...v2.0.9) (2023-04-20)
+
+
+### Bug Fixes
+
+* remove unused ([622e201](https://github.com/kubeshop/monokle/commit/622e201c104170e92784f6e73cee15312fc9623f))
+* saving resources ([b08ebc9](https://github.com/kubeshop/monokle/commit/b08ebc9e24d20d8b9cb551e082afdad1c9c91461))
+
 ### [2.0.8](https://github.com/kubeshop/monokle/compare/v2.0.8-prerelease-398a993936618a06c00cb8e6f44bfa1290ae024e.0...v2.0.8) (2023-04-19)
 
 
