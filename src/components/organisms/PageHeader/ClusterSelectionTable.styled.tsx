@@ -24,6 +24,7 @@ export const ClusterColor = styled.div<{
 }>`
   cursor: pointer;
   border-radius: 4px;
+  transform: translateY(2px);
 
   ${({$color, $selected, $size}) => `
     background-color: ${$color};

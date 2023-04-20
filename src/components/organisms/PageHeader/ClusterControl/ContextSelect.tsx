@@ -63,6 +63,31 @@ function Trigger({icon, value}: {icon?: ReactNode; value: string}) {
   );
 }
 
+function InvalidKubeconfigButton() {
+  const dispatch = useAppDispatch();
+
+  const handleClick = useCallback(() => {
+    dispatch(setLeftMenuSelection('dashboard'));
+  }, [dispatch]);
+
+  return (
+    <TriggerBtn onClick={handleClick}>
+      <Spacer>
+        <Icon name="cluster-dashboard" />
+        <span>No cluster detected</span>
+      </Spacer>
+    </TriggerBtn>
+  );
+}
+
+// Styled Components
+
+const Spacer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
 const TriggerBtn = styled(Button)<{$connected?: boolean}>`
   display: flex;
   flex: 0 1 auto;
@@ -84,29 +109,6 @@ const TriggerBtn = styled(Button)<{$connected?: boolean}>`
     background-color: ${({$connected}) => ($connected ? Colors.geekblue7 : Colors.grey3b)};
     color: ${Colors.whitePure};
   }
-`;
-
-function InvalidKubeconfigButton() {
-  const dispatch = useAppDispatch();
-
-  const handleClick = useCallback(() => {
-    dispatch(setLeftMenuSelection('dashboard'));
-  }, [dispatch]);
-
-  return (
-    <TriggerBtn onClick={handleClick}>
-      <Spacer>
-        <Icon name="cluster-dashboard" />
-        <span>No cluster detected</span>
-      </Spacer>
-    </TriggerBtn>
-  );
-}
-
-const Spacer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
 `;
 
 const TriggerContent = styled.div`

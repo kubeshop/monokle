@@ -213,7 +213,6 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
                       </S.DefaultColorContainer>
                     </>
                   }
-                  trigger="click"
                   zIndex={1500}
                   onOpenChange={visible => {
                     if (!visible) {
@@ -225,7 +224,8 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
                     $color={kubeConfigContextsColors[record.name] || BackgroundColors.clusterModeBackground}
                     $selected
                     $size="small"
-                    onClick={() => {
+                    onClick={e => {
+                      e.stopPropagation();
                       setChangeClusterColor(record.name);
                     }}
                   />
