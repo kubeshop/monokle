@@ -15,6 +15,7 @@ const HorizontalPodAutoscalerHandler: ResourceKindHandler = {
   isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const autoscalingV1Api = kubeconfig.makeApiClient(k8s.AutoscalingV1Api);
+    autoscalingV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     return autoscalingV1Api.readNamespacedHorizontalPodAutoscaler(
       resource.name,
       resource.namespace || 'default',
@@ -23,6 +24,7 @@ const HorizontalPodAutoscalerHandler: ResourceKindHandler = {
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const autoscalingV1Api = kubeconfig.makeApiClient(k8s.AutoscalingV1Api);
+    autoscalingV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     const response = namespace
       ? await autoscalingV1Api.listNamespacedHorizontalPodAutoscaler(namespace)
       : await autoscalingV1Api.listHorizontalPodAutoscalerForAllNamespaces();
@@ -30,6 +32,7 @@ const HorizontalPodAutoscalerHandler: ResourceKindHandler = {
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const autoscalingV1Api = kubeconfig.makeApiClient(k8s.AutoscalingV1Api);
+    autoscalingV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     await autoscalingV1Api.deleteNamespacedHorizontalPodAutoscaler(resource.name, resource.namespace || 'default');
   },
   helpLink: 'https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/',

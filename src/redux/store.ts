@@ -4,6 +4,8 @@ import {createLogger} from 'redux-logger';
 
 import {configSlice} from './appConfig';
 import {appConfigListeners} from './appConfig/appConfig.listeners';
+import {clusterListeners} from './cluster/listeners';
+import {clusterSlice} from './cluster/slice';
 import * as compareListeners from './compare/listeners';
 import {compareSlice} from './compare/slice';
 import {dashboardSlice} from './dashboard';
@@ -13,10 +15,9 @@ import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
 import {extensionSlice} from './reducers/extension';
 import {mainSlice} from './reducers/main';
-import {retryClusterConnectionListener} from './reducers/main/clusterListeners';
 import {imageListParserListener} from './reducers/main/mainListeners';
 import {killTerminalProcessesListener, removeTerminalListener, terminalSlice} from './reducers/terminal';
-import {stopClusterConnectionListener, uiSlice} from './reducers/ui';
+import {uiSlice} from './reducers/ui';
 import {validationListeners} from './validation/validation.listeners';
 import {validationSlice} from './validation/validation.slice';
 
@@ -41,9 +42,8 @@ combineListeners([
   removeTerminalListener,
   ...validationListeners,
   ...appConfigListeners,
+  ...clusterListeners,
   imageListParserListener,
-  stopClusterConnectionListener,
-  retryClusterConnectionListener,
 ]);
 
 const appReducer = combineReducers({
@@ -58,6 +58,7 @@ const appReducer = combineReducers({
   form: formSlice.reducer,
   validation: validationSlice.reducer,
   dashboard: dashboardSlice.reducer,
+  cluster: clusterSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {

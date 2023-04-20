@@ -24,6 +24,7 @@ import {
   kubeConfigContextSelector,
   kubeConfigPathSelector,
 } from '@redux/appConfig';
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal} from '@redux/reducers/main';
@@ -44,7 +45,7 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 import {Icon} from '@monokle/components';
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {RootState} from '@shared/models/rootState';
-import {createKubeClient, hasAccessToResourceKind} from '@shared/utils/kubeclient';
+import {hasAccessToResourceKind} from '@shared/utils/kubeclient';
 
 import * as S from './styled';
 
@@ -228,7 +229,9 @@ const DiffModal = () => {
     }
 
     const getClusterResources = async () => {
-      const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
+      const context = kubeConfigContext;
+      const kubeconfig = kubeConfigPath;
+      const kc = await createKubeClientWithSetup({context, kubeconfig, skipHealthCheck: true});
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
       const getResources = async () => {

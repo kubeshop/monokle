@@ -5,6 +5,7 @@ import {sortBy} from 'lodash';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
+import {selectKubeconfig} from '@redux/cluster/selectors';
 import {extractK8sResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
@@ -39,9 +40,17 @@ export const runPreviewConfiguration = createAsyncThunk<
   const configState = thunkAPI.getState().config;
   const mainState = thunkAPI.getState().main;
   const previewConfigurationMap = configState.projectConfig?.helm?.previewConfigurationMap;
-  const kubeconfig = configState.kubeConfig.path;
-  const currentContext = thunkAPI.getState().config.kubeConfig.currentContext;
+  const kubeconfig = selectKubeconfig(thunkAPI.getState());
 
+  if (!kubeconfig?.isValid) {
+    return createRejectionWithAlert(
+      thunkAPI,
+      'Preview Configuration Error',
+      `Could not preview due to invalid kubeconfig`
+    );
+  }
+
+  const currentContext = kubeconfig.currentContext;
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
 
   let previewConfiguration: HelmPreviewConfiguration | null | undefined;

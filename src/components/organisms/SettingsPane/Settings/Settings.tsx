@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 import {Button, Checkbox, Form, Input, InputNumber, InputRef, Select, Tooltip} from 'antd';
@@ -82,11 +82,11 @@ export const Settings = ({
   const [isSchemaDownloading, setIsSchemaDownloading] = useState<boolean>(false);
   const [localConfig, setLocalConfig, localConfigRef] = useStateWithRef<ProjectConfig | null | undefined>(config);
 
-  const handleConfigChange = () => {
+  const handleConfigChange = useCallback(() => {
     if (onConfigChange && !isEqual(localConfigRef.current, config)) {
       onConfigChange(localConfig);
     }
-  };
+  }, [config, localConfig, localConfigRef, onConfigChange]);
 
   useEffect(() => {
     setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
@@ -106,7 +106,7 @@ export const Settings = ({
   useEffect(() => {
     handleConfigChange();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [localConfig]);
+  }, [handleConfigChange, localConfig]);
 
   useEffect(() => {
     settingsForm.setFieldsValue({projectName});
@@ -118,7 +118,7 @@ export const Settings = ({
       handleConfigChange();
     },
     DEFAULT_EDITOR_DEBOUNCE,
-    [localConfig?.folderReadsMaxDepth]
+    [handleConfigChange, localConfig?.folderReadsMaxDepth]
   );
 
   const onChangeFileIncludes = (patterns: string[]) => {

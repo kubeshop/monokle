@@ -24,6 +24,8 @@ export const DEFAULT_GIT_REPO_PLACEHOLDER = 'https://github.com/kubeshop/monokle
 export const TEMPLATES_HELP_URL = 'https://github.com/kubeshop/monokle/blob/main/docs/templates.md';
 export const PLUGINS_HELP_URL = 'https://kubeshop.github.io/monokle/plugins';
 
+export const DISCORD_URL = 'https://discord.gg/kMJxmuYTMu';
+
 export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';
 export const LET_US_KNOW_URL = 'https://github.com/kubeshop/monokle/issues/1550';
 export const CLUSTER_AVAILABLE_COLORS = [

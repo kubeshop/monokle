@@ -34,7 +34,6 @@ import {DISABLED_TELEMETRY} from '@shared/models/telemetry';
 import {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@shared/models/template';
 import {disableSegment, enableSegment, getSegmentClient} from '@shared/utils/segment';
 
-import {startKubeConfigService, stopKubeConfigService} from '../KubeConfigManager';
 import autoUpdater from '../autoUpdater';
 import {
   checkNewVersion,
@@ -46,6 +45,7 @@ import {
 } from '../commands';
 import {killKubectlProxyProcess, startKubectlProxyProcess} from '../kubectl';
 import {ProjectNameChange, StorePropagation} from '../models';
+import '../services/cluster/ipc';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
   downloadTemplate,
@@ -420,9 +420,6 @@ ipcMain.on('pod.terminal.init', (event, args) => {
     }
   );
 });
-
-ipcMain.handle('kubeService:start', () => startKubeConfigService());
-ipcMain.handle('kubeService:stop', () => stopKubeConfigService());
 
 ipcMain.handle('analytics:toggleTracking', async (_event, {disableEventTracking}) => {
   const segmentClient = getSegmentClient();

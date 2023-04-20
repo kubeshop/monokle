@@ -9,8 +9,9 @@ import {closeKubectlProxy} from '@shared/utils/commands/kubectl';
 
 export const stopClusterConnection = createAsyncThunk<void, undefined, {dispatch: AppDispatch; state: RootState}>(
   'main/stopClusterConnection',
-  async (payload, thunkAPI) => {
-    thunkAPI.dispatch(setClusterProxyPort(undefined));
+  async (payload, {dispatch, getState}) => {
+    // Close connection
+    dispatch(setClusterProxyPort(undefined));
     disconnectFromCluster();
     closeKubectlProxy();
   }

@@ -192,6 +192,7 @@ const DashboardPane = () => {
 
             {parent.children?.map((child: DashboardMenu) => (
               <MenuItem
+                key={child.key}
                 type="child"
                 menuItem={child}
                 onActiveMenuItem={(ref: HTMLElement) => setActiveMenuItemRef(ref)}

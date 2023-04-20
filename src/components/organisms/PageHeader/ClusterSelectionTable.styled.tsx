@@ -24,6 +24,7 @@ export const ClusterColor = styled.div<{
 }>`
   cursor: pointer;
   border-radius: 4px;
+  transform: translateY(2px);
 
   ${({$color, $selected, $size}) => `
     background-color: ${$color};
@@ -66,7 +67,7 @@ export const NamespacesTooltipContainer = styled.div`
 `;
 
 export const Table = styled(props => <RawTable {...props} />)`
-  width: 840px;
+  width: 600px;
   border-top: 1px solid ${Colors.grey3};
 
   tbody {

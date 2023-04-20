@@ -4,6 +4,7 @@ import {cloneDeep, noop} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {updateResource} from '@redux/thunks/updateResource';
 import {createNamespace, getNamespace, getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 
@@ -18,7 +19,6 @@ import {ClusterOrigin} from '@shared/models/origin';
 import {RootState} from '@shared/models/rootState';
 import {execute} from '@shared/utils/commands';
 import {createKubectlApplyCommand} from '@shared/utils/commands/kubectl';
-import {createKubeClient} from '@shared/utils/kubeclient';
 
 type Type = ResourceSet['type'];
 
@@ -60,7 +60,11 @@ async function deployResourceToCluster(
   const currentContext = options.context ?? kubeConfigContextSelector(state);
   const kubeConfigPath = kubeConfigPathSelector(state);
   const namespace = source.namespace ?? options.namespace ?? 'default';
-  const kubeClient = createKubeClient(kubeConfigPath, currentContext);
+  const kubeClient = await createKubeClientWithSetup({
+    context: currentContext,
+    kubeconfig: kubeConfigPath,
+    skipHealthCheck: true,
+  });
   const hasNamespace = await getNamespace(kubeClient, namespace);
 
   try {

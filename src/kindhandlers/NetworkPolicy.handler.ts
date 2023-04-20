@@ -15,10 +15,12 @@ const NetworkPolicyHandler: ResourceKindHandler = {
   isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+    k8sNetworkingV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     return k8sNetworkingV1Api.readNamespacedNetworkPolicy(resource.name, resource.namespace || 'default');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+    k8sNetworkingV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     const response = namespace
       ? await k8sNetworkingV1Api.listNamespacedNetworkPolicy(namespace)
       : await k8sNetworkingV1Api.listNetworkPolicyForAllNamespaces();
@@ -26,6 +28,7 @@ const NetworkPolicyHandler: ResourceKindHandler = {
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sNetworkingV1Api = kubeconfig.makeApiClient(k8s.NetworkingV1Api);
+    k8sNetworkingV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     await k8sNetworkingV1Api.deleteNamespacedNetworkPolicy(resource.name, resource.namespace || 'default');
   },
   helpLink: 'https://kubernetes.io/docs/concepts/services-networking/network-policies/',
