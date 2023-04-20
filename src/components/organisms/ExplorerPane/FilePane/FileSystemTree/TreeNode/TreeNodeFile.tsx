@@ -101,14 +101,13 @@ const TreeNodeFile: React.FC<Props> = props => {
               Preview
             </S.PreviewButton>
           )}
-          {!isDisabled ||
-            (!fileEntry.isSupported && (
-              <ContextMenu items={menuItems}>
-                <div ref={contextMenuButtonRef}>
-                  <Dots color={isSelected ? Colors.blackPure : undefined} />
-                </div>
-              </ContextMenu>
-            ))}
+          {(fileEntry.isSupported || !isDisabled) && (
+            <ContextMenu items={menuItems}>
+              <div ref={contextMenuButtonRef}>
+                <Dots color={isSelected ? Colors.blackPure : undefined} />
+              </div>
+            </ContextMenu>
+          )}
         </S.ActionButtonsContainer>
       )}
     </S.NodeContainer>
