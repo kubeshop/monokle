@@ -104,8 +104,6 @@ export type SetPreviewDataPayload = {
   previewResourceMetaMap?: ResourceMetaMap<'preview'>;
   previewResourceContentMap?: ResourceContentMap<'preview'>;
   alert?: AlertType;
-  previewKubeConfigPath?: string;
-  previewKubeConfigContext?: string;
 };
 
 export type SetDiffDataPayload = {

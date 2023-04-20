@@ -12,8 +12,8 @@ export function applyFileWithConfirm(
   selectedPath: string,
   fileMap: FileMapType,
   dispatch: ThunkDispatch<any, any, any>,
-  kubeconfig: string,
-  context: string
+  kubeconfig: string | undefined,
+  context: string | undefined
 ) {
   const title = `Deploy ${fileMap[selectedPath].name} to cluster [${context}]?`;
 

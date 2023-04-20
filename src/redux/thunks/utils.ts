@@ -5,6 +5,8 @@ import {stringify} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
+
 import {stringifyK8sResource} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
@@ -12,7 +14,6 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 import {AlertEnum} from '@shared/models/alert';
 import {K8sObject} from '@shared/models/k8s';
 import {ResourceMeta} from '@shared/models/k8sResource';
-import {createKubeClient} from '@shared/utils/kubeclient';
 
 /**
  * Utility to convert list of objects returned by k8s api to a single YAML document
@@ -48,20 +49,32 @@ export function createRejectionWithAlert(thunkAPI: any, title: string, message: 
 
 export async function getResourceFromCluster(
   resourceMeta: ResourceMeta,
-  kubeconfigPath: string,
-  context?: string
+  kubeconfigPath: string | undefined,
+  context: string
 ): Promise<K8sObject | undefined> {
   const resourceKindHandler = getResourceKindHandler(resourceMeta.kind);
 
   if (resourceKindHandler) {
-    const kubeClient = createKubeClient(kubeconfigPath, context);
+    const kubeClient = await createKubeClientWithSetup({
+      kubeconfig: kubeconfigPath,
+      context,
+      skipHealthCheck: true,
+    });
     const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kubeClient, resourceMeta);
     return toPojo(resourceFromCluster.body);
   }
 }
 
-export async function removeNamespaceFromCluster(namespace: string, kubeconfigPath: string, context?: string) {
-  const kubeClient = createKubeClient(kubeconfigPath, context);
+export async function removeNamespaceFromCluster(
+  namespace: string,
+  kubeconfigPath: string | undefined,
+  context: string
+) {
+  const kubeClient = await createKubeClientWithSetup({
+    kubeconfig: kubeconfigPath,
+    context,
+    skipHealthCheck: true,
+  });
   const k8sCoreV1Api = kubeClient.makeApiClient(k8s.CoreV1Api);
   await k8sCoreV1Api.deleteNamespace(namespace);
 }

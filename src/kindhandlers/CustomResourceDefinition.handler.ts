@@ -15,15 +15,18 @@ const CustomResourceDefinitionHandler: ResourceKindHandler = {
   isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sExtensionsV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
+    k8sExtensionsV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     return k8sExtensionsV1Api.readCustomResourceDefinition(resource.name);
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sExtensionsV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
+    k8sExtensionsV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     const response = await k8sExtensionsV1Api.listCustomResourceDefinition();
     return response.body.items;
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sExtensionsV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
+    k8sExtensionsV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     await k8sExtensionsV1Api.deleteCustomResourceDefinition(resource.name);
   },
   helpLink: 'https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/',

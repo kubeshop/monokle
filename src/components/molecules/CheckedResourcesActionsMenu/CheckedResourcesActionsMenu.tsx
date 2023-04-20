@@ -6,7 +6,8 @@ import {CloseOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
 
-import {isInClusterModeSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
+import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/appConfig';
+import {selectKubeContext} from '@redux/cluster/selectors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath, uncheckAllResourceIds} from '@redux/reducers/main';
@@ -32,7 +33,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const resourceMetaMap = useActiveResourceMetaMap();
   const transientResourceMetaMap = useResourceMetaMap('transient');
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigContext = useAppSelector(selectKubeContext);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
@@ -75,7 +76,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   );
 
   const confirmModalTitle = useMemo(
-    () => makeApplyMultipleResourcesText(checkedResources.length, kubeConfigContext, kubeConfigContextColor),
+    () => makeApplyMultipleResourcesText(checkedResources.length, kubeConfigContext?.name, kubeConfigContextColor),
     [checkedResources.length, kubeConfigContext, kubeConfigContextColor]
   );
 

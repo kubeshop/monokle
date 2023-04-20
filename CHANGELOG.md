@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.9](https://github.com/kubeshop/monokle/compare/v2.0.9-nightly-2023-04-20.0...v2.0.9) (2023-04-20)
+
+
+### Features
+
+* add kube-client with setup helper ([78f6fb3](https://github.com/kubeshop/monokle/commit/78f6fb39e46a646a588d51183c36e4afce0fcca7))
+* add kubeconfig watcher and proxy service ([23b6c09](https://github.com/kubeshop/monokle/commit/23b6c09cbfb3c7e1ad134f0b1a978f24bac11152))
+* add notification utils ([dfe03a6](https://github.com/kubeshop/monokle/commit/dfe03a6717735cba370e8c2732b2426d1002c7b7))
+* improve empty current context handling ([ee48cd4](https://github.com/kubeshop/monokle/commit/ee48cd467fadd065e5a281c1247d8828c4ed7037))
+* improve error messaging on malformed kubeconfigs ([dca4fe7](https://github.com/kubeshop/monokle/commit/dca4fe761f93d84bcd88a4afa50e249715dcbb6d))
+* improve kubeconfig error handling ([4a508b1](https://github.com/kubeshop/monokle/commit/4a508b12544758da77eed29a53ae261cf50eed78))
+* improve kubeconfig error handling ([e492c4d](https://github.com/kubeshop/monokle/commit/e492c4defd57d7a92cc67509df06772c2345c5df))
+* improve preview controls ([a0e209a](https://github.com/kubeshop/monokle/commit/a0e209ad832161eee85190d3cdffe4fe9746691d))
+* improve responsiveness of header ([b584a71](https://github.com/kubeshop/monokle/commit/b584a71a0473ee4b0fed4d6272ca9123e6ee21b8))
+* minor improvements ([9011e74](https://github.com/kubeshop/monokle/commit/9011e7438cc6fb71a1e7e7f3baa675e675c040b1))
+* persist default project setting of kubeconfig ([c2f01a9](https://github.com/kubeshop/monokle/commit/c2f01a94c64b9b2d538ad6d79d8d71b4545d30ec))
+* rework context controls ([dc52b01](https://github.com/kubeshop/monokle/commit/dc52b017b07a75995d28d95937de9378ad6bbc2b))
+
+
+### Bug Fixes
+
+* always use proxy with kubeclient ([7afe124](https://github.com/kubeshop/monokle/commit/7afe12419c2e4c43013d6c4cf0a098548c93118f))
+* cluster use last namespace loaded ([b382f4a](https://github.com/kubeshop/monokle/commit/b382f4afd91085767142ed740b346a16342bd20d))
+* fix cluster namespace control ([74d2a4a](https://github.com/kubeshop/monokle/commit/74d2a4a89fb5d671478d4a1118524f7c2245318d))
+* fix importing removed file ([9380537](https://github.com/kubeshop/monokle/commit/93805373b73827368dc5351a5c67fbbcd7d9a6c7))
+* fixup ([0852544](https://github.com/kubeshop/monokle/commit/0852544db18cff82a6b428d91529a3d16c4f01d4))
+* handle authentication in kubectl-proxy ([b668fa9](https://github.com/kubeshop/monokle/commit/b668fa952ac60653db02beb20afd8752fd114030))
+* key ([caf1b16](https://github.com/kubeshop/monokle/commit/caf1b16665e32eea683dc36a8ce759cb0dff4086))
+* make context and kubeconfigPath nullable ([d33c85a](https://github.com/kubeshop/monokle/commit/d33c85a2b50b75d615b3f2360448d61e918f390f))
+* reduce loading resources on connect ([2d16445](https://github.com/kubeshop/monokle/commit/2d164453be42e2e7301ec8344225684c79ef9132))
+* remove KubeConfigManager ([44a3bec](https://github.com/kubeshop/monokle/commit/44a3becd43e9ec24d0f98fb8a930ee28086f3671))
+* remove unused ([622e201](https://github.com/kubeshop/monokle/commit/622e201c104170e92784f6e73cee15312fc9623f))
+* remove unused code ([377096a](https://github.com/kubeshop/monokle/commit/377096a2332326ef4ab272eaadcaa02f43ed3fa8))
+* remove unused import ([de95d12](https://github.com/kubeshop/monokle/commit/de95d127964a5f9e25fbdb92e90e6663bcca2f2a))
+* resolve comments ([5292db7](https://github.com/kubeshop/monokle/commit/5292db734befc5d8db06faabcb07b549945f5d29))
+* saving resources ([b08ebc9](https://github.com/kubeshop/monokle/commit/b08ebc9e24d20d8b9cb551e082afdad1c9c91461))
+* typescript error ([3f02bc2](https://github.com/kubeshop/monokle/commit/3f02bc2a86206893d8e3626de1c5d89c8c9d6424))
+
 ### [2.0.8](https://github.com/kubeshop/monokle/compare/v2.0.8-prerelease-398a993936618a06c00cb8e6f44bfa1290ae024e.0...v2.0.8) (2023-04-19)
 
 

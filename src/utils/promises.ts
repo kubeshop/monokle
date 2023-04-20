@@ -19,3 +19,7 @@ export function promiseTimeout<T = any>(promise: Promise<T>, timeoutMs: number) 
     }
   ) as Promise<T>;
 }
+
+export function isPromiseFulfilledResult<T>(result: PromiseSettledResult<T>): result is PromiseFulfilledResult<T> {
+  return Boolean(result.status === 'fulfilled' && result.value);
+}

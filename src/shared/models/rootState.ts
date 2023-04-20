@@ -1,5 +1,6 @@
 import {AlertState} from './alert';
 import {AppState} from './appState';
+import {ClusterState} from './clusterState';
 import {CompareState} from './compare';
 import {AppConfig} from './config';
 import {DashboardState} from './dashboard';
@@ -26,6 +27,7 @@ type RootState = {
   ui: UiState;
   validation: ValidationState;
   dashboard: DashboardState;
+  cluster: ClusterState;
 };
 
 type ElectronMenuDataType = Pick<RootState, 'config'> & {

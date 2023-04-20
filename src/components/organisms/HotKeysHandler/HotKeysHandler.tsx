@@ -10,6 +10,7 @@ import {
   kubeConfigPathSelector,
   kubeConfigPathValidSelector,
 } from '@redux/appConfig';
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openResourceDiffModal, resetResourceFilter} from '@redux/reducers/main';
 import {
@@ -27,7 +28,6 @@ import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {stopPreview} from '@redux/services/preview';
 import {applyResourceToCluster} from '@redux/thunks/applyResource';
-import {startClusterConnection} from '@redux/thunks/cluster';
 import {selectFromHistory} from '@redux/thunks/selectFromHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -188,7 +188,7 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.LOAD_CLUSTER.key,
     () => {
-      startClusterConnection({context: kubeConfigContext});
+      connectCluster({context: kubeConfigContext});
     },
     [kubeConfigContext]
   );

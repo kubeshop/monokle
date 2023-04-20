@@ -15,10 +15,12 @@ const EndpointsHandler: ResourceKindHandler = {
   isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    k8sCoreV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     return k8sCoreV1Api.readNamespacedEndpoints(resource.name, resource.namespace || 'default', 'true');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    k8sCoreV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     const response = namespace
       ? await k8sCoreV1Api.listNamespacedEndpoints(namespace)
       : await k8sCoreV1Api.listEndpointsForAllNamespaces();
@@ -26,6 +28,7 @@ const EndpointsHandler: ResourceKindHandler = {
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    k8sCoreV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     await k8sCoreV1Api.deleteNamespacedEndpoints(resource.name, resource.namespace || 'default');
   },
   helpLink: 'https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#endpoints-v1-core',

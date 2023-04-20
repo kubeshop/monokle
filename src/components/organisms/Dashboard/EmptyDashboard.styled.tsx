@@ -4,16 +4,17 @@ import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
   display: flex;
+  position: relative;
+  justify-content: center;
   gap: 10px;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 145px;
-  padding-top: 20px;
+  height: 100%;
+  width: 100%;
+  background-color: ${Colors.grey3000};
 `;
 
 export const Image = styled.img<{$right?: number}>`
-  width: 180px;
-  min-width: 180px;
+  width: 66px;
+  min-width: 66px;
 `;
 
 export const Text = styled.div`

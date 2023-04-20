@@ -4,7 +4,9 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Input, Modal, Radio, Select} from 'antd';
 
-import {currentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {currentClusterAccessSelector} from '@redux/appConfig';
+import {selectKubeconfig} from '@redux/cluster/selectors';
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {useAppSelector} from '@redux/hooks';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
@@ -12,7 +14,6 @@ import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 import {getDefaultNamespaceForApply} from '@utils/resources';
 
 import {ResourceMeta} from '@shared/models/k8sResource';
-import {createKubeClient} from '@shared/utils/kubeclient';
 
 import * as S from './ModalConfirmWithNamespaceSelect.styled';
 
@@ -30,8 +31,7 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
   const clusterNamespaces = clusterAccess?.map(cl => cl.namespace);
   const defaultClusterNamespace = clusterNamespaces && clusterNamespaces.length ? clusterNamespaces[0] : 'default';
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const kubeconfig = useAppSelector(selectKubeconfig);
 
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resourceMetaList, defaultClusterNamespace);
 
@@ -43,33 +43,40 @@ const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const [selectedOption, setSelectedOption] = useState<'existing' | 'create' | 'none'>();
 
   const onClickOk = useCallback(() => {
+    if (!kubeconfig?.isValid) {
+      return setErrorMessage('Cannot use invalid kubeconfig');
+    }
+
     if (selectedOption === 'create') {
       if (!createNamespaceName) {
         setErrorMessage('Namespace name must not be empty!');
         return;
       }
 
-      const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
-      const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
-
-      k8sCoreV1Api
-        .createNamespace({metadata: {name: createNamespaceName}})
-        .then(() => {
+      (async () => {
+        try {
+          const kc = await createKubeClientWithSetup({
+            context: kubeconfig.currentContext,
+            kubeconfig: kubeconfig.path,
+            skipHealthCheck: true,
+          });
+          const k8sCoreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+          await k8sCoreV1Api.createNamespace({metadata: {name: createNamespaceName}});
           onOk({name: createNamespaceName, new: true});
-        })
-        .catch(err => {
+        } catch (err: any) {
           if (err.statusCode === 409) {
             setErrorMessage('Namespace already exists in the cluster!');
           } else {
             setErrorMessage(err.message);
           }
-        });
+        }
+      })();
     } else if (selectedOption === 'existing') {
       onOk({name: selectedNamespace, new: false});
     } else if (!selectedOption || selectedOption === 'none') {
       onOk();
     }
-  }, [selectedOption, createNamespaceName, kubeConfigPath, kubeConfigContext, onOk, selectedNamespace]);
+  }, [selectedOption, createNamespaceName, kubeconfig, onOk, selectedNamespace]);
 
   const clusterScopedResourcesCount = useMemo(
     () => resourceMetaList.filter(r => r.isClusterScoped).length,

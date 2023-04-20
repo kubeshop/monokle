@@ -17,12 +17,14 @@ const NodeHandler: ResourceKindHandler = {
   isCustom: false,
   async getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    k8sCoreV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     const response = await k8sCoreV1Api.listNode();
     const nodes: k8s.V1Node[] = response.body.items;
     return nodes.find(node => node.metadata?.name === resource.name);
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    k8sCoreV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     const response = await k8sCoreV1Api.listNode();
     return response.body.items;
   },

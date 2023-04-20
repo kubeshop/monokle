@@ -10,7 +10,6 @@ import {init as sentryInit} from '@sentry/electron/main';
 import electronStore from '@shared/utils/electronStore';
 import '@shared/utils/segment';
 
-import './KubeConfigManager';
 import './ipc/ipcListeners';
 import {openApplication} from './openApplication';
 import './services/git/ipc';

@@ -8,6 +8,8 @@ import {v4 as uuid} from 'uuid';
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {selectKubeconfig} from '@redux/cluster/selectors';
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {getCommitResources} from '@redux/git/git.ipc';
 import {runKustomize} from '@redux/thunks/previewKustomization';
 
@@ -36,7 +38,6 @@ import {
   runCommandInMainThread,
 } from '@shared/utils/commands';
 import {isDefined} from '@shared/utils/filter';
-import {createKubeClient} from '@shared/utils/kubeclient';
 
 import getClusterObjects from '../getClusterObjects';
 import {extractK8sResources, joinK8sResource, joinK8sResourceMap} from '../resource';
@@ -124,7 +125,11 @@ async function fetchResourcesFromCluster(
     const kubeConfigPath = kubeConfigPathSelector(state);
     const currentContext = options.context;
     const clusterAccess = state.config?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
-    const kc = createKubeClient(kubeConfigPath, currentContext);
+    const kc = await createKubeClientWithSetup({
+      context: currentContext,
+      kubeconfig: kubeConfigPath,
+      skipHealthCheck: true,
+    });
 
     const res = clusterAccess.length
       ? await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)))
@@ -160,8 +165,13 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
   try {
     const {chartId, valuesId} = options;
     const projectConfig = currentConfigSelector(state);
-    const kubeconfig = projectConfig.kubeConfig?.path;
-    const currentContext = projectConfig.kubeConfig?.currentContext;
+    const kubeconfig = selectKubeconfig(state);
+
+    if (!kubeconfig?.isValid) {
+      throw new Error('Kubeconfig is invalid');
+    }
+
+    const currentContext = kubeconfig.currentContext;
     const helmPreviewMode = projectConfig.settings ? projectConfig.settings.helmPreviewMode : 'template';
 
     const chart = state.main.helmChartMap[chartId];
@@ -178,7 +188,7 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
 
     let command: CommandOptions;
     if (helmPreviewMode === 'install') {
-      if (!kubeconfig || !currentContext) {
+      if (!kubeconfig.path || !currentContext) {
         throw new Error('Kube context not found');
       }
 
@@ -190,7 +200,7 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
           chart: chart.name,
         },
         {
-          KUBECONFIG: kubeconfig,
+          KUBECONFIG: kubeconfig.path,
         }
       );
     } else {
@@ -201,7 +211,7 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
           name: folder,
         },
         {
-          KUBECONFIG: kubeconfig,
+          KUBECONFIG: kubeconfig.path,
         }
       );
     }
@@ -231,9 +241,14 @@ async function previewCustomHelmResources(
 ): Promise<K8sResource<'preview'>[]> {
   try {
     const {chartId, configId} = options;
-    const projectConfig = currentConfigSelector(state);
-    const kubeconfig = projectConfig.kubeConfig?.path;
-    const currentContext = projectConfig.kubeConfig?.currentContext;
+    const kubeconfig = selectKubeconfig(state);
+
+    if (!kubeconfig?.isValid) {
+      throw new Error('Kubeconfig is invalid');
+    }
+
+    const currentContext = kubeconfig.currentContext;
+
     const rootFolder = state.main.fileMap[ROOT_FILE_ENTRY].filePath;
 
     const chart = state.main.helmChartMap[chartId];
@@ -262,7 +277,7 @@ async function previewCustomHelmResources(
       commandId: uuid(),
       cmd: 'helm',
       args: args.splice(1),
-      env: {KUBECONFIG: kubeconfig},
+      env: {KUBECONFIG: kubeconfig.path},
     };
 
     const result = await runCommandInMainThread(command);

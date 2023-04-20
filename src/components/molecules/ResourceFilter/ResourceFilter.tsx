@@ -9,6 +9,7 @@ import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES, TOOLTIP_DELAY} from '@c
 import {QuickFilterTooltip} from '@constants/tooltips';
 
 import {isInClusterModeSelector, kubeConfigContextSelector} from '@redux/appConfig';
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal} from '@redux/reducers/ui';
@@ -19,7 +20,6 @@ import {
   allResourceKindsSelector,
   allResourceLabelsSelector,
 } from '@redux/selectors/resourceMapSelectors';
-import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {useFileFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 import {useNamespaces} from '@hooks/useNamespaces';
@@ -230,7 +230,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
       dispatch(updateResourceFilter(localResourceFilter));
 
       if (isInClusterMode && !isEqual(resourceFilterKinds, localResourceFilter.kinds)) {
-        dispatch(startClusterConnection({context: kubeConfigContext, isRestart: true}));
+        dispatch(connectCluster({context: kubeConfigContext, reload: true}));
       }
     },
     DEFAULT_EDITOR_DEBOUNCE,

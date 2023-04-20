@@ -143,6 +143,7 @@ type UiState = {
     isActive: boolean;
     isValidationDrawerVisible: boolean;
     selection: LeftMenuSelectionType;
+    activityBeforeClusterConnect: LeftMenuSelectionType | undefined;
     activeTab: string | null;
   };
   quickSearchActionsPopup: {
