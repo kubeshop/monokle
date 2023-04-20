@@ -7,6 +7,7 @@ import {
   activeResourceStorageSelector,
   useActiveResourceContentMap,
   useActiveResourceMetaMap,
+  useResourceContentMap,
   useResourceMetaMap,
 } from '@redux/selectors/resourceMapSelectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
@@ -24,14 +25,21 @@ const ResourceGraphTab: React.FC = () => {
   const selectedResource = useSelectedResource();
   const activeResoureMetaMap = useActiveResourceMetaMap();
   const activeResoureContentMap = useActiveResourceContentMap();
+  const transientResourceMetaMap = useResourceMetaMap('transient');
+  const transientResourceContentMap = useResourceContentMap('transient');
+
   const [selection, selectionRef] = useSelectorWithRef(state => state.main.selection);
   const localResourceMetaMap = useResourceMetaMap('local');
 
   // TODO: computing this is expensive, but the Graph is from core and it needs the resource map...
-  const resourceMap = useMemo(
-    () => joinK8sResourceMap(activeResoureMetaMap, activeResoureContentMap),
-    [activeResoureMetaMap, activeResoureContentMap]
-  );
+  const resourceMap = useMemo(() => {
+    let result = joinK8sResourceMap(activeResoureMetaMap, activeResoureContentMap);
+    let transientResources = joinK8sResourceMap(transientResourceMetaMap, transientResourceContentMap);
+    Object.keys(transientResources).forEach((k: string) => {
+      result[k] = transientResources[k];
+    });
+    return result;
+  }, [activeResoureMetaMap, activeResoureContentMap, transientResourceMetaMap, transientResourceContentMap]);
   const validationState = useValidationSelector(state => state);
 
   const resources = useMemo(() => {
@@ -49,10 +57,10 @@ const ResourceGraphTab: React.FC = () => {
   const onSelectResource = useCallback(
     (resource: any) => {
       if (selectionRef.current?.type !== 'file') {
-        dispatch(selectResource({resourceIdentifier: {id: resource.id, storage: activeStorage}}));
+        dispatch(selectResource({resourceIdentifier: {id: resource.id, storage: resourceMap[resource.id].storage}}));
       }
     },
-    [activeStorage, dispatch, selectionRef]
+    [dispatch, selectionRef, resourceMap]
   );
   const onSelectImage = useCallback(
     (imageId: string) => {
