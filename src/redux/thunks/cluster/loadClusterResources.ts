@@ -237,9 +237,7 @@ async function loadCustomResourceObjects(
   return [];
 }
 
-const getItemsFromResponseBody = (body: object) => {
-  if ('items' in body && isArray(body.items)) {
-    return body.items;
-  }
-  return [];
+const getItemsFromResponseBody = (body: any) => {
+  const items = 'items' in body ? body.items : [];
+  return isArray(items) ? items : [];
 };
