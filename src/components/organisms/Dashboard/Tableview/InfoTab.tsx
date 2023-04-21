@@ -95,7 +95,7 @@ export const Annotations = ({annotations}: {annotations: any}) => {
       <div>
         {Object.keys(annotations).map(key => (
           <Tag key={`${key}=${annotations[key]}`} color="geekblue" style={{marginBottom: '4px'}}>
-            {key}={annotations[key]}
+            {key}={typeof annotations[key] === 'object' ? JSON.stringify(annotations[key]) : annotations[key]}
           </Tag>
         ))}
       </div>
@@ -177,7 +177,6 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
   const fileMap = useAppSelector(state => state.main.fileMap);
   const selectedResource = useSelectedResource();
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
-  const preview = useAppSelector(state => state.main.preview);
 
   const resourceRefs = useMemo(
     () =>
