@@ -51,18 +51,14 @@ const DashboardFilteredMenu: React.FC<IProps> = props => {
       {filteredMenu.map((parent: DashboardMenu) => {
         return (
           <div key={parent.key}>
-            <MenuItem
-              type="parent"
-              menuItem={parent}
-              onActiveMenuItem={(ref: HTMLElement) => setActiveMenuItemRef(ref)}
-            />
+            <MenuItem type="parent" menuItem={parent} onActiveMenuItem={ref => setActiveMenuItemRef(ref)} />
 
             {parent.children?.map((child: DashboardMenu) => (
               <MenuItem
                 key={child.key}
                 type="child"
                 menuItem={child}
-                onActiveMenuItem={(ref: HTMLElement) => setActiveMenuItemRef(ref)}
+                onActiveMenuItem={ref => setActiveMenuItemRef(ref)}
               />
             ))}
           </div>

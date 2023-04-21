@@ -19,11 +19,11 @@ export const MenuItem = ({
 }: {
   type: 'parent' | 'child';
   menuItem: DashboardMenu;
-  onActiveMenuItem?: Function;
+  onActiveMenuItem?: (menuItemRef: HTMLDivElement) => void;
 }) => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const dispatch = useAppDispatch();
-  const menuItemRef = useRef(null);
+  const menuItemRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   useEffect(() => {
