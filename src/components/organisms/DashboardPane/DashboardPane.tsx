@@ -102,7 +102,7 @@ const DashboardPane = () => {
     dispatch(setDashboardMenuList(tempMenu));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMeta]);
+  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMeta, problems]);
 
   useEffect(() => {
     if (activeMenuItemRef) {
