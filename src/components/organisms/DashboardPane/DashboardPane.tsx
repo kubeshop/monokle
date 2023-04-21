@@ -11,7 +11,7 @@ import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelec
 import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
-import {useRefSelector, useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 
 import {DashboardMenu} from '@shared/models/dashboard';
 import {ResourceMeta} from '@shared/models/k8sResource';
@@ -22,7 +22,7 @@ import {MenuItem} from './MenuItem';
 
 const DashboardPane = () => {
   const dispatch = useAppDispatch();
-  const [menuList, menuListRef] = useSelectorWithRef(state => state.dashboard.ui.menuList);
+  const menuList = useAppSelector(state => state.dashboard.ui.menuList);
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const currentContext = useAppSelector(currentKubeContextSelector);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
@@ -35,9 +35,10 @@ const DashboardPane = () => {
 
   const filteredMenu = useMemo(() => {
     if (!filterText) {
-      return menuListRef.current;
+      return menuList;
     }
-    return menuListRef.current
+
+    return menuList
       .map((menuItem: DashboardMenu) => ({
         ...menuItem,
         children: menuItem.children?.filter((m: DashboardMenu) =>
@@ -54,7 +55,7 @@ const DashboardPane = () => {
           ) > 0
       );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterText, menuListRef, menuList, clusterConnectionOptions]);
+  }, [filterText, menuList, clusterConnectionOptions]);
 
   useEffect(() => {
     let tempMenu: DashboardMenu[] = [
