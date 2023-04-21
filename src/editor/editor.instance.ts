@@ -38,6 +38,12 @@ export const resetEditor = () => {
   EDITOR?.setModel(null);
 };
 
+export function recreateEditorModel(editor: monaco.editor.ICodeEditor, text: string, language: string = 'yaml') {
+  resetEditor();
+  editor.getModel()?.dispose();
+  editor.setModel(monaco.editor.createModel(text, language));
+}
+
 export const getEditor = () => EDITOR;
 
 export const addEditorHover = (hover: EditorHover) => {

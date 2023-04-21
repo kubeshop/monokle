@@ -2,7 +2,7 @@ import {Middleware, combineReducers, configureStore, createAction} from '@reduxj
 
 import {createLogger} from 'redux-logger';
 
-import {editorListener} from '@src/editor/editor.listener';
+import {editorListeners} from '@src/editor/editor.listeners';
 
 import {configSlice} from './appConfig';
 import {appConfigListeners} from './appConfig/appConfig.listeners';
@@ -36,7 +36,7 @@ if (process.env.NODE_ENV === `development`) {
 export const resetStore = createAction('app/reset');
 
 combineListeners([
-  editorListener,
+  ...editorListeners,
   compareListeners.resourceFetchListener('left'),
   compareListeners.resourceFetchListener('right'),
   compareListeners.compareListener,

@@ -1,7 +1,6 @@
 import {isAnyOf} from '@reduxjs/toolkit';
 
 import {readFile} from 'fs/promises';
-import * as monaco from 'monaco-editor';
 import {join} from 'path';
 
 import {AppListenerFn} from '@redux/listeners/base';
@@ -13,16 +12,10 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 
-import {getEditor, resetEditor} from './editor.instance';
+import {getEditor, recreateEditorModel, resetEditor} from './editor.instance';
 import {editorEnhancers} from './enhancers';
 
-export function recreateEditorModel(editor: monaco.editor.ICodeEditor, text: string, language: string = 'yaml') {
-  resetEditor();
-  editor.getModel()?.dispose();
-  editor.setModel(monaco.editor.createModel(text, language));
-}
-
-export const editorListener: AppListenerFn = listen => {
+export const editorSelectionListener: AppListenerFn = listen => {
   listen({
     matcher: isAnyOf(selectResource, selectFile, updateResource.fulfilled, updateFileEntry.fulfilled),
     async effect(_action, {getState, delay, dispatch, cancelActiveListeners}) {
@@ -59,3 +52,5 @@ export const editorListener: AppListenerFn = listen => {
     },
   });
 };
+
+export const editorListeners = [editorSelectionListener];
