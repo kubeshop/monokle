@@ -35,7 +35,6 @@ export const resetEditor = () => {
   clearEditorLinks();
   clearEditorCommands();
   clearEditorDecorations();
-  EDITOR?.setModel(null);
 };
 
 export function recreateEditorModel(editor: monaco.editor.ICodeEditor, text: string, language: string = 'yaml') {

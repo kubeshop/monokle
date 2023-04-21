@@ -24,6 +24,7 @@ type UpdateResourcePayload = {
   text: string;
   preventSelectionAndHighlightsUpdate?: boolean;
   isUpdateFromForm?: boolean;
+  isUpdateFromEditor?: boolean; // this property is used by editor enhancers to prevent replacing the text in the editor
 };
 
 export const updateResource = createAsyncThunk<
