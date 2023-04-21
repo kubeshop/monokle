@@ -276,3 +276,31 @@ export const navigatorResourcesCountSelector = createSelector(
   navigatorResourcesSelector,
   navigatorResources => navigatorResources.length
 );
+
+/**
+ * Selects the resource identifier of the resource that is currently being edited.
+ * If the selection is a file that contains only one resource, it returns it's identifier
+ */
+export const editorResourceIdentifierSelector = createSelector(
+  [(state: RootState) => state.main.selection, (state: RootState) => state.main.resourceMetaMapByStorage.local],
+  (selection, localResourceMetaMap) => {
+    if (!selection) {
+      return undefined;
+    }
+
+    if (selection.type === 'file') {
+      const selectedFilePath = selection.filePath;
+      const resourceIdentifiersFromFile = Object.values(localResourceMetaMap).filter(
+        r => r.origin.filePath === selectedFilePath
+      );
+
+      if (resourceIdentifiersFromFile.length === 1) {
+        return resourceIdentifiersFromFile[0];
+      }
+    }
+
+    if (selection.type === 'resource') {
+      return selection.resourceIdentifier;
+    }
+  }
+);
