@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {Skeleton} from 'antd';
 
@@ -17,12 +17,11 @@ import {DashboardMenu} from '@shared/models/dashboard';
 import {ResourceMeta} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
+import DashboardFilteredMenu from './DashboardFilteredMenu';
 import * as S from './DashboardPane.style';
-import {MenuItem} from './MenuItem';
 
 const DashboardPane = () => {
   const dispatch = useAppDispatch();
-  const menuList = useAppSelector(state => state.dashboard.ui.menuList);
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const currentContext = useAppSelector(currentKubeContextSelector);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
@@ -30,32 +29,8 @@ const DashboardPane = () => {
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
   const clusterConnectionOptions = useRefSelector(state => state.main.clusterConnectionOptions);
   const clusterResourceMeta = useResourceMetaMap('cluster');
-  const [activeMenuItemRef, setActiveMenuItemRef] = useState<HTMLElement>();
+
   const problems = useValidationSelector(state => problemsSelector(state));
-
-  const filteredMenu = useMemo(() => {
-    if (!filterText) {
-      return menuList;
-    }
-
-    return menuList
-      .map((menuItem: DashboardMenu) => ({
-        ...menuItem,
-        children: menuItem.children?.filter((m: DashboardMenu) =>
-          m.label.toLowerCase().includes(filterText.toLowerCase())
-        ),
-      }))
-      .filter((menuItem: DashboardMenu) => menuItem.children && menuItem.children?.length > 0)
-      .filter(
-        (menuItem: DashboardMenu) =>
-          menuItem.children &&
-          menuItem.children?.reduce(
-            (total: number, m: DashboardMenu) => total + (m.resourceCount ? m.resourceCount : 0),
-            0
-          ) > 0
-      );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterText, menuList, clusterConnectionOptions]);
 
   useEffect(() => {
     let tempMenu: DashboardMenu[] = [
@@ -104,12 +79,6 @@ const DashboardPane = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMeta, problems]);
-
-  useEffect(() => {
-    if (activeMenuItemRef) {
-      activeMenuItemRef.scrollIntoView({behavior: 'smooth'});
-    }
-  }, [activeMenuItemRef]);
 
   const compareNamespaces = useCallback(
     (namespace?: string) => {
@@ -182,26 +151,7 @@ const DashboardPane = () => {
         </S.FilterContainer>
       </S.HeaderContainer>
 
-      {filteredMenu.map((parent: DashboardMenu) => {
-        return (
-          <div key={parent.key}>
-            <MenuItem
-              type="parent"
-              menuItem={parent}
-              onActiveMenuItem={(ref: HTMLElement) => setActiveMenuItemRef(ref)}
-            />
-
-            {parent.children?.map((child: DashboardMenu) => (
-              <MenuItem
-                key={child.key}
-                type="child"
-                menuItem={child}
-                onActiveMenuItem={(ref: HTMLElement) => setActiveMenuItemRef(ref)}
-              />
-            ))}
-          </div>
-        );
-      })}
+      <DashboardFilteredMenu filterText={filterText} />
     </S.Container>
   );
 };
