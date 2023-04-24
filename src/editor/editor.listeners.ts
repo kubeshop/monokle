@@ -6,12 +6,16 @@ import {join} from 'path';
 import {AppListenerFn} from '@redux/listeners/base';
 import {processResourceRefs} from '@redux/parsing/parser.thunks';
 import {selectFile, selectResource} from '@redux/reducers/main';
-import {getResourceContentFromState} from '@redux/selectors/resourceGetters';
+import {selectedFilePathSelector} from '@redux/selectors';
+import {getResourceContentFromState, getResourceMetaFromState} from '@redux/selectors/resourceGetters';
 import {editorResourceIdentifierSelector} from '@redux/selectors/resourceSelectors';
+import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
+import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateResource} from '@redux/thunks/updateResource';
 import {validateResources} from '@redux/validation/validation.thunks';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {isLocalResourceMeta} from '@shared/models/k8sResource';
 import {isEqual} from '@shared/utils/isEqual';
 
 import {getEditor, recreateEditorModel, resetEditor} from './editor.instance';
@@ -55,43 +59,82 @@ export const editorSelectionListener: AppListenerFn = listen => {
   });
 };
 
-export const editorResourceUpdateListener: AppListenerFn = listen => {
+export const editorTextUpdateListener: AppListenerFn = listen => {
   listen({
-    matcher: isAnyOf(updateResource.fulfilled),
+    matcher: isAnyOf(updateResource.fulfilled, updateFileEntry.fulfilled, multiplePathsChanged.fulfilled),
     async effect(_action, {getState, delay, cancelActiveListeners}) {
       cancelActiveListeners();
       await delay(1);
+      const rootFolderPath = getState().main.fileMap[ROOT_FILE_ENTRY].filePath;
+      const selectedFilePath = selectedFilePathSelector(getState());
 
-      // this check is used as a type guard for _action.meta.arg.resourceIdentifier
-      if (!isAnyOf(updateResource.fulfilled)(_action)) {
+      if (_action.meta.arg.isUpdateFromEditor || !rootFolderPath) {
         return;
       }
 
-      if (_action.meta.arg.isUpdateFromEditor) {
-        return;
-      }
+      let updatedText: string | undefined;
 
-      const updatedResourceIdentifier = _action.meta.arg.resourceIdentifier;
       const editorResourceIdentifier = editorResourceIdentifierSelector(getState());
 
-      if (!editorResourceIdentifier || !isEqual(editorResourceIdentifier, updatedResourceIdentifier)) {
-        return;
+      if (isAnyOf(updateResource.fulfilled)(_action)) {
+        const updatedResourceIdentifier = _action.meta.arg.resourceIdentifier;
+        if (!editorResourceIdentifier || !isEqual(editorResourceIdentifier, updatedResourceIdentifier)) {
+          return;
+        }
+        const resourceContent = getResourceContentFromState(getState(), editorResourceIdentifier);
+        updatedText = resourceContent?.text;
       }
 
-      const resourceContent = getResourceContentFromState(getState(), editorResourceIdentifier);
+      if (isAnyOf(updateFileEntry.fulfilled, multiplePathsChanged.fulfilled)(_action)) {
+        const editorResourceMeta = editorResourceIdentifier
+          ? getResourceMetaFromState(getState(), editorResourceIdentifier)
+          : undefined;
+
+        if (!editorResourceMeta || !isLocalResourceMeta(editorResourceMeta)) {
+          if (!selectedFilePath) {
+            return;
+          }
+
+          const wasSelectedFileUpdated = 'path' in _action.meta.arg && _action.meta.arg.path === selectedFilePath;
+          const wasSelectedFileReloaded =
+            'reloadedFilePaths' in _action.payload && _action.payload.reloadedFilePaths.includes(selectedFilePath);
+
+          if (wasSelectedFileUpdated || wasSelectedFileReloaded) {
+            const fileText = await readFile(join(rootFolderPath, selectedFilePath), 'utf8');
+            updatedText = fileText;
+          }
+        } else {
+          const wasFileContainingEditorResourceUpdated =
+            'path' in _action.meta.arg && editorResourceMeta.origin.filePath === _action.meta.arg.path;
+
+          const wasFileContainingEditorResourceReloaded =
+            'reloadedFilePaths' in _action.payload &&
+            _action.payload.reloadedFilePaths
+              .map(absolutePath => {
+                const relativePath = absolutePath.slice(rootFolderPath.length);
+                return relativePath;
+              })
+              .includes(editorResourceMeta.origin.filePath);
+
+          if (wasFileContainingEditorResourceUpdated || wasFileContainingEditorResourceReloaded) {
+            const resourceContent = getResourceContentFromState(getState(), editorResourceMeta);
+            updatedText = resourceContent?.text;
+          }
+        }
+      }
 
       const editor = getEditor();
       const editorModel = editor?.getModel();
-      if (!editor || !editorModel || !resourceContent) {
+      if (!editor || !editorModel || !updatedText) {
         return;
       }
 
       const editorText = editorModel.getValue();
-      if (editorText === resourceContent?.text) {
+      if (editorText === updatedText) {
         return;
       }
 
-      editorModel.setValue(resourceContent.text);
+      editorModel.setValue(updatedText);
     },
   });
 };
@@ -134,7 +177,7 @@ export const editorValidationListener: AppListenerFn = listen => {
 
 export const editorListeners: AppListenerFn[] = [
   editorSelectionListener,
-  editorResourceUpdateListener,
+  editorTextUpdateListener,
   editorResourceRefsListener,
   editorValidationListener,
 ];

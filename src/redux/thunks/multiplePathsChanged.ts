@@ -16,12 +16,16 @@ export const multiplePathsChanged = createAsyncThunk<
   {
     nextMainState: AppState;
     affectedResourceIdentifiers: ResourceIdentifier[];
+    // the paths of the existing files that have been modified
+    reloadedFilePaths: string[];
   },
   Array<string>
 >('main/multiplePathsChanged', async (filePaths, thunkAPI: {getState: Function; dispatch: Function}) => {
   const state: RootState = thunkAPI.getState();
   const projectConfig = currentConfigSelector(state);
   const projectRootFolder = state.config.selectedProjectRootFolder;
+
+  const reloadedFilePaths: string[] = [];
 
   const fileSideEffect: FileSideEffect = {
     affectedResourceIds: [],
@@ -32,6 +36,7 @@ export const multiplePathsChanged = createAsyncThunk<
       let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
       if (fileEntry) {
         reloadFile(filePath, fileEntry, mainState, projectConfig, fileSideEffect);
+        reloadedFilePaths.push(filePath);
       } else if (!projectConfig.scanExcludes || !micromatch.any(filePath, projectConfig.scanExcludes)) {
         addPath(filePath, mainState, projectConfig, fileSideEffect);
       }
@@ -56,5 +61,6 @@ export const multiplePathsChanged = createAsyncThunk<
   return {
     nextMainState,
     affectedResourceIdentifiers: fileSideEffect.affectedResourceIds.map(id => ({id, storage: 'local'})),
+    reloadedFilePaths,
   };
 });

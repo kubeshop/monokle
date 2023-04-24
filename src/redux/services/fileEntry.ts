@@ -331,14 +331,6 @@ export function getAbsoluteFilePath(relativePath: string, fileMap: FileMapType) 
 }
 
 /**
- * Returns the relative path for the specified absolute path
- */
-export function getRelativeFilePath(absolutePath: string) {
-  const pathArr = absolutePath.split('/');
-  return `/${pathArr[pathArr.length - 1]}`;
-}
-
-/**
  * Returns the absolute path to the specified FileEntry
  */
 
