@@ -1,11 +1,12 @@
 import {isAnyOf} from '@reduxjs/toolkit';
 
 import {readFile} from 'fs/promises';
+import {isArray} from 'lodash';
 import {join} from 'path';
 
 import {AppListenerFn} from '@redux/listeners/base';
 import {processResourceRefs} from '@redux/parsing/parser.thunks';
-import {selectFile, selectResource} from '@redux/reducers/main';
+import {selectFile, selectResource, updateMultipleClusterResources} from '@redux/reducers/main';
 import {selectedFilePathSelector} from '@redux/selectors';
 import {getResourceContentFromState, getResourceMetaFromState} from '@redux/selectors/resourceGetters';
 import {editorResourceIdentifierSelector} from '@redux/selectors/resourceSelectors';
@@ -61,7 +62,12 @@ export const editorSelectionListener: AppListenerFn = listen => {
 
 export const editorTextUpdateListener: AppListenerFn = listen => {
   listen({
-    matcher: isAnyOf(updateResource.fulfilled, updateFileEntry.fulfilled, multiplePathsChanged.fulfilled),
+    matcher: isAnyOf(
+      updateResource.fulfilled,
+      updateMultipleClusterResources,
+      updateFileEntry.fulfilled,
+      multiplePathsChanged.fulfilled
+    ),
     async effect(_action, {getState, delay, cancelActiveListeners}) {
       cancelActiveListeners();
       await delay(1);
@@ -76,11 +82,30 @@ export const editorTextUpdateListener: AppListenerFn = listen => {
 
       const editorResourceIdentifier = editorResourceIdentifierSelector(getState());
 
-      if (isAnyOf(updateResource.fulfilled)(_action)) {
-        const updatedResourceIdentifier = _action.meta.arg.resourceIdentifier;
-        if (!editorResourceIdentifier || !isEqual(editorResourceIdentifier, updatedResourceIdentifier)) {
+      if (isAnyOf(updateResource.fulfilled, updateMultipleClusterResources)(_action)) {
+        if (!editorResourceIdentifier) {
           return;
         }
+
+        // return early if the resource affected by the updateResource action is not the one currently opened in the editor
+        if (
+          'meta' in _action &&
+          _action.meta.arg.resourceIdentifier &&
+          !isEqual(_action.meta.arg.resourceIdentifier, editorResourceIdentifier)
+        ) {
+          return;
+        }
+
+        // return early if the updateMultipleClusterResources action has not affected the resource currently opened in the editor
+        if (
+          isArray(_action.payload) &&
+          !_action.payload.some(
+            r => r.id === editorResourceIdentifier.id && r.storage === editorResourceIdentifier.storage
+          )
+        ) {
+          return;
+        }
+
         const resourceContent = getResourceContentFromState(getState(), editorResourceIdentifier);
         updatedText = resourceContent?.text;
       }
