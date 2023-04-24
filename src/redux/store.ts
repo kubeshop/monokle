@@ -2,7 +2,7 @@ import {Middleware, combineReducers, configureStore, createAction} from '@reduxj
 
 import {createLogger} from 'redux-logger';
 
-import {editorListeners} from '@src/editor/editor.listeners';
+import {editorListeners} from '@editor/listeners';
 
 import {configSlice} from './appConfig';
 import {appConfigListeners} from './appConfig/appConfig.listeners';
