@@ -131,7 +131,7 @@ export type ValidKubeConfig = {
 export type InvalidKubeConfig = {
   isValid: false;
   path: string;
-  code: 'not_found' | 'malformed' | 'unknown';
+  code: 'not_found' | 'malformed' | 'unknown' | 'empty';
   reason: string;
 };
 
