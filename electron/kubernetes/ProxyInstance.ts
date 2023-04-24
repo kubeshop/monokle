@@ -125,7 +125,7 @@ export class ProxyInstance {
   }
 
   stop() {
-    console.log('[kubectl-proxy] STOP', this._process?.pid);
+    log.info('[kubectl-proxy] STOP', this._process?.pid);
     if (!this._process || !this._process.pid) {
       return;
     }
