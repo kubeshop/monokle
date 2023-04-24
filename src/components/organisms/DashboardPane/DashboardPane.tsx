@@ -1,6 +1,8 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Skeleton} from 'antd';
+
+import {groupBy, size} from 'lodash';
 
 import navSectionNames from '@constants/navSectionNames';
 
@@ -30,7 +32,29 @@ const DashboardPane = () => {
   const clusterConnectionOptions = useRefSelector(state => state.main.clusterConnectionOptions);
   const clusterResourceMeta = useResourceMetaMap('cluster');
 
-  const problems = useValidationSelector(state => problemsSelector(state));
+  const problems = useValidationSelector(problemsSelector);
+
+  const groupedResources = useMemo(() => groupBy(clusterResourceMeta, 'kind'), [clusterResourceMeta]);
+
+  const getProblemCount = useCallback(
+    (kind: string, level: 'error' | 'warning') => {
+      if (!groupedResources[kind]) return 0;
+
+      return groupedResources[kind].reduce((total: number, resource: ResourceMeta) => {
+        const problemCount = problems.filter(
+          p =>
+            p.level === level &&
+            p.locations.find(
+              l =>
+                l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
+                l.physicalLocation.artifactLocation.uri === resource.id
+            )
+        );
+        return total + problemCount.length;
+      }, 0);
+    },
+    [groupedResources, problems]
+  );
 
   useEffect(() => {
     let tempMenu: DashboardMenu[] = [
@@ -59,7 +83,7 @@ const DashboardPane = () => {
             label: kindHandler.kind,
             errorCount: getProblemCount(kindHandler.kind, 'error'),
             warningCount: getProblemCount(kindHandler.kind, 'warning'),
-            resourceCount: getResourceCount(kindHandler.kind),
+            resourceCount: size(groupedResources[kindHandler.kind]) ?? 0,
             children: [],
           });
         } else {
@@ -68,7 +92,7 @@ const DashboardPane = () => {
             label: kindHandler.kind,
             errorCount: getProblemCount(kindHandler.kind, 'error'),
             warningCount: getProblemCount(kindHandler.kind, 'warning'),
-            resourceCount: getResourceCount(kindHandler.kind),
+            resourceCount: size(groupedResources[kindHandler.kind]) ?? 0,
             children: [],
           });
         }
@@ -76,49 +100,7 @@ const DashboardPane = () => {
     });
 
     dispatch(setDashboardMenuList(tempMenu));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMeta, problems]);
-
-  const compareNamespaces = useCallback(
-    (namespace?: string) => {
-      if (clusterConnectionOptions.current.lastNamespaceLoaded === '<all>') {
-        return true;
-      }
-      if (clusterConnectionOptions.current.lastNamespaceLoaded === '<not-namespaced>') {
-        return !namespace;
-      }
-      return clusterConnectionOptions.current.lastNamespaceLoaded === namespace;
-    },
-    [clusterConnectionOptions]
-  );
-
-  const getResources = useCallback(
-    (kind: string) => {
-      return Object.values(clusterResourceMeta).filter(r => r.kind === kind && compareNamespaces(r.namespace));
-    },
-    [clusterResourceMeta, compareNamespaces]
-  );
-
-  const getResourceCount = useCallback((kind: string) => getResources(kind).length, [getResources]);
-
-  const getProblemCount = useCallback(
-    (kind: string, level: 'error' | 'warning') => {
-      return getResources(kind).reduce((total: number, resource: ResourceMeta) => {
-        const problemCount = problems.filter(
-          p =>
-            p.level === level &&
-            p.locations.find(
-              l =>
-                l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
-                l.physicalLocation.artifactLocation.uri === resource.id
-            )
-        );
-        return total + problemCount.length;
-      }, 0);
-    },
-    [getResources, problems]
-  );
+  }, [registeredKindHandlers, leftMenu, selectedNamespace, dispatch, getProblemCount, groupedResources]);
 
   if (clusterConnectionOptions.current.isLoading) {
     return (
