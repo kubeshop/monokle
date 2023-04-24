@@ -57,7 +57,7 @@ import {
 } from '@shared/models/k8sResource';
 import {PreviewType} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
-import {AppSelection} from '@shared/models/selection';
+import {AppSelection, isResourceSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
 import {isEqual} from '@shared/utils/isEqual';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -305,6 +305,18 @@ export const mainSlice = createSlice({
         delete state.resourceMetaMapByStorage.cluster[r.id];
         delete state.resourceContentMapByStorage.cluster[r.id];
       });
+      // clear the selection if the selected resource has been deleted
+      const selection = state.selection;
+      if (isResourceSelection(selection)) {
+        const selectedResourceIdentifier = selection.resourceIdentifier;
+        if (
+          action.payload.some(
+            r => r.id === selectedResourceIdentifier.id && r.storage === selectedResourceIdentifier.storage
+          )
+        ) {
+          clearSelectionReducer(state);
+        }
+      }
     },
     setActiveEditorTab: (state: Draft<AppState>, action: PayloadAction<ActionPaneTab>) => {
       state.activeEditorTab = action.payload;
