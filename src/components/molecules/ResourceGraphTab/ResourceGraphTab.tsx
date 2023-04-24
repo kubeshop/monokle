@@ -1,10 +1,9 @@
 import {useCallback, useMemo} from 'react';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {useAppDispatch} from '@redux/hooks';
 import {selectImage, selectResource} from '@redux/reducers/main';
 import {setExplorerSelectedSection} from '@redux/reducers/ui';
 import {
-  activeResourceStorageSelector,
   useActiveResourceContentMap,
   useActiveResourceMetaMap,
   useResourceContentMap,
@@ -21,7 +20,6 @@ import {RuleLevel} from '@monokle/validation';
 
 const ResourceGraphTab: React.FC = () => {
   const dispatch = useAppDispatch();
-  const activeStorage = useAppSelector(activeResourceStorageSelector);
   const selectedResource = useSelectedResource();
   const activeResoureMetaMap = useActiveResourceMetaMap();
   const activeResoureContentMap = useActiveResourceContentMap();
