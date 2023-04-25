@@ -173,7 +173,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   }
 
   return (
-    <TitleBarWrapper>
+    <TitleBarWrapper $editor>
       <TitleBar
         type="secondary"
         title="Editor"
