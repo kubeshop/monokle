@@ -94,6 +94,10 @@ export const setEditorDecorations = (decorations: monaco.editor.IModelDeltaDecor
   editorDecorationsCollection = EDITOR?.createDecorationsCollection(decorations);
 };
 
+export const setEditorSelection = (selectionRange: monaco.IRange) => {
+  EDITOR?.setSelection(selectionRange);
+};
+
 export const clearEditorDecorations = () => {
   editorDecorationsCollection?.clear();
   editorDecorationsCollection = undefined;
