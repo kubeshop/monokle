@@ -57,11 +57,15 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   margin-top: -10px;
 
   & .ant-tabs-nav {
-    padding: 8px 16px 0 0;
+    padding: 0px 16px 0 0;
     margin-bottom: 0px;
     background: rgba(25, 31, 33, 0.7);
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
+  }
+
+  & .ant-tabs-nav-wrap {
+    padding-top: 9px;
   }
 
   & .ant-tabs-nav::before {
@@ -85,11 +89,17 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
     border-bottom: none;
     font-weight: bold;
     font-size: 12px;
+    background: ${Colors.grey10};
+    color: ${Colors.blue7};
   }
 
   & .ant-tabs-tab-active {
     border-bottom: none;
-    background: black;
+    background: ${Colors.black100};
+
+    & .ant-tabs-tab-btn {
+      color: ${Colors.grey9};
+    }
   }
 
   & .ant-tabs-ink-bar {
