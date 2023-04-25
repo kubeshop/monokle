@@ -6,7 +6,6 @@ import {TabsProps} from 'antd';
 import {sep} from 'path';
 
 import {useAppSelector} from '@redux/hooks';
-import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
 import {
   problemFilePathAndRangeSelector,
   problemResourceAndRangeSelector,
@@ -31,7 +30,6 @@ const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
 };
 
 export function useProblemPaneMenuItems(width: number, height: number) {
-  const activeStorage = useAppSelector(activeResourceStorageSelector);
   const lastResponse = useValidationSelector(state => state.lastResponse);
   const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem?.problem ?? null);
   const selectedProblemMonacoData = useAppSelector(state => {
@@ -60,7 +58,7 @@ export function useProblemPaneMenuItems(width: number, height: number) {
       type: 'resource',
       resourceIdentifier: {id: selectedProblemMonacoData.resourceId, storage: selectedProblemMonacoData.storage},
     };
-  }, [activeStorage, selectedProblemMonacoData]);
+  }, [selectedProblemMonacoData]);
 
   const rule = useMemo(() => {
     if (!lastResponse || !selectedProblem) {
