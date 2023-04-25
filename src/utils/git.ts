@@ -2,6 +2,7 @@ import {shell} from 'electron';
 
 import {useCallback, useMemo} from 'react';
 
+import {isUndefined} from 'lodash';
 import path from 'path';
 
 import {useAppSelector} from '@redux/hooks';
@@ -30,12 +31,12 @@ export function useOpenOnGithub(relativePath?: string) {
   const repoCurrentBranch = useAppSelector(state => state.git.repo?.currentBranch);
 
   const canOpenOnGithub = useMemo(
-    () => Boolean(repoRemoteUrl && repoCurrentBranch && relativePath),
+    () => Boolean(repoRemoteUrl && repoCurrentBranch && !isUndefined(relativePath)),
     [repoRemoteUrl, repoCurrentBranch, relativePath]
   );
 
   const openOnGithub = useCallback(() => {
-    if (repoRemoteUrl && repoCurrentBranch && relativePath) {
+    if (repoRemoteUrl && repoCurrentBranch && !isUndefined(relativePath)) {
       openGithubPath({repoRemoteUrl, repoCurrentBranch, relativePath});
     }
   }, [repoRemoteUrl, repoCurrentBranch, relativePath]);

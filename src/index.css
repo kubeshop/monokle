@@ -478,3 +478,16 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 .welcome-modal .ant-modal-content .ant-modal-body {
   background-color: #dbdbdb;
 }
+
+.root-folder-tree-node .ant-tree-switcher {
+  display: none;
+  width: 0;
+}
+
+.root-folder-tree-node .ant-tree-node-content-wrapper {
+  padding-left: 1px;
+}
+
+.root-folder-tree-node .ant-tree-title {
+  padding-left: 9px;
+}
