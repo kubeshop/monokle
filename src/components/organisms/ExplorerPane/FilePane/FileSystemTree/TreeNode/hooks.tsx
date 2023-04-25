@@ -60,11 +60,23 @@ export const useDelete = () => {
       if (!fileEntry) {
         return;
       }
-      setIsLoading(true);
-      setImmediate(async () => {
-        const result = await deleteFileEntry(fileEntry);
-        dispatchDeleteAlert(dispatch, result);
-        setIsLoading(false);
+
+      let title = `Delete ${isDefined(fileEntry.children) ? 'folder' : 'file'} [${fileEntry.name}]?`;
+
+      Modal.confirm({
+        title,
+        onOk() {
+          return new Promise(resolve => {
+            setImmediate(async () => {
+              setIsLoading(true);
+              const result = await deleteFileEntry(fileEntry);
+              dispatchDeleteAlert(dispatch, result);
+              setIsLoading(false);
+            });
+            resolve({});
+          });
+        },
+        onCancel() {},
       });
     },
     [dispatch]
