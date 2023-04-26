@@ -7,6 +7,7 @@ import {Entries} from 'type-fest';
 
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
+import {setOpenProject} from '@redux/appConfig';
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import initialState from '@redux/initialState';
 import {stopClusterConnection} from '@redux/thunks/cluster';
@@ -428,6 +429,9 @@ export const uiSlice = createSlice({
       })
       .addCase(connectCluster.rejected, state => {
         state.leftMenu.selection = 'dashboard';
+      })
+      .addCase(setOpenProject.fulfilled, state => {
+        state.leftMenu.selection = 'explorer';
       });
   },
 });
