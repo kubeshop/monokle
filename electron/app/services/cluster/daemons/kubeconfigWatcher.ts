@@ -66,6 +66,17 @@ export class KubeConfigWatcher {
         return false;
       }
 
+      const fileStats = await fs.lstat(kubeconfigPath);
+
+      if (!fileStats.isFile()) {
+        this.broadcastError({
+          path: kubeconfigPath,
+          code: 'not_file',
+          reason: 'The specified path is not a file.',
+        });
+        return false;
+      }
+
       const watcher = watch(kubeconfigPath, {
         persistent: true,
         usePolling: true,
