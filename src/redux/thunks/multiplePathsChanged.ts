@@ -35,8 +35,8 @@ export const multiplePathsChanged = createAsyncThunk<
     filePaths.forEach(filePath => {
       let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
       if (fileEntry) {
-        reloadFile(filePath, fileEntry, mainState, projectConfig, fileSideEffect);
-        reloadedFilePaths.push(filePath);
+        const hasReloadedFile = reloadFile(filePath, fileEntry, mainState, projectConfig, fileSideEffect);
+        if (hasReloadedFile) reloadedFilePaths.push(filePath);
       } else if (!projectConfig.scanExcludes || !micromatch.any(filePath, projectConfig.scanExcludes)) {
         addPath(filePath, mainState, projectConfig, fileSideEffect);
       }

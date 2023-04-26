@@ -42,7 +42,8 @@ const debouncedCodeSave = debounce(
         return false;
       }
     }
-  }
+  },
+  250
 );
 
 const onCodeChange = () => {

@@ -14,7 +14,7 @@ import {getLineChanged} from '@redux/services/manifest-utils';
 import {extractResourceMeta, isSupportedResource} from '@redux/services/resource';
 
 import {AppState} from '@shared/models/appState';
-import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {ResourceIdentifier, isLocalResourceMeta} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {ThunkApi} from '@shared/models/thunk';
 import {isEqual} from '@shared/utils/isEqual';
@@ -91,8 +91,7 @@ export const updateResource = createAsyncThunk<
         if (!isSupportedResource(updatedResourceMeta)) {
           delete mainState.resourceMetaMapByStorage[resourceMeta.storage][resourceMeta.id];
           delete mainState.resourceContentMapByStorage[resourceMeta.storage][resourceMeta.id];
-          if (updatedResourceMeta.storage === 'local') {
-            // @ts-ignore
+          if (isLocalResourceMeta(updatedResourceMeta)) {
             selectFileReducer(mainState, {filePath: updatedResourceMeta.origin.filePath});
           } else {
             clearSelectionReducer(mainState);

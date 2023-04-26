@@ -500,7 +500,7 @@ export function reloadFile(
 
   if (fileEntry.timestamp && absolutePathTimestamp && absolutePathTimestamp <= fileEntry.timestamp) {
     log.info(`ignoring changed file ${absolutePath} because of timestamp`);
-    return;
+    return false;
   }
 
   // const fileStats = getFileStats(absolutePath);
@@ -520,6 +520,8 @@ export function reloadFile(
     selectFileReducer(state, {filePath: fileEntry.filePath});
     state.selectionOptions.shouldEditorReload = true;
   }
+
+  return true;
 }
 
 /**
