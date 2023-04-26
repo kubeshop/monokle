@@ -8,7 +8,7 @@ import {addEditorCommand, addEditorHover, addEditorLink, setEditorDecorations} f
 import {GlyphDecorationTypes} from '@editor/editor.constants';
 import {EditorCommand} from '@editor/editor.types';
 import {createGlyphDecoration, createMarkdownString} from '@editor/editor.utils';
-import {ResourceRef, ResourceRefType} from '@monokle/validation';
+import {ResourceRef, ResourceRefType, isUnsatisfiedRef} from '@monokle/validation';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType} from '@shared/models/appState';
 import {ResourceMeta, ResourceMetaMap, isLocalResourceMeta} from '@shared/models/k8sResource';
@@ -28,6 +28,13 @@ export const applyEditorRefs = createEditorEnhancer(({state, resourceIdentifier,
   for (const ref of refs) {
     const position = ref.position;
     if (position) {
+      const decorations = createEditorDecorationsForRef({ref});
+      setEditorDecorations(decorations);
+
+      if (isUnsatisfiedRef(ref.type)) {
+        continue;
+      }
+
       const range = new monaco.Range(position.line, position.column, position.line, position.column + position.length);
       addEditorLinkForRef({resourceMeta, ref, range, dispatch});
       const editorCommand = addEditorCommandForRef({
@@ -42,8 +49,6 @@ export const applyEditorRefs = createEditorEnhancer(({state, resourceIdentifier,
         range,
         hoverContents: editorCommand?.markdownLink ? [editorCommand.markdownLink] : [],
       });
-      const decorations = createEditorDecorationsForRef({ref});
-      setEditorDecorations(decorations);
     }
   }
 });
@@ -55,7 +60,9 @@ const createEditorDecorationsForRef = (args: {ref: ResourceRef}): monaco.editor.
   }
   const glyphDecoration = createGlyphDecoration(
     ref.position.line,
-    ref.type === ResourceRefType.Outgoing
+    ref.type === ResourceRefType.Unsatisfied
+      ? GlyphDecorationTypes.UnsatisfiedRef
+      : ref.type === ResourceRefType.Outgoing
       ? ref.target?.type === 'image'
         ? GlyphDecorationTypes.OutgoingImageRef
         : GlyphDecorationTypes.OutgoingRef
