@@ -2,6 +2,7 @@ import {Middleware, combineReducers, configureStore, createAction} from '@reduxj
 
 import {createLogger} from 'redux-logger';
 
+import {editorSlice} from '@editor/editor.slice';
 import {editorListeners} from '@editor/listeners';
 
 import {configSlice} from './appConfig';
@@ -62,6 +63,7 @@ const appReducer = combineReducers({
   validation: validationSlice.reducer,
   dashboard: dashboardSlice.reducer,
   cluster: clusterSlice.reducer,
+  editor: editorSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {
