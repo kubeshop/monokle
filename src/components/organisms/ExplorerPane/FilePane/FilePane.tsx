@@ -112,7 +112,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
                 <TitleBarCount count={filesOnly.length} isActive={false} />
               )
             }
-            descriptionStyle={{paddingTop: '10px'}}
+            descriptionStyle={{paddingTop: '5px'}}
             description={
               <S.RootFolderText>
                 {isFolderLoading ? (

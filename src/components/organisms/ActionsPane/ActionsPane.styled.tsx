@@ -62,10 +62,11 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
     background: rgba(25, 31, 33, 0.7);
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
+    min-height: 35px;
   }
 
   & .ant-tabs-nav-wrap {
-    padding-top: 9px;
+    padding-top: 11px;
   }
 
   & .ant-tabs-nav::before {
