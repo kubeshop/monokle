@@ -14,6 +14,8 @@ import {setupCluster} from '@redux/cluster/thunks/setup';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setActiveSettingsPanel, setLeftMenuSelection} from '@redux/reducers/ui';
 
+import {useRefSelector} from '@utils/hooks';
+
 import {ContextId, MonokleClusterError} from '@shared/ipc';
 import {ModernKubeConfig, SettingsPanel} from '@shared/models/config';
 import {Colors} from '@shared/styles';
@@ -106,6 +108,7 @@ function KubeconfigErrorMessage() {
   const controls = useAnimationControls();
   const previousErrorRef = useRef<ModernKubeConfig | undefined>(undefined);
   const kubeconfig = useAppSelector(selectKubeconfig);
+  const activeProjectRef = useRefSelector(activeProjectSelector);
 
   const handleTryAgain = useCallback(() => {
     dispatch(stopWatchingKubeconfig());
@@ -116,7 +119,13 @@ function KubeconfigErrorMessage() {
 
   const handleReconfigure = useCallback(() => {
     dispatch(setLeftMenuSelection('settings'));
-  }, [dispatch]);
+
+    if (activeProjectRef.current) {
+      dispatch(setActiveSettingsPanel(SettingsPanel.CurrentProjectSettings));
+    } else {
+      dispatch(setActiveSettingsPanel(SettingsPanel.DefaultProjectSettings));
+    }
+  }, [activeProjectRef, dispatch]);
 
   useEffect(() => {
     if (
