@@ -69,10 +69,6 @@ export const PropertyContainer = styled.div`
   margin-left: 5px;
 `;
 
-export const FieldContainer = styled.div`
-  margin-left: 10px;
-`;
-
 export const FormContainer = styled.div`
   height: 100%;
   width: 100%;

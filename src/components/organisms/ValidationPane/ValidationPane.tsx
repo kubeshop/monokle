@@ -85,7 +85,7 @@ const ValidationPane: React.FC = () => {
           containerStyle={{marginTop: '20px'}}
           showOnlyByResource={isInClusterMode || isInPreviewMode}
           filters={validationFilters}
-          height={height - titleBarHeight - 40}
+          height={height - titleBarHeight - 60}
           newProblemsIntroducedType={newProblemsIntroducedType}
           selectedProblem={selectedProblem?.problem}
           validationResponse={lastResponse}

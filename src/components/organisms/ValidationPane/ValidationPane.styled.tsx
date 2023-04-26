@@ -46,5 +46,5 @@ export const RevalidateButton = styled(Button)`
 `;
 
 export const ValidationPaneContainer = styled.div`
-  padding: 10px 25px 10px 10px;
+  padding: 20px;
 `;

@@ -10,7 +10,7 @@ export const ActionsRow = styled(Row)`
 `;
 
 export const CompareSyncPaneContainer = styled.div`
-  padding: 10px;
+  padding: 20px 10px 20px 10px;
   background-color: ${Colors.grey10};
   height: 100%;
   width: 100%;

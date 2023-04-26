@@ -53,12 +53,12 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   width: 100%;
   height: ${({$height}) => `${$height}px`};
   overflow: visible;
-  padding: 0px 16px 0px 16px;
+  padding: 0px 20px 0px 20px;
   margin-top: -10px;
 
   & .ant-tabs-nav {
     padding: 0px 16px 0 0;
-    margin-bottom: 0px;
+    margin-bottom: 10px;
     background: rgba(25, 31, 33, 0.7);
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
@@ -80,6 +80,7 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   & .ant-tabs-extra-content {
     display: flex;
     align-items: center;
+    transform: translateY(3px);
   }
 
   & .ant-tabs-tab {
