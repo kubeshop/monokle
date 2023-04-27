@@ -4,7 +4,7 @@ import {selectFile} from '@redux/reducers/main';
 import {selectedHelmValuesSelector} from '@redux/selectors';
 
 import {InlineDecorationTypes} from '@editor/editor.constants';
-import {addEditorCommand, addEditorHover, setEditorSelection} from '@editor/editor.instance';
+import {addEditorCommand, addEditorHover, setEditorDecorations, setEditorSelection} from '@editor/editor.instance';
 import {EditorCommand} from '@editor/editor.types';
 import {createInlineDecoration} from '@editor/editor.utils';
 import {AppDispatch} from '@shared/models/appDispatch';
@@ -38,7 +38,6 @@ export const helmValuesFileEnhancer = createEditorEnhancer(({state, resourceIden
 
   placesUsed.forEach(placeUsed => {
     const commands: EditorCommand[] = [];
-
     decorations.push(createInlineDecoration(placeUsed.locationInValueFile, InlineDecorationTypes.SatisfiedRef));
     placeUsed.uses.forEach(use => {
       const newCommand = addEditorCommand({
@@ -69,6 +68,8 @@ export const helmValuesFileEnhancer = createEditorEnhancer(({state, resourceIden
       });
     }
   });
+
+  setEditorDecorations(decorations);
 });
 
 const goToFileAndHighlightCode = (args: {range: monaco.IRange; filePath: string; dispatch: AppDispatch}) => {
