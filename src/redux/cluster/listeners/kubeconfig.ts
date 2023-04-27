@@ -4,6 +4,7 @@ import isEqual from 'react-fast-compare';
 
 import {createAction, isAnyOf} from '@reduxjs/toolkit';
 
+import {cloneDeep} from 'lodash';
 import log from 'loglevel';
 
 import {
@@ -67,7 +68,12 @@ export const kubeConfigListener: AppListenerFn = listen => {
 
         const isGlobalKubeconfig = getState().config.kubeConfig.path === config?.path;
         if (isGlobalKubeconfig) {
-          const oldKubeconfig = getState().config.kubeConfig;
+          const oldKubeconfig = cloneDeep(getState().config.kubeConfig);
+
+          if (!oldKubeconfig.isPathValid && oldKubeconfig.currentContext) {
+            delete oldKubeconfig.currentContext;
+          }
+
           const changed = !isEqual(newKubeconfig, oldKubeconfig);
           if (changed) {
             dispatch(setKubeConfig(newKubeconfig));

@@ -7,6 +7,7 @@ import {Entries} from 'type-fest';
 
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
+import {setOpenProject} from '@redux/appConfig';
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import initialState from '@redux/initialState';
 import {stopClusterConnection} from '@redux/thunks/cluster';
@@ -360,6 +361,12 @@ export const uiSlice = createSlice({
         filePath: '',
       };
     },
+    showNewVersionNotice: (state: Draft<UiState>) => {
+      state.newVersionNotice.isVisible = true;
+    },
+    hideNewVersionNotice: (state: Draft<UiState>) => {
+      state.newVersionNotice.isVisible = false;
+    },
     setShowOpenProjectAlert: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.showOpenProjectAlert = action.payload;
       electronStore.set('ui.showOpenProjectAlert', action.payload);
@@ -428,6 +435,9 @@ export const uiSlice = createSlice({
       })
       .addCase(connectCluster.rejected, state => {
         state.leftMenu.selection = 'dashboard';
+      })
+      .addCase(setOpenProject.fulfilled, state => {
+        state.leftMenu.selection = 'explorer';
       });
   },
 });
@@ -456,6 +466,7 @@ export const {
   collapseResourceKinds,
   expandKustomizeKinds,
   expandResourceKinds,
+  hideNewVersionNotice,
   highlightItem,
   openAboutModal,
   openCreateFileFolderModal,
@@ -494,6 +505,7 @@ export const {
   setStartPageLearnTopic,
   setStartPageMenuOption,
   setTemplateProjectCreate,
+  showNewVersionNotice,
   toggleExpandActionsPaneFooter,
   toggleHelmChart,
   toggleLeftMenu,

@@ -58,6 +58,10 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
         const paths: Array<string> = args.map(arg => arg[0]);
         thunkAPI.dispatch(multiplePathsRemoved(filterGitFolder(paths)));
 
+        if (!thunkAPI.getState().git.repo) {
+          return;
+        }
+
         getRepoInfo({path: folder})
           .then(repo => {
             if (!thunkAPI.getState().git.loading) {
@@ -87,6 +91,10 @@ export function monitorRootFolder(folder: string, thunkAPI: {getState: Function;
       debounceWithPreviousArgs((args: any[]) => {
         const paths: Array<string> = args.map(arg => arg[0]);
         thunkAPI.dispatch(multiplePathsRemoved(filterGitFolder(paths)));
+
+        if (!thunkAPI.getState().git.repo) {
+          return;
+        }
 
         getRepoInfo({path: folder})
           .then(repo => {

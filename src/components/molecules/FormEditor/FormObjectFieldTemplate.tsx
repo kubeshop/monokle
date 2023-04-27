@@ -14,7 +14,7 @@ const FormObjectFieldTemplate = (props: ObjectFieldTemplateProps<any, RJSFSchema
   const opacity = (10 - (uiSchema?.level ?? 0)) / 10;
 
   return (
-    <S.FieldContainer>
+    <>
       <S.TitleWrapper onClick={() => toggleExpand(prev => !prev)} opacityStep={opacity || 1}>
         {isExpanded ? <S.ArrowIconExpanded /> : <S.ArrowIconClosed />}
 
@@ -34,7 +34,7 @@ const FormObjectFieldTemplate = (props: ObjectFieldTemplateProps<any, RJSFSchema
           </Button>
         </>
       )}
-    </S.FieldContainer>
+    </>
   );
 };
 

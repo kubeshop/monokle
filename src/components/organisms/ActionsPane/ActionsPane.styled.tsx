@@ -53,15 +53,20 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   width: 100%;
   height: ${({$height}) => `${$height}px`};
   overflow: visible;
-  padding: 0px 16px 0px 16px;
+  padding: 0px 20px 0px 20px;
   margin-top: -10px;
 
   & .ant-tabs-nav {
-    padding: 8px 16px 0 0;
-    margin-bottom: 0px;
+    padding: 0px 16px 0 0;
+    margin-bottom: 10px;
     background: rgba(25, 31, 33, 0.7);
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
+    min-height: 35px;
+  }
+
+  & .ant-tabs-nav-wrap {
+    padding-top: 11px;
   }
 
   & .ant-tabs-nav::before {
@@ -75,6 +80,7 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
   & .ant-tabs-extra-content {
     display: flex;
     align-items: center;
+    transform: translateY(3px);
   }
 
   & .ant-tabs-tab {
@@ -85,11 +91,17 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
     border-bottom: none;
     font-weight: bold;
     font-size: 12px;
+    background: ${Colors.grey10};
+    color: ${Colors.blue7};
   }
 
   & .ant-tabs-tab-active {
     border-bottom: none;
-    background: black;
+    background: ${Colors.black100};
+
+    & .ant-tabs-tab-btn {
+      color: ${Colors.grey9};
+    }
   }
 
   & .ant-tabs-ink-bar {

@@ -13,7 +13,6 @@ import {InjectedPanelProps} from '@shared/models/explorer';
 import {isDefined} from '@shared/utils/filter';
 
 import AccordionPanel from '../AccordionPanel';
-import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
 import PreviewConfigurationAdd from './PreviewConfigurationAdd';
 import PreviewConfigurationList from './PreviewConfigurationList';
 
@@ -44,14 +43,12 @@ const PreviewConfigurationPane: React.FC<InjectedPanelProps> = props => {
       {...props}
       collapsible={isInClusterMode ? 'disabled' : undefined}
       header={
-        <AccordionTitleBarContainer>
-          <TitleBar
-            title="Helm Preview Configurations"
-            expandable
-            isOpen={Boolean(isActive)}
-            actions={<TitleBarCount count={count} isActive={Boolean(isActive)} />}
-          />
-        </AccordionTitleBarContainer>
+        <TitleBar
+          title="Helm Preview Configurations"
+          expandable
+          isOpen={Boolean(isActive)}
+          actions={<TitleBarCount count={count} isActive={Boolean(isActive)} />}
+        />
       }
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}

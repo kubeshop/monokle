@@ -4,7 +4,7 @@ import {BrowserWindow} from 'electron';
 
 import {FSWatcher, watch} from 'chokidar';
 import fs from 'fs-extra';
-import {uniq} from 'lodash';
+import {size, uniq} from 'lodash';
 import log from 'loglevel';
 
 import {InvalidKubeConfig, ValidKubeConfig} from '@shared/models/config';
@@ -66,6 +66,17 @@ export class KubeConfigWatcher {
         return false;
       }
 
+      const fileStats = await fs.lstat(kubeconfigPath);
+
+      if (!fileStats.isFile()) {
+        this.broadcastError({
+          path: kubeconfigPath,
+          code: 'not_file',
+          reason: 'The specified path is not a file.',
+        });
+        return false;
+      }
+
       const watcher = watch(kubeconfigPath, {
         persistent: true,
         usePolling: true,
@@ -105,7 +116,16 @@ export class KubeConfigWatcher {
     try {
       const config = new k8s.KubeConfig();
       config.loadFromFile(kubeconfigPath);
-      this.broadcastSuccess(kubeconfigPath, config);
+
+      if (size(config.contexts) === 0 && size(config.clusters) === 0) {
+        this.broadcastError({
+          path: kubeconfigPath,
+          code: 'empty',
+          reason: `The kubeconfig is empty. No context or clusters found.`,
+        });
+      } else {
+        this.broadcastSuccess(kubeconfigPath, config);
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : undefined;
       this.broadcastError({

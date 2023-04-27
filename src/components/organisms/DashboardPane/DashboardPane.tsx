@@ -2,6 +2,8 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Skeleton} from 'antd';
 
+import {groupBy, size} from 'lodash';
+
 import navSectionNames from '@constants/navSectionNames';
 
 import {currentKubeContextSelector} from '@redux/appConfig';
@@ -11,18 +13,17 @@ import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelec
 import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
-import {useRefSelector, useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 
 import {DashboardMenu} from '@shared/models/dashboard';
 import {ResourceMeta} from '@shared/models/k8sResource';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 
+import DashboardFilteredMenu from './DashboardFilteredMenu';
 import * as S from './DashboardPane.style';
-import {MenuItem} from './MenuItem';
 
 const DashboardPane = () => {
   const dispatch = useAppDispatch();
-  const [menuList, menuListRef] = useSelectorWithRef(state => state.dashboard.ui.menuList);
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const currentContext = useAppSelector(currentKubeContextSelector);
   const leftMenu = useAppSelector(state => state.ui.leftMenu);
@@ -30,31 +31,30 @@ const DashboardPane = () => {
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
   const clusterConnectionOptions = useRefSelector(state => state.main.clusterConnectionOptions);
   const clusterResourceMeta = useResourceMetaMap('cluster');
-  const [activeMenuItemRef, setActiveMenuItemRef] = useState<HTMLElement>();
-  const problems = useValidationSelector(state => problemsSelector(state));
 
-  const filteredMenu = useMemo(() => {
-    if (!filterText) {
-      return menuListRef.current;
-    }
-    return menuListRef.current
-      .map((menuItem: DashboardMenu) => ({
-        ...menuItem,
-        children: menuItem.children?.filter((m: DashboardMenu) =>
-          m.label.toLowerCase().includes(filterText.toLowerCase())
-        ),
-      }))
-      .filter((menuItem: DashboardMenu) => menuItem.children && menuItem.children?.length > 0)
-      .filter(
-        (menuItem: DashboardMenu) =>
-          menuItem.children &&
-          menuItem.children?.reduce(
-            (total: number, m: DashboardMenu) => total + (m.resourceCount ? m.resourceCount : 0),
-            0
-          ) > 0
-      );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterText, menuListRef, menuList, clusterConnectionOptions]);
+  const problems = useValidationSelector(problemsSelector);
+
+  const groupedResources = useMemo(() => groupBy(clusterResourceMeta, 'kind'), [clusterResourceMeta]);
+
+  const getProblemCount = useCallback(
+    (kind: string, level: 'error' | 'warning') => {
+      if (!groupedResources[kind]) return 0;
+
+      return groupedResources[kind].reduce((total: number, resource: ResourceMeta) => {
+        const problemCount = problems.filter(
+          p =>
+            p.level === level &&
+            p.locations.find(
+              l =>
+                l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
+                l.physicalLocation.artifactLocation.uri === resource.id
+            )
+        );
+        return total + problemCount.length;
+      }, 0);
+    },
+    [groupedResources, problems]
+  );
 
   useEffect(() => {
     let tempMenu: DashboardMenu[] = [
@@ -83,7 +83,7 @@ const DashboardPane = () => {
             label: kindHandler.kind,
             errorCount: getProblemCount(kindHandler.kind, 'error'),
             warningCount: getProblemCount(kindHandler.kind, 'warning'),
-            resourceCount: getResourceCount(kindHandler.kind),
+            resourceCount: size(groupedResources[kindHandler.kind]) ?? 0,
             children: [],
           });
         } else {
@@ -92,7 +92,7 @@ const DashboardPane = () => {
             label: kindHandler.kind,
             errorCount: getProblemCount(kindHandler.kind, 'error'),
             warningCount: getProblemCount(kindHandler.kind, 'warning'),
-            resourceCount: getResourceCount(kindHandler.kind),
+            resourceCount: size(groupedResources[kindHandler.kind]) ?? 0,
             children: [],
           });
         }
@@ -100,55 +100,7 @@ const DashboardPane = () => {
     });
 
     dispatch(setDashboardMenuList(tempMenu));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registeredKindHandlers, leftMenu, selectedNamespace, clusterResourceMeta]);
-
-  useEffect(() => {
-    if (activeMenuItemRef) {
-      activeMenuItemRef.scrollIntoView({behavior: 'smooth'});
-    }
-  }, [activeMenuItemRef]);
-
-  const compareNamespaces = useCallback(
-    (namespace?: string) => {
-      if (clusterConnectionOptions.current.lastNamespaceLoaded === '<all>') {
-        return true;
-      }
-      if (clusterConnectionOptions.current.lastNamespaceLoaded === '<not-namespaced>') {
-        return !namespace;
-      }
-      return clusterConnectionOptions.current.lastNamespaceLoaded === namespace;
-    },
-    [clusterConnectionOptions]
-  );
-
-  const getResources = useCallback(
-    (kind: string) => {
-      return Object.values(clusterResourceMeta).filter(r => r.kind === kind && compareNamespaces(r.namespace));
-    },
-    [clusterResourceMeta, compareNamespaces]
-  );
-
-  const getResourceCount = useCallback((kind: string) => getResources(kind).length, [getResources]);
-
-  const getProblemCount = useCallback(
-    (kind: string, level: 'error' | 'warning') => {
-      return getResources(kind).reduce((total: number, resource: ResourceMeta) => {
-        const problemCount = problems.filter(
-          p =>
-            p.level === level &&
-            p.locations.find(
-              l =>
-                l.physicalLocation?.artifactLocation.uriBaseId === 'RESOURCE' &&
-                l.physicalLocation.artifactLocation.uri === resource.id
-            )
-        );
-        return total + problemCount.length;
-      }, 0);
-    },
-    [getResources, problems]
-  );
+  }, [registeredKindHandlers, leftMenu, selectedNamespace, dispatch, getProblemCount, groupedResources]);
 
   if (clusterConnectionOptions.current.isLoading) {
     return (
@@ -181,26 +133,7 @@ const DashboardPane = () => {
         </S.FilterContainer>
       </S.HeaderContainer>
 
-      {filteredMenu.map((parent: DashboardMenu) => {
-        return (
-          <div key={parent.key}>
-            <MenuItem
-              type="parent"
-              menuItem={parent}
-              onActiveMenuItem={(ref: HTMLElement) => setActiveMenuItemRef(ref)}
-            />
-
-            {parent.children?.map((child: DashboardMenu) => (
-              <MenuItem
-                key={child.key}
-                type="child"
-                menuItem={child}
-                onActiveMenuItem={(ref: HTMLElement) => setActiveMenuItemRef(ref)}
-              />
-            ))}
-          </div>
-        );
-      })}
+      <DashboardFilteredMenu filterText={filterText} />
     </S.Container>
   );
 };

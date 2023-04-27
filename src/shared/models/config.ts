@@ -78,6 +78,7 @@ interface AppConfig {
     [name: string]: ClusterColors;
   };
   fileExplorerSortOrder: FileExplorerSortOrder;
+  isNewVersionAvailable: boolean;
 }
 
 type ClusterAccess = {
@@ -131,7 +132,7 @@ export type ValidKubeConfig = {
 export type InvalidKubeConfig = {
   isValid: false;
   path: string;
-  code: 'not_found' | 'malformed' | 'unknown';
+  code: 'not_found' | 'malformed' | 'unknown' | 'empty' | 'not_file';
   reason: string;
 };
 

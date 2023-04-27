@@ -41,7 +41,7 @@ export const removeResources = createAsyncThunk<
           resourceMetaMap: mainState.resourceMetaMapByStorage.transient,
           resourceContentMap: mainState.resourceContentMapByStorage.transient,
         });
-        return original(mainState);
+        return mainState;
       }
 
       if (isLocalResourceMeta(resourceMeta)) {
@@ -49,7 +49,7 @@ export const removeResources = createAsyncThunk<
           resourceMetaMap: mainState.resourceMetaMapByStorage.local,
           resourceContentMap: mainState.resourceContentMapByStorage.local,
         });
-        return original(mainState);
+        return mainState;
       }
 
       if (mainState.clusterConnection && isClusterResourceMeta(resourceMeta)) {

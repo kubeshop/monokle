@@ -8,6 +8,7 @@ import initialState from '@redux/initialState';
 import {processResourceRefs} from '@redux/parsing/parser.thunks';
 import {setAlert} from '@redux/reducers/alert';
 import {getResourceContentMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
+import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
 import {
@@ -355,6 +356,7 @@ export const mainSlice = createSlice({
     builder
       .addCase(reloadClusterResources.pending, state => {
         state.clusterConnectionOptions.isLoading = true;
+        disconnectFromCluster();
       })
       .addCase(reloadClusterResources.fulfilled, (state, action) => {
         state.clusterConnectionOptions.isLoading = false;

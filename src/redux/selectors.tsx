@@ -1,3 +1,5 @@
+import {FolderOpenFilled} from '@ant-design/icons';
+
 import path from 'path';
 import {createSelector} from 'reselect';
 
@@ -176,11 +178,21 @@ export const projectFileTreeSelector = createSelector(
   (fileMap, fileExplorerSortOrder) => {
     const rootEntry = fileMap[ROOT_FILE_ENTRY];
 
+    const rootEntryNode = {
+      key: ROOT_FILE_ENTRY,
+      title: `[${path.basename(rootEntry.filePath)}]`,
+      children: [],
+      className: 'root-folder-tree-node',
+      icon: <FolderOpenFilled />,
+      isRootEntry: true,
+    };
+
     const rootFileNodes = createFileNodes(path.sep, fileMap);
     const rootFolderNodes =
       rootEntry?.children
         ?.map(folderPath => createFolderTree(`${path.sep}${folderPath}`, fileMap, fileExplorerSortOrder))
         .filter(isDefined) || [];
-    return sortNodes(rootFolderNodes, rootFileNodes, fileExplorerSortOrder);
+
+    return [rootEntryNode, ...sortNodes(rootFolderNodes, rootFileNodes, fileExplorerSortOrder)];
   }
 );

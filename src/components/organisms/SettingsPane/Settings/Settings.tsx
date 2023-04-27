@@ -25,6 +25,7 @@ import {
 } from '@constants/tooltips';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
+import {selectKubeconfig} from '@redux/cluster/selectors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -61,6 +62,7 @@ export const Settings = ({
   const dispatch = useAppDispatch();
   const [settingsForm] = useForm();
 
+  const kubeConfig = useAppSelector(selectKubeconfig);
   const isScanIncludesUpdated = useAppSelector(state => state.config.isScanIncludesUpdated);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const filePath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]?.filePath);
@@ -73,7 +75,7 @@ export const Settings = ({
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
     Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid)
   );
-  const [currentKubeConfig, setCurrentKubeConfig] = useState(config?.kubeConfig?.path);
+  const [currentKubeConfigPath, setCurrentKubeConfigPath] = useState(kubeConfig?.path);
   const [currentProjectName, setCurrentProjectName] = useState(projectName);
   const isEditingDisabled = isInClusterMode;
   const [k8sVersions] = useState<Array<string>>(K8S_VERSIONS);
@@ -90,7 +92,7 @@ export const Settings = ({
 
   useEffect(() => {
     setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
-    setCurrentKubeConfig(config?.kubeConfig?.path);
+    setCurrentKubeConfigPath(config?.kubeConfig?.path);
     setIsKubeConfigBrowseSettingsOpen(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.kubeConfig]);
@@ -205,12 +207,12 @@ export const Settings = ({
 
   useDebounce(
     () => {
-      if (currentKubeConfig !== localConfig?.kubeConfig?.path) {
-        setLocalConfig({...localConfig, kubeConfig: {path: currentKubeConfig}});
+      if (currentKubeConfigPath !== localConfig?.kubeConfig?.path) {
+        setLocalConfig({...localConfig, kubeConfig: {path: currentKubeConfigPath}});
       }
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,
-    [currentKubeConfig]
+    [currentKubeConfigPath]
   );
 
   useDebounce(
@@ -227,7 +229,7 @@ export const Settings = ({
     if (isEditingDisabled) {
       return;
     }
-    setCurrentKubeConfig(e.target.value);
+    setCurrentKubeConfigPath(e.target.value);
     setIsKubeConfigBrowseSettingsOpen(false);
   };
 
@@ -237,7 +239,7 @@ export const Settings = ({
       const file: any = fileInput.current.files[0];
       if (file.path) {
         const selectedFilePath = file.path;
-        setCurrentKubeConfig(selectedFilePath);
+        setCurrentKubeConfigPath(selectedFilePath);
         setIsKubeConfigBrowseSettingsOpen(false);
       }
     }
@@ -300,25 +302,28 @@ export const Settings = ({
             {isClusterActionDisabled && wasRehydrated && (
               <S.WarningOutlined
                 className={isClusterPaneIconHighlighted ? 'animated-highlight' : ''}
-                isKubeconfigPathValid={Boolean(config?.kubeConfig?.isPathValid)}
+                isKubeconfigPathValid={Boolean(kubeConfig?.isValid)}
                 highlighted={Boolean(isClusterPaneIconHighlighted)}
               />
             )}
           </S.Heading>
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KubeconfigPathTooltip}>
-            <Input.Search
+            <Input
               ref={inputRef}
               onClick={() => focusInput()}
-              value={currentKubeConfig}
+              value={currentKubeConfigPath}
               onChange={onUpdateKubeconfig}
               disabled={isEditingDisabled}
-              loading={!isKubeConfigBrowseSettingsOpen}
             />
           </Tooltip>
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
-            <S.Button onClick={openFileSelect} disabled={isEditingDisabled || !isKubeConfigBrowseSettingsOpen}>
+            <S.Button
+              onClick={openFileSelect}
+              disabled={isEditingDisabled || !isKubeConfigBrowseSettingsOpen}
+              loading={!isKubeConfigBrowseSettingsOpen}
+            >
               Browse
             </S.Button>
           </Tooltip>

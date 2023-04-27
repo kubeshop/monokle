@@ -3,7 +3,7 @@ import {useMeasure} from 'react-use';
 
 import {Tooltip} from 'antd';
 
-import {join} from 'path';
+import {basename, join} from 'path';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
@@ -14,6 +14,7 @@ import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {ContextMenu, Dots} from '@components/atoms';
 
 import {Spinner} from '@monokle/components';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileEntry} from '@shared/models/fileEntry';
 import {isEqual} from '@shared/utils/isEqual';
 
@@ -69,7 +70,7 @@ const TreeNodeFolder: React.FC<Props> = props => {
             }
             placement="bottom"
           >
-            <span>{folderEntry.name}</span>
+            <span>{folderPath === ROOT_FILE_ENTRY ? `[${basename(folderEntry.filePath)}]` : folderEntry.name}</span>
           </Tooltip>
         </S.TitleText>
       </S.TitleContainer>

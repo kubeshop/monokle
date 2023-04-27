@@ -8,6 +8,7 @@ export const Container = styled.div`
   padding: 12px 8px 3px 8px;
   overflow-y: auto;
   height: calc(100% - 32px);
+  width: 100%;
 `;
 
 export const EventRow = styled.div<{$type: string}>`
