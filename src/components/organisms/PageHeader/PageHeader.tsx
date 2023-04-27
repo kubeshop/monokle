@@ -184,11 +184,11 @@ const PageHeader = () => {
       <S.Header>
         <div style={{display: 'flex', alignItems: 'center'}}>
           <S.LogoContainer $isNewVersionNoticeVisible={isNewVersionNoticeVisible}>
-            <NewVersionNotice>
-              <S.NewVersionBadge dot={isNewVersionAvailable}>
+            <S.NewVersionBadge dot={isNewVersionAvailable}>
+              <NewVersionNotice>
                 <S.Logo id="monokle-logo-header" onClick={onClickLogoHandler} src={MonokleKubeshopLogo} alt="Monokle" />
-              </S.NewVersionBadge>
-            </NewVersionNotice>
+              </NewVersionNotice>
+            </S.NewVersionBadge>
           </S.LogoContainer>
 
           <S.Divider type="vertical" />

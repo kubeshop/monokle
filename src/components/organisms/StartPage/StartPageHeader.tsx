@@ -64,16 +64,16 @@ const StartPageHeader: React.FC = () => {
   return (
     <S.StartPageHeaderContainer>
       <S.LogoContainer $isNewVersionNoticeVisible={isNewVersionNoticeVisible}>
-        <NewVersionNotice>
-          <S.NewVersionBadge dot={isNewVersionAvailable}>
+        <S.NewVersionBadge dot={isNewVersionAvailable}>
+          <NewVersionNotice>
             <S.Logo
               id="monokle-logo-header"
               src={MonokleKubeshopLogo}
               alt="Monokle"
               onClick={() => dispatch(setStartPageMenuOption('new-project'))}
             />
-          </S.NewVersionBadge>
-        </NewVersionNotice>
+          </NewVersionNotice>
+        </S.NewVersionBadge>
       </S.LogoContainer>
 
       <S.SearchContainer>
