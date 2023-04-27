@@ -95,6 +95,7 @@ const NewPaneManager: React.FC = () => {
                 )
               ) : (
                 <ResizableColumnsPanel
+                  key={currentActivity?.name}
                   paneCloseIconStyle={{top: 15}}
                   left={leftMenuActive ? currentActivity?.component : undefined}
                   center={
