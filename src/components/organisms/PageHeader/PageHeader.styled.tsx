@@ -1,4 +1,4 @@
-import {Button, Layout, Button as RawButton, Divider as RawDivider, Row as RawRow} from 'antd';
+import {Badge, Button, Layout, Button as RawButton, Divider as RawDivider, Row as RawRow} from 'antd';
 
 import {
   BellOutlined as RawBellOutlined,
@@ -91,12 +91,20 @@ export const Logo = styled.img`
   cursor: pointer;
 `;
 
-export const LogoContainer = styled.div`
+export const LogoContainer = styled.div<{$newVersionAvailable: boolean}>`
   height: 100%;
   min-width: 50px;
   width: 50px;
   display: flex;
   justify-content: center;
+
+  margin-right: ${({$newVersionAvailable}) => ($newVersionAvailable ? '315px' : '0px')};
+`;
+
+export const NewVersionBadge = styled(Badge)`
+  & .ant-badge-dot {
+    background: ${Colors.geekblue7};
+  }
 `;
 
 export const PreviewRow = styled(RawRow)<{
