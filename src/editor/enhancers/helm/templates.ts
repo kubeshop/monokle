@@ -4,7 +4,7 @@ import * as monaco from 'monaco-editor';
 import {selectedFilePathSelector} from '@redux/selectors';
 
 import {InlineDecorationTypes} from '@editor/editor.constants';
-import {addEditorCommand, addEditorHover, addEditorLink, setEditorDecorations} from '@editor/editor.instance';
+import {addEditorCommand, addEditorDecorations, addEditorHover, addEditorLink} from '@editor/editor.instance';
 import {EditorCommand} from '@editor/editor.types';
 import {createInlineDecoration, createMarkdownString} from '@editor/editor.utils';
 
@@ -122,5 +122,5 @@ export const helmTemplateFileEnhancer = createEditorEnhancer(({state, resourceId
     });
   });
 
-  setEditorDecorations(newDecorations);
+  addEditorDecorations(newDecorations);
 });

@@ -3,7 +3,7 @@ import * as monaco from 'monaco-editor';
 import {selectedHelmValuesSelector} from '@redux/selectors';
 
 import {InlineDecorationTypes} from '@editor/editor.constants';
-import {addEditorCommand, addEditorHover, setEditorDecorations} from '@editor/editor.instance';
+import {addEditorCommand, addEditorDecorations, addEditorHover} from '@editor/editor.instance';
 import {EditorCommand} from '@editor/editor.types';
 import {createInlineDecoration} from '@editor/editor.utils';
 import {HelmTemplatesMapType} from '@shared/models/appState';
@@ -69,7 +69,7 @@ export const helmValuesFileEnhancer = createEditorEnhancer(({state, resourceIden
     }
   });
 
-  setEditorDecorations(decorations);
+  addEditorDecorations(decorations);
 });
 
 const findWhereHelmValuesAreUsed = (

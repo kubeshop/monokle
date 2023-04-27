@@ -3,7 +3,7 @@ import * as monaco from 'monaco-editor';
 import {selectFile, selectImage, selectResource} from '@redux/reducers/main';
 import {getResourceMetaFromState} from '@redux/selectors/resourceGetters';
 
-import {addEditorCommand, addEditorHover, addEditorLink, setEditorDecorations} from '@src/editor/editor.instance';
+import {addEditorCommand, addEditorDecorations, addEditorHover, addEditorLink} from '@src/editor/editor.instance';
 
 import {GlyphDecorationTypes} from '@editor/editor.constants';
 import {EditorCommand} from '@editor/editor.types';
@@ -29,7 +29,7 @@ export const applyEditorRefs = createEditorEnhancer(({state, resourceIdentifier,
     const position = ref.position;
     if (position) {
       const decorations = createEditorDecorationsForRef({ref});
-      setEditorDecorations(decorations);
+      addEditorDecorations(decorations);
 
       if (isUnsatisfiedRef(ref.type)) {
         continue;

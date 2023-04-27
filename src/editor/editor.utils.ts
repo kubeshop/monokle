@@ -1,4 +1,7 @@
 import * as monaco from 'monaco-editor';
+import {ILanguageFeaturesService} from 'monaco-editor/esm/vs/editor/common/services/languageFeatures.js';
+import {OutlineModel} from 'monaco-editor/esm/vs/editor/contrib/documentSymbols/browser/outlineModel.js';
+import {StandaloneServices} from 'monaco-editor/esm/vs/editor/standalone/browser/standaloneServices.js';
 
 import {
   GlyphDecorationTypes,
@@ -48,3 +51,10 @@ export function createInlineDecoration(range: monaco.IRange, inlineDecorationTyp
   };
   return inlineDecoration;
 }
+
+export const getSymbols = async (model: monaco.editor.IModel) => {
+  const {documentSymbolProvider} = StandaloneServices.get(ILanguageFeaturesService);
+  const outline = await OutlineModel.create(documentSymbolProvider, model);
+  const symbols = outline.asListOfDocumentSymbols();
+  return symbols;
+};

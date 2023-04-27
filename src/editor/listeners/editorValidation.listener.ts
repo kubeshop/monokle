@@ -7,6 +7,7 @@ import {validateResources} from '@redux/validation/validation.thunks';
 
 import {getEditor, resetEditor} from '@editor/editor.instance';
 import {applyEditorRefs} from '@editor/enhancers/k8sResource/refs';
+import {resourceSymbolsEnhancer} from '@editor/enhancers/k8sResource/symbols';
 import {applyEditorValidation} from '@editor/enhancers/k8sResource/validation';
 
 export const editorResourceRefsListener: AppListenerFn = listen => {
@@ -24,6 +25,13 @@ export const editorResourceRefsListener: AppListenerFn = listen => {
         return;
       }
       applyEditorRefs({state: getState(), resourceIdentifier: editorResourceIdentifier, editor, dispatch});
+      // TODO: this should problably be moved elsewhere?
+      await resourceSymbolsEnhancer({
+        state: getState(),
+        editor,
+        resourceIdentifier: editorResourceIdentifier,
+        dispatch,
+      });
     },
   });
 };

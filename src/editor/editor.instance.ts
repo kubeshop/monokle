@@ -10,6 +10,7 @@ let EDITOR: monaco.editor.IStandaloneCodeEditor | undefined;
 let editorHovers: EditorHover[] = [];
 let editorLinks: EditorLink[] = [];
 let editorCommands: EditorCommand[] = [];
+let editorDecorations: monaco.editor.IModelDeltaDecoration[] = [];
 let editorDecorationsCollection: monaco.editor.IEditorDecorationsCollection | undefined;
 let nextSelection: monaco.IRange | undefined;
 let isRecreatingModel = false;
@@ -115,9 +116,10 @@ export const clearEditorCommands = () => {
   editorCommands = [];
 };
 
-export const setEditorDecorations = (decorations: monaco.editor.IModelDeltaDecoration[]) => {
+export const addEditorDecorations = (decorations: monaco.editor.IModelDeltaDecoration[]) => {
+  editorDecorations.push(...decorations);
   editorDecorationsCollection?.clear();
-  editorDecorationsCollection = EDITOR?.createDecorationsCollection(decorations);
+  editorDecorationsCollection = EDITOR?.createDecorationsCollection(editorDecorations);
 };
 
 export const setEditorSelection = (selectionRange: monaco.IRange) => {
@@ -126,6 +128,7 @@ export const setEditorSelection = (selectionRange: monaco.IRange) => {
 };
 
 export const clearEditorDecorations = () => {
+  editorDecorations = [];
   editorDecorationsCollection?.clear();
   editorDecorationsCollection = undefined;
 };
