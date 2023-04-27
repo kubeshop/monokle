@@ -13,6 +13,8 @@ import {setOpenProject} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setShowStartPageLearn, setStartPageMenuOption, toggleNotifications} from '@redux/reducers/ui';
 
+import {NewVersionNotice} from '@molecules';
+
 import {IconButton} from '@atoms';
 
 import {useHelpMenuItems} from '@hooks/menuItemsHooks';
@@ -25,6 +27,8 @@ import * as S from './StartPageHeader.styled';
 
 const StartPageHeader: React.FC = () => {
   const dispatch = useAppDispatch();
+  const isNewVersionAvailable = useAppSelector(state => state.config.isNewVersionAvailable);
+  const isNewVersionNoticeVisible = useAppSelector(state => state.ui.newVersionNotice.isVisible);
   const isStartPageLearnVisible = useAppSelector(state => state.ui.startPage.learn.isVisible);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const projects = useAppSelector(state => _.sortBy(state.config.projects, p => p?.name?.toLowerCase()));
@@ -59,13 +63,17 @@ const StartPageHeader: React.FC = () => {
 
   return (
     <S.StartPageHeaderContainer>
-      <S.LogoContainer>
-        <S.Logo
-          id="monokle-logo-header"
-          src={MonokleKubeshopLogo}
-          alt="Monokle"
-          onClick={() => dispatch(setStartPageMenuOption('new-project'))}
-        />
+      <S.LogoContainer $isNewVersionNoticeVisible={isNewVersionNoticeVisible}>
+        <NewVersionNotice>
+          <S.NewVersionBadge dot={isNewVersionAvailable}>
+            <S.Logo
+              id="monokle-logo-header"
+              src={MonokleKubeshopLogo}
+              alt="Monokle"
+              onClick={() => dispatch(setStartPageMenuOption('new-project'))}
+            />
+          </S.NewVersionBadge>
+        </NewVersionNotice>
       </S.LogoContainer>
 
       <S.SearchContainer>

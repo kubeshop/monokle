@@ -91,14 +91,14 @@ export const Logo = styled.img`
   cursor: pointer;
 `;
 
-export const LogoContainer = styled.div<{$newVersionAvailable: boolean}>`
+export const LogoContainer = styled.div<{$isNewVersionNoticeVisible: boolean}>`
   height: 100%;
   min-width: 50px;
   width: 50px;
   display: flex;
   justify-content: center;
 
-  margin-right: ${({$newVersionAvailable}) => ($newVersionAvailable ? '315px' : '0px')};
+  margin-right: ${({$isNewVersionNoticeVisible}) => ($isNewVersionNoticeVisible ? '308px' : '0px')};
 `;
 
 export const NewVersionBadge = styled(Badge)`

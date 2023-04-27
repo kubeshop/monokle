@@ -55,6 +55,7 @@ const PageHeader = () => {
   const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
   const isNewVersionAvailable = useAppSelector(state => state.config.isNewVersionAvailable);
+  const isNewVersionNoticeVisible = useAppSelector(state => state.ui.newVersionNotice.isVisible);
 
   let timeoutRef = useRef<any>(null);
 
@@ -182,7 +183,7 @@ const PageHeader = () => {
     <S.PageHeaderContainer ref={pageHeaderRef}>
       <S.Header>
         <div style={{display: 'flex', alignItems: 'center'}}>
-          <S.LogoContainer $newVersionAvailable={isNewVersionAvailable}>
+          <S.LogoContainer $isNewVersionNoticeVisible={isNewVersionNoticeVisible}>
             <NewVersionNotice>
               <S.NewVersionBadge dot={isNewVersionAvailable}>
                 <S.Logo id="monokle-logo-header" onClick={onClickLogoHandler} src={MonokleKubeshopLogo} alt="Monokle" />
