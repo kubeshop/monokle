@@ -491,3 +491,21 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 .root-folder-tree-node .ant-tree-title {
   padding-left: 9px;
 }
+
+.new-version-notice-tooltip  {
+  max-width: 310px;
+}
+
+.new-version-notice-tooltip .ant-tooltip-inner {
+  background-color: #5273E0;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 8px;
+}
+
+.new-version-notice-tooltip .ant-tooltip-arrow-content::before {
+  background: #5273E0;
+
+}

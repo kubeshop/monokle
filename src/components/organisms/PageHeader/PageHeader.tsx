@@ -23,7 +23,7 @@ import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {stopPreview} from '@redux/services/preview';
 import store from '@redux/store';
 
-import BranchSelect from '@components/molecules/BranchSelect';
+import {BranchSelect, NewVersionNotice} from '@molecules';
 
 import {useHelpMenuItems} from '@hooks/menuItemsHooks';
 
@@ -54,6 +54,8 @@ const PageHeader = () => {
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
+  const isNewVersionAvailable = useAppSelector(state => state.config.isNewVersionAvailable);
+  const isNewVersionNoticeVisible = useAppSelector(state => state.ui.newVersionNotice.isVisible);
 
   let timeoutRef = useRef<any>(null);
 
@@ -181,8 +183,12 @@ const PageHeader = () => {
     <S.PageHeaderContainer ref={pageHeaderRef}>
       <S.Header>
         <div style={{display: 'flex', alignItems: 'center'}}>
-          <S.LogoContainer>
-            <S.Logo id="monokle-logo-header" onClick={onClickLogoHandler} src={MonokleKubeshopLogo} alt="Monokle" />
+          <S.LogoContainer $isNewVersionNoticeVisible={isNewVersionNoticeVisible}>
+            <S.NewVersionBadge dot={isNewVersionAvailable}>
+              <NewVersionNotice>
+                <S.Logo id="monokle-logo-header" onClick={onClickLogoHandler} src={MonokleKubeshopLogo} alt="Monokle" />
+              </NewVersionNotice>
+            </S.NewVersionBadge>
           </S.LogoContainer>
 
           <S.Divider type="vertical" />

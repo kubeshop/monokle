@@ -361,6 +361,12 @@ export const uiSlice = createSlice({
         filePath: '',
       };
     },
+    showNewVersionNotice: (state: Draft<UiState>) => {
+      state.newVersionNotice.isVisible = true;
+    },
+    hideNewVersionNotice: (state: Draft<UiState>) => {
+      state.newVersionNotice.isVisible = false;
+    },
     setShowOpenProjectAlert: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.showOpenProjectAlert = action.payload;
       electronStore.set('ui.showOpenProjectAlert', action.payload);
@@ -460,6 +466,7 @@ export const {
   collapseResourceKinds,
   expandKustomizeKinds,
   expandResourceKinds,
+  hideNewVersionNotice,
   highlightItem,
   openAboutModal,
   openCreateFileFolderModal,
@@ -498,6 +505,7 @@ export const {
   setStartPageLearnTopic,
   setStartPageMenuOption,
   setTemplateProjectCreate,
+  showNewVersionNotice,
   toggleExpandActionsPaneFooter,
   toggleHelmChart,
   toggleLeftMenu,

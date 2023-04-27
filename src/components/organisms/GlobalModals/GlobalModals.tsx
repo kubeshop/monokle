@@ -16,10 +16,8 @@ import {fetchAppVersion} from '@utils/appVersion';
 import PerformanceIcon from '@assets/PerformanceIcon.svg';
 
 import {AlertEnum} from '@shared/models/alert';
-import {NewVersionCode, Project} from '@shared/models/config';
+import {Project} from '@shared/models/config';
 import {electronStore} from '@shared/utils';
-
-import UpdateNotice from '../UpdateNotice/UpdateNotice';
 
 const GitCloneModal = React.lazy(() => import('@organisms/GitCloneModal'));
 
@@ -70,7 +68,6 @@ const GlobalModals = () => {
   const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
   const isTemplateExplorerVisible = useAppSelector(state => state.ui.templateExplorer.isVisible);
-  const newVersion = useAppSelector(state => state.config.newVersion);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
   const isWelcomeModalVisible = useAppSelector(state => state.ui.welcomeModal.isVisible);
@@ -89,18 +86,6 @@ const GlobalModals = () => {
     setShowReleaseNotes(false);
     electronStore.set('appConfig.lastSeenReleaseNotesVersion', appVersion);
   }, [appVersion]);
-
-  const isUpdateNoticeVisible = useMemo(() => {
-    if (!appVersion) {
-      return false;
-    }
-
-    return (
-      semver.patch(appVersion) === 0 &&
-      ((newVersion.code < NewVersionCode.Idle && !newVersion.data?.initial) ||
-        newVersion.code === NewVersionCode.Downloaded)
-    );
-  }, [appVersion, newVersion]);
 
   useLayoutEffect(() => {
     fetchAppVersion().then(version => {
@@ -183,8 +168,6 @@ const GlobalModals = () => {
 
   return (
     <>
-      {isUpdateNoticeVisible && <UpdateNotice />}
-
       <Suspense fallback={null}>
         {isAboutModalVisible && <AboutModal />}
         {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}

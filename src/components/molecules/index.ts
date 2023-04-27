@@ -1,3 +1,4 @@
+export {default as BranchSelect} from './BranchSelect';
 export {default as ChangeFiltersConfirmModal} from './ChangeFiltersConfirmModal';
 export {default as CheckedResourcesActionsMenu} from './CheckedResourcesActionsMenu';
 export {default as FormEditor} from './FormEditor';
@@ -7,6 +8,7 @@ export {default as Logs} from './Logs';
 export {default as ModalConfirm} from './ModalConfirm';
 export {default as ModalConfirmWithNamespaceSelect} from './ModalConfirmWithNamespaceSelect';
 export {default as Monaco} from './Monaco';
+export {default as NewVersionNotice} from './NewVersionNotice';
 export {default as NotificationMarkdown} from './NotificationMarkdown';
 export {default as PreviewConfigurationDetails} from './PreviewConfigurationDetails';
 export {default as QuickActionCompare} from './QuickActionCompare';

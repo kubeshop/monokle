@@ -95,6 +95,9 @@ type UiState = {
   isScaleModalOpen: boolean;
   isNotificationsOpen: boolean;
   isAboutModalOpen: boolean;
+  newVersionNotice: {
+    isVisible: boolean;
+  };
   newResourceWizard: {
     isOpen: boolean;
     defaultInput?: NewResourceWizardInput;

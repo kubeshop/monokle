@@ -434,6 +434,9 @@ export const configSlice = createSlice({
       state.kubeConfigContextsColors[name] = color;
       electronStore.set('appConfig.kubeConfigContextsColors', state.kubeConfigContextsColors);
     },
+    setIsNewVersionAvailable: (state: Draft<AppConfig>, action: PayloadAction<boolean>) => {
+      state.isNewVersionAvailable = action.payload;
+    },
     updateTelemetry: (
       state: Draft<AppConfig>,
       action: PayloadAction<{disableErrorReporting: boolean; disableEventTracking: boolean}>
@@ -546,6 +549,7 @@ export const {
   toggleEditorPlaceholderVisiblity,
   toggleErrorReporting,
   setEventTracking,
+  setIsNewVersionAvailable,
   toggleProjectPin,
   updateApplicationSettings,
   updateFileExplorerSortOrder,
