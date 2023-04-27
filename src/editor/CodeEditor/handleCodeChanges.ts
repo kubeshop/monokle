@@ -24,7 +24,7 @@ const debouncedCodeSave = debounce(
     // is a file and no resource selected?
     if (selectedPath && !selectedResourceIdentifier) {
       try {
-        dispatch(updateFileEntry({path: selectedPath, text: code}));
+        dispatch(updateFileEntry({path: selectedPath, text: code, isUpdateFromEditor: true}));
         return true;
       } catch (e) {
         log.warn(`Failed to update file ${e}`);
