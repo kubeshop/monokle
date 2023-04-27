@@ -1,17 +1,16 @@
 import * as monaco from 'monaco-editor';
 
-import {selectFile} from '@redux/reducers/main';
 import {selectedHelmValuesSelector} from '@redux/selectors';
 
 import {InlineDecorationTypes} from '@editor/editor.constants';
-import {addEditorCommand, addEditorHover, setEditorDecorations, setEditorSelection} from '@editor/editor.instance';
+import {addEditorCommand, addEditorHover, setEditorDecorations} from '@editor/editor.instance';
 import {EditorCommand} from '@editor/editor.types';
 import {createInlineDecoration} from '@editor/editor.utils';
-import {AppDispatch} from '@shared/models/appDispatch';
 import {HelmTemplatesMapType} from '@shared/models/appState';
 import {HelmChart, HelmValuesFile} from '@shared/models/helm';
 
 import {createEditorEnhancer} from '../createEnhancer';
+import {goToFileAndHighlightCode} from './utils';
 
 interface HelmMatches {
   locationInValueFile: monaco.Range;
@@ -47,6 +46,7 @@ export const helmValuesFileEnhancer = createEditorEnhancer(({state, resourceIden
         afterText: `at Ln ${use.range.startLineNumber}`,
         handler: () => {
           goToFileAndHighlightCode({
+            state,
             range: {
               startLineNumber: use.range.startLineNumber,
               startColumn: use.range.startColumn,
@@ -71,14 +71,6 @@ export const helmValuesFileEnhancer = createEditorEnhancer(({state, resourceIden
 
   setEditorDecorations(decorations);
 });
-
-const goToFileAndHighlightCode = (args: {range: monaco.IRange; filePath: string; dispatch: AppDispatch}) => {
-  const {range, filePath, dispatch} = args;
-  dispatch(selectFile({filePath}));
-  setImmediate(() => {
-    setEditorSelection(range);
-  });
-};
 
 const findWhereHelmValuesAreUsed = (
   helmValuesFile: HelmValuesFile,

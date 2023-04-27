@@ -17,6 +17,7 @@ import {MONACO_YAML_BASE_DIAGNOSTICS_OPTIONS} from '@editor/editor.constants';
 import {getEditor, recreateEditorModel} from '@editor/editor.instance';
 import {editorMounted} from '@editor/editor.slice';
 import {editorEnhancers} from '@editor/enhancers';
+import {helmTemplateFileEnhancer} from '@editor/enhancers/helm/templates';
 import {helmValuesFileEnhancer} from '@editor/enhancers/helm/valuesFile';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceMeta} from '@shared/models/k8sResource';
@@ -68,10 +69,12 @@ export const editorSelectionListener: AppListenerFn = listen => {
         const fileText = await readFile(join(rootFolderPath, selectedFilePath), 'utf8');
         recreateEditorModel(editor, fileText);
         enableFileSchemaValidation(selectedFilePath, getState());
-      }
 
-      if (selectedHelmValuesFilePath) {
-        helmValuesFileEnhancer({state: getState(), editor, resourceIdentifier, dispatch});
+        if (selectedHelmValuesFilePath) {
+          helmValuesFileEnhancer({state: getState(), editor, resourceIdentifier, dispatch});
+        }
+
+        helmTemplateFileEnhancer({state: getState(), editor, resourceIdentifier, dispatch});
       }
     },
   });
