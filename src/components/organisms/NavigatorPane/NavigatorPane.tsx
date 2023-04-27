@@ -5,6 +5,7 @@ import {Dropdown, Tooltip} from 'antd';
 
 import {PlusOutlined} from '@ant-design/icons';
 
+import log from 'loglevel';
 import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
@@ -13,7 +14,7 @@ import {NewResourceTooltip} from '@constants/tooltips';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
 import {isInPreviewModeSelectorNew} from '@redux/selectors';
-import {resourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
+import {activeResourceStorageSelector, navigatorResourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
@@ -120,16 +121,18 @@ export default NavPane;
 
 function CollapseAction() {
   const dispatch = useAppDispatch();
-  const allKinds = useAppSelector(resourceKindsSelector);
+  const activeStorage = useAppSelector(activeResourceStorageSelector);
+  const navigatorKinds = useAppSelector(navigatorResourceKindsSelector);
   const collapsedKinds = useAppSelector(s => s.ui.navigator.collapsedResourceKinds);
 
   const onClick = useCallback(() => {
-    if (collapsedKinds.length === allKinds.length) {
-      dispatch(expandResourceKinds(allKinds));
+    log.info('collapsing', navigatorKinds, collapsedKinds);
+    if (collapsedKinds.length === navigatorKinds.length) {
+      dispatch(expandResourceKinds(navigatorKinds));
       return;
     }
-    dispatch(collapseResourceKinds(allKinds));
-  }, [dispatch, collapsedKinds, allKinds]);
+    dispatch(collapseResourceKinds(navigatorKinds));
+  }, [dispatch, collapsedKinds, navigatorKinds, activeStorage]);
 
   return (
     <CollapseIconWrapper onClick={onClick}>
