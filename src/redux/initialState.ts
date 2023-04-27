@@ -93,7 +93,7 @@ const initialAppConfigState: AppConfig = {
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
   isScanIncludesUpdated: 'applied',
   folderReadsMaxDepth: electronStore.get('appConfig.folderReadsMaxDepth') || 10,
-  isNewVersionAvailable: true,
+  isNewVersionAvailable: false,
   newVersion: {
     code: electronStore.get('appConfig.newVersion') || NewVersionCode.Idle,
     data: {
@@ -177,7 +177,7 @@ const initialUiState: UiState = {
     absolutePathToEntity: '',
   },
   newVersionNotice: {
-    isVisible: true,
+    isVisible: false,
   },
   leftMenu: {
     bottomSelection: uiLeftMenuBottomSelection,
