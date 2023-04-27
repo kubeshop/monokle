@@ -3,7 +3,6 @@ import React, {useCallback, useMemo} from 'react';
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile, selectResource, setActiveEditorTab} from '@redux/reducers/main';
-import {setMonacoEditor} from '@redux/reducers/ui';
 import {
   activeResourceStorageSelector,
   useActiveResourceMetaMap,
@@ -15,9 +14,9 @@ import {getRefRange} from '@utils/refs';
 
 import GraphIcon from '@assets/GraphIcon.svg';
 
+import {editorSetNextSelection, editorSetSelection} from '@editor/editor.slice';
 import {ResourceRef, ResourceRefType, areRefPosEqual} from '@monokle/validation';
 import {ResourceMeta, ResourceMetaMap} from '@shared/models/k8sResource';
-import {MonacoRange} from '@shared/models/ui';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import RefLink from './RefLink';
@@ -128,24 +127,10 @@ const RefsPopoverContent = (props: {
     }
   };
 
-  const makeMonacoSelection = (type: 'resource' | 'file', target: string, range: MonacoRange) => {
-    const newMonacoSelection =
-      type === 'resource'
-        ? {
-            type,
-            resourceId: target,
-            range,
-          }
-        : {type, filePath: target, range};
-    dispatch(
-      setMonacoEditor({
-        selection: newMonacoSelection,
-      })
-    );
-  };
-
   const onLinkClick = (ref: ResourceRef) => {
     trackEvent('explore/navigate_resource_link', {type: ref.type});
+
+    const refRange = getRefRange(ref);
 
     if (ref.type !== ResourceRefType.Incoming) {
       if (
@@ -154,20 +139,18 @@ const RefsPopoverContent = (props: {
         (selection?.type === 'resource' && selection.resourceIdentifier.id !== resource.id)
       ) {
         triggerSelectResource(resource.id);
+        if (refRange) {
+          dispatch(editorSetNextSelection({range: refRange}));
+        }
+      } else if (refRange) {
+        dispatch(editorSetSelection({range: refRange}));
       }
-
-      const refRange = getRefRange(ref);
-
-      if (refRange) {
-        setImmediate(() => {
-          makeMonacoSelection('resource', resource.id, refRange);
-        });
-      }
-
       return;
     }
 
     if (ref.target?.type === 'resource') {
+      let changedSelection = false;
+
       if (!ref.target.resourceId) {
         return;
       }
@@ -178,6 +161,7 @@ const RefsPopoverContent = (props: {
 
       if (selection?.type === 'resource' && selection.resourceIdentifier.id !== targetResourceMeta.id) {
         triggerSelectResource(targetResourceMeta.id);
+        changedSelection = true;
       }
 
       const targetOutgoingRef = targetResourceMeta.refs?.find(
@@ -190,7 +174,11 @@ const RefsPopoverContent = (props: {
 
       const targetOutgoingRefRange = getRefRange(targetOutgoingRef);
       if (targetOutgoingRefRange) {
-        makeMonacoSelection('resource', targetResourceMeta.id, targetOutgoingRefRange);
+        if (changedSelection) {
+          dispatch(editorSetNextSelection({range: targetOutgoingRefRange}));
+        } else {
+          dispatch(editorSetSelection({range: targetOutgoingRefRange}));
+        }
       }
     }
     if (ref.target?.type === 'file') {

@@ -11,6 +11,8 @@ let editorHovers: EditorHover[] = [];
 let editorLinks: EditorLink[] = [];
 let editorCommands: EditorCommand[] = [];
 let editorDecorationsCollection: monaco.editor.IEditorDecorationsCollection | undefined;
+let nextSelection: monaco.IRange | undefined;
+let isRecreatingModel = false;
 
 const modelContentChangeListeners: ((e: monaco.editor.IModelContentChangedEvent) => any)[] = [];
 
@@ -22,6 +24,11 @@ export const mountEditor = (domElement: HTMLElement) => {
   EDITOR = monaco.editor.create(domElement, MONACO_EDITOR_INITIAL_CONFIG);
   EDITOR.onDidChangeModelContent(e => {
     modelContentChangeListeners.forEach(listener => listener(e));
+  });
+  EDITOR.onDidChangeCursorPosition(() => {
+    if (!isRecreatingModel) {
+      consumeNextSelection();
+    }
   });
 };
 
@@ -37,10 +44,29 @@ export const resetEditor = () => {
   clearEditorDecorations();
 };
 
+const consumeNextSelection = () => {
+  if (!nextSelection) {
+    return;
+  }
+  const copy = structuredClone(nextSelection);
+  nextSelection = undefined;
+  return copy;
+};
+
+export const setEditorNextSelection = (range: monaco.IRange) => {
+  nextSelection = range;
+};
+
 export function recreateEditorModel(editor: monaco.editor.ICodeEditor, text: string, language: string = 'yaml') {
+  isRecreatingModel = true;
   resetEditor();
   editor.getModel()?.dispose();
   editor.setModel(monaco.editor.createModel(text, language));
+  const selection = consumeNextSelection();
+  if (selection) {
+    setEditorSelection(selection);
+  }
+  isRecreatingModel = false;
 }
 
 export const getEditor = () => EDITOR;
@@ -96,6 +122,7 @@ export const setEditorDecorations = (decorations: monaco.editor.IModelDeltaDecor
 
 export const setEditorSelection = (selectionRange: monaco.IRange) => {
   EDITOR?.setSelection(selectionRange);
+  EDITOR?.revealLineInCenter(selectionRange.startLineNumber);
 };
 
 export const clearEditorDecorations = () => {
