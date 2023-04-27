@@ -101,7 +101,7 @@ export const updateFileEntry = createAsyncThunk<
                 },
               });
             });
-            state.main.highlights = newHighlights;
+            mainState.highlights = newHighlights;
           }
         }
 
