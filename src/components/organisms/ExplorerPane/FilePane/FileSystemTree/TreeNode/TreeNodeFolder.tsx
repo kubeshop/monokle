@@ -57,11 +57,6 @@ const TreeNodeFolder: React.FC<Props> = props => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onContextMenu={onContextMenu}
-      onClick={e => {
-        if (folderEntry.name === ROOT_FILE_ENTRY) {
-          e.stopPropagation();
-        }
-      }}
     >
       <S.TitleContainer $actionButtonsWidth={actionButtonsWidth} $isHovered={isHovered}>
         <S.TitleText>

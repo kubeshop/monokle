@@ -46,7 +46,7 @@ const ExplorerPane: React.FC = () => {
 export default ExplorerPane;
 
 const Collapse = styled(RawCollapse)`
-  padding-top: 8px;
+  padding-top: 18px;
   box-sizing: border-box;
   height: 100%;
   padding-bottom: 14px;
@@ -57,8 +57,7 @@ const Collapse = styled(RawCollapse)`
   min-height: 0;
 
   .ant-collapse-header {
-    padding-top: 2px !important;
-    padding-bottom: 0 !important;
+    padding: 2px 20px 0px 20px !important;
   }
 `;
 

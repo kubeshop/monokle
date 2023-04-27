@@ -20,7 +20,6 @@ import {InjectedPanelProps} from '@shared/models/explorer';
 import {isEqual} from '@shared/utils/isEqual';
 
 import AccordionPanel from '../AccordionPanel';
-import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
 import * as S from './FilePane.styled';
 import FileSystemTree from './FileSystemTree';
 import {useSetFolderFromMainThread} from './useSetFolderFromMainThread';
@@ -56,79 +55,74 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
       collapsible={isInClusterMode ? 'disabled' : undefined}
       showArrow={false}
       header={
-        <AccordionTitleBarContainer>
-          <TitleBar
-            expandable
-            isOpen={Boolean(isActive)}
-            title="Files"
-            actions={
-              isActive ? (
-                <S.TitleBarActions onClick={e => e.stopPropagation()}>
-                  {isScanExcludesUpdated === 'outdated' && (
-                    <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerChanged}>
-                      <ExclamationCircleOutlined />
-                    </Tooltip>
-                  )}
-                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY}>
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        dispatch(
-                          openCreateFileFolderModal({
-                            rootDir: rootEntry.filePath,
-                            type: 'folder',
-                          })
-                        );
-                      }}
-                      icon={<FolderAddOutlined />}
-                      type="link"
-                    />
+        <TitleBar
+          expandable
+          isOpen={Boolean(isActive)}
+          title="Files"
+          actions={
+            isActive ? (
+              <S.TitleBarActions onClick={e => e.stopPropagation()}>
+                {isScanExcludesUpdated === 'outdated' && (
+                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerChanged}>
+                    <ExclamationCircleOutlined />
                   </Tooltip>
-                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-                    <Button
-                      size="small"
-                      onClick={() => dispatch(setRootFolder(rootEntry.filePath))}
-                      icon={<ReloadOutlined />}
-                      type="link"
-                      disabled={isButtonDisabled}
-                    />
-                  </Tooltip>
-                  <Tooltip
-                    mouseEnterDelay={TOOLTIP_DELAY}
-                    title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}
-                  >
-                    <Button
-                      icon={<Icon name="collapse" />}
-                      onClick={() =>
-                        dispatch(setFileExplorerExpandedFolders(isCollapsed ? allFolderKeysRef.current : []))
-                      }
-                      type="link"
-                      size="small"
-                      disabled={isButtonDisabled}
-                    />
-                  </Tooltip>
-                </S.TitleBarActions>
-              ) : (
-                <TitleBarCount count={filesOnly.length} isActive={false} />
-              )
-            }
-            descriptionStyle={{paddingTop: '10px'}}
-            description={
-              <S.RootFolderText>
-                {isFolderLoading ? (
-                  'Loading...'
-                ) : (
-                  <>
-                    <span id="file-explorer-count">
-                      <b>{filesOnly.length || 0} files</b>
-                    </span>{' '}
-                    in <span id="file-explorer-project-name">{rootEntry?.filePath}</span>
-                  </>
                 )}
-              </S.RootFolderText>
-            }
-          />
-        </AccordionTitleBarContainer>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY}>
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      dispatch(
+                        openCreateFileFolderModal({
+                          rootDir: rootEntry.filePath,
+                          type: 'folder',
+                        })
+                      );
+                    }}
+                    icon={<FolderAddOutlined />}
+                    type="link"
+                  />
+                </Tooltip>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+                  <Button
+                    size="small"
+                    onClick={() => dispatch(setRootFolder(rootEntry.filePath))}
+                    icon={<ReloadOutlined />}
+                    type="link"
+                    disabled={isButtonDisabled}
+                  />
+                </Tooltip>
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}>
+                  <Button
+                    icon={<Icon name="collapse" />}
+                    onClick={() =>
+                      dispatch(setFileExplorerExpandedFolders(isCollapsed ? allFolderKeysRef.current : []))
+                    }
+                    type="link"
+                    size="small"
+                    disabled={isButtonDisabled}
+                  />
+                </Tooltip>
+              </S.TitleBarActions>
+            ) : (
+              <TitleBarCount count={filesOnly.length} isActive={false} />
+            )
+          }
+          descriptionStyle={{paddingTop: '5px'}}
+          description={
+            <S.RootFolderText>
+              {isFolderLoading ? (
+                'Loading...'
+              ) : (
+                <>
+                  <span id="file-explorer-count">
+                    <b>{filesOnly.length || 0} files</b>
+                  </span>{' '}
+                  in <span id="file-explorer-project-name">{rootEntry?.filePath}</span>
+                </>
+              )}
+            </S.RootFolderText>
+          }
+        />
       }
       key={panelKey as CollapsePanelProps['key']}
     >

@@ -11,6 +11,7 @@ import {helmValuesMapByFilePathSelector, projectFileTreeSelector, selectionFileP
 import {getAllParentFolderPaths} from '@utils/files';
 import {useSelectorWithRef} from '@utils/hooks';
 
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {isFileSelection} from '@shared/models/selection';
 import {isHelmValuesFile} from '@shared/utils';
 
@@ -88,7 +89,7 @@ const FileSystemTree: React.FC = () => {
         virtual
         onClick={(mouseEvent, nodeEvent) => {
           mouseEvent.preventDefault();
-          if (nodeEvent.selectable === false) {
+          if (nodeEvent.selectable === false || nodeEvent.key === ROOT_FILE_ENTRY) {
             return;
           }
           if (typeof nodeEvent.key === 'string' && !nodeEvent.disabled) {

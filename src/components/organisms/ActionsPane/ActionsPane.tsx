@@ -423,7 +423,7 @@ const ActionsPane: React.FC = () => {
         <ImageDetails />
       ) : selectedResource || selectedFilePath || selectedHelmValues ? (
         <S.Tabs
-          $height={height - DEFAULT_PANE_TITLE_HEIGHT}
+          $height={height - DEFAULT_PANE_TITLE_HEIGHT - 8}
           defaultActiveKey="source"
           activeKey={activeEditorTab}
           items={tabItems}
