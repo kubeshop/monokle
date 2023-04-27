@@ -44,6 +44,16 @@ export const editorSelectionListener: AppListenerFn = listen => {
         recreateEditorModel(editor, resourceContent.text);
         enableResourceSchemaValidation(resourceMeta, getState());
 
+        if (resourceMeta.storage === 'preview') {
+          editor.updateOptions({
+            readOnly: true,
+          });
+        } else {
+          editor.updateOptions({
+            readOnly: false,
+          });
+        }
+
         const promises = editorEnhancers.map(enhancer =>
           Promise.resolve(enhancer({state: getState(), editor, resourceIdentifier, dispatch}))
         );
