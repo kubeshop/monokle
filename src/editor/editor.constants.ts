@@ -1,5 +1,7 @@
 import {monaco} from 'react-monaco-editor';
 
+import {DiagnosticsOptions} from 'monaco-yaml';
+
 import {Colors} from '@shared/styles/colors';
 
 import {KUBESHOP_MONACO_THEME} from './editor.theme';
@@ -18,6 +20,13 @@ export const MONACO_EDITOR_INITIAL_CONFIG: monaco.editor.IStandaloneEditorConstr
   minimap: {
     enabled: true,
   },
+};
+
+export const MONACO_YAML_BASE_DIAGNOSTICS_OPTIONS: DiagnosticsOptions = {
+  enableSchemaRequest: true,
+  hover: true,
+  completion: true,
+  format: true,
 };
 
 export const MODEL_OWNER = 'monokle';
