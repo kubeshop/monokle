@@ -309,18 +309,21 @@ export const Settings = ({
           </S.Heading>
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={KubeconfigPathTooltip}>
-            <Input.Search
+            <Input
               ref={inputRef}
               onClick={() => focusInput()}
               value={currentKubeConfigPath}
               onChange={onUpdateKubeconfig}
               disabled={isEditingDisabled}
-              loading={!isKubeConfigBrowseSettingsOpen}
             />
           </Tooltip>
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
-            <S.Button onClick={openFileSelect} disabled={isEditingDisabled || !isKubeConfigBrowseSettingsOpen}>
+            <S.Button
+              onClick={openFileSelect}
+              disabled={isEditingDisabled || !isKubeConfigBrowseSettingsOpen}
+              loading={!isKubeConfigBrowseSettingsOpen}
+            >
               Browse
             </S.Button>
           </Tooltip>
