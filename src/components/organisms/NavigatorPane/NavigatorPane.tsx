@@ -66,7 +66,7 @@ const NavPane: React.FC = () => {
             type="secondary"
             title="Kubernetes Resources"
             description={<NavigatorDescription />}
-            descriptionStyle={{paddingTop: '9px'}}
+            descriptionStyle={{paddingTop: '5px'}}
             actions={
               <S.TitleBarRightButtons>
                 <CollapseAction />

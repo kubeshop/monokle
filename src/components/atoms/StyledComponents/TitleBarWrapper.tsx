@@ -1,19 +1,15 @@
 import styled from 'styled-components';
 
-export const TitleBarWrapper = styled.div<{$closable?: boolean; $editor?: boolean; $navigator?: boolean}>`
-  padding: 10px 16px 10px 16px;
+export const TitleBarWrapper = styled.div<{$editor?: boolean; $navigator?: boolean}>`
+  padding: 20px 20px 10px 20px;
 
-  ${({$closable, $editor, $navigator}) => {
-    if ($closable) {
-      return `padding-right: 24px;`;
-    }
-
+  ${({$editor, $navigator}) => {
     if ($editor) {
       return `padding-bottom: 6px;`;
     }
 
     if ($navigator) {
-      return `padding-left: 20px; padding-bottom: 0px;`;
+      return `padding-bottom: 4px;`;
     }
   }};
 `;
