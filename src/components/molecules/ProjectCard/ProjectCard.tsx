@@ -87,7 +87,9 @@ export const ProjectCard: React.FC<IProps> = props => {
             }
 
             dispatch(stopClusterConnection());
-            dispatch(setOpenProject(project.rootFolder));
+            setImmediate(() => {
+              dispatch(setOpenProject(project.rootFolder));
+            });
           },
         });
 

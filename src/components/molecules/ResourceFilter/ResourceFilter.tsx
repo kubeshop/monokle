@@ -349,7 +349,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
         <FilterField name="Contained in file/folder:">
           <TreeSelect
             showSearch
-            disabled={isInPreviewMode || areFiltersDisabled}
+            disabled={isInPreviewMode || isInClusterMode || areFiltersDisabled}
             value={localResourceFilter.fileOrFolderContainedIn}
             defaultValue={ROOT_FILE_ENTRY}
             onChange={updateFileOrFolderContainedIn}
