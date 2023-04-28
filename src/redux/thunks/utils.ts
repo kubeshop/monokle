@@ -15,7 +15,7 @@ import {ResourceMeta} from '@shared/models/k8sResource';
 
 /**
  * Preprocess for proper serialization:
- * - remove null values in timestamp properties
+ * - remove timestamps with null values
  * - change Date objects to properly quoted strings
  */
 
@@ -34,6 +34,7 @@ function preprocessClusterResource(item: any) {
       }
     },
     Scalar(key, node, path) {
+      // change dates to properly formatted and quoted strings
       if (node.value instanceof Date) {
         node.value = node.value.toISOString();
         node.type = 'QUOTE_SINGLE';
