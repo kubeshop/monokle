@@ -428,16 +428,19 @@ export const uiSlice = createSlice({
         state.leftMenu.activityBeforeClusterConnect = state.leftMenu.selection;
         state.leftMenu.selection = 'dashboard';
         state.leftMenu.isActive = true;
+        state.navigator.collapsedResourceKinds = [];
       })
       .addCase(stopClusterConnection.fulfilled, state => {
         state.leftMenu.selection = state.leftMenu.activityBeforeClusterConnect ?? 'explorer';
         state.leftMenu.activityBeforeClusterConnect = undefined;
+        state.navigator.collapsedResourceKinds = [];
       })
       .addCase(connectCluster.rejected, state => {
         state.leftMenu.selection = 'dashboard';
       })
       .addCase(setOpenProject.fulfilled, state => {
         state.leftMenu.selection = 'explorer';
+        state.navigator.collapsedResourceKinds = [];
       });
   },
 });
