@@ -5,7 +5,6 @@ import {Dropdown, Tooltip} from 'antd';
 
 import {PlusOutlined} from '@ant-design/icons';
 
-import log from 'loglevel';
 import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
@@ -123,12 +122,10 @@ export default NavPane;
 
 function CollapseAction() {
   const dispatch = useAppDispatch();
-  // const activeStorage = useAppSelector(activeResourceStorageSelector);
   const navigatorKinds = useRefSelector(navigatorResourceKindsSelector);
   const collapsedKinds = useRefSelector(s => s.ui.navigator.collapsedResourceKinds);
 
   const onClick = useCallback(() => {
-    log.info('collapsing', navigatorKinds, collapsedKinds);
     if (collapsedKinds.current.length === navigatorKinds.current.length) {
       dispatch(expandResourceKinds(navigatorKinds.current));
       return;
