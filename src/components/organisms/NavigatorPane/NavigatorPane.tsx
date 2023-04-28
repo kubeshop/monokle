@@ -8,7 +8,7 @@ import {PlusOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {NewResourceTooltip} from '@constants/tooltips';
+import {DisabledAddResourceTooltip, NewResourceTooltip} from '@constants/tooltips';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -47,6 +47,11 @@ const NavPane: React.FC = () => {
   const height = usePaneHeight();
   const newResourceMenuItems = useNewResourceMenuItems();
 
+  const isAddResourceDisabled = useMemo(
+    () => !isFolderOpen || isInPreviewMode || isInClusterMode,
+    [isFolderOpen, isInClusterMode, isInPreviewMode]
+  );
+
   const resourceFilterButtonHandler = useCallback(() => {
     dispatch(toggleResourceFilters());
   }, [dispatch]);
@@ -72,25 +77,35 @@ const NavPane: React.FC = () => {
             actions={
               <S.TitleBarRightButtons>
                 <CollapseAction />
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
-                  <Dropdown
-                    trigger={['click']}
-                    menu={{items: newResourceMenuItems}}
-                    overlayClassName="dropdown-secondary"
-                    disabled={!isFolderOpen || isInPreviewMode || isInClusterMode}
+
+                <Dropdown
+                  trigger={['click']}
+                  menu={{items: newResourceMenuItems}}
+                  overlayClassName="dropdown-secondary"
+                  disabled={isAddResourceDisabled}
+                >
+                  <Tooltip
+                    mouseEnterDelay={TOOLTIP_DELAY}
+                    title={
+                      isAddResourceDisabled
+                        ? DisabledAddResourceTooltip({
+                            type: isInClusterMode ? 'cluster' : isInPreviewMode ? 'preview' : 'other',
+                          })
+                        : NewResourceTooltip
+                    }
                   >
                     <S.PlusButton
                       id="create-resource-button"
-                      $disabled={!isFolderOpen || isInPreviewMode || isInClusterMode}
+                      $disabled={isAddResourceDisabled}
                       $highlighted={isHighlighted}
                       className={isHighlighted ? 'animated-highlight' : ''}
-                      disabled={!isFolderOpen || isInPreviewMode || isInClusterMode}
+                      disabled={isAddResourceDisabled}
                       icon={<PlusOutlined />}
                       size="small"
                       type="link"
                     />
-                  </Dropdown>
-                </Tooltip>
+                  </Tooltip>
+                </Dropdown>
               </S.TitleBarRightButtons>
             }
           />
