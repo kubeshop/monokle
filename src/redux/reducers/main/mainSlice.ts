@@ -92,6 +92,7 @@ export type UpdateMultipleResourcesPayload = {
 }[];
 
 export type UpdateFileEntryPayload = {
+  isUpdateFromEditor?: boolean; // this is used by the editor listeners
   path: string;
   text: string;
 };

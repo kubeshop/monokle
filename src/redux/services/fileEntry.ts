@@ -331,14 +331,6 @@ export function getAbsoluteFilePath(relativePath: string, fileMap: FileMapType) 
 }
 
 /**
- * Returns the relative path for the specified absolute path
- */
-export function getRelativeFilePath(absolutePath: string) {
-  const pathArr = absolutePath.split('/');
-  return `/${pathArr[pathArr.length - 1]}`;
-}
-
-/**
  * Returns the absolute path to the specified FileEntry
  */
 
@@ -508,7 +500,7 @@ export function reloadFile(
 
   if (fileEntry.timestamp && absolutePathTimestamp && absolutePathTimestamp <= fileEntry.timestamp) {
     log.info(`ignoring changed file ${absolutePath} because of timestamp`);
-    return;
+    return false;
   }
 
   // const fileStats = getFileStats(absolutePath);
@@ -528,6 +520,8 @@ export function reloadFile(
     selectFileReducer(state, {filePath: fileEntry.filePath});
     state.selectionOptions.shouldEditorReload = true;
   }
+
+  return true;
 }
 
 /**

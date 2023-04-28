@@ -24,6 +24,8 @@
       "@utils": ["src/utils/"],
       "@shared": ["src/shared/"],
       "@shared/*": ["src/shared/*"],
+      "@editor": ["src/editor/"],
+      "@editor/*": ["src/editor/*"],
       "@src/*": ["src/*"],
       "@src": ["src/"],
       "@root/*": ["./*"],
