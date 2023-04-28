@@ -15,7 +15,7 @@ import {ResourceMeta} from '@shared/models/k8sResource';
 
 /**
  * Preprocess for proper serialization:
- * - remove timestamps with null values
+ * - remove pairs with null values
  * - change Date objects to properly quoted strings
  */
 
@@ -23,13 +23,7 @@ function preprocessClusterResource(item: any) {
   let doc = new Document(item, {schema: 'yaml-1.1'});
   visit(doc, {
     Pair(_, pair) {
-      if (
-        pair.key instanceof Scalar &&
-        pair.value instanceof Scalar &&
-        pair.value.value === null &&
-        // should we even check this? or just remove all pairs with null values?
-        pair.key.value.toString().toLowerCase().includes('timestamp')
-      ) {
+      if (pair.value instanceof Scalar && pair.value.value === null) {
         return visit.REMOVE;
       }
     },
