@@ -64,7 +64,10 @@ function determineError(reason: string, contextId: ContextId): MonokleClusterErr
   // Networking / OS errors between proxy and API server.
   // These can happen when a socket hangs up or a port refuses a connection.
   const isLocal = reason.includes('127.0.0.1') || reason.includes('0.0.0.0');
-  const isRefused = reason.includes('connect: connection refused') || reason.includes('ECONNREFUSED');
+  const isRefused =
+    reason.includes('connect: connection refused') ||
+    reason.includes('ECONNREFUSED') ||
+    reason.includes('No connection could be made because the target machine actively refused it');
   if (isLocal && isRefused) {
     return getMonokleClusterError('local-connection-refused', contextId);
   }

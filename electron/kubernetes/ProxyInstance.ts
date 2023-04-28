@@ -96,7 +96,12 @@ export class ProxyInstance {
       const msg = data?.toString() ?? '';
 
       if (!proxySignal.isResolved) {
-        if (msg.includes('bind: address already in use')) {
+        if (
+          msg.includes('bind: address already in use') ||
+          msg.includes(
+            'bind: Only one usage of each socket address (protocol/network address/port) is normally permitted'
+          )
+        ) {
           proxySignal.reject(new Error('EADDRINUSE'));
         } else if (msg.includes('error: The gcp auth plugin has been removed')) {
           proxySignal.reject(new Error('MONOKLE_PROXY_GCP_LEGACY_PLUGIN'));
