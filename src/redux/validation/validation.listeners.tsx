@@ -19,6 +19,7 @@ import {
   addResource,
   clearPreview,
   clearPreviewAndSelectionHistory,
+  deleteMultipleClusterResources,
   multiplePathsRemoved,
   updateMultipleClusterResources,
 } from '@redux/reducers/main';
@@ -89,6 +90,7 @@ const validateListener: AppListenerFn = listen => {
       runPreviewConfiguration.rejected,
       previewSavedCommand.rejected,
       stopClusterConnection.fulfilled,
+      deleteMultipleClusterResources,
       multiplePathsRemoved,
       clearPreviewAndSelectionHistory,
       clearPreview
