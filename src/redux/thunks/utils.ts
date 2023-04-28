@@ -1,13 +1,11 @@
 import * as k8s from '@kubernetes/client-node';
 
 import invariant from 'tiny-invariant';
-import {stringify} from 'yaml';
+import {Document, Scalar, visit} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
-
-import {stringifyK8sResource} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -16,21 +14,49 @@ import {K8sObject} from '@shared/models/k8s';
 import {ResourceMeta} from '@shared/models/k8sResource';
 
 /**
+ * Preprocess for proper serialization:
+ * - remove pairs with null values
+ * - change Date objects to properly quoted strings
+ */
+
+function preprocessClusterResource(item: any) {
+  let doc = new Document(item, {schema: 'yaml-1.1'});
+  visit(doc, {
+    Pair(_, pair) {
+      if (pair.value instanceof Scalar && pair.value.value === null) {
+        return visit.REMOVE;
+      }
+    },
+    Scalar(key, node, path) {
+      // change dates to properly formatted and quoted strings
+      if (node.value instanceof Date) {
+        node.value = node.value.toISOString();
+        node.type = 'QUOTE_SINGLE';
+      }
+    },
+  });
+  return doc;
+}
+
+/**
  * Utility to convert list of objects returned by k8s api to a single YAML document
  */
 
 export function getK8sObjectsAsYaml(items: any[], kind?: string, apiVersion?: string): string {
-  return items
+  const result = items
     .map(item => {
       delete item.metadata?.managedFields;
 
+      let doc = preprocessClusterResource(item);
       if (kind && apiVersion && !item.apiVersion && !item.kind) {
-        return `apiVersion: ${apiVersion}\nkind: ${kind}\n${stringify(item)}`;
+        return `apiVersion: ${apiVersion}\nkind: ${kind}\n${doc.toString()}`;
       }
 
-      return stringifyK8sResource(item);
+      return doc.toString();
     })
     .join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
+
+  return result;
 }
 
 /**
