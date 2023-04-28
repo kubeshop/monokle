@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.10](https://github.com/kubeshop/monokle/compare/v2.0.10-nightly-2023-04-28.0...v2.0.10) (2023-04-28)
+
+
+### Features
+
+* add tooltip ([94dc35c](https://github.com/kubeshop/monokle/commit/94dc35cbb23b4bd861aed05c1c2bd0de3bf78d2c))
+* code editor schema validation ([10dd39d](https://github.com/kubeshop/monokle/commit/10dd39dd00491c6a0a1ab901487c92abe5b121c5))
+* editor listeners for refs processing and validation ([0c6996f](https://github.com/kubeshop/monokle/commit/0c6996f5023f601525cc944d831390324a73e546))
+* helm template files code enhancer ([ab72186](https://github.com/kubeshop/monokle/commit/ab721868b97030e26dff5f7276e942e795651695))
+* helm values editor enhancer ([1cde39b](https://github.com/kubeshop/monokle/commit/1cde39b98fbfe32a180abcead3d05f881136731d))
+* resource symbols code enhancer ([e2114d1](https://github.com/kubeshop/monokle/commit/e2114d14336cd7c5f5511c9350176e713c3ac949))
+
+
+### Bug Fixes
+
+* clear collapsed resources kinds on cluster connect/disconnect ([39ad1bf](https://github.com/kubeshop/monokle/commit/39ad1bf74ec3225a5fa1ad36cf3eae687e391d43))
+* disable add resource in cluster mode ([56d7fee](https://github.com/kubeshop/monokle/commit/56d7fee3ad8ad455cd381f7a10e226f9c4a010b7))
+* dispose editor model if selection is cleared ([845adb8](https://github.com/kubeshop/monokle/commit/845adb841f48e4fe1f6fdfad4d521a0b77668d9b))
+* don't try expanding on root click ( file tree ) ([10c3a33](https://github.com/kubeshop/monokle/commit/10c3a337c7a233bf496c83a8edc517ec0543430d))
+* editor file update ([7f9e740](https://github.com/kubeshop/monokle/commit/7f9e7400143f2f9ede3aeccb88cc2815b7c9ee8b))
+* editor file updates ([bbc5686](https://github.com/kubeshop/monokle/commit/bbc56867bd2533e972bb59d71062b7b50ad798f4))
+* editor next selection on recreate model ([73ca808](https://github.com/kubeshop/monokle/commit/73ca8081d7d982a8c1251f726dad4862a9acad7a))
+* editor resource refs enhancer ([86fe816](https://github.com/kubeshop/monokle/commit/86fe816e8edbfa3640cddb5dd8660e224ddda54e))
+* editor text on updateMultipleClusterResources ([02303bd](https://github.com/kubeshop/monokle/commit/02303bd0b7d40574b7148329873839c90a509934))
+* formatting or removal of timestamp properties retrieved from cluster ([797fe34](https://github.com/kubeshop/monokle/commit/797fe34cbbc4344265e109416ac137dd58047292))
+* helm values file code selection & enhancer ([312b044](https://github.com/kubeshop/monokle/commit/312b04460644003bd048315ca0584431bce51ceb))
+* improved comments ([d063c21](https://github.com/kubeshop/monokle/commit/d063c21b4d046276b115ba92b02b6d6ff86db83f))
+* initial fix for expanding all kinds ([f7648b5](https://github.com/kubeshop/monokle/commit/f7648b520a89d683db334b1f562962bc7117e725))
+* read-only state for editor ([205e1cb](https://github.com/kubeshop/monokle/commit/205e1cb50158851fd40d802e8ee0b18849690dfa))
+* rehydrate editor state on mount ([7a1ffef](https://github.com/kubeshop/monokle/commit/7a1ffefa3989783f80471fbe2599e39dde7862dc))
+* removal all pairs with null values ([4a9354c](https://github.com/kubeshop/monokle/commit/4a9354c9f712605f7447c6acc65074786380eb7c))
+* review comments ([db7c00e](https://github.com/kubeshop/monokle/commit/db7c00e77b4b05080aa5a75c01039340e2af0c8a))
+* selection after deleteMultipleClusteResources ([2bc3810](https://github.com/kubeshop/monokle/commit/2bc3810543c52f3e2984fbb082212b89694e92b1))
+* set highlights on updateFileEntry ([0d59952](https://github.com/kubeshop/monokle/commit/0d59952fbeffb2d345e8fb81a30c7db54e8ae5a8))
+* transferred resources when switching projects ([9354a8e](https://github.com/kubeshop/monokle/commit/9354a8e25ff8526ddcb796773dbb8c4cc7beae95))
+* validate on deleteMultipleClusterResources ([b78c30d](https://github.com/kubeshop/monokle/commit/b78c30d12b9a3a2fa39766427787c11d534f2869))
+* validation on path remove & cluster update ([d371490](https://github.com/kubeshop/monokle/commit/d37149000bcbc48d6d670c0165c19ffdd450cf96))
+
 ### [2.0.9](https://github.com/kubeshop/monokle/compare/v2.0.9-nightly-2023-04-20.0...v2.0.9) (2023-04-20)
 
 
