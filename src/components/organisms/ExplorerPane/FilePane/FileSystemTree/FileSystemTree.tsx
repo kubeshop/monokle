@@ -70,6 +70,10 @@ const FileSystemTree: React.FC = () => {
         ref={treeRef}
         expandedKeys={fileExplorerExpandedFolders}
         onExpand={(keys, info) => {
+          if (info.node.key === ROOT_FILE_ENTRY) {
+            return;
+          }
+
           dispatch(
             setFileExplorerExpandedFolders(
               keys.filter(
