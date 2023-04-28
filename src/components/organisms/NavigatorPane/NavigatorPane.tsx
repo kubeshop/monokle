@@ -14,7 +14,7 @@ import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
 import {isInPreviewModeSelectorNew} from '@redux/selectors';
-import {resourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
+import {navigatorResourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
@@ -22,6 +22,8 @@ import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrappe
 
 import {useNewResourceMenuItems} from '@hooks/menuItemsHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
+
+import {useRefSelector} from '@utils/hooks';
 
 import {Icon, ResizableRowsPanel, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -137,16 +139,16 @@ export default NavPane;
 
 function CollapseAction() {
   const dispatch = useAppDispatch();
-  const allKinds = useAppSelector(resourceKindsSelector);
-  const collapsedKinds = useAppSelector(s => s.ui.navigator.collapsedResourceKinds);
+  const navigatorKinds = useRefSelector(navigatorResourceKindsSelector);
+  const collapsedKinds = useRefSelector(s => s.ui.navigator.collapsedResourceKinds);
 
   const onClick = useCallback(() => {
-    if (collapsedKinds.length === allKinds.length) {
-      dispatch(expandResourceKinds(allKinds));
+    if (collapsedKinds.current.length === navigatorKinds.current.length) {
+      dispatch(expandResourceKinds(navigatorKinds.current));
       return;
     }
-    dispatch(collapseResourceKinds(allKinds));
-  }, [dispatch, collapsedKinds, allKinds]);
+    dispatch(collapseResourceKinds(navigatorKinds.current));
+  }, [dispatch, collapsedKinds, navigatorKinds]);
 
   return (
     <CollapseIconWrapper onClick={onClick}>
