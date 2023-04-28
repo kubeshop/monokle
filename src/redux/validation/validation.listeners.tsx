@@ -14,7 +14,15 @@ import {
   updateProjectK8sVersion,
 } from '@redux/appConfig';
 import {AppListenerFn} from '@redux/listeners/base';
-import {addMultipleResources, addResource, clearPreview, clearPreviewAndSelectionHistory} from '@redux/reducers/main';
+import {
+  addMultipleResources,
+  addResource,
+  clearPreview,
+  clearPreviewAndSelectionHistory,
+  deleteMultipleClusterResources,
+  multiplePathsRemoved,
+  updateMultipleClusterResources,
+} from '@redux/reducers/main';
 import {setIsInQuickClusterMode} from '@redux/reducers/ui';
 import {getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {previewSavedCommand} from '@redux/services/previewCommand';
@@ -82,6 +90,8 @@ const validateListener: AppListenerFn = listen => {
       runPreviewConfiguration.rejected,
       previewSavedCommand.rejected,
       stopClusterConnection.fulfilled,
+      deleteMultipleClusterResources,
+      multiplePathsRemoved,
       clearPreviewAndSelectionHistory,
       clearPreview
     ),
@@ -143,6 +153,7 @@ const incrementalValidationListener: AppListenerFn = listen => {
       addMultipleResources,
       updateResource.fulfilled,
       updateMultipleResources.fulfilled,
+      updateMultipleClusterResources,
       updateFileEntry.fulfilled,
       removeResources.fulfilled,
       multiplePathsAdded.fulfilled,
@@ -168,7 +179,7 @@ const incrementalValidationListener: AppListenerFn = listen => {
         resourceIdentifiers = [_action.payload];
       }
 
-      if (isAnyOf(addMultipleResources)(_action)) {
+      if (isAnyOf(addMultipleResources, updateMultipleClusterResources)(_action)) {
         resourceIdentifiers = _action.payload;
       }
 
