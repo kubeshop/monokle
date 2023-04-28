@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useMemo} from 'react';
 
 import {Button, Tooltip} from 'antd';
 
@@ -7,6 +7,7 @@ import {PlusOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
+import {DisabledAddResourceTooltip} from '@constants/tooltips';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -27,7 +28,8 @@ const ButtonContainer = styled.span`
   display: flex;
   align-items: center;
   padding: 0 4px;
-  margin-right: 2px;
+  margin-right: 16px;
+
   & .ant-btn-sm {
     height: 20px;
     width: 20px;
@@ -48,6 +50,8 @@ const KindSuffix: React.FC<Props> = props => {
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isSectionCollapsed = useAppSelector(state => state.ui.navigator.collapsedResourceKinds.includes(resourceKind));
 
+  const isAddResourceDisabled = useMemo(() => isInPreviewMode || isInClusterMode, [isInClusterMode, isInPreviewMode]);
+
   const createResource = useCallback(() => {
     if (!resourceKind) {
       return;
@@ -67,13 +71,20 @@ const KindSuffix: React.FC<Props> = props => {
   return (
     <SuffixContainer>
       <ButtonContainer>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={`Create a new ${resourceKind}`}>
+        <Tooltip
+          mouseEnterDelay={TOOLTIP_DELAY}
+          title={
+            isAddResourceDisabled
+              ? DisabledAddResourceTooltip({type: isInClusterMode ? 'cluster' : 'preview', kind: resourceKind})
+              : `Create a new ${resourceKind}`
+          }
+        >
           <Button
             icon={<PlusOutlined />}
             type="link"
             onClick={createResource}
             size="small"
-            disabled={isInPreviewMode || isInClusterMode}
+            disabled={isAddResourceDisabled}
             style={{color: isSelected && isSectionCollapsed ? Colors.blackPure : undefined}}
           />
         </Tooltip>

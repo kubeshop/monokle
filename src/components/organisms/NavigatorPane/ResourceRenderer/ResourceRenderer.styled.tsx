@@ -18,14 +18,16 @@ export const ItemContainer = styled.span<ItemContainerProps>`
     min-width: 0;
   }
   padding-left: 30px;
-  padding-right: 8px;
+  padding-right: 20px;
   margin-bottom: 2px;
   cursor: pointer;
+
   ${props => {
     if (props.isLastItem) {
       return `margin-bottom: 12px;`;
     }
   }}
+
   ${props => {
     if (!props.isSelected && props.isHighlighted) {
       if (props.isHovered) {
