@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {NewResourceTooltip} from '@constants/tooltips';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
 import {isInPreviewModeSelectorNew} from '@redux/selectors';
@@ -36,6 +37,7 @@ const NavPane: React.FC = () => {
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
@@ -75,14 +77,14 @@ const NavPane: React.FC = () => {
                     trigger={['click']}
                     menu={{items: newResourceMenuItems}}
                     overlayClassName="dropdown-secondary"
-                    disabled={!isFolderOpen || isInPreviewMode}
+                    disabled={!isFolderOpen || isInPreviewMode || isInClusterMode}
                   >
                     <S.PlusButton
                       id="create-resource-button"
-                      $disabled={!isFolderOpen || isInPreviewMode}
+                      $disabled={!isFolderOpen || isInPreviewMode || isInClusterMode}
                       $highlighted={isHighlighted}
                       className={isHighlighted ? 'animated-highlight' : ''}
-                      disabled={!isFolderOpen || isInPreviewMode}
+                      disabled={!isFolderOpen || isInPreviewMode || isInClusterMode}
                       icon={<PlusOutlined />}
                       size="small"
                       type="link"
