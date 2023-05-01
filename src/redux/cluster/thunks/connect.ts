@@ -25,8 +25,11 @@ type ConnectResponse = {
 export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, ThunkApi>(
   'cluster/connect',
   async (payload, {getState, dispatch, rejectWithValue}) => {
-    const lastNamespaceLoaded = getState().main.clusterConnectionOptions?.lastNamespaceLoaded;
-
+    let lastNamespaceLoaded;
+    const lastConnectionContext = getState().main.clusterConnection?.context;
+    if (lastConnectionContext === payload.context) {
+      lastNamespaceLoaded = getState().main.clusterConnectionOptions?.lastNamespaceLoaded;
+    }
     // Ping for healthy connection
     await dispatch(setupCluster());
     const contextId = selectCurrentContextId(getState());
