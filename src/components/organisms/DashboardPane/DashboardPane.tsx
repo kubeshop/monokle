@@ -2,7 +2,7 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Skeleton} from 'antd';
 
-import {groupBy, size} from 'lodash';
+import {groupBy, size, uniq} from 'lodash';
 
 import navSectionNames from '@constants/navSectionNames';
 
@@ -31,7 +31,6 @@ const DashboardPane = () => {
   const registeredKindHandlers = useAppSelector(registeredKindHandlersSelector);
   const clusterConnectionOptions = useRefSelector(state => state.main.clusterConnectionOptions);
   const clusterResourceMeta = useResourceMetaMap('cluster');
-
   const problems = useValidationSelector(problemsSelector);
 
   const groupedResources = useMemo(() => groupBy(clusterResourceMeta, 'kind'), [clusterResourceMeta]);
@@ -65,13 +64,15 @@ const DashboardPane = () => {
       },
     ];
 
-    navSectionNames.representation[navSectionNames.K8S_RESOURCES].forEach((path: string) => {
-      tempMenu.push({
-        key: path,
-        label: path,
-        children: [],
+    navSectionNames.representation[navSectionNames.K8S_RESOURCES]
+      .filter(r => r !== navSectionNames.CUSTOM)
+      .forEach((path: string) => {
+        tempMenu.push({
+          key: path,
+          label: path,
+          children: [],
+        });
       });
-    });
 
     registeredKindHandlers.forEach((kindHandler: ResourceKindHandler) => {
       const parent: DashboardMenu | undefined = tempMenu.find(m => m.key === kindHandler.navigatorPath[1]);
@@ -99,8 +100,36 @@ const DashboardPane = () => {
       }
     });
 
+    const kinds = uniq(Object.keys(groupedResources));
+    const nonCustomKinds = tempMenu.map(i => i.children?.map(t => t.label)).flat();
+    const customKinds = kinds.filter(k => !nonCustomKinds.includes(k));
+    const customResources: DashboardMenu = {
+      key: navSectionNames.CUSTOM,
+      label: navSectionNames.CUSTOM,
+      children: [],
+    };
+
+    if (customKinds.length > 0) {
+      customKinds.forEach(kind => {
+        customResources.children?.push({
+          key: `${kind}`,
+          label: kind,
+          children: [],
+          resourceCount: size(groupedResources[kind]) ?? 0,
+        });
+      });
+      tempMenu.push(customResources);
+    }
     dispatch(setDashboardMenuList(tempMenu));
-  }, [registeredKindHandlers, leftMenu, selectedNamespace, dispatch, getProblemCount, groupedResources]);
+  }, [
+    registeredKindHandlers,
+    leftMenu,
+    selectedNamespace,
+    dispatch,
+    getProblemCount,
+    groupedResources,
+    clusterResourceMeta,
+  ]);
 
   if (clusterConnectionOptions.current.isLoading) {
     return (
