@@ -13,7 +13,7 @@ import 'monaco-yaml';
 import path from 'path';
 import {Document, ParsedNode, isMap} from 'yaml';
 
-import {isInClusterModeSelector, settingsSelector} from '@redux/appConfig';
+import {settingsSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   editorHasReloadedSelectedPath,
@@ -49,7 +49,7 @@ import {ResourceFilterType} from '@shared/models/appState';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {ResourceSelection} from '@shared/models/selection';
 import {MonacoRange, NewResourceWizardInput} from '@shared/models/ui';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './Monaco.styled';
 import {EDITOR_DISPOSABLES} from './disposables';

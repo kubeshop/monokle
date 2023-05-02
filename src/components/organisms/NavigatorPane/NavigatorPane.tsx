@@ -10,7 +10,6 @@ import styled from 'styled-components';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {DisabledAddResourceTooltip, NewResourceTooltip} from '@constants/tooltips';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
 import {navigatorResourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
@@ -27,7 +26,7 @@ import {useRefSelector} from '@utils/hooks';
 import {Icon, ResizableRowsPanel, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Colors} from '@shared/styles';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import NavigatorDescription from './NavigatorDescription';
 import * as S from './NavigatorPane.styled';

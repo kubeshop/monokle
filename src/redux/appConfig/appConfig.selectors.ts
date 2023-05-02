@@ -2,13 +2,13 @@ import {createSelector} from '@reduxjs/toolkit';
 
 import {has} from 'lodash';
 
-import {selectKubeContext, selectKubeconfig} from '@redux/cluster/selectors';
 import {createDeepEqualSelector} from '@redux/selectors/utils';
 import {mergeConfigs, populateProjectConfig} from '@redux/services/projectConfig';
 
 import {HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
 import {RootState} from '@shared/models/rootState';
 import {Colors} from '@shared/styles';
+import {selectKubeContext, selectKubeconfig} from '@shared/utils/cluster/selectors';
 
 export {activeProjectSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
@@ -89,14 +89,6 @@ export const selectHelmConfig = (state: RootState, id?: string): HelmPreviewConf
 export const selectCurrentKubeConfig = createSelector(
   [(state: RootState) => state.config.projectConfig?.kubeConfig, (state: RootState) => state.config.kubeConfig],
   (projectKubeConfig, kubeConfig) => projectKubeConfig || kubeConfig
-);
-
-export const isInClusterModeSelector = createSelector(
-  selectKubeContext,
-  (state: RootState) => state.main.clusterConnection?.context,
-  (context, clusterConnectionContext): boolean => {
-    return context !== undefined && clusterConnectionContext !== undefined && clusterConnectionContext === context.name;
-  }
 );
 
 export const isProjectKubeConfigSelector = createSelector(

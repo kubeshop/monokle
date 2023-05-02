@@ -1,13 +1,10 @@
 import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
-import {
-  currentClusterAccessSelector,
-  isInClusterModeSelector,
-  kubeConfigContextSelector,
-  kubeConfigPathSelector,
-} from '@redux/appConfig';
+import {currentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 import {getTargetClusterNamespaces} from '@redux/services/resource';
+
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 export const ALL_NAMESPACES = '<all>';
 export const NO_NAMESPACE = '<none>';

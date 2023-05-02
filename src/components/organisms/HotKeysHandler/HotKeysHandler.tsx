@@ -4,7 +4,6 @@ import {useHotkeys} from 'react-hotkeys-hook';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {
-  isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
@@ -41,7 +40,7 @@ import {useFeatureFlags} from '@utils/features';
 import {useRefSelector} from '@utils/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const HotKeysHandler = () => {
   const {ShowRightMenu} = useFeatureFlags();

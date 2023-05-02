@@ -7,7 +7,6 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 import path from 'path';
 import styled from 'styled-components';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
@@ -21,7 +20,7 @@ import {deleteFileEntry, dispatchDeleteAlert} from '@utils/files';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {HelmValuesFile} from '@shared/models/helm';
 import {Colors} from '@shared/styles/colors';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 import {showItemInFolder} from '@shared/utils/shell';
 
 type IProps = {

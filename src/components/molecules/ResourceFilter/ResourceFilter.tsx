@@ -8,7 +8,7 @@ import {isEmpty, omit, uniqWith} from 'lodash';
 import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES, TOOLTIP_DELAY} from '@constants/constants';
 import {QuickFilterTooltip} from '@constants/tooltips';
 
-import {isInClusterModeSelector, kubeConfigContextSelector} from '@redux/appConfig';
+import {kubeConfigContextSelector} from '@redux/appConfig';
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
@@ -29,7 +29,7 @@ import {Filter, FilterButton, FilterField, FilterHeader, KeyValueInput, NewKeyVa
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {isEqual} from '@shared/utils/isEqual';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ResourceFilter.styled';
 

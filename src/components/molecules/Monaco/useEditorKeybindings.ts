@@ -1,7 +1,6 @@
 import {useCallback, useEffect, useRef} from 'react';
 import {monaco} from 'react-monaco-editor';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard, openQuickSearchActionsPopup} from '@redux/reducers/ui';
 
@@ -9,7 +8,7 @@ import {restartEditorPreview} from '@utils/restartEditorPreview';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 function useEditorKeybindings(
   editorRef: React.MutableRefObject<monaco.editor.IStandaloneCodeEditor | null>,

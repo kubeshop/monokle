@@ -1,11 +1,10 @@
 import styled from 'styled-components';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openReplaceImageModal} from '@redux/reducers/ui';
 
 import {Colors} from '@shared/styles/colors';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 type IProps = {
   id: string;

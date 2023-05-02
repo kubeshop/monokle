@@ -24,8 +24,6 @@ import {
   KustomizeCommandTooltip,
 } from '@constants/tooltips';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
-import {selectKubeconfig} from '@redux/cluster/selectors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -38,7 +36,9 @@ import {doesSchemaExist} from '@utils/index';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {K8S_VERSIONS} from '@shared/constants/k8s';
 import {ProjectConfig} from '@shared/models/config';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {isEqual} from '@shared/utils/isEqual';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './Settings.styled';
 

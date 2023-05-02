@@ -2,12 +2,12 @@ import {useHotkeys} from 'react-hotkeys-hook';
 
 import styled from 'styled-components';
 
-import {activeProjectSelector, isInClusterModeSelector, kubeConfigContextSelector} from '@redux/appConfig';
+import {activeProjectSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
-import {defineHotkey} from '@shared/utils';
+import {defineHotkey, isInClusterModeSelector} from '@shared/utils';
 
 import {ConnectButton, ExitButton} from './Buttons';
 import {ContextSelect} from './ContextSelect';

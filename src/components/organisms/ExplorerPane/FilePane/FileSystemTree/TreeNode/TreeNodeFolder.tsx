@@ -7,7 +7,6 @@ import {basename, join} from 'path';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 
 import {ContextMenu, Dots} from '@components/atoms';
@@ -16,7 +15,7 @@ import {Spinner} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileEntry} from '@shared/models/fileEntry';
 import {isEqual} from '@shared/utils/isEqual';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './TreeNode.styled';
 import {useDelete, useFolderMenuItems, useIsDisabled} from './hooks';

@@ -2,6 +2,7 @@ import {has, size} from 'lodash';
 import {createSelector} from 'reselect';
 
 import {RootState} from '../models/rootState';
+import {selectKubeContext} from './cluster/selectors';
 
 export const transientResourceCountSelector = createSelector(
   // TODO: could we memoize this for only the count? maybe a new `createCountSelector`?
@@ -9,6 +10,14 @@ export const transientResourceCountSelector = createSelector(
     state.main.resourceMetaMapByStorage.transient,
   transientMetaStorage => {
     return size(transientMetaStorage);
+  }
+);
+
+export const isInClusterModeSelector = createSelector(
+  selectKubeContext,
+  (state: RootState) => state.main.clusterConnection?.context,
+  (context, clusterConnectionContext): boolean => {
+    return context !== undefined && clusterConnectionContext !== undefined && clusterConnectionContext === context.name;
   }
 );
 
@@ -37,4 +46,12 @@ export const kubeConfigPathValidSelector = createSelector(
 
     return Boolean(globalKubeConfig.isPathValid);
   }
+);
+
+export const kubeConfigPathSelector = createSelector(
+  [
+    (state: RootState) => state.config.projectConfig?.kubeConfig?.path,
+    (state: RootState) => state.config.kubeConfig.path,
+  ],
+  (projectKubeConfigPath, kubeConfigPath) => projectKubeConfigPath ?? kubeConfigPath ?? undefined
 );

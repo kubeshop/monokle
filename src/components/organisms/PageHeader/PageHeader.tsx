@@ -12,7 +12,7 @@ import newGithubIssueUrl from 'new-github-issue-url';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {InitializeGitTooltip, InstallGitTooltip, NotificationsTooltip} from '@constants/tooltips';
 
-import {activeProjectSelector, isInClusterModeSelector, updateProjectsGitRepo} from '@redux/appConfig';
+import {activeProjectSelector, updateProjectsGitRepo} from '@redux/appConfig';
 import {setCurrentBranch, setRepo} from '@redux/git';
 import {getRepoInfo, initGitRepo} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -31,7 +31,7 @@ import {showGitErrorModal} from '@utils/terminal';
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {Icon} from '@monokle/components';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {ClusterControls} from './ClusterControl/ClusterControls';

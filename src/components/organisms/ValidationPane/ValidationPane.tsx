@@ -5,7 +5,6 @@ import Link from 'antd/lib/typography/Link';
 
 import {ReloadOutlined} from '@ant-design/icons';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
@@ -20,7 +19,7 @@ import {useRefSelector} from '@utils/hooks';
 import ValidationFigure from '@assets/NewValidationFigure.svg';
 
 import {Icon, TitleBar, ValidationOverview} from '@monokle/components';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ValidationPane.styled';
 

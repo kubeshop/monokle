@@ -1,12 +1,12 @@
 import {rgba} from 'polished';
 import styled from 'styled-components';
 
-import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/appConfig';
+import {kubeConfigContextColorSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 
 import {ClusterColors} from '@shared/models/cluster';
 import {BackgroundColors, Colors} from '@shared/styles/colors';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const ImageFilteredTag: React.FC = () => {
   const isInClusterMode = useAppSelector(isInClusterModeSelector);

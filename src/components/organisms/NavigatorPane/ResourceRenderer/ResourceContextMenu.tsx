@@ -10,7 +10,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {isInClusterModeSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
+import {kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
@@ -40,7 +40,7 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sResource, ResourceMeta, ResourceMetaMap, isLocalResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 import {defineHotkey} from '@shared/utils/hotkey';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;

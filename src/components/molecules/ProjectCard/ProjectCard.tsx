@@ -6,7 +6,7 @@ import {DeleteOutlined, ExclamationCircleOutlined, PushpinFilled, PushpinOutline
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {isInClusterModeSelector, setDeleteProject, setOpenProject, toggleProjectPin} from '@redux/appConfig';
+import {setDeleteProject, setOpenProject, toggleProjectPin} from '@redux/appConfig';
 import {useAppDispatch} from '@redux/hooks';
 import {setShowOpenProjectAlert, toggleStartProjectPane} from '@redux/reducers/ui';
 import {stopClusterConnection} from '@redux/thunks/cluster';
@@ -15,6 +15,7 @@ import {useRefSelector} from '@utils/hooks';
 import {getRelativeDate} from '@utils/index';
 
 import {Project} from '@shared/models/config';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ProjectCard.styled';
 

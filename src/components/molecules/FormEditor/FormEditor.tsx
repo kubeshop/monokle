@@ -12,7 +12,7 @@ import log from 'loglevel';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
-import {isInClusterModeSelector, settingsSelector} from '@redux/appConfig';
+import {settingsSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingStatus} from '@redux/reducers/main';
 import {selectedFilePathSelector} from '@redux/selectors';
@@ -30,7 +30,7 @@ import {parseYamlDocument, stringifyK8sResource} from '@utils/yaml';
 
 import {isHelmChartFile} from '@shared/utils/helm';
 import {isEqual} from '@shared/utils/isEqual';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';

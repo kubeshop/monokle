@@ -11,7 +11,6 @@ import {
   SaveTransientResourceTooltip,
 } from '@constants/tooltips';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
@@ -25,6 +24,7 @@ import {useRefSelector} from '@utils/hooks';
 
 import {TitleBar} from '@monokle/components';
 import {ResourceMeta} from '@shared/models/k8sResource';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ActionsPaneHeader.styled';
 import Diff from './Diff/Diff';
