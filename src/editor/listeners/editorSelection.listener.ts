@@ -30,7 +30,7 @@ export const editorSelectionListener: AppListenerFn = listen => {
     async effect(_action, {getState, delay, dispatch, cancelActiveListeners}) {
       cancelActiveListeners();
       await delay(1);
-      const rootFolderPath = getState().main.fileMap[ROOT_FILE_ENTRY].filePath;
+      const rootFolderPath = getState().main.fileMap[ROOT_FILE_ENTRY]?.filePath;
       const editor = getEditor();
 
       if (!editor || !rootFolderPath) {
