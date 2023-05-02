@@ -5,15 +5,14 @@ import {RootState} from '../models/rootState';
 
 export const transientResourceCountSelector = createSelector(
   // TODO: could we memoize this for only the count? maybe a new `createCountSelector`?
-  (state: Pick<RootState, 'main'> & {main: Pick<RootState['main'], 'resourceMetaMapByStorage'>}) =>
-    state.main.resourceMetaMapByStorage.transient,
+  (state: {main: Pick<RootState['main'], 'resourceMetaMapByStorage'>}) => state.main.resourceMetaMapByStorage.transient,
   transientMetaStorage => {
     return size(transientMetaStorage);
   }
 );
 
 export const isInPreviewModeSelector = createSelector(
-  (state: Pick<RootState, 'main'> & {main: Pick<RootState['main'], 'preview'>}) => state?.main?.preview,
+  (state: {main: Pick<RootState['main'], 'preview'>}) => state?.main?.preview,
   preview => {
     return Boolean(preview);
   }
