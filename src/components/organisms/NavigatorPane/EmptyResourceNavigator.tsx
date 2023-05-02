@@ -1,3 +1,5 @@
+import {Skeleton} from 'antd';
+
 import styled from 'styled-components';
 
 import {kubeConfigContextSelector, kubeConfigPathValidSelector} from '@redux/appConfig';
@@ -34,6 +36,7 @@ function EmptyResourceNavigator() {
   const hasAnyActiveResources = useAppSelector(state => activeResourceCountSelector(state) > 0);
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const isLoading = useAppSelector(state => state.ui.isFolderLoading);
 
   function resetFilters() {
     const emptyFilter: ResourceFilterType = {annotations: {}, labels: {}};
@@ -63,6 +66,14 @@ function EmptyResourceNavigator() {
       dispatch(highlightItem(null));
     }, 3000);
   };
+
+  if (isLoading) {
+    return (
+      <div style={{padding: '20px'}}>
+        <Skeleton active />
+      </div>
+    );
+  }
 
   return (
     <div style={{padding: 16}}>
