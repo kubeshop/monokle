@@ -37,16 +37,22 @@ function addNamespaceFilterLink(
   const namespace = getSymbolValue(lines, symbol);
   if (namespace) {
     const newCommand = addEditorCommand({
-      text: `${namespace}`,
+      text: `Apply or remove`,
       altText: 'Add/remove namespace to/from current filter',
       handler: () => {
         dispatch(updateResourceFilter({namespaces: [namespace], labels: {}, annotations: {}}));
       },
     });
 
+    const filterMarkdown = createMarkdownString(`
+| Filter resources by      |                                  |
+|--------------------------|----------------------------------|
+| namespace: ${namespace}  | ${newCommand.markdownLink.value} |
+`);
+
     addEditorHover({
       range: symbol.range,
-      contents: [createMarkdownString('Filter Resources'), newCommand.markdownLink],
+      contents: [filterMarkdown],
     });
 
     addLinkDecoration(symbol, newDecorations);
@@ -76,16 +82,22 @@ function addKindFilterLink(
   const kind = getSymbolValue(lines, symbol);
   if (kind) {
     const newCommand = addEditorCommand({
-      text: `${kind}`,
+      text: `Apply or remove`,
       altText: 'Add/remove kind to/from current filter',
       handler: () => {
         dispatch(updateResourceFilter({kinds: [kind], labels: {}, annotations: {}}));
       },
     });
 
+    const filterMarkdown = createMarkdownString(`
+| Filter resources by |                                  |
+|---------------------|----------------------------------|
+| kind: ${kind}       | ${newCommand.markdownLink.value} |
+`);
+
     addEditorHover({
       range: symbol.range,
-      contents: [createMarkdownString('Filter Resources'), newCommand.markdownLink],
+      contents: [filterMarkdown],
     });
 
     addLinkDecoration(symbol, newDecorations);
@@ -103,7 +115,7 @@ function addLabelFilterLink(
     const value = label.substring(symbol.name.length + 1).trim();
 
     const newCommand = addEditorCommand({
-      text: `${label}`,
+      text: `Apply or remove`,
       altText: 'Add/remove label to/from current filter',
       handler: () => {
         const labels: Record<string, string | null> = {};
@@ -112,9 +124,15 @@ function addLabelFilterLink(
       },
     });
 
+    const filterMarkdown = createMarkdownString(`
+| Filter resources by          |                                  |
+|------------------------------|----------------------------------|
+| ${symbol.name}: ${value}     | ${newCommand.markdownLink.value} |
+`);
+
     addEditorHover({
       range: symbol.range,
-      contents: [createMarkdownString('Filter Resources'), newCommand.markdownLink],
+      contents: [filterMarkdown],
     });
 
     addLinkDecoration(symbol, newDecorations);
@@ -141,9 +159,15 @@ function addAnnotationFilterLink(
       },
     });
 
+    const filterMarkdown = createMarkdownString(`
+| Filter resources by          |                                  |
+|------------------------------|----------------------------------|
+| ${symbol.name}: ${value}     | ${newCommand.markdownLink.value} |
+    `);
+
     addEditorHover({
       range: symbol.range,
-      contents: [createMarkdownString('Filter Resources'), newCommand.markdownLink],
+      contents: [filterMarkdown],
     });
 
     addLinkDecoration(symbol, newDecorations);
@@ -160,16 +184,22 @@ function addDecodeSecretHover(
     const decoded = Buffer.from(value, 'base64').toString('utf-8');
 
     const newCommand = addEditorCommand({
-      text: decoded,
-      altText: 'Copy to clipboard',
+      text: 'Copy to clipboard',
+      altText: 'Copy decoded secret to clipboard',
       handler: () => {
         clipboard.writeText(decoded);
       },
     });
 
+    const secretMarkdown = createMarkdownString(`
+| Secret value |                                  |
+|--------------|----------------------------------|
+| ${decoded}   | ${newCommand.markdownLink.value} |
+`);
+
     addEditorHover({
       range: symbol.range,
-      contents: [createMarkdownString('Secret Value'), newCommand.markdownLink],
+      contents: [secretMarkdown],
     });
 
     addLinkDecoration(symbol, newDecorations);
@@ -179,14 +209,13 @@ function addDecodeSecretHover(
 function processSymbol(
   resource: ResourceMeta,
   symbol: monaco.languages.DocumentSymbol,
-  parents: monaco.languages.DocumentSymbol[],
   lines: string[],
   dispatch: AppDispatch,
   newDecorations: monaco.editor.IModelDeltaDecoration[]
 ) {
   if (symbol.children) {
     symbol.children.forEach(child => {
-      processSymbol(resource, child, parents.concat(symbol), lines, dispatch, newDecorations);
+      processSymbol(resource, child, lines, dispatch, newDecorations);
     });
   }
 
@@ -198,18 +227,17 @@ function processSymbol(
     addKindFilterLink(lines, symbol, dispatch, newDecorations);
   }
 
-  if (parents.length > 0) {
-    const parentName = parents[parents.length - 1].name;
-
+  if (symbol.containerName) {
+    const containerName = symbol.containerName;
     if (
-      parentName === 'labels' ||
-      parentName === 'matchLabels' ||
-      (parentName === 'selector' && symbol.name !== 'matchLabels')
+      containerName === 'labels' ||
+      containerName === 'matchLabels' ||
+      (containerName === 'selector' && symbol.name !== 'matchLabels')
     ) {
       addLabelFilterLink(lines, symbol, dispatch, newDecorations);
-    } else if (parentName === 'annotations') {
+    } else if (containerName === 'annotations') {
       addAnnotationFilterLink(lines, symbol, dispatch, newDecorations);
-    } else if (parentName === 'data' && resource.kind === SecretHandler.kind) {
+    } else if (containerName === 'data' && resource.kind === SecretHandler.kind) {
       addDecodeSecretHover(lines, symbol, newDecorations);
     }
   }
@@ -224,7 +252,7 @@ async function processSymbols(
   const symbols: monaco.languages.DocumentSymbol[] = await getSymbols(model);
   const lines = resource.text.split('\n');
 
-  symbols.forEach(symbol => processSymbol(resource, symbol, [], lines, dispatch, newDecorations));
+  symbols.forEach(symbol => processSymbol(resource, symbol, lines, dispatch, newDecorations));
 }
 
 export const resourceSymbolsEnhancer = createEditorEnhancer(async ({state, resourceIdentifier, dispatch}) => {

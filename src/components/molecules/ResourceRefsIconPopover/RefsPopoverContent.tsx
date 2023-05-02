@@ -51,6 +51,7 @@ const RefsPopoverContent = (props: {
   const selection = useAppSelector(state => state.main.selection);
   const preview = useAppSelector(state => state.main.preview);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
+  const activeEditorTab = useAppSelector(state => state.main.activeEditorTab);
 
   const isRefLinkDisabled = useCallback(
     (ref: ResourceRef) => {
@@ -132,7 +133,7 @@ const RefsPopoverContent = (props: {
 
     const refRange = getRefRange(ref);
 
-    if (ref.type !== ResourceRefType.Incoming) {
+    if (ref.type !== ResourceRefType.Incoming && activeEditorTab !== 'graph') {
       if (
         !selection ||
         selection?.type !== 'resource' ||

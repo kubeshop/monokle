@@ -1,4 +1,4 @@
-import {BrowserWindow, Menu, MenuItemConstructorOptions} from 'electron';
+import {BrowserWindow, Menu, MenuItemConstructorOptions, app} from 'electron';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 import {NewVersionCode, Project} from '@shared/models/config';
@@ -44,7 +44,7 @@ const getUpdateMonokleText = (newVersion: {code: NewVersionCode; data: any}) => 
   return 'Check for Update';
 };
 
-const checkForUpdateMenu = (state: ElectronMenuDataType, dispatch: MainDispatch) => {
+const createAppUpdateMenuItem = (state: ElectronMenuDataType, dispatch: MainDispatch) => {
   return {
     label: getUpdateMonokleText(state?.config?.newVersion),
     enabled: state?.config?.newVersion?.code !== NewVersionCode.Downloading,
@@ -54,7 +54,7 @@ const checkForUpdateMenu = (state: ElectronMenuDataType, dispatch: MainDispatch)
   };
 };
 
-const appMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItemConstructorOptions => {
+const createAppMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItemConstructorOptions => {
   return {
     label: `Monokle${state?.config?.newVersion?.code > NewVersionCode.Checking ? ' ⬆️' : ''}`,
     submenu: [
@@ -64,7 +64,8 @@ const appMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItemC
           dispatch({type: 'ui/openAboutModal', payload: undefined});
         },
       },
-      checkForUpdateMenu(state, dispatch),
+      createAppUpdateMenuItem(state, dispatch),
+      {label: `Version: ${app.getVersion()}`},
       {type: 'separator'},
       {label: 'Hide Monokle', role: 'hide'},
       {role: 'hideOthers'},
@@ -315,7 +316,7 @@ const helpMenu = (
 
   if (includeUpdateMenu) {
     submenu.push({type: 'separator'});
-    submenu.push(checkForUpdateMenu(state, dispatch));
+    submenu.push(createAppUpdateMenuItem(state, dispatch));
   }
   return {
     label: 'Help',
@@ -333,7 +334,7 @@ export const createMenu = (state: ElectronMenuDataType, dispatch: MainDispatch) 
   ];
 
   if (isMac) {
-    template.unshift(appMenu(state, dispatch));
+    template.unshift(createAppMenu(state, dispatch));
   }
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
