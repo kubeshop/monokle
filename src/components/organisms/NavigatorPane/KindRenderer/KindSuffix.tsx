@@ -9,16 +9,15 @@ import styled from 'styled-components';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {DisabledAddResourceTooltip} from '@constants/tooltips';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {NewResourceWizardInput} from '@shared/models/ui';
 import {Colors} from '@shared/styles/colors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const SuffixContainer = styled.span`
   display: inline-block;
@@ -46,7 +45,7 @@ const KindSuffix: React.FC<Props> = props => {
   const dispatch = useAppDispatch();
 
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isSectionCollapsed = useAppSelector(state => state.ui.navigator.collapsedResourceKinds.includes(resourceKind));
 

@@ -3,7 +3,6 @@ import log from 'loglevel';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {selectKubeconfig} from '@redux/cluster/selectors';
 import {setAlert} from '@redux/reducers/alert';
 import {doesTextStartWithYamlDocumentDelimiter} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
@@ -15,6 +14,7 @@ import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sResource} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 
 const applyMultipleResources = async (
   state: RootState,

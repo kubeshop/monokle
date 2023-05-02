@@ -1,10 +1,12 @@
 import {shell} from 'electron';
 
-import {isInClusterModeSelector, toggleEditorPlaceholderVisiblity} from '@redux/appConfig';
+import {toggleEditorPlaceholderVisiblity} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setExplorerSelectedSection, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import MonacoPlaceholderImage from '@assets/MonacoPlaceholderImage.svg';
+
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './MonacoPlaceholder.styled';
 

@@ -2,12 +2,12 @@ import {memo} from 'react';
 
 import {CollapsePanelProps} from 'antd';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 import {kustomizationResourcesSelectors} from '@redux/selectors';
 
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {InjectedPanelProps} from '@shared/models/explorer';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import AccordionPanel from '../AccordionPanel';
 import KustomizeList from './KustomizeList';

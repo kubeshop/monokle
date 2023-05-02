@@ -6,7 +6,6 @@ import Column from 'antd/lib/table/Column';
 import {CLUSTER_AVAILABLE_COLORS} from '@constants/constants';
 
 import {setCurrentContext, setKubeConfigContextColor} from '@redux/appConfig';
-import {selectKubeContext, selectKubeconfig} from '@redux/cluster/selectors';
 import {KUBECTL} from '@redux/cluster/service/kube-control';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -16,6 +15,7 @@ import {useNotifications} from '@utils/notification';
 import {AlertEnum} from '@shared/models/alert';
 import {ClusterColors} from '@shared/models/cluster';
 import {BackgroundColors} from '@shared/styles/colors';
+import {selectKubeContext, selectKubeconfig} from '@shared/utils/cluster/selectors';
 
 import * as S from './ClusterSelectionTable.styled';
 

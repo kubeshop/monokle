@@ -19,7 +19,6 @@ import {
 
 import {
   currentClusterAccessSelector,
-  isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
@@ -46,6 +45,7 @@ import {Icon} from '@monokle/components';
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {RootState} from '@shared/models/rootState';
 import {hasAccessToResourceKind} from '@shared/utils/kubeclient';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './styled';
 

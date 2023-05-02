@@ -5,12 +5,12 @@ import {CollapsePanelProps} from 'antd';
 import {isEmpty, size} from 'lodash';
 import styled from 'styled-components';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {InjectedPanelProps} from '@shared/models/explorer';
 import {isDefined} from '@shared/utils/filter';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import AccordionPanel from '../AccordionPanel';
 import PreviewConfigurationAdd from './PreviewConfigurationAdd';

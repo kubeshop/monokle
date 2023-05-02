@@ -7,9 +7,8 @@ import {join} from 'path';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
-import {isInPreviewModeSelectorNew, selectionFilePathSelector} from '@redux/selectors';
+import {selectionFilePathSelector} from '@redux/selectors';
 
 import {ContextMenu, Dots} from '@components/atoms';
 
@@ -17,6 +16,7 @@ import {Spinner} from '@monokle/components';
 import {FileEntry} from '@shared/models/fileEntry';
 import {Colors} from '@shared/styles';
 import {isEqual} from '@shared/utils/isEqual';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './TreeNode.styled';
 import {useCanPreview, useDelete, useFileMenuItems, useIsDisabled, usePreview} from './hooks';
@@ -29,7 +29,7 @@ const TreeNodeFile: React.FC<Props> = props => {
   const {filePath} = props;
   const fileEntry: FileEntry | undefined = useAppSelector(state => state.main.fileMap[filePath]);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const selectedFilePath = useAppSelector(selectionFilePathSelector);
   const isSelected = selectedFilePath === filePath;
   const isDisabled = useIsDisabled(fileEntry);

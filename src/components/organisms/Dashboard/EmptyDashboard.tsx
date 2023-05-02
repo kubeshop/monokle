@@ -9,7 +9,7 @@ import styled from 'styled-components';
 
 import {activeProjectSelector} from '@redux/appConfig';
 import {startWatchingKubeconfig, stopWatchingKubeconfig} from '@redux/cluster/listeners/kubeconfig';
-import {selectCurrentContextId, selectKubeconfig, useClusterSelector} from '@redux/cluster/selectors';
+import {selectCurrentContextId, useClusterSelector} from '@redux/cluster/selectors';
 import {setupCluster} from '@redux/cluster/thunks/setup';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setActiveSettingsPanel, setLeftMenuSelection} from '@redux/reducers/ui';
@@ -19,6 +19,7 @@ import {useRefSelector} from '@utils/hooks';
 import {ContextId, MonokleClusterError} from '@shared/ipc';
 import {ModernKubeConfig, SettingsPanel} from '@shared/models/config';
 import {Colors} from '@shared/styles';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {openDiscord, openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import {ClusterIndication} from './Disconnected/ClusterIndication';

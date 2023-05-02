@@ -6,7 +6,7 @@ import {ApiOutlined, CloseCircleFilled, LoadingOutlined} from '@ant-design/icons
 
 import styled from 'styled-components';
 
-import {getContext, selectKubeconfig} from '@redux/cluster/selectors';
+import {getContext} from '@redux/cluster/selectors';
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {toggleStartProjectPane} from '@redux/reducers/ui';
@@ -15,6 +15,7 @@ import {stopClusterConnection} from '@redux/thunks/cluster';
 import {Tooltip} from '@components/atoms/Tooltip/Tooltip';
 
 import {Colors} from '@shared/styles';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 
 export function ConnectButton() {
   const dispatch = useAppDispatch();

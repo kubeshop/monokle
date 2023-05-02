@@ -10,7 +10,7 @@ import {parse} from 'yaml';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {isInClusterModeSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
+import {kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResourceToCluster} from '@redux/thunks/applyResource';
@@ -25,6 +25,7 @@ import {stringifyK8sResource} from '@utils/yaml';
 
 import {Icon} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './ResourceDiff.styled';

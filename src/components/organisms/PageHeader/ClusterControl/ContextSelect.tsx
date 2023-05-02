@@ -6,13 +6,13 @@ import {DownOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
-import {selectKubeconfig} from '@redux/cluster/selectors';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {Icon} from '@monokle/components';
 import {Colors} from '@shared/styles';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import {ClusterSelectionTable} from '../ClusterSelectionTable';
 

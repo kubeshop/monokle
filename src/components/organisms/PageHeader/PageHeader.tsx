@@ -12,13 +12,12 @@ import newGithubIssueUrl from 'new-github-issue-url';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {InitializeGitTooltip, InstallGitTooltip, NotificationsTooltip} from '@constants/tooltips';
 
-import {activeProjectSelector, isInClusterModeSelector, updateProjectsGitRepo} from '@redux/appConfig';
+import {activeProjectSelector, updateProjectsGitRepo} from '@redux/appConfig';
 import {setCurrentBranch, setRepo} from '@redux/git';
 import {getRepoInfo, initGitRepo} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError} from '@redux/reducers/main';
 import {setIsInQuickClusterMode, setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {stopPreview} from '@redux/services/preview';
 import store from '@redux/store';
@@ -32,6 +31,7 @@ import {showGitErrorModal} from '@utils/terminal';
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {Icon} from '@monokle/components';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {ClusterControls} from './ClusterControl/ClusterControls';
@@ -47,7 +47,7 @@ const PageHeader = () => {
   const gitLoading = useAppSelector(state => state.git.loading);
   const hasGitRepo = useAppSelector(state => Boolean(state.git.repo));
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layoutSize = useAppSelector(state => state.ui.layoutSize);

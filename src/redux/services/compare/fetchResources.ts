@@ -8,7 +8,6 @@ import {v4 as uuid} from 'uuid';
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/appConfig';
-import {selectKubeconfig} from '@redux/cluster/selectors';
 import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {getCommitResources} from '@redux/git/git.ipc';
 import {runKustomize} from '@redux/thunks/previewKustomization';
@@ -31,6 +30,7 @@ import {
 } from '@shared/models/compare';
 import {K8sResource} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {
   createHelmInstallCommand,
   createHelmTemplateCommand,

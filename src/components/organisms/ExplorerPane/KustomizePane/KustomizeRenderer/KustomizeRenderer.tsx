@@ -1,6 +1,5 @@
 import {memo, useState} from 'react';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 import {useResourceMeta} from '@redux/selectors/resourceSelectors';
@@ -10,6 +9,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {isEqual} from '@shared/utils/isEqual';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import KustomizeContextMenu from './KustomizeContextMenu';
 import KustomizePrefix from './KustomizePrefix';

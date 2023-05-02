@@ -7,7 +7,6 @@ import {ExclamationCircleOutlined, FolderAddOutlined, ReloadOutlined} from '@ant
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openCreateFileFolderModal, setFileExplorerExpandedFolders} from '@redux/reducers/ui';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -18,6 +17,7 @@ import {Icon, TitleBar, TitleBarCount} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {InjectedPanelProps} from '@shared/models/explorer';
 import {isEqual} from '@shared/utils/isEqual';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import AccordionPanel from '../AccordionPanel';
 import * as S from './FilePane.styled';

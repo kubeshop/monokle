@@ -2,11 +2,12 @@ import {useSelector} from 'react-redux';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {stopPreview} from '@redux/services/preview';
 
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
+
 export const useFileSelect = () => {
-  const isInPreviewMode = useSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useSelector(isInPreviewModeSelector);
   const dispatch = useAppDispatch();
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
 

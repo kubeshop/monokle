@@ -17,7 +17,6 @@ import {
 } from '@constants/tooltips';
 
 import {
-  isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
@@ -63,6 +62,7 @@ import {Icon} from '@monokle/components';
 import {ActionPaneTab} from '@shared/models/appState';
 import {HelmChart} from '@shared/models/helm';
 import {isHelmChartFile} from '@shared/utils/helm';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 import {openExternalResourceKindDocumentation} from '@shared/utils/shell';
 
 import * as S from './ActionsPane.styled';

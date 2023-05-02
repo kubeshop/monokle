@@ -4,7 +4,6 @@ import {useHotkeys} from 'react-hotkeys-hook';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
 import {
-  isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
@@ -22,7 +21,7 @@ import {
   setLeftMenuSelection,
   toggleRightMenu,
 } from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew, rootFilePathSelector, selectedFilePathSelector} from '@redux/selectors';
+import {rootFilePathSelector, selectedFilePathSelector} from '@redux/selectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -41,13 +40,14 @@ import {useFeatureFlags} from '@utils/features';
 import {useRefSelector} from '@utils/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const HotKeysHandler = () => {
   const {ShowRightMenu} = useFeatureFlags();
   const dispatch = useAppDispatch();
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isNewResourceWizardOpened = useAppSelector(state => state.ui.newResourceWizard.isOpen);
   const isQuickSearchActionsPopupOpened = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
@@ -219,7 +219,7 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.OPEN_NEW_RESOURCE_WIZARD.key,
     () => {
-      if (!isNewResourceWizardOpened && rootFilePath) {
+      if (!isNewResourceWizardOpened && rootFilePath && !isInClusterMode && !isInPreviewMode) {
         dispatch(openNewResourceWizard());
       }
     },

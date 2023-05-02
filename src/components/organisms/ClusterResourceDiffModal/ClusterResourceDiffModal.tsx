@@ -10,7 +10,7 @@ import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import {ClusterName, makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {isInClusterModeSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
+import {kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal} from '@redux/reducers/main';
@@ -29,6 +29,7 @@ import {stringifyK8sResource} from '@utils/yaml';
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {K8sResource} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ClusterResourceDiffModal.styled';
 

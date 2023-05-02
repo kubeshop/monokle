@@ -4,7 +4,7 @@ import {hotkeys} from '@shared/constants/hotkeys';
 import {NewVersionCode, Project} from '@shared/models/config';
 import type {ElectronMenuDataType} from '@shared/models/rootState';
 import {defineHotkey} from '@shared/utils/hotkey';
-import {isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 import {openDiscord, openDocumentation, openGitHub, openLogs} from '@shared/utils/shell';
 
 import {checkNewVersion} from './commands';
@@ -17,6 +17,10 @@ export const menuStatePropertiesToPick = [
   'config.projects',
   'config.selectedProjectRootFolder',
   'config.newVersion',
+  'config.projectConfig',
+  'config.kubeConfig',
+
+  'cluster.kubeconfigs',
 
   'ui.isStartProjectPaneVisible',
   'ui.isInQuickClusterMode',
@@ -25,6 +29,7 @@ export const menuStatePropertiesToPick = [
 
   'main.selection',
   'main.preview',
+  'main.clusterConnection',
 ];
 
 const getUpdateMonokleText = (newVersion: {code: NewVersionCode; data: any}) => {
@@ -153,7 +158,10 @@ const fileMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItem
       {type: 'separator'},
       {
         label: 'New Resource',
-        enabled: Boolean(state?.config?.selectedProjectRootFolder),
+        enabled:
+          Boolean(state?.config?.selectedProjectRootFolder) &&
+          !isInPreviewModeSelector(state) &&
+          !isInClusterModeSelector(state as any),
         click: () => {
           dispatch({type: 'ui/openNewResourceWizard', payload: undefined});
         },

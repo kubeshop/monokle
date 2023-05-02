@@ -2,10 +2,10 @@ import {Collapse as RawCollapse} from 'antd';
 
 import styled from 'styled-components';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setExplorerSelectedSection} from '@redux/reducers/ui';
 
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import FilePane from './FilePane';

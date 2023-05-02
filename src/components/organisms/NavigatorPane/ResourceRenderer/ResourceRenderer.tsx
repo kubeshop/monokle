@@ -1,6 +1,5 @@
 import {memo, useCallback, useState} from 'react';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 import {useResourceMeta} from '@redux/selectors/resourceSelectors';
@@ -10,6 +9,7 @@ import ResourcePopover from '@components/molecules/ResourcePopover/ResourcePopov
 
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {isEqual} from '@shared/utils/isEqual';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import ResourceContextMenu from './ResourceContextMenu';
 import {ResourceInfoIcon} from './ResourceInfoIcon';

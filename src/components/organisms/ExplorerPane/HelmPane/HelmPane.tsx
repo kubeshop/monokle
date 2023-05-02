@@ -4,11 +4,11 @@ import {CollapsePanelProps} from 'antd';
 
 import {size} from 'lodash';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {InjectedPanelProps} from '@shared/models/explorer';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import AccordionPanel from '../AccordionPanel';
 import HelmList from './HelmList';

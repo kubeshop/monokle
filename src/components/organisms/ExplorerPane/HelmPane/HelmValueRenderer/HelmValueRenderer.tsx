@@ -1,8 +1,9 @@
 import {memo, useState} from 'react';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
+
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import HelmContextMenu from '../HelmContextMenu';
 import HelmValueQuickAction from './HelmValueQuickAction';

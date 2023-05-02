@@ -6,10 +6,10 @@ import log from 'loglevel';
 import stream from 'stream';
 import {v4 as uuidv4} from 'uuid';
 
-import {selectKubeconfig} from '@redux/cluster/selectors';
 import {useAppSelector} from '@redux/hooks';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
 import * as S from './Logs.styled';

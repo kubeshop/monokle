@@ -6,13 +6,11 @@ import {CloseOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {makeApplyMultipleResourcesText} from '@constants/makeApplyText';
 
-import {isInClusterModeSelector, kubeConfigContextColorSelector} from '@redux/appConfig';
-import {selectKubeContext} from '@redux/cluster/selectors';
+import {kubeConfigContextColorSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath, uncheckAllResourceIds} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {useActiveResourceMetaMap, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {applyCheckedResources} from '@redux/thunks/applyCheckedResources';
 import {removeResources} from '@redux/thunks/removeResources';
@@ -21,7 +19,9 @@ import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ResourceIdentifier, ResourceMeta} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
+import {selectKubeContext} from '@shared/utils/cluster/selectors';
 import {isDefined} from '@shared/utils/filter';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './CheckedResourcesActionMenu.styled';
@@ -30,7 +30,7 @@ const CheckedResourcesActionsMenu: React.FC = () => {
   const dispatch = useAppDispatch();
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const resourceMetaMap = useActiveResourceMetaMap();
   const transientResourceMetaMap = useResourceMetaMap('transient');
   const kubeConfigContext = useAppSelector(selectKubeContext);

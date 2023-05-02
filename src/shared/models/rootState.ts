@@ -31,9 +31,12 @@ type RootState = {
 };
 
 type ElectronMenuDataType = {
-  config: Pick<RootState['config'], 'projects' | 'newVersion' | 'selectedProjectRootFolder'>;
+  config: Pick<
+    RootState['config'],
+    'projects' | 'newVersion' | 'selectedProjectRootFolder' | 'kubeConfig' | 'projectConfig'
+  >;
 } & {
-  main: Pick<RootState['main'], 'selection' | 'preview'>;
+  main: Pick<RootState['main'], 'selection' | 'preview' | 'clusterConnection'>;
 } & {
   ui: Pick<
     RootState['ui'],

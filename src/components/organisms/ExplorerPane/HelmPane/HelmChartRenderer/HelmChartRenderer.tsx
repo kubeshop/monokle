@@ -6,12 +6,12 @@ import {dirname} from 'path';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 
 import {Icon} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import HelmContextMenu from '../HelmContextMenu';
 import HelmChartCollapse from './HelmChartCollapse';
