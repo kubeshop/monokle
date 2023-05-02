@@ -97,7 +97,7 @@ const FileSystemTree: React.FC = () => {
             return;
           }
           if (typeof nodeEvent.key === 'string' && !nodeEvent.disabled) {
-            if (isHelmValuesFile(nodeEvent.key)) {
+            if (isHelmValuesFile(nodeEvent.key) && helmValuesMapByFilePath[nodeEvent.key]) {
               const valuesFileId = helmValuesMapByFilePath[nodeEvent.key].id;
               dispatch(selectHelmValuesFile({valuesFileId}));
             } else {
