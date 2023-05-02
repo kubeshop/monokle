@@ -1,7 +1,7 @@
 import * as k8s from '@kubernetes/client-node';
 
 import invariant from 'tiny-invariant';
-import {Document, Scalar, visit} from 'yaml';
+import {Document, isScalar, visit} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
@@ -23,7 +23,7 @@ function preprocessClusterResource(item: any) {
   let doc = new Document(item, {schema: 'yaml-1.1'});
   visit(doc, {
     Pair(_, pair) {
-      if (pair.value instanceof Scalar && pair.value.value === null) {
+      if (isScalar(pair.value) && pair.value.value === null) {
         return visit.REMOVE;
       }
     },
