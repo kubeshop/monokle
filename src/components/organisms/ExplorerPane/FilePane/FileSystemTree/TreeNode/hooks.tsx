@@ -311,7 +311,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     newMenuItems.push({
       key: 'rename',
       label: 'Rename',
-      disabled: isRoot,
+      disabled: isRoot || fileEntry.isExcluded,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
         renameFileEntry(fileEntry);

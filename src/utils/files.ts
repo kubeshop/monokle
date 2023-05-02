@@ -218,7 +218,7 @@ export const isFileEntryDisabled = (fileEntry?: FileEntry) => {
     return false;
   }
 
-  return !isSupported;
+  return !isSupported || fileEntry.isExcluded;
 };
 
 const getParentFolderPath = (relativePath: string): string | undefined => {

@@ -14,6 +14,7 @@ export const ActionButtonsContainer = styled.div`
   height: 100%;
   position: absolute;
   right: 0;
+  cursor: pointer;
 `;
 
 export const PreviewButton = styled(Button)<{$isItemSelected: boolean}>`
@@ -55,20 +56,28 @@ export const TitleContainer = styled.div<{$actionButtonsWidth: number; $isHovere
   width: ${({$actionButtonsWidth, $isHovered}) => ($isHovered ? `calc(100% - ${$actionButtonsWidth}px)` : '100%')};
 `;
 
-export const TitleText = styled.span<{$isSelected?: boolean; $isHighlighted?: boolean}>(props => ({
-  overflow: 'hidden',
-  position: 'relative',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-  color: props.$isSelected ? Colors.blackPure : props.$isHighlighted ? Colors.cyan7 : Colors.blue10,
-}));
+export const TitleText = styled.span<{$isSelected?: boolean; $isHighlighted?: boolean; $isExcluded?: boolean}>(
+  props => ({
+    overflow: 'hidden',
+    position: 'relative',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    color: props.$isSelected
+      ? Colors.blackPure
+      : props.$isHighlighted
+      ? Colors.cyan7
+      : props.$isExcluded
+      ? Colors.grey7
+      : Colors.blue10,
+  })
+);
 
-export const NodeContainer = styled.div<{$isDisabled: boolean}>`
+export const NodeContainer = styled.div<{$isDisabled: boolean; $isExcluded?: boolean}>`
   position: relative;
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: ${({$isDisabled}) => ($isDisabled ? 'default' : 'inherit')};
+  cursor: inherit;
   height: 100%;
 `;
