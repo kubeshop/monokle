@@ -216,7 +216,7 @@ const Monaco: React.FC<IProps> = props => {
     imageMap,
     selectResource: triggerSelectResource,
     selectFilePath,
-    createResource: isInPreviewMode ? undefined : createResource,
+    createResource: isInPreviewMode || isInClusterMode ? undefined : createResource,
     filterResources,
     selectImageHandler,
     selectedPath: selectedFilePath,

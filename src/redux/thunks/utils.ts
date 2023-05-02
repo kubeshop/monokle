@@ -27,7 +27,7 @@ function preprocessClusterResource(item: any) {
         return visit.REMOVE;
       }
     },
-    Scalar(key, node, path) {
+    Scalar(key, node) {
       // change dates to properly formatted and quoted strings
       if (node.value instanceof Date) {
         node.value = node.value.toISOString();

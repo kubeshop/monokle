@@ -219,7 +219,7 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.OPEN_NEW_RESOURCE_WIZARD.key,
     () => {
-      if (!isNewResourceWizardOpened && rootFilePath) {
+      if (!isNewResourceWizardOpened && rootFilePath && !isInClusterMode && !isInPreviewMode) {
         dispatch(openNewResourceWizard());
       }
     },

@@ -1,8 +1,10 @@
 import {useCallback, useEffect, useRef} from 'react';
 import {monaco} from 'react-monaco-editor';
 
+import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard, openQuickSearchActionsPopup} from '@redux/reducers/ui';
+import {isInPreviewModeSelectorNew} from '@redux/selectors';
 
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 
@@ -18,6 +20,8 @@ function useEditorKeybindings(
 ) {
   const dispatch = useAppDispatch();
   const isQuickSearchActionsOpen = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
   const applySelectionDisposableRef = useRef<monaco.IDisposable | null>(null);
   const diffSelectedResourceDisposableRef = useRef<monaco.IDisposable | null>(null);
 
@@ -70,7 +74,7 @@ function useEditorKeybindings(
         // eslint-disable-next-line no-bitwise
         keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyN],
         run: () => {
-          if (fileMapRef.current[ROOT_FILE_ENTRY]) {
+          if (fileMapRef.current[ROOT_FILE_ENTRY] && !isInPreviewMode && !isInClusterMode) {
             dispatch(openNewResourceWizard());
           }
         },
