@@ -64,7 +64,11 @@ const loadClusterResourcesHandler = async (
       if (namespaces.length === 0) {
         throw new Error('no_namespaces_found');
       }
-      if (!namespaces.includes(currentNamespace)) {
+      if (
+        currentNamespace !== '<all>' &&
+        currentNamespace !== '<not-namespaced>' &&
+        !namespaces.includes(currentNamespace)
+      ) {
         currentNamespace = 'default';
       }
     }
