@@ -39,11 +39,18 @@ export function ConnectButton() {
     dispatch(
       connectCluster({
         context: context.name,
-        namespace: context.namespace,
+        namespace: clusterConnectionOptions.lastNamespaceLoaded,
         reload: clusterConnection !== undefined,
       })
     );
-  }, [clusterConnection, dispatch, isStartProjectPaneVisible, kubeConfig, loading]);
+  }, [
+    clusterConnection,
+    clusterConnectionOptions.lastNamespaceLoaded,
+    dispatch,
+    isStartProjectPaneVisible,
+    kubeConfig,
+    loading,
+  ]);
 
   if (loading) {
     return (

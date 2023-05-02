@@ -53,7 +53,7 @@ export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, Thu
       await dispatch(
         reloadClusterResources({
           context: context.name,
-          namespace: payload.namespace ?? context.namespace ?? lastNamespaceLoaded ?? 'default',
+          namespace: payload.namespace ?? lastNamespaceLoaded ?? context.namespace ?? 'default',
           port: setupResponse.port,
         })
       );
