@@ -33,7 +33,7 @@ import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/se
 
 import * as S from './ResourceFilter.styled';
 
-export const NAVIGATOR_FILTER_BODY_HEIGHT = 375;
+export const NAVIGATOR_FILTER_BODY_HEIGHT = 300;
 
 export type Props = {
   active: boolean;
@@ -67,7 +67,6 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   const [localResourceFilter, setLocalResourceFilter] = useState<ResourceFilterType>(filtersMap);
   const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
   const folderTree = useFileFolderTreeSelectData('all');
-  const filterBodyHeight = isInClusterMode ? NAVIGATOR_FILTER_BODY_HEIGHT - 56 : NAVIGATOR_FILTER_BODY_HEIGHT;
 
   const autocompleteOptions = useMemo(() => {
     return {
@@ -254,7 +253,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   return (
     <S.Container>
       <Filter
-        height={filterBodyHeight}
+        height={NAVIGATOR_FILTER_BODY_HEIGHT}
         search={localResourceFilter?.name}
         onClear={handleClear}
         onSearch={handleSearched}
