@@ -23,7 +23,7 @@ import {
   selectResource,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew, selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
+import {selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
 import {
   activeResourceStorageSelector,
   useActiveResourceContentMapRef,
@@ -49,6 +49,7 @@ import {ResourceFilterType} from '@shared/models/appState';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {ResourceSelection} from '@shared/models/selection';
 import {MonacoRange, NewResourceWizardInput} from '@shared/models/ui';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './Monaco.styled';
 import {EDITOR_DISPOSABLES} from './disposables';
@@ -115,7 +116,7 @@ const Monaco: React.FC<IProps> = props => {
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const imageMap = useAppSelector(state => state.main.imageMap);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
 

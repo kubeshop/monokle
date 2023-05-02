@@ -4,12 +4,12 @@ import {monaco} from 'react-monaco-editor';
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openNewResourceWizard, openQuickSearchActionsPopup} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
 
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 function useEditorKeybindings(
   editorRef: React.MutableRefObject<monaco.editor.IStandaloneCodeEditor | null>,
@@ -21,7 +21,7 @@ function useEditorKeybindings(
   const dispatch = useAppDispatch();
   const isQuickSearchActionsOpen = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const applySelectionDisposableRef = useRef<monaco.IDisposable | null>(null);
   const diffSelectedResourceDisposableRef = useRef<monaco.IDisposable | null>(null);
 

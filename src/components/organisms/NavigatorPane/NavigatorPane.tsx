@@ -13,7 +13,6 @@ import {DisabledAddResourceTooltip, NewResourceTooltip} from '@constants/tooltip
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {navigatorResourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
@@ -28,6 +27,7 @@ import {useRefSelector} from '@utils/hooks';
 import {Icon, ResizableRowsPanel, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Colors} from '@shared/styles';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import NavigatorDescription from './NavigatorDescription';
 import * as S from './NavigatorPane.styled';
@@ -40,7 +40,7 @@ const NavPane: React.FC = () => {
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
 

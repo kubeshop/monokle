@@ -8,7 +8,6 @@ import {ReloadOutlined} from '@ant-design/icons';
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
 import {useValidationSelector} from '@redux/validation/validation.selectors';
 import {setSelectedProblem, setValidationFilters} from '@redux/validation/validation.slice';
@@ -21,6 +20,7 @@ import {useRefSelector} from '@utils/hooks';
 import ValidationFigure from '@assets/NewValidationFigure.svg';
 
 import {Icon, TitleBar, ValidationOverview} from '@monokle/components';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ValidationPane.styled';
 
@@ -29,7 +29,7 @@ const ValidationPane: React.FC = () => {
   const activeStorageRef = useRefSelector(activeResourceStorageSelector);
   const lastResponse = useValidationSelector(state => state.lastResponse);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const newProblemsIntroducedType = useValidationSelector(state => state.validationOverview.newProblemsIntroducedType);
   const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem);
   const status = useValidationSelector(state => state.status);

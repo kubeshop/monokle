@@ -9,7 +9,6 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
 
 import {ContextMenu, Dots} from '@components/atoms';
 
@@ -17,6 +16,7 @@ import {Spinner} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileEntry} from '@shared/models/fileEntry';
 import {isEqual} from '@shared/utils/isEqual';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './TreeNode.styled';
 import {useDelete, useFolderMenuItems, useIsDisabled} from './hooks';
@@ -29,7 +29,7 @@ const TreeNodeFolder: React.FC<Props> = props => {
   const {folderPath} = props;
   const folderEntry: FileEntry | undefined = useAppSelector(state => state.main.fileMap[folderPath]);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
 
   const [isHovered, setIsHovered] = useState(false);
 

@@ -20,7 +20,6 @@ import {
   openSaveResourcesToFileFolderModal,
   setLeftBottomMenuSelection,
 } from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {knownResourceKindsSelector} from '@redux/selectors/resourceKindSelectors';
 import {useActiveResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {useResource} from '@redux/selectors/resourceSelectors';
@@ -41,6 +40,7 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sResource, ResourceMeta, ResourceMetaMap, isLocalResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 import {defineHotkey} from '@shared/utils/hotkey';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;
@@ -90,7 +90,7 @@ const ResourceKindContextMenu = (props: Props) => {
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const knownResourceKinds = useAppSelector(knownResourceKindsSelector);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
