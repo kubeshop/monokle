@@ -5,6 +5,7 @@ import {ItemType as AntdMenuItem} from 'antd/lib/menu/hooks/useItems';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
+import micromatch from 'micromatch';
 import {basename, dirname, join, sep} from 'path';
 
 import {scanExcludesSelector, updateProjectConfig} from '@redux/appConfig';
@@ -247,6 +248,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
   const dispatch = useAppDispatch();
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
+  const projectConfig = useAppSelector(state => state.config.projectConfig);
 
   const {canOpenOnGithub, openOnGithub} = useOpenOnGithub(
     fileEntry?.name === ROOT_FILE_ENTRY ? '' : fileEntry?.filePath
@@ -277,9 +279,13 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     });
 
     newMenuItems.push({
-      disabled: isRoot,
+      disabled: isRoot || (!fileEntry.children && !fileEntry.isSupported),
       key: 'update_scanning',
-      label: `${fileEntry.isExcluded ? 'Remove from' : 'Add to'} Files: Exclude`,
+      label: `${
+        fileEntry.isExcluded && projectConfig?.scanExcludes?.some(e => micromatch.isMatch(filePath, e))
+          ? 'Remove from'
+          : 'Add to'
+      } Files: Exclude`,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
         if (fileEntry.isExcluded) {
@@ -311,7 +317,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     newMenuItems.push({
       key: 'rename',
       label: 'Rename',
-      disabled: isRoot,
+      disabled: isRoot || fileEntry.isExcluded,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
         renameFileEntry(fileEntry);
@@ -356,13 +362,14 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     return newMenuItems;
   }, [
     fileEntry,
-    platformFileManagerName,
-    addEntryToScanExcludes,
-    removeEntryFromScanExcludes,
-    openOnGithub,
+    projectConfig,
     canOpenOnGithub,
+    platformFileManagerName,
+    removeEntryFromScanExcludes,
+    addEntryToScanExcludes,
     renameFileEntry,
     deleteEntry,
+    openOnGithub,
   ]);
 
   return menuItems;
@@ -471,6 +478,7 @@ export const useFileMenuItems = (
     if (isYamlFile(fileEntry.filePath)) {
       newMenuItems.push({
         key: 'compare',
+        disabled: fileEntry.isExcluded,
         label: 'Compare with another file',
         onClick: () => {
           dispatch(openFileCompareModal(fileEntry.filePath));

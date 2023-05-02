@@ -13,7 +13,11 @@ const FileSystemTreeNode: React.FC<{node: any}> = props => {
 
   const isFolder = useAppSelector(state => isDefined(state.main.fileMap[node.key]?.children)) || node.isRootEntry;
 
-  return isFolder ? <TreeNodeFolder folderPath={node.key} /> : <TreeNodeFile filePath={node.key} />;
+  return isFolder ? (
+    <TreeNodeFolder folderPath={node.key} disabledNode={node.disabled} />
+  ) : (
+    <TreeNodeFile filePath={node.key} />
+  );
 };
 
 export default memo(FileSystemTreeNode, isEqual);

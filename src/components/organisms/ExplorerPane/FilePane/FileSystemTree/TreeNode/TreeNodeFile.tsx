@@ -63,7 +63,7 @@ const TreeNodeFile: React.FC<Props> = props => {
       $isDisabled={isDisabled}
     >
       <S.TitleContainer $actionButtonsWidth={actionButtonsWidth} $isHovered={isHovered}>
-        <S.TitleText $isSelected={isSelected}>
+        <S.TitleText $isSelected={isSelected} $isExcluded={fileEntry.isExcluded} $isSupported={fileEntry.isSupported}>
           <Tooltip
             overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
             mouseEnterDelay={TOOLTIP_DELAY}
@@ -100,13 +100,12 @@ const TreeNodeFile: React.FC<Props> = props => {
               Preview
             </S.PreviewButton>
           )}
-          {!isDisabled && (
-            <ContextMenu items={menuItems}>
-              <div ref={contextMenuButtonRef}>
-                <Dots color={isSelected ? Colors.blackPure : undefined} />
-              </div>
-            </ContextMenu>
-          )}
+
+          <ContextMenu items={menuItems}>
+            <div ref={contextMenuButtonRef}>
+              <Dots color={isSelected ? Colors.blackPure : undefined} />
+            </div>
+          </ContextMenu>
         </S.ActionButtonsContainer>
       )}
     </S.NodeContainer>

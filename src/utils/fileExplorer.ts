@@ -75,6 +75,7 @@ export function createFolderTree(
   fileExplorerSortOrder: FileExplorerSortOrder
 ) {
   const folderEntry = fileMap[folderPath];
+
   if (!folderEntry || !isDefined(folderEntry.children)) {
     return undefined;
   }
@@ -87,11 +88,16 @@ export function createFolderTree(
 
   let children: DataNode[] = sortNodes(folderNodes, fileNodes, fileExplorerSortOrder);
 
+  const foldersChildren = children.filter(child => !child.isLeaf && !child.disabled);
+  const filesChildren = children.filter(child => child.isLeaf);
+  const shouldBeDisabled = !foldersChildren.length && filesChildren.every(child => child.disabled);
+
   const treeNode: DataNode = {
     key: folderEntry.filePath,
     title: path.basename(folderEntry.filePath),
     children,
     selectable: false,
+    disabled: folderEntry.isExcluded || shouldBeDisabled,
   };
 
   return treeNode;

@@ -5,6 +5,8 @@ import util from 'util';
 
 import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
+import {fileIsExcluded} from '@redux/services/fileEntry';
+
 import {getFileTimestamp, hasValidExtension} from '@utils/files';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -23,6 +25,7 @@ type ResourcePayload = {
   resourceFilePath: string;
   resourceRange?: {start: number; length: number};
   fileTimestamp: number | undefined;
+  isExcluded: boolean;
 };
 
 type SaveMultipleTransientResourcesPayload = {resourcePayloads: ResourcePayload[]};
@@ -109,6 +112,7 @@ export const saveTransientResources = createAsyncThunk<
         resourceFilePath: absolutePath,
         resourceRange,
         fileTimestamp,
+        isExcluded: Boolean(fileIsExcluded(absolutePath, thunkAPI.getState().config.projectConfig || {})),
       });
     } catch (e) {
       if (e instanceof Error) {
