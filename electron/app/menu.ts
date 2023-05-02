@@ -65,6 +65,7 @@ const createAppMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): Men
         },
       },
       createAppUpdateMenuItem(state, dispatch),
+      {label: `Version: ${app.getVersion()}}`},
       {type: 'separator'},
       {label: 'Hide Monokle', role: 'hide'},
       {role: 'hideOthers'},
