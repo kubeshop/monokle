@@ -160,16 +160,22 @@ function addDecodeSecretHover(
     const decoded = Buffer.from(value, 'base64').toString('utf-8');
 
     const newCommand = addEditorCommand({
-      text: decoded,
-      altText: 'Copy to clipboard',
+      text: 'Copy to clipboard',
+      altText: 'Copy decoded secret to clipboard',
       handler: () => {
         clipboard.writeText(decoded);
       },
     });
 
+    const secretMarkdown = createMarkdownString(`
+| Secret value |                                  |
+|--------------|----------------------------------|
+| ${decoded}   | ${newCommand.markdownLink.value} |
+`);
+
     addEditorHover({
       range: symbol.range,
-      contents: [createMarkdownString('Secret Value'), newCommand.markdownLink],
+      contents: [secretMarkdown],
     });
 
     addLinkDecoration(symbol, newDecorations);
@@ -179,14 +185,13 @@ function addDecodeSecretHover(
 function processSymbol(
   resource: ResourceMeta,
   symbol: monaco.languages.DocumentSymbol,
-  parents: monaco.languages.DocumentSymbol[],
   lines: string[],
   dispatch: AppDispatch,
   newDecorations: monaco.editor.IModelDeltaDecoration[]
 ) {
   if (symbol.children) {
     symbol.children.forEach(child => {
-      processSymbol(resource, child, parents.concat(symbol), lines, dispatch, newDecorations);
+      processSymbol(resource, child, lines, dispatch, newDecorations);
     });
   }
 
@@ -198,18 +203,17 @@ function processSymbol(
     addKindFilterLink(lines, symbol, dispatch, newDecorations);
   }
 
-  if (parents.length > 0) {
-    const parentName = parents[parents.length - 1].name;
-
+  if (symbol.containerName) {
+    const containerName = symbol.containerName;
     if (
-      parentName === 'labels' ||
-      parentName === 'matchLabels' ||
-      (parentName === 'selector' && symbol.name !== 'matchLabels')
+      containerName === 'labels' ||
+      containerName === 'matchLabels' ||
+      (containerName === 'selector' && symbol.name !== 'matchLabels')
     ) {
       addLabelFilterLink(lines, symbol, dispatch, newDecorations);
-    } else if (parentName === 'annotations') {
+    } else if (containerName === 'annotations') {
       addAnnotationFilterLink(lines, symbol, dispatch, newDecorations);
-    } else if (parentName === 'data' && resource.kind === SecretHandler.kind) {
+    } else if (containerName === 'data' && resource.kind === SecretHandler.kind) {
       addDecodeSecretHover(lines, symbol, newDecorations);
     }
   }
@@ -224,7 +228,7 @@ async function processSymbols(
   const symbols: monaco.languages.DocumentSymbol[] = await getSymbols(model);
   const lines = resource.text.split('\n');
 
-  symbols.forEach(symbol => processSymbol(resource, symbol, [], lines, dispatch, newDecorations));
+  symbols.forEach(symbol => processSymbol(resource, symbol, lines, dispatch, newDecorations));
 }
 
 export const resourceSymbolsEnhancer = createEditorEnhancer(async ({state, resourceIdentifier, dispatch}) => {

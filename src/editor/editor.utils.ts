@@ -28,8 +28,8 @@ export function isRangeInRange(innerRange: monaco.IRange, outerRange: monaco.IRa
   );
 }
 
-export function createMarkdownString(text: string): monaco.IMarkdownString {
-  return {isTrusted: true, value: text};
+export function createMarkdownString(text: string, supportHtml?: boolean): monaco.IMarkdownString {
+  return {isTrusted: true, value: text, supportHtml};
 }
 
 export function createGlyphDecoration(
