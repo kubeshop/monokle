@@ -37,16 +37,22 @@ function addNamespaceFilterLink(
   const namespace = getSymbolValue(lines, symbol);
   if (namespace) {
     const newCommand = addEditorCommand({
-      text: `${namespace}`,
+      text: `Apply or remove`,
       altText: 'Add/remove namespace to/from current filter',
       handler: () => {
         dispatch(updateResourceFilter({namespaces: [namespace], labels: {}, annotations: {}}));
       },
     });
 
+    const filterMarkdown = createMarkdownString(`
+| Filter resources by      |                                  |
+|--------------------------|----------------------------------|
+| namespace: ${namespace}  | ${newCommand.markdownLink.value} |
+`);
+
     addEditorHover({
       range: symbol.range,
-      contents: [createMarkdownString('Filter Resources'), newCommand.markdownLink],
+      contents: [filterMarkdown],
     });
 
     addLinkDecoration(symbol, newDecorations);
@@ -76,16 +82,22 @@ function addKindFilterLink(
   const kind = getSymbolValue(lines, symbol);
   if (kind) {
     const newCommand = addEditorCommand({
-      text: `${kind}`,
+      text: `Apply or remove`,
       altText: 'Add/remove kind to/from current filter',
       handler: () => {
         dispatch(updateResourceFilter({kinds: [kind], labels: {}, annotations: {}}));
       },
     });
 
+    const filterMarkdown = createMarkdownString(`
+| Filter resources by |                                  |
+|---------------------|----------------------------------|
+| kind: ${kind}       | ${newCommand.markdownLink.value} |
+`);
+
     addEditorHover({
       range: symbol.range,
-      contents: [createMarkdownString('Filter Resources'), newCommand.markdownLink],
+      contents: [filterMarkdown],
     });
 
     addLinkDecoration(symbol, newDecorations);
@@ -103,7 +115,7 @@ function addLabelFilterLink(
     const value = label.substring(symbol.name.length + 1).trim();
 
     const newCommand = addEditorCommand({
-      text: `${label}`,
+      text: `Apply or remove`,
       altText: 'Add/remove label to/from current filter',
       handler: () => {
         const labels: Record<string, string | null> = {};
@@ -112,9 +124,15 @@ function addLabelFilterLink(
       },
     });
 
+    const filterMarkdown = createMarkdownString(`
+| Filter resources by          |                                  |
+|------------------------------|----------------------------------|
+| ${symbol.name}: ${value}     | ${newCommand.markdownLink.value} |
+`);
+
     addEditorHover({
       range: symbol.range,
-      contents: [createMarkdownString('Filter Resources'), newCommand.markdownLink],
+      contents: [filterMarkdown],
     });
 
     addLinkDecoration(symbol, newDecorations);
@@ -141,9 +159,15 @@ function addAnnotationFilterLink(
       },
     });
 
+    const filterMarkdown = createMarkdownString(`
+| Filter resources by          |                                  |
+|------------------------------|----------------------------------|
+| ${symbol.name}: ${value}     | ${newCommand.markdownLink.value} |
+    `);
+
     addEditorHover({
       range: symbol.range,
-      contents: [createMarkdownString('Filter Resources'), newCommand.markdownLink],
+      contents: [filterMarkdown],
     });
 
     addLinkDecoration(symbol, newDecorations);
