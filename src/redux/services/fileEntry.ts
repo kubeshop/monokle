@@ -2,6 +2,9 @@ import fs from 'fs';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
+import textExtensions from 'text-extensions';
+
+import {ADDITIONAL_SUPPORTED_FILES} from '@constants/constants';
 
 import {clearSelectionReducer, selectFileReducer, selectResourceReducer} from '@redux/reducers/main/selectionReducers';
 import {
@@ -69,7 +72,9 @@ export function createFileEntry({fileEntryPath, fileMap, helmChartId, extension,
     filePath: fileEntryPath,
     rootFolderPath: fileMap[ROOT_FILE_ENTRY].filePath,
     isExcluded: Boolean(fileIsExcluded(fileEntryPath, projectConfig)),
-    isSupported: false,
+    isSupported:
+      textExtensions.some(supportedExtension => supportedExtension === extension) ||
+      ADDITIONAL_SUPPORTED_FILES.some(supportedExtension => supportedExtension === path.basename(fileEntryPath)),
     helmChartId,
     extension,
   };
@@ -105,7 +110,11 @@ export function createRootFileEntry(rootFolder: string, fileMap: FileMapType) {
  */
 
 export function fileIsExcluded(filePath: FileEntry['filePath'], projectConfig: ProjectConfig) {
-  return projectConfig.scanExcludes?.some(e => micromatch.isMatch(filePath, e) || micromatch.contains(filePath, e));
+  return (
+    projectConfig.scanExcludes?.some(
+      e => micromatch.isMatch(filePath, e) || micromatch.isMatch(path.dirname(filePath), e)
+    ) && !ADDITIONAL_SUPPORTED_FILES.includes(path.basename(filePath))
+  );
 }
 
 /**

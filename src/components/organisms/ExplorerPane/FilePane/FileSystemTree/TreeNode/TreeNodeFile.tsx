@@ -61,10 +61,9 @@ const TreeNodeFile: React.FC<Props> = props => {
       onMouseLeave={() => setIsHovered(false)}
       onContextMenu={onContextMenu}
       $isDisabled={isDisabled}
-      $isExcluded={fileEntry.isExcluded}
     >
       <S.TitleContainer $actionButtonsWidth={actionButtonsWidth} $isHovered={isHovered}>
-        <S.TitleText $isSelected={isSelected} $isExcluded={fileEntry.isExcluded}>
+        <S.TitleText $isSelected={isSelected} $isExcluded={fileEntry.isExcluded} $isSupported={fileEntry.isSupported}>
           <Tooltip
             overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
             mouseEnterDelay={TOOLTIP_DELAY}

@@ -279,7 +279,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     });
 
     newMenuItems.push({
-      disabled: isRoot,
+      disabled: isRoot || (!fileEntry.children && !fileEntry.isSupported),
       key: 'update_scanning',
       label: `${
         fileEntry.isExcluded && projectConfig?.scanExcludes?.some(e => micromatch.isMatch(filePath, e))

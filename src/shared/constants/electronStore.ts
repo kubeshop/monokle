@@ -1,3 +1,5 @@
+import {sep} from 'path';
+
 import {PREDEFINED_K8S_VERSION} from './k8s';
 
 export const electronStoreSchema = {
@@ -283,7 +285,7 @@ export const electronStoreDefaults = {
     useKubectlProxy: false,
     loadLastProjectOnStartup: false,
     fileExplorerSortOrder: 'folders',
-    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', '.monokle'],
+    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', `${sep}.github`],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {
       theme: 'dark',

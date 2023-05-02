@@ -56,23 +56,27 @@ export const TitleContainer = styled.div<{$actionButtonsWidth: number; $isHovere
   width: ${({$actionButtonsWidth, $isHovered}) => ($isHovered ? `calc(100% - ${$actionButtonsWidth}px)` : '100%')};
 `;
 
-export const TitleText = styled.span<{$isSelected?: boolean; $isHighlighted?: boolean; $isExcluded?: boolean}>(
-  props => ({
-    overflow: 'hidden',
-    position: 'relative',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    color: props.$isSelected
-      ? Colors.blackPure
-      : props.$isHighlighted
-      ? Colors.cyan7
-      : props.$isExcluded
-      ? Colors.grey7
-      : Colors.blue10,
-  })
-);
+export const TitleText = styled.span<{
+  $isSelected?: boolean;
+  $isHighlighted?: boolean;
+  $isExcluded: boolean;
+  $isSupported: boolean;
+}>(props => ({
+  overflow: 'hidden',
+  position: 'relative',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  fontStyle: props.$isExcluded ? 'italic' : 'normal',
+  color: props.$isSelected
+    ? Colors.blackPure
+    : props.$isHighlighted
+    ? Colors.cyan7
+    : props.$isExcluded || !props.$isSupported
+    ? Colors.grey7
+    : Colors.blue10,
+}));
 
-export const NodeContainer = styled.div<{$isDisabled: boolean; $isExcluded?: boolean}>`
+export const NodeContainer = styled.div<{$isDisabled: boolean}>`
   position: relative;
   width: 100%;
   display: flex;
