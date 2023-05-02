@@ -5,7 +5,6 @@ import {sortBy} from 'lodash';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
-import {selectKubeconfig} from '@redux/cluster/selectors';
 import {extractK8sResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
@@ -18,6 +17,7 @@ import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/mod
 import {K8sResource} from '@shared/models/k8sResource';
 import {HelmConfigPreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {runCommandInMainThread} from '@shared/utils/commands';
 import {trackEvent} from '@shared/utils/telemetry';
 

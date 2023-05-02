@@ -3,8 +3,9 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {loadClusterResources, reloadClusterResources} from '@redux/thunks/cluster';
 
 import {ThunkApi} from '@shared/models/thunk';
+import {selectKubeContext} from '@shared/utils/cluster/selectors';
 
-import {selectCurrentContextId, selectKubeContext} from '../selectors';
+import {selectCurrentContextId} from '../selectors';
 import {setup} from '../service/kube-control';
 import {setupCluster} from './setup';
 

@@ -5,7 +5,6 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Input, Modal, Radio, Select} from 'antd';
 
 import {currentClusterAccessSelector} from '@redux/appConfig';
-import {selectKubeconfig} from '@redux/cluster/selectors';
 import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {useAppSelector} from '@redux/hooks';
 
@@ -14,6 +13,7 @@ import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 import {getDefaultNamespaceForApply} from '@utils/resources';
 
 import {ResourceMeta} from '@shared/models/k8sResource';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 
 import * as S from './ModalConfirmWithNamespaceSelect.styled';
 

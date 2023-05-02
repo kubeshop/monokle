@@ -8,7 +8,7 @@ import {mergeConfigs, populateProjectConfig} from '@redux/services/projectConfig
 import {HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
 import {RootState} from '@shared/models/rootState';
 import {Colors} from '@shared/styles';
-import {selectKubeContext, selectKubeconfig} from '@shared/utils/cluster/selectors';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 
 export {activeProjectSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
