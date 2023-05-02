@@ -1,6 +1,6 @@
 import {useMemo, useState} from 'react';
 
-import {AutoComplete, Badge, Dropdown, Popover, Tooltip, Typography} from 'antd';
+import {AutoComplete, Badge, Dropdown, Tooltip, Typography} from 'antd';
 
 import {BellOutlined, EllipsisOutlined} from '@ant-design/icons';
 
@@ -13,7 +13,7 @@ import {setOpenProject} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setShowStartPageLearn, setStartPageMenuOption, toggleNotifications} from '@redux/reducers/ui';
 
-import {WelcomePopupContent} from '@molecules';
+import {NewVersionNotice} from '@molecules';
 
 import {IconButton} from '@atoms';
 
@@ -27,9 +27,10 @@ import * as S from './StartPageHeader.styled';
 
 const StartPageHeader: React.FC = () => {
   const dispatch = useAppDispatch();
+  const isNewVersionAvailable = useAppSelector(state => state.config.isNewVersionAvailable);
+  const isNewVersionNoticeVisible = useAppSelector(state => state.ui.newVersionNotice.isVisible);
   const isStartPageLearnVisible = useAppSelector(state => state.ui.startPage.learn.isVisible);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
-  const isWelcomePopupVisible = useAppSelector(state => state.ui.welcomePopup.isVisible);
   const projects = useAppSelector(state => _.sortBy(state.config.projects, p => p?.name?.toLowerCase()));
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
@@ -62,13 +63,17 @@ const StartPageHeader: React.FC = () => {
 
   return (
     <S.StartPageHeaderContainer>
-      <S.LogoContainer>
-        <S.Logo
-          id="monokle-logo-header"
-          src={MonokleKubeshopLogo}
-          alt="Monokle"
-          onClick={() => dispatch(setStartPageMenuOption('new-project'))}
-        />
+      <S.LogoContainer $isNewVersionNoticeVisible={isNewVersionNoticeVisible}>
+        <S.NewVersionBadge dot={isNewVersionAvailable}>
+          <NewVersionNotice>
+            <S.Logo
+              id="monokle-logo-header"
+              src={MonokleKubeshopLogo}
+              alt="Monokle"
+              onClick={() => dispatch(setStartPageMenuOption('new-project'))}
+            />
+          </NewVersionNotice>
+        </S.NewVersionBadge>
       </S.LogoContainer>
 
       <S.SearchContainer>
@@ -86,23 +91,15 @@ const StartPageHeader: React.FC = () => {
         <div id="projectsList" />
       </S.SearchContainer>
       <S.ActionsContainer>
-        <Popover
-          zIndex={100}
-          content={<WelcomePopupContent />}
-          overlayClassName="welcome-popup"
-          open={isWelcomePopupVisible}
-          placement="leftTop"
+        <S.LearnButton
+          $isActive={isStartPageLearnVisible}
+          type="text"
+          onClick={() => {
+            dispatch(setShowStartPageLearn(true));
+          }}
         >
-          <S.LearnButton
-            $isActive={isStartPageLearnVisible}
-            type="text"
-            onClick={() => {
-              dispatch(setShowStartPageLearn(true));
-            }}
-          >
-            Learn
-          </S.LearnButton>
-        </Popover>
+          Learn
+        </S.LearnButton>
 
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
           <Badge count={unseenNotificationsCount} size="small">

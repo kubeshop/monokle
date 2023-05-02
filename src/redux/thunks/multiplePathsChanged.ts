@@ -4,9 +4,8 @@ import micromatch from 'micromatch';
 
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading} from '@redux/git';
+import {getChangedFiles} from '@redux/git/git.ipc';
 import {addPath, getFileEntryForAbsolutePath, reloadFile} from '@redux/services/fileEntry';
-
-import {promiseFromIpcRenderer} from '@utils/promises';
 
 import {AppState} from '@shared/models/appState';
 import {FileSideEffect} from '@shared/models/fileEntry';
@@ -17,12 +16,16 @@ export const multiplePathsChanged = createAsyncThunk<
   {
     nextMainState: AppState;
     affectedResourceIdentifiers: ResourceIdentifier[];
+    // the paths of the existing files that have been modified
+    reloadedFilePaths: string[];
   },
   Array<string>
 >('main/multiplePathsChanged', async (filePaths, thunkAPI: {getState: Function; dispatch: Function}) => {
   const state: RootState = thunkAPI.getState();
   const projectConfig = currentConfigSelector(state);
   const projectRootFolder = state.config.selectedProjectRootFolder;
+
+  const reloadedFilePaths: string[] = [];
 
   const fileSideEffect: FileSideEffect = {
     affectedResourceIds: [],
@@ -32,7 +35,8 @@ export const multiplePathsChanged = createAsyncThunk<
     filePaths.forEach(filePath => {
       let fileEntry = getFileEntryForAbsolutePath(filePath, mainState.fileMap);
       if (fileEntry) {
-        reloadFile(filePath, fileEntry, mainState, projectConfig, fileSideEffect);
+        const hasReloadedFile = reloadFile(filePath, fileEntry, mainState, projectConfig, fileSideEffect);
+        if (hasReloadedFile) reloadedFilePaths.push(filePath);
       } else if (!projectConfig.scanExcludes || !micromatch.any(filePath, projectConfig.scanExcludes)) {
         addPath(filePath, mainState, projectConfig, fileSideEffect);
       }
@@ -44,20 +48,19 @@ export const multiplePathsChanged = createAsyncThunk<
       thunkAPI.dispatch(setGitLoading(true));
     }
 
-    promiseFromIpcRenderer('git.getChangedFiles', 'git.getChangedFiles.result', {
-      localPath: projectRootFolder,
-      fileMap: nextMainState.fileMap,
-    }).then(result => {
-      if (!result?.error) {
-        thunkAPI.dispatch(setChangedFiles(result));
-      }
-
-      thunkAPI.dispatch(setGitLoading(false));
-    });
+    getChangedFiles({localPath: projectRootFolder || '', fileMap: thunkAPI.getState().main.fileMap})
+      .then(changedFiles => {
+        thunkAPI.dispatch(setChangedFiles(changedFiles));
+        thunkAPI.dispatch(setGitLoading(false));
+      })
+      .catch(() => {
+        thunkAPI.dispatch(setGitLoading(false));
+      });
   }
 
   return {
     nextMainState,
     affectedResourceIdentifiers: fileSideEffect.affectedResourceIds.map(id => ({id, storage: 'local'})),
+    reloadedFilePaths,
   };
 });

@@ -9,7 +9,6 @@ import {Button, Select, Skeleton, Switch} from 'antd';
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
 import {flatten} from 'lodash';
-import {stringify} from 'yaml';
 
 import {
   ClusterName,
@@ -20,11 +19,11 @@ import {
 
 import {
   currentClusterAccessSelector,
-  isInClusterModeSelector,
   kubeConfigContextColorSelector,
   kubeConfigContextSelector,
   kubeConfigPathSelector,
 } from '@redux/appConfig';
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal, openResourceDiffModal} from '@redux/reducers/main';
@@ -38,13 +37,15 @@ import {ModalConfirm, ModalConfirmWithNamespaceSelect} from '@components/molecul
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
+import {stringifyK8sResource} from '@utils/yaml';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {Icon} from '@monokle/components';
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {RootState} from '@shared/models/rootState';
-import {createKubeClient, hasAccessToResourceKind} from '@shared/utils/kubeclient';
+import {hasAccessToResourceKind} from '@shared/utils/kubeclient';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './styled';
 
@@ -198,7 +199,7 @@ const DiffModal = () => {
     const newDiffContentObject = removeIgnoredPathsFromResourceObject(
       matchingResourcesById[selectedMatchingResourceId]
     );
-    const cleanDiffContentString = stringify(newDiffContentObject, {sortMapEntries: true});
+    const cleanDiffContentString = stringifyK8sResource(newDiffContentObject, {sortMapEntries: true});
     return cleanDiffContentString;
   }, [
     isDiffModalVisible,
@@ -228,7 +229,9 @@ const DiffModal = () => {
     }
 
     const getClusterResources = async () => {
-      const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
+      const context = kubeConfigContext;
+      const kubeconfig = kubeConfigPath;
+      const kc = await createKubeClientWithSetup({context, kubeconfig, skipHealthCheck: true});
 
       const resourceKindHandler = getResourceKindHandler(targetResource.kind);
       const getResources = async () => {
@@ -292,7 +295,7 @@ const DiffModal = () => {
           hasClusterMatchingResource = true;
           setSelectedMathingResourceId(foundResourceFromCluster.metadata.uid);
           setDefaultNamespace(foundResourceFromCluster.metadata.namespace);
-          setMatchingResourceText(stringify(foundResourceFromCluster, {sortMapEntries: true}));
+          setMatchingResourceText(stringifyK8sResource(foundResourceFromCluster, {sortMapEntries: true}));
         }
       } else if (resourceFilter.namespaces) {
         const foundResourceFromCluster = resourcesFromCluster.find(r =>
@@ -302,20 +305,20 @@ const DiffModal = () => {
           hasClusterMatchingResource = true;
           setSelectedMathingResourceId(foundResourceFromCluster.metadata.uid);
           setDefaultNamespace(foundResourceFromCluster.metadata.namespace);
-          setMatchingResourceText(stringify(foundResourceFromCluster, {sortMapEntries: true}));
+          setMatchingResourceText(stringifyK8sResource(foundResourceFromCluster, {sortMapEntries: true}));
         }
       }
 
       if (!hasClusterMatchingResource) {
         setSelectedMathingResourceId(resourcesFromCluster[0].metadata.uid);
         setDefaultNamespace(resourcesFromCluster[0].metadata.namespace);
-        setMatchingResourceText(stringify(resourcesFromCluster[0], {sortMapEntries: true}));
+        setMatchingResourceText(stringifyK8sResource(resourcesFromCluster[0], {sortMapEntries: true}));
       }
 
       setHasDiffModalLoaded(true);
     };
 
-    setTargetResourceText(stringify(targetResource.object, {sortMapEntries: true}));
+    setTargetResourceText(stringifyK8sResource(targetResource.object, {sortMapEntries: true}));
     getClusterResources();
   }, [
     kubeConfigContext,

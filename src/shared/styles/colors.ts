@@ -78,6 +78,7 @@ export enum Colors {
   cyan1 = '#112123',
   cyan2 = '#113536',
   cyan5 = '#138585',
+  cyan6 = '#13A8A8',
   cyan7 = '#33BCB7',
   cyan8 = '#58D1C9',
   cyan9 = '#84E2D8',

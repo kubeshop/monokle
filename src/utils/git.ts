@@ -1,22 +1,14 @@
-import {ipcRenderer, shell} from 'electron';
+import {shell} from 'electron';
 
 import {useCallback, useMemo} from 'react';
 
+import {isUndefined} from 'lodash';
 import path from 'path';
 
 import {useAppSelector} from '@redux/hooks';
 
 export function filterGitFolder(paths: string[]) {
   return paths.filter(p => p !== '.git' && !p.includes(`${path.sep}.git${path.sep}`) && !p.endsWith('.git'));
-}
-
-export function fetchIsGitInstalled() {
-  return new Promise<boolean>(resolve => {
-    ipcRenderer.once('git.isGitInstalled.result', (_, isGitInstalled) => {
-      resolve(isGitInstalled);
-    });
-    ipcRenderer.send('git.isGitInstalled');
-  });
 }
 
 export function gitCommitDate(date: string) {
@@ -39,12 +31,12 @@ export function useOpenOnGithub(relativePath?: string) {
   const repoCurrentBranch = useAppSelector(state => state.git.repo?.currentBranch);
 
   const canOpenOnGithub = useMemo(
-    () => Boolean(repoRemoteUrl && repoCurrentBranch && relativePath),
+    () => Boolean(repoRemoteUrl && repoCurrentBranch && !isUndefined(relativePath)),
     [repoRemoteUrl, repoCurrentBranch, relativePath]
   );
 
   const openOnGithub = useCallback(() => {
-    if (repoRemoteUrl && repoCurrentBranch && relativePath) {
+    if (repoRemoteUrl && repoCurrentBranch && !isUndefined(relativePath)) {
       openGithubPath({repoRemoteUrl, repoCurrentBranch, relativePath});
     }
   }, [repoRemoteUrl, repoCurrentBranch, relativePath]);

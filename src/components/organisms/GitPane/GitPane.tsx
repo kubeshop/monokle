@@ -7,13 +7,14 @@ import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {setGitLoading} from '@redux/git';
+import {stageChangedFiles, unstageFiles} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
 
 import {TitleBar} from '@monokle/components';
 import {GitChangedFile} from '@shared/models/git';
@@ -29,7 +30,7 @@ const GitPane: React.FC = () => {
   const gitLoading = useAppSelector(state => state.git.loading);
   const gitRepo = useAppSelector(state => state.git.repo);
   const remoteRepo = useAppSelector(state => state.git.repo?.remoteRepo);
-  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder) || '';
 
   const [selectedStagedFiles, setSelectedStagedFiles] = useState<GitChangedFile[]>([]);
   const [selectedUnstagedFiles, setSelectedUnstagedFiles] = useState<GitChangedFile[]>([]);
@@ -42,7 +43,7 @@ const GitPane: React.FC = () => {
   const height = usePaneHeight();
 
   const fileContainerHeight = useMemo(() => {
-    let h: number = height - DEFAULT_PANE_TITLE_HEIGHT - 12;
+    let h: number = height - DEFAULT_PANE_TITLE_HEIGHT - 22;
 
     // 12 is the margin top of the git pane content
     if (gitRepo) {
@@ -90,19 +91,28 @@ const GitPane: React.FC = () => {
     dispatch(setGitLoading(true));
 
     if (type === 'stage') {
-      await promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
-        localPath: selectedProjectRootFolder,
-        filePaths: selectedUnstagedFiles.map(item => item.fullGitPath),
-      });
-
-      setSelectedUnstagedFiles([]);
+      try {
+        await stageChangedFiles({
+          localPath: selectedProjectRootFolder,
+          filePaths: selectedUnstagedFiles.map(item => item.fullGitPath),
+        });
+        setSelectedUnstagedFiles([]);
+      } catch (e: any) {
+        showGitErrorModal('Staging changes failed!', e.message);
+        setGitLoading(false);
+      }
     } else {
-      await promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
-        localPath: selectedProjectRootFolder,
-        filePaths: selectedStagedFiles.map(item => item.fullGitPath),
-      });
+      try {
+        await unstageFiles({
+          localPath: selectedProjectRootFolder,
+          filePaths: selectedStagedFiles.map(item => item.fullGitPath),
+        });
 
-      setSelectedStagedFiles([]);
+        setSelectedStagedFiles([]);
+      } catch (e: any) {
+        showGitErrorModal('Unstaging changes failed!', e.message);
+        setGitLoading(false);
+      }
     }
   };
 
@@ -117,7 +127,7 @@ const GitPane: React.FC = () => {
 
   return (
     <S.GitPaneContainer id="GitPane" $height={height}>
-      <TitleBarWrapper $closable>
+      <TitleBarWrapper>
         <TitleBar title="Git" />
       </TitleBarWrapper>
 
@@ -201,7 +211,11 @@ const GitPane: React.FC = () => {
           </S.FileContainer>
         </>
       ) : (
-        <S.NoChangedFilesLabel>There were no changed files found.</S.NoChangedFilesLabel>
+        <S.NoChangedFilesLabel>
+          {!gitRepo
+            ? 'Initialize a new Git repository by clicking on the button from the header.'
+            : 'There were no changed files found.'}{' '}
+        </S.NoChangedFilesLabel>
       )}
 
       {gitRepo ? (

@@ -95,6 +95,9 @@ type UiState = {
   isScaleModalOpen: boolean;
   isNotificationsOpen: boolean;
   isAboutModalOpen: boolean;
+  newVersionNotice: {
+    isVisible: boolean;
+  };
   newResourceWizard: {
     isOpen: boolean;
     defaultInput?: NewResourceWizardInput;
@@ -143,6 +146,7 @@ type UiState = {
     isActive: boolean;
     isValidationDrawerVisible: boolean;
     selection: LeftMenuSelectionType;
+    activityBeforeClusterConnect: LeftMenuSelectionType | undefined;
     activeTab: string | null;
   };
   quickSearchActionsPopup: {
@@ -187,7 +191,8 @@ type UiState = {
   isInQuickClusterMode?: boolean;
   collapsedKustomizeKinds: string[];
   collapsedHelmCharts: string[];
-  welcomePopup: {
+  collapsedPreviewConfigurationsHelmCharts: string[];
+  welcomeModal: {
     isVisible: boolean;
   };
   fileCompareModal: {

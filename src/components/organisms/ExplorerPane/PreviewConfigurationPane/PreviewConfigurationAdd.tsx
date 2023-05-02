@@ -36,4 +36,5 @@ export default PreviewConfigurationAdd;
 const AddButton = styled(Button)`
   border-radius: 4px;
   font-size: 13px;
+  padding-left: 11px;
 `;

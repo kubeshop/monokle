@@ -5,14 +5,16 @@ import {Col, InputNumber, Modal, Row, Tooltip} from 'antd';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ScaleTooltip} from '@constants/tooltips';
 
-import {isInClusterModeSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeScaleModal, openScaleModal} from '@redux/reducers/ui';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import scaleDeployment from '@redux/services/scaleDeployment';
-import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {PrimaryButton} from '@atoms';
+
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 const Scale: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -40,7 +42,7 @@ const Scale: React.FC = () => {
       await scaleDeployment({name, replicas, namespace, currentContext, kubeConfigPath});
       toggleScaling(false);
       // TODO: we should have a way of updating a single resource instead of restarting the whole cluster
-      dispatch(startClusterConnection({context: currentContext, namespace, isRestart: true}));
+      dispatch(connectCluster({context: currentContext, namespace, reload: true}));
     }
     dispatch(closeScaleModal());
   };

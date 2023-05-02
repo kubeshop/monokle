@@ -9,14 +9,13 @@ import {TemplatesType} from '@rjsf/utils';
 import validator from '@rjsf/validator-ajv8';
 
 import log from 'loglevel';
-import {stringify} from 'yaml';
 
 import {DEFAULT_EDITOR_DEBOUNCE} from '@constants/constants';
 
-import {isInClusterModeSelector, settingsSelector} from '@redux/appConfig';
+import {settingsSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingStatus} from '@redux/reducers/main';
-import {isInPreviewModeSelectorNew, selectedFilePathSelector} from '@redux/selectors';
+import {selectedFilePathSelector} from '@redux/selectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {mergeManifests} from '@redux/services/manifest-utils';
 import {removeSchemaDefaults} from '@redux/services/schema';
@@ -27,10 +26,11 @@ import {updateResource} from '@redux/thunks/updateResource';
 import {ErrorPage} from '@components/organisms/ErrorPage/ErrorPage';
 
 import {useStateWithRef} from '@utils/hooks';
-import {parseYamlDocument} from '@utils/yaml';
+import {parseYamlDocument, stringifyK8sResource} from '@utils/yaml';
 
-import {isHelmChartFile} from '@shared/utils';
+import {isHelmChartFile} from '@shared/utils/helm';
 import {isEqual} from '@shared/utils/isEqual';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';
@@ -59,7 +59,7 @@ const FormEditor: React.FC<IProps> = props => {
   const dispatch = useAppDispatch();
   const autosavingStatus = useAppSelector(state => state.main.autosaving.status);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const selectedResource = useSelectedResource();
   const [formData, _setFormData, formDataRef] = useStateWithRef<any>(undefined);
@@ -90,7 +90,7 @@ const FormEditor: React.FC<IProps> = props => {
         return;
       }
 
-      let formString = stringify(formData);
+      let formString = stringifyK8sResource(formData);
 
       if (selectedResource) {
         const content = mergeManifests(selectedResource.text, formString);

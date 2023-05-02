@@ -6,11 +6,11 @@ import {Button, Switch} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
-import {parse, stringify} from 'yaml';
+import {parse} from 'yaml';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {isInClusterModeSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
+import {kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {applyResourceToCluster} from '@redux/thunks/applyResource';
@@ -21,9 +21,11 @@ import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
+import {stringifyK8sResource} from '@utils/yaml';
 
 import {Icon} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './ResourceDiff.styled';
@@ -74,7 +76,7 @@ const ResourceDiff = (props: {
 
   // TODO: can't we just use localResource.text here?
   const localResourceText = useMemo(() => {
-    return stringify(localResource.object, {sortMapEntries: true});
+    return stringifyK8sResource(localResource.object, {sortMapEntries: true});
   }, [localResource]);
 
   const cleanClusterResourceText = useMemo(() => {
@@ -84,7 +86,7 @@ const ResourceDiff = (props: {
     const originalClusterResourceContent = parse(clusterResourceText);
     const cleanClusterResourceContent = removeIgnoredPathsFromResourceObject(originalClusterResourceContent);
 
-    return stringify(cleanClusterResourceContent, {sortMapEntries: true});
+    return stringifyK8sResource(cleanClusterResourceContent, {sortMapEntries: true});
   }, [clusterResourceText, shouldDiffIgnorePaths]);
 
   const areResourcesDifferent = useMemo(() => {

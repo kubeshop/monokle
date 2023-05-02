@@ -10,7 +10,6 @@ import styled from 'styled-components';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {useResource} from '@redux/selectors/resourceSelectors';
 import {getAbsoluteFilePath} from '@redux/services/fileEntry';
 import {isResourceSelected} from '@redux/services/resource';
@@ -26,6 +25,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Colors} from '@shared/styles/colors';
+import {isInPreviewModeSelector} from '@shared/utils/selectors';
 import {showItemInFolder} from '@shared/utils/shell';
 
 type IProps = {
@@ -48,7 +48,7 @@ const KustomizeContextMenu: React.FC<IProps> = props => {
   );
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const filters = useAppSelector(state => state.main.resourceFilter);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isKustomizationSelected = useAppSelector(state =>
     resource ? isResourceSelected(resource, state.main.selection) : false
   );

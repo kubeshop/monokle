@@ -8,11 +8,9 @@ import {Button, Select, Skeleton, Switch} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
-import {stringify} from 'yaml';
-
 import {ClusterName, makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {isInClusterModeSelector, kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
+import {kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeResourceDiffModal} from '@redux/reducers/main';
@@ -26,10 +24,12 @@ import {ModalConfirmWithNamespaceSelect} from '@molecules';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
+import {stringifyK8sResource} from '@utils/yaml';
 
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {K8sResource} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ClusterResourceDiffModal.styled';
 
@@ -90,10 +90,10 @@ const ClusterResourceDiffModal = () => {
     }
 
     if (!shouldDiffIgnorePaths) {
-      return stringify(targetResource.object, {sortMapEntries: true});
+      return stringifyK8sResource(targetResource.object, {sortMapEntries: true});
     }
 
-    return stringify(removeIgnoredPathsFromResourceObject(targetResource.object, targetResource.namespace), {
+    return stringifyK8sResource(removeIgnoredPathsFromResourceObject(targetResource.object, targetResource.namespace), {
       sortMapEntries: true,
     });
   }, [isDiffModalVisible, shouldDiffIgnorePaths, targetResource]);
@@ -168,7 +168,7 @@ const ClusterResourceDiffModal = () => {
     }
 
     setSelectedMatchingResourceId(resourceId);
-    setMatchingResourceText(stringify(matchingLocalResources[resourceId].object, {sortMapEntries: true}));
+    setMatchingResourceText(stringifyK8sResource(matchingLocalResources[resourceId].object, {sortMapEntries: true}));
   };
 
   const handleApply = () => {
@@ -230,7 +230,7 @@ const ClusterResourceDiffModal = () => {
       if (foundResource) {
         hasLocalMatchingResource = true;
         setSelectedMatchingResourceId(foundResource.id);
-        setMatchingResourceText(stringify(foundResource.object, {sortMapEntries: true}));
+        setMatchingResourceText(stringifyK8sResource(foundResource.object, {sortMapEntries: true}));
       }
     } else if (targetResource.namespace === 'default') {
       const foundResource = Object.values(matchingLocalResources).filter(
@@ -240,21 +240,23 @@ const ClusterResourceDiffModal = () => {
       if (foundResource) {
         hasLocalMatchingResource = true;
         setSelectedMatchingResourceId(foundResource.id);
-        setMatchingResourceText(stringify(foundResource.object, {sortMapEntries: true}));
+        setMatchingResourceText(stringifyK8sResource(foundResource.object, {sortMapEntries: true}));
       } else {
         const foundResourceWithoutNamespace = Object.values(matchingLocalResources).filter(r => !r.namespace)[0];
 
         if (foundResourceWithoutNamespace) {
           hasLocalMatchingResource = true;
           setSelectedMatchingResourceId(foundResourceWithoutNamespace.id);
-          setMatchingResourceText(stringify(foundResourceWithoutNamespace.object, {sortMapEntries: true}));
+          setMatchingResourceText(stringifyK8sResource(foundResourceWithoutNamespace.object, {sortMapEntries: true}));
         }
       }
     }
 
     if (!hasLocalMatchingResource) {
       setSelectedMatchingResourceId(Object.keys(matchingLocalResources)[0]);
-      setMatchingResourceText(stringify(Object.values(matchingLocalResources)[0].object, {sortMapEntries: true}));
+      setMatchingResourceText(
+        stringifyK8sResource(Object.values(matchingLocalResources)[0].object, {sortMapEntries: true})
+      );
     }
 
     setHasDiffModalLoaded(true);

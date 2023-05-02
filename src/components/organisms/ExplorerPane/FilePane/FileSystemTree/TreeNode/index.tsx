@@ -10,7 +10,9 @@ import TreeNodeFolder from './TreeNodeFolder';
 
 const FileSystemTreeNode: React.FC<{node: any}> = props => {
   const {node} = props;
-  const isFolder = useAppSelector(state => isDefined(state.main.fileMap[node.key]?.children));
+
+  const isFolder = useAppSelector(state => isDefined(state.main.fileMap[node.key]?.children)) || node.isRootEntry;
+
   return isFolder ? <TreeNodeFolder folderPath={node.key} /> : <TreeNodeFile filePath={node.key} />;
 };
 

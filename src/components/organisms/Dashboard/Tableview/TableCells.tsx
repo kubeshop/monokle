@@ -158,7 +158,8 @@ export const CellPodsCount = {
     </span>
   ),
   sorter: (a: K8sResource, b: K8sResource) =>
-    Number(a.object?.status?.availableReplicas) - Number(b.object?.status?.availableReplicas) || UNSORTED_VALUE,
+    Number(b.object?.status?.availableReplicas || 0) - Number(a.object?.status?.availableReplicas || 0) ||
+    UNSORTED_VALUE,
 };
 
 export const CellScheduledCount = {

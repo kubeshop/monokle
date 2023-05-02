@@ -14,7 +14,15 @@ import {
   updateProjectK8sVersion,
 } from '@redux/appConfig';
 import {AppListenerFn} from '@redux/listeners/base';
-import {addMultipleResources, addResource, clearPreview, clearPreviewAndSelectionHistory} from '@redux/reducers/main';
+import {
+  addMultipleResources,
+  addResource,
+  clearPreview,
+  clearPreviewAndSelectionHistory,
+  deleteMultipleClusterResources,
+  multiplePathsRemoved,
+  updateMultipleClusterResources,
+} from '@redux/reducers/main';
 import {setIsInQuickClusterMode} from '@redux/reducers/ui';
 import {getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {previewSavedCommand} from '@redux/services/previewCommand';
@@ -77,11 +85,21 @@ const validateListener: AppListenerFn = listen => {
       previewHelmValuesFile.fulfilled,
       runPreviewConfiguration.fulfilled,
       previewSavedCommand.fulfilled,
+      previewKustomization.rejected,
+      previewHelmValuesFile.rejected,
+      runPreviewConfiguration.rejected,
+      previewSavedCommand.rejected,
       stopClusterConnection.fulfilled,
+      deleteMultipleClusterResources,
+      multiplePathsRemoved,
       clearPreviewAndSelectionHistory,
       clearPreview
     ),
     async effect(_action, {dispatch, getState, cancelActiveListeners, signal, delay}) {
+      if (_action.type === 'main/clearPreviewAndSelectionHistory' && _action.payload.revalidate === false) {
+        return;
+      }
+
       cancelActiveListeners();
 
       const validatorsLoading = getState().validation.status === 'loading';
@@ -107,7 +125,17 @@ const validateListener: AppListenerFn = listen => {
         resourceStorage = 'preview';
       }
 
-      if (isAnyOf(stopClusterConnection.fulfilled, clearPreviewAndSelectionHistory, clearPreview)(_action)) {
+      if (
+        isAnyOf(
+          stopClusterConnection.fulfilled,
+          clearPreviewAndSelectionHistory,
+          clearPreview,
+          previewKustomization.rejected,
+          previewHelmValuesFile.rejected,
+          runPreviewConfiguration.rejected,
+          previewSavedCommand.rejected
+        )(_action)
+      ) {
         resourceStorage = 'local';
       }
 
@@ -125,6 +153,7 @@ const incrementalValidationListener: AppListenerFn = listen => {
       addMultipleResources,
       updateResource.fulfilled,
       updateMultipleResources.fulfilled,
+      updateMultipleClusterResources,
       updateFileEntry.fulfilled,
       removeResources.fulfilled,
       multiplePathsAdded.fulfilled,
@@ -150,7 +179,7 @@ const incrementalValidationListener: AppListenerFn = listen => {
         resourceIdentifiers = [_action.payload];
       }
 
-      if (isAnyOf(addMultipleResources)(_action)) {
+      if (isAnyOf(addMultipleResources, updateMultipleClusterResources)(_action)) {
         resourceIdentifiers = _action.payload;
       }
 

@@ -1,5 +1,6 @@
 import {AlertState} from './alert';
 import {AppState} from './appState';
+import {ClusterState} from './clusterState';
 import {CompareState} from './compare';
 import {AppConfig} from './config';
 import {DashboardState} from './dashboard';
@@ -26,6 +27,21 @@ type RootState = {
   ui: UiState;
   validation: ValidationState;
   dashboard: DashboardState;
+  cluster: ClusterState;
 };
 
-export type {RootState};
+type ElectronMenuDataType = {
+  config: Pick<
+    RootState['config'],
+    'projects' | 'newVersion' | 'selectedProjectRootFolder' | 'kubeConfig' | 'projectConfig'
+  >;
+} & {
+  main: Pick<RootState['main'], 'selection' | 'preview' | 'clusterConnection'>;
+} & {
+  ui: Pick<
+    RootState['ui'],
+    'isStartProjectPaneVisible' | 'isInQuickClusterMode' | 'isStartProjectPaneVisible' | 'monacoEditor'
+  >;
+};
+
+export type {RootState, ElectronMenuDataType};

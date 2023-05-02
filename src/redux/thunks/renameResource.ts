@@ -1,6 +1,6 @@
-import {stringify} from 'yaml';
-
 import {updateResource} from '@redux/thunks/updateResource';
+
+import {stringifyK8sResource} from '@utils/yaml';
 
 import {isIncomingRef} from '@monokle/validation';
 import {AppDispatch} from '@shared/models/appDispatch';
@@ -25,7 +25,7 @@ export const renameResource = (
       name: newResourceName,
     },
   };
-  const newResourceText = stringify(newResourceObject);
+  const newResourceText = stringifyK8sResource(newResourceObject);
   if (shouldUpdateRefs && resource.refs) {
     resource.refs.forEach(ref => {
       if (!isIncomingRef(ref.type) || !(ref.target?.type === 'resource' && ref.target.resourceId)) {

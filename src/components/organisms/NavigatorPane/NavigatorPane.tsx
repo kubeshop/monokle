@@ -8,12 +8,11 @@ import {PlusOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {NewResourceTooltip} from '@constants/tooltips';
+import {DisabledAddResourceTooltip, NewResourceTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
-import {resourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
+import {navigatorResourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
@@ -22,9 +21,12 @@ import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrappe
 import {useNewResourceMenuItems} from '@hooks/menuItemsHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
+import {useRefSelector} from '@utils/hooks';
+
 import {Icon, ResizableRowsPanel, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Colors} from '@shared/styles';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import NavigatorDescription from './NavigatorDescription';
 import * as S from './NavigatorPane.styled';
@@ -36,7 +38,8 @@ const NavPane: React.FC = () => {
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
 
@@ -44,6 +47,11 @@ const NavPane: React.FC = () => {
 
   const height = usePaneHeight();
   const newResourceMenuItems = useNewResourceMenuItems();
+
+  const isAddResourceDisabled = useMemo(
+    () => !isFolderOpen || isInPreviewMode || isInClusterMode,
+    [isFolderOpen, isInClusterMode, isInPreviewMode]
+  );
 
   const resourceFilterButtonHandler = useCallback(() => {
     dispatch(toggleResourceFilters());
@@ -66,27 +74,39 @@ const NavPane: React.FC = () => {
             type="secondary"
             title="Kubernetes Resources"
             description={<NavigatorDescription />}
+            descriptionStyle={{paddingTop: '5px'}}
             actions={
               <S.TitleBarRightButtons>
                 <CollapseAction />
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
-                  <Dropdown
-                    trigger={['click']}
-                    menu={{items: newResourceMenuItems}}
-                    overlayClassName="dropdown-secondary"
+
+                <Dropdown
+                  trigger={['click']}
+                  menu={{items: newResourceMenuItems}}
+                  overlayClassName="dropdown-secondary"
+                  disabled={isAddResourceDisabled}
+                >
+                  <Tooltip
+                    mouseEnterDelay={TOOLTIP_DELAY}
+                    title={
+                      isAddResourceDisabled
+                        ? DisabledAddResourceTooltip({
+                            type: isInClusterMode ? 'cluster' : isInPreviewMode ? 'preview' : 'other',
+                          })
+                        : NewResourceTooltip
+                    }
                   >
                     <S.PlusButton
                       id="create-resource-button"
-                      $disabled={!isFolderOpen || isInPreviewMode}
+                      $disabled={isAddResourceDisabled}
                       $highlighted={isHighlighted}
                       className={isHighlighted ? 'animated-highlight' : ''}
-                      disabled={!isFolderOpen || isInPreviewMode}
+                      disabled={isAddResourceDisabled}
                       icon={<PlusOutlined />}
                       size="small"
                       type="link"
                     />
-                  </Dropdown>
-                </Tooltip>
+                  </Tooltip>
+                </Dropdown>
               </S.TitleBarRightButtons>
             }
           />
@@ -118,16 +138,16 @@ export default NavPane;
 
 function CollapseAction() {
   const dispatch = useAppDispatch();
-  const allKinds = useAppSelector(resourceKindsSelector);
-  const collapsedKinds = useAppSelector(s => s.ui.navigator.collapsedResourceKinds);
+  const navigatorKinds = useRefSelector(navigatorResourceKindsSelector);
+  const collapsedKinds = useRefSelector(s => s.ui.navigator.collapsedResourceKinds);
 
   const onClick = useCallback(() => {
-    if (collapsedKinds.length === allKinds.length) {
-      dispatch(expandResourceKinds(allKinds));
+    if (collapsedKinds.current.length === navigatorKinds.current.length) {
+      dispatch(expandResourceKinds(navigatorKinds.current));
       return;
     }
-    dispatch(collapseResourceKinds(allKinds));
-  }, [dispatch, collapsedKinds, allKinds]);
+    dispatch(collapseResourceKinds(navigatorKinds.current));
+  }, [dispatch, collapsedKinds, navigatorKinds]);
 
   return (
     <CollapseIconWrapper onClick={onClick}>

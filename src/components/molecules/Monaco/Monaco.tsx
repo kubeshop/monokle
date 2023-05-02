@@ -13,7 +13,7 @@ import 'monaco-yaml';
 import path from 'path';
 import {Document, ParsedNode, isMap} from 'yaml';
 
-import {isInClusterModeSelector, settingsSelector} from '@redux/appConfig';
+import {settingsSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   editorHasReloadedSelectedPath,
@@ -23,7 +23,7 @@ import {
   selectResource,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew, selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
+import {selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
 import {
   activeResourceStorageSelector,
   useActiveResourceContentMapRef,
@@ -49,6 +49,7 @@ import {ResourceFilterType} from '@shared/models/appState';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {ResourceSelection} from '@shared/models/selection';
 import {MonacoRange, NewResourceWizardInput} from '@shared/models/ui';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './Monaco.styled';
 import {EDITOR_DISPOSABLES} from './disposables';
@@ -101,7 +102,11 @@ const Monaco: React.FC<IProps> = props => {
   const stateSelectedResource = useSelectedResource();
   const providedResource = useResource(providedResourceSelection?.resourceIdentifier);
 
-  const selectedResource = providedResourceSelection ? providedResource : stateSelectedResource;
+  const selectedResource = providedResourceSelection
+    ? providedResource
+    : providedFilePath
+    ? undefined
+    : stateSelectedResource;
   const selectedResourceRef = useRef(selectedResource);
   selectedResourceRef.current = selectedResource;
 
@@ -111,7 +116,7 @@ const Monaco: React.FC<IProps> = props => {
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
   const imageMap = useAppSelector(state => state.main.imageMap);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
 
@@ -212,7 +217,7 @@ const Monaco: React.FC<IProps> = props => {
     imageMap,
     selectResource: triggerSelectResource,
     selectFilePath,
-    createResource: isInPreviewMode ? undefined : createResource,
+    createResource: isInPreviewMode || isInClusterMode ? undefined : createResource,
     filterResources,
     selectImageHandler,
     selectedPath: selectedFilePath,
@@ -241,12 +246,7 @@ const Monaco: React.FC<IProps> = props => {
     fileMapRef
   );
 
-  const debouncedSaveContent = useDebouncedCodeSave(
-    originalCodeRef,
-    activeResourceMetaMapRef,
-    selectedResourceIdRef,
-    selectedFilePathRef
-  );
+  const debouncedSaveContent = useDebouncedCodeSave(originalCodeRef, selectedResourceRef, selectedFilePathRef);
 
   useMonacoUiState(editorRef.current, selectedResourceIdRef.current, selectedFilePath);
 
@@ -393,13 +393,13 @@ const Monaco: React.FC<IProps> = props => {
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all - or allowEditInClusterMode is false
   const isReadOnlyMode = useMemo(() => {
-    if (!selection) {
+    if (!selection && !selectedFilePath && !selectedResource) {
       return true;
     }
 
     if (
       (isInClusterMode && !settings.allowEditInClusterMode) ||
-      (isInPreviewMode && selection.type === 'resource' && selection.resourceIdentifier.storage === 'preview')
+      (isInPreviewMode && selection?.type === 'resource' && selection.resourceIdentifier.storage === 'preview')
     ) {
       return true;
     }

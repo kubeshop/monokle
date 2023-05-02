@@ -42,13 +42,7 @@ import {
 import {AppSelection, ResourceSelection} from '@shared/models/selection';
 import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
 
-import {
-  deleteResource,
-  extractK8sResources,
-  hasSupportedResourceContent,
-  joinK8sResource,
-  splitK8sResource,
-} from './resource';
+import {deleteResource, extractK8sResources, isSupportedResource, joinK8sResource, splitK8sResource} from './resource';
 
 type PathRemovalSideEffect = {
   removedResources: ResourceIdentifier[];
@@ -141,7 +135,7 @@ export function extractResourcesForFileEntry(fileEntry: FileEntry, rootFolderPat
     fileEntry.isSupported = true;
     extractK8sResourcesFromFile(fileEntry.filePath, rootFolderPath).forEach(resource => {
       // TODO: shouldn't we filter out resources that are not supported?
-      if (!hasSupportedResourceContent(resource)) {
+      if (!isSupportedResource(resource)) {
         fileEntry.isSupported = false;
         return;
       }
@@ -337,14 +331,6 @@ export function getAbsoluteFilePath(relativePath: string, fileMap: FileMapType) 
 }
 
 /**
- * Returns the relative path for the specified absolute path
- */
-export function getRelativeFilePath(absolutePath: string) {
-  const pathArr = absolutePath.split('/');
-  return `/${pathArr[pathArr.length - 1]}`;
-}
-
-/**
  * Returns the absolute path to the specified FileEntry
  */
 
@@ -514,7 +500,7 @@ export function reloadFile(
 
   if (fileEntry.timestamp && absolutePathTimestamp && absolutePathTimestamp <= fileEntry.timestamp) {
     log.info(`ignoring changed file ${absolutePath} because of timestamp`);
-    return;
+    return false;
   }
 
   // const fileStats = getFileStats(absolutePath);
@@ -534,6 +520,8 @@ export function reloadFile(
     selectFileReducer(state, {filePath: fileEntry.filePath});
     state.selectionOptions.shouldEditorReload = true;
   }
+
+  return true;
 }
 
 /**

@@ -66,6 +66,7 @@ const initialAppState: AppState = {
   validationIntegration: undefined,
   autosaving: {},
   lastChangedLine: 0,
+  activeEditorTab: 'source',
 };
 
 const initialAppConfigState: AppConfig = {
@@ -92,6 +93,7 @@ const initialAppConfigState: AppConfig = {
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
   isScanIncludesUpdated: 'applied',
   folderReadsMaxDepth: electronStore.get('appConfig.folderReadsMaxDepth') || 10,
+  isNewVersionAvailable: false,
   newVersion: {
     code: electronStore.get('appConfig.newVersion') || NewVersionCode.Idle,
     data: {
@@ -142,6 +144,7 @@ const initialUiState: UiState = {
   isKeyboardShortcutsModalOpen: false,
   collapsedKustomizeKinds: [],
   collapsedHelmCharts: [],
+  collapsedPreviewConfigurationsHelmCharts: [],
   isScaleModalOpen: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
@@ -173,12 +176,16 @@ const initialUiState: UiState = {
     entityName: '',
     absolutePathToEntity: '',
   },
+  newVersionNotice: {
+    isVisible: false,
+  },
   leftMenu: {
     bottomSelection: uiLeftMenuBottomSelection,
     expandedFolders: [],
     expandedSearchedFiles: ['filter'],
     isValidationDrawerVisible: false,
     selection: uiLeftMenuSelection,
+    activityBeforeClusterConnect: undefined,
     isActive:
       !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
     activeTab: null,
@@ -223,7 +230,7 @@ const initialUiState: UiState = {
   templateExplorer: {
     isVisible: false,
   },
-  welcomePopup: {
+  welcomeModal: {
     isVisible: false,
   },
   activeSettingsPanel: SettingsPanel.GlobalSettings,

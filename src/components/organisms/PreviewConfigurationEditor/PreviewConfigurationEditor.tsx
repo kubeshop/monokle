@@ -2,7 +2,7 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Button, Input, Select} from 'antd';
 
-import _ from 'lodash';
+import _, {cloneDeep} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 
 import {HELM_INSTALL_OPTIONS_DOCS_URL, HELM_TEMPLATE_OPTIONS_DOCS_URL} from '@constants/constants';
@@ -161,7 +161,7 @@ const PreviewConfigurationEditor = () => {
         valuesFileItemMap,
       };
 
-      const updatedPreviewConfigurationMap = JSON.parse(JSON.stringify(previewConfigurationMap));
+      const updatedPreviewConfigurationMap = cloneDeep(previewConfigurationMap);
       updatedPreviewConfigurationMap[input.id] = input;
 
       dispatch(
@@ -182,14 +182,15 @@ const PreviewConfigurationEditor = () => {
       }
     },
     [
-      dispatch,
+      helmChart,
       name,
+      previewConfiguration,
       helmCommand,
       helmOptions,
-      previewConfigurationMap,
-      previewConfiguration,
-      helmChart,
       valuesFileItemMap,
+      previewConfigurationMap,
+      dispatch,
+      projectConfigRef,
     ]
   );
 

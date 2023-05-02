@@ -1,5 +1,7 @@
 import {useRef} from 'react';
 
+import {Skeleton} from 'antd';
+
 import {size} from 'lodash';
 import styled from 'styled-components';
 
@@ -9,6 +11,7 @@ import {previewConfigurationListSelector} from '@redux/selectors/helmSelectors';
 import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
+import HelmChartRenderer from './HelmChartRenderer';
 import PreviewConfigurationRenderer from './PreviewConfigurationRenderer';
 
 const ROW_HEIGHT = 26;
@@ -16,6 +19,7 @@ const ROW_HEIGHT = 26;
 const PreviewConfigurationList: React.FC = () => {
   const list = useAppSelector(previewConfigurationListSelector);
   const ref = useRef<HTMLUListElement>(null);
+  const isLoading = useAppSelector(state => state.ui.isFolderLoading);
 
   const rowVirtualizer = useVirtualizer({
     count: list.length,
@@ -23,6 +27,14 @@ const PreviewConfigurationList: React.FC = () => {
     getScrollElement: () => ref.current,
     scrollToFn: elementScroll,
   });
+
+  if (isLoading) {
+    return (
+      <div style={{padding: '16px'}}>
+        <Skeleton active />
+      </div>
+    );
+  }
 
   if (!size(list)) {
     return <EmptyText>No Preview Configurations found in the current project.</EmptyText>;
@@ -52,7 +64,11 @@ const PreviewConfigurationList: React.FC = () => {
                 transform: `translateY(${virtualItem.start}px)`,
               }}
             >
-              {node.type === 'preview-configuration' ? <PreviewConfigurationRenderer id={node.id} /> : null}
+              {node.type === 'preview-configuration-helm-chart' ? (
+                <HelmChartRenderer id={node.id} />
+              ) : node.type === 'preview-configuration' ? (
+                <PreviewConfigurationRenderer id={node.id} />
+              ) : null}
             </VirtualItem>
           );
         })}
@@ -74,7 +90,7 @@ const ListContainer = styled.ul`
   height: 100%;
   overflow-y: auto;
   padding: 0px 0px 12px;
-  margin-top: 15px;
+  margin-top: 10px;
 `;
 
 const VirtualItem = styled.div`

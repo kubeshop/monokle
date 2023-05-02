@@ -61,11 +61,23 @@ export const useDelete = () => {
       if (!fileEntry) {
         return;
       }
-      setIsLoading(true);
-      setImmediate(async () => {
-        const result = await deleteFileEntry(fileEntry);
-        dispatchDeleteAlert(dispatch, result);
-        setIsLoading(false);
+
+      let title = `Delete ${isDefined(fileEntry.children) ? 'folder' : 'file'} [${fileEntry.name}]?`;
+
+      Modal.confirm({
+        title,
+        onOk() {
+          return new Promise(resolve => {
+            setImmediate(async () => {
+              setIsLoading(true);
+              const result = await deleteFileEntry(fileEntry);
+              dispatchDeleteAlert(dispatch, result);
+              setIsLoading(false);
+            });
+            resolve({});
+          });
+        },
+        onCancel() {},
       });
     },
     [dispatch]
@@ -236,7 +248,9 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
 
-  const {canOpenOnGithub, openOnGithub} = useOpenOnGithub(fileEntry?.filePath);
+  const {canOpenOnGithub, openOnGithub} = useOpenOnGithub(
+    fileEntry?.name === ROOT_FILE_ENTRY ? '' : fileEntry?.filePath
+  );
   const renameFileEntry = useRename();
   const reloadRootFolder = useCallback(() => {
     if (!fileEntry) {
@@ -251,6 +265,10 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     if (!fileEntry) {
       return [];
     }
+
+    const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
+    const filePath = isRoot ? '' : fileEntry.filePath;
+
     const newMenuItems: AntdMenuItem[] = [];
 
     newMenuItems.push({
@@ -259,14 +277,15 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     });
 
     newMenuItems.push({
+      disabled: isRoot,
       key: 'update_scanning',
       label: `${fileEntry.isExcluded ? 'Remove from' : 'Add to'} Files: Exclude`,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
         if (fileEntry.isExcluded) {
-          removeEntryFromScanExcludes(fileEntry.filePath);
+          removeEntryFromScanExcludes(filePath);
         } else {
-          addEntryToScanExcludes(fileEntry.filePath);
+          addEntryToScanExcludes(filePath);
         }
       },
     });
@@ -276,7 +295,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
       label: 'Copy path',
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
-        navigator.clipboard.writeText(join(fileEntry.rootFolderPath, fileEntry.filePath));
+        navigator.clipboard.writeText(join(fileEntry.rootFolderPath, filePath));
       },
     });
 
@@ -285,13 +304,14 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
       label: 'Copy relative path',
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
-        navigator.clipboard.writeText(fileEntry.filePath);
+        navigator.clipboard.writeText(filePath);
       },
     });
 
     newMenuItems.push({
       key: 'rename',
       label: 'Rename',
+      disabled: isRoot,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
         renameFileEntry(fileEntry);
@@ -301,6 +321,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     newMenuItems.push({
       key: 'delete',
       label: 'Delete',
+      disabled: isRoot,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
         deleteEntry(fileEntry);
@@ -322,7 +343,13 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
       label: `Reveal in ${platformFileManagerName}`,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
-        showItemInFolder(join(fileEntry.rootFolderPath, fileEntry.filePath));
+
+        if (fileEntry.name === ROOT_FILE_ENTRY) {
+          showItemInFolder(fileEntry.rootFolderPath);
+          return;
+        }
+
+        showItemInFolder(join(fileEntry.rootFolderPath, filePath));
       },
     });
 
@@ -352,8 +379,6 @@ export const useFileMenuItems = (
   const localResourceMetaMapRef = useResourceMetaMapRef('local');
   const createNewResource = useCreateResource();
   const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
-
-  const isRoot = useMemo(() => fileEntry?.filePath === ROOT_FILE_ENTRY, [fileEntry]);
 
   const preview = usePreview();
   const duplicate = useDuplicate();
@@ -427,7 +452,7 @@ export const useFileMenuItems = (
           : 'Filter on this file',
       disabled: isNonResourceFile,
       onClick: () => {
-        if (isRoot || (fileOrFolderContainedInFilter && fileEntry.filePath === fileOrFolderContainedInFilter)) {
+        if (fileOrFolderContainedInFilter && fileEntry.filePath === fileOrFolderContainedInFilter) {
           onFilterByFileOrFolder(undefined);
         } else {
           onFilterByFileOrFolder(fileEntry.filePath);
@@ -464,7 +489,6 @@ export const useFileMenuItems = (
     preview,
     dispatch,
     createNewResource,
-    isRoot,
     fileOrFolderContainedInFilter,
     onFilterByFileOrFolder,
     duplicate,
@@ -479,8 +503,10 @@ export const useFolderMenuItems = (
 ) => {
   const {deleteEntry, isInClusterMode, isInPreviewMode} = stateArgs;
   const dispatch = useAppDispatch();
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const commonMenuItems = useCommonMenuItems({deleteEntry}, fileEntry);
   const createNewResource = useCreateResource();
+  const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
 
   const menuItems = useMemo(() => {
     const isFolder = isDefined(fileEntry?.children);
@@ -488,15 +514,16 @@ export const useFolderMenuItems = (
       return [];
     }
 
+    const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
+    const filePath = isRoot ? '' : fileEntry?.filePath;
+
     const newMenuItems: AntdMenuItem[] = [];
 
     newMenuItems.push({
       key: 'new-folder',
       label: 'New Folder',
       onClick: () => {
-        dispatch(
-          openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath), type: 'folder'})
-        );
+        dispatch(openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, filePath), type: 'folder'}));
       },
     });
 
@@ -504,9 +531,7 @@ export const useFolderMenuItems = (
       key: 'new-file',
       label: 'New File',
       onClick: () => {
-        dispatch(
-          openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath), type: 'file'})
-        );
+        dispatch(openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, filePath), type: 'file'}));
       },
     });
 
@@ -519,10 +544,34 @@ export const useFolderMenuItems = (
       },
     });
 
+    newMenuItems.push({
+      key: 'filter_on_folder',
+      label:
+        fileOrFolderContainedInFilter && filePath === fileOrFolderContainedInFilter
+          ? 'Remove from filter'
+          : 'Filter on this folder',
+      onClick: () => {
+        if (fileOrFolderContainedInFilter && filePath === fileOrFolderContainedInFilter) {
+          onFilterByFileOrFolder(undefined);
+        } else {
+          onFilterByFileOrFolder(filePath);
+        }
+      },
+    });
+
     newMenuItems.push(...commonMenuItems);
 
     return newMenuItems;
-  }, [fileEntry, commonMenuItems, isInClusterMode, isInPreviewMode, createNewResource, dispatch]);
+  }, [
+    fileEntry,
+    isInClusterMode,
+    isInPreviewMode,
+    fileOrFolderContainedInFilter,
+    commonMenuItems,
+    dispatch,
+    createNewResource,
+    onFilterByFileOrFolder,
+  ]);
 
   return menuItems;
 };

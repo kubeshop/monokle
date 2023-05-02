@@ -8,18 +8,17 @@ import {isEmpty, omit, uniqWith} from 'lodash';
 import {DEFAULT_EDITOR_DEBOUNCE, PANE_CONSTRAINT_VALUES, TOOLTIP_DELAY} from '@constants/constants';
 import {QuickFilterTooltip} from '@constants/tooltips';
 
-import {isInClusterModeSelector, kubeConfigContextSelector} from '@redux/appConfig';
+import {kubeConfigContextSelector} from '@redux/appConfig';
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {updateResourceFilter} from '@redux/reducers/main';
 import {openFiltersPresetModal} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
 import {
   activeResourceCountSelector,
   allResourceAnnotationsSelector,
   allResourceKindsSelector,
   allResourceLabelsSelector,
 } from '@redux/selectors/resourceMapSelectors';
-import {startClusterConnection} from '@redux/thunks/cluster';
 
 import {useFileFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 import {useNamespaces} from '@hooks/useNamespaces';
@@ -30,6 +29,7 @@ import {Filter, FilterButton, FilterField, FilterHeader, KeyValueInput, NewKeyVa
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {isEqual} from '@shared/utils/isEqual';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ResourceFilter.styled';
 
@@ -54,7 +54,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   const areFiltersDisabled = useAppSelector(state => Boolean(state.main.checkedResourceIdentifiers.length));
   const fileMap = useAppSelector(state => state.main.fileMap);
   const filtersMap = useAppSelector(state => state.main.resourceFilter);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
@@ -67,6 +67,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   const [localResourceFilter, setLocalResourceFilter] = useState<ResourceFilterType>(filtersMap);
   const [wasLocalUpdate, setWasLocalUpdate] = useState<boolean>(false);
   const folderTree = useFileFolderTreeSelectData('all');
+  const filterBodyHeight = isInClusterMode ? NAVIGATOR_FILTER_BODY_HEIGHT - 56 : NAVIGATOR_FILTER_BODY_HEIGHT;
 
   const autocompleteOptions = useMemo(() => {
     return {
@@ -229,7 +230,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
       dispatch(updateResourceFilter(localResourceFilter));
 
       if (isInClusterMode && !isEqual(resourceFilterKinds, localResourceFilter.kinds)) {
-        dispatch(startClusterConnection({context: kubeConfigContext, isRestart: true}));
+        dispatch(connectCluster({context: kubeConfigContext, reload: true}));
       }
     },
     DEFAULT_EDITOR_DEBOUNCE,
@@ -253,7 +254,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
   return (
     <S.Container>
       <Filter
-        height={NAVIGATOR_FILTER_BODY_HEIGHT}
+        height={filterBodyHeight}
         search={localResourceFilter?.name}
         onClear={handleClear}
         onSearch={handleSearched}
@@ -300,18 +301,20 @@ const ResourceFilter = ({active, onToggle}: Props) => {
           />
         </FilterField>
 
-        <FilterField name="Namespace">
-          <Select
-            mode="tags"
-            style={{width: '100%'}}
-            placeholder="Select one or more namespaces.."
-            value={localResourceFilter.namespaces}
-            options={autocompleteOptions.namespaces}
-            onChange={onNamespaceChangeHandler}
-            onClear={onNamespaceClearHandler}
-            allowClear
-          />
-        </FilterField>
+        {!isInClusterMode && (
+          <FilterField name="Namespace">
+            <Select
+              mode="tags"
+              style={{width: '100%'}}
+              placeholder="Select one or more namespaces.."
+              value={localResourceFilter.namespaces}
+              options={autocompleteOptions.namespaces}
+              onChange={onNamespaceChangeHandler}
+              onClear={onNamespaceClearHandler}
+              allowClear
+            />
+          </FilterField>
+        )}
 
         <FilterField name="Labels">
           <NewKeyValueInput onAddKeyValue={handleUpsertLabelFilter} keyOptions={autocompleteOptions.labels} />
@@ -346,7 +349,7 @@ const ResourceFilter = ({active, onToggle}: Props) => {
         <FilterField name="Contained in file/folder:">
           <TreeSelect
             showSearch
-            disabled={isInPreviewMode || areFiltersDisabled}
+            disabled={isInPreviewMode || isInClusterMode || areFiltersDisabled}
             value={localResourceFilter.fileOrFolderContainedIn}
             defaultValue={ROOT_FILE_ENTRY}
             onChange={updateFileOrFolderContainedIn}

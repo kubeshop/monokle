@@ -8,9 +8,16 @@ import initialState from '@redux/initialState';
 import {processResourceRefs} from '@redux/parsing/parser.thunks';
 import {setAlert} from '@redux/reducers/alert';
 import {getResourceContentMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
+import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
-import {isResourceSelected, saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
+import {
+  isResourceSelected,
+  isSupportedResource,
+  saveResource,
+  splitK8sResource,
+  splitK8sResourceMap,
+} from '@redux/services/resource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
@@ -27,6 +34,7 @@ import {parseYamlDocument} from '@utils/yaml';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AlertType} from '@shared/models/alert';
 import {
+  ActionPaneTab,
   AppState,
   FileMapType,
   HelmChartMapType,
@@ -49,7 +57,7 @@ import {
 } from '@shared/models/k8sResource';
 import {PreviewType} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
-import {AppSelection} from '@shared/models/selection';
+import {AppSelection, isResourceSelection} from '@shared/models/selection';
 import {ThunkApi} from '@shared/models/thunk';
 import electronStore from '@shared/utils/electronStore';
 import {isEqual} from '@shared/utils/isEqual';
@@ -58,7 +66,12 @@ import {trackEvent} from '@shared/utils/telemetry';
 import {filterReducers} from './filterReducers';
 import {imageReducers} from './imageReducers';
 import {clearPreviewReducer, previewExtraReducers, previewReducers} from './previewReducers';
-import {clearSelectionReducer, selectResourceReducer, selectionReducers} from './selectionReducers';
+import {
+  clearSelectionReducer,
+  createResourceHighlights,
+  selectResourceReducer,
+  selectionReducers,
+} from './selectionReducers';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
@@ -80,6 +93,7 @@ export type UpdateMultipleResourcesPayload = {
 }[];
 
 export type UpdateFileEntryPayload = {
+  isUpdateFromEditor?: boolean; // this is used by the editor listeners
   path: string;
   text: string;
 };
@@ -93,8 +107,6 @@ export type SetPreviewDataPayload = {
   previewResourceMetaMap?: ResourceMetaMap<'preview'>;
   previewResourceContentMap?: ResourceContentMap<'preview'>;
   alert?: AlertType;
-  previewKubeConfigPath?: string;
-  previewKubeConfigContext?: string;
 };
 
 export type SetDiffDataPayload = {
@@ -302,6 +314,21 @@ export const mainSlice = createSlice({
         delete state.resourceMetaMapByStorage.cluster[r.id];
         delete state.resourceContentMapByStorage.cluster[r.id];
       });
+      // clear the selection if the selected resource has been deleted
+      const selection = state.selection;
+      if (isResourceSelection(selection)) {
+        const selectedResourceIdentifier = selection.resourceIdentifier;
+        if (
+          action.payload.some(
+            r => r.id === selectedResourceIdentifier.id && r.storage === selectedResourceIdentifier.storage
+          )
+        ) {
+          clearSelectionReducer(state);
+        }
+      }
+    },
+    setActiveEditorTab: (state: Draft<AppState>, action: PayloadAction<ActionPaneTab>) => {
+      state.activeEditorTab = action.payload;
     },
   },
   extraReducers: builder => {
@@ -349,6 +376,7 @@ export const mainSlice = createSlice({
     builder
       .addCase(reloadClusterResources.pending, state => {
         state.clusterConnectionOptions.isLoading = true;
+        disconnectFromCluster();
       })
       .addCase(reloadClusterResources.fulfilled, (state, action) => {
         state.clusterConnectionOptions.isLoading = false;
@@ -395,6 +423,8 @@ export const mainSlice = createSlice({
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
       state.resourceMetaMapByStorage.local = action.payload.resourceMetaMap;
       state.resourceContentMapByStorage.local = action.payload.resourceContentMap;
+      state.resourceMetaMapByStorage.transient = {};
+      state.resourceContentMapByStorage.transient = {};
       state.fileMap = action.payload.fileMap;
       state.helmChartMap = action.payload.helmChartMap;
       state.helmValuesMap = action.payload.helmValuesMap;
@@ -429,7 +459,7 @@ export const mainSlice = createSlice({
           const extension = path.extname(relativeFilePath);
           const newFileEntry: FileEntry = {
             ...createFileEntry({fileEntryPath: relativeFilePath, fileMap: state.fileMap, extension}),
-            isSupported: true,
+            isSupported: isSupportedResource(resourceMeta),
             timestamp: resourcePayload.fileTimestamp,
           };
           state.fileMap[relativeFilePath] = newFileEntry;
@@ -538,6 +568,18 @@ export const mainSlice = createSlice({
           resourceContentMap[resource.id] = content;
         }
       });
+
+      const selection = state.selection;
+      if (selection?.type === 'resource') {
+        const resourceIdentifier = selection.resourceIdentifier;
+        // TODO: 2.0+ should processResourceRefs return the storage as well so we can first check if the selection matches it?
+        const resource = action.payload.find(
+          r => r.id === resourceIdentifier.id && r.storage === resourceIdentifier.storage
+        );
+        if (resource) {
+          state.highlights = createResourceHighlights(resource);
+        }
+      }
     });
 
     builder.addCase(updateShouldOptionalIgnoreUnsatisfiedRefs.fulfilled, (state, action) => {
@@ -623,5 +665,6 @@ export const {
   setLastChangedLine,
   updateMultipleClusterResources,
   deleteMultipleClusterResources,
+  setActiveEditorTab,
 } = mainSlice.actions;
 export default mainSlice.reducer;

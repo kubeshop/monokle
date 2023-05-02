@@ -1,16 +1,16 @@
 import {webFrame} from 'electron';
 
-import {Draft, PayloadAction, createSlice, isAnyOf} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
 import {Entries} from 'type-fest';
 
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
-import {activeProjectSelector} from '@redux/appConfig';
+import {setOpenProject} from '@redux/appConfig';
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import initialState from '@redux/initialState';
-import {AppListenerFn} from '@redux/listeners/base';
-import {loadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
+import {stopClusterConnection} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -238,6 +238,16 @@ export const uiSlice = createSlice({
 
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
     },
+    collapsePreviewConfigurationsHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.collapsedPreviewConfigurationsHelmCharts.push(action.payload);
+    },
+
+    togglePreviewConfigurationsHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.collapsedPreviewConfigurationsHelmCharts = state.collapsedPreviewConfigurationsHelmCharts.filter(
+        chart => chart !== action.payload
+      );
+    },
+
     collapseHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.collapsedHelmCharts.push(action.payload);
     },
@@ -273,11 +283,11 @@ export const uiSlice = createSlice({
         );
       }
     },
-    closeWelcomePopup: (state: Draft<UiState>) => {
-      state.welcomePopup.isVisible = false;
+    closeWelcomeModal: (state: Draft<UiState>) => {
+      state.welcomeModal.isVisible = false;
     },
-    openWelcomePopup: (state: Draft<UiState>) => {
-      state.welcomePopup.isVisible = true;
+    openWelcomeModal: (state: Draft<UiState>) => {
+      state.welcomeModal.isVisible = true;
     },
     setExpandedFolders: (state: Draft<UiState>, action: PayloadAction<React.Key[]>) => {
       state.leftMenu.expandedFolders = action.payload;
@@ -351,6 +361,12 @@ export const uiSlice = createSlice({
         filePath: '',
       };
     },
+    showNewVersionNotice: (state: Draft<UiState>) => {
+      state.newVersionNotice.isVisible = true;
+    },
+    hideNewVersionNotice: (state: Draft<UiState>) => {
+      state.newVersionNotice.isVisible = false;
+    },
     setShowOpenProjectAlert: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.showOpenProjectAlert = action.payload;
       electronStore.set('ui.showOpenProjectAlert', action.payload);
@@ -408,9 +424,23 @@ export const uiSlice = createSlice({
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;
       })
-      .addCase(loadClusterResources.fulfilled, state => {
+      .addCase(connectCluster.fulfilled, state => {
+        state.leftMenu.activityBeforeClusterConnect = state.leftMenu.selection;
         state.leftMenu.selection = 'dashboard';
         state.leftMenu.isActive = true;
+        state.navigator.collapsedResourceKinds = [];
+      })
+      .addCase(stopClusterConnection.fulfilled, state => {
+        state.leftMenu.selection = state.leftMenu.activityBeforeClusterConnect ?? 'explorer';
+        state.leftMenu.activityBeforeClusterConnect = undefined;
+        state.navigator.collapsedResourceKinds = [];
+      })
+      .addCase(connectCluster.rejected, state => {
+        state.leftMenu.selection = 'dashboard';
+      })
+      .addCase(setOpenProject.fulfilled, state => {
+        state.leftMenu.selection = 'explorer';
+        state.navigator.collapsedResourceKinds = [];
       });
   },
 });
@@ -432,12 +462,14 @@ export const {
   closeSaveEditCommandModal,
   closeSaveResourcesToFileFolderModal,
   closeTemplateExplorer,
-  closeWelcomePopup,
+  closeWelcomeModal,
   collapseHelmChart,
   collapseKustomizeKinds,
+  collapsePreviewConfigurationsHelmChart,
   collapseResourceKinds,
   expandKustomizeKinds,
   expandResourceKinds,
+  hideNewVersionNotice,
   highlightItem,
   openAboutModal,
   openCreateFileFolderModal,
@@ -455,7 +487,7 @@ export const {
   openSaveEditCommandModal,
   openSaveResourcesToFileFolderModal,
   openTemplateExplorer,
-  openWelcomePopup,
+  openWelcomeModal,
   resetLayout,
   setActiveSettingsPanel,
   setExpandedFolders,
@@ -476,10 +508,12 @@ export const {
   setStartPageLearnTopic,
   setStartPageMenuOption,
   setTemplateProjectCreate,
+  showNewVersionNotice,
   toggleExpandActionsPaneFooter,
   toggleHelmChart,
   toggleLeftMenu,
   toggleNotifications,
+  togglePreviewConfigurationsHelmChart,
   toggleResourceFilters,
   toggleRightMenu,
   toggleStartProjectPane,
@@ -493,24 +527,3 @@ export const {
   setIsInQuickClusterMode,
 } = uiSlice.actions;
 export default uiSlice.reducer;
-
-// Listeners
-
-export const stopClusterConnectionListener: AppListenerFn = listen => {
-  listen({
-    matcher: isAnyOf(stopClusterConnection.fulfilled),
-    effect: async (action, {getState, dispatch}) => {
-      const activeProject = activeProjectSelector(getState());
-
-      if (activeProject) {
-        return;
-      }
-
-      const leftMenuSelection = getState().ui.leftMenu.selection;
-
-      if (leftMenuSelection === 'validation') {
-        dispatch(setLeftMenuSelection('dashboard'));
-      }
-    },
-  });
-};

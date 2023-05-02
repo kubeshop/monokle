@@ -27,7 +27,11 @@ export const processResourceRefs = createAsyncThunk<ValidationResource[], Proces
     const osPlatform = getState().config.osPlatform;
 
     if (osPlatform === 'win32') {
-      return validationResources.map(r => ({...r, refs: r.refs?.map(transformRefsFilePath)}));
+      return validationResources.map(r => ({
+        ...r,
+        filePath: r.filePath.replaceAll('/', '\\'),
+        refs: r.refs?.map(transformRefsFilePath),
+      }));
     }
 
     return validationResources;

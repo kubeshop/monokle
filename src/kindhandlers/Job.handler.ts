@@ -15,10 +15,12 @@ const JobHandler: ResourceKindHandler = {
   isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sBatchV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
+    k8sBatchV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     return k8sBatchV1Api.readNamespacedJob(resource.name, resource.namespace || 'default', 'true');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sBatchV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
+    k8sBatchV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     const response = namespace
       ? await k8sBatchV1Api.listNamespacedJob(namespace)
       : await k8sBatchV1Api.listJobForAllNamespaces();
@@ -26,6 +28,7 @@ const JobHandler: ResourceKindHandler = {
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sBatchV1Api = kubeconfig.makeApiClient(k8s.BatchV1Api);
+    k8sBatchV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     await k8sBatchV1Api.deleteNamespacedJob(resource.name, resource.namespace || 'default');
   },
   helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/job/',

@@ -1,16 +1,22 @@
 import {ipcRenderer} from 'electron';
 
-import React, {useCallback, useEffect, useMemo} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {useEffectOnce, useMount} from 'react-use';
 
 import lodash from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 
-import {TelemetryDocumentationUrl} from '@constants/tooltips';
-
-import {activeProjectSelector, setCreateProject, setLoadingProject, setOpenProject} from '@redux/appConfig';
+import {
+  activeProjectSelector,
+  setCreateProject,
+  setKubeConfig,
+  setLoadingProject,
+  setOpenProject,
+} from '@redux/appConfig';
+import {startWatchingKubeconfig} from '@redux/cluster/listeners/kubeconfig';
 import {setIsGitInstalled} from '@redux/git';
+import {isGitInstalled} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reducers/main';
@@ -24,13 +30,12 @@ import {FileExplorer} from '@atoms';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {getFileStats} from '@utils/files';
-import {fetchIsGitInstalled} from '@utils/git';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 import {StartupFlag} from '@utils/startupFlag';
 
-import {AlertEnum, ExtraContentType} from '@shared/models/alert';
+import {AlertEnum} from '@shared/models/alert';
 import {Project} from '@shared/models/config';
 import {Size} from '@shared/models/window';
 import electronStore from '@shared/utils/electronStore';
@@ -55,15 +60,8 @@ const App = () => {
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
   const projects: Project[] = useAppSelector(state => state.config.projects);
-  const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
-  const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
   const size: Size = useWindowSize();
-
-  const shouldTriggerTelemetryNotification = useMemo(
-    () => disableEventTracking === undefined && disableErrorReporting === undefined,
-    [disableEventTracking, disableErrorReporting]
-  );
 
   const onExecutedFrom = useCallback(
     (_: any, data: any) => {
@@ -92,25 +90,10 @@ const App = () => {
   );
 
   useEffect(() => {
-    if (!shouldTriggerTelemetryNotification) {
-      return;
-    }
-
-    dispatch(
-      setAlert({
-        title: 'Monokle telemetry',
-        message: `We have enabled telemetry to learn more about Monokle use and be able to offer the best features around. **Data gathering is *(and will always be!)* anonymous**. We want to make sure you are cool with that, though! [Read more about this in our documentation.](${TelemetryDocumentationUrl})`,
-        type: AlertEnum.Info,
-        extraContentType: ExtraContentType.Telemetry,
-        duration: 5,
-        id: 'monokle_telemetry_alert',
-      })
-    );
-  }, [shouldTriggerTelemetryNotification, dispatch]);
-
-  useEffect(() => {
-    ipcRenderer.invoke('kubeService:start');
-  }, []);
+    const kubeconfig = electronStore.get('appConfig.kubeConfig');
+    dispatch(setKubeConfig({path: kubeconfig}));
+    dispatch(startWatchingKubeconfig());
+  }, [dispatch]);
 
   useEffect(() => {
     ipcRenderer.on('executed-from', onExecutedFrom);
@@ -127,9 +110,16 @@ const App = () => {
   }, []);
 
   useMount(() => {
-    fetchIsGitInstalled().then(isGitInstalled => {
-      dispatch(setIsGitInstalled(isGitInstalled));
-    });
+    const fetchIsGitInstalled = async () => {
+      try {
+        await isGitInstalled({});
+        dispatch(setIsGitInstalled(true));
+      } catch (error) {
+        dispatch(setIsGitInstalled(false));
+      }
+    };
+
+    fetchIsGitInstalled();
   });
 
   // called from main thread because thunks cannot be dispatched by main

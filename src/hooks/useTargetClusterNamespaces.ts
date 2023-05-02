@@ -4,6 +4,8 @@ import {currentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathS
 import {useAppSelector} from '@redux/hooks';
 import {getTargetClusterNamespaces} from '@redux/services/resource';
 
+import {isInClusterModeSelector} from '@shared/utils/selectors';
+
 export const ALL_NAMESPACES = '<all>';
 export const NO_NAMESPACE = '<none>';
 
@@ -11,12 +13,13 @@ export function useTargetClusterNamespaces(): [string[], Dispatch<SetStateAction
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const clusterAccess = useAppSelector(currentClusterAccessSelector);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   const [namespaces, setNamespaces] = useState<string[]>([]);
 
   useEffect(() => {
     const setClusterNamespaces = async () => {
-      if (!kubeConfigPath.trim().length) {
+      if (!kubeConfigPath?.trim().length) {
         setNamespaces([]);
         return;
       }
@@ -37,7 +40,7 @@ export function useTargetClusterNamespaces(): [string[], Dispatch<SetStateAction
     };
 
     setClusterNamespaces();
-  }, [kubeConfigContext, kubeConfigPath, clusterAccess]);
+  }, [kubeConfigContext, kubeConfigPath, clusterAccess, isInClusterMode]);
 
   return [namespaces, setNamespaces];
 }

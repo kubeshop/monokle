@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import {Colors} from '@shared/styles/colors';
 
 export const Dot = styled.div<{$color: Colors}>`
-  width: 5px;
-  height: 5px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
   background-color: ${props => props.$color};
 `;

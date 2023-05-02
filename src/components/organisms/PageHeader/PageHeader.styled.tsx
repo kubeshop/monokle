@@ -1,4 +1,4 @@
-import {Button, Layout, Button as RawButton, Divider as RawDivider, Row as RawRow} from 'antd';
+import {Badge, Button, Layout, Button as RawButton, Divider as RawDivider, Row as RawRow} from 'antd';
 
 import {
   BellOutlined as RawBellOutlined,
@@ -13,7 +13,7 @@ import {PreviewType} from '@shared/models/preview';
 import {AnimationDurations} from '@shared/styles';
 import {Colors, FontColors, PanelColors} from '@shared/styles/colors';
 
-import {getPreviewTheme} from './ClusterSelection.styled';
+import {getPreviewTheme} from './Controls.styled';
 
 export const AutosavingContainer = styled.div`
   margin-left: 10px;
@@ -78,12 +78,12 @@ export const Header = styled(Layout.Header)`
 
 export const InitButton = styled(RawButton)`
   margin-left: 10px;
+  margin-right: 6px;
   font-size: 12px;
   border-radius: 4px;
   display: flex;
   align-items: center;
-  padding: 4px 16px;
-  height: 28px;
+  color: ${Colors.grey7};
 `;
 
 export const Logo = styled.img`
@@ -91,12 +91,20 @@ export const Logo = styled.img`
   cursor: pointer;
 `;
 
-export const LogoContainer = styled.div`
+export const LogoContainer = styled.div<{$isNewVersionNoticeVisible: boolean}>`
   height: 100%;
   min-width: 50px;
   width: 50px;
   display: flex;
   justify-content: center;
+
+  margin-right: ${({$isNewVersionNoticeVisible}) => ($isNewVersionNoticeVisible ? '308px' : '0px')};
+`;
+
+export const NewVersionBadge = styled(Badge)`
+  & .ant-badge-dot {
+    background: ${Colors.geekblue7};
+  }
 `;
 
 export const PreviewRow = styled(RawRow)<{
@@ -180,6 +188,9 @@ export const BackProjectsButton = styled(Button)`
   color: #ffffff;
   line-height: 20px;
   font-weight: 400;
+  border-radius: 4px;
+  height: 30px;
   padding-left: 16px;
   padding-right: 16px;
+  margin-right: 8px;
 `;

@@ -2,11 +2,11 @@ import {memo, useState} from 'react';
 
 import {EyeOutlined} from '@ant-design/icons';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectPreviewConfiguration} from '@redux/reducers/main';
 
 import {Colors} from '@shared/styles/colors';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import PreviewConfigurationQuickAction from './PreviewConfigurationQuickAction';
 import * as S from './PreviewConfigurationRenderer.styled';

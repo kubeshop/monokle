@@ -66,10 +66,18 @@ type HelmValueNode = {
 
 type HelmListNode = HelmChartNode | HelmValueNode;
 
+type PreviewConfigurationHelmChartNode = {
+  type: 'preview-configuration-helm-chart';
+  id: string;
+  filePath: string;
+};
+
 type PreviewConfigurationNode = {
   type: 'preview-configuration';
   id: string;
 };
+
+type PreviewConfigurationListNode = PreviewConfigurationNode | PreviewConfigurationHelmChartNode;
 
 export type {
   HelmChart,
@@ -81,5 +89,7 @@ export type {
   HelmValueMatch,
   HelmValueNode,
   PreviewConfigurationNode,
+  PreviewConfigurationHelmChartNode,
+  PreviewConfigurationListNode,
   RangeAndValue,
 };

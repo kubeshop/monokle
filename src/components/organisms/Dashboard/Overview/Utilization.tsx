@@ -3,9 +3,9 @@ import {useInterval} from 'react-use';
 
 import {Tooltip} from 'antd';
 
+import {useAppSelector} from '@redux/hooks';
 import {useResourceContentMap} from '@redux/selectors/resourceMapSelectors';
 import {NodeMetric, getClusterUtilization} from '@redux/services/clusterDashboard';
-import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import {convertBytesToGigabyte, memoryParser} from '@utils/unit-converter';
 
@@ -25,22 +25,14 @@ export const Utilization = () => {
   const [averageMemoryUsage, setAverageMemoryUsage] = useState(0);
   const [totalMemory, setTotalMemory] = useState(0);
   const [utilizationData, setUtilizationData] = useState<NodeMetric[]>([]);
-  const [heartbeat, setHeartbeat] = useState(0);
-
-  useEffect(() => {
-    const k8sApiClient = new KubeConfigManager().getV1ApiClient();
-    const metricClient = new KubeConfigManager().getMetricsClient();
-    if (metricClient && k8sApiClient) {
-      getClusterUtilization(k8sApiClient, metricClient)
-        .then(data => setUtilizationData(data))
-        .catch(() => setUtilizationData([]));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [heartbeat]);
+  const connection = useAppSelector(s => s.main.clusterConnection);
 
   useInterval(() => {
-    setHeartbeat(heartbeat + 1);
-  }, 5000);
+    if (!connection) return;
+    getClusterUtilization(connection?.kubeConfigPath, connection?.context)
+      .then(data => setUtilizationData(data))
+      .catch(() => setUtilizationData([]));
+  }, 8000);
 
   useEffect(() => {
     setTotalCpu(utilizationData.reduce((total, u) => u.cpuCapacity + total, 0));

@@ -3,19 +3,20 @@ import {KubeConfig} from '@kubernetes/client-node';
 
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
-import {flatten} from 'lodash';
+import {flatten, isArray} from 'lodash';
 import log from 'loglevel';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {currentClusterAccessSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {currentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
-import {extractK8sResources} from '@redux/services/resource';
+import {extractK8sResources, getTargetClusterNamespaces} from '@redux/services/resource';
 import {createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
+
+import {isPromiseFulfilledResult} from '@utils/promises';
 
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
-import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ClusterAccess} from '@shared/models/config';
 import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
@@ -47,61 +48,56 @@ const loadClusterResourcesHandler = async (
 ) => {
   const {context, port, namespace} = payload;
   const startTime = new Date().getTime();
+  const kubeConfigContext = kubeConfigContextSelector(thunkAPI.getState());
   const clusterAccess = currentClusterAccessSelector(thunkAPI.getState());
   const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
   const useKubectlProxy = thunkAPI.getState().config.useKubectlProxy;
 
-  let currentNamespace: string = namespace || '<all>';
+  let currentNamespace: string = namespace ?? 'default';
 
   trackEvent('preview/cluster/start');
 
   try {
-    let kc = createKubeClient(kubeConfigPath, context);
-
-    if (port) {
-      const proxyKubeConfig = new KubeConfig();
-      proxyKubeConfig.loadFromOptions({
-        currentContext: kc.getCurrentContext(),
-        clusters: kc.getClusters().map(c => ({...c, server: `http://127.0.0.1:${port}`, skipTLSVerify: true})),
-        users: kc.getUsers(),
-        contexts: kc.getContexts(),
-      });
-      kc = proxyKubeConfig;
+    let namespaces: Array<string> = [];
+    if (kubeConfigPath?.trim().length) {
+      namespaces = await getTargetClusterNamespaces(kubeConfigPath, kubeConfigContext, clusterAccess);
+      if (namespaces.length === 0) {
+        throw new Error('no_namespaces_found');
+      }
+      if (
+        currentNamespace !== '<all>' &&
+        currentNamespace !== '<not-namespaced>' &&
+        !namespaces.includes(currentNamespace)
+      ) {
+        currentNamespace = 'default';
+      }
     }
 
-    let foundNamespace: ClusterAccess | undefined;
-    let results: PromiseSettledResult<string>[] | PromiseSettledResult<string>[][];
+    let kc = createKubeClient(kubeConfigPath, context, port);
+    let results: PromiseSettledResult<string>[] | PromiseSettledResult<string>[][] = [];
 
-    if (clusterAccess && clusterAccess.length) {
-      foundNamespace = clusterAccess?.find(ca => ca.namespace === currentNamespace);
-
-      if (currentNamespace === '<all>') {
-        results = await Promise.all(
-          clusterAccess.map((ca: ClusterAccess) => getNonCustomClusterObjects(kc, ca.namespace, true))
-        );
-      } else {
-        if (currentNamespace !== '<not-namespaced>' && !foundNamespace) {
-          currentNamespace = clusterAccess[0].namespace;
-        }
-
-        results = await getNonCustomClusterObjects(kc, currentNamespace);
-      }
-    } else {
+    if (currentNamespace === '<all>') {
+      results = await Promise.all(namespaces.map(ns => getNonCustomClusterObjects(kc, ns, true)));
+    } else if (currentNamespace === '<not-namespaced>') {
       results = await getNonCustomClusterObjects(kc);
+    } else {
+      results = await getNonCustomClusterObjects(kc, currentNamespace);
     }
 
     const flatResults = flatten(results);
 
     const fulfilledResults = flatResults.filter((r: any) => r.status === 'fulfilled' && r.value);
     if (fulfilledResults.length === 0) {
-      // @ts-ignore
-      let message = results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0]);
+      let message =
+        'reason' in results[0] && results[0].reason ? results[0].reason.toString() : JSON.stringify(results[0]);
       trackEvent('preview/cluster/fail', {reason: message});
       return createRejectionWithAlert(thunkAPI, 'Cluster Resources Failed', message);
     }
 
-    // @ts-ignore
-    const allYaml = fulfilledResults.map(r => r.value).join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
+    const allYaml = fulfilledResults
+      .filter(isPromiseFulfilledResult)
+      .map(r => r.value)
+      .join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
 
     const clusterResourceMap = Object.values(
       extractK8sResources(allYaml, 'cluster', {
@@ -154,16 +150,8 @@ const loadClusterResourcesHandler = async (
 
     startWatchingResources(thunkAPI.dispatch, kc, clusterResourceMap, currentNamespace);
 
-    const alert: AlertType = {
-      type: AlertEnum.Success,
-      title: 'Cluster Resources Loaded',
-      message: `Processed ${Object.keys(clusterResourceMap).length} resources from ${context}}`,
-      silent: true,
-    };
-
     return {
       resources: Object.values(clusterResourceMap),
-      alert,
       context,
       kubeConfigPath,
       namespace: currentNamespace,
@@ -237,10 +225,7 @@ async function loadCustomResourceObjects(
             ? !kindHandler.isNamespaced
             : kindHandler.isNamespaced)
         ) {
-          return kindHandler.listResourcesInCluster(kc, {namespace}, crd).then(response =>
-            // @ts-ignore
-            getK8sObjectsAsYaml(response.body.items)
-          );
+          return kindHandler.listResourcesInCluster(kc, {namespace}, crd).then(items => getK8sObjectsAsYaml(items));
         }
 
         // retrieve objects using latest version name
@@ -248,24 +233,23 @@ async function loadCustomResourceObjects(
         return namespace
           ? k8sApi
               .listNamespacedCustomObject(crd.object.spec.group, version, namespace, crd.object.spec.names.plural)
-              .then(response =>
-                // @ts-ignore
-                getK8sObjectsAsYaml(response.body.items)
-              )
+              .then(response => getK8sObjectsAsYaml(getItemsFromResponseBody(response.body)))
           : k8sApi
               .listClusterCustomObject(crd.object.spec.group, version, crd.object.spec.names.plural)
-              .then(response =>
-                // @ts-ignore
-                getK8sObjectsAsYaml(response.body.items)
-              );
+              .then(response => getK8sObjectsAsYaml(getItemsFromResponseBody(response.body)));
       });
 
     const customResults = await Promise.allSettled(customObjects);
-    // @ts-ignore
-    return customResults.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
+
+    return customResults.filter(isPromiseFulfilledResult).map(r => r.value);
   } catch (e) {
     log.warn(e);
   }
 
   return [];
 }
+
+const getItemsFromResponseBody = (body: any) => {
+  const items = 'items' in body ? body.items : [];
+  return isArray(items) ? items : [];
+};

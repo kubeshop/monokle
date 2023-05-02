@@ -6,8 +6,8 @@ type ScaleDeploymentOptions = {
   replicas: number;
   name: string;
   namespace: string;
-  currentContext: string;
-  kubeConfigPath: string;
+  currentContext?: string;
+  kubeConfigPath?: string;
 };
 
 async function scaleDeployment(options: ScaleDeploymentOptions) {

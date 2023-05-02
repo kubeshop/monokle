@@ -12,7 +12,6 @@ import {InjectedPanelProps} from '@shared/models/explorer';
 import {Colors} from '@shared/styles/colors';
 
 import AccordionPanel from '../AccordionPanel';
-import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
 import ImageFilteredTag from './ImageFilteredTag';
 import ImageSearch from './ImageSearch';
 import ImagesList from './ImagesList';
@@ -26,14 +25,12 @@ const ImagesPane: React.FC<InjectedPanelProps> = props => {
     <AccordionPanel
       {...props}
       header={
-        <AccordionTitleBarContainer>
-          <TitleBar
-            title="Images"
-            expandable
-            isOpen={Boolean(isActive)}
-            actions={<TitleBarCount count={size(imageMap)} isActive={Boolean(isActive)} />}
-          />
-        </AccordionTitleBarContainer>
+        <TitleBar
+          title="Images"
+          expandable
+          isOpen={Boolean(isActive)}
+          actions={<TitleBarCount count={size(imageMap)} isActive={Boolean(isActive)} />}
+        />
       }
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}

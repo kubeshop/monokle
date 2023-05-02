@@ -1,14 +1,13 @@
-import {size} from 'lodash';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
-import {getActiveResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
-import {isKustomizationPatch, isKustomizationResource} from '@redux/services/kustomize';
-import {errorsSelector, useValidationSelector, warningsSelector} from '@redux/validation/validation.selectors';
+import {navigatorResourcesCountSelector} from '@redux/selectors/resourceSelectors';
+import {
+  errorsByResourcesFilterCountSelector,
+  warningsByResourcesFilterCountSelector,
+} from '@redux/validation/validation.selectors';
 import {setValidationFilters} from '@redux/validation/validation.slice';
 
 import {useRefSelector} from '@utils/hooks';
-import {isResourcePassingFilter} from '@utils/resources';
 
 import {ProblemIcon} from '@monokle/components';
 
@@ -16,19 +15,11 @@ import * as S from './NavigatorDescription.styled';
 
 const NavigatorDescription: React.FC = () => {
   const dispatch = useAppDispatch();
-  const errorsCount = useValidationSelector(state => size(errorsSelector(state)));
-  const warningsCount = useValidationSelector(state => size(warningsSelector(state)));
-  const resourceCount = useAppSelector(state =>
-    size(
-      Object.values(getActiveResourceMetaMapFromState(state)).filter(
-        r =>
-          r.kind &&
-          isResourcePassingFilter(r, state.main.resourceFilter) &&
-          !isKustomizationResource(r) &&
-          !isKustomizationPatch(r)
-      )
-    )
-  );
+  const navigatorResourcesCount = useAppSelector(navigatorResourcesCountSelector);
+
+  const errorsCount = useAppSelector(errorsByResourcesFilterCountSelector);
+  const warningsCount = useAppSelector(warningsByResourcesFilterCountSelector);
+
   const currentFilters = useRefSelector(state => state.validation.validationOverview.filters);
 
   const handleSetFilters = (type: 'warning' | 'error') => {
@@ -38,7 +29,7 @@ const NavigatorDescription: React.FC = () => {
 
   return (
     <S.NavigatorDescriptionContainer>
-      <S.ResourcesCount>{resourceCount} objects</S.ResourcesCount>
+      <S.ResourcesCount>{navigatorResourcesCount} objects</S.ResourcesCount>
 
       <S.WarningsErrorsContainer>
         <S.ProblemCountContainer onClick={() => handleSetFilters('error')}>

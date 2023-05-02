@@ -15,10 +15,12 @@ const StatefulSetHandler: ResourceKindHandler = {
   isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    k8sAppV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     return k8sAppV1Api.readNamespacedStatefulSet(resource.name, resource.namespace || 'default');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    k8sAppV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     const response = namespace
       ? await k8sAppV1Api.listNamespacedStatefulSet(namespace)
       : await k8sAppV1Api.listStatefulSetForAllNamespaces();
@@ -26,6 +28,7 @@ const StatefulSetHandler: ResourceKindHandler = {
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sAppV1Api = kubeconfig.makeApiClient(k8s.AppsV1Api);
+    k8sAppV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     await k8sAppV1Api.deleteNamespacedStatefulSet(resource.name, resource.namespace || 'default');
   },
   helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/',

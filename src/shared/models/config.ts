@@ -1,3 +1,5 @@
+import {Cluster, Context, User} from '@kubernetes/client-node';
+
 import {ClusterColors} from './cluster';
 import {KustomizeCommandType} from './kustomize';
 
@@ -76,6 +78,7 @@ interface AppConfig {
     [name: string]: ClusterColors;
   };
   fileExplorerSortOrder: FileExplorerSortOrder;
+  isNewVersionAvailable: boolean;
 }
 
 type ClusterAccess = {
@@ -98,9 +101,39 @@ type HelmPreviewConfiguration = {
 
 type KubeConfig = {
   path?: string; // It can be `undefined` until refactor
+
+  /**
+   * @deprecated
+   */
   isPathValid?: boolean; // It can be `undefined` until refactor
+
+  /**
+   * @deprecated
+   */
   contexts?: Array<KubeConfigContext>;
+
+  /**
+   * @deprecated
+   */
   currentContext?: string;
+};
+
+export type ModernKubeConfig = InvalidKubeConfig | ValidKubeConfig;
+
+export type ValidKubeConfig = {
+  isValid: true;
+  path: string;
+  currentContext: string;
+  contexts: Context[];
+  clusters: Cluster[];
+  users: User[];
+};
+
+export type InvalidKubeConfig = {
+  isValid: false;
+  path: string;
+  code: 'not_found' | 'malformed' | 'unknown' | 'empty' | 'not_file';
+  reason: string;
 };
 
 // Parsed from kubernetes config file

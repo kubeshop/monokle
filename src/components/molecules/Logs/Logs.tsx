@@ -6,10 +6,10 @@ import log from 'loglevel';
 import stream from 'stream';
 import {v4 as uuidv4} from 'uuid';
 
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
 import * as S from './Logs.styled';
@@ -27,8 +27,7 @@ const logOptions = {
 };
 
 const Logs = () => {
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const kubeconfig = useAppSelector(selectKubeconfig);
   const selectedResource = useSelectedResource();
   const [logs, setLogs] = useState<LogLineType[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -41,8 +40,12 @@ const Logs = () => {
   }, [logs]);
 
   useEffect(() => {
+    if (!kubeconfig?.isValid) {
+      return;
+    }
+
     setLogs([]);
-    const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
+    const kc = createKubeClient(kubeconfig.path, kubeconfig.currentContext);
     const k8sLog = new k8s.Log(kc);
     const logStream = new stream.PassThrough();
     if (selectedResource && selectedResource.kind === 'Pod') {
@@ -72,7 +75,7 @@ const Logs = () => {
         logStream.destroy();
       }
     };
-  }, [kubeConfigContext, kubeConfigPath, selectedResource]);
+  }, [kubeconfig, selectedResource]);
 
   return (
     <S.LogContainer ref={containerRef}>

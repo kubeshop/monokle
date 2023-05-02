@@ -2,7 +2,7 @@ import React, {useCallback, useMemo} from 'react';
 
 import {Skeleton} from 'antd';
 
-import {activeProjectSelector, isInClusterModeSelector} from '@redux/appConfig';
+import {activeProjectSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
 
@@ -12,6 +12,7 @@ import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import ProblemPane from '../ProblemPane';
 import StartPage from '../StartPage';
@@ -95,7 +96,8 @@ const NewPaneManager: React.FC = () => {
                 )
               ) : (
                 <ResizableColumnsPanel
-                  paneCloseIconStyle={{top: 15}}
+                  key={currentActivity?.name}
+                  paneCloseIconStyle={{top: '20px', right: '-8px'}}
                   left={leftMenuActive ? currentActivity?.component : undefined}
                   center={
                     !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? <NavigatorPane /> : null

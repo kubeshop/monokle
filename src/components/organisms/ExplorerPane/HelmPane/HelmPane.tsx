@@ -4,14 +4,13 @@ import {CollapsePanelProps} from 'antd';
 
 import {size} from 'lodash';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {InjectedPanelProps} from '@shared/models/explorer';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import AccordionPanel from '../AccordionPanel';
-import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
 import HelmList from './HelmList';
 
 const HelmPane: React.FC<InjectedPanelProps> = props => {
@@ -30,14 +29,12 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
       {...props}
       collapsible={isInClusterMode ? 'disabled' : undefined}
       header={
-        <AccordionTitleBarContainer>
-          <TitleBar
-            title="Helm Charts"
-            expandable
-            isOpen={Boolean(isActive)}
-            actions={<TitleBarCount count={count} isActive={Boolean(isActive)} />}
-          />
-        </AccordionTitleBarContainer>
+        <TitleBar
+          title="Helm Charts"
+          expandable
+          isOpen={Boolean(isActive)}
+          actions={<TitleBarCount count={count} isActive={Boolean(isActive)} />}
+        />
       }
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}

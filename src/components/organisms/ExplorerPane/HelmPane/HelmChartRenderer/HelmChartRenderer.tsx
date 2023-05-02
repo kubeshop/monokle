@@ -6,12 +6,12 @@ import {dirname} from 'path';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
 
 import {Icon} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import HelmContextMenu from '../HelmContextMenu';
 import HelmChartCollapse from './HelmChartCollapse';
@@ -53,14 +53,12 @@ const HelmChartRenderer: React.FC<IProps> = props => {
     >
       <S.PrefixContainer>
         <HelmChartCollapse id={id} isSelected={isSelected} />
-        <Icon name="helm" style={{color: isSelected ? Colors.blackPure : Colors.grey9, fontSize: '18px'}} />
+        <Icon name="helm" style={{color: isSelected ? Colors.blackPure : Colors.grey9, fontSize: '16px'}} />
       </S.PrefixContainer>
 
-      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={helmChart.name}>
-        <S.ItemName isDisabled={isDisabled} isSelected={isSelected}>
-          {helmChart.name}
-        </S.ItemName>
-      </Tooltip>
+      <S.ItemName isDisabled={isDisabled} isSelected={isSelected}>
+        {helmChart.name}
+      </S.ItemName>
 
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={helmChart.filePath}>
         <S.SuffixContainer isSelected={isSelected}>{dirname(helmChart.filePath)}</S.SuffixContainer>

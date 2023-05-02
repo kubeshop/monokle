@@ -11,4 +11,6 @@ export * from './selectionHistory';
 export * from './selectors';
 export * from './shell';
 export * from './telemetry';
+export * from './templateForm';
 export * from './thread';
+export * from './watch';

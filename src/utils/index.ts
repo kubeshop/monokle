@@ -1,4 +1,5 @@
 import {existsSync} from 'fs';
+import _ from 'lodash';
 import {DateTime} from 'luxon';
 import path from 'path';
 
@@ -23,3 +24,6 @@ export const getRelativeDate = (isoDate: string | undefined) => {
 export const doesSchemaExist = (k8sVersion: string, userDataDir: string) => {
   return existsSync(path.join(String(userDataDir), path.sep, 'schemas', `${k8sVersion}.json`));
 };
+
+export const deepPick = (paths: any, obj: any) =>
+  _.fromPairs(paths.map((p: string) => [_.last(p.split('.')), _.get(obj, p)]));

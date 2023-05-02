@@ -17,6 +17,7 @@ import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/mod
 import {K8sResource} from '@shared/models/k8sResource';
 import {HelmConfigPreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {runCommandInMainThread} from '@shared/utils/commands';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -39,9 +40,17 @@ export const runPreviewConfiguration = createAsyncThunk<
   const configState = thunkAPI.getState().config;
   const mainState = thunkAPI.getState().main;
   const previewConfigurationMap = configState.projectConfig?.helm?.previewConfigurationMap;
-  const kubeconfig = configState.kubeConfig.path;
-  const currentContext = thunkAPI.getState().config.kubeConfig.currentContext;
+  const kubeconfig = selectKubeconfig(thunkAPI.getState());
 
+  if (!kubeconfig?.isValid) {
+    return createRejectionWithAlert(
+      thunkAPI,
+      'Preview Configuration Error',
+      `Could not preview due to invalid kubeconfig`
+    );
+  }
+
+  const currentContext = kubeconfig.currentContext;
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
 
   let previewConfiguration: HelmPreviewConfiguration | null | undefined;

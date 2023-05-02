@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import log from 'loglevel';
-import {stringify} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
@@ -9,20 +8,29 @@ import {doesTextStartWithYamlDocumentDelimiter} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
 import {removeNamespaceFromCluster} from '@redux/thunks/utils';
 
+import {stringifyK8sResource} from '@utils/yaml';
+
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {AppConfig} from '@shared/models/config';
 import {K8sResource} from '@shared/models/k8sResource';
+import {RootState} from '@shared/models/rootState';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 
 const applyMultipleResources = async (
-  config: AppConfig,
+  state: RootState,
   resourcesToApply: K8sResource[],
   dispatch: AppDispatch,
   namespace?: {name: string; new: boolean},
   onSuccessCallback?: () => void
 ) => {
-  const kubeConfigPath = config.kubeConfig.path;
-  const currentContext = config.kubeConfig.currentContext;
+  const kubeconfig = selectKubeconfig(state);
+
+  if (!kubeconfig?.isValid) {
+    return;
+  }
+
+  const kubeConfigPath = kubeconfig.path;
+  const currentContext = kubeconfig.currentContext;
 
   if (!kubeConfigPath || !currentContext || !resourcesToApply.length) {
     return;
@@ -35,7 +43,7 @@ const applyMultipleResources = async (
         delete resourceObject.metadata.namespace;
       }
 
-      return stringify(resourceObject);
+      return stringifyK8sResource(resourceObject);
     })
     .reduce<string>((fullYaml, currentText) => {
       if (doesTextStartWithYamlDocumentDelimiter(currentText)) {

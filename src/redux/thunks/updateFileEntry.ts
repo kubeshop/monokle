@@ -19,6 +19,7 @@ import {AppState} from '@shared/models/appState';
 import {FileSideEffect} from '@shared/models/fileEntry';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
+import {AppSelection} from '@shared/models/selection';
 import {isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
 
 export const updateFileEntry = createAsyncThunk<
@@ -86,21 +87,21 @@ export const updateFileEntry = createAsyncThunk<
               fileOffset: 0,
             });
 
+            const newHighlights: AppSelection[] = [];
             Object.values(extractedResources).forEach(r => {
               fileSideEffect.affectedResourceIds.push(r.id);
               const {meta, content} = splitK8sResource(r);
               mainState.resourceMetaMapByStorage.local[meta.id] = meta;
               mainState.resourceContentMapByStorage.local[content.id] = content;
-              mainState.highlights = [
-                {
-                  type: 'resource',
-                  resourceIdentifier: {
-                    id: r.id,
-                    storage: r.storage,
-                  },
+              newHighlights.push({
+                type: 'resource',
+                resourceIdentifier: {
+                  id: r.id,
+                  storage: r.storage,
                 },
-              ];
+              });
             });
+            mainState.highlights = newHighlights;
           }
         }
 

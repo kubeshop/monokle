@@ -2,7 +2,8 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {set} from 'lodash';
 
-import {startClusterConnection, stopClusterConnection} from '@redux/thunks/cluster';
+import {connectCluster} from '@redux/cluster/thunks/connect';
+import {stopClusterConnection} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ValidationFiltersValueType} from '@monokle/components';
@@ -195,10 +196,10 @@ export const validationSlice = createSlice({
     });
 
     builder
-      .addCase(startClusterConnection.fulfilled, state => {
+      .addCase(stopClusterConnection.fulfilled, state => {
         state.validationOverview.selectedProblem = undefined;
       })
-      .addCase(stopClusterConnection.fulfilled, state => {
+      .addCase(connectCluster.fulfilled, state => {
         state.validationOverview.selectedProblem = undefined;
       });
   },

@@ -1,6 +1,10 @@
 import {TypedUseSelectorHook} from 'react-redux';
 
+import {createSelector} from 'reselect';
+
 import {useAppSelector} from '@redux/hooks';
+import {activeResourceStorageSelector, transientResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {filteredResourcesIdsSelector} from '@redux/selectors/resourceSelectors';
 import {createDeepEqualSelector} from '@redux/selectors/utils';
 
 import {
@@ -11,9 +15,11 @@ import {
   getResourceId,
   getResourceLocation,
 } from '@monokle/validation';
+import {ResourceStorage} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {MonacoRange} from '@shared/models/ui';
 import {ValidationState} from '@shared/models/validation';
+import {isDefined} from '@shared/utils/filter';
 
 import {VALIDATOR} from './validator';
 
@@ -83,6 +89,20 @@ export const errorsByResourceSelector = (state: ValidationState, resource?: stri
 export const warningsByResourceSelector = (state: ValidationState, resource?: string) => {
   return problemsByResourceSelector(state, resource, 'warning');
 };
+
+export const errorsByResourcesFilterCountSelector = createSelector(
+  [filteredResourcesIdsSelector, state => errorsByResourcesSelector(state.validation)],
+  (filteredResources, errorsByResourceMap) => {
+    return filteredResources.map(id => errorsByResourceMap[id]?.length || 0).reduce((a, b) => a + b, 0);
+  }
+);
+
+export const warningsByResourcesFilterCountSelector = createSelector(
+  [filteredResourcesIdsSelector, state => warningsByResourcesSelector(state.validation)],
+  (filteredResources, warningsByResourceMap) => {
+    return filteredResources.map(id => warningsByResourceMap[id]?.length || 0).reduce((a, b) => a + b, 0);
+  }
+);
 
 /* * * * * * * * * * * * * * * * * *
  * Problems by file path
@@ -222,19 +242,24 @@ export const problemFilePathAndRangeSelector = createDeepEqualSelector(
   }
 );
 
-export const problemResourceIdAndRangeSelector = createDeepEqualSelector(
-  (state: ValidationState) => state.validationOverview.selectedProblem?.problem ?? null,
-  (problem: ValidationResult | null) => {
+export const problemResourceAndRangeSelector = createDeepEqualSelector(
+  (state: RootState) => state.validation.validationOverview.selectedProblem?.problem ?? null,
+  activeResourceStorageSelector,
+  transientResourceMetaMapSelector,
+  (problem: ValidationResult | null, activeStorage, transientMetaMap) => {
     if (!problem) {
-      return {resourceId: '', range: undefined};
+      return {resourceId: '', storage: 'local' as ResourceStorage, range: undefined};
     }
 
     const resourceId = getResourceId(problem) ?? '';
     const location = getResourceLocation(problem);
     const region = location.physicalLocation?.region;
 
+    // need to check if the resource might be in transient storage since the validation problem does not know
+    const storage = activeStorage === 'local' && isDefined(transientMetaMap[resourceId]) ? 'transient' : activeStorage;
+
     if (!region) {
-      return {resourceId, range: undefined};
+      return {resourceId, storage, range: undefined};
     }
 
     const range: MonacoRange = {
@@ -244,6 +269,6 @@ export const problemResourceIdAndRangeSelector = createDeepEqualSelector(
       startLineNumber: region.startLine,
     };
 
-    return {resourceId, range};
+    return {resourceId, storage, range};
   }
 );

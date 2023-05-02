@@ -20,9 +20,11 @@ export const DEFAULT_PANE_TITLE_HEIGHT = 40;
 export const MIN_SPLIT_VIEW_PANE_WIDTH = 350;
 export const GUTTER_SPLIT_VIEW_PANE_WIDTH = 15;
 export const VALIDATION_HIDING_LABELS_WIDTH = 450;
-export const DEFAULT_GIT_REPO_PLACEHOLDER = 'https://github.com/kubeshop/monokle/';
+export const DEFAULT_GIT_REPO_PLACEHOLDER = 'https://github.com/kubeshop/monokle-demo';
 export const TEMPLATES_HELP_URL = 'https://github.com/kubeshop/monokle/blob/main/docs/templates.md';
 export const PLUGINS_HELP_URL = 'https://kubeshop.github.io/monokle/plugins';
+
+export const DISCORD_URL = 'https://discord.gg/kMJxmuYTMu';
 
 export const PLUGIN_DOCS_URL = 'https://kubeshop.github.io/monokle/plugins/';
 export const LET_US_KNOW_URL = 'https://github.com/kubeshop/monokle/issues/1550';
@@ -74,3 +76,5 @@ export const ADDITIONAL_SUPPORTED_FILES = [
   '.env.production',
   '.env.development',
 ];
+
+export const CLUSTER_DASHBOARD_HELP_URL: string = 'https://kubeshop.github.io/monokle/cluster-mode';

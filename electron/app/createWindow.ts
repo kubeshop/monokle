@@ -1,7 +1,6 @@
 import {BrowserWindow, app, nativeImage} from 'electron';
 
 import indexOf from 'lodash/indexOf';
-import {machineIdSync} from 'node-machine-id';
 import * as path from 'path';
 
 import {APP_MIN_HEIGHT, APP_MIN_WIDTH, NEW_VERSION_CHECK_INTERVAL} from '@shared/constants/app';
@@ -11,10 +10,7 @@ import {AlertEnum} from '@shared/models/alert';
 import type {AlertType} from '@shared/models/alert';
 import {NewVersionCode} from '@shared/models/config';
 import {StartupFlags} from '@shared/models/startupFlag';
-import {DISABLED_TELEMETRY} from '@shared/models/telemetry';
 import utilsElectronStore from '@shared/utils/electronStore';
-import {disableSegment, enableSegment, getSegmentClient} from '@shared/utils/segment';
-import {activeProjectSelector, transientResourceCountSelector} from '@shared/utils/selectors';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 
 import autoUpdater from './autoUpdater';
@@ -25,7 +21,7 @@ import {
   dispatchToWindow,
   subscribeToStoreStateChanges,
 } from './ipc/ipcMainRedux';
-import {createMenu} from './menu';
+import {createMenu, menuStatePropertiesToPick} from './menu';
 import {downloadPlugin, loadPluginMap} from './services/pluginService';
 import {loadTemplateMap, loadTemplatePackMap} from './services/templateService';
 import {setWindowTitle} from './setWindowTitle';
@@ -46,7 +42,6 @@ const templatesDir = path.join(userDataDir, 'monokleTemplates');
 const crdsDir = path.join(userDataDir, 'savedCRDs');
 const templatePacksDir = path.join(userDataDir, 'monokleTemplatePacks');
 const APP_DEPENDENCIES = ['kubectl', 'helm', 'kustomize', 'git'];
-const machineId = machineIdSync();
 
 export const createWindow = (givenPath?: string) => {
   const iconPath = isDev ? path.join('resources', 'icon.ico') : path.join(process.resourcesPath, 'icon.ico');
@@ -59,7 +54,6 @@ export const createWindow = (givenPath?: string) => {
     title: 'Monokle',
     icon: image,
     webPreferences: {
-      preload: path.normalize(`${__dirname}/preload.js`),
       zoomFactor: utilsElectronStore.get('ui.zoomFactor'),
       webSecurity: false,
       contextIsolation: false,
@@ -92,6 +86,8 @@ export const createWindow = (givenPath?: string) => {
 
   // Hot Reloading
   if (isDev) {
+    win.webContents.setVisualZoomLevelLimits(1, 5);
+
     // eslint-disable-next-line global-require
     require('electron-reload')(__dirname, {
       electron: path.join(
@@ -104,7 +100,7 @@ export const createWindow = (givenPath?: string) => {
         `electron${process.platform === 'win32' ? '.cmd' : ''}`
       ),
       forceHardReset: true,
-      hardResetMethod: 'exit',
+      hardResetMethod: 'quit',
     });
   }
 
@@ -143,23 +139,18 @@ export const createWindow = (givenPath?: string) => {
 
     const dispatch = createDispatchForWindow(win);
 
-    subscribeToStoreStateChanges(win.webContents, storeState => {
-      createMenu(storeState, dispatch);
-      let projectName = activeProjectSelector(storeState)?.name;
-      setWindowTitle(storeState, win, projectName);
-      unsavedResourceCount = transientResourceCountSelector(storeState);
-      const segmentClient = getSegmentClient();
+    subscribeToStoreStateChanges(
+      win.webContents,
+      menuStatePropertiesToPick,
+      (storeState, title, _unsavedResourceCount) => {
+        if (storeState) {
+          createMenu(storeState, dispatch);
+          setWindowTitle(title, win);
 
-      if (storeState.config.disableEventTracking) {
-        segmentClient?.track({
-          userId: machineId,
-          event: DISABLED_TELEMETRY,
-        });
-        disableSegment();
-      } else {
-        enableSegment();
+          unsavedResourceCount = _unsavedResourceCount;
+        }
       }
-    });
+    );
 
     dispatch({type: 'main/setAppRehydrating', payload: true});
 

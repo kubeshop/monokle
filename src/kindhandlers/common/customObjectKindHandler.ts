@@ -145,6 +145,7 @@ const createNamespacedCustomObjectKindHandler = (
       const {version, group} = extractResourceVersion(resource, kindVersion, kindGroup);
 
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+      customObjectsApi.setDefaultAuthentication(new k8s.VoidAuth());
       return customObjectsApi.getNamespacedCustomObject(
         group,
         version,
@@ -155,6 +156,7 @@ const createNamespacedCustomObjectKindHandler = (
     },
     async listResourcesInCluster(kubeconfig: k8s.KubeConfig, options, crd?: K8sResource) {
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+      customObjectsApi.setDefaultAuthentication(new k8s.VoidAuth());
 
       if (crd) {
         const defaultVersion = findDefaultVersionForCRD(crd.object);
@@ -172,6 +174,7 @@ const createNamespacedCustomObjectKindHandler = (
 
       // need to find which versions that are in cluster to find default version
       const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
+      customObjectsApi.setDefaultAuthentication(new k8s.VoidAuth());
       const crdName = `${kindPlural}.${kindGroup}`;
       try {
         const result = await k8sCoreV1Api.readCustomResourceDefinition(crdName).then(
@@ -203,6 +206,7 @@ const createNamespacedCustomObjectKindHandler = (
       const {version, group} = extractResourceVersion(resource, kindVersion, kindGroup);
 
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+      customObjectsApi.setDefaultAuthentication(new k8s.VoidAuth());
       await customObjectsApi.deleteNamespacedCustomObject(
         group,
         version,
@@ -239,10 +243,12 @@ const createClusterCustomObjectKindHandler = (
       const {version, group} = extractResourceVersion(resource, kindVersion, kindGroup);
 
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+      customObjectsApi.setDefaultAuthentication(new k8s.VoidAuth());
       return customObjectsApi.getClusterCustomObject(group, version, kindPlural, resource.name);
     },
     async listResourcesInCluster(kubeconfig: k8s.KubeConfig, options, crd?: K8sResource) {
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+      customObjectsApi.setDefaultAuthentication(new k8s.VoidAuth());
 
       if (crd) {
         const defaultVersion = findDefaultVersionForCRD(crd.object);
@@ -252,6 +258,7 @@ const createClusterCustomObjectKindHandler = (
       }
       // need to find which versions that are in cluster to find default version
       const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.ApiextensionsV1Api);
+      k8sCoreV1Api.setDefaultAuthentication(new k8s.VoidAuth());
       const crdName = `${kindPlural}.${kindGroup}`;
       try {
         const result = await k8sCoreV1Api.readCustomResourceDefinition(crdName).then(
@@ -276,6 +283,7 @@ const createClusterCustomObjectKindHandler = (
       const {version, group} = extractResourceVersion(resource, kindVersion, kindGroup);
 
       const customObjectsApi = kubeconfig.makeApiClient(k8s.CustomObjectsApi);
+      customObjectsApi.setDefaultAuthentication(new k8s.VoidAuth());
       await customObjectsApi.deleteClusterCustomObject(group, version, kindPlural, resource.name);
     },
   };

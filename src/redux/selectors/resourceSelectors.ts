@@ -195,27 +195,38 @@ export const previewedKustomizationSelector = createDeepEqualSelector(
   }
 );
 
-export const resourceNavigatorSelector = createSelector(
+/**
+ * Selects all resources that should be visible in the navigator, mixing in transient resources and applying filters
+ */
+export const navigatorResourcesSelector = createSelector(
   [
     activeResourceStorageSelector,
     activeResourceMetaMapSelector,
     transientResourceMetaMapSelector,
     (state: RootState) => state.main.resourceFilter,
-    (state: RootState) => state.ui.navigator.collapsedResourceKinds,
   ],
-  (activeResourceStorage, activeResourceMetaMap, transientResourceMetaMap, resourceFilter, collapsedResourceKinds) => {
-    const list: ResourceNavigatorNode[] = [];
-
-    const resources = Object.values(activeResourceMetaMap)
-      .concat(Object.values(transientResourceMetaMap))
+  (activeResourceStorage, activeResourceMetaMap, transientResourceMetaMap, resourceFilter) => {
+    return Object.values(activeResourceMetaMap)
+      .concat(Object.values(transientResourceMetaMap).filter(r => r.origin.createdIn === activeResourceStorage))
       .filter(
         resource =>
           isResourcePassingFilter(resource, resourceFilter) &&
           !isKustomizationResource(resource) &&
           !isKustomizationPatch(resource)
       );
+  }
+);
 
-    const groups = groupBy(resources, 'kind');
+export const resourceNavigatorSelector = createSelector(
+  [
+    activeResourceStorageSelector,
+    navigatorResourcesSelector,
+    (state: RootState) => state.ui.navigator.collapsedResourceKinds,
+  ],
+  (activeResourceStorage, navigatorResources, collapsedResourceKinds) => {
+    const list: ResourceNavigatorNode[] = [];
+
+    const groups = groupBy(navigatorResources, 'kind');
     const entries = Object.entries(groups);
     const sortedEntries = entries.sort();
 
@@ -244,5 +255,52 @@ export const resourceNavigatorSelector = createSelector(
     }
 
     return list;
+  }
+);
+
+export const selectedResourceIdentifierSelector = createSelector(
+  (state: RootState) => state.main.selection,
+  selection => {
+    if (selection?.type === 'resource') {
+      return selection.resourceIdentifier;
+    }
+    return undefined;
+  }
+);
+
+export const filteredResourcesIdsSelector = createSelector(navigatorResourcesSelector, navigatorResources =>
+  navigatorResources.map(r => r.id)
+);
+
+export const navigatorResourcesCountSelector = createSelector(
+  navigatorResourcesSelector,
+  navigatorResources => navigatorResources.length
+);
+
+/**
+ * Selects the resource identifier of the resource that is currently being edited.
+ * If the selection is a file that contains only one resource, it returns it's identifier
+ */
+export const editorResourceIdentifierSelector = createSelector(
+  [(state: RootState) => state.main.selection, (state: RootState) => state.main.resourceMetaMapByStorage.local],
+  (selection, localResourceMetaMap) => {
+    if (!selection) {
+      return undefined;
+    }
+
+    if (selection.type === 'file') {
+      const selectedFilePath = selection.filePath;
+      const resourceIdentifiersFromFile = Object.values(localResourceMetaMap).filter(
+        r => r.origin.filePath === selectedFilePath
+      );
+
+      if (resourceIdentifiersFromFile.length === 1) {
+        return resourceIdentifiersFromFile[0];
+      }
+    }
+
+    if (selection.type === 'resource') {
+      return selection.resourceIdentifier;
+    }
   }
 );
