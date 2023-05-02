@@ -9,7 +9,7 @@ const CustomResourceDefinitionHandler: ResourceKindHandler = {
   kind: 'CustomResourceDefinition',
   apiVersionMatcher: '**',
   isNamespaced: false,
-  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CUSTOM, 'Definitions'],
+  navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CONFIGURATION, 'Definitions'],
   clusterApiVersion: 'apiextensions.k8s.io/v1',
   validationSchemaPrefix: 'io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.v1',
   isCustom: false,
