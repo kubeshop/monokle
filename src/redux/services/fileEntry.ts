@@ -2,9 +2,8 @@ import fs from 'fs';
 import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
-import textExtensions from 'text-extensions';
 
-import {ADDITIONAL_SUPPORTED_FILES} from '@constants/constants';
+import {ADDITIONAL_SUPPORTED_FILES, SUPPORTED_TEXT_EXTENSIONS} from '@constants/constants';
 
 import {clearSelectionReducer, selectFileReducer, selectResourceReducer} from '@redux/reducers/main/selectionReducers';
 import {
@@ -73,7 +72,7 @@ export function createFileEntry({fileEntryPath, fileMap, helmChartId, extension,
     rootFolderPath: fileMap[ROOT_FILE_ENTRY].filePath,
     isExcluded: Boolean(fileIsExcluded(fileEntryPath, projectConfig)),
     isSupported:
-      textExtensions.some(supportedExtension => supportedExtension === extension) ||
+      SUPPORTED_TEXT_EXTENSIONS.some(supportedExtension => supportedExtension === extension) ||
       ADDITIONAL_SUPPORTED_FILES.some(supportedExtension => supportedExtension === path.basename(fileEntryPath)),
     helmChartId,
     extension,

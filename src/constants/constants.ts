@@ -78,3 +78,4 @@ export const ADDITIONAL_SUPPORTED_FILES = [
 ];
 
 export const CLUSTER_DASHBOARD_HELP_URL: string = 'https://kubeshop.github.io/monokle/cluster-mode';
+export const SUPPORTED_TEXT_EXTENSIONS = ['.md', '.yaml', '.yml'];

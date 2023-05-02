@@ -22,10 +22,11 @@ import {useDelete, useFolderMenuItems, useIsDisabled} from './hooks';
 
 type Props = {
   folderPath: string;
+  disabledNode: boolean;
 };
 
 const TreeNodeFolder: React.FC<Props> = props => {
-  const {folderPath} = props;
+  const {disabledNode, folderPath} = props;
   const folderEntry: FileEntry | undefined = useAppSelector(state => state.main.fileMap[folderPath]);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
@@ -52,13 +53,13 @@ const TreeNodeFolder: React.FC<Props> = props => {
 
   return (
     <S.NodeContainer
-      $isDisabled={isDisabled}
+      $isDisabled={isDisabled || disabledNode}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onContextMenu={onContextMenu}
     >
       <S.TitleContainer $actionButtonsWidth={actionButtonsWidth} $isHovered={isHovered}>
-        <S.TitleText $isExcluded={folderEntry.isExcluded} $isSupported>
+        <S.TitleText $isExcluded={folderEntry.isExcluded} $isSupported={!disabledNode}>
           <Tooltip
             overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
             mouseEnterDelay={TOOLTIP_DELAY}
