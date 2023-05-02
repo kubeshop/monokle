@@ -30,18 +30,18 @@ type RootState = {
   cluster: ClusterState;
 };
 
-type ElectronMenuDataType = Pick<RootState, 'config'> & {
+type ElectronMenuDataType = {
   config: Pick<
     RootState['config'],
     'projects' | 'newVersion' | 'selectedProjectRootFolder' | 'kubeConfig' | 'projectConfig'
   >;
-} & Pick<RootState, 'main'> & {
-    main: Pick<RootState['main'], 'selection' | 'preview' | 'clusterConnection'>;
-  } & Pick<RootState, 'ui'> & {
-    main: Pick<
-      RootState['ui'],
-      'isStartProjectPaneVisible' | 'isInQuickClusterMode' | 'isStartProjectPaneVisible' | 'monacoEditor'
-    >;
-  };
+} & {
+  main: Pick<RootState['main'], 'selection' | 'preview' | 'clusterConnection'>;
+} & {
+  ui: Pick<
+    RootState['ui'],
+    'isStartProjectPaneVisible' | 'isInQuickClusterMode' | 'isStartProjectPaneVisible' | 'monacoEditor'
+  >;
+};
 
 export type {RootState, ElectronMenuDataType};

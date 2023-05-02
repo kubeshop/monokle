@@ -58,14 +58,26 @@ const loadClusterResourcesHandler = async (
   trackEvent('preview/cluster/start');
 
   try {
+    let namespaces: Array<string> = [];
+    if (kubeConfigPath?.trim().length) {
+      namespaces = await getTargetClusterNamespaces(kubeConfigPath, kubeConfigContext, clusterAccess);
+      if (namespaces.length === 0) {
+        throw new Error('no_namespaces_found');
+      }
+      if (
+        currentNamespace !== '<all>' &&
+        currentNamespace !== '<not-namespaced>' &&
+        !namespaces.includes(currentNamespace)
+      ) {
+        currentNamespace = 'default';
+      }
+    }
+
     let kc = createKubeClient(kubeConfigPath, context, port);
     let results: PromiseSettledResult<string>[] | PromiseSettledResult<string>[][] = [];
 
     if (currentNamespace === '<all>') {
-      if (kubeConfigPath?.trim().length) {
-        const namespaces = await getTargetClusterNamespaces(kubeConfigPath, kubeConfigContext, clusterAccess);
-        results = await Promise.all(namespaces.map(ns => getNonCustomClusterObjects(kc, ns, true)));
-      }
+      results = await Promise.all(namespaces.map(ns => getNonCustomClusterObjects(kc, ns, true)));
     } else if (currentNamespace === '<not-namespaced>') {
       results = await getNonCustomClusterObjects(kc);
     } else {
