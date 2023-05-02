@@ -29,10 +29,10 @@ export const editorTextUpdateListener: AppListenerFn = listen => {
     async effect(_action, {getState, delay, cancelActiveListeners}) {
       cancelActiveListeners();
       await delay(1);
-      const rootFolderPath = getState().main.fileMap[ROOT_FILE_ENTRY].filePath;
+      const rootFolderPath = getState().main.fileMap[ROOT_FILE_ENTRY]?.filePath;
       const selectedFilePath = selectedFilePathSelector(getState());
 
-      if (_action.meta.arg.isUpdateFromEditor || !rootFolderPath) {
+      if (!_action.meta || _action.meta.arg.isUpdateFromEditor || !rootFolderPath) {
         return;
       }
 

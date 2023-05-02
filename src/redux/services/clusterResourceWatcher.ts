@@ -4,8 +4,7 @@ import * as k8s from '@kubernetes/client-node';
 import log from 'loglevel';
 
 import {deleteMultipleClusterResources, updateMultipleClusterResources} from '@redux/reducers/main';
-
-import {jsonToYaml} from '@utils/yaml';
+import {getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 import {getRegisteredKindHandlers, registerCrdKindHandlers} from '@src/kindhandlers';
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
@@ -149,7 +148,7 @@ const watchResource = async (
 };
 
 export const extractClusterResourceFromObject = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sResource => {
-  const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(apiObj), 'cluster', {
+  const [resource]: K8sResource[] = extractK8sResources(getK8sObjectsAsYaml([apiObj]), 'cluster', {
     context: kubeConfig.currentContext,
   });
   return resource;
