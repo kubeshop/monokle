@@ -75,6 +75,7 @@ export function createFolderTree(
   fileExplorerSortOrder: FileExplorerSortOrder
 ) {
   const folderEntry = fileMap[folderPath];
+
   if (!folderEntry || !isDefined(folderEntry.children)) {
     return undefined;
   }
@@ -92,6 +93,7 @@ export function createFolderTree(
     title: path.basename(folderEntry.filePath),
     children,
     selectable: false,
+    disabled: folderEntry.isExcluded,
   };
 
   return treeNode;

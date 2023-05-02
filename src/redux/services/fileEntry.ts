@@ -104,7 +104,7 @@ export function createRootFileEntry(rootFolder: string, fileMap: FileMapType) {
  */
 
 export function fileIsExcluded(filePath: FileEntry['filePath'], projectConfig: ProjectConfig) {
-  return projectConfig.scanExcludes?.some(e => micromatch.isMatch(filePath, e));
+  return projectConfig.scanExcludes?.some(e => micromatch.isMatch(filePath, e) || micromatch.contains(filePath, e));
 }
 
 /**
@@ -227,7 +227,9 @@ export function readFiles(
 
       if (isExcluded) {
         fileEntry.isExcluded = true;
-      } else if (isDir) {
+      }
+
+      if (isDir) {
         const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
         if (depth === folderReadsMaxDepth) {
           log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);

@@ -471,6 +471,7 @@ export const useFileMenuItems = (
     if (isYamlFile(fileEntry.filePath)) {
       newMenuItems.push({
         key: 'compare',
+        disabled: fileEntry.isExcluded,
         label: 'Compare with another file',
         onClick: () => {
           dispatch(openFileCompareModal(fileEntry.filePath));
