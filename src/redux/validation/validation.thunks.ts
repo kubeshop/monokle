@@ -3,15 +3,12 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {merge} from 'lodash';
 
 import {processResourceRefs} from '@redux/parsing/parser.thunks';
-import {RESOURCE_PARSER} from '@redux/parsing/resourceParser';
 import {
   getActiveResourceMapFromState,
   getResourceMapFromState,
   getResourceMetaMapFromState,
 } from '@redux/selectors/resourceMapGetters';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
-
-import {transformResourceForValidation} from '@utils/resources';
 
 import {ValidationResponse} from '@monokle/validation';
 import {CORE_PLUGINS} from '@shared/constants/validation';
@@ -91,12 +88,11 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
 
     const incrementalResourceIds =
       payload?.type === 'incremental' ? payload.resourceIdentifiers.map(r => r.id) : undefined;
-    RESOURCE_PARSER.clear(incrementalResourceIds);
 
     // Build references
     const references = dispatch(
       processResourceRefs({
-        resources: resources.map(transformResourceForValidation).filter(isDefined),
+        resources,
         incremental: incrementalResourceIds ? {resourceIds: incrementalResourceIds} : undefined,
       })
     );
@@ -104,6 +100,7 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
     signal.addEventListener('abort', () => {
       references.abort();
     });
+
     let resourcesWithRefs: ValidationResource[] = [];
     try {
       resourcesWithRefs = await references.unwrap();

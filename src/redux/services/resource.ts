@@ -13,6 +13,7 @@ import {
 } from '@constants/constants';
 
 import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
+import {RESOURCE_PARSER} from '@redux/parsing/resourceParser';
 import {getAbsoluteResourcePath, getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 
 // import {VALIDATOR} from '@redux/validation/validation.services';
@@ -456,6 +457,7 @@ export function deleteResource<Storage extends ResourceStorage>(
   const {resourceMetaMap, resourceContentMap} = stateArgs;
   delete resourceMetaMap[resource.id];
   delete resourceContentMap[resource.id];
+  RESOURCE_PARSER.clear([resource.id]);
 }
 
 /**

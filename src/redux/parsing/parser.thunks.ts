@@ -17,6 +17,7 @@ type ProcessArgs = {
 export const processResourceRefs = createAsyncThunk<ValidationResource[], ProcessArgs, ThunkApi>(
   'references/process',
   async (payload, {signal, getState, rejectWithValue}) => {
+    RESOURCE_PARSER.clear(payload.incremental?.resourceIds);
     let resources: ValidationResource[] = [];
 
     try {
