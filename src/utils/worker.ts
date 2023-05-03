@@ -1,5 +1,3 @@
-import log from 'loglevel';
-
 export interface WorkerMessage {
   type: string;
   input: any;
@@ -17,7 +15,6 @@ export const createWorkerEventPromise = <Output extends any>(args: {worker: Work
       if (!matchWorkerEvent(event, type)) {
         return;
       }
-      log.info('[WORKER_EVENT_FULFILLED]', event);
       resolve(event.data.output);
     };
   });

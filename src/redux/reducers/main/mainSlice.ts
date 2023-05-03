@@ -6,6 +6,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import initialState from '@redux/initialState';
 import {processResourceRefs} from '@redux/parsing/parser.thunks';
+import {RESOURCE_PARSER} from '@redux/parsing/resourceParser';
 import {setAlert} from '@redux/reducers/alert';
 import {getResourceContentMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
@@ -306,6 +307,9 @@ export const mainSlice = createSlice({
         delete state.resourceMetaMapByStorage.cluster[r.id];
         delete state.resourceContentMapByStorage.cluster[r.id];
       });
+
+      RESOURCE_PARSER.clear(action.payload.map((r: K8sResource) => r.id));
+
       // clear the selection if the selected resource has been deleted
       const selection = state.selection;
       if (isResourceSelection(selection)) {
