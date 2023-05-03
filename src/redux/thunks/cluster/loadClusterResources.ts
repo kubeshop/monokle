@@ -13,8 +13,6 @@ import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
 import {extractK8sResources, getTargetClusterNamespaces} from '@redux/services/resource';
 import {createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
-import {isPromiseFulfilledResult} from '@utils/promises';
-
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
 import {AppDispatch} from '@shared/models/appDispatch';
@@ -22,6 +20,7 @@ import {ClusterAccess} from '@shared/models/config';
 import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {createKubeClient} from '@shared/utils/kubeclient';
+import {isPromiseFulfilledResult} from '@shared/utils/promises';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {findDefaultVersionForCRD} from './findDefaultVersionForCRD';
