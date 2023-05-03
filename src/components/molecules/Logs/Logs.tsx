@@ -32,6 +32,8 @@ const Logs = () => {
   const [logs, setLogs] = useState<LogLineType[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const [errorMessage, setErrorMessage] = useState('');
+
   useEffect(() => {
     if (containerRef && containerRef.current) {
       const position = containerRef.current.scrollHeight - containerRef.current.clientHeight;
@@ -64,7 +66,11 @@ const Logs = () => {
       if (selectedResource.namespace) {
         k8sLog
           .log(selectedResource.namespace, selectedResource.name, containerName, logStream, logOptions)
+          .then(() => {
+            setErrorMessage('');
+          })
           .catch((err: Error) => {
+            setErrorMessage(`${err.name}: ${err.message}`);
             log.error(err);
           });
       }
@@ -76,6 +82,10 @@ const Logs = () => {
       }
     };
   }, [kubeconfig, selectedResource]);
+
+  if (errorMessage) {
+    return <S.ErrorContainer>{errorMessage}</S.ErrorContainer>;
+  }
 
   return (
     <S.LogContainer ref={containerRef}>

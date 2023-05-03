@@ -6,6 +6,11 @@ import {Colors} from '@shared/styles/colors';
 
 const {Text} = Typography;
 
+export const ErrorContainer = styled.div`
+  padding: 10px;
+  color: ${Colors.red6};
+`;
+
 export const LogContainer = styled.div`
   padding: 0 10px;
   height: 100%;
