@@ -77,7 +77,7 @@ const loadClusterResourcesHandler = async (
     let results: PromiseSettledResult<string>[] | PromiseSettledResult<string>[][] = [];
 
     if (currentNamespace === '<all>') {
-      results = await Promise.all(namespaces.map(ns => getNonCustomClusterObjects(kc, ns, true)));
+      results = await getNonCustomClusterObjects(kc, undefined, true);
     } else if (currentNamespace === '<not-namespaced>') {
       results = await getNonCustomClusterObjects(kc);
     } else {
