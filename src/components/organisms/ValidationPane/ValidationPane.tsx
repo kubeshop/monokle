@@ -89,7 +89,7 @@ const ValidationPane: React.FC = () => {
           selectedProblem={selectedProblem?.problem}
           validationResponse={lastResponse}
           onProblemSelect={problem => dispatch(setSelectedProblem(problem))}
-          status={status}
+          status={isInClusterMode ? 'loaded' : status}
           skeletonStyle={{marginTop: '20px'}}
           onFiltersChange={filters => dispatch(setValidationFilters(filters))}
         />
