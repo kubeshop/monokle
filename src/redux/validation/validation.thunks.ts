@@ -14,7 +14,7 @@ import {ValidationResponse} from '@monokle/validation';
 import {CORE_PLUGINS} from '@shared/constants/validation';
 import {K8sResource} from '@shared/models/k8sResource';
 import type {ThunkApi} from '@shared/models/thunk';
-import type {LoadValidationResult, ValidationArgs} from '@shared/models/validation';
+import type {LoadValidationResult, ValidationArgs, ValidationResource} from '@shared/models/validation';
 import electronStore from '@shared/utils/electronStore';
 import {isDefined} from '@shared/utils/filter';
 
@@ -44,7 +44,7 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
 
 export const validateResources = createAsyncThunk<ValidationResponse | undefined, ValidationArgs | undefined, ThunkApi>(
   'validation/validate',
-  async (payload, {getState, dispatch, signal}) => {
+  async (payload, {getState, dispatch, signal, rejectWithValue}) => {
     let resources: K8sResource[] = [];
 
     if (payload?.type === 'full') {
@@ -101,15 +101,23 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
       references.abort();
     });
 
-    const resourcesWithRefs = await references.unwrap();
+    let resourcesWithRefs: ValidationResource[] = [];
+    try {
+      resourcesWithRefs = await references.unwrap();
+    } catch (e) {
+      return rejectWithValue(e);
+    }
     signal.throwIfAborted();
 
     // TODO: could the active resource map change while the validation is running? before we get the refs?
-    const {response} = await VALIDATOR.runValidation({
-      resources: resourcesWithRefs,
-      incremental: incrementalResourceIds ? {resourceIds: incrementalResourceIds} : undefined,
-    });
-
-    return response;
+    try {
+      const {response} = await VALIDATOR.runValidation({
+        resources: resourcesWithRefs,
+        incremental: incrementalResourceIds ? {resourceIds: incrementalResourceIds} : undefined,
+      });
+      return response;
+    } catch (e) {
+      rejectWithValue(e);
+    }
   }
 );
