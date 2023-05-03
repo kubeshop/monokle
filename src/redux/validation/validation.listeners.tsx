@@ -159,7 +159,7 @@ const incrementalValidationListener: AppListenerFn = listen => {
       multiplePathsAdded.fulfilled,
       multiplePathsChanged.fulfilled
     ),
-    async effect(_action, {dispatch, delay, signal}) {
+    async effect(_action, {dispatch, delay, signal, cancelActiveListeners}) {
       let resourceIdentifiers: ResourceIdentifier[] = [];
 
       if (
@@ -188,7 +188,7 @@ const incrementalValidationListener: AppListenerFn = listen => {
       // TODO: should we cancel active listeners or not?
       // I think it depends on the resource storage?
       // but maybe validation should actually be cancelled while the processing of refs should not?!
-      // cancelActiveListeners();
+      cancelActiveListeners();
 
       await delay(200);
       if (signal.aborted) return;
