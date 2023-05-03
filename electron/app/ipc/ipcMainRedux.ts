@@ -3,8 +3,7 @@ import {BrowserWindow, WebContents, ipcMain, webContents} from 'electron';
 import {AnyAction} from 'redux';
 
 import type {ElectronMenuDataType, RootState} from '@shared/models/rootState';
-
-import {promiseTimeout} from '../utils/promises';
+import {promiseTimeout} from '@shared/utils/promises';
 
 const FETCH_STORE_STATE_TIMEOUT = 10000;
 

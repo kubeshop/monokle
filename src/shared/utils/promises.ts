@@ -1,9 +1,10 @@
-export function promiseTimeout<T = any>(promise: Promise<T>, timeoutMs: number, onTimeout?: () => void) {
+export function promiseTimeout<T = any>(promise: Promise<T>, timeoutMs: number) {
   let timeout: NodeJS.Timeout;
 
   const timeoutPromise = new Promise<T>((_, reject) => {
     timeout = setTimeout(() => {
-      reject(new Error(`Timed out in ${timeoutMs} ms.`, {cause: 'timeout'}));
+      const error: Error = {name: 'TimeoutError', message: `Timed out in ${timeoutMs} ms.`};
+      reject(error);
     }, timeoutMs);
   });
 
@@ -13,9 +14,6 @@ export function promiseTimeout<T = any>(promise: Promise<T>, timeoutMs: number, 
   };
 
   const onPromiseRejected = (error: any) => {
-    if (error instanceof Error && error.cause === 'timeout' && onTimeout) {
-      onTimeout();
-    }
     clearTimeout(timeout);
     throw error;
   };

@@ -16,24 +16,32 @@ type ProcessArgs = {
 
 export const processResourceRefs = createAsyncThunk<ValidationResource[], ProcessArgs, ThunkApi>(
   'references/process',
-  async (payload, {signal, getState}) => {
-    const {validationResources} = await RESOURCE_PARSER.processRefs({
-      resources: payload.resources,
-      incremental: payload.incremental,
-    });
+  async (payload, {signal, getState, rejectWithValue}) => {
+    let resources: ValidationResource[] = [];
+
+    try {
+      const {validationResources} = await RESOURCE_PARSER.processRefs({
+        resources: payload.resources,
+        incremental: payload.incremental,
+      });
+      resources = validationResources;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+
     if (signal.aborted) return [];
     signal.throwIfAborted();
 
     const osPlatform = getState().config.osPlatform;
 
     if (osPlatform === 'win32') {
-      return validationResources.map(r => ({
+      return resources.map(r => ({
         ...r,
         filePath: r.filePath.replaceAll('/', '\\'),
         refs: r.refs?.map(transformRefsFilePath),
       }));
     }
 
-    return validationResources;
+    return resources;
   }
 );
