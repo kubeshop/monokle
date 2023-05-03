@@ -155,6 +155,9 @@ export const validationSlice = createSlice({
     },
   },
   extraReducers: builder => {
+    builder.addCase(setRootFolder.pending, state => {
+      state.lastResponse = undefined;
+    });
     builder.addCase(setRootFolder.fulfilled, state => {
       state.validationOverview.selectedProblem = undefined;
       state.validationOverview.newProblemsIntroducedType = 'initial';
