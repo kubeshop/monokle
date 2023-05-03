@@ -2,6 +2,8 @@ import {ReactNode} from 'react';
 
 import {Popover} from 'antd';
 
+import {TOOLTIP_DELAY} from '@constants/constants';
+
 import {useValidationLevel} from '@hooks/useValidationLevel';
 
 import {ResourceMeta} from '@shared/models/k8sResource';
@@ -39,7 +41,7 @@ const ResourcePopover = (props: Props) => {
 
   return (
     <Popover
-      mouseEnterDelay={0.5}
+      mouseEnterDelay={TOOLTIP_DELAY}
       placement="bottom"
       content={
         <S.PopoverContainer>
