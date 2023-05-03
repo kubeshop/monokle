@@ -4,6 +4,7 @@ import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import initialState from '@redux/initialState';
 import {processResourceRefs} from '@redux/parsing/parser.thunks';
 import {setAlert} from '@redux/reducers/alert';
@@ -336,6 +337,16 @@ export const mainSlice = createSlice({
     });
 
     previewExtraReducers(builder);
+
+    builder.addCase(connectCluster.rejected, state => {
+      state.clusterConnectionOptions.isLoading = false;
+    });
+    builder.addCase(connectCluster.pending, state => {
+      state.clusterConnectionOptions.isLoading = true;
+    });
+    builder.addCase(connectCluster.fulfilled, state => {
+      state.clusterConnectionOptions.isLoading = false;
+    });
 
     builder
       .addCase(loadClusterResources.pending, state => {
