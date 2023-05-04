@@ -88,6 +88,7 @@ export const ScrollToLatest = styled.div`
   display: flex;
   align-items: center;
   margin-left: 16px;
+  z-index: 5;
 `;
 export const ScrollToOldest = styled.div`
   position: absolute;
@@ -98,6 +99,7 @@ export const ScrollToOldest = styled.div`
   display: flex;
   align-items: center;
   margin-left: 16px;
+  z-index: 5;
 `;
 export const CloseOutlined = styled(RawCloseOutlined)`
   color: ${Colors.grey8};
@@ -107,4 +109,12 @@ export const CloseOutlined = styled(RawCloseOutlined)`
   :hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
+`;
+
+export const VirtualItem = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
 `;

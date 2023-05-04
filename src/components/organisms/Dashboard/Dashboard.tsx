@@ -2,8 +2,6 @@ import {useCallback, useMemo} from 'react';
 
 import {Skeleton} from 'antd';
 
-import {orderBy} from 'lodash';
-
 import {useAppSelector} from '@redux/hooks';
 import {useResourceContentMap, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 
@@ -80,7 +78,7 @@ const Dashboard: React.FC = () => {
   );
 
   const filterResources = useCallback(() => {
-    const items = Object.values(clusterResourceContent)
+    return Object.values(clusterResourceContent)
       .map(r => ({...r, ...clusterResourceMeta[r.id]}))
       .filter(resource => {
         return (
@@ -89,11 +87,6 @@ const Dashboard: React.FC = () => {
           compareNamespaces(resource.object.metadata.namespace)
         );
       });
-
-    if (activeMenu.label === 'Event') {
-      return orderBy(items, ['object.lastTimestamp'], ['desc']).slice(0, 100);
-    }
-    return items;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeMenu, clusterResourceContent, clusterResourceMeta, clusterConnectionOptions]);
 
