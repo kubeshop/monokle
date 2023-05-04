@@ -3,7 +3,7 @@ import {useMemo} from 'react';
 import {Skeleton} from 'antd';
 
 import {useAppSelector} from '@redux/hooks';
-import {useResourceContentMapRef, useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
+import {useResourceContentMapRef, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
@@ -61,11 +61,10 @@ const Dashboard: React.FC = () => {
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
   const {height} = useMainPaneDimensions();
   const clusterConnectionOptions = useAppSelector(state => state.main.clusterConnectionOptions);
-  const clusterResourceMeta = useResourceMetaMapRef('cluster').current;
+  const clusterResourceMeta = useResourceMetaMap('cluster');
   const clusterResourceContent = useResourceContentMapRef('cluster').current;
 
   const filteredResources = useMemo(() => {
-    console.log('@@@ filteredResources');
     return Object.values(clusterResourceContent)
       .map(r => ({...r, ...clusterResourceMeta[r.id]}))
       .filter(resource => {
