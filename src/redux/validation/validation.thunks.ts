@@ -3,11 +3,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {merge} from 'lodash';
 
 import {processResourceRefs} from '@redux/parsing/parser.thunks';
-import {
-  getActiveResourceMapFromState,
-  getResourceMapFromState,
-  getResourceMetaMapFromState,
-} from '@redux/selectors/resourceMapGetters';
+import {getResourceMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {ValidationResponse} from '@monokle/validation';
@@ -46,15 +42,11 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
   'validation/validate',
   async (payload, {getState, dispatch, signal, rejectWithValue}) => {
     let resources: K8sResource[] = [];
+    let files: undefined | string[];
 
     if (payload?.type === 'full') {
-      let resourceStorage = payload.resourceStorage;
-      if (resourceStorage) {
-        resources = Object.values(getResourceMapFromState(getState(), resourceStorage) || {}).filter(isDefined);
-      } else {
-        resources = Object.values(getActiveResourceMapFromState(getState())).filter(isDefined);
-        resourceStorage = activeResourceStorageSelector(getState());
-      }
+      let resourceStorage = payload.resourceStorage || activeResourceStorageSelector(getState());
+      resources = Object.values(getResourceMapFromState(getState(), resourceStorage) || {}).filter(isDefined);
 
       // mix in transient resources created in the resourceStorage
       resources = resources.concat(
@@ -63,6 +55,10 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
           // @ts-ignore
           .filter(r => r.origin.createdIn === resourceStorage)
       );
+
+      if (resourceStorage === 'local') {
+        files = Object.keys(getState().main.fileMap);
+      }
     } else if (payload?.type === 'incremental') {
       const affectedStorages = new Set(payload.resourceIdentifiers.map(r => r.storage));
 
@@ -84,6 +80,10 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
         const resourceMap = getResourceMapFromState(getState(), storage);
         resources = resources.concat(Object.values(resourceMap).filter(isDefined));
       });
+
+      if (affectedStorages.has('local')) {
+        files = Object.keys(getState().main.fileMap);
+      }
     }
 
     const incrementalResourceIds =
@@ -94,6 +94,7 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
       processResourceRefs({
         resources,
         incremental: incrementalResourceIds ? {resourceIds: incrementalResourceIds} : undefined,
+        files,
       })
     );
 
