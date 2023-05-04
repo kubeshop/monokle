@@ -3,7 +3,7 @@ import {uniq} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
-import {Document, LineCounter, ParsedNode} from 'yaml';
+import {LineCounter} from 'yaml';
 
 import {
   KUSTOMIZATION_API_GROUP,
@@ -15,11 +15,12 @@ import {
 import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {RESOURCE_PARSER} from '@redux/parsing/resourceParser';
 import {getAbsoluteResourcePath, getLocalResourceMetasForPath} from '@redux/services/fileEntry';
+import {processK8sResourceDoc} from '@redux/thunks/utils';
 
 // import {VALIDATOR} from '@redux/validation/validation.services';
 import {saveCRD} from '@utils/crds';
 import {getFileTimestamp} from '@utils/files';
-import {parseAllYamlDocuments, parseYamlDocument} from '@utils/yaml';
+import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {getResourceKindHandler, registerKindHandler} from '@src/kindhandlers';
 import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
@@ -55,33 +56,6 @@ export function doesTextStartWithYamlDocumentDelimiter(text: string) {
   return ['\n', '\r\n', '\r'].some(lineEnding => {
     return text.startsWith(`${YAML_DOCUMENT_DELIMITER}${lineEnding}`);
   });
-}
-
-type ParsedDocCacheEntry = {
-  parsedDoc: Document.Parsed<ParsedNode>;
-  lineCounter: LineCounter;
-};
-
-const parsedDocCache = new Map<string, ParsedDocCacheEntry>();
-
-export function getParsedDoc(resource: K8sResource, options?: {forceParse?: boolean}): Document.Parsed<ParsedNode> {
-  const forceParse = options?.forceParse ?? false;
-
-  if (forceParse || !parsedDocCache.has(resource.id)) {
-    const lineCounter = new LineCounter();
-    const parsedDoc = parseYamlDocument(resource.text, lineCounter);
-    parsedDocCache.set(resource.id, {parsedDoc, lineCounter});
-  }
-
-  const cacheEntry = parsedDocCache.get(resource.id);
-  return cacheEntry!.parsedDoc;
-}
-
-export function getLineCounter(resource: K8sResource) {
-  if (getParsedDoc(resource)) {
-    const cacheEntry = parsedDocCache.get(resource.id);
-    return cacheEntry ? cacheEntry.lineCounter : undefined;
-  }
 }
 
 /**
@@ -350,7 +324,7 @@ export function extractK8sResources<
           log.warn('[extractK8sResources]: Doc has warnings', doc);
         }
 
-        const resourceObject = doc.toJS();
+        const resourceObject = processK8sResourceDoc(doc).toJS();
         const rawFileOffset = lineCounter.linePos(doc.range[0]).line;
         const fileOffset = rawFileOffset === 1 ? 0 : rawFileOffset;
 
@@ -401,9 +375,7 @@ export function extractK8sResources<
           }
 
           // if this is a single-resource file we can save the parsedDoc and lineCounter
-          if (documents.length === 1) {
-            parsedDocCache.set(resource.id, {parsedDoc: doc, lineCounter});
-          } else {
+          if (documents.length !== 1) {
             // for multi-resource files we just save the range - the parsedDoc and lineCounter will
             // be created on demand (since they are incorrect in this context)
             resource.range = {start: doc.range[0], length: doc.range[1] - doc.range[0]};
@@ -437,7 +409,6 @@ export function extractK8sResources<
           };
 
           // if this is a single-resource file we can save the parsedDoc and lineCounter
-          parsedDocCache.set(resource.id, {parsedDoc: doc, lineCounter});
           result.push(resource);
         }
       }

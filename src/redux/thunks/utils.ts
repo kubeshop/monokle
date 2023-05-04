@@ -19,11 +19,10 @@ import {ResourceMeta} from '@shared/models/k8sResource';
  * - change Date objects to properly quoted strings
  */
 
-function preprocessClusterResource(item: any) {
-  let doc = new Document(item, {schema: 'yaml-1.1'});
+export function processK8sResourceDoc(doc: Document, removeNullValues?: boolean) {
   visit(doc, {
     Pair(_, pair) {
-      if (isScalar(pair.value) && pair.value.value === null) {
+      if (removeNullValues === true && isScalar(pair.value) && pair.value.value === null) {
         return visit.REMOVE;
       }
     },
@@ -36,6 +35,11 @@ function preprocessClusterResource(item: any) {
     },
   });
   return doc;
+}
+
+function preprocessClusterResource(item: any) {
+  let doc = new Document(item, {schema: 'yaml-1.1'});
+  return processK8sResourceDoc(doc, true);
 }
 
 /**
