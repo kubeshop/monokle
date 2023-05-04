@@ -12,6 +12,7 @@ import {ResourceMeta} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 
 import {Drawer} from './Drawer';
+import NoResourcesFound from './NoResourcesFound';
 import * as S from './Tableview.styled';
 
 export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; columns: ColumnsType<any>}) => {
@@ -43,12 +44,11 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
           onChange={(event: any) => setFilterText(event.target.value)}
           allowClear
         />
-        {/* <S.BulkAction size="large" disabled>
-          Bulk action
-        </S.BulkAction> */}
       </S.FilterContainer>
+
       <S.TableContainer>
         <S.Table
+          locale={{emptyText: <NoResourcesFound />}}
           dataSource={filteredDataSource}
           columns={columns}
           rowKey="id"
