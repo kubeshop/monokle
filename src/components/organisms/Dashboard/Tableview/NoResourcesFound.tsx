@@ -11,6 +11,7 @@ import NoDataFound from '@assets/NoDataFound.svg';
 
 const NoResourcesFound: React.FC = () => {
   const activeProject = useAppSelector(activeProjectSelector);
+  const lastLoadedNamespace = useAppSelector(state => state.main.clusterConnectionOptions.lastNamespaceLoaded);
 
   const quickTipText = useMemo(() => {
     if (activeProject) {
@@ -20,10 +21,22 @@ const NoResourcesFound: React.FC = () => {
     return 'Quick tip: Start a local project and create resources of any kind from scratch. You can then deploy them to your cluster.';
   }, [activeProject]);
 
+  const notFoundtext = useMemo(() => {
+    if (!lastLoadedNamespace || lastLoadedNamespace === '<all>' || lastLoadedNamespace === '<not-namespaced>') {
+      return 'No resources found in cluster';
+    }
+
+    return (
+      <>
+        No resources found in namespace <b>{lastLoadedNamespace}</b>
+      </>
+    );
+  }, [lastLoadedNamespace]);
+
   return (
     <Container>
       <Image src={NoDataFound} width={100} height={100} />
-      <NotFoundText>No resources found</NotFoundText>
+      <NotFoundText>{notFoundtext}</NotFoundText>
       <QuickTipText>{quickTipText}</QuickTipText>
     </Container>
   );
