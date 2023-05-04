@@ -63,11 +63,6 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
     [changeClusterColor, currentContext]
   );
 
-  const edit = (record: Partial<ClusterTableRow>) => {
-    form.setFieldsValue({name: '', namespaces: [], hasFullAccess: false, ...record});
-    setEditingKey(record.name as string);
-  };
-
   const save = async (clusterName: string) => {
     const localCluster = localClusters.find(c => c.name === clusterName);
     if (!localCluster) {
