@@ -1,5 +1,6 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
+import {setCurrentContext} from '@redux/appConfig';
 import {connectCluster} from '@redux/cluster/thunks/connect';
 
 import {DashboardMenu, DashboardState} from '@shared/models/dashboard';
@@ -16,16 +17,6 @@ export const dashboardSlice = createSlice({
     },
     setDashboardMenuList: (state: Draft<DashboardState>, action: PayloadAction<Array<DashboardMenu>>) => {
       state.ui.menuList = action.payload;
-      if (
-        action.payload.every(item => item.key !== state.ui.activeMenu.key) &&
-        action.payload.every(item =>
-          item.children
-            ? item.children.filter(i => i.resourceCount).every(i => i.key !== state.ui.activeMenu.key)
-            : true
-        )
-      ) {
-        state.ui.activeMenu = {key: 'Overview', label: 'Overview'};
-      }
     },
     setDashboardSelectedResourceId: (state: Draft<DashboardState>, action: PayloadAction<string | undefined>) => {
       state.tableDrawer.selectedResourceId = action.payload;
@@ -38,6 +29,9 @@ export const dashboardSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(connectCluster.fulfilled, state => {
       state.tableDrawer.selectedResourceId = undefined;
+    });
+    builder.addCase(setCurrentContext, state => {
+      state.ui.activeMenu = {key: 'Overview', label: 'Overview'};
     });
   },
 });
