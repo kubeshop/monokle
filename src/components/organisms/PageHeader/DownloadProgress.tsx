@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import {useAppSelector} from '@redux/hooks';
 
 import {NewVersionCode} from '@shared/models/config';
+import {Colors} from '@shared/styles/colors';
 
 declare global {
   interface Window {
@@ -35,7 +36,16 @@ const DownloadProgress: React.FC = () => {
 
   return (
     <Container>
-      <Progress percent={newVersion.data.percent ?? 0} size="small" />
+      <Progress
+        strokeColor={{
+          '0%': '#84AAE2',
+          '90%': '#9C84E2',
+          '100%': '#CD92F1',
+        }}
+        format={percent => <DownloadingText>Downloading new version {percent}%</DownloadingText>}
+        percent={newVersion.data.percent ?? 99}
+        size="small"
+      />
     </Container>
   );
 };
@@ -45,4 +55,9 @@ export default DownloadProgress;
 const Container = styled.div`
   max-width: 120px;
   min-width: 120px;
+`;
+
+const DownloadingText = styled.span`
+  color: ${Colors.grey7};
+  font-size: 11px;
 `;
