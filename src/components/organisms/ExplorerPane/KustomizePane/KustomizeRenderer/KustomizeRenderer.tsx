@@ -8,6 +8,7 @@ import {isResourceHighlighted, isResourceSelected} from '@redux/services/resourc
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {isLocalOrigin} from '@shared/models/origin';
 import {isEqual} from '@shared/utils/isEqual';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
@@ -65,7 +66,9 @@ const KustomizeRenderer: React.FC<IProps> = props => {
       </S.PrefixContainer>
 
       <S.ItemName isDisabled={isDisabled} isSelected={isSelected} isHighlighted={isHighlighted}>
-        {resourceMeta.name}
+        {isLocalOrigin(resourceMeta.origin)
+          ? resourceMeta.origin.filePath.substring(0, resourceMeta.origin.filePath.lastIndexOf('/'))
+          : resourceMeta.name}
       </S.ItemName>
 
       <S.SuffixContainer>

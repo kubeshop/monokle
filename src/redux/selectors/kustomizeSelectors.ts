@@ -10,7 +10,7 @@ import {RootState} from '@shared/models/rootState';
 import {getResourceMetaMapFromState} from './resourceMapGetters';
 
 const kindNameRenderer = (kind: string) => {
-  if (kind === 'Kustomization') return kind;
+  if (kind === 'Kustomization') return 'Kustomize Overlays';
 
   return `${kind} Patches`;
 };
