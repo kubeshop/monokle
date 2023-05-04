@@ -62,7 +62,7 @@ export const MenuItem = ({
     );
   }
 
-  if (type === 'child' && menuItem.resourceCount) {
+  if (type === 'child') {
     return (
       <S.SubSection
         ref={menuItemRef}
@@ -73,7 +73,7 @@ export const MenuItem = ({
         onClick={() => setActiveMenu(menuItem)}
       >
         <span style={{marginRight: '4px'}}>{menuItem.label}</span>
-        {menuItem.resourceCount ? <Resource>{menuItem.resourceCount}</Resource> : null}
+        <Resource>{menuItem.resourceCount}</Resource>
         {menuItem.errorCount ? <ErrorCell>{menuItem.errorCount}</ErrorCell> : null}
         {menuItem.warningCount ? <Warning style={{marginLeft: '8px'}}>{menuItem.warningCount}</Warning> : null}
       </S.SubSection>

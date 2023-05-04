@@ -29,15 +29,7 @@ const DashboardFilteredMenu: React.FC<IProps> = props => {
           m.label.toLowerCase().includes(filterText.toLowerCase())
         ),
       }))
-      .filter((menuItem: DashboardMenu) => menuItem.children && menuItem.children?.length > 0)
-      .filter(
-        (menuItem: DashboardMenu) =>
-          menuItem.children &&
-          menuItem.children?.reduce(
-            (total: number, m: DashboardMenu) => total + (m.resourceCount ? m.resourceCount : 0),
-            0
-          ) > 0
-      );
+      .filter((menuItem: DashboardMenu) => menuItem.children && menuItem.children?.length > 0);
   }, [filterText, menuList]);
 
   useEffect(() => {
