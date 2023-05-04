@@ -20,6 +20,7 @@ import {
 } from '@redux/services/projectConfig';
 import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {init as sentryInit} from '@sentry/electron/renderer';
 import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
@@ -70,6 +71,10 @@ export const setOpenProject = createAsyncThunk(
   async (projectRootPath: string | null, thunkAPI: any) => {
     const appConfig: AppConfig = thunkAPI.getState().config;
     const appUi: UiState = thunkAPI.getState().ui;
+
+    if (projectRootPath && !existsSync(projectRootPath)) {
+      return createRejectionWithAlert(thunkAPI, 'Project not found', 'The project folder does not exist');
+    }
 
     if (projectRootPath && appUi.isStartProjectPaneVisible) {
       thunkAPI.dispatch(toggleStartProjectPane());
