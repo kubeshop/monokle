@@ -35,6 +35,7 @@ import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/se
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {ClusterControls} from './ClusterControl/ClusterControls';
+import DownloadProgress from './DownloadProgress';
 import {K8sVersionSelection} from './K8sVersionSelection';
 import * as S from './PageHeader.styled';
 import {PreviewControls} from './PreviewControl/PreviewControls';
@@ -246,6 +247,8 @@ const PageHeader = () => {
               )}
             </S.AutosavingContainer>
           )}
+
+          <DownloadProgress />
         </div>
 
         <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
