@@ -65,11 +65,11 @@ const Dashboard: React.FC = () => {
   const clusterResourceContent = useResourceContentMapRef('cluster').current;
 
   const filteredResources = useMemo(() => {
+    console.log('@@@ filteredResources');
     return Object.values(clusterResourceContent)
       .map(r => ({...r, ...clusterResourceMeta[r.id]}))
       .filter(resource => {
         return (
-          activeMenu.key.replace(`${resource.object.apiVersion}-`, '') === resource.object.kind &&
           resource.object.kind === activeMenu.label &&
           compareNamespaces(clusterConnectionOptions.lastNamespaceLoaded, resource.object.metadata.namespace)
         );
@@ -88,7 +88,6 @@ const Dashboard: React.FC = () => {
     <S.Container $paneHeight={height}>
       <S.Header title={activeMenu.label} />
       <S.Content>
-        {activeMenu.key === 'Overview' && <Overview />}
         {CLICKAKBLE_RESOURCE_GROUPS.findIndex(m => m === activeMenu.key) > -1 ? (
           <ResourceGroupTable
             dataSource={
@@ -104,12 +103,16 @@ const Dashboard: React.FC = () => {
                 .filter(k => Boolean(k)) || []
             }
           />
+        ) : activeMenu.key === 'Overview' ? (
+          <Overview />
         ) : (
           <Tableview
             dataSource={filteredResources}
             columns={resourceKindColumns[activeMenu.label] || resourceKindColumns['ANY']}
           />
         )}
+
+        {}
       </S.Content>
     </S.Container>
   );
