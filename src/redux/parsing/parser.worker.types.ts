@@ -16,6 +16,7 @@ export interface ProcessRefsMessage extends WorkerMessage {
   input: {
     resources: K8sResource[];
     incremental?: Incremental;
+    files?: string[];
   };
   output: {
     validationResources: ValidationResource[];

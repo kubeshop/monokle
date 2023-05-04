@@ -12,6 +12,7 @@ import {RESOURCE_PARSER} from './resourceParser';
 type ProcessArgs = {
   resources: K8sResource[];
   incremental?: Incremental;
+  files?: string[];
 };
 
 export const processResourceRefs = createAsyncThunk<ValidationResource[], ProcessArgs, ThunkApi>(
@@ -24,6 +25,7 @@ export const processResourceRefs = createAsyncThunk<ValidationResource[], Proces
       const {validationResources} = await RESOURCE_PARSER.processRefs({
         resources: payload.resources,
         incremental: payload.incremental,
+        files: payload.files,
       });
       resources = validationResources;
     } catch (e) {
