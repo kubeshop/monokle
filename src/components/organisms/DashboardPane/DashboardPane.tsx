@@ -2,7 +2,7 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Skeleton} from 'antd';
 
-import {groupBy, size, uniq} from 'lodash';
+import {groupBy, size, sortBy, uniq} from 'lodash';
 
 import navSectionNames from '@constants/navSectionNames';
 
@@ -14,6 +14,8 @@ import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
 import {useRefSelector} from '@utils/hooks';
+
+import EventHandler from '@src/kindhandlers/EventHandler';
 
 import {DashboardMenu} from '@shared/models/dashboard';
 import {ResourceMeta} from '@shared/models/k8sResource';
@@ -78,13 +80,19 @@ const DashboardPane = () => {
       const parent: DashboardMenu | undefined = tempMenu.find(m => m.key === kindHandler.navigatorPath[1]);
       if (parent) {
         const child: DashboardMenu | undefined = parent.children?.find(m => m.key === kindHandler.navigatorPath[2]);
+
+        let kindResources = groupedResources[kindHandler.kind];
+        if (kindHandler.kind === EventHandler.kind) {
+          kindResources = sortBy(kindResources, ['object.lastTimestamp'], ['desc']).slice(0, 100);
+        }
+
         if (child) {
           child.children?.push({
             key: `${kindHandler.clusterApiVersion}-${kindHandler.kind}`,
             label: kindHandler.kind,
             errorCount: getProblemCount(kindHandler.kind, 'error'),
             warningCount: getProblemCount(kindHandler.kind, 'warning'),
-            resourceCount: size(groupedResources[kindHandler.kind]) ?? 0,
+            resourceCount: size(kindResources) ?? 0,
             children: [],
           });
         } else {
@@ -93,7 +101,7 @@ const DashboardPane = () => {
             label: kindHandler.kind,
             errorCount: getProblemCount(kindHandler.kind, 'error'),
             warningCount: getProblemCount(kindHandler.kind, 'warning'),
-            resourceCount: size(groupedResources[kindHandler.kind]) ?? 0,
+            resourceCount: size(kindResources) ?? 0,
             children: [],
           });
         }
