@@ -1,3 +1,4 @@
+import log from 'loglevel';
 import fetch from 'node-fetch';
 
 import type {ContextId, MonokleClusterError, SetupParams, SetupResult} from '@shared/ipc';
@@ -84,5 +85,6 @@ function determineError(reason: string, contextId: ContextId): MonokleClusterErr
     return getMonokleClusterError('k8s-unauthenticated', contextId);
   }
 
+  log.error('Cluster error reason:', reason);
   return getMonokleClusterError('unknown', contextId);
 }

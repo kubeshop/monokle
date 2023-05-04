@@ -20,10 +20,26 @@ import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 
+declare global {
+  interface Window {
+    debug_logs: Function;
+  }
+}
+
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
   log.enableAll();
   log.debug('Enabled all log levels');
 }
+
+window.debug_logs = (value: boolean) => {
+  if (value) {
+    log.enableAll();
+    log.debug('Enabled all log levels');
+  } else {
+    log.disableAll();
+    log.debug('Disabled all log levels');
+  }
+};
 
 ignoreKnownErrors();
 
