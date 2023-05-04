@@ -245,23 +245,14 @@ export const useFileScanning = (onConfirm: () => void) => {
 
 export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void}, fileEntry?: FileEntry) => {
   const {deleteEntry} = props;
-  const dispatch = useAppDispatch();
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
-  const projectConfig = useAppSelector(state => state.config.projectConfig);
+  const duplicate = useDuplicate();
 
   const {canOpenOnGithub, openOnGithub} = useOpenOnGithub(
     fileEntry?.name === ROOT_FILE_ENTRY ? '' : fileEntry?.filePath
   );
   const renameFileEntry = useRename();
-  const reloadRootFolder = useCallback(() => {
-    if (!fileEntry) {
-      return;
-    }
-    dispatch(setRootFolder(fileEntry.rootFolderPath));
-  }, [fileEntry, dispatch]);
-
-  const {addEntryToScanExcludes, removeEntryFromScanExcludes} = useFileScanning(reloadRootFolder);
 
   const menuItems = useMemo(() => {
     if (!fileEntry) {
@@ -279,21 +270,35 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     });
 
     newMenuItems.push({
-      disabled: isRoot || (!fileEntry.children && !fileEntry.isSupported),
-      key: 'update_scanning',
-      label: `${
-        fileEntry.isExcluded && projectConfig?.scanExcludes?.some(e => micromatch.isMatch(filePath, e))
-          ? 'Remove from'
-          : 'Add to'
-      } Files: Exclude`,
+      key: 'rename',
+      label: 'Rename',
+      disabled: isRoot || fileEntry.isExcluded,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
-        if (fileEntry.isExcluded) {
-          removeEntryFromScanExcludes(filePath);
-        } else {
-          addEntryToScanExcludes(filePath);
-        }
+        renameFileEntry(fileEntry);
       },
+    });
+
+    newMenuItems.push({
+      key: 'duplicate',
+      label: 'Duplicate',
+      onClick: () => {
+        duplicate(fileEntry);
+      },
+    });
+
+    newMenuItems.push({
+      key: 'delete',
+      label: 'Delete',
+      disabled: isRoot,
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        deleteEntry(fileEntry);
+      },
+    });
+
+    newMenuItems.push({
+      type: 'divider',
     });
 
     newMenuItems.push({
@@ -315,23 +320,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     });
 
     newMenuItems.push({
-      key: 'rename',
-      label: 'Rename',
-      disabled: isRoot || fileEntry.isExcluded,
-      onClick: (e: any) => {
-        e.domEvent.stopPropagation();
-        renameFileEntry(fileEntry);
-      },
-    });
-
-    newMenuItems.push({
-      key: 'delete',
-      label: 'Delete',
-      disabled: isRoot,
-      onClick: (e: any) => {
-        e.domEvent.stopPropagation();
-        deleteEntry(fileEntry);
-      },
+      type: 'divider',
     });
 
     newMenuItems.push({
@@ -360,17 +349,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     });
 
     return newMenuItems;
-  }, [
-    fileEntry,
-    projectConfig,
-    canOpenOnGithub,
-    platformFileManagerName,
-    removeEntryFromScanExcludes,
-    addEntryToScanExcludes,
-    renameFileEntry,
-    deleteEntry,
-    openOnGithub,
-  ]);
+  }, [fileEntry, canOpenOnGithub, platformFileManagerName, renameFileEntry, deleteEntry, openOnGithub, duplicate]);
 
   return menuItems;
 };
@@ -386,9 +365,18 @@ export const useFileMenuItems = (
   const localResourceMetaMapRef = useResourceMetaMapRef('local');
   const createNewResource = useCreateResource();
   const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
+  const projectConfig = useAppSelector(state => state.config.projectConfig);
+
+  const reloadRootFolder = useCallback(() => {
+    if (!fileEntry) {
+      return;
+    }
+    dispatch(setRootFolder(fileEntry.rootFolderPath));
+  }, [fileEntry, dispatch]);
+
+  const {addEntryToScanExcludes, removeEntryFromScanExcludes} = useFileScanning(reloadRootFolder);
 
   const preview = usePreview();
-  const duplicate = useDuplicate();
 
   const menuItems = useMemo(() => {
     const isFolder = isDefined(fileEntry?.children);
@@ -405,6 +393,9 @@ export const useFileMenuItems = (
       fileEntry.isExcluded;
 
     const newMenuItems: AntdMenuItem[] = [];
+
+    const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
+    const filePath = isRoot ? '' : fileEntry?.filePath;
 
     if (canBePreviewed) {
       newMenuItems.push({
@@ -452,6 +443,10 @@ export const useFileMenuItems = (
     });
 
     newMenuItems.push({
+      type: 'divider',
+    });
+
+    newMenuItems.push({
       key: 'filter_on_file',
       label:
         fileOrFolderContainedInFilter && fileEntry.filePath === fileOrFolderContainedInFilter
@@ -468,10 +463,20 @@ export const useFileMenuItems = (
     });
 
     newMenuItems.push({
-      key: 'duplicate',
-      label: 'Duplicate',
-      onClick: () => {
-        duplicate(fileEntry);
+      disabled: isRoot || (!fileEntry.children && !fileEntry.isSupported),
+      key: 'update_scanning',
+      label: `${
+        fileEntry.isExcluded && projectConfig?.scanExcludes?.some(e => micromatch.isMatch(filePath, e))
+          ? 'Remove from'
+          : 'Add to'
+      } Files: Exclude`,
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        if (fileEntry.isExcluded) {
+          removeEntryFromScanExcludes(filePath);
+        } else {
+          addEntryToScanExcludes(filePath);
+        }
       },
     });
 
@@ -499,7 +504,9 @@ export const useFileMenuItems = (
     createNewResource,
     fileOrFolderContainedInFilter,
     onFilterByFileOrFolder,
-    duplicate,
+    addEntryToScanExcludes,
+    removeEntryFromScanExcludes,
+    projectConfig,
   ]);
 
   return menuItems;
@@ -550,6 +557,10 @@ export const useFolderMenuItems = (
       onClick: () => {
         createNewResource(fileEntry);
       },
+    });
+
+    newMenuItems.push({
+      type: 'divider',
     });
 
     newMenuItems.push({
