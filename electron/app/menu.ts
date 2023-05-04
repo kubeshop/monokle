@@ -100,7 +100,9 @@ const fileMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItem
         label: 'New Monokle Window',
         accelerator: defineHotkey(hotkeys.OPEN_NEW_WINDOW.key),
         click() {
-          openApplication();
+          setImmediate(() => {
+            openApplication();
+          });
         },
       },
       {type: 'separator'},
