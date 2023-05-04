@@ -27,7 +27,6 @@ import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
 import {ClusterColors} from '@shared/models/cluster';
 import {
   AppConfig,
-  ClusterAccess,
   FileExplorerSortOrder,
   KubeConfig,
   Languages,
@@ -455,30 +454,7 @@ export const configSlice = createSlice({
       state.fileExplorerSortOrder = action.payload;
       electronStore.set('appConfig.fileExplorerSortOrder', action.payload);
     },
-    addNamespaceToContext: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess>) => {
-      const access = state.clusterAccess.find(
-        c => c.context === action.payload.context && c.namespace === action.payload.namespace
-      );
-      if (!access) {
-        state.clusterAccess.push(action.payload);
-      }
-      state.isAccessLoading = false;
-    },
-    removeNamespaceFromContext: (
-      state: Draft<AppConfig>,
-      action: PayloadAction<{context: string; namespace: string}>
-    ) => {
-      const index = state.clusterAccess.findIndex(
-        c => c.context === action.payload.context && c.namespace === action.payload.namespace
-      );
-      if (index && index > -1) {
-        state.clusterAccess.splice(index, 1);
-      }
-      state.isAccessLoading = false;
-    },
-    updateClusterAccess: (state: Draft<AppConfig>, action: PayloadAction<ClusterAccess[]>) => {
-      state.clusterAccess = action.payload;
-    },
+
     toggleEditorPlaceholderVisiblity: (state: Draft<AppConfig>, action: PayloadAction<boolean | undefined>) => {
       if (action.payload !== undefined && state.projectConfig && state.projectConfig.settings) {
         state.projectConfig.settings.hideEditorPlaceholder = action.payload;
@@ -537,13 +513,11 @@ export const sortProjects = (projects: Array<Project>, isAnyProjectOpened: boole
 };
 
 export const {
-  addNamespaceToContext,
   changeCurrentProjectName,
   changeProjectsRootPath,
   createProject,
   handleFavoriteTemplate,
   initRendererSentry,
-  removeNamespaceFromContext,
   setAccessLoading,
   setAutoZoom,
   setCurrentContext,

@@ -27,7 +27,6 @@ import NamespaceHandler from '@src/kindhandlers/Namespace.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {FileMapType} from '@shared/models/appState';
-import {ClusterAccess} from '@shared/models/config';
 import {K8sObject} from '@shared/models/k8s';
 import {
   K8sResource,
@@ -82,17 +81,7 @@ export function getNamespaces(resourceMetaMap: ResourceMetaMap) {
   return namespaces;
 }
 
-export async function getTargetClusterNamespaces(
-  kubeconfigPath: string,
-  context: string,
-  clusterAccess?: ClusterAccess[]
-): Promise<string[]> {
-  const hasFullAccess = clusterAccess?.some(ca => ca.hasFullAccess);
-  const clusterAccessNamespaces = clusterAccess?.map(ca => ca.namespace) || [];
-  if (!hasFullAccess && clusterAccess?.length) {
-    return clusterAccessNamespaces;
-  }
-
+export async function getTargetClusterNamespaces(kubeconfigPath: string, context: string): Promise<string[]> {
   try {
     const kubeClient = await createKubeClientWithSetup({context, kubeconfig: kubeconfigPath});
     const namespaces = await NamespaceHandler.listResourcesInCluster(kubeClient, {});
@@ -106,7 +95,6 @@ export async function getTargetClusterNamespaces(
       }
     });
 
-    ns.push(...clusterAccessNamespaces);
     return uniq(ns);
   } catch (e: any) {
     log.warn(`Failed to get namespaces in selected context. ${e.message}`);

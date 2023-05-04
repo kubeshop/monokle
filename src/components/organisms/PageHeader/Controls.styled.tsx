@@ -212,10 +212,6 @@ export const ClusterContextName = styled.span`
   white-space: nowrap;
 `;
 
-export const ClusterAccessContainer = styled.span`
-  color: ${Colors.grey8} !important;
-`;
-
 export const ClusterOutlined = styled(RawClusterOutlined)`
   font-size: 14px;
   margin-right: 8px;

@@ -124,16 +124,13 @@ async function fetchResourcesFromCluster(
   try {
     const kubeConfigPath = kubeConfigPathSelector(state);
     const currentContext = options.context;
-    const clusterAccess = state.config?.clusterAccess?.filter(ca => ca.context === currentContext) || [];
     const kc = await createKubeClientWithSetup({
       context: currentContext,
       kubeconfig: kubeConfigPath,
       skipHealthCheck: true,
     });
 
-    const res = clusterAccess.length
-      ? await Promise.all(clusterAccess.map(ca => getClusterObjects(kc, ca.namespace)))
-      : await getClusterObjects(kc);
+    const res = await getClusterObjects(kc);
     const results = flatten(res);
     const fulfilledResults = results.filter(r => r.status === 'fulfilled' && r.value);
 

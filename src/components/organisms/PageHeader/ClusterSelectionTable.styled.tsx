@@ -13,10 +13,6 @@ export const ActionsContainer = styled.div`
   gap: 20px;
 `;
 
-export const ClusterAccessContainer = styled.span`
-  padding: 5px;
-`;
-
 export const ClusterColor = styled.div<{
   $color: ClusterColors;
   $selected?: boolean;

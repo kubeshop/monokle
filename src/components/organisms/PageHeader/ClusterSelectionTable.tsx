@@ -25,8 +25,6 @@ interface ClusterSelectionTableProps {
 
 interface ClusterTableRow {
   name: string;
-  namespaces: string[];
-  hasFullAccess?: boolean;
   editable: boolean;
   color?: ClusterColors;
 }
@@ -34,7 +32,6 @@ interface ClusterTableRow {
 export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClusterDropdownOpen}) => {
   const dispatch = useAppDispatch();
   const notify = useNotifications();
-  const clusterAccess = useAppSelector(state => state.config?.clusterAccess);
   const kubeconfig = useAppSelector(selectKubeconfig);
   const currentContext = useAppSelector(selectKubeContext);
   const kubeConfigContextsColors = useAppSelector(state => state.config.kubeConfigContextsColors);
@@ -62,11 +59,6 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
     },
     [changeClusterColor, currentContext]
   );
-
-  const edit = (record: Partial<ClusterTableRow>) => {
-    form.setFieldsValue({name: '', namespaces: [], hasFullAccess: false, ...record});
-    setEditingKey(record.name as string);
-  };
 
   const save = async (clusterName: string) => {
     const localCluster = localClusters.find(c => c.name === clusterName);
@@ -127,23 +119,15 @@ export const ClusterSelectionTable: FC<ClusterSelectionTableProps> = ({setIsClus
     }
 
     const clusterTableRows: ClusterTableRow[] = kubeconfig.contexts.map(context => {
-      const contextNamespaces = clusterAccess.filter(appNs => appNs.context === context.name);
-      const clusterSpecificAccess = clusterAccess?.filter(ca => ca.context === context.name) || [];
-      const hasFullAccess = clusterSpecificAccess.length
-        ? clusterSpecificAccess?.every(ca => ca.hasFullAccess)
-        : undefined;
-
       return {
-        namespaces: contextNamespaces.map(ctxNs => ctxNs.namespace),
         name: context.name,
-        hasFullAccess,
         editable: true,
         color: kubeConfigContextsColors[context.name],
       };
     });
 
     setLocalClusters(clusterTableRows);
-  }, [kubeconfig, clusterAccess, kubeConfigContextsColors]);
+  }, [kubeconfig, kubeConfigContextsColors]);
 
   return (
     <Form form={form} component={false}>
