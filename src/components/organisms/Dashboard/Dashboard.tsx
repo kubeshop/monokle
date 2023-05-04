@@ -1,9 +1,9 @@
-import {useCallback, useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {Skeleton} from 'antd';
 
 import {useAppSelector} from '@redux/hooks';
-import {useResourceContentMap, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
+import {useResourceContentMapRef, useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
@@ -61,70 +61,20 @@ const Dashboard: React.FC = () => {
   const menuList = useAppSelector(state => state.dashboard.ui.menuList);
   const {height} = useMainPaneDimensions();
   const clusterConnectionOptions = useAppSelector(state => state.main.clusterConnectionOptions);
-  const clusterResourceMeta = useResourceMetaMap('cluster');
-  const clusterResourceContent = useResourceContentMap('cluster');
+  const clusterResourceMeta = useResourceMetaMapRef('cluster').current;
+  const clusterResourceContent = useResourceContentMapRef('cluster').current;
 
-  const compareNamespaces = useCallback(
-    (namespace: string) => {
-      if (clusterConnectionOptions.lastNamespaceLoaded === '<all>') {
-        return true;
-      }
-      if (clusterConnectionOptions.lastNamespaceLoaded === '<not-namespaced>') {
-        return !namespace;
-      }
-      return clusterConnectionOptions.lastNamespaceLoaded === namespace;
-    },
-    [clusterConnectionOptions]
-  );
-
-  const filterResources = useCallback(() => {
+  const filteredResources = useMemo(() => {
     return Object.values(clusterResourceContent)
       .map(r => ({...r, ...clusterResourceMeta[r.id]}))
       .filter(resource => {
         return (
           activeMenu.key.replace(`${resource.object.apiVersion}-`, '') === resource.object.kind &&
           resource.object.kind === activeMenu.label &&
-          compareNamespaces(resource.object.metadata.namespace)
+          compareNamespaces(clusterConnectionOptions.lastNamespaceLoaded, resource.object.metadata.namespace)
         );
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMenu, clusterResourceContent, clusterResourceMeta, clusterConnectionOptions]);
-
-  const filteredResources = useMemo(() => {
-    return filterResources();
-  }, [filterResources]);
-
-  const getContent = useCallback(() => {
-    if (activeMenu.key === 'Overview') {
-      return <Overview />;
-    }
-    if (CLICKAKBLE_RESOURCE_GROUPS.findIndex(m => m === activeMenu.key) > -1) {
-      return (
-        <ResourceGroupTable
-          dataSource={
-            menuList
-              .find(m => m.key === activeMenu.key)
-              ?.children?.map(
-                k =>
-                  getResourceKindHandler(k.label) && {
-                    ...getResourceKindHandler(k.label),
-                    menu: k,
-                  }
-              )
-              .filter(k => Boolean(k)) || []
-          }
-        />
-      );
-    }
-    if (activeMenu.key !== 'Overview') {
-      return (
-        <Tableview
-          dataSource={filteredResources}
-          columns={resourceKindColumns[activeMenu.label] || resourceKindColumns['ANY']}
-        />
-      );
-    }
-  }, [activeMenu.key, activeMenu.label, filteredResources, menuList]);
+  }, [activeMenu, clusterResourceContent, clusterResourceMeta, clusterConnectionOptions.lastNamespaceLoaded]);
 
   if (clusterConnectionOptions.isLoading) {
     return (
@@ -137,7 +87,30 @@ const Dashboard: React.FC = () => {
   return (
     <S.Container $paneHeight={height}>
       <S.Header title={activeMenu.label} />
-      <S.Content>{getContent()}</S.Content>
+      <S.Content>
+        {activeMenu.key === 'Overview' && <Overview />}
+        {CLICKAKBLE_RESOURCE_GROUPS.findIndex(m => m === activeMenu.key) > -1 ? (
+          <ResourceGroupTable
+            dataSource={
+              menuList
+                .find(m => m.key === activeMenu.key)
+                ?.children?.map(
+                  k =>
+                    getResourceKindHandler(k.label) && {
+                      ...getResourceKindHandler(k.label),
+                      menu: k,
+                    }
+                )
+                .filter(k => Boolean(k)) || []
+            }
+          />
+        ) : (
+          <Tableview
+            dataSource={filteredResources}
+            columns={resourceKindColumns[activeMenu.label] || resourceKindColumns['ANY']}
+          />
+        )}
+      </S.Content>
     </S.Container>
   );
 };
@@ -161,4 +134,14 @@ export const resourceKindColumns = {
   [CustomResourceDefinitionHandler.kind]: [CellKind, CellGroup, CellVersion, CellScope, CellAge],
   Node: [CellName, CellNodeRoles, CellAddresses, CellNodeOS, CellNodeKernel, CellAge],
   ANY: [CellName, CellError, CellNamespace, CellAge],
+};
+
+const compareNamespaces = (currentNamespace?: string, namespace?: string) => {
+  if (currentNamespace === '<all>') {
+    return true;
+  }
+  if (currentNamespace === '<not-namespaced>') {
+    return !namespace;
+  }
+  return currentNamespace === namespace;
 };
