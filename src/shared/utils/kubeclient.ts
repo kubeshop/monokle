@@ -2,7 +2,6 @@ import * as k8s from '@kubernetes/client-node';
 
 import log from 'loglevel';
 
-import {ClusterAccess} from '@shared/models/config';
 import {getMainProcessEnv} from '@shared/utils/env';
 
 export function createKubeClient(path?: string, context?: string, proxy?: number): k8s.KubeConfig {
@@ -64,21 +63,4 @@ export function createKubeClient(path?: string, context?: string, proxy?: number
   }
 
   return kc;
-}
-
-// TODO: verb should be typed as a union of all possible verbs
-export function hasAccessToResourceKind(resourceKind: string, verb: string, clusterAccess?: ClusterAccess) {
-  if (!clusterAccess) {
-    return false;
-  }
-
-  if (clusterAccess.hasFullAccess) {
-    return true;
-  }
-
-  const resourceAccess = clusterAccess.permissions.find(access => {
-    return access.resourceKind === resourceKind.toLowerCase() && access.verbs.includes(verb);
-  });
-
-  return Boolean(resourceAccess);
 }

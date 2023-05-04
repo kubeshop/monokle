@@ -72,7 +72,6 @@ interface AppConfig {
   favoriteTemplates: string[];
   disableEventTracking: boolean;
   disableErrorReporting: boolean;
-  clusterAccess: Array<ClusterAccess>;
   isAccessLoading?: boolean;
   kubeConfigContextsColors: {
     [name: string]: ClusterColors;
@@ -80,13 +79,6 @@ interface AppConfig {
   fileExplorerSortOrder: FileExplorerSortOrder;
   isNewVersionAvailable: boolean;
 }
-
-type ClusterAccess = {
-  permissions: KubePermissions[];
-  hasFullAccess: boolean;
-  namespace: string;
-  context: string;
-};
 
 type FileExplorerSortOrder = 'folders' | 'files' | 'mixed';
 
@@ -205,7 +197,6 @@ type Settings = {
 
 export type {
   AppConfig,
-  ClusterAccess,
   FileExplorerSortOrder,
   HelmPreviewConfiguration,
   KubeConfig,

@@ -42,16 +42,6 @@ export const currentKubeContextSelector = createSelector(
   kubeconfig => (kubeconfig?.isValid ? kubeconfig.currentContext : undefined)
 );
 
-export const currentClusterAccessSelector = createSelector(
-  [currentKubeContextSelector, (state: RootState) => state.config.clusterAccess],
-  (currentContext, clusterAccess) => {
-    if (!currentContext) {
-      return [];
-    }
-    return clusterAccess?.filter(ca => ca.context === currentContext) || [];
-  }
-);
-
 export const kubeConfigPathSelector = createSelector(
   [
     (state: RootState) => state.config.projectConfig?.kubeConfig?.path,

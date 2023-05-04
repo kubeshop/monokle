@@ -8,7 +8,7 @@ import log from 'loglevel';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 
-import {currentClusterAccessSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {startWatchingResources} from '@redux/services/clusterResourceWatcher';
 import {extractK8sResources, getTargetClusterNamespaces} from '@redux/services/resource';
 import {createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils';
@@ -16,7 +16,6 @@ import {createRejectionWithAlert, getK8sObjectsAsYaml} from '@redux/thunks/utils
 import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandlers';
 
 import {AppDispatch} from '@shared/models/appDispatch';
-import {ClusterAccess} from '@shared/models/config';
 import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {createKubeClient} from '@shared/utils/kubeclient';
@@ -41,6 +40,51 @@ const getNonCustomClusterObjects = async (kc: any, namespace?: string, allNamesp
   );
 };
 
+async function loadCustomResourceObjects(
+  kc: KubeConfig,
+  customResourceDefinitions: K8sResource[],
+  namespace?: string,
+  allNamespaces?: boolean
+): Promise<string[]> {
+  const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
+
+  try {
+    const customObjects = customResourceDefinitions
+      .filter(crd => crd.object.spec)
+      .map(crd => {
+        const kindHandler = getResourceKindHandler(crd.object.spec.names?.kind);
+        if (
+          kindHandler &&
+          (allNamespaces
+            ? true
+            : namespace === '<not-namespaced>'
+            ? !kindHandler.isNamespaced
+            : kindHandler.isNamespaced)
+        ) {
+          return kindHandler.listResourcesInCluster(kc, {namespace}, crd).then(items => getK8sObjectsAsYaml(items));
+        }
+
+        // retrieve objects using latest version name
+        const version = findDefaultVersionForCRD(crd.object) || 'v1';
+        return namespace
+          ? k8sApi
+              .listNamespacedCustomObject(crd.object.spec.group, version, namespace, crd.object.spec.names.plural)
+              .then(response => getK8sObjectsAsYaml(getItemsFromResponseBody(response.body)))
+          : k8sApi
+              .listClusterCustomObject(crd.object.spec.group, version, crd.object.spec.names.plural)
+              .then(response => getK8sObjectsAsYaml(getItemsFromResponseBody(response.body)));
+      });
+
+    const customResults = await Promise.allSettled(customObjects);
+
+    return customResults.filter(isPromiseFulfilledResult).map(r => r.value);
+  } catch (e) {
+    log.warn(e);
+  }
+
+  return [];
+}
+
 const loadClusterResourcesHandler = async (
   payload: {context: string; namespace?: string; port?: number},
   thunkAPI: any
@@ -48,7 +92,6 @@ const loadClusterResourcesHandler = async (
   const {context, port, namespace} = payload;
   const startTime = new Date().getTime();
   const kubeConfigContext = kubeConfigContextSelector(thunkAPI.getState());
-  const clusterAccess = currentClusterAccessSelector(thunkAPI.getState());
   const kubeConfigPath = kubeConfigPathSelector(thunkAPI.getState());
   const useKubectlProxy = thunkAPI.getState().config.useKubectlProxy;
 
@@ -59,7 +102,7 @@ const loadClusterResourcesHandler = async (
   try {
     let namespaces: Array<string> = [];
     if (kubeConfigPath?.trim().length) {
-      namespaces = await getTargetClusterNamespaces(kubeConfigPath, kubeConfigContext, clusterAccess);
+      namespaces = await getTargetClusterNamespaces(kubeConfigPath, kubeConfigContext);
       if (namespaces.length === 0) {
         throw new Error('no_namespaces_found');
       }
@@ -114,20 +157,10 @@ const loadClusterResourcesHandler = async (
     if (customResourceDefinitions.length > 0) {
       let customResourceObjects: string[];
 
-      if (clusterAccess && clusterAccess.length) {
-        if (currentNamespace === '<all>') {
-          customResourceObjects = flatten(
-            await Promise.all(
-              clusterAccess.map((ca: ClusterAccess) =>
-                loadCustomResourceObjects(kc, customResourceDefinitions, ca.namespace)
-              )
-            )
-          );
-        } else {
-          customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions, currentNamespace);
-        }
+      if (currentNamespace === '<all>') {
+        customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions, undefined, true);
       } else {
-        customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions);
+        customResourceObjects = await loadCustomResourceObjects(kc, customResourceDefinitions, currentNamespace);
       }
 
       // if any were found we need to merge them into the preview-result
@@ -202,51 +235,6 @@ export const reloadClusterResources = createAsyncThunk<
 /**
  * Load custom resource objects for CRDs found in cluster
  */
-
-async function loadCustomResourceObjects(
-  kc: KubeConfig,
-  customResourceDefinitions: K8sResource[],
-  namespace?: string,
-  allNamespaces?: string
-): Promise<string[]> {
-  const k8sApi = kc.makeApiClient(k8s.CustomObjectsApi);
-
-  try {
-    const customObjects = customResourceDefinitions
-      .filter(crd => crd.object.spec)
-      .map(crd => {
-        const kindHandler = getResourceKindHandler(crd.object.spec.names?.kind);
-        if (
-          kindHandler &&
-          (allNamespaces
-            ? true
-            : namespace === '<not-namespaced>'
-            ? !kindHandler.isNamespaced
-            : kindHandler.isNamespaced)
-        ) {
-          return kindHandler.listResourcesInCluster(kc, {namespace}, crd).then(items => getK8sObjectsAsYaml(items));
-        }
-
-        // retrieve objects using latest version name
-        const version = findDefaultVersionForCRD(crd.object) || 'v1';
-        return namespace
-          ? k8sApi
-              .listNamespacedCustomObject(crd.object.spec.group, version, namespace, crd.object.spec.names.plural)
-              .then(response => getK8sObjectsAsYaml(getItemsFromResponseBody(response.body)))
-          : k8sApi
-              .listClusterCustomObject(crd.object.spec.group, version, crd.object.spec.names.plural)
-              .then(response => getK8sObjectsAsYaml(getItemsFromResponseBody(response.body)));
-      });
-
-    const customResults = await Promise.allSettled(customObjects);
-
-    return customResults.filter(isPromiseFulfilledResult).map(r => r.value);
-  } catch (e) {
-    log.warn(e);
-  }
-
-  return [];
-}
 
 const getItemsFromResponseBody = (body: any) => {
   const items = 'items' in body ? body.items : [];

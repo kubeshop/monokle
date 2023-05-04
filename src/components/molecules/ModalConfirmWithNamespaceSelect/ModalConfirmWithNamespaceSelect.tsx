@@ -4,7 +4,6 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Input, Modal, Radio, Select} from 'antd';
 
-import {currentClusterAccessSelector} from '@redux/appConfig';
 import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {useAppSelector} from '@redux/hooks';
 
@@ -28,14 +27,12 @@ interface IProps {
 const ModalConfirmWithNamespaceSelect: React.FC<IProps> = props => {
   const {isVisible, resourceMetaList = [], title, onCancel, onOk} = props;
 
-  const clusterAccess = useAppSelector(currentClusterAccessSelector);
-  const clusterNamespaces = clusterAccess?.map(cl => cl.namespace);
-  const defaultClusterNamespace = clusterNamespaces && clusterNamespaces.length ? clusterNamespaces[0] : 'default';
+  const [namespaces] = useTargetClusterNamespaces();
+
+  const defaultClusterNamespace = namespaces && namespaces.length ? namespaces[0] : 'default';
   const kubeconfig = useAppSelector(selectKubeconfig);
 
   const {defaultNamespace, defaultOption} = getDefaultNamespaceForApply(resourceMetaList, defaultClusterNamespace);
-
-  const [namespaces] = useTargetClusterNamespaces();
 
   const [createNamespaceName, setCreateNamespaceName] = useState<string>();
   const [errorMessage, setErrorMessage] = useState('');

@@ -8,8 +8,6 @@ import {Button, Select, Skeleton, Switch} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
-import {flatten} from 'lodash';
-
 import {
   ClusterName,
   makeApplyKustomizationText,
@@ -17,12 +15,7 @@ import {
   makeReplaceResourceText,
 } from '@constants/makeApplyText';
 
-import {
-  currentClusterAccessSelector,
-  kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
-  kubeConfigPathSelector,
-} from '@redux/appConfig';
+import {kubeConfigContextColorSelector, kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -34,6 +27,8 @@ import {updateResource} from '@redux/thunks/updateResource';
 
 import {ModalConfirm, ModalConfirmWithNamespaceSelect} from '@components/molecules';
 
+import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
+
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
@@ -44,7 +39,6 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 import {Icon} from '@monokle/components';
 import {AlertEnum, AlertType} from '@shared/models/alert';
 import {RootState} from '@shared/models/rootState';
-import {hasAccessToResourceKind} from '@shared/utils/kubeclient';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './styled';
@@ -63,8 +57,6 @@ const DiffModal = () => {
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
   const resourceFilter = useAppSelector(state => state.main.resourceFilter);
   const configState = useAppSelector(state => state.config);
-  const clusterAccess = useAppSelector(currentClusterAccessSelector);
-  const namespaces = useMemo(() => clusterAccess?.map(cl => cl.namespace), [clusterAccess]);
 
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
   const targetResource = useMemo(() => {
@@ -80,6 +72,8 @@ const DiffModal = () => {
   }, [targetResourceId, store]);
 
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
+
+  const [namespaces] = useTargetClusterNamespaces();
 
   const [clusterNamespacesMatchingResources, setClusterNamespacesMatchingResources] = useState<string[]>([]);
   const [defaultNamespace, setDefaultNamespace] = useState<string>('');
@@ -239,17 +233,7 @@ const DiffModal = () => {
           return [];
         }
 
-        if (!clusterAccess || !clusterAccess.length) {
-          return resourceKindHandler.listResourcesInCluster(kc, {});
-        }
-
-        const namespacesWithAccess = clusterAccess
-          .filter(ca => hasAccessToResourceKind(targetResource.kind, 'get', ca))
-          .map(ca => ca.namespace);
-        const resources = await Promise.all(
-          namespacesWithAccess.map(ns => resourceKindHandler.listResourcesInCluster(kc, {namespace: ns}))
-        );
-        return flatten(resources);
+        return resourceKindHandler.listResourcesInCluster(kc, {});
       };
 
       const resourcesFromCluster = (await getResources()).filter(r => r.metadata.name === targetResource.name);
@@ -328,7 +312,6 @@ const DiffModal = () => {
     isDiffModalVisible,
     configState,
     namespaces,
-    clusterAccess,
     kubeConfigPath,
   ]);
 
