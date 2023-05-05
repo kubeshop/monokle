@@ -122,6 +122,7 @@ const TerminalPane: React.FC<IProps> = props => {
     setTimeout(() => {
       addonRef.current?.fit();
       terminalRef.current?.focus();
+      terminalRef.current?.scrollToBottom();
     }, 250);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
