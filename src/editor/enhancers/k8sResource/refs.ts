@@ -3,7 +3,13 @@ import * as monaco from 'monaco-editor';
 import {selectFile, selectImage, selectResource} from '@redux/reducers/main';
 import {getResourceMetaFromState} from '@redux/selectors/resourceGetters';
 
-import {addEditorCommand, addEditorDecorations, addEditorHover, addEditorLink} from '@src/editor/editor.instance';
+import {
+  addEditorCommand,
+  addEditorDecorations,
+  addEditorHover,
+  addEditorLink,
+  getEditorType,
+} from '@src/editor/editor.instance';
 
 import {GlyphDecorationTypes} from '@editor/editor.constants';
 import {EditorCommand} from '@editor/editor.types';
@@ -118,6 +124,9 @@ const addEditorCommandForRef = (args: {
       text,
       altText: 'Select resource',
       handler: () => {
+        if (getEditorType() === 'cluster') {
+          return;
+        }
         if (ref.target && 'resourceId' in ref.target) {
           dispatch(
             selectResource({resourceIdentifier: {id: (ref.target as any).resourceId, storage: resourceMeta.storage}})
@@ -149,6 +158,9 @@ const addEditorLinkForRef = (args: {
   range: monaco.IRange;
   dispatch: AppDispatch;
 }) => {
+  if (getEditorType() === 'cluster') {
+    return;
+  }
   const {resourceMeta, ref, range, dispatch} = args;
   const tooltip = ref.target?.type === 'image' ? 'Select image' : 'Open resource';
   addEditorLink({
@@ -159,6 +171,9 @@ const addEditorLinkForRef = (args: {
 };
 
 const onClickRefLink = (args: {resourceMeta: ResourceMeta; ref: ResourceRef; dispatch: AppDispatch}) => {
+  if (getEditorType() === 'cluster') {
+    return;
+  }
   const {resourceMeta, ref, dispatch} = args;
   if (ref.target?.type === 'resource' && ref.target.resourceId) {
     // is the storage of the target resource the same as the current resource?

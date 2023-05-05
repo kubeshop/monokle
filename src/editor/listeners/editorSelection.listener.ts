@@ -4,6 +4,7 @@ import {readFile} from 'fs/promises';
 import {setDiagnosticsOptions} from 'monaco-yaml';
 import {join} from 'path';
 
+import {setDashboardSelectedResourceId} from '@redux/dashboard';
 import {AppListenerFn} from '@redux/listeners/base';
 import {selectFile, selectHelmValuesFile, selectResource} from '@redux/reducers/main';
 import {selectedFilePathSelector} from '@redux/selectors';
@@ -14,30 +15,42 @@ import {isSupportedResource} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
 
 import {MONACO_YAML_BASE_DIAGNOSTICS_OPTIONS} from '@editor/editor.constants';
-import {getEditor, recreateEditorModel} from '@editor/editor.instance';
+import {getEditor, getEditorType, recreateEditorModel} from '@editor/editor.instance';
 import {editorMounted} from '@editor/editor.slice';
 import {editorEnhancers} from '@editor/enhancers';
 import {helmTemplateFileEnhancer} from '@editor/enhancers/helm/templates';
 import {helmValuesFileEnhancer} from '@editor/enhancers/helm/valuesFile';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {ResourceMeta} from '@shared/models/k8sResource';
+import {ResourceIdentifier, ResourceMeta} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {isHelmValuesFileSelection} from '@shared/models/selection';
 
 export const editorSelectionListener: AppListenerFn = listen => {
   listen({
-    matcher: isAnyOf(editorMounted, selectResource, selectFile, selectHelmValuesFile),
+    matcher: isAnyOf(editorMounted, selectResource, selectFile, selectHelmValuesFile, setDashboardSelectedResourceId),
     async effect(_action, {getState, delay, dispatch, cancelActiveListeners}) {
       cancelActiveListeners();
       await delay(1);
       const rootFolderPath = getState().main.fileMap[ROOT_FILE_ENTRY]?.filePath;
       const editor = getEditor();
+      const editorType = getEditorType();
 
-      if (!editor || !rootFolderPath) {
+      if (!editor || (editorType === 'local' && !rootFolderPath)) {
         return;
       }
 
-      const resourceIdentifier = editorResourceIdentifierSelector(getState());
+      let resourceIdentifier: ResourceIdentifier | undefined;
+
+      if (editorType === 'local') {
+        resourceIdentifier = editorResourceIdentifierSelector(getState());
+      } else if (editorType === 'cluster') {
+        const selectedResourceId = getState().dashboard.tableDrawer.selectedResourceId;
+        resourceIdentifier = selectedResourceId ? {id: selectedResourceId, storage: 'cluster'} : undefined;
+        console.log({resourceIdentifier});
+      } else {
+        return;
+      }
+
       if (resourceIdentifier) {
         const resourceMeta = getResourceMetaFromState(getState(), resourceIdentifier);
         const resourceContent = getResourceContentFromState(getState(), resourceIdentifier);
@@ -61,6 +74,11 @@ export const editorSelectionListener: AppListenerFn = listen => {
           Promise.resolve(enhancer({state: getState(), editor, resourceIdentifier, dispatch}))
         );
         await Promise.all(promises);
+        return;
+      }
+
+      if (editorType === 'cluster') {
+        return;
       }
 
       const selectedHelmValuesFilePath = getSelectedHelmValuesFilePath(getState());

@@ -316,10 +316,7 @@ const ActionsPane: React.FC = () => {
             {isFolderLoading || isPreviewLoading || isClusterModeLoading ? (
               <S.Skeleton active />
             ) : activeEditorTab === 'source' ? (
-              (selectedResourceRef.current || selectedFilePath || selectedHelmValuesId) && (
-                <CodeEditor />
-                // <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
-              )
+              (selectedResourceRef.current || selectedFilePath || selectedHelmValuesId) && <CodeEditor type="local" />
             ) : null}
           </>
         ),

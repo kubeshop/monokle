@@ -16,7 +16,6 @@ export const MONACO_EDITOR_INITIAL_CONFIG: monaco.editor.IStandaloneEditorConstr
   tabSize: 2,
   scrollBeyondLastLine: false,
   glyphMargin: true,
-  automaticLayout: true,
   minimap: {
     enabled: true,
   },

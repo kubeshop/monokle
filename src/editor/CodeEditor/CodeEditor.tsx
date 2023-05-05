@@ -26,12 +26,17 @@ window.MonacoEnvironment = {
   },
 };
 
-const CodeEditor = () => {
+type CodeEditorProps = {
+  type: 'local' | 'cluster';
+};
+
+const CodeEditor = (props: CodeEditorProps) => {
+  const {type} = props;
   const dispatch = useAppDispatch();
   const [containerRef, dimensions] = useMeasure<HTMLDivElement>();
 
   useEffectOnce(() => {
-    mountEditor(document.getElementById('monokle-monaco')!);
+    mountEditor({element: document.getElementById('monokle-monaco')!, type});
     dispatch(editorMounted());
     return () => unmountEditor();
   });
