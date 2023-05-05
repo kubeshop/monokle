@@ -501,14 +501,17 @@ export function splitK8sResourceMap<Storage extends ResourceStorage = ResourceSt
 
 export function joinK8sResourceMap<Storage extends ResourceStorage = ResourceStorage>(
   metaMap: ResourceMetaMap<Storage>,
-  contentMap: ResourceContentMap<Storage>
+  contentMap: ResourceContentMap<Storage>,
+  resourcePredicate?: (meta: ResourceMeta<Storage>) => boolean
 ) {
   const resourceMap: ResourceMap<Storage> = {};
-  Object.values(metaMap).forEach(meta => {
-    const content = contentMap[meta.id];
-    if (content) {
-      resourceMap[meta.id] = {...meta, ...content};
-    }
-  });
+  Object.values(metaMap)
+    .filter(meta => (resourcePredicate ? resourcePredicate(meta) : true))
+    .forEach(meta => {
+      const content = contentMap[meta.id];
+      if (content) {
+        resourceMap[meta.id] = {...meta, ...content};
+      }
+    });
   return resourceMap;
 }

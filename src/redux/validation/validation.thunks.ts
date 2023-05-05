@@ -3,12 +3,15 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {merge} from 'lodash';
 
 import {processResourceRefs} from '@redux/parsing/parser.thunks';
+import {getIncludedFilePaths} from '@redux/selectors/fileMapGetters';
 import {getResourceMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
 
+import {getResourceKindHandler} from '@src/kindhandlers';
+
 import {ValidationResponse} from '@monokle/validation';
 import {CORE_PLUGINS} from '@shared/constants/validation';
-import {K8sResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMeta} from '@shared/models/k8sResource';
 import type {ThunkApi} from '@shared/models/thunk';
 import type {LoadValidationResult, ValidationArgs, ValidationResource} from '@shared/models/validation';
 import electronStore from '@shared/utils/electronStore';
@@ -44,6 +47,17 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
   }
 );
 
+/**
+ * Ignore cluster events and unknown resources for now
+ */
+
+function shouldResourceBeValidated(resourceMeta: ResourceMeta) {
+  return (
+    !(resourceMeta.storage === 'cluster' && resourceMeta.kind === 'Event') ||
+    !isDefined(getResourceKindHandler(resourceMeta.kind))
+  );
+}
+
 export const validateResources = createAsyncThunk<ValidationResponse | undefined, ValidationArgs | undefined, ThunkApi>(
   'validation/validate',
   async (payload, {getState, dispatch, signal, rejectWithValue}) => {
@@ -52,7 +66,9 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
 
     if (payload?.type === 'full') {
       let resourceStorage = payload.resourceStorage || activeResourceStorageSelector(getState());
-      resources = Object.values(getResourceMapFromState(getState(), resourceStorage) || {}).filter(isDefined);
+      resources = Object.values(
+        getResourceMapFromState(getState(), resourceStorage, shouldResourceBeValidated) || {}
+      ).filter(isDefined);
 
       // mix in transient resources created in the resourceStorage
       resources = resources.concat(
@@ -63,7 +79,7 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
       );
 
       if (resourceStorage === 'local') {
-        files = Object.keys(getState().main.fileMap);
+        files = getIncludedFilePaths(getState().main.fileMap);
       }
     } else if (payload?.type === 'incremental') {
       const affectedStorages = new Set(payload.resourceIdentifiers.map(r => r.storage));
@@ -83,12 +99,12 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
       }
 
       affectedStorages.forEach(storage => {
-        const resourceMap = getResourceMapFromState(getState(), storage);
+        const resourceMap = getResourceMapFromState(getState(), storage, shouldResourceBeValidated);
         resources = resources.concat(Object.values(resourceMap).filter(isDefined));
       });
 
       if (affectedStorages.has('local')) {
-        files = Object.keys(getState().main.fileMap);
+        files = getIncludedFilePaths(getState().main.fileMap);
       }
     }
 

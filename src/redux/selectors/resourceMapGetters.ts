@@ -1,17 +1,25 @@
 import {joinK8sResourceMap} from '@redux/services/resource';
 
-import {ResourceContentMap, ResourceMap, ResourceMetaMap, ResourceStorage} from '@shared/models/k8sResource';
+import {
+  ResourceContentMap,
+  ResourceMap,
+  ResourceMeta,
+  ResourceMetaMap,
+  ResourceStorage,
+} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 
 import {activeResourceStorageSelector} from './resourceMapSelectors';
 
 export const getResourceMapFromState = <Storage extends ResourceStorage>(
   state: RootState,
-  storage: Storage
+  storage: Storage,
+  resourcePredicate?: (meta: ResourceMeta<Storage>) => boolean
 ): ResourceMap<Storage> => {
   return joinK8sResourceMap(
     state.main.resourceMetaMapByStorage[storage],
-    state.main.resourceContentMapByStorage[storage]
+    state.main.resourceContentMapByStorage[storage],
+    resourcePredicate
   );
 };
 
