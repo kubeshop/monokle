@@ -52,8 +52,8 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
  */
 
 function shouldResourceBeValidated(resourceMeta: ResourceMeta) {
-  return (
-    !(resourceMeta.storage === 'cluster' && resourceMeta.kind === 'Event') ||
+  return !(
+    (resourceMeta.storage === 'cluster' && resourceMeta.kind === 'Event') ||
     !isDefined(getResourceKindHandler(resourceMeta.kind))
   );
 }
