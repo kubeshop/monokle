@@ -54,8 +54,6 @@ const NewVersionNotice: React.FC<IProps> = ({children}) => {
     if (newVersion.code === NewVersionCode.Errored) {
       return <span>{getErrorMessage(newVersion.data?.errorCode)}</span>;
     }
-
-    return <span>You are already running the latest version of Monokle!</span>;
   }, [getErrorMessage, newVersion.code, newVersion.data?.errorCode]);
 
   useEffect(() => {
@@ -65,7 +63,7 @@ const NewVersionNotice: React.FC<IProps> = ({children}) => {
     ) {
       dispatch(showNewVersionNotice());
 
-      if (newVersion.code !== NewVersionCode.NotAvailable) {
+      if (newVersion.code === NewVersionCode.Downloaded) {
         dispatch(setIsNewVersionAvailable(true));
       }
     }
