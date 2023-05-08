@@ -1,12 +1,11 @@
 import ReactDOM from 'react-dom';
 import {ErrorBoundary} from 'react-error-boundary';
 import {Provider} from 'react-redux';
-import 'react-reflex/styles.css';
 
 import 'antd/dist/antd.less';
 
 import 'allotment/dist/style.css';
-import * as log from 'loglevel';
+import log from 'loglevel';
 
 import '@redux/ipcRendererRedux';
 import store from '@redux/store';

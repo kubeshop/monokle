@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 
 import {Skeleton} from 'antd';
 
@@ -11,7 +11,7 @@ import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
-import {AllotmentResizableColumnsPanel, AllotmentResizableRowsPanel} from '@monokle/components';
+import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import ProblemPane from '../ProblemPane';
@@ -82,7 +82,6 @@ const PaneManager: React.FC = () => {
     const editPaneWidth = editPane * width;
 
     if (leftPaneWidth + navPaneWidth + editPaneWidth > width) {
-      handleColumnResize([leftPaneWidth, 350, 1 - leftPaneWidth - 350]);
       return [leftPaneWidth, 350, 1 - leftPaneWidth - 350];
     }
 
@@ -95,15 +94,7 @@ const PaneManager: React.FC = () => {
     }
 
     return [navPaneWidth, 0, editPaneWidth];
-  }, [
-    currentActivity?.name,
-    handleColumnResize,
-    layout.editPane,
-    layout.leftPane,
-    layout.navPane,
-    leftMenuActive,
-    width,
-  ]);
+  }, [currentActivity?.name, layout.editPane, layout.leftPane, layout.navPane, leftMenuActive, width]);
 
   const rowsSizes = useMemo(() => {
     return [height - layout.bottomPaneHeight, layout.bottomPaneHeight];
@@ -116,6 +107,18 @@ const PaneManager: React.FC = () => {
     [dispatch]
   );
 
+  useEffect(() => {
+    const editPane = layout.editPane === 0 ? 1 - layout.leftPane - layout.navPane : layout.editPane;
+
+    const leftPaneWidth = layout.leftPane * width;
+    const navPaneWidth = layout.navPane * width;
+    const editPaneWidth = editPane * width;
+
+    if (leftPaneWidth + navPaneWidth + editPaneWidth > width) {
+      handleColumnResize([leftPaneWidth, 350, 1 - leftPaneWidth - 350]);
+    }
+  }, [handleColumnResize, layout.editPane, layout.leftPane, layout.navPane, width]);
+
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
       {isProjectLoading ? (
@@ -124,7 +127,7 @@ const PaneManager: React.FC = () => {
         <>
           <PaneManagerLeftMenu />
 
-          <AllotmentResizableRowsPanel
+          <ResizableRowsPanel
             defaultSizes={rowsSizes}
             top={
               currentActivity?.type === 'fullscreen' ? (
@@ -136,7 +139,7 @@ const PaneManager: React.FC = () => {
                   <EmptyDashboard />
                 )
               ) : (
-                <AllotmentResizableColumnsPanel
+                <ResizableColumnsPanel
                   key={currentActivity?.name}
                   paneCloseIconStyle={{top: '20px', right: '-8px'}}
                   left={leftMenuActive || currentActivity?.name !== 'explorer' ? currentActivity?.component : undefined}
