@@ -8,7 +8,7 @@ import {CloseOutlined as RawCloseOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import {setIsNewVersionAvailable} from '@redux/appConfig';
+import {setIsNewVersionAvailable, updateNewVersion} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {hideNewVersionNotice, showNewVersionNotice} from '@redux/reducers/ui';
 
@@ -54,6 +54,8 @@ const NewVersionNotice: React.FC<IProps> = ({children}) => {
     if (newVersion.code === NewVersionCode.Errored) {
       return <span>{getErrorMessage(newVersion.data?.errorCode)}</span>;
     }
+
+    return <span>You are already running the latest version of Monokle!</span>;
   }, [getErrorMessage, newVersion.code, newVersion.data?.errorCode]);
 
   useEffect(() => {
@@ -62,7 +64,10 @@ const NewVersionNotice: React.FC<IProps> = ({children}) => {
       newVersion.code === NewVersionCode.Downloaded
     ) {
       dispatch(showNewVersionNotice());
-      dispatch(setIsNewVersionAvailable(true));
+
+      if (newVersion.code !== NewVersionCode.NotAvailable) {
+        dispatch(setIsNewVersionAvailable(true));
+      }
     }
   }, [dispatch, newVersion.code, newVersion.data?.initial]);
 
@@ -72,7 +77,15 @@ const NewVersionNotice: React.FC<IProps> = ({children}) => {
       open={isNewVersionNoticeVisible}
       title={
         <TitleContainer>
-          {content} <CloseOutlined onClick={() => dispatch(hideNewVersionNotice())} />
+          {content}
+          <CloseOutlined
+            onClick={() => {
+              dispatch(hideNewVersionNotice());
+              if (newVersion.code === NewVersionCode.NotAvailable) {
+                dispatch(updateNewVersion({code: NewVersionCode.Idle, data: null}));
+              }
+            }}
+          />
         </TitleContainer>
       }
       placement="right"
