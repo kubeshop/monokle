@@ -87,8 +87,6 @@ export const populateProjectConfig = (state: AppConfig | SerializableObject) => 
   applicationConfig.settings = {
     helmPreviewMode: state.settings.helmPreviewMode,
     kustomizeCommand: state.settings.kustomizeCommand,
-    // hideExcludedFilesInFileExplorer: state.settings.hideExcludedFilesInFileExplorer,
-    //  hideUnsupportedFilesInFileExplorer: state.settings.hideUnsupportedFilesInFileExplorer,
     enableHelmWithKustomize: state.settings.enableHelmWithKustomize,
     createDefaultObjects: state.settings.createDefaultObjects,
     setDefaultPrimitiveValues: state.settings.setDefaultPrimitiveValues,
@@ -130,12 +128,6 @@ export const readProjectConfig = (projectRootPath?: string | null): ProjectConfi
           kustomizeCommand: _.includes(['kubectl', 'kustomize'], settings.kustomizeCommand)
             ? settings.kustomizeCommand
             : undefined,
-          // hideExcludedFilesInFileExplorer: _.isBoolean(settings.hideExcludedFilesInFileExplorer)
-          //   ? settings.hideExcludedFilesInFileExplorer
-          //   : undefined,
-          // hideUnsupportedFilesInFileExplorer: _.isBoolean(settings.hideUnsupportedFilesInFileExplorer)
-          //   ? settings.hideUnsupportedFilesInFileExplorer
-          //   : undefined,
           enableHelmWithKustomize: _.isBoolean(settings.enableHelmWithKustomize)
             ? settings.enableHelmWithKustomize
             : undefined,
