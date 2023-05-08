@@ -7,7 +7,7 @@ export type EditorHover = {
 
 export type EditorLink = {
   range: monaco.IRange;
-  tooltip: string;
+  tooltip?: string;
   handler: () => Promise<void> | void;
 };
 

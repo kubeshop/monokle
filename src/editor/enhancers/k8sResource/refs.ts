@@ -14,10 +14,9 @@ import {
 import {GlyphDecorationTypes} from '@editor/editor.constants';
 import {EditorCommand} from '@editor/editor.types';
 import {createGlyphDecoration, createMarkdownString} from '@editor/editor.utils';
-import {ResourceRef, ResourceRefType, isUnsatisfiedRef} from '@monokle/validation';
+import {RefPosition, ResourceRef, ResourceRefType, areRefPosEqual} from '@monokle/validation';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {FileMapType} from '@shared/models/appState';
-import {ResourceMeta, ResourceMetaMap, isLocalResourceMeta} from '@shared/models/k8sResource';
+import {ResourceMeta, isLocalResourceMeta} from '@shared/models/k8sResource';
 
 import {createEditorEnhancer} from '../createEnhancer';
 
@@ -31,143 +30,211 @@ export const applyEditorRefs = createEditorEnhancer(({state, resourceIdentifier,
     return;
   }
 
-  for (const ref of refs) {
-    const position = ref.position;
-    if (position) {
-      const decorations = createEditorDecorationsForRef({ref});
-      addEditorDecorations(decorations);
+  const refsByEqualPos: {
+    refType: ResourceRefType;
+    position: RefPosition;
+    matchedRefs: ResourceRef[];
+    targetType: string;
+  }[] = [];
 
-      if (isUnsatisfiedRef(ref.type)) {
-        continue;
+  // find refs that can be decorated
+  refs.forEach(ref => {
+    const refPos = ref.position;
+    if (refPos) {
+      const refsByEqualPosIndex = refsByEqualPos.findIndex(e => areRefPosEqual(e.position, refPos));
+      if (refsByEqualPosIndex === -1) {
+        refsByEqualPos.push({
+          refType: ref.type,
+          position: refPos,
+          matchedRefs: [ref],
+          targetType: ref.target?.type || '',
+        });
+      } else {
+        refsByEqualPos[refsByEqualPosIndex].matchedRefs.push(ref);
       }
+    }
+  });
 
-      const range = new monaco.Range(position.line, position.column, position.line, position.column + position.length);
-      addEditorLinkForRef({resourceMeta, ref, range, dispatch});
+  refsByEqualPos.forEach(({matchedRefs, position, refType, targetType}) => {
+    const range = new monaco.Range(position.line, position.column, position.line, position.column + position.length);
+
+    // Add glyph decoration
+    const glyphDecoration = createGlyphDecoration(
+      position.line,
+      refType === ResourceRefType.Unsatisfied
+        ? GlyphDecorationTypes.UnsatisfiedRef
+        : refType === ResourceRefType.Outgoing
+        ? targetType === 'image'
+          ? GlyphDecorationTypes.OutgoingImageRef
+          : GlyphDecorationTypes.OutgoingRef
+        : GlyphDecorationTypes.IncomingRef
+    );
+    addEditorDecorations([glyphDecoration]);
+
+    const incomingRefsMarkdownTableRows: string[] = [];
+    const outgoingRefsMarkdownTableRows: string[] = [];
+    matchedRefs.forEach(ref => {
       const editorCommand = addEditorCommandForRef({
-        resourceMetaMap: state.main.resourceMetaMapByStorage[resourceMeta.storage],
-        fileMap: state.main.fileMap,
         resourceMeta,
         ref,
         dispatch,
       });
-      createEditorHoverForRef({
-        ref,
-        range,
-        hoverContents: editorCommand?.markdownLink ? [editorCommand.markdownLink] : [],
-      });
+      if (!editorCommand || ref.type === ResourceRefType.Unsatisfied) {
+        return;
+      }
+
+      let markdown: string | undefined;
+
+      if (ref.target?.type === 'resource' && ref.target.resourceId) {
+        const targetResourceMeta = state.main.resourceMetaMapByStorage[resourceMeta.storage][ref.target.resourceId];
+
+        if (!targetResourceMeta) {
+          return;
+        }
+
+        markdown = `
+<li>Resource
+  <ul>
+    <li>Name: <strong>${targetResourceMeta.name}</strong></li>
+    <li>Kind: ${targetResourceMeta.kind}</li>
+    ${isLocalResourceMeta(targetResourceMeta) ? `<li>File path: ${targetResourceMeta.origin.filePath}</li>` : ''}
+    <li>${editorCommand.markdownLink.value}</li>
+  </ul>
+</li>
+`;
+      } else if (ref.target?.type === 'file') {
+        const targetFile = state.main.fileMap[ref.target.filePath];
+        if (!targetFile) {
+          return;
+        }
+        markdown = `
+<li>File
+  <ul>
+    <li>Name: <strong>${targetFile.name}</strong></li>
+    <li>Path: ${targetFile.filePath}</li>
+    <li>${editorCommand.markdownLink.value}</li>
+  </ul>
+</li>
+`;
+      } else if (ref.target?.type === 'image') {
+        const imageId = `${ref.name}:${ref.target?.tag}`;
+        const targetImage = state.main.imageMap[imageId];
+        if (!targetImage) {
+          return;
+        }
+        markdown = `
+<li>Image
+  <ul>
+    <li>Name: <strong>${targetImage.name}</strong></li>
+    <li>Tag: ${targetImage.tag}</li>
+    <li>${editorCommand.markdownLink.value}</li>
+  </ul>
+</li>`;
+      }
+
+      if (!markdown) {
+        return;
+      }
+
+      if (ref.type === ResourceRefType.Incoming) {
+        incomingRefsMarkdownTableRows.push(markdown);
+      } else {
+        outgoingRefsMarkdownTableRows.push(markdown);
+      }
+    });
+
+    const hoverContents: monaco.IMarkdownString[] = [];
+    if (incomingRefsMarkdownTableRows.length) {
+      hoverContents.push(
+        createMarkdownString(
+          `
+<h3>Incoming Links</h3>
+${incomingRefsMarkdownTableRows.join('\n')}
+`,
+          true
+        )
+      );
     }
-  }
+    if (outgoingRefsMarkdownTableRows.length) {
+      hoverContents.push(
+        createMarkdownString(
+          `
+<h3>Outgoing Links</h3>
+${outgoingRefsMarkdownTableRows.join('\n')}
+`,
+          true
+        )
+      );
+    }
+    addEditorHover({
+      range,
+      contents: hoverContents,
+    });
+
+    if (matchedRefs.length === 1 && getEditorType() !== 'cluster') {
+      const ref = matchedRefs[0];
+      addEditorLink({
+        range,
+        handler: () => onClickRefLink({resourceMeta, ref, dispatch}),
+      });
+    } else {
+      addEditorLink({range, handler: () => {}});
+    }
+  });
 });
 
-const createEditorDecorationsForRef = (args: {ref: ResourceRef}): monaco.editor.IModelDeltaDecoration[] => {
-  const {ref} = args;
-  if (!ref.position) {
-    return [];
-  }
-  const glyphDecoration = createGlyphDecoration(
-    ref.position.line,
-    ref.type === ResourceRefType.Unsatisfied
-      ? GlyphDecorationTypes.UnsatisfiedRef
-      : ref.type === ResourceRefType.Outgoing
-      ? ref.target?.type === 'image'
-        ? GlyphDecorationTypes.OutgoingImageRef
-        : GlyphDecorationTypes.OutgoingRef
-      : GlyphDecorationTypes.IncomingRef
-  );
-  return [glyphDecoration];
-};
-
-const createEditorHoverForRef = (args: {
-  ref: ResourceRef;
-  range: monaco.IRange;
-  hoverContents?: monaco.IMarkdownString[];
-}) => {
-  const {ref, range, hoverContents} = args;
-  const hoverTitle =
-    ref.type === ResourceRefType.Outgoing
-      ? ref.target?.type === 'image'
-        ? 'Outgoing Image Link'
-        : 'Outgoing Link'
-      : ref.type === ResourceRefType.Incoming
-      ? 'Incoming Link'
-      : 'Unsatisfied Link';
-
-  const contents = [createMarkdownString(hoverTitle), ...(hoverContents ?? [])];
-  addEditorHover({
-    range,
-    contents,
-  });
-};
-
-const addEditorCommandForRef = (args: {
-  resourceMetaMap: ResourceMetaMap;
-  fileMap: FileMapType;
-  resourceMeta: ResourceMeta;
-  ref: ResourceRef;
-  dispatch: AppDispatch;
-}) => {
-  const {resourceMetaMap, fileMap, resourceMeta, ref, dispatch} = args;
+const addEditorCommandForRef = (args: {resourceMeta: ResourceMeta; ref: ResourceRef; dispatch: AppDispatch}) => {
+  const {resourceMeta, ref, dispatch} = args;
   if (!ref.target) {
     return;
   }
   let command: EditorCommand | undefined;
   if (ref.target.type === 'resource' && ref.target.resourceId) {
-    const outgoingRefResourceMeta = resourceMetaMap[ref.target.resourceId];
-    if (!outgoingRefResourceMeta) {
-      return;
-    }
-    let text = `${outgoingRefResourceMeta.kind}: ${outgoingRefResourceMeta.name}`;
-    if (isLocalResourceMeta(outgoingRefResourceMeta)) {
-      text += ` in ${outgoingRefResourceMeta.origin.filePath}`;
-    }
-    command = addEditorCommand({
-      text,
-      altText: 'Select resource',
-      handler: () => {
-        if (getEditorType() === 'cluster') {
-          return;
-        }
-        if (ref.target && 'resourceId' in ref.target) {
-          dispatch(
-            selectResource({resourceIdentifier: {id: (ref.target as any).resourceId, storage: resourceMeta.storage}})
-          );
-        }
+    command = addEditorCommand(
+      {
+        text: 'Open resource',
+        altText: 'Open resource',
+        handler: () => {
+          if (getEditorType() === 'cluster') {
+            return;
+          }
+          if (ref.target?.type === 'resource') {
+            dispatch(
+              selectResource({resourceIdentifier: {id: (ref.target as any).resourceId, storage: resourceMeta.storage}})
+            );
+          }
+        },
       },
-    });
+      true
+    );
   } else if (ref.target.type === 'file') {
-    const outgoingRefFile = fileMap[ref.target.filePath];
-    if (!outgoingRefFile) {
-      return;
-    }
-    command = addEditorCommand({
-      text: `Open ${outgoingRefFile.name}`,
-      altText: 'Select file',
-      handler: () => {
-        if (ref.target && 'filePath' in ref.target) {
-          dispatch(selectFile({filePath: ref.target.filePath}));
-        }
+    command = addEditorCommand(
+      {
+        text: `Open file`,
+        altText: 'Open file',
+        handler: () => {
+          if (ref.target?.type === 'file') {
+            dispatch(selectFile({filePath: ref.target.filePath}));
+          }
+        },
       },
-    });
+      true
+    );
+  } else if (ref.target.type === 'image') {
+    command = addEditorCommand(
+      {
+        text: `Open image`,
+        altText: 'Open image',
+        handler: () => {
+          if (ref.target?.type === 'image') {
+            dispatch(selectImage({imageId: `${ref.name}:${ref.target?.tag}`}));
+          }
+        },
+      },
+      true
+    );
   }
   return command;
-};
-
-const addEditorLinkForRef = (args: {
-  resourceMeta: ResourceMeta;
-  ref: ResourceRef;
-  range: monaco.IRange;
-  dispatch: AppDispatch;
-}) => {
-  if (getEditorType() === 'cluster') {
-    return;
-  }
-  const {resourceMeta, ref, range, dispatch} = args;
-  const tooltip = ref.target?.type === 'image' ? 'Select image' : 'Open resource';
-  addEditorLink({
-    range,
-    tooltip,
-    handler: () => onClickRefLink({resourceMeta, ref, dispatch}),
-  });
 };
 
 const onClickRefLink = (args: {resourceMeta: ResourceMeta; ref: ResourceRef; dispatch: AppDispatch}) => {
