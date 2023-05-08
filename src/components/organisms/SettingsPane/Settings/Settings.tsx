@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 import {Button, Checkbox, Form, Input, InputNumber, InputRef, Select, Tooltip} from 'antd';
-import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
@@ -135,20 +134,6 @@ export const Settings = ({
     if (selectedHelmPreviewMode === 'template' || selectedHelmPreviewMode === 'install') {
       setLocalConfig({...localConfig, settings: {...localConfig?.settings, helmPreviewMode: selectedHelmPreviewMode}});
     }
-  };
-
-  const onChangeHideExcludedFilesInFileExplorer = (e: CheckboxChangeEvent) => {
-    setLocalConfig({
-      ...localConfig,
-      settings: {...localConfig?.settings, hideExcludedFilesInFileExplorer: e.target.checked},
-    });
-  };
-
-  const onChangeHideUnsupportedFilesInFileExplorer = (e: CheckboxChangeEvent) => {
-    setLocalConfig({
-      ...localConfig,
-      settings: {...localConfig?.settings, hideUnsupportedFilesInFileExplorer: e.target.checked},
-    });
   };
 
   const onChangeKustomizeCommand = (selectedKustomizeCommand: any) => {
@@ -390,23 +375,6 @@ export const Settings = ({
               dispatch(setRootFolder(filePath));
             }}
           />
-        </S.Div>
-        <S.Div>
-          <Checkbox
-            checked={Boolean(localConfig?.settings?.hideExcludedFilesInFileExplorer)}
-            onChange={onChangeHideExcludedFilesInFileExplorer}
-          >
-            Hide excluded files
-          </Checkbox>
-        </S.Div>
-
-        <S.Div>
-          <Checkbox
-            checked={Boolean(localConfig?.settings?.hideUnsupportedFilesInFileExplorer)}
-            onChange={onChangeHideUnsupportedFilesInFileExplorer}
-          >
-            Hide unsupported files
-          </Checkbox>
         </S.Div>
       </S.SettingsColumnContainer>
       <S.SettingsColumnContainer>
