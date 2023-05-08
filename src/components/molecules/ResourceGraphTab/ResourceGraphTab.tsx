@@ -17,6 +17,7 @@ import {useSelectorWithRef} from '@utils/hooks';
 
 import {ResourceGraph} from '@monokle/components';
 import {RuleLevel} from '@monokle/validation';
+import {trackEvent} from '@shared/utils';
 
 const ResourceGraphTab: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -56,6 +57,7 @@ const ResourceGraphTab: React.FC = () => {
     (resource: any) => {
       if (selectionRef.current?.type !== 'file') {
         dispatch(selectResource({resourceIdentifier: {id: resource.id, storage: resourceMap[resource.id].storage}}));
+        trackEvent('graph/select_resource', {kind: resourceMap[resource.id].kind});
       }
     },
     [dispatch, selectionRef, resourceMap]
@@ -65,6 +67,7 @@ const ResourceGraphTab: React.FC = () => {
       if (selectionRef.current?.type !== 'file') {
         dispatch(setExplorerSelectedSection('images'));
         dispatch(selectImage({imageId}));
+        trackEvent('graph/select_image');
       }
     },
     [dispatch, selectionRef]

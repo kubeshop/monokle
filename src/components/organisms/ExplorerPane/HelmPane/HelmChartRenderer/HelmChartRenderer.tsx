@@ -11,6 +11,7 @@ import {selectFile} from '@redux/reducers/main';
 
 import {Icon} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
+import {trackEvent} from '@shared/utils';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import HelmContextMenu from '../HelmContextMenu';
@@ -49,7 +50,10 @@ const HelmChartRenderer: React.FC<IProps> = props => {
       isHovered={isHovered}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => dispatch(selectFile({filePath: helmChart.filePath}))}
+      onClick={() => {
+        dispatch(selectFile({filePath: helmChart.filePath}));
+        trackEvent('explore/select_chart');
+      }}
     >
       <S.PrefixContainer>
         <HelmChartCollapse id={id} isSelected={isSelected} />

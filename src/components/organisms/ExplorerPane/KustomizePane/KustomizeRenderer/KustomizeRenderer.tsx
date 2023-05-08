@@ -9,6 +9,7 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {isLocalOrigin} from '@shared/models/origin';
+import {trackEvent} from '@shared/utils';
 import {isEqual} from '@shared/utils/isEqual';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
@@ -58,6 +59,7 @@ const KustomizeRenderer: React.FC<IProps> = props => {
       onClick={() => {
         if (!isDisabled) {
           dispatch(selectResource({resourceIdentifier: identifier}));
+          trackEvent('explore/select_overlay');
         }
       }}
     >

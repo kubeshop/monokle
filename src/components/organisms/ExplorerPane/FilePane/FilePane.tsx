@@ -16,6 +16,7 @@ import {useRefSelector} from '@utils/hooks';
 import {Icon, TitleBar, TitleBarCount} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {InjectedPanelProps} from '@shared/models/explorer';
+import {trackEvent} from '@shared/utils';
 import {isEqual} from '@shared/utils/isEqual';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
@@ -94,9 +95,10 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}>
                   <Button
                     icon={<Icon name="collapse" />}
-                    onClick={() =>
-                      dispatch(setFileExplorerExpandedFolders(isCollapsed ? allFolderKeysRef.current : []))
-                    }
+                    onClick={() => {
+                      dispatch(setFileExplorerExpandedFolders(isCollapsed ? allFolderKeysRef.current : []));
+                      trackEvent(isCollapsed ? 'explore/expand_all' : 'explore/collapse_all');
+                    }}
                     type="link"
                     size="small"
                     disabled={isButtonDisabled}

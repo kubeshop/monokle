@@ -7,6 +7,8 @@ import {isKustomizationPatch} from '@redux/services/kustomize';
 
 import {useSelectorWithRef} from '@utils/hooks';
 
+import {trackEvent} from '@shared/utils';
+
 import * as S from './KindRenderer.styled';
 import KindSuffix from './KindSuffix';
 import ResourceCounter from './ResourceCounter';
@@ -55,8 +57,10 @@ function KindRenderer(props: KindRendererProps) {
   const toggleCollapse = useCallback(() => {
     if (isCollapsedRef.current) {
       dispatch(expandResourceKinds([kind]));
+      trackEvent('explore/select_kind', {kind, expand: true});
     } else {
       dispatch(collapseResourceKinds([kind]));
+      trackEvent('explore/select_kind', {kind, expand: false});
     }
   }, [kind, isCollapsedRef, dispatch]);
 

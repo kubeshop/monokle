@@ -35,6 +35,7 @@ import {doesSchemaExist} from '@utils/index';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {K8S_VERSIONS} from '@shared/constants/k8s';
 import {ProjectConfig} from '@shared/models/config';
+import {trackEvent} from '@shared/utils';
 import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {isEqual} from '@shared/utils/isEqual';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
@@ -235,6 +236,7 @@ export const Settings = ({
     if (doesSchemaExist(k8sVersion, String(userDataDir))) {
       setLocalConfig({...localConfig, k8sVersion});
     }
+    trackEvent('configure/k8s_version', {version: k8sVersion, scope: 'project', where: 'settings'});
   };
 
   const handleDownloadVersionSchema = async () => {

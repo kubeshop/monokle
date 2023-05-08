@@ -13,6 +13,7 @@ import {CreateFileFolderCallback, createFile, createFolder, doesPathExist} from 
 import {useFocus} from '@utils/hooks';
 
 import {AlertEnum} from '@shared/models/alert';
+import {trackEvent} from '@shared/utils';
 
 const prohibitedFirstSymbols = ['/', '\\'];
 
@@ -29,8 +30,10 @@ const CreateFileFolderModal: React.FC = () => {
 
     if (uiState.type === 'folder') {
       createFolder(uiState.rootDir, fileFolderName, onCreate);
+      trackEvent('create/folder');
     } else {
       createFile(uiState.rootDir, fileFolderName, onCreate);
+      trackEvent('create/file');
     }
   };
 

@@ -13,6 +13,7 @@ import {setConfigK8sSchemaVersion} from '@redux/validation/validation.slice';
 import {doesSchemaExist} from '@utils/index';
 
 import {K8S_VERSIONS} from '@shared/constants/k8s';
+import {trackEvent} from '@shared/utils';
 
 import * as S from './K8sVersionSelection.style';
 
@@ -37,6 +38,12 @@ export const K8sVersionSelection = () => {
     }
 
     dispatch(setConfigK8sSchemaVersion(k8sVersion));
+
+    trackEvent('configure/k8s_version', {
+      version: k8sVersion,
+      scope: activeProject ? 'project' : 'global',
+      where: 'header',
+    });
   };
 
   const menuItems = K8S_VERSIONS.map(version => ({

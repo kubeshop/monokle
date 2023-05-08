@@ -3,6 +3,7 @@ import {memo, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
 
+import {trackEvent} from '@shared/utils';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import HelmContextMenu from '../HelmContextMenu';
@@ -43,7 +44,10 @@ const HelmValueRenderer: React.FC<IProps> = props => {
       isSelected={isSelected}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => dispatch(selectHelmValuesFile({valuesFileId: id}))}
+      onClick={() => {
+        dispatch(selectHelmValuesFile({valuesFileId: id}));
+        trackEvent('explore/select_values_file');
+      }}
     >
       <S.ItemName isDisabled={isDisabled} isSelected={isSelected}>
         {helmValue.name}
