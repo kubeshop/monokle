@@ -186,8 +186,6 @@ type Settings = {
   autoZoomGraphOnSelection?: boolean;
   helmPreviewMode?: 'template' | 'install';
   kustomizeCommand?: KustomizeCommandType;
-  hideExcludedFilesInFileExplorer?: boolean;
-  hideUnsupportedFilesInFileExplorer?: boolean;
   enableHelmWithKustomize?: boolean;
   createDefaultObjects?: boolean;
   setDefaultPrimitiveValues?: boolean;
