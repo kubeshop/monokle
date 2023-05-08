@@ -155,7 +155,7 @@ const PaneManager: React.FC = () => {
                       <ActionsPane />
                     )
                   }
-                  leftClosable
+                  leftClosable={currentActivity?.name === 'explorer'}
                   onCloseLeftPane={() => dispatch(toggleLeftMenu())}
                   defaultSizes={columnsSizes}
                   onDragEnd={handleColumnResize}
