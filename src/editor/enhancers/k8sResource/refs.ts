@@ -79,7 +79,7 @@ export const applyEditorRefs = createEditorEnhancer(({state, resourceIdentifier,
         ref,
         dispatch,
       });
-      if (!editorCommand || ref.type === ResourceRefType.Unsatisfied) {
+      if (ref.type === ResourceRefType.Unsatisfied) {
         return;
       }
 
@@ -98,7 +98,7 @@ export const applyEditorRefs = createEditorEnhancer(({state, resourceIdentifier,
     <li>Name: <strong>${targetResourceMeta.name}</strong></li>
     <li>Kind: ${targetResourceMeta.kind}</li>
     ${isLocalResourceMeta(targetResourceMeta) ? `<li>File path: ${targetResourceMeta.origin.filePath}</li>` : ''}
-    <li>${editorCommand.markdownLink.value}</li>
+    ${editorCommand ? `<li>${editorCommand.markdownLink.value}</li>` : ''}
   </ul>
 </li>
 `;
@@ -112,7 +112,7 @@ export const applyEditorRefs = createEditorEnhancer(({state, resourceIdentifier,
   <ul>
     <li>Name: <strong>${targetFile.name}</strong></li>
     <li>Path: ${targetFile.filePath}</li>
-    <li>${editorCommand.markdownLink.value}</li>
+    ${editorCommand ? `<li>${editorCommand.markdownLink.value}</li>` : ''}
   </ul>
 </li>
 `;
@@ -127,7 +127,7 @@ export const applyEditorRefs = createEditorEnhancer(({state, resourceIdentifier,
   <ul>
     <li>Name: <strong>${targetImage.name}</strong></li>
     <li>Tag: ${targetImage.tag}</li>
-    <li>${editorCommand.markdownLink.value}</li>
+    ${editorCommand ? `<li>${editorCommand.markdownLink.value}</li>` : ''}
   </ul>
 </li>`;
       }
@@ -184,6 +184,9 @@ ${outgoingRefsMarkdownTableRows.join('\n')}
 });
 
 const addEditorCommandForRef = (args: {resourceMeta: ResourceMeta; ref: ResourceRef; dispatch: AppDispatch}) => {
+  if (getEditorType() === 'cluster') {
+    return;
+  }
   const {resourceMeta, ref, dispatch} = args;
   if (!ref.target) {
     return;
