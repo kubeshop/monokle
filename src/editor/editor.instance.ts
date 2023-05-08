@@ -95,15 +95,26 @@ export const clearEditorLinks = () => {
   editorLinks = [];
 };
 
-export const addEditorCommand = (payload: EditorCommand['payload']) => {
+export const addEditorCommand = (payload: EditorCommand['payload'], supportHtml?: boolean) => {
   const {text, altText, handler, beforeText, afterText} = payload;
 
   const id = `cmd_${uuidv4()}`;
   const disposable: monaco.IDisposable = monaco.editor.registerCommand(id, handler);
-  const markdownLink = {
-    isTrusted: true,
-    value: `${beforeText || ''}[${text}](command:${id} '${altText}')${afterText || ''}`,
-  };
+
+  let markdownLink: monaco.IMarkdownString;
+
+  if (supportHtml) {
+    markdownLink = {
+      isTrusted: true,
+      supportHtml: true,
+      value: `<a href="command:${id}">${text}</a>`,
+    };
+  } else {
+    markdownLink = {
+      isTrusted: true,
+      value: `${beforeText || ''}[${text}](command:${id} '${altText}')${afterText || ''}`,
+    };
+  }
 
   const command: EditorCommand = {
     id,
