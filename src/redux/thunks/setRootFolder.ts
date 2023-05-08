@@ -5,7 +5,7 @@ import log from 'loglevel';
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {getChangedFiles, getRepoInfo, isFolderGitRepo} from '@redux/git/git.ipc';
-import {SetRootFolderPayload} from '@redux/reducers/main';
+import {SetRootFolderArgs, SetRootFolderPayload} from '@redux/reducers/main';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -27,12 +27,12 @@ import {trackEvent} from '@shared/utils/telemetry';
 
 export const setRootFolder = createAsyncThunk<
   SetRootFolderPayload,
-  string | null,
+  SetRootFolderArgs,
   {
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/setRootFolder', async (rootFolder, thunkAPI) => {
+>('main/setRootFolder', async ({rootFolder, isReload}, thunkAPI) => {
   const startTime = new Date().getTime();
   const projectConfig = currentConfigSelector(thunkAPI.getState());
 
@@ -164,5 +164,6 @@ export const setRootFolder = createAsyncThunk<
     isScanIncludesUpdated: 'applied',
     alert: rootFolder ? generatedAlert : undefined,
     isGitRepo,
+    isReload,
   };
 });

@@ -85,7 +85,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
                   <Button
                     size="small"
-                    onClick={() => dispatch(setRootFolder(rootEntry.filePath))}
+                    onClick={() => dispatch(setRootFolder({rootFolder: rootEntry.filePath, isReload: true}))}
                     icon={<ReloadOutlined />}
                     type="link"
                     disabled={isButtonDisabled}
