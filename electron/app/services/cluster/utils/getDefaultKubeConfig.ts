@@ -2,8 +2,14 @@ import {app} from 'electron';
 
 import path from 'path';
 
+import {getMainProcessEnv} from '@shared/utils';
+
 export function getDefaultKubeConfig() {
-  // TODO: use KUBECONFIG env as override to this default.
+  const mainProcessEnv = getMainProcessEnv() ?? {};
+
+  if (mainProcessEnv.KUBECONFIG) {
+    return mainProcessEnv.KUBECONFIG;
+  }
 
   const home = app.getPath('home');
   const kubeConfigPath = path.join(home, `${path.sep}.kube${path.sep}config`);
