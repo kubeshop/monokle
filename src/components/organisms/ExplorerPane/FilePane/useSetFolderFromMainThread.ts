@@ -11,7 +11,7 @@ export function useSetFolderFromMainThread() {
   const dispatch = useAppDispatch();
   const setFolder = useCallback(
     (folder: string) => {
-      dispatch(setRootFolder(folder));
+      dispatch(setRootFolder({rootFolder: folder}));
     },
     [dispatch]
   );

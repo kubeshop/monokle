@@ -360,7 +360,7 @@ export const Settings = ({
             tooltip={AddInclusionPatternTooltip}
             showApplyButton={isScanIncludesUpdated === 'outdated'}
             onApplyClick={() => {
-              dispatch(setRootFolder(filePath));
+              dispatch(setRootFolder({rootFolder: filePath}));
             }}
           />
         </S.Div>
@@ -372,7 +372,7 @@ export const Settings = ({
             tooltip={AddExclusionPatternTooltip}
             showApplyButton={isScanExcludesUpdated === 'outdated'}
             onApplyClick={() => {
-              dispatch(setRootFolder(filePath));
+              dispatch(setRootFolder({rootFolder: filePath}));
             }}
           />
         </S.Div>

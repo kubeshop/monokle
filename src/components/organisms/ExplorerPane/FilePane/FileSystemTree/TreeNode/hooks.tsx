@@ -371,7 +371,7 @@ export const useFileMenuItems = (
     if (!fileEntry) {
       return;
     }
-    dispatch(setRootFolder(fileEntry.rootFolderPath));
+    dispatch(setRootFolder({rootFolder: fileEntry.rootFolderPath, isReload: true}));
   }, [fileEntry, dispatch]);
 
   const {addEntryToScanExcludes, removeEntryFromScanExcludes} = useFileScanning(reloadRootFolder);

@@ -68,7 +68,7 @@ const HotKeysHandler = () => {
       if (!folderPath) {
         return;
       }
-      dispatch(setRootFolder(folderPath));
+      dispatch(setRootFolder({rootFolder: folderPath}));
     },
     {
       isDirectoryExplorer: true,
@@ -93,7 +93,7 @@ const HotKeysHandler = () => {
     hotkeys.REFRESH_FOLDER.key,
     () => {
       if (rootFilePath) {
-        dispatch(setRootFolder(rootFilePath));
+        dispatch(setRootFolder({rootFolder: rootFilePath}));
       }
     },
     [rootFilePath]

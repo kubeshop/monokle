@@ -70,7 +70,7 @@ const KustomizeContextMenu: React.FC<IProps> = props => {
   );
 
   const refreshFolder = useCallback(
-    () => dispatch(setRootFolder(fileMapRef.current[ROOT_FILE_ENTRY].filePath)),
+    () => dispatch(setRootFolder({rootFolder: fileMapRef.current[ROOT_FILE_ENTRY].filePath, isReload: true})),
     [dispatch, fileMapRef]
   );
   const {onExcludeFromProcessing} = useProcessing(refreshFolder);
