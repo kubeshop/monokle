@@ -10,7 +10,7 @@ import {trackEvent} from '@shared/utils/telemetry';
 
 import {activities, extraActivities} from './activities';
 
-const NewPaneManagerLeftMenu: React.FC = () => {
+const PaneManagerLeftMenu: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
   const leftActive = useAppSelector(state => state.ui.leftMenu.isActive);
@@ -61,4 +61,4 @@ const NewPaneManagerLeftMenu: React.FC = () => {
   );
 };
 
-export default NewPaneManagerLeftMenu;
+export default PaneManagerLeftMenu;

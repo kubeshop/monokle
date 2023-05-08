@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 
 import {Skeleton} from 'antd';
 
@@ -20,7 +20,7 @@ import * as S from './PaneManager.styled';
 import PaneManagerLeftMenu from './PaneManagerLeftMenu';
 import {activities} from './activities';
 
-const NewPaneManager: React.FC = () => {
+const PaneManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeProject = useAppSelector(activeProjectSelector);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
@@ -30,10 +30,13 @@ const NewPaneManager: React.FC = () => {
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
+  const leftMenuBottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
 
   const {height, width} = useMainPaneDimensions();
+
+  const currentActivity = useMemo(() => activities.find(a => a.name === leftMenuSelection), [leftMenuSelection]);
 
   const gridColumns = useMemo(() => {
     if ((!activeProject && !isInQuickClusterMode) || isStartProjectPaneVisible) {
@@ -43,37 +46,78 @@ const NewPaneManager: React.FC = () => {
     return 'max-content 1fr';
   }, [activeProject, isStartProjectPaneVisible, isInQuickClusterMode]);
 
-  const topPaneFlex = useMemo(
-    () => (bottomSelection ? 1 - layout.bottomPaneHeight / height : 1),
-    [bottomSelection, height, layout.bottomPaneHeight]
-  );
-
   const handleColumnResize = useCallback(
-    (position: 'center' | 'right' | 'left', flex: number) => {
-      if (position === 'center') {
-        dispatch(setPaneConfiguration({navPane: flex}));
-      } else if (position === 'left') {
-        dispatch(setPaneConfiguration({leftPane: flex}));
-      } else if (position === 'right') {
-        dispatch(setPaneConfiguration({editPane: flex}));
-      }
-    },
+    (sizes: number[]) => {
+      const [left, center, right] = sizes;
 
-    [dispatch]
-  );
+      let leftPane = left / width;
+      let navPane = center / width;
+      let editPane = right / width;
 
-  const handleRowResize = useCallback(
-    (position: 'top' | 'bottom', flex: number) => {
-      if (position !== 'bottom') {
+      if (currentActivity?.name !== 'explorer') {
+        leftPane = left / width;
+        editPane = center / width;
+        dispatch(setPaneConfiguration({leftPane, editPane}));
         return;
       }
 
-      dispatch(setPaneConfiguration({bottomPaneHeight: flex * height}));
+      // if left pane is closed, only update center and right
+      if (!right) {
+        navPane = left / width;
+        editPane = center / width;
+        dispatch(setPaneConfiguration({navPane, editPane}));
+      } else {
+        dispatch(setPaneConfiguration({leftPane, navPane, editPane}));
+      }
     },
-    [dispatch, height]
+
+    [currentActivity?.name, dispatch, width]
   );
 
-  const currentActivity = useMemo(() => activities.find(a => a.name === leftMenuSelection), [leftMenuSelection]);
+  const columnsSizes = useMemo(() => {
+    const editPane = layout.editPane === 0 ? 1 - layout.leftPane - layout.navPane : layout.editPane;
+
+    const leftPaneWidth = layout.leftPane * width;
+    const navPaneWidth = layout.navPane * width;
+    const editPaneWidth = editPane * width;
+
+    if (leftPaneWidth + navPaneWidth + editPaneWidth > width) {
+      return [leftPaneWidth, 350, 1 - leftPaneWidth - 350];
+    }
+
+    if (leftMenuActive && currentActivity?.name === 'explorer') {
+      return [leftPaneWidth, navPaneWidth, editPaneWidth];
+    }
+
+    if (currentActivity?.name !== 'explorer') {
+      return [leftPaneWidth, 0, width - leftPaneWidth];
+    }
+
+    return [navPaneWidth, 0, editPaneWidth];
+  }, [currentActivity?.name, layout.editPane, layout.leftPane, layout.navPane, leftMenuActive, width]);
+
+  const rowsSizes = useMemo(() => {
+    return [height - layout.bottomPaneHeight, layout.bottomPaneHeight];
+  }, [height, layout.bottomPaneHeight]);
+
+  const handleRowResize = useCallback(
+    (sizes: number[]) => {
+      dispatch(setPaneConfiguration({bottomPaneHeight: sizes[1]}));
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    const editPane = layout.editPane === 0 ? 1 - layout.leftPane - layout.navPane : layout.editPane;
+
+    const leftPaneWidth = layout.leftPane * width;
+    const navPaneWidth = layout.navPane * width;
+    const editPaneWidth = editPane * width;
+
+    if (leftPaneWidth + navPaneWidth + editPaneWidth > width) {
+      handleColumnResize([leftPaneWidth, 350, 1 - leftPaneWidth - 350]);
+    }
+  }, [handleColumnResize, layout.editPane, layout.leftPane, layout.navPane, width]);
 
   return (
     <S.PaneManagerContainer $gridTemplateColumns={gridColumns}>
@@ -84,7 +128,7 @@ const NewPaneManager: React.FC = () => {
           <PaneManagerLeftMenu />
 
           <ResizableRowsPanel
-            layout={{top: topPaneFlex, bottom: layout.bottomPaneHeight / height}}
+            defaultSizes={rowsSizes}
             top={
               currentActivity?.type === 'fullscreen' ? (
                 currentActivity.component
@@ -98,10 +142,8 @@ const NewPaneManager: React.FC = () => {
                 <ResizableColumnsPanel
                   key={currentActivity?.name}
                   paneCloseIconStyle={{top: '20px', right: '-8px'}}
-                  left={leftMenuActive ? currentActivity?.component : undefined}
-                  center={
-                    !['git', 'validation', 'dashboard'].includes(currentActivity?.name ?? '') ? <NavigatorPane /> : null
-                  }
+                  left={leftMenuActive || currentActivity?.name !== 'explorer' ? currentActivity?.component : undefined}
+                  center={currentActivity?.name === 'explorer' ? <NavigatorPane /> : undefined}
                   right={
                     currentActivity?.name === 'git' ? (
                       <GitOpsView />
@@ -113,23 +155,19 @@ const NewPaneManager: React.FC = () => {
                       <ActionsPane />
                     )
                   }
-                  layout={{left: layout.leftPane, center: layout.navPane, right: layout.editPane}}
-                  width={width}
-                  onStopResize={handleColumnResize}
                   leftClosable
                   onCloseLeftPane={() => dispatch(toggleLeftMenu())}
+                  defaultSizes={columnsSizes}
+                  onDragEnd={handleColumnResize}
                 />
               )
             }
-            bottom={<BottomPaneManager />}
-            splitterStyle={{display: bottomSelection === 'terminal' ? 'block' : 'none'}}
+            bottom={leftMenuBottomSelection ? <BottomPaneManager /> : undefined}
             bottomElementStyle={{
               overflow: bottomSelection === 'terminal' ? 'hidden' : 'auto',
               display: bottomSelection === 'terminal' ? 'block' : 'none',
             }}
-            onStopResize={handleRowResize}
-            height={height}
-            width={width}
+            onDragEnd={handleRowResize}
           />
         </>
       ) : (
@@ -139,4 +177,4 @@ const NewPaneManager: React.FC = () => {
   );
 };
 
-export default NewPaneManager;
+export default PaneManager;
