@@ -46,7 +46,6 @@ export const editorSelectionListener: AppListenerFn = listen => {
       } else if (editorType === 'cluster') {
         const selectedResourceId = getState().dashboard.tableDrawer.selectedResourceId;
         resourceIdentifier = selectedResourceId ? {id: selectedResourceId, storage: 'cluster'} : undefined;
-        console.log({resourceIdentifier});
       } else {
         return;
       }

@@ -389,8 +389,6 @@ const ActionsPane: React.FC = () => {
       isGraphViewVisible,
       selectedResourceId,
       activeEditorTab,
-      applySelection,
-      diffSelectedResource,
       isFolderLoading,
       isKustomization,
       isInClusterMode,
