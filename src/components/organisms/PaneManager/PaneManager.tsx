@@ -40,17 +40,22 @@ const PaneManager: React.FC = () => {
 
   const currentActivity = useMemo(() => activities.find(a => a.name === leftMenuSelection), [leftMenuSelection]);
 
+  const showClosedPanePlaceholder = useMemo(
+    () => !leftMenuActive && currentActivity?.name === 'explorer',
+    [currentActivity?.name, leftMenuActive]
+  );
+
   const gridColumns = useMemo(() => {
     if ((!activeProject && !isInQuickClusterMode) || isStartProjectPaneVisible) {
       return '1fr';
     }
 
-    if (!leftMenuActive) {
+    if (showClosedPanePlaceholder) {
       return 'max-content 12px 1fr';
     }
 
     return 'max-content 1fr';
-  }, [activeProject, isInQuickClusterMode, isStartProjectPaneVisible, leftMenuActive]);
+  }, [activeProject, isInQuickClusterMode, isStartProjectPaneVisible, showClosedPanePlaceholder]);
 
   const handleColumnResize = useCallback(
     (sizes: number[]) => {
@@ -133,7 +138,7 @@ const PaneManager: React.FC = () => {
         <>
           <PaneManagerLeftMenu />
 
-          {!leftMenuActive && <ClosedPanePlaceholder />}
+          {showClosedPanePlaceholder && <ClosedPanePlaceholder />}
 
           <ResizableRowsPanel
             defaultSizes={rowsSizes}
