@@ -83,7 +83,6 @@ type PaneConfiguration = {
   navPane: number;
   editPane: number;
   bottomPaneHeight: number;
-  recentProjectsPaneWidth: number;
 };
 
 type RightMenuSelectionType = 'logs' | 'graph';

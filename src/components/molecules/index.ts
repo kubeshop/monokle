@@ -1,6 +1,7 @@
 export {default as BranchSelect} from './BranchSelect';
 export {default as ChangeFiltersConfirmModal} from './ChangeFiltersConfirmModal';
 export {default as CheckedResourcesActionsMenu} from './CheckedResourcesActionsMenu';
+export {default as ClosedPanePlaceholder} from './ClosedPanePlaceholder';
 export {default as FormEditor} from './FormEditor';
 export {default as HelmChartModalConfirmWithNamespaceSelect} from './HelmChartModalConfirmWithNamespaceSelect';
 export {default as ImageDetails} from './ImageDetails';

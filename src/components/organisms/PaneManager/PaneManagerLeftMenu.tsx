@@ -19,8 +19,8 @@ const PaneManagerLeftMenu: React.FC = () => {
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
 
   const isActive = useMemo(
-    () => Boolean(activeProject || isInQuickClusterMode) && leftActive,
-    [activeProject, leftActive, isInQuickClusterMode]
+    () => Boolean(activeProject || isInQuickClusterMode) && Boolean(leftMenuSelection),
+    [activeProject, isInQuickClusterMode, leftMenuSelection]
   );
 
   return (
