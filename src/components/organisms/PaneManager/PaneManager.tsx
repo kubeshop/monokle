@@ -9,6 +9,8 @@ import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
 import {ActionsPane, BottomPaneManager, Dashboard, GitOpsView, NavigatorPane} from '@organisms';
 import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 
+import {ClosedPanePlaceholder} from '@molecules';
+
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {ResizableColumnsPanel, ResizableRowsPanel} from '@monokle/components';
@@ -43,8 +45,12 @@ const PaneManager: React.FC = () => {
       return '1fr';
     }
 
+    if (!leftMenuActive) {
+      return 'max-content 12px 1fr';
+    }
+
     return 'max-content 1fr';
-  }, [activeProject, isStartProjectPaneVisible, isInQuickClusterMode]);
+  }, [activeProject, isInQuickClusterMode, isStartProjectPaneVisible, leftMenuActive]);
 
   const handleColumnResize = useCallback(
     (sizes: number[]) => {
@@ -74,6 +80,8 @@ const PaneManager: React.FC = () => {
     [currentActivity?.name, dispatch, width]
   );
 
+  console.log(currentActivity);
+
   const columnsSizes = useMemo(() => {
     const editPane = layout.editPane === 0 ? 1 - layout.leftPane - layout.navPane : layout.editPane;
 
@@ -95,6 +103,8 @@ const PaneManager: React.FC = () => {
 
     return [navPaneWidth, 0, editPaneWidth];
   }, [currentActivity?.name, layout.editPane, layout.leftPane, layout.navPane, leftMenuActive, width]);
+
+  console.log(columnsSizes);
 
   const rowsSizes = useMemo(() => {
     return [height - layout.bottomPaneHeight, layout.bottomPaneHeight];
@@ -127,6 +137,8 @@ const PaneManager: React.FC = () => {
         <>
           <PaneManagerLeftMenu />
 
+          {!leftMenuActive && <ClosedPanePlaceholder />}
+
           <ResizableRowsPanel
             defaultSizes={rowsSizes}
             top={
@@ -140,6 +152,7 @@ const PaneManager: React.FC = () => {
                 )
               ) : (
                 <ResizableColumnsPanel
+                  isLeftActive={leftMenuActive}
                   key={currentActivity?.name}
                   paneCloseIconStyle={{top: '20px', right: '-8px'}}
                   left={leftMenuActive ? currentActivity?.component : undefined}
