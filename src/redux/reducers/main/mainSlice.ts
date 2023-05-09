@@ -86,6 +86,12 @@ export type SetRootFolderPayload = {
   isScanExcludesUpdated: 'outdated' | 'applied';
   isScanIncludesUpdated: 'outdated' | 'applied';
   isGitRepo: boolean;
+  isReload?: boolean;
+};
+
+export type SetRootFolderArgs = {
+  rootFolder: string | null;
+  isReload?: boolean;
 };
 
 export type UpdateMultipleResourcesPayload = {
@@ -430,12 +436,15 @@ export const mainSlice = createSlice({
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
       state.resourceMetaMapByStorage.local = action.payload.resourceMetaMap;
       state.resourceContentMapByStorage.local = action.payload.resourceContentMap;
-      state.resourceMetaMapByStorage.transient = {};
-      state.resourceContentMapByStorage.transient = {};
       state.fileMap = action.payload.fileMap;
       state.helmChartMap = action.payload.helmChartMap;
       state.helmValuesMap = action.payload.helmValuesMap;
       state.helmTemplatesMap = action.payload.helmTemplatesMap;
+
+      if (!action.payload.isReload) {
+        state.resourceMetaMapByStorage.transient = {};
+        state.resourceContentMapByStorage.transient = {};
+      }
 
       clearSelectionReducer(state);
       clearPreviewReducer(state);

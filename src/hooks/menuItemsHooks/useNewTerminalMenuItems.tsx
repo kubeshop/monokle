@@ -5,6 +5,8 @@ import {v4 as uuidv4} from 'uuid';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {addTerminal, setSelectedTerminal} from '@redux/reducers/terminal';
 
+import {trackEvent} from '@shared/utils';
+
 export function useNewTerminalMenuItems() {
   const dispatch = useAppDispatch();
   const shellsMap = useAppSelector(state => state.terminal.shellsMap);
@@ -20,6 +22,7 @@ export function useNewTerminalMenuItems() {
 
       dispatch(setSelectedTerminal(newTerminalId));
       dispatch(addTerminal({id: newTerminalId, isRunning: false, shell}));
+      trackEvent('terminal/add');
     },
     [dispatch]
   );

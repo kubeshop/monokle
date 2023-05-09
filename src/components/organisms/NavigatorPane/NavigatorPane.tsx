@@ -24,6 +24,7 @@ import {useRefSelector} from '@utils/hooks';
 import {Icon, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Colors} from '@shared/styles';
+import {trackEvent} from '@shared/utils';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import NavigatorDescription from './NavigatorDescription';
@@ -127,9 +128,11 @@ function CollapseAction() {
   const onClick = useCallback(() => {
     if (collapsedKinds.current.length === navigatorKinds.current.length) {
       dispatch(expandResourceKinds(navigatorKinds.current));
+      trackEvent('navigator/expand_all');
       return;
     }
     dispatch(collapseResourceKinds(navigatorKinds.current));
+    trackEvent('navigator/collapse_all');
   }, [dispatch, collapsedKinds, navigatorKinds]);
 
   return (

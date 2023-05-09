@@ -19,6 +19,7 @@ import {useNewTerminalMenuItems, useTerminalOptionsMenuItems} from '@hooks/menuI
 
 import {Icon} from '@monokle/components';
 import {TerminalType} from '@shared/models/terminal';
+import {trackEvent} from '@shared/utils';
 
 import TerminalPane from '../TerminalPane';
 import * as S from './BottomPaneManager.styled';
@@ -77,6 +78,7 @@ const BottomPaneManager: React.FC = () => {
     const newTerminalId = uuidv4();
     dispatch(addTerminal({id: newTerminalId, isRunning: false, shell: settings.defaultShell}));
     dispatch(setSelectedTerminal(newTerminalId));
+    trackEvent('terminal/open');
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bottomSelection, selectedTerminal, shellsMap]);
@@ -113,6 +115,7 @@ const BottomPaneManager: React.FC = () => {
                   onConfirm={e => {
                     e?.stopPropagation();
                     setTerminalToKill(terminal.id);
+                    trackEvent('terminal/kill');
                   }}
                   onCancel={e => {
                     e?.stopPropagation();

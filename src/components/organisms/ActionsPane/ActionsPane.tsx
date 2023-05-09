@@ -61,6 +61,7 @@ import {extractFormSchema} from '@src/kindhandlers/common/customObjectKindHandle
 import {Icon} from '@monokle/components';
 import {ActionPaneTab} from '@shared/models/appState';
 import {HelmChart} from '@shared/models/helm';
+import {trackEvent} from '@shared/utils';
 import {isHelmChartFile} from '@shared/utils/helm';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 import {openExternalResourceKindDocumentation} from '@shared/utils/shell';
@@ -428,7 +429,12 @@ const ActionsPane: React.FC = () => {
           defaultActiveKey="source"
           activeKey={activeEditorTab}
           items={tabItems}
-          onChange={k => dispatch(setActiveEditorTab(k as ActionPaneTab))}
+          onChange={k => {
+            dispatch(setActiveEditorTab(k as ActionPaneTab));
+            if (k === 'graph') {
+              trackEvent('edit/graphview');
+            }
+          }}
           tabBarExtraContent={
             selectedResource && resourceKindHandler?.helpLink ? (
               <>

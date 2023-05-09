@@ -45,7 +45,6 @@ export const DEFAULT_PANE_CONFIGURATION: PaneConfiguration = {
   navPane: 0.25,
   editPane: 0,
   bottomPaneHeight: 250,
-  recentProjectsPaneWidth: 450,
 };
 
 export const PANE_CONSTRAINT_VALUES = {

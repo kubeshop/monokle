@@ -24,6 +24,7 @@ import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandl
 
 import {AlertEnum} from '@shared/models/alert';
 import {CRD_SCHEMA_INTEGRATION} from '@shared/models/integrations';
+import {trackEvent} from '@shared/utils';
 import {readFile} from '@shared/utils/fileSystem';
 
 import ValidationPaneHeading from '../ValidationPaneHeading';
@@ -105,10 +106,11 @@ const CRDsSchemaValidation: React.FC = () => {
       const response = await fetch(inputUrl);
       const text = await response.text();
 
-      const succes = await registerCRD(text, inputUrl);
+      const success = await registerCRD(text, inputUrl);
 
-      if (succes) {
+      if (success) {
         cancelRegistering();
+        trackEvent('configure/crds_register', {from: 'url'});
       }
       return;
     }
@@ -141,6 +143,7 @@ const CRDsSchemaValidation: React.FC = () => {
       });
 
       if (indexesToRemove.length === inputFilePaths.length) {
+        trackEvent('configure/crds_register', {from: 'file'});
         cancelRegistering();
       }
     }

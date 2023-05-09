@@ -8,6 +8,7 @@ import {isResourceHighlighted, isResourceSelected} from '@redux/services/resourc
 import ResourcePopover from '@components/molecules/ResourcePopover/ResourcePopover';
 
 import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {trackEvent} from '@shared/utils';
 import {isEqual} from '@shared/utils/isEqual';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
@@ -51,7 +52,8 @@ function ResourceRenderer(props: ResourceRendererProps) {
       return;
     }
     dispatch(selectResource({resourceIdentifier}));
-  }, [resourceIdentifier, dispatch]);
+    trackEvent('explore/select_resource', {kind: resourceMeta ? resourceMeta.kind : 'unknown'});
+  }, [resourceIdentifier, dispatch, resourceMeta]);
 
   if (!resourceMeta) {
     return null;

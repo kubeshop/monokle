@@ -19,6 +19,7 @@ import {useRefSelector} from '@utils/hooks';
 
 import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
 import {HelmValuesFile} from '@shared/models/helm';
+import {trackEvent} from '@shared/utils';
 
 import HelmChartSelect from './HelmChartSelect';
 import ValuesFilesList from './ValuesFilesList';
@@ -160,6 +161,10 @@ const PreviewConfigurationEditor = () => {
         options: helmOptions,
         valuesFileItemMap,
       };
+
+      if (!previewConfiguration) {
+        trackEvent('create/preview_configuration');
+      }
 
       const updatedPreviewConfigurationMap = cloneDeep(previewConfigurationMap);
       updatedPreviewConfigurationMap[input.id] = input;
