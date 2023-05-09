@@ -32,7 +32,6 @@ const PaneManager: React.FC = () => {
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
-  const leftMenuBottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
 
@@ -176,11 +175,8 @@ const PaneManager: React.FC = () => {
                 />
               )
             }
-            bottom={leftMenuBottomSelection ? <BottomPaneManager /> : undefined}
-            bottomElementStyle={{
-              overflow: bottomSelection === 'terminal' ? 'hidden' : 'auto',
-              display: bottomSelection === 'terminal' ? 'block' : 'none',
-            }}
+            bottom={<BottomPaneManager />}
+            isBottomVisible={Boolean(bottomSelection)}
             onDragEnd={handleRowResize}
           />
         </>
