@@ -69,7 +69,10 @@ export const replaceImageTag = createAsyncThunk<void, {image: ImageType; tag: st
 
     const resourceMap = joinK8sResourceMap(
       getState().main.resourceMetaMapByStorage.local,
-      getState().main.resourceContentMapByStorage.local
+      getState().main.resourceContentMapByStorage.local,
+      meta => {
+        return image.resourcesIds.includes(meta.id);
+      }
     );
 
     _replaceImageTag(image, tag, resourceMap, dispatch);
