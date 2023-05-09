@@ -49,7 +49,6 @@ import {TabHeader} from '@atoms';
 
 import {MonacoPlaceholder} from '@components/molecules/MonacoPlaceholder/MonacoPlaceholder';
 
-import {useDiff} from '@hooks/resourceHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {useRefSelector, useSelectorWithRef} from '@utils/hooks';
@@ -104,7 +103,6 @@ const ActionsPane: React.FC = () => {
   const settings = useAppSelector(settingsSelector);
   const localResourceMetaMap = useResourceMetaMap('local');
 
-  const {diffSelectedResource} = useDiff();
   const height = usePaneHeight();
 
   // Could not get the ref of Tabs Component
