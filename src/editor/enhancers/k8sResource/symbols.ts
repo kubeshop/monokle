@@ -7,7 +7,13 @@ import {getResourceFromState} from '@redux/selectors/resourceGetters';
 
 import SecretHandler from '@src/kindhandlers/Secret.handler';
 
-import {addEditorCommand, addEditorDecorations, addEditorHover, getEditor} from '@editor/editor.instance';
+import {
+  addEditorCommand,
+  addEditorDecorations,
+  addEditorHover,
+  getEditor,
+  getEditorType,
+} from '@editor/editor.instance';
 import {createMarkdownString, getSymbols} from '@editor/editor.utils';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sResource, ResourceMeta} from '@shared/models/k8sResource';
@@ -213,6 +219,13 @@ function processSymbol(
   dispatch: AppDispatch,
   newDecorations: monaco.editor.IModelDeltaDecoration[]
 ) {
+  if (getEditorType() === 'cluster') {
+    if (symbol.containerName === 'data' && resource.kind === SecretHandler.kind) {
+      addDecodeSecretHover(lines, symbol, newDecorations);
+    }
+    return;
+  }
+
   if (symbol.children) {
     symbol.children.forEach(child => {
       processSymbol(resource, child, lines, dispatch, newDecorations);

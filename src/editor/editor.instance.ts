@@ -14,15 +14,18 @@ let editorDecorations: monaco.editor.IModelDeltaDecoration[] = [];
 let editorDecorationsCollection: monaco.editor.IEditorDecorationsCollection | undefined;
 let nextSelection: monaco.IRange | undefined;
 let isRecreatingModel = false;
+let editorType: 'local' | 'cluster' | undefined;
 
 const modelContentChangeListeners: ((e: monaco.editor.IModelContentChangedEvent) => any)[] = [];
 
-export const mountEditor = (domElement: HTMLElement) => {
+export const mountEditor = (props: {element: HTMLElement; type: 'local' | 'cluster'}) => {
+  const {element, type} = props;
   if (EDITOR) {
     log.warn('Editor already mounted!');
     return;
   }
-  EDITOR = monaco.editor.create(domElement, MONACO_EDITOR_INITIAL_CONFIG);
+  editorType = type;
+  EDITOR = monaco.editor.create(element, MONACO_EDITOR_INITIAL_CONFIG);
   EDITOR.onDidChangeModelContent(e => {
     modelContentChangeListeners.forEach(listener => listener(e));
   });
@@ -32,6 +35,8 @@ export const mountEditor = (domElement: HTMLElement) => {
     }
   });
 };
+
+export const getEditorType = () => editorType;
 
 export const unmountEditor = () => {
   EDITOR?.dispose();
@@ -90,15 +95,26 @@ export const clearEditorLinks = () => {
   editorLinks = [];
 };
 
-export const addEditorCommand = (payload: EditorCommand['payload']) => {
+export const addEditorCommand = (payload: EditorCommand['payload'], supportHtml?: boolean) => {
   const {text, altText, handler, beforeText, afterText} = payload;
 
   const id = `cmd_${uuidv4()}`;
   const disposable: monaco.IDisposable = monaco.editor.registerCommand(id, handler);
-  const markdownLink = {
-    isTrusted: true,
-    value: `${beforeText || ''}[${text}](command:${id} '${altText}')${afterText || ''}`,
-  };
+
+  let markdownLink: monaco.IMarkdownString;
+
+  if (supportHtml) {
+    markdownLink = {
+      isTrusted: true,
+      supportHtml: true,
+      value: `<a href="command:${id}">${text}</a>`,
+    };
+  } else {
+    markdownLink = {
+      isTrusted: true,
+      value: `${beforeText || ''}[${text}](command:${id} '${altText}')${afterText || ''}`,
+    };
+  }
 
   const command: EditorCommand = {
     id,

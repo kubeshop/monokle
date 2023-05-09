@@ -8,8 +8,9 @@ import {Logs, ResourceRefsIconPopover} from '@components/molecules';
 
 import PodHandler from '@src/kindhandlers/Pod.handler';
 
+import CodeEditor from '@editor/CodeEditor';
+
 import * as S from './Drawer.styled';
-import {EditorTab} from './EditorTab';
 import {InfoTab} from './InfoTab';
 import {TerminalTab} from './TerminalTab';
 
@@ -91,7 +92,7 @@ export const Drawer = () => {
             {
               label: 'Manifest',
               key: 'Manifest',
-              children: <EditorTab />,
+              children: <CodeEditor type="cluster" />,
             },
             ...(selectedResource?.kind === PodHandler.kind
               ? [

@@ -49,7 +49,6 @@ import {TabHeader} from '@atoms';
 
 import {MonacoPlaceholder} from '@components/molecules/MonacoPlaceholder/MonacoPlaceholder';
 
-import {useDiff} from '@hooks/resourceHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {useRefSelector, useSelectorWithRef} from '@utils/hooks';
@@ -105,7 +104,6 @@ const ActionsPane: React.FC = () => {
   const settings = useAppSelector(settingsSelector);
   const localResourceMetaMap = useResourceMetaMap('local');
 
-  const {diffSelectedResource} = useDiff();
   const height = usePaneHeight();
 
   // Could not get the ref of Tabs Component
@@ -317,10 +315,7 @@ const ActionsPane: React.FC = () => {
             {isFolderLoading || isPreviewLoading || isClusterModeLoading ? (
               <S.Skeleton active />
             ) : activeEditorTab === 'source' ? (
-              (selectedResourceRef.current || selectedFilePath || selectedHelmValuesId) && (
-                <CodeEditor />
-                // <Monaco applySelection={applySelection} diffSelectedResource={diffSelectedResource} />
-              )
+              (selectedResourceRef.current || selectedFilePath || selectedHelmValuesId) && <CodeEditor type="local" />
             ) : null}
           </>
         ),
@@ -393,8 +388,6 @@ const ActionsPane: React.FC = () => {
       isGraphViewVisible,
       selectedResourceId,
       activeEditorTab,
-      applySelection,
-      diffSelectedResource,
       isFolderLoading,
       isKustomization,
       isInClusterMode,
