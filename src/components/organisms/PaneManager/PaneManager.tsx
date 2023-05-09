@@ -80,8 +80,6 @@ const PaneManager: React.FC = () => {
     [currentActivity?.name, dispatch, width]
   );
 
-  console.log(currentActivity);
-
   const columnsSizes = useMemo(() => {
     const editPane = layout.editPane === 0 ? 1 - layout.leftPane - layout.navPane : layout.editPane;
 
@@ -103,8 +101,6 @@ const PaneManager: React.FC = () => {
 
     return [navPaneWidth, 0, editPaneWidth];
   }, [currentActivity?.name, layout.editPane, layout.leftPane, layout.navPane, leftMenuActive, width]);
-
-  console.log(columnsSizes);
 
   const rowsSizes = useMemo(() => {
     return [height - layout.bottomPaneHeight, layout.bottomPaneHeight];
