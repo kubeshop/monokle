@@ -9,7 +9,7 @@ import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelecto
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ValidationResponse} from '@monokle/validation';
+import {ResourceRefType, ValidationResponse} from '@monokle/validation';
 import {CORE_PLUGINS} from '@shared/constants/validation';
 import {K8sResource, ResourceMeta} from '@shared/models/k8sResource';
 import type {ThunkApi} from '@shared/models/thunk';
@@ -52,10 +52,19 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
  */
 
 function shouldResourceBeValidated(resourceMeta: ResourceMeta) {
-  return !(
-    (resourceMeta.storage === 'cluster' && resourceMeta.kind === 'Event') ||
-    !isDefined(getResourceKindHandler(resourceMeta.kind))
-  );
+  if (resourceMeta.storage === 'cluster' && ['Event', 'Namespace'].includes(resourceMeta.kind)) {
+    return false;
+  }
+
+  if (resourceMeta.kind === 'Pod' && resourceMeta.refs?.some(ref => ref.type === ResourceRefType.IncomingOwner)) {
+    return false;
+  }
+
+  if (!isDefined(getResourceKindHandler(resourceMeta.kind))) {
+    return false;
+  }
+
+  return true;
 }
 
 export const validateResources = createAsyncThunk<ValidationResponse | undefined, ValidationArgs | undefined, ThunkApi>(
