@@ -10,7 +10,11 @@ import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 import {setOpenProject} from '@redux/appConfig';
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import initialState from '@redux/initialState';
+import {previewSavedCommand} from '@redux/services/previewCommand';
 import {stopClusterConnection} from '@redux/thunks/cluster';
+import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
+import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -440,6 +444,18 @@ export const uiSlice = createSlice({
       })
       .addCase(setOpenProject.fulfilled, state => {
         state.leftMenu.selection = 'explorer';
+        state.navigator.collapsedResourceKinds = [];
+      })
+      .addCase(previewKustomization.fulfilled, state => {
+        state.navigator.collapsedResourceKinds = [];
+      })
+      .addCase(previewHelmValuesFile.fulfilled, state => {
+        state.navigator.collapsedResourceKinds = [];
+      })
+      .addCase(previewSavedCommand.fulfilled, state => {
+        state.navigator.collapsedResourceKinds = [];
+      })
+      .addCase(runPreviewConfiguration.fulfilled, state => {
         state.navigator.collapsedResourceKinds = [];
       });
   },
