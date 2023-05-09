@@ -12,6 +12,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
 import {Colors} from '@shared/styles';
+import {trackEvent} from '@shared/utils';
 
 import * as S from '../Controls.styled';
 
@@ -24,6 +25,7 @@ export function NamespaceSelect() {
   const onNamespaceChanged = useCallback(
     (namespace: any) => {
       dispatch(connectCluster({context: kubeConfigContext, namespace, reload: true}));
+      trackEvent('dashboard/changeNamespace');
     },
     [dispatch, kubeConfigContext]
   );

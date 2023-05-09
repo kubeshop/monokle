@@ -16,6 +16,7 @@ import {Icon, IconNames} from '@monokle/components';
 import {PluginMetadataWithConfig} from '@monokle/validation';
 import type {Rule} from '@shared/models/validation';
 import {Colors} from '@shared/styles/colors';
+import {trackEvent} from '@shared/utils';
 
 import ValidationLevelSelect from './ValidationLevelSelect';
 import * as S from './ValidationOpenPolicyAgentTable.styled';
@@ -26,6 +27,7 @@ export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width:
   const handleToggle = useCallback(
     (rule: Rule) => {
       dispatch(toggleRule({plugin: 'open-policy-agent', rule: rule.name}));
+      trackEvent('configure/toggle_rule', {id: rule.id});
     },
     [dispatch]
   );

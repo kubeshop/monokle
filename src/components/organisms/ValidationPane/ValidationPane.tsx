@@ -19,6 +19,7 @@ import {useRefSelector} from '@utils/hooks';
 import ValidationFigure from '@assets/NewValidationFigure.svg';
 
 import {Icon, TitleBar, ValidationOverview} from '@monokle/components';
+import {trackEvent} from '@shared/utils';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ValidationPane.styled';
@@ -88,7 +89,13 @@ const ValidationPane: React.FC = () => {
           newProblemsIntroducedType={newProblemsIntroducedType}
           selectedProblem={selectedProblem?.problem}
           validationResponse={lastResponse}
-          onProblemSelect={problem => dispatch(setSelectedProblem(problem))}
+          onProblemSelect={problem => {
+            dispatch(setSelectedProblem(problem));
+            trackEvent('explore/select_problem', {
+              ruleId: problem.problem.ruleId,
+              source: activeStorageRef.current,
+            });
+          }}
           status={isInClusterMode ? 'loaded' : status}
           skeletonStyle={{marginTop: '20px'}}
           onFiltersChange={filters => dispatch(setValidationFilters(filters))}

@@ -13,7 +13,7 @@ import {useSelectorWithRef} from '@utils/hooks';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {isFileSelection} from '@shared/models/selection';
-import {isHelmValuesFile} from '@shared/utils';
+import {isHelmValuesFile, trackEvent} from '@shared/utils';
 
 import * as S from './FileSystemTree.styled';
 import FileSystemTreeNode from './TreeNode';
@@ -100,8 +100,10 @@ const FileSystemTree: React.FC = () => {
             if (isHelmValuesFile(nodeEvent.key) && helmValuesMapByFilePath[nodeEvent.key]) {
               const valuesFileId = helmValuesMapByFilePath[nodeEvent.key].id;
               dispatch(selectHelmValuesFile({valuesFileId}));
+              trackEvent('explore/select_values_file');
             } else {
               dispatch(selectFile({filePath: nodeEvent.key}));
+              trackEvent('explore/select_file');
             }
           }
         }}

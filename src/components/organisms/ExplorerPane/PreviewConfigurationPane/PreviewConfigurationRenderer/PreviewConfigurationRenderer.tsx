@@ -6,6 +6,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectPreviewConfiguration} from '@redux/reducers/main';
 
 import {Colors} from '@shared/styles/colors';
+import {trackEvent} from '@shared/utils';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import PreviewConfigurationQuickAction from './PreviewConfigurationQuickAction';
@@ -40,7 +41,10 @@ const PreviewConfigurationRenderer: React.FC<IProps> = props => {
       isSelected={isSelected}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => dispatch(selectPreviewConfiguration({previewConfigurationId: id}))}
+      onClick={() => {
+        dispatch(selectPreviewConfiguration({previewConfigurationId: id}));
+        trackEvent('explore/select_preview_configuration');
+      }}
     >
       <S.PrefixContainer>
         <EyeOutlined style={{color: isSelected ? Colors.blackPure : Colors.grey9}} />

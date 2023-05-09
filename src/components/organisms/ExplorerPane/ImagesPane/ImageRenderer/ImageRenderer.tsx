@@ -4,6 +4,8 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectImage} from '@redux/reducers/main';
 import {isImageHighlighted, isImageSelected} from '@redux/services/image';
 
+import {trackEvent} from '@shared/utils';
+
 import ImageQuickAction from './ImageQuickAction';
 import * as S from './ImageRenderer.styled';
 import ImageSuffix from './ImageSuffix';
@@ -29,7 +31,10 @@ const ImageRenderer: React.FC<IProps> = props => {
       isHovered={isHovered}
       isSelected={isSelected}
       isHighlighted={isHighlighted}
-      onClick={() => dispatch(selectImage({imageId: id}))}
+      onClick={() => {
+        dispatch(selectImage({imageId: id}));
+        trackEvent('explore/select_image');
+      }}
     >
       <S.ItemName isSelected={isSelected} isHighlighted={isHighlighted}>
         {id}
