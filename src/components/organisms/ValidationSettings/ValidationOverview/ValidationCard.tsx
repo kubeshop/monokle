@@ -8,6 +8,7 @@ import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
 import {toggleValidation} from '@redux/validation/validation.slice';
 
 import {ValidationIntegration} from '@shared/models/integrations';
+import {trackEvent} from '@shared/utils';
 
 import * as S from './ValidationCard.styled';
 
@@ -30,6 +31,7 @@ const ValidationCard: React.FC<Props> = ({integration}) => {
 
   const toggleEnabled = useCallback(() => {
     dispatch(toggleValidation(id));
+    trackEvent('configure/toggle_validation', {id});
   }, [dispatch, id]);
 
   return (

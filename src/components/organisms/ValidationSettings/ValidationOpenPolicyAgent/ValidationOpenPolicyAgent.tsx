@@ -6,6 +6,7 @@ import {toggleRule} from '@redux/validation/validation.slice';
 import {Button} from '@src/App.styled';
 
 import {OPA_INTEGRATION} from '@shared/models/integrations';
+import {trackEvent} from '@shared/utils';
 
 import ValidationPaneHeading from '../ValidationPaneHeading';
 import * as S from './ValidationOpenPolicyAgent.styled';
@@ -17,6 +18,7 @@ const ValidationOpenPolicyAgent: React.FC = () => {
   const toggleRules = useCallback(
     (enable: boolean) => {
       dispatch(toggleRule({plugin: 'open-policy-agent', enable}));
+      trackEvent('configure/toggle_rule', {id: enable ? 'enable-all-opa' : 'disable-all-opa'});
     },
     [dispatch]
   );

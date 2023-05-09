@@ -39,9 +39,9 @@ export type EventMap = {
   };
   'app_start/create_project': {from: 'scratch' | 'git' | 'template'; templateID?: string};
   'configure/k8s_version': {version: string; scope: 'global' | 'project'; where: 'settings' | 'header'};
-  'configure/opa_enabled': {all: boolean};
-  'configure/opa_disabled': {all: boolean};
   'configure/crds_register': {from: 'url' | 'file'};
+  'configure/toggle_validation': {id: string};
+  'configure/toggle_rule': {id: string};
   'explore/navigate_resource_link': {type: string};
   'explore/navigate_resource_error': undefined;
   'explore/select_file': undefined;
