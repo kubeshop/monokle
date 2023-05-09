@@ -295,6 +295,7 @@ export const electronStoreDefaults = {
       createDefaultObjects: false,
       setDefaultPrimitiveValues: true,
       allowEditInClusterMode: true,
+      enableHelmWithKustomize: true,
     },
     recentFolders: [],
     newVersion: 0,
