@@ -4,7 +4,8 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {isAnyOf} from '@reduxjs/toolkit';
 
-import {isEmpty} from 'lodash';
+import {isEmpty, uniqWith} from 'lodash';
+import log from 'loglevel';
 
 import {
   activeProjectSelector,
@@ -47,6 +48,17 @@ import {isEqual} from '@shared/utils/isEqual';
 
 import {changeRuleLevel, setConfigK8sSchemaVersion, toggleRule, toggleValidation} from './validation.slice';
 import {loadValidation, validateResources} from './validation.thunks';
+
+type IncrementalValidationStatus = {
+  isRunning: boolean;
+  nextBatch: ResourceIdentifier[];
+  abortController?: AbortController;
+};
+
+let incrementalValidationStatus: IncrementalValidationStatus = {
+  isRunning: false,
+  nextBatch: [],
+};
 
 const loadListener: AppListenerFn = listen => {
   listen({
@@ -101,6 +113,12 @@ const validateListener: AppListenerFn = listen => {
       }
 
       cancelActiveListeners();
+
+      if (incrementalValidationStatus.isRunning) {
+        incrementalValidationStatus.abortController?.abort();
+        incrementalValidationStatus.abortController = undefined;
+        incrementalValidationStatus.isRunning = false;
+      }
 
       const validatorsLoading = getState().validation.status === 'loading';
       if (validatorsLoading) return;
@@ -159,7 +177,7 @@ const incrementalValidationListener: AppListenerFn = listen => {
       multiplePathsAdded.fulfilled,
       multiplePathsChanged.fulfilled
     ),
-    async effect(_action, {dispatch, delay, signal, cancelActiveListeners}) {
+    async effect(_action, {dispatch, delay, signal}) {
       let resourceIdentifiers: ResourceIdentifier[] = [];
 
       if (
@@ -185,16 +203,29 @@ const incrementalValidationListener: AppListenerFn = listen => {
 
       if (resourceIdentifiers.length === 0) return;
 
-      // TODO: should we cancel active listeners or not?
-      // I think it depends on the resource storage?
-      // but maybe validation should actually be cancelled while the processing of refs should not?!
-      cancelActiveListeners();
+      if (incrementalValidationStatus.isRunning) {
+        incrementalValidationStatus.nextBatch.push(...resourceIdentifiers);
+        log.info('Incremental validation is already running, adding to the next batch', resourceIdentifiers);
+        return;
+      }
 
-      await delay(200);
+      await delay(1);
       if (signal.aborted) return;
+
+      resourceIdentifiers = uniqWith([...resourceIdentifiers, ...incrementalValidationStatus.nextBatch], isEqual);
+      incrementalValidationStatus = {
+        isRunning: true,
+        nextBatch: [],
+        abortController: new AbortController(),
+      };
+
       const response = dispatch(validateResources({type: 'incremental', resourceIdentifiers}));
       signal.addEventListener('abort', () => response.abort());
+      incrementalValidationStatus.abortController?.signal.addEventListener('abort', () => response.abort());
       await response;
+
+      incrementalValidationStatus.isRunning = false;
+      incrementalValidationStatus.abortController = undefined;
     },
   });
 };
