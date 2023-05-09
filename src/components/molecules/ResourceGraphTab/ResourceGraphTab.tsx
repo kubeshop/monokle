@@ -17,6 +17,7 @@ import {useSelectorWithRef} from '@utils/hooks';
 
 import {ResourceGraph} from '@monokle/components';
 import {RuleLevel} from '@monokle/validation';
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {trackEvent} from '@shared/utils';
 
 const ResourceGraphTab: React.FC = () => {
@@ -32,8 +33,18 @@ const ResourceGraphTab: React.FC = () => {
 
   // TODO: computing this is expensive, but the Graph is from core and it needs the resource map...
   const resourceMap = useMemo(() => {
-    let result = joinK8sResourceMap(activeResoureMetaMap, activeResoureContentMap);
-    let transientResources = joinK8sResourceMap(transientResourceMetaMap, transientResourceContentMap);
+    // only include resources that have refs - the graph view won't include unrelated resources
+    const inclusionPredicate = (meta: ResourceMeta) => {
+      return Boolean(meta.refs && meta.refs?.length > 0);
+    };
+
+    let result = joinK8sResourceMap(activeResoureMetaMap, activeResoureContentMap, inclusionPredicate);
+    let transientResources = joinK8sResourceMap(
+      transientResourceMetaMap,
+      transientResourceContentMap,
+      inclusionPredicate
+    );
+
     Object.keys(transientResources).forEach((k: string) => {
       result[k] = transientResources[k];
     });

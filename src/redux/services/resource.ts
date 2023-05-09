@@ -190,7 +190,6 @@ export function removeResourceFromFile(
   }
 ) {
   const {resourceMetaMap, resourceContentMap} = stateArgs;
-  const resourceMap: ResourceMap = joinK8sResourceMap(resourceMetaMap, resourceContentMap);
 
   if (!isLocalResourceMeta(removedResource)) {
     throw new Error(`[removeResourceFromFile]: Specified resource is not from a file.`);
@@ -223,6 +222,11 @@ export function removeResourceFromFile(
   // recalculate ranges for resources below the removed resource
   let newRangeStart = 0;
   let passedRemovedResource = false;
+
+  const resourceMap: ResourceMap = joinK8sResourceMap(resourceMetaMap, resourceContentMap, meta => {
+    return resourceIds.includes(meta.id);
+  });
+
   resourceIds.forEach(resourceId => {
     const resource = resourceMap[resourceId];
     if (resourceId === removedResource.id) {
@@ -501,14 +505,17 @@ export function splitK8sResourceMap<Storage extends ResourceStorage = ResourceSt
 
 export function joinK8sResourceMap<Storage extends ResourceStorage = ResourceStorage>(
   metaMap: ResourceMetaMap<Storage>,
-  contentMap: ResourceContentMap<Storage>
+  contentMap: ResourceContentMap<Storage>,
+  resourcePredicate?: (meta: ResourceMeta<Storage>) => boolean
 ) {
   const resourceMap: ResourceMap<Storage> = {};
-  Object.values(metaMap).forEach(meta => {
-    const content = contentMap[meta.id];
-    if (content) {
-      resourceMap[meta.id] = {...meta, ...content};
-    }
-  });
+  Object.values(metaMap)
+    .filter(meta => (resourcePredicate ? resourcePredicate(meta) : true))
+    .forEach(meta => {
+      const content = contentMap[meta.id];
+      if (content) {
+        resourceMap[meta.id] = {...meta, ...content};
+      }
+    });
   return resourceMap;
 }

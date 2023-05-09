@@ -3,12 +3,15 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {merge} from 'lodash';
 
 import {processResourceRefs} from '@redux/parsing/parser.thunks';
+import {getIncludedFilePaths} from '@redux/selectors/fileMapGetters';
 import {getResourceMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
 
-import {ValidationResponse} from '@monokle/validation';
+import {getResourceKindHandler} from '@src/kindhandlers';
+
+import {ResourceRefType, ValidationResponse} from '@monokle/validation';
 import {CORE_PLUGINS} from '@shared/constants/validation';
-import {K8sResource} from '@shared/models/k8sResource';
+import {K8sResource, ResourceMeta} from '@shared/models/k8sResource';
 import type {ThunkApi} from '@shared/models/thunk';
 import type {LoadValidationResult, ValidationArgs, ValidationResource} from '@shared/models/validation';
 import electronStore from '@shared/utils/electronStore';
@@ -44,6 +47,26 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
   }
 );
 
+/**
+ * Ignore cluster events and unknown resources for now
+ */
+
+function shouldResourceBeValidated(resourceMeta: ResourceMeta) {
+  if (resourceMeta.storage === 'cluster' && ['Event', 'Namespace'].includes(resourceMeta.kind)) {
+    return false;
+  }
+
+  if (resourceMeta.kind === 'Pod' && resourceMeta.refs?.some(ref => ref.type === ResourceRefType.IncomingOwner)) {
+    return false;
+  }
+
+  if (!isDefined(getResourceKindHandler(resourceMeta.kind))) {
+    return false;
+  }
+
+  return true;
+}
+
 export const validateResources = createAsyncThunk<ValidationResponse | undefined, ValidationArgs | undefined, ThunkApi>(
   'validation/validate',
   async (payload, {getState, dispatch, signal, rejectWithValue}) => {
@@ -52,7 +75,9 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
 
     if (payload?.type === 'full') {
       let resourceStorage = payload.resourceStorage || activeResourceStorageSelector(getState());
-      resources = Object.values(getResourceMapFromState(getState(), resourceStorage) || {}).filter(isDefined);
+      resources = Object.values(
+        getResourceMapFromState(getState(), resourceStorage, shouldResourceBeValidated) || {}
+      ).filter(isDefined);
 
       // mix in transient resources created in the resourceStorage
       resources = resources.concat(
@@ -63,7 +88,7 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
       );
 
       if (resourceStorage === 'local') {
-        files = Object.keys(getState().main.fileMap);
+        files = getIncludedFilePaths(getState().main.fileMap);
       }
     } else if (payload?.type === 'incremental') {
       const affectedStorages = new Set(payload.resourceIdentifiers.map(r => r.storage));
@@ -83,12 +108,12 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
       }
 
       affectedStorages.forEach(storage => {
-        const resourceMap = getResourceMapFromState(getState(), storage);
+        const resourceMap = getResourceMapFromState(getState(), storage, shouldResourceBeValidated);
         resources = resources.concat(Object.values(resourceMap).filter(isDefined));
       });
 
       if (affectedStorages.has('local')) {
-        files = Object.keys(getState().main.fileMap);
+        files = getIncludedFilePaths(getState().main.fileMap);
       }
     }
 
