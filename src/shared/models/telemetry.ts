@@ -66,6 +66,7 @@ export type EventMap = {
   'explore/quick_search': undefined;
   'graph/select_resource': {kind: string};
   'graph/select_image': undefined;
+  'edit/code_changes': {from?: 'local' | 'cluster'};
   'edit/template_use': {templateID: string};
   'edit/form_editor': {resourceKind?: string};
   'edit/source': {resourceKind?: string};

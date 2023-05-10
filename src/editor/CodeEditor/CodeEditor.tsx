@@ -5,7 +5,7 @@ import 'monaco-yaml';
 
 import {useAppDispatch} from '@redux/hooks';
 
-import {editorMounted} from '@editor/editor.slice';
+import {editorMounted, editorUnmounted} from '@editor/editor.slice';
 
 import {getEditor, mountEditor, unmountEditor} from '../editor.instance';
 import * as S from './CodeEditor.styled';
@@ -38,7 +38,10 @@ const CodeEditor = (props: CodeEditorProps) => {
   useEffectOnce(() => {
     mountEditor({element: document.getElementById('monokle-monaco')!, type});
     dispatch(editorMounted());
-    return () => unmountEditor();
+    return () => {
+      dispatch(editorUnmounted());
+      unmountEditor();
+    };
   });
 
   useEffect(() => {

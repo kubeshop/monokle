@@ -11,6 +11,7 @@ export const editorSlice = createSlice({
     // this action is dispatched by the editor component when it mounts
     // then, it's used by the editor redux listener to rehydrate the editor state based on the current selection
     editorMounted: () => {},
+    editorUnmounted: () => {},
     editorSetSelection: (_, action: PayloadAction<{range: monaco.IRange}>) => {
       setEditorSelection(action.payload.range);
     },
@@ -20,4 +21,4 @@ export const editorSlice = createSlice({
   },
 });
 
-export const {editorMounted, editorSetSelection, editorSetNextSelection} = editorSlice.actions;
+export const {editorMounted, editorUnmounted, editorSetSelection, editorSetNextSelection} = editorSlice.actions;
