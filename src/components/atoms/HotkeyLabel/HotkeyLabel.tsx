@@ -24,10 +24,6 @@ const HotkeyLabel: React.FC<IProps> = props => {
       return macOSKeyIcon[keyboardKey];
     }
 
-    if (keyboardKey === 'command') {
-      return 'Cmd';
-    }
-
     return keyboardKey.charAt(0).toUpperCase() + keyboardKey.slice(1) || ',';
   };
 

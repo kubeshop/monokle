@@ -26,6 +26,7 @@ export const menuStatePropertiesToPick = [
   'ui.isInQuickClusterMode',
   'ui.isStartProjectPaneVisible',
   'ui.monacoEditor',
+  'ui.leftMenu',
 
   'main.selection',
   'main.preview',
@@ -234,9 +235,8 @@ const viewMenu = (state: ElectronMenuDataType, dispatch: MainDispatch): MenuItem
       {type: 'separator'},
       {
         label: 'Toggle Left Menu',
-        accelerator: defineHotkey(hotkeys.TOGGLE_LEFT_PANE.key),
         click: () => {
-          if (!state.ui.isInQuickClusterMode) {
+          if (!state.ui.isInQuickClusterMode && state.ui.leftMenu.selection === 'explorer') {
             dispatch({type: 'ui/toggleLeftMenu', payload: undefined});
           }
         },
