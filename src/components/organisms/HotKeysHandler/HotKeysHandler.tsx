@@ -85,9 +85,7 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.TOGGLE_SETTINGS.key,
     () => {
-      if (!isInQuickClusterMode) {
-        dispatch(setLeftMenuSelection('settings'));
-      }
+      dispatch(setLeftMenuSelection('settings'));
     },
     {splitKey: '&'}
   );
