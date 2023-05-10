@@ -126,16 +126,6 @@ export const hotkeys = createHotkeys({
     key: 'ctrl+backspace, command+backspace',
     category: 'tool',
   },
-  FIND: {
-    name: 'Search Files',
-    key: 'ctrl+f, command+f',
-    category: 'tool',
-  },
-  REPLACE: {
-    name: 'Search and Replace Files',
-    key: 'ctrl+shift+f, command+shift+f',
-    category: 'tool',
-  },
   SCALE: {
     name: 'Scale replicas',
     key: 'ctrl+shift+s, command+shift+s',

@@ -17,7 +17,6 @@ import {
   openNewResourceWizard,
   openQuickSearchActionsPopup,
   openScaleModal,
-  setActiveTab,
   setLeftBottomMenuSelection,
   setLeftMenuSelection,
   toggleLeftMenu,
@@ -60,7 +59,6 @@ const HotKeysHandler = () => {
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
   useHotkeys(hotkeys.SELECT_FOLDER.key, () => {
-    console.log('Here');
     dispatch(openFolderExplorer());
   });
 
@@ -248,20 +246,6 @@ const HotKeysHandler = () => {
     },
     [isQuickSearchActionsPopupOpened]
   );
-
-  useHotkeys(hotkeys.FIND.key, () => {
-    if (!isInQuickClusterMode) {
-      dispatch(setLeftMenuSelection('search'));
-      dispatch(setActiveTab('search'));
-    }
-  });
-
-  useHotkeys(hotkeys.REPLACE.key, () => {
-    if (!isInQuickClusterMode) {
-      dispatch(setLeftMenuSelection('search'));
-      dispatch(setActiveTab('findReplace'));
-    }
-  });
 
   return (
     <>
