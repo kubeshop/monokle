@@ -6,7 +6,7 @@ import {ItemType as AntdMenuItem} from 'antd/lib/menu/hooks/useItems';
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import micromatch from 'micromatch';
-import {basename, dirname, join, sep} from 'path';
+import {basename, dirname, join} from 'path';
 
 import {scanExcludesSelector, updateProjectConfig} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -406,32 +406,6 @@ export const useFileMenuItems = (
         },
       });
     }
-
-    newMenuItems.push({
-      key: 'new-file',
-      label: 'New File',
-      onClick: () => {
-        dispatch(
-          openCreateFileFolderModal({
-            rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath.split(sep).slice(0, -1).join(sep)),
-            type: 'file',
-          })
-        );
-      },
-    });
-
-    newMenuItems.push({
-      key: 'new-folder',
-      label: 'New Folder',
-      onClick: () => {
-        dispatch(
-          openCreateFileFolderModal({
-            rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath.split(sep).slice(0, -1).join(sep)),
-            type: 'folder',
-          })
-        );
-      },
-    });
 
     newMenuItems.push({
       key: 'add-resource',
