@@ -17,12 +17,12 @@ export async function debugProxy({context, kubeconfig}: DebugProxyArgs): Promise
     }
 
     return {
-      cmd: 'kubectl proxy exitted',
+      cmd: 'kubectl proxy exited',
       logs: [
         {
           type: 'stderr',
           timestamp: Date.now(),
-          content: result.title,
+          content: `${result.title}: ${result.description}`,
         },
       ],
     };

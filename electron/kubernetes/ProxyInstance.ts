@@ -73,7 +73,7 @@ export class ProxyInstance {
 
       this.log({
         type: 'exit',
-        content: `Exitted with code ${code}`,
+        content: `Exited with code ${code}`,
         code,
         signal: signal?.toString(),
         timestamp: Date.now(),
