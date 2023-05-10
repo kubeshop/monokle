@@ -3,7 +3,7 @@ import {HotkeyConf} from '../models/hotkeys';
 export const hotkeys = createHotkeys({
   TOGGLE_SETTINGS: {
     name: 'Toggle Settings',
-    key: `ctrl+\,, command+\,`,
+    key: `ctrl+, & command+,`,
     category: 'tool',
   },
   LOAD_CLUSTER: {
@@ -31,11 +31,11 @@ export const hotkeys = createHotkeys({
     key: 'ctrl+b, command+b',
     category: 'navigation',
   },
-  TOGGLE_RIGHT_PANE: {
-    name: 'Toggle Right Pane',
-    key: 'ctrl+alt+b, command+alt+b',
-    category: 'navigation',
-  },
+  // TOGGLE_RIGHT_PANE: {
+  //   name: 'Toggle Right Pane',
+  //   key: 'ctrl+alt+b, command+alt+b',
+  //   category: 'navigation',
+  // },
   ZOOM_IN: {
     name: 'Zoom in',
     key: 'ctrl+=, command+=',

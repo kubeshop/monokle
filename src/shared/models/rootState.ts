@@ -40,7 +40,7 @@ type ElectronMenuDataType = {
 } & {
   ui: Pick<
     RootState['ui'],
-    'isStartProjectPaneVisible' | 'isInQuickClusterMode' | 'isStartProjectPaneVisible' | 'monacoEditor'
+    'isStartProjectPaneVisible' | 'isInQuickClusterMode' | 'isStartProjectPaneVisible' | 'monacoEditor' | 'leftMenu'
   >;
 };
 

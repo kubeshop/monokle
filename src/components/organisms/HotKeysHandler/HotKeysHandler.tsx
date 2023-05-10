@@ -19,7 +19,7 @@ import {
   setActiveTab,
   setLeftBottomMenuSelection,
   setLeftMenuSelection,
-  toggleRightMenu,
+  toggleLeftMenu,
 } from '@redux/reducers/ui';
 import {rootFilePathSelector, selectedFilePathSelector} from '@redux/selectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
@@ -36,25 +36,24 @@ import FileExplorer from '@atoms/FileExplorer';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import {useFeatureFlags} from '@utils/features';
 import {useRefSelector} from '@utils/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const HotKeysHandler = () => {
-  const {ShowRightMenu} = useFeatureFlags();
   const dispatch = useAppDispatch();
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
+  const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isNewResourceWizardOpened = useAppSelector(state => state.ui.newResourceWizard.isOpen);
   const isQuickSearchActionsPopupOpened = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
-  const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
-  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
+  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
   const rootFilePath = useAppSelector(rootFilePathSelector);
   const selectedFilePath = useAppSelector(selectedFilePathSelector);
   const selectedResource = useSelectedResource();
@@ -99,10 +98,22 @@ const HotKeysHandler = () => {
     [rootFilePath]
   );
 
-  useHotkeys(hotkeys.TOGGLE_SETTINGS.key, () => {
-    if (!isInQuickClusterMode) {
-      dispatch(setLeftMenuSelection('settings'));
+  useHotkeys(
+    hotkeys.TOGGLE_SETTINGS.key,
+    () => {
+      if (!isInQuickClusterMode) {
+        dispatch(setLeftMenuSelection('settings'));
+      }
+    },
+    {splitKey: '&'}
+  );
+
+  useHotkeys(hotkeys.TOGGLE_LEFT_PANE.key, () => {
+    if (isInQuickClusterMode || leftMenuSelection !== 'explorer') {
+      return;
     }
+
+    dispatch(toggleLeftMenu());
   });
 
   const applySelection = useCallback(() => {
@@ -188,7 +199,7 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.LOAD_CLUSTER.key,
     () => {
-      connectCluster({context: kubeConfigContext});
+      dispatch(connectCluster({context: kubeConfigContext}));
     },
     [kubeConfigContext]
   );
@@ -203,10 +214,10 @@ const HotKeysHandler = () => {
     [isInPreviewMode]
   );
 
-  useHotkeys(hotkeys.TOGGLE_RIGHT_PANE.key, () => {
-    if (!ShowRightMenu) return;
-    dispatch(toggleRightMenu());
-  });
+  // useHotkeys(hotkeys.TOGGLE_RIGHT_PANE.key, () => {
+  //   if (!ShowRightMenu) return;
+  //   dispatch(toggleRightMenu());
+  // });
 
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK.key, () => {
     dispatch(selectFromHistory('left'));
