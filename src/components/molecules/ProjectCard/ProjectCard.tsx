@@ -15,6 +15,7 @@ import {useRefSelector} from '@utils/hooks';
 import {getRelativeDate} from '@utils/index';
 
 import {Project} from '@shared/models/config';
+import {trackEvent} from '@shared/utils';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ProjectCard.styled';
@@ -44,6 +45,7 @@ export const ProjectCard: React.FC<IProps> = props => {
       onOk() {
         return new Promise(resolve => {
           dispatch(setDeleteProject(project));
+          trackEvent('project_list/delete_project');
           resolve({});
         });
       },
@@ -56,6 +58,7 @@ export const ProjectCard: React.FC<IProps> = props => {
     setIsTooltipMessageVisible(false);
 
     setTimeout(() => {
+      trackEvent(project.isPinned ? 'project_list/unpin_project' : 'project_list/pin_project');
       dispatch(toggleProjectPin(project));
     }, 200);
   };
@@ -90,6 +93,7 @@ export const ProjectCard: React.FC<IProps> = props => {
             dispatch(stopClusterConnection());
             setImmediate(() => {
               dispatch(setOpenProject(project.rootFolder));
+              trackEvent('project_list/open_project');
             });
           },
         });

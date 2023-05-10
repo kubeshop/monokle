@@ -37,7 +37,13 @@ export type EventMap = {
     numberOfHelmCharts: number;
     executionTime: number;
   };
-  'app_start/create_project': {from: 'scratch' | 'git' | 'template'; templateID?: string};
+  'app_start/create_project': {from: 'scratch' | 'git' | 'template' | 'folder'; templateID?: string};
+  'app_start/select_page': {page: string};
+  'project_list/open_project': undefined;
+  'project_list/pin_project': undefined;
+  'project_list/unpin_project': undefined;
+  'project_list/delete_project': undefined;
+  'learn/select_topic': {topic: string};
   'configure/k8s_version': {version: string; scope: 'global' | 'project'; where: 'settings' | 'header'};
   'configure/crds_register': {from: 'url' | 'file'};
   'configure/toggle_validation': {id: string};
@@ -69,6 +75,7 @@ export type EventMap = {
   'create/resource': {resourceKind: string};
   'create/preview_configuration': undefined;
   'help/open_link': {linkType: string; link?: string};
+  'help/create_issue': undefined;
   'preview/helm/start': undefined;
   'preview/helm/fail': {reason: string};
   'preview/helm/end': {resourcesCount?: number; executionTime: number};
@@ -98,6 +105,8 @@ export type EventMap = {
   'git/commit': undefined;
   'git/initialize': undefined;
   'git/push': undefined;
+  'git/init': undefined;
+  'git/error': {action: string; reason: string};
   'dashboard/open': {from: string};
   'dashboard/selectKind': {kind: string};
   'dashboard/selectTab': {tab: string};
@@ -107,6 +116,7 @@ export type EventMap = {
   'terminal/kill': undefined;
   'left-menu/activity-changed': {activity: LeftMenuSelectionType; section?: string};
   'bottom-left-menu/select-option': {option: LeftMenuBottomSelectionType};
+  'notifications/toggle': undefined;
 };
 export const APP_INSTALLED = 'APP_INSTALLED';
 export const APP_SESSION = 'APP_SESSION';

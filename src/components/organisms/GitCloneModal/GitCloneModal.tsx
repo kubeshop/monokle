@@ -21,12 +21,13 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {doesPathExist} from '@utils/files';
 
+import {trackEvent} from '@shared/utils';
+
 const GitCloneModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
 
   const [loading, setLoading] = useState(false);
-
   const [form] = useForm();
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
@@ -61,6 +62,7 @@ const GitCloneModal: React.FC = () => {
         setLoading(false);
         dispatch(closeGitCloneModal());
         dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName.replace('.git', '')}`}));
+        trackEvent('app_start/create_project', {from: 'git'});
       } catch (error: any) {
         setLoading(false);
         dispatch(closeGitCloneModal());
