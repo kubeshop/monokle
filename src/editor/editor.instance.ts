@@ -2,6 +2,8 @@ import log from 'loglevel';
 import * as monaco from 'monaco-editor';
 import {v4 as uuidv4} from 'uuid';
 
+import {trackEvent} from '@shared/utils/telemetry';
+
 import {MONACO_EDITOR_INITIAL_CONFIG} from './editor.constants';
 import {EditorCommand, EditorHover, EditorLink} from './editor.types';
 import {isPositionInRange, isRangeInRange} from './editor.utils';
@@ -15,6 +17,7 @@ let editorDecorationsCollection: monaco.editor.IEditorDecorationsCollection | un
 let nextSelection: monaco.IRange | undefined;
 let isRecreatingModel = false;
 let editorType: 'local' | 'cluster' | undefined;
+let hasTypedInEditor = false;
 
 const modelContentChangeListeners: ((e: monaco.editor.IModelContentChangedEvent) => any)[] = [];
 
@@ -26,6 +29,13 @@ export const mountEditor = (props: {element: HTMLElement; type: 'local' | 'clust
   }
   editorType = type;
   EDITOR = monaco.editor.create(element, MONACO_EDITOR_INITIAL_CONFIG);
+  EDITOR.onKeyDown(() => {
+    if (hasTypedInEditor) {
+      return;
+    }
+    trackEvent('edit/code_changes', {from: getEditorType()});
+    hasTypedInEditor = true;
+  });
   EDITOR.onDidChangeModelContent(e => {
     modelContentChangeListeners.forEach(listener => listener(e));
   });
@@ -41,6 +51,7 @@ export const getEditorType = () => editorType;
 export const unmountEditor = () => {
   EDITOR?.dispose();
   EDITOR = undefined;
+  hasTypedInEditor = false;
 };
 
 export const resetEditor = () => {
