@@ -1,4 +1,4 @@
-import {useCallback, useMemo} from 'react';
+import {useMemo} from 'react';
 
 import {Tag} from 'antd';
 
@@ -189,21 +189,21 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
     [resource, type]
   );
 
-  const isRefLinkDisabled = useCallback(
-    (ref: ResourceRef) => {
-      // TODO: revisit this logic
-      // if (preview?.type === 'kustomize' && ref.target?.type === 'resource') {
-      //   const targetResourceId = ref.target.resourceId;
-      //   const targetResource = targetResourceId ? clusterResourceMap[targetResourceId] : undefined;
-      //   if (isKustomizationResource(targetResource) && targetResourceId !== previewResourceId) {
-      //     return true;
-      //   }
-      // }
-      return false;
-    },
-    []
-    // [resourceMap, previewResourceId, previewType]
-  );
+  // const isRefLinkDisabled = useCallback(
+  //   (ref: ResourceRef) => {
+  //     // TODO: revisit this logic
+  //     // if (preview?.type === 'kustomize' && ref.target?.type === 'resource') {
+  //     //   const targetResourceId = ref.target.resourceId;
+  //     //   const targetResource = targetResourceId ? clusterResourceMap[targetResourceId] : undefined;
+  //     //   if (isKustomizationResource(targetResource) && targetResourceId !== previewResourceId) {
+  //     //     return true;
+  //     //   }
+  //     // }
+  //     return false;
+  //   },
+  //   []
+  //   // [resourceMap, previewResourceId, previewType]
+  // );
 
   const processedRefsWithKeys: Array<{ref: ResourceRef; key: string}> | undefined = useMemo(() => {
     return (
@@ -382,7 +382,7 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
           // eslint-disable-next-line react/no-array-index-key
           <S.RefDiv key={index + ref.name + ref.type + key}>
             <RefLink
-              isDisabled={isRefLinkDisabled(ref)}
+              isDisabled={false}
               resourceRef={ref}
               resourceMetaMap={clusterResourceMetaMap}
               onClick={(e: Event) => {
