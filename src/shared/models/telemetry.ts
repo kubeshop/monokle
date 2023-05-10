@@ -68,8 +68,10 @@ export type EventMap = {
   'graph/select_image': undefined;
   'edit/template_use': {templateID: string};
   'edit/form_editor': {resourceKind?: string};
+  'edit/source': {resourceKind?: string};
   'edit/side_by_side_editor': {resourceKind: string};
-  'edit/graphview': {kind: string};
+  'edit/select_hover_link': {type: 'resource' | 'image' | 'file'};
+  'edit/graphview': {resourceKind?: string};
   'create/file': undefined;
   'create/folder': undefined;
   'create/resource': {resourceKind: string};

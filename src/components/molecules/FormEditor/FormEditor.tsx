@@ -31,7 +31,6 @@ import {parseYamlDocument, stringifyK8sResource} from '@utils/yaml';
 import {isHelmChartFile} from '@shared/utils/helm';
 import {isEqual} from '@shared/utils/isEqual';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
-import {trackEvent} from '@shared/utils/telemetry';
 
 import {FormArrayFieldTemplate} from './FormArrayFieldTemplate';
 import * as S from './FormEditor.styled';
@@ -123,12 +122,6 @@ const FormEditor: React.FC<IProps> = props => {
       }
     };
     loadResourceFile();
-
-    return () => {
-      if (selectedResource || selectedFilePath) {
-        trackEvent('edit/form_editor', {resourceKind: selectedResource?.kind});
-      }
-    };
   }, [dispatch, selectedResource, selectedFilePath, setFormData]);
 
   useEffect(() => {

@@ -425,7 +425,13 @@ const ActionsPane: React.FC = () => {
           onChange={k => {
             dispatch(setActiveEditorTab(k as ActionPaneTab));
             if (k === 'graph') {
-              trackEvent('edit/graphview');
+              trackEvent('edit/graphview', {resourceKind: selectedResource?.kind});
+            }
+            if (k === 'form') {
+              trackEvent('edit/form_editor', {resourceKind: selectedResource?.kind});
+            }
+            if (k === 'source') {
+              trackEvent('edit/source', {resourceKind: selectedResource?.kind});
             }
           }}
           tabBarExtraContent={
