@@ -16,7 +16,6 @@ import {
   toggleEventTracking,
   updateFileExplorerSortOrder,
   updateLoadLastProjectOnStartup,
-  updateUsingKubectlProxy,
 } from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
@@ -35,7 +34,7 @@ export const GlobalSettings = () => {
   const fileExplorerSortOrder = useAppSelector(state => state.config.fileExplorerSortOrder);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
-  const useKubectlProxy = useAppSelector(state => state.config.useKubectlProxy);
+  // const useKubectlProxy = useAppSelector(state => state.config.useKubectlProxy);
 
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
@@ -53,9 +52,9 @@ export const GlobalSettings = () => {
     dispatch(updateLoadLastProjectOnStartup(e.target.checked));
   };
 
-  const handleChangeUsingKubectlProxy = (e: any) => {
-    dispatch(updateUsingKubectlProxy(e.target.checked));
-  };
+  // const handleChangeUsingKubectlProxy = (e: any) => {
+  //   dispatch(updateUsingKubectlProxy(e.target.checked));
+  // };
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -137,12 +136,12 @@ export const GlobalSettings = () => {
           </Select>
         </S.Div>
 
-        <S.Div>
+        {/* <S.Div>
           <S.Span>Kubectl proxy</S.Span>
           <Checkbox checked={useKubectlProxy} onChange={handleChangeUsingKubectlProxy}>
             Use kubectl proxy
           </Checkbox>
-        </S.Div>
+        </S.Div> */}
 
         <S.Span>On Startup</S.Span>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
