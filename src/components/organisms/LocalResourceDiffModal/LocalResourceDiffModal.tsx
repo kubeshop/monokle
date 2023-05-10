@@ -63,11 +63,18 @@ const DiffModal = () => {
     if (!targetResourceId) {
       return;
     }
-    const meta = store.getState().main.resourceMetaMapByStorage.local[targetResourceId];
-    const content = store.getState().main.resourceContentMapByStorage.local[targetResourceId];
+
+    const meta =
+      store.getState().main.resourceMetaMapByStorage.local[targetResourceId] ??
+      store.getState().main.resourceMetaMapByStorage.transient[targetResourceId];
+    const content =
+      store.getState().main.resourceContentMapByStorage.local[targetResourceId] ??
+      store.getState().main.resourceContentMapByStorage.transient[targetResourceId];
+
     if (!meta || !content) {
       return;
     }
+
     return joinK8sResource(meta, content);
   }, [targetResourceId, store]);
 
