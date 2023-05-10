@@ -131,13 +131,6 @@ export const GlobalSettings = () => {
           </Select>
         </S.Div>
 
-        {/* <S.Div>
-          <S.Span>Kubectl proxy</S.Span>
-          <Checkbox checked={useKubectlProxy} onChange={handleChangeUsingKubectlProxy}>
-            Use kubectl proxy
-          </Checkbox>
-        </S.Div> */}
-
         <S.Span>On Startup</S.Span>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
           <Checkbox checked={loadLastProjectOnStartup} onChange={handleChangeLoadLastFolderOnStartup}>
