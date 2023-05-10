@@ -5,7 +5,7 @@ import {HotkeyConf} from '../models/hotkeys';
 export const hotkeys = createHotkeys({
   TOGGLE_SETTINGS: {
     name: 'Toggle Settings',
-    key: `ctrl+, Meta+,`,
+    key: `ctrl+, & Meta+,`,
     category: 'tool',
   },
   LOAD_CLUSTER: {
