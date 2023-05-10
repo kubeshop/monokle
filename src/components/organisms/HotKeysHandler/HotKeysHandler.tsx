@@ -36,11 +36,10 @@ import {ModalConfirmWithNamespaceSelect} from '@molecules';
 import {useRefSelector} from '@utils/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
-import {activeProjectSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
-  const activeProject = useAppSelector(activeProjectSelector);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
@@ -48,6 +47,7 @@ const HotKeysHandler = () => {
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isNewResourceWizardOpened = useAppSelector(state => state.ui.newResourceWizard.isOpen);
   const isQuickSearchActionsPopupOpened = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
+  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
@@ -87,7 +87,7 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.TOGGLE_SETTINGS.key,
     () => {
-      if (!isInQuickClusterMode && !activeProject) {
+      if (isStartProjectPaneVisible) {
         dispatch(setStartPageMenuOption('settings'));
         return;
       }
