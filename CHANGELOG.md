@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/kubeshop/monokle/compare/v2.0.11-nightly-2023-05-10.0...v2.1.0) (2023-05-10)
+
+
+### Bug Fixes
+
+* added more telemetry and log telemetry to console in dev ([77757bc](https://github.com/kubeshop/monokle/commit/77757bce81d76b8320aaa06cdd1fd26aae7c4664))
+* added more telemetry to app start panels ([45e8f36](https://github.com/kubeshop/monokle/commit/45e8f36999ad22c9ac84598632553c1811b74eb1))
+* clean code ([d5a87f2](https://github.com/kubeshop/monokle/commit/d5a87f2be7379c9f3acb1f62b7e37804e7bf508b))
+* dependencies ([cf46a69](https://github.com/kubeshop/monokle/commit/cf46a69b2a4f413d508fa81ed8500374a7290725))
+* diff against cluster for transient resource ([d28be06](https://github.com/kubeshop/monokle/commit/d28be06e353fd365a7c1b51cf5c754391ed39b4d))
+* global settings hotkey ([a1473d9](https://github.com/kubeshop/monokle/commit/a1473d9009b1f48727144de7f86a4596a5baab14))
+* global settings hotkey 2 ([9430f57](https://github.com/kubeshop/monokle/commit/9430f576ef3c0476aef4b818fd51aa35cf725003))
+* hotkeys part 1 ([98ccc95](https://github.com/kubeshop/monokle/commit/98ccc953fa54c93e435108de1ebe7617d4cc2b94))
+* make command key work for hotkeys ([984f75a](https://github.com/kubeshop/monokle/commit/984f75a1b616255ee30cae669240664c583a81b3))
+* remove element ([b419a3d](https://github.com/kubeshop/monokle/commit/b419a3d4361f42ca782f491b3b3afc99314e2d26))
+* remove unused ([8ff6881](https://github.com/kubeshop/monokle/commit/8ff6881fef605c9f1452a45f0a2bce34df0e2118))
+* remove use kubectl proxy option ([aac0bab](https://github.com/kubeshop/monokle/commit/aac0bab49d21bf2f00678fa3adadb57674abe997))
+* rendering of kustomization name when in root folder ([fbe7a57](https://github.com/kubeshop/monokle/commit/fbe7a5795b60436e60419dd1aed6ddeadbc444b2))
+* select folder ([70bbafd](https://github.com/kubeshop/monokle/commit/70bbafd24c41c385af7a55cf950f92d79bd4e080))
+* settings hotkey ([9a8cd2f](https://github.com/kubeshop/monokle/commit/9a8cd2ff36de5309c6dcf7fb2255451a1809451b))
+* show cluster error description ([3caa293](https://github.com/kubeshop/monokle/commit/3caa293587e365ef9159781a9d06df381241db13))
+* toggle settings ([a5cc2b2](https://github.com/kubeshop/monokle/commit/a5cc2b2f036a924832ea850dd0d5d0852ca7be1e))
+* toggle settings ([3e36abf](https://github.com/kubeshop/monokle/commit/3e36abfd72ecfd6a0ae3f42c48b01267498d135d))
+
 ### [2.0.10](https://github.com/kubeshop/monokle/compare/v2.0.10-nightly-2023-04-28.0...v2.0.10) (2023-04-28)
 
 
