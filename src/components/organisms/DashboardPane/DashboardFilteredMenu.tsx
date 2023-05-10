@@ -34,7 +34,7 @@ const DashboardFilteredMenu: React.FC<IProps> = props => {
 
   useEffect(() => {
     if (activeMenuItemRef) {
-      activeMenuItemRef.scrollIntoView({behavior: 'smooth'});
+      activeMenuItemRef.scrollIntoView({behavior: 'smooth', block: 'center', inline: 'center'});
     }
   }, [activeMenuItemRef]);
 
