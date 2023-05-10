@@ -77,22 +77,20 @@ const KustomizeRenderer: React.FC<IProps> = props => {
         <KustomizeSuffix resourceMeta={resourceMeta} isSelected={isSelected} isDisabled={isDisabled} />
       </S.SuffixContainer>
 
-      {isHovered && (
-        <div
-          style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}
-          onClick={e => {
-            e.stopPropagation();
-          }}
-        >
-          <S.QuickActionContainer>
-            <KustomizeQuickAction id={resourceMeta.id} isSelected={isSelected} />
-          </S.QuickActionContainer>
+      <div
+        style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}
+        onClick={e => {
+          e.stopPropagation();
+        }}
+      >
+        <S.QuickActionContainer>
+          <KustomizeQuickAction id={resourceMeta.id} isSelected={isSelected} />
+        </S.QuickActionContainer>
 
-          <S.ContextMenuContainer>
-            <KustomizeContextMenu id={resourceMeta.id} isSelected={isSelected} />
-          </S.ContextMenuContainer>
-        </div>
-      )}
+        <S.ContextMenuContainer>
+          <KustomizeContextMenu id={resourceMeta.id} isSelected={isSelected} />
+        </S.ContextMenuContainer>
+      </div>
     </S.ItemContainer>
   );
 };

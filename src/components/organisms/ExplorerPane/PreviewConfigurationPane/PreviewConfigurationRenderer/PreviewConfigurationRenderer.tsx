@@ -54,18 +54,16 @@ const PreviewConfigurationRenderer: React.FC<IProps> = props => {
         {previewConfiguration.name}
       </S.ItemName>
 
-      {isHovered && (
-        <div
-          style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}
-          onClick={e => {
-            e.stopPropagation();
-          }}
-        >
-          <S.QuickActionContainer>
-            <PreviewConfigurationQuickAction id={previewConfiguration.id} isSelected={isSelected} />
-          </S.QuickActionContainer>
-        </div>
-      )}
+      <div
+        style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}
+        onClick={e => {
+          e.stopPropagation();
+        }}
+      >
+        <S.QuickActionContainer>
+          <PreviewConfigurationQuickAction id={previewConfiguration.id} isSelected={isSelected} />
+        </S.QuickActionContainer>
+      </div>
     </S.ItemContainer>
   );
 };
