@@ -69,6 +69,7 @@ const PageHeader = () => {
 
   const toggleNotificationsDrawer = () => {
     dispatch(toggleNotifications());
+    trackEvent('notifications/toggle');
   };
 
   const onClickLogoHandler = () => {
@@ -99,6 +100,7 @@ const PageHeader = () => {
     });
 
     shell.openExternal(url);
+    trackEvent('help/create_issue');
   }, [autosavingError]);
 
   const initGitRepoHandler = async () => {
@@ -111,8 +113,10 @@ const PageHeader = () => {
 
     try {
       await initGitRepo({path: projectRootFolder});
+      trackEvent('git/init');
     } catch (e: any) {
       showGitErrorModal('Failed to initialize git repo', e.message);
+      trackEvent('git/error', {action: 'init', reason: e.message});
       setIsInitializingGitRepo(false);
       return;
     }
@@ -128,6 +132,7 @@ const PageHeader = () => {
       });
     } catch (e: any) {
       showGitErrorModal('Git repo error', e.message);
+      trackEvent('git/error', {action: 'get_repo_info', reason: e.message});
     }
   };
 

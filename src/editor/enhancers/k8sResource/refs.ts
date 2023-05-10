@@ -17,6 +17,7 @@ import {createGlyphDecoration, createMarkdownString} from '@editor/editor.utils'
 import {RefPosition, ResourceRef, ResourceRefType, areRefPosEqual} from '@monokle/validation';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ResourceMeta, isLocalResourceMeta} from '@shared/models/k8sResource';
+import {trackEvent} from '@shared/utils';
 
 import {createEditorEnhancer} from '../createEnhancer';
 
@@ -205,6 +206,7 @@ const addEditorCommandForRef = (args: {resourceMeta: ResourceMeta; ref: Resource
             dispatch(
               selectResource({resourceIdentifier: {id: (ref.target as any).resourceId, storage: resourceMeta.storage}})
             );
+            trackEvent('edit/select_hover_link', {type: 'resource'});
           }
         },
       },
@@ -218,6 +220,7 @@ const addEditorCommandForRef = (args: {resourceMeta: ResourceMeta; ref: Resource
         handler: () => {
           if (ref.target?.type === 'file') {
             dispatch(selectFile({filePath: ref.target.filePath}));
+            trackEvent('edit/select_hover_link', {type: 'file'});
           }
         },
       },
@@ -231,6 +234,7 @@ const addEditorCommandForRef = (args: {resourceMeta: ResourceMeta; ref: Resource
         handler: () => {
           if (ref.target?.type === 'image') {
             dispatch(selectImage({imageId: `${ref.name}:${ref.target?.tag}`}));
+            trackEvent('edit/select_hover_link', {type: 'image'});
           }
         },
       },
@@ -248,9 +252,12 @@ const onClickRefLink = (args: {resourceMeta: ResourceMeta; ref: ResourceRef; dis
   if (ref.target?.type === 'resource' && ref.target.resourceId) {
     // is the storage of the target resource the same as the current resource?
     dispatch(selectResource({resourceIdentifier: {id: ref.target.resourceId, storage: resourceMeta.storage}}));
+    trackEvent('edit/select_hover_link', {type: 'resource'});
   } else if (ref.target?.type === 'file' && ref.target.filePath) {
     dispatch(selectFile({filePath: ref.target.filePath}));
+    trackEvent('edit/select_hover_link', {type: 'file'});
   } else if (ref.target?.type === 'image') {
     dispatch(selectImage({imageId: `${ref.name}:${ref.target?.tag}`}));
+    trackEvent('edit/select_hover_link', {type: 'image'});
   }
 };

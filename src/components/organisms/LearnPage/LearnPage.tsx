@@ -9,7 +9,7 @@ import {setStartPageLearnTopic} from '@redux/reducers/ui';
 
 import {Icon, LearnCard, LearnPage as LearnPageContainer} from '@monokle/components';
 import {LearnTopicType} from '@shared/models/ui';
-import {openDiscord, openDocumentation, openTutorialVideo} from '@shared/utils';
+import {openDiscord, openDocumentation, openTutorialVideo, trackEvent} from '@shared/utils';
 
 import WalkThroughModal from './WalkThroughModal';
 
@@ -20,6 +20,7 @@ const LearnPage = () => {
   const onLearnCardClickHandler = useCallback(
     (topic: LearnTopicType) => {
       dispatch(setStartPageLearnTopic(topic));
+      trackEvent('learn/select_topic', {topic});
     },
     [dispatch]
   );
