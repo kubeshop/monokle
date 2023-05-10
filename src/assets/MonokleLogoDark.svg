@@ -10,24 +10,24 @@
   <defs>
     <style>
       .cls-1 {
-        fill: none;
+      fill: none;
       }
       .cls-2 {
-        fill: #fff;
+      fill: #fff;
       }
       .cls-3,
       .cls-4,
       .cls-5 {
-        fill-rule: evenodd;
+      fill-rule: evenodd;
       }
       .cls-3 {
-        fill: url(#linear-gradient);
+      fill: url(#linear-gradient);
       }
       .cls-4 {
-        fill: url(#radial-gradient);
+      fill: url(#radial-gradient);
       }
       .cls-5 {
-        fill: url(#radial-gradient-2);
+      fill: url(#radial-gradient-2);
       }
     </style>
     <linearGradient
