@@ -1,5 +1,5 @@
 export const defineHotkey = (hotkey: string) => {
-  const shortcuts = hotkey.split(',');
+  const shortcuts = hotkey.includes('&') ? hotkey.split('&') : hotkey.split(',');
 
   if (shortcuts.length < 2) {
     return hotkey;

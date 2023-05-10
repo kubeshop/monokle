@@ -31,11 +31,6 @@ export const hotkeys = createHotkeys({
     key: 'ctrl+b, command+b',
     category: 'navigation',
   },
-  // TOGGLE_RIGHT_PANE: {
-  //   name: 'Toggle Right Pane',
-  //   key: 'ctrl+alt+b, command+alt+b',
-  //   category: 'navigation',
-  // },
   ZOOM_IN: {
     name: 'Zoom in',
     key: 'ctrl+=, command+=',
