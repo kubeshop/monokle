@@ -19,6 +19,7 @@ import {
   openScaleModal,
   setLeftBottomMenuSelection,
   setLeftMenuSelection,
+  setStartPageMenuOption,
   toggleLeftMenu,
 } from '@redux/reducers/ui';
 import {rootFilePathSelector, selectedFilePathSelector} from '@redux/selectors';
@@ -46,6 +47,7 @@ const HotKeysHandler = () => {
   const isKubeConfigPathValid = useAppSelector(kubeConfigPathValidSelector);
   const isNewResourceWizardOpened = useAppSelector(state => state.ui.newResourceWizard.isOpen);
   const isQuickSearchActionsPopupOpened = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
+  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
   const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
@@ -85,9 +87,12 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.TOGGLE_SETTINGS.key,
     () => {
-      if (!isInQuickClusterMode) {
-        dispatch(setLeftMenuSelection('settings'));
+      if (isStartProjectPaneVisible) {
+        dispatch(setStartPageMenuOption('settings'));
+        return;
       }
+
+      dispatch(setLeftMenuSelection('settings'));
     },
     {splitKey: '&'}
   );
