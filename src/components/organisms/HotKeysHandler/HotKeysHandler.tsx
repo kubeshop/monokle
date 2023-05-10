@@ -19,6 +19,7 @@ import {
   openScaleModal,
   setLeftBottomMenuSelection,
   setLeftMenuSelection,
+  setStartPageMenuOption,
   toggleLeftMenu,
 } from '@redux/reducers/ui';
 import {rootFilePathSelector, selectedFilePathSelector} from '@redux/selectors';
@@ -35,10 +36,11 @@ import {ModalConfirmWithNamespaceSelect} from '@molecules';
 import {useRefSelector} from '@utils/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
-import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
+import {activeProjectSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
+  const activeProject = useAppSelector(activeProjectSelector);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
@@ -85,6 +87,11 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.TOGGLE_SETTINGS.key,
     () => {
+      if (!isInQuickClusterMode && !activeProject) {
+        dispatch(setStartPageMenuOption('settings'));
+        return;
+      }
+
       dispatch(setLeftMenuSelection('settings'));
     },
     {splitKey: '&'}
