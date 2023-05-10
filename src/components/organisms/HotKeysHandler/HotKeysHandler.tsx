@@ -13,6 +13,7 @@ import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openResourceDiffModal, resetResourceFilter} from '@redux/reducers/main';
 import {
+  openFolderExplorer,
   openNewResourceWizard,
   openQuickSearchActionsPopup,
   openScaleModal,
@@ -31,10 +32,6 @@ import {selectFromHistory} from '@redux/thunks/selectFromHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ModalConfirmWithNamespaceSelect} from '@molecules';
-
-import FileExplorer from '@atoms/FileExplorer';
-
-import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useRefSelector} from '@utils/hooks';
 
@@ -62,20 +59,9 @@ const HotKeysHandler = () => {
 
   const [isApplyModalVisible, setIsApplyModalVisible] = useState(false);
 
-  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
-    ({folderPath}) => {
-      if (!folderPath) {
-        return;
-      }
-      dispatch(setRootFolder({rootFolder: folderPath}));
-    },
-    {
-      isDirectoryExplorer: true,
-    }
-  );
-
   useHotkeys(hotkeys.SELECT_FOLDER.key, () => {
-    openFileExplorer();
+    console.log('Here');
+    dispatch(openFolderExplorer());
   });
 
   useHotkeys(
@@ -279,8 +265,6 @@ const HotKeysHandler = () => {
 
   return (
     <>
-      <FileExplorer {...fileExplorerProps} />
-
       {isApplyModalVisible && (
         <ModalConfirmWithNamespaceSelect
           isVisible={isApplyModalVisible}
