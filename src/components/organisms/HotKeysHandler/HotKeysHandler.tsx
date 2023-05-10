@@ -36,10 +36,11 @@ import {ModalConfirmWithNamespaceSelect} from '@molecules';
 import {useRefSelector} from '@utils/hooks';
 
 import {hotkeys} from '@shared/constants/hotkeys';
-import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
+import {activeProjectSelector, isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 const HotKeysHandler = () => {
   const dispatch = useAppDispatch();
+  const activeProject = useAppSelector(activeProjectSelector);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
@@ -94,16 +95,21 @@ const HotKeysHandler = () => {
 
       dispatch(setLeftMenuSelection('settings'));
     },
-    {splitKey: '&'}
+    {splitKey: '&'},
+    [isStartProjectPaneVisible]
   );
 
-  useHotkeys(hotkeys.TOGGLE_LEFT_PANE.key, () => {
-    if (isInQuickClusterMode || leftMenuSelection !== 'explorer') {
-      return;
-    }
+  useHotkeys(
+    hotkeys.TOGGLE_LEFT_PANE.key,
+    () => {
+      if (isInQuickClusterMode || leftMenuSelection !== 'explorer') {
+        return;
+      }
 
-    dispatch(toggleLeftMenu());
-  });
+      dispatch(toggleLeftMenu());
+    },
+    [isInQuickClusterMode, leftMenuSelection]
+  );
 
   const applySelection = useCallback(() => {
     if (selectedResource) {
@@ -200,13 +206,8 @@ const HotKeysHandler = () => {
         stopPreview(dispatch);
       }
     },
-    [isInPreviewMode]
+    [isInPreviewMode, isInClusterMode]
   );
-
-  // useHotkeys(hotkeys.TOGGLE_RIGHT_PANE.key, () => {
-  //   if (!ShowRightMenu) return;
-  //   dispatch(toggleRightMenu());
-  // });
 
   useHotkeys(hotkeys.SELECT_FROM_HISTORY_BACK.key, () => {
     dispatch(selectFromHistory('left'));
@@ -223,7 +224,7 @@ const HotKeysHandler = () => {
         dispatch(openNewResourceWizard());
       }
     },
-    [isNewResourceWizardOpened, rootFilePath]
+    [isNewResourceWizardOpened, rootFilePath, isInClusterMode, isInPreviewMode]
   );
 
   useHotkeys(hotkeys.OPEN_EXPLORER_TAB.key, () => {
@@ -245,11 +246,11 @@ const HotKeysHandler = () => {
   useHotkeys(
     hotkeys.OPEN_QUICK_SEARCH.key,
     () => {
-      if (!isQuickSearchActionsPopupOpened) {
+      if (!isQuickSearchActionsPopupOpened && activeProject && !isStartProjectPaneVisible) {
         dispatch(openQuickSearchActionsPopup());
       }
     },
-    [isQuickSearchActionsPopupOpened]
+    [isQuickSearchActionsPopupOpened, activeProject, isStartProjectPaneVisible]
   );
 
   return (
