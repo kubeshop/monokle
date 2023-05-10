@@ -34,7 +34,6 @@ export const GlobalSettings = () => {
   const fileExplorerSortOrder = useAppSelector(state => state.config.fileExplorerSortOrder);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
-  // const useKubectlProxy = useAppSelector(state => state.config.useKubectlProxy);
 
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
@@ -51,10 +50,6 @@ export const GlobalSettings = () => {
   const handleChangeLoadLastFolderOnStartup = (e: any) => {
     dispatch(updateLoadLastProjectOnStartup(e.target.checked));
   };
-
-  // const handleChangeUsingKubectlProxy = (e: any) => {
-  //   dispatch(updateUsingKubectlProxy(e.target.checked));
-  // };
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
