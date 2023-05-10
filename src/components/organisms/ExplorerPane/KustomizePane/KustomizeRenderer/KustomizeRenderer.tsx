@@ -68,7 +68,7 @@ const KustomizeRenderer: React.FC<IProps> = props => {
       </S.PrefixContainer>
 
       <S.ItemName isDisabled={isDisabled} isSelected={isSelected} isHighlighted={isHighlighted}>
-        {isLocalOrigin(resourceMeta.origin)
+        {isLocalOrigin(resourceMeta.origin) && resourceMeta.origin.filePath.lastIndexOf('/') > 1
           ? resourceMeta.origin.filePath.substring(0, resourceMeta.origin.filePath.lastIndexOf('/'))
           : resourceMeta.name}
       </S.ItemName>
