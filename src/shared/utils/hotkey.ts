@@ -5,8 +5,8 @@ export const defineHotkey = (hotkey: string) => {
     return hotkey;
   }
 
-  const darwinShortcuts = shortcuts.filter(shortcut => shortcut.includes('command') || shortcut.includes('cmd'));
-  const windowsShortcuts = shortcuts.filter(shortcut => !shortcut.includes('command') && !shortcut.includes('cmd'));
+  const darwinShortcuts = shortcuts.filter(shortcut => shortcut.includes('Meta'));
+  const windowsShortcuts = shortcuts.filter(shortcut => !shortcut.includes('Meta'));
 
   return process.platform === 'darwin' ? darwinShortcuts.join() : windowsShortcuts.join();
 };

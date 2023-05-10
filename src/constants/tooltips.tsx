@@ -2,8 +2,7 @@ import {HotkeyLabel} from '@atoms';
 
 export const macOSKeyIcon: Record<string, string> = {
   alt: '⌥',
-  command: '⌘',
-  cmd: '⌘',
+  Meta: '⌘',
   shift: '⇧',
 };
 

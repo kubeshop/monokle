@@ -1,14 +1,16 @@
+import {defineHotkey} from '@shared/utils/hotkey';
+
 import {HotkeyConf} from '../models/hotkeys';
 
 export const hotkeys = createHotkeys({
   TOGGLE_SETTINGS: {
     name: 'Toggle Settings',
-    key: `ctrl+, & command+,`,
+    key: `ctrl+, Meta+,`,
     category: 'tool',
   },
   LOAD_CLUSTER: {
     name: 'Load Cluster',
-    key: 'ctrl+i, command+i',
+    key: 'ctrl+i, Meta+i',
     category: 'tool',
   },
   EXIT_PREVIEW_MODE: {
@@ -18,32 +20,32 @@ export const hotkeys = createHotkeys({
   },
   SELECT_FOLDER: {
     name: 'Select Folder',
-    key: 'ctrl+o, command+o',
+    key: 'ctrl+o, Meta+o',
     category: 'tool',
   },
   REFRESH_FOLDER: {
     name: 'Refresh Folder',
-    key: 'ctrl+f5, command+f5',
+    key: 'ctrl+f5, Meta+f5',
     category: 'tool',
   },
   TOGGLE_LEFT_PANE: {
     name: 'Toggle Left Pane',
-    key: 'ctrl+b, command+b',
+    key: 'ctrl+b, Meta+b',
     category: 'navigation',
   },
   ZOOM_IN: {
     name: 'Zoom in',
-    key: 'ctrl+=, command+=',
+    key: 'ctrl+=, Meta+=',
     category: 'tool',
   },
   ZOOM_OUT: {
     name: 'Zoom out',
-    key: 'ctrl+-, command+-',
+    key: 'ctrl+-, Meta+-',
     category: 'tool',
   },
   SAVE: {
     name: 'Save',
-    key: 'ctrl+s, command+s',
+    key: 'ctrl+s, Meta+s',
     category: 'tool',
   },
   SELECT_FROM_HISTORY_BACK: {
@@ -58,7 +60,7 @@ export const hotkeys = createHotkeys({
   },
   OPEN_NEW_RESOURCE_WIZARD: {
     name: 'Open New Resource Wizard',
-    key: 'ctrl+n, cmd+n',
+    key: 'ctrl+n, Meta+n',
     category: 'navigation',
   },
   CREATE_NEW_RESOURCE: {
@@ -68,66 +70,77 @@ export const hotkeys = createHotkeys({
   },
   APPLY_SELECTION: {
     name: 'Apply Selection',
-    key: 'ctrl+alt+s, cmd+alt+s',
+    key: 'ctrl+alt+s, Meta+alt+s',
     category: 'tool',
   },
   DIFF_RESOURCE: {
     name: 'Diff Resource',
-    key: 'ctrl+alt+d, cmd+alt+d',
+    key: 'ctrl+alt+d, Meta+alt+d',
     category: 'tool',
   },
   OPEN_EXPLORER_TAB: {
     name: 'Open Explorer Tab',
-    key: 'ctrl+shift+e, command+shift+e',
+    key: 'ctrl+shift+e, Meta+shift+e',
     category: 'navigation',
   },
   OPEN_VALIDATION_TAB: {
     name: 'Open Validation Tab',
-    key: 'ctrl+shift+v, command+shift+v',
+    key: 'ctrl+shift+v, Meta+shift+v',
     category: 'navigation',
   },
   TOGGLE_TERMINAL_PANE: {
     name: 'Toggle Terminal Pane',
-    key: 'ctrl+`, command+`',
+    key: 'ctrl+`, Meta+`',
     category: 'navigation',
   },
   RESET_RESOURCE_FILTERS: {
     name: 'Reset Resource Filters',
-    key: 'ctrl+alt+r, command+alt+r',
+    key: 'ctrl+alt+r, Meta+alt+r',
     category: 'tool',
   },
   OPEN_QUICK_SEARCH: {
     name: 'Open Quick Search',
-    key: 'ctrl+p, ctrl+shift+p, command+p, command+shift+p',
+    key: 'ctrl+p, ctrl+shift+p, Meta+p, Meta+shift+p',
     category: 'navigation',
   },
   OPEN_NEW_WINDOW: {
     name: 'Open New Window',
-    key: 'ctrl+shift+n, command+shift+n',
+    key: 'ctrl+shift+n, Meta+shift+n',
     category: 'navigation',
   },
   OPEN_SHORTCUTS: {
     name: 'Open Shortcuts',
-    key: 'ctrl+/, command+/',
+    key: 'ctrl+/, Meta+/',
     category: 'tool',
   },
   RELOAD_PREVIEW: {
     name: 'Reload Preview',
-    key: 'ctrl+r, command+r',
+    key: 'ctrl+r, Meta+r',
     category: 'tool',
   },
   DELETE_RESOURCE: {
     name: 'Delete Resource',
-    key: 'ctrl+backspace, command+backspace',
+    key: 'ctrl+backspace, Meta+backspace',
     category: 'tool',
   },
   SCALE: {
     name: 'Scale replicas',
-    key: 'ctrl+shift+s, command+shift+s',
+    key: 'ctrl+shift+s, Meta+shift+s',
     category: 'tool',
   },
 });
 
 function createHotkeys<TName extends string>(config: Record<TName, HotkeyConf>) {
-  return config;
+  return Object.fromEntries(
+    Object.entries(config).map(entry => {
+      const [name, conf] = entry as [TName, HotkeyConf];
+      return [
+        name,
+        {
+          ...conf,
+          key: defineHotkey(conf.key),
+        },
+      ];
+    })
+  );
 }
