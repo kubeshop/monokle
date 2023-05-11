@@ -1,4 +1,4 @@
-import {useCallback, useRef, useState} from 'react';
+import {memo, useCallback, useRef, useState} from 'react';
 import {useMeasure} from 'react-use';
 
 import {Tooltip} from 'antd';
@@ -7,15 +7,16 @@ import {join} from 'path';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
+import {selectionFilePathSelector} from '@redux/selectors';
 
 import {ContextMenu, Dots} from '@components/atoms';
 
 import {Spinner} from '@monokle/components';
 import {FileEntry} from '@shared/models/fileEntry';
 import {Colors} from '@shared/styles';
+import {isEqual} from '@shared/utils/isEqual';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './TreeNode.styled';
 import {useCanPreview, useDelete, useFileMenuItems, useIsDisabled, usePreview} from './hooks';
@@ -28,10 +29,9 @@ const TreeNodeFile: React.FC<Props> = props => {
   const {filePath} = props;
   const fileEntry: FileEntry | undefined = useAppSelector(state => state.main.fileMap[filePath]);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
-  const isSelected = useAppSelector(
-    state => state.main.selection?.type === 'file' && state.main.selection.filePath === filePath
-  );
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+  const selectedFilePath = useAppSelector(selectionFilePathSelector);
+  const isSelected = selectedFilePath === filePath;
   const isDisabled = useIsDisabled(fileEntry);
   const canBePreviewed = useCanPreview(fileEntry, isDisabled);
   const {deleteEntry, isDeleteLoading} = useDelete();
@@ -63,7 +63,7 @@ const TreeNodeFile: React.FC<Props> = props => {
       $isDisabled={isDisabled}
     >
       <S.TitleContainer $actionButtonsWidth={actionButtonsWidth} $isHovered={isHovered}>
-        <S.TitleText $isSelected={isSelected}>
+        <S.TitleText $isSelected={isSelected} $isExcluded={fileEntry.isExcluded} $isSupported={fileEntry.isSupported}>
           <Tooltip
             overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
             mouseEnterDelay={TOOLTIP_DELAY}
@@ -100,17 +100,16 @@ const TreeNodeFile: React.FC<Props> = props => {
               Preview
             </S.PreviewButton>
           )}
-          {!isDisabled && (
-            <ContextMenu items={menuItems}>
-              <div ref={contextMenuButtonRef}>
-                <Dots color={isSelected ? Colors.blackPure : undefined} />
-              </div>
-            </ContextMenu>
-          )}
+
+          <ContextMenu items={menuItems}>
+            <div ref={contextMenuButtonRef}>
+              <Dots color={isSelected ? Colors.blackPure : undefined} />
+            </div>
+          </ContextMenu>
         </S.ActionButtonsContainer>
       )}
     </S.NodeContainer>
   );
 };
 
-export default TreeNodeFile;
+export default memo(TreeNodeFile, isEqual);

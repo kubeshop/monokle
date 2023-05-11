@@ -3,7 +3,7 @@ import {useEffect} from 'react';
 import {setDiagnosticsOptions} from 'monaco-yaml';
 
 import {isKustomizationPatch} from '@redux/services/kustomize';
-import {hasSupportedResourceContent} from '@redux/services/resource';
+import {isSupportedResource} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
 
 import {FileMapType} from '@shared/models/appState';
@@ -33,7 +33,7 @@ function useResourceYamlSchema(
       validate =
         resourceSchema &&
         !isKustomizationPatch(selectedResourceRef.current) &&
-        hasSupportedResourceContent(selectedResourceRef.current);
+        isSupportedResource(selectedResourceRef.current);
     } else if (selectedPath && fileMapRef?.current) {
       resourceSchema = getSchemaForPath(selectedPath, fileMapRef.current);
       validate = resourceSchema !== undefined;

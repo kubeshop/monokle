@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 import {Button, Checkbox, Form, Input, Select, Tooltip} from 'antd';
+import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 import {useForm} from 'antd/lib/form/Form';
 
 import _ from 'lodash';
@@ -13,10 +14,8 @@ import {
   changeProjectsRootPath,
   toggleErrorReporting,
   toggleEventTracking,
-  updateClusterSelectorVisibilty,
   updateFileExplorerSortOrder,
   updateLoadLastProjectOnStartup,
-  updateUsingKubectlProxy,
 } from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
@@ -34,16 +33,14 @@ export const GlobalSettings = () => {
   const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
   const fileExplorerSortOrder = useAppSelector(state => state.config.fileExplorerSortOrder);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
-  const isClusterSelectorVisible = useAppSelector(state => state.config.isClusterSelectorVisible);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
-  const useKubectlProxy = useAppSelector(state => state.config.useKubectlProxy);
 
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
   const [settingsForm] = useForm();
 
-  const handleToggleEventTracking = () => {
-    dispatch(toggleEventTracking());
+  const handleToggleEventTracking = (e: CheckboxChangeEvent) => {
+    dispatch(toggleEventTracking(e.target.checked));
   };
 
   const handleToggleErrorReporting = () => {
@@ -52,14 +49,6 @@ export const GlobalSettings = () => {
 
   const handleChangeLoadLastFolderOnStartup = (e: any) => {
     dispatch(updateLoadLastProjectOnStartup(e.target.checked));
-  };
-
-  const handleChangeClusterSelectorVisibilty = (e: any) => {
-    dispatch(updateClusterSelectorVisibilty(e.target.checked));
-  };
-
-  const handleChangeUsingKubectlProxy = (e: any) => {
-    dispatch(updateUsingKubectlProxy(e.target.checked));
   };
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
@@ -142,25 +131,12 @@ export const GlobalSettings = () => {
           </Select>
         </S.Div>
 
-        <S.Div>
-          <S.Span>Kubectl proxy</S.Span>
-          <Checkbox checked={useKubectlProxy} onChange={handleChangeUsingKubectlProxy}>
-            Use kubectl proxy
-          </Checkbox>
-        </S.Div>
-
         <S.Span>On Startup</S.Span>
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
           <Checkbox checked={loadLastProjectOnStartup} onChange={handleChangeLoadLastFolderOnStartup}>
             Automatically load last project
           </Checkbox>
         </Tooltip>
-
-        <S.Div style={{marginTop: '12px'}}>
-          <Checkbox checked={isClusterSelectorVisible} onChange={handleChangeClusterSelectorVisibilty}>
-            Show Cluster Selector
-          </Checkbox>
-        </S.Div>
       </div>
 
       <div style={{width: '45%'}}>

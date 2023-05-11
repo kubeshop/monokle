@@ -30,8 +30,9 @@ import {
 } from '@shared/models/extension';
 import type {FileExplorerOptions, FileOptions} from '@shared/models/fileExplorer';
 import {AnyPlugin} from '@shared/models/plugin';
+import {DISABLED_TELEMETRY} from '@shared/models/telemetry';
 import {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@shared/models/template';
-import {getSegmentClient} from '@shared/utils/segment';
+import {disableSegment, enableSegment, getSegmentClient} from '@shared/utils/segment';
 
 import autoUpdater from '../autoUpdater';
 import {
@@ -44,6 +45,7 @@ import {
 } from '../commands';
 import {killKubectlProxyProcess, startKubectlProxyProcess} from '../kubectl';
 import {ProjectNameChange, StorePropagation} from '../models';
+import '../services/cluster/ipc';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
   downloadTemplate,
@@ -101,11 +103,14 @@ const killTerminal = (id: string) => {
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   const segmentClient = getSegmentClient();
   if (segmentClient) {
+    const properties: any = {appVersion: app.getVersion(), ...payload};
     segmentClient.track({
       event: eventName,
       userId: machineId,
-      properties: payload,
+      properties,
     });
+  } else if (process.env.NODE_ENV === `development`) {
+    console.log(`telemetry event ${eventName}`, payload);
   }
 });
 
@@ -383,7 +388,7 @@ ipcMain.on('pod.terminal.close', () => {
 });
 
 ipcMain.on('pod.terminal.init', (event, args) => {
-  const { podNamespace, podName, containerName, webContentsId} = args;
+  const {podNamespace, podName, containerName, webContentsId} = args;
   if (!webContentsId) {
     return;
   }
@@ -416,4 +421,18 @@ ipcMain.on('pod.terminal.init', (event, args) => {
       }
     }
   );
+});
+
+ipcMain.handle('analytics:toggleTracking', async (_event, {disableEventTracking}) => {
+  const segmentClient = getSegmentClient();
+
+  if (disableEventTracking) {
+    segmentClient?.track({
+      userId: machineId,
+      event: DISABLED_TELEMETRY,
+    });
+    disableSegment();
+  } else {
+    enableSegment();
+  }
 });

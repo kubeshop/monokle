@@ -2,6 +2,275 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/kubeshop/monokle/compare/v2.0.11-nightly-2023-05-10.0...v2.1.0) (2023-05-11)
+
+
+### Bug Fixes
+
+* added more telemetry and log telemetry to console in dev ([77757bc](https://github.com/kubeshop/monokle/commit/77757bce81d76b8320aaa06cdd1fd26aae7c4664))
+* added more telemetry to app start panels ([45e8f36](https://github.com/kubeshop/monokle/commit/45e8f36999ad22c9ac84598632553c1811b74eb1))
+* clean code ([d5a87f2](https://github.com/kubeshop/monokle/commit/d5a87f2be7379c9f3acb1f62b7e37804e7bf508b))
+* dependencies ([cf46a69](https://github.com/kubeshop/monokle/commit/cf46a69b2a4f413d508fa81ed8500374a7290725))
+* diff against cluster for transient resource ([d28be06](https://github.com/kubeshop/monokle/commit/d28be06e353fd365a7c1b51cf5c754391ed39b4d))
+* global settings hotkey ([a1473d9](https://github.com/kubeshop/monokle/commit/a1473d9009b1f48727144de7f86a4596a5baab14))
+* global settings hotkey 2 ([9430f57](https://github.com/kubeshop/monokle/commit/9430f576ef3c0476aef4b818fd51aa35cf725003))
+* hotkeys part 1 ([98ccc95](https://github.com/kubeshop/monokle/commit/98ccc953fa54c93e435108de1ebe7617d4cc2b94))
+* learn more url ([8368ae5](https://github.com/kubeshop/monokle/commit/8368ae58fcc095804a8ad437510a26bd11bab37e))
+* make command key work for hotkeys ([984f75a](https://github.com/kubeshop/monokle/commit/984f75a1b616255ee30cae669240664c583a81b3))
+* remove element ([b419a3d](https://github.com/kubeshop/monokle/commit/b419a3d4361f42ca782f491b3b3afc99314e2d26))
+* remove unused ([8ff6881](https://github.com/kubeshop/monokle/commit/8ff6881fef605c9f1452a45f0a2bce34df0e2118))
+* remove use kubectl proxy option ([aac0bab](https://github.com/kubeshop/monokle/commit/aac0bab49d21bf2f00678fa3adadb57674abe997))
+* rendering of kustomization name when in root folder ([fbe7a57](https://github.com/kubeshop/monokle/commit/fbe7a5795b60436e60419dd1aed6ddeadbc444b2))
+* select folder ([70bbafd](https://github.com/kubeshop/monokle/commit/70bbafd24c41c385af7a55cf950f92d79bd4e080))
+* settings hotkey ([9a8cd2f](https://github.com/kubeshop/monokle/commit/9a8cd2ff36de5309c6dcf7fb2255451a1809451b))
+* show cluster error description ([3caa293](https://github.com/kubeshop/monokle/commit/3caa293587e365ef9159781a9d06df381241db13))
+* toggle settings ([a5cc2b2](https://github.com/kubeshop/monokle/commit/a5cc2b2f036a924832ea850dd0d5d0852ca7be1e))
+* toggle settings ([3e36abf](https://github.com/kubeshop/monokle/commit/3e36abfd72ecfd6a0ae3f42c48b01267498d135d))
+
+## [2.1.0](https://github.com/kubeshop/monokle/compare/v2.0.11-nightly-2023-05-10.0...v2.1.0) (2023-05-10)
+
+
+### Bug Fixes
+
+* added more telemetry and log telemetry to console in dev ([77757bc](https://github.com/kubeshop/monokle/commit/77757bce81d76b8320aaa06cdd1fd26aae7c4664))
+* added more telemetry to app start panels ([45e8f36](https://github.com/kubeshop/monokle/commit/45e8f36999ad22c9ac84598632553c1811b74eb1))
+* clean code ([d5a87f2](https://github.com/kubeshop/monokle/commit/d5a87f2be7379c9f3acb1f62b7e37804e7bf508b))
+* dependencies ([cf46a69](https://github.com/kubeshop/monokle/commit/cf46a69b2a4f413d508fa81ed8500374a7290725))
+* diff against cluster for transient resource ([d28be06](https://github.com/kubeshop/monokle/commit/d28be06e353fd365a7c1b51cf5c754391ed39b4d))
+* global settings hotkey ([a1473d9](https://github.com/kubeshop/monokle/commit/a1473d9009b1f48727144de7f86a4596a5baab14))
+* global settings hotkey 2 ([9430f57](https://github.com/kubeshop/monokle/commit/9430f576ef3c0476aef4b818fd51aa35cf725003))
+* hotkeys part 1 ([98ccc95](https://github.com/kubeshop/monokle/commit/98ccc953fa54c93e435108de1ebe7617d4cc2b94))
+* make command key work for hotkeys ([984f75a](https://github.com/kubeshop/monokle/commit/984f75a1b616255ee30cae669240664c583a81b3))
+* remove element ([b419a3d](https://github.com/kubeshop/monokle/commit/b419a3d4361f42ca782f491b3b3afc99314e2d26))
+* remove unused ([8ff6881](https://github.com/kubeshop/monokle/commit/8ff6881fef605c9f1452a45f0a2bce34df0e2118))
+* remove use kubectl proxy option ([aac0bab](https://github.com/kubeshop/monokle/commit/aac0bab49d21bf2f00678fa3adadb57674abe997))
+* rendering of kustomization name when in root folder ([fbe7a57](https://github.com/kubeshop/monokle/commit/fbe7a5795b60436e60419dd1aed6ddeadbc444b2))
+* select folder ([70bbafd](https://github.com/kubeshop/monokle/commit/70bbafd24c41c385af7a55cf950f92d79bd4e080))
+* settings hotkey ([9a8cd2f](https://github.com/kubeshop/monokle/commit/9a8cd2ff36de5309c6dcf7fb2255451a1809451b))
+* show cluster error description ([3caa293](https://github.com/kubeshop/monokle/commit/3caa293587e365ef9159781a9d06df381241db13))
+* toggle settings ([a5cc2b2](https://github.com/kubeshop/monokle/commit/a5cc2b2f036a924832ea850dd0d5d0852ca7be1e))
+* toggle settings ([3e36abf](https://github.com/kubeshop/monokle/commit/3e36abfd72ecfd6a0ae3f42c48b01267498d135d))
+
+### [2.0.10](https://github.com/kubeshop/monokle/compare/v2.0.10-nightly-2023-04-28.0...v2.0.10) (2023-04-28)
+
+
+### Features
+
+* add tooltip ([94dc35c](https://github.com/kubeshop/monokle/commit/94dc35cbb23b4bd861aed05c1c2bd0de3bf78d2c))
+* code editor schema validation ([10dd39d](https://github.com/kubeshop/monokle/commit/10dd39dd00491c6a0a1ab901487c92abe5b121c5))
+* editor listeners for refs processing and validation ([0c6996f](https://github.com/kubeshop/monokle/commit/0c6996f5023f601525cc944d831390324a73e546))
+* helm template files code enhancer ([ab72186](https://github.com/kubeshop/monokle/commit/ab721868b97030e26dff5f7276e942e795651695))
+* helm values editor enhancer ([1cde39b](https://github.com/kubeshop/monokle/commit/1cde39b98fbfe32a180abcead3d05f881136731d))
+* resource symbols code enhancer ([e2114d1](https://github.com/kubeshop/monokle/commit/e2114d14336cd7c5f5511c9350176e713c3ac949))
+
+
+### Bug Fixes
+
+* clear collapsed resources kinds on cluster connect/disconnect ([39ad1bf](https://github.com/kubeshop/monokle/commit/39ad1bf74ec3225a5fa1ad36cf3eae687e391d43))
+* disable add resource in cluster mode ([56d7fee](https://github.com/kubeshop/monokle/commit/56d7fee3ad8ad455cd381f7a10e226f9c4a010b7))
+* dispose editor model if selection is cleared ([845adb8](https://github.com/kubeshop/monokle/commit/845adb841f48e4fe1f6fdfad4d521a0b77668d9b))
+* don't try expanding on root click ( file tree ) ([10c3a33](https://github.com/kubeshop/monokle/commit/10c3a337c7a233bf496c83a8edc517ec0543430d))
+* editor file update ([7f9e740](https://github.com/kubeshop/monokle/commit/7f9e7400143f2f9ede3aeccb88cc2815b7c9ee8b))
+* editor file updates ([bbc5686](https://github.com/kubeshop/monokle/commit/bbc56867bd2533e972bb59d71062b7b50ad798f4))
+* editor next selection on recreate model ([73ca808](https://github.com/kubeshop/monokle/commit/73ca8081d7d982a8c1251f726dad4862a9acad7a))
+* editor resource refs enhancer ([86fe816](https://github.com/kubeshop/monokle/commit/86fe816e8edbfa3640cddb5dd8660e224ddda54e))
+* editor text on updateMultipleClusterResources ([02303bd](https://github.com/kubeshop/monokle/commit/02303bd0b7d40574b7148329873839c90a509934))
+* formatting or removal of timestamp properties retrieved from cluster ([797fe34](https://github.com/kubeshop/monokle/commit/797fe34cbbc4344265e109416ac137dd58047292))
+* helm values file code selection & enhancer ([312b044](https://github.com/kubeshop/monokle/commit/312b04460644003bd048315ca0584431bce51ceb))
+* improved comments ([d063c21](https://github.com/kubeshop/monokle/commit/d063c21b4d046276b115ba92b02b6d6ff86db83f))
+* initial fix for expanding all kinds ([f7648b5](https://github.com/kubeshop/monokle/commit/f7648b520a89d683db334b1f562962bc7117e725))
+* read-only state for editor ([205e1cb](https://github.com/kubeshop/monokle/commit/205e1cb50158851fd40d802e8ee0b18849690dfa))
+* rehydrate editor state on mount ([7a1ffef](https://github.com/kubeshop/monokle/commit/7a1ffefa3989783f80471fbe2599e39dde7862dc))
+* removal all pairs with null values ([4a9354c](https://github.com/kubeshop/monokle/commit/4a9354c9f712605f7447c6acc65074786380eb7c))
+* review comments ([db7c00e](https://github.com/kubeshop/monokle/commit/db7c00e77b4b05080aa5a75c01039340e2af0c8a))
+* selection after deleteMultipleClusteResources ([2bc3810](https://github.com/kubeshop/monokle/commit/2bc3810543c52f3e2984fbb082212b89694e92b1))
+* set highlights on updateFileEntry ([0d59952](https://github.com/kubeshop/monokle/commit/0d59952fbeffb2d345e8fb81a30c7db54e8ae5a8))
+* transferred resources when switching projects ([9354a8e](https://github.com/kubeshop/monokle/commit/9354a8e25ff8526ddcb796773dbb8c4cc7beae95))
+* validate on deleteMultipleClusterResources ([b78c30d](https://github.com/kubeshop/monokle/commit/b78c30d12b9a3a2fa39766427787c11d534f2869))
+* validation on path remove & cluster update ([d371490](https://github.com/kubeshop/monokle/commit/d37149000bcbc48d6d670c0165c19ffdd450cf96))
+
+### [2.0.9](https://github.com/kubeshop/monokle/compare/v2.0.9-nightly-2023-04-20.0...v2.0.9) (2023-04-20)
+
+
+### Features
+
+* add kube-client with setup helper ([78f6fb3](https://github.com/kubeshop/monokle/commit/78f6fb39e46a646a588d51183c36e4afce0fcca7))
+* add kubeconfig watcher and proxy service ([23b6c09](https://github.com/kubeshop/monokle/commit/23b6c09cbfb3c7e1ad134f0b1a978f24bac11152))
+* add notification utils ([dfe03a6](https://github.com/kubeshop/monokle/commit/dfe03a6717735cba370e8c2732b2426d1002c7b7))
+* improve empty current context handling ([ee48cd4](https://github.com/kubeshop/monokle/commit/ee48cd467fadd065e5a281c1247d8828c4ed7037))
+* improve error messaging on malformed kubeconfigs ([dca4fe7](https://github.com/kubeshop/monokle/commit/dca4fe761f93d84bcd88a4afa50e249715dcbb6d))
+* improve kubeconfig error handling ([4a508b1](https://github.com/kubeshop/monokle/commit/4a508b12544758da77eed29a53ae261cf50eed78))
+* improve kubeconfig error handling ([e492c4d](https://github.com/kubeshop/monokle/commit/e492c4defd57d7a92cc67509df06772c2345c5df))
+* improve preview controls ([a0e209a](https://github.com/kubeshop/monokle/commit/a0e209ad832161eee85190d3cdffe4fe9746691d))
+* improve responsiveness of header ([b584a71](https://github.com/kubeshop/monokle/commit/b584a71a0473ee4b0fed4d6272ca9123e6ee21b8))
+* minor improvements ([9011e74](https://github.com/kubeshop/monokle/commit/9011e7438cc6fb71a1e7e7f3baa675e675c040b1))
+* persist default project setting of kubeconfig ([c2f01a9](https://github.com/kubeshop/monokle/commit/c2f01a94c64b9b2d538ad6d79d8d71b4545d30ec))
+* rework context controls ([dc52b01](https://github.com/kubeshop/monokle/commit/dc52b017b07a75995d28d95937de9378ad6bbc2b))
+
+
+### Bug Fixes
+
+* always use proxy with kubeclient ([7afe124](https://github.com/kubeshop/monokle/commit/7afe12419c2e4c43013d6c4cf0a098548c93118f))
+* cluster use last namespace loaded ([b382f4a](https://github.com/kubeshop/monokle/commit/b382f4afd91085767142ed740b346a16342bd20d))
+* fix cluster namespace control ([74d2a4a](https://github.com/kubeshop/monokle/commit/74d2a4a89fb5d671478d4a1118524f7c2245318d))
+* fix importing removed file ([9380537](https://github.com/kubeshop/monokle/commit/93805373b73827368dc5351a5c67fbbcd7d9a6c7))
+* fixup ([0852544](https://github.com/kubeshop/monokle/commit/0852544db18cff82a6b428d91529a3d16c4f01d4))
+* handle authentication in kubectl-proxy ([b668fa9](https://github.com/kubeshop/monokle/commit/b668fa952ac60653db02beb20afd8752fd114030))
+* key ([caf1b16](https://github.com/kubeshop/monokle/commit/caf1b16665e32eea683dc36a8ce759cb0dff4086))
+* make context and kubeconfigPath nullable ([d33c85a](https://github.com/kubeshop/monokle/commit/d33c85a2b50b75d615b3f2360448d61e918f390f))
+* reduce loading resources on connect ([2d16445](https://github.com/kubeshop/monokle/commit/2d164453be42e2e7301ec8344225684c79ef9132))
+* remove KubeConfigManager ([44a3bec](https://github.com/kubeshop/monokle/commit/44a3becd43e9ec24d0f98fb8a930ee28086f3671))
+* remove unused ([622e201](https://github.com/kubeshop/monokle/commit/622e201c104170e92784f6e73cee15312fc9623f))
+* remove unused code ([377096a](https://github.com/kubeshop/monokle/commit/377096a2332326ef4ab272eaadcaa02f43ed3fa8))
+* remove unused import ([de95d12](https://github.com/kubeshop/monokle/commit/de95d127964a5f9e25fbdb92e90e6663bcca2f2a))
+* resolve comments ([5292db7](https://github.com/kubeshop/monokle/commit/5292db734befc5d8db06faabcb07b549945f5d29))
+* saving resources ([b08ebc9](https://github.com/kubeshop/monokle/commit/b08ebc9e24d20d8b9cb551e082afdad1c9c91461))
+* typescript error ([3f02bc2](https://github.com/kubeshop/monokle/commit/3f02bc2a86206893d8e3626de1c5d89c8c9d6424))
+
+### [2.0.8](https://github.com/kubeshop/monokle/compare/v2.0.8-prerelease-398a993936618a06c00cb8e6f44bfa1290ae024e.0...v2.0.8) (2023-04-19)
+
+
+### Bug Fixes
+
+* checking out to remote branch ([3b506ee](https://github.com/kubeshop/monokle/commit/3b506ee4e4e3b9bc0513d045223f6e0bd0550faf))
+* checkout command ([db3403a](https://github.com/kubeshop/monokle/commit/db3403a03f5210d131cef398231d0e6815e9e632))
+* consistent YAML parsing/stringification and octal formatting ([95e7042](https://github.com/kubeshop/monokle/commit/95e70426b6a5268dbcfccf12b10cd96192ea344d))
+* **docs:** link for linux release binaries ([36171cb](https://github.com/kubeshop/monokle/commit/36171cb962788e8ea2169c1e6cec13a05e17c492))
+* **docs:** link name for downloading linux bundles ([8d11db5](https://github.com/kubeshop/monokle/commit/8d11db5d2d246cfa90d9571e1fb65966bacdfe3e))
+* **docs:** merge conflict ([a78a709](https://github.com/kubeshop/monokle/commit/a78a709ef7ed61145b96d534f320eacf89ae6730))
+* **docs:** update to include .rpm binaries ([fd128a5](https://github.com/kubeshop/monokle/commit/fd128a5e8e587dd37695f431d67687faa978be0a))
+* getRepoInfo ([4d63d54](https://github.com/kubeshop/monokle/commit/4d63d54f9f047405951e40da302851be206d533d))
+* git log ([816805c](https://github.com/kubeshop/monokle/commit/816805c286c1231a308c34a3fc08e8474c9d9ee6))
+* hide namespace  filter in cluster mode ([4e6a3ad](https://github.com/kubeshop/monokle/commit/4e6a3ad9ddbffad65d8d2c94495c42da8fa7e93d))
+* improved handling of transient resources ([392b8b9](https://github.com/kubeshop/monokle/commit/392b8b9c77e5d61a6e49142b6fc69c05b1a9c77b))
+* isFolderGitRepo catch ([cf52237](https://github.com/kubeshop/monokle/commit/cf522372d1f183f86d1b35a1b05bf4c73e8bcc76))
+* memoize selector ([a993662](https://github.com/kubeshop/monokle/commit/a9936627aa9649ffaec3552e77d3e9e4511a8ece))
+* more fixes ([c11ebf4](https://github.com/kubeshop/monokle/commit/c11ebf4141b2076f1de6c13a99f50922212cb741))
+* Promise.all handle error ([14e87ad](https://github.com/kubeshop/monokle/commit/14e87ad42b89954a0f15d082bbe62bef5ffd2af3))
+* reload namespaces list on cluster connection ([4d11c1c](https://github.com/kubeshop/monokle/commit/4d11c1c82eb32034169456f164e01345652e1144))
+* removed import from old git ipc ([4704979](https://github.com/kubeshop/monokle/commit/4704979a2379c6bfa34c0191d7fc159de0ce3077))
+* resource errors count ([f23ca1d](https://github.com/kubeshop/monokle/commit/f23ca1d665d4a89656c781861c11067f59110302))
+* review comments ([50632e9](https://github.com/kubeshop/monokle/commit/50632e9bb11327dd4ee07c8c95496a47b881398a))
+* set root folder pending git ([b5cca71](https://github.com/kubeshop/monokle/commit/b5cca71909f80013bacc03b4390f09d395989a4a))
+* try/catch ([8672f0e](https://github.com/kubeshop/monokle/commit/8672f0e413c1481dc5e0feddc7799ef6a267cb46))
+* update the count ([0fa0cc7](https://github.com/kubeshop/monokle/commit/0fa0cc7a8e8006d8d5206d1a2fdb1e51484d805b))
+* validation resources count ([401758c](https://github.com/kubeshop/monokle/commit/401758cfa73d356ed3203035f4f050a571433116))
+
+### [2.0.7](https://github.com/kubeshop/monokle/compare/v2.0.7-nightly-2023-04-06.0...v2.0.7) (2023-04-06)
+
+
+### Features
+
+* add ipc framework ([449b3b7](https://github.com/kubeshop/monokle/commit/449b3b7c09c5d9b9143c19be08612ddc7f6d0653))
+* add resource popover ([d5a58e6](https://github.com/kubeshop/monokle/commit/d5a58e6bf27a860936c57b002a60a5de8eb0a3bf))
+* follow dashboard left menu item on select ([5eba987](https://github.com/kubeshop/monokle/commit/5eba98770e09a9ef3abffe686607deeb05bc1b1f))
+* helm chart renderer ([49e6bda](https://github.com/kubeshop/monokle/commit/49e6bda966a170d15be37a2fb4344c25fa868a48))
+* match selected resource colors of cluster pane with navigator pane ([f65af4e](https://github.com/kubeshop/monokle/commit/f65af4ea608db29f482dcf86cc7291e53ed0587d))
+* redesign refs popover ([e6ab1fd](https://github.com/kubeshop/monokle/commit/e6ab1fd2ff520e58cca0b4bb8f08e714300b5486))
+* toggle/collapse ([0661f95](https://github.com/kubeshop/monokle/commit/0661f951eaac350df66aed4790a88c904789d3ec))
+* use monokle sample repo button ([113f29a](https://github.com/kubeshop/monokle/commit/113f29a503da88637730346b717e1084b15978dc))
+
+
+### Bug Fixes
+
+* add appVersion to all telemetry events ([8200fee](https://github.com/kubeshop/monokle/commit/8200fee64059c27641ab34d9dc197e71aeaf2bd1))
+* change table height according to terminal ([daa68e3](https://github.com/kubeshop/monokle/commit/daa68e3a94c595bedc6437e0ba1cd7106d5c6b4e))
+* clean code ([43014c7](https://github.com/kubeshop/monokle/commit/43014c7a5fc43204f308954f133b7f7fee4f4af6))
+* delete preview configuration ([0b6d979](https://github.com/kubeshop/monokle/commit/0b6d9795b308b5e176fc8eb27ac4cf197514da23))
+* duplicate extra reducer ([e8ab995](https://github.com/kubeshop/monokle/commit/e8ab995e5ff5fa99aa8a131b97655a62cff95bc9))
+* fixed deselection of deleted resource ([9fce6fb](https://github.com/kubeshop/monokle/commit/9fce6fbcf4c2896ff8c80da6abc7a577777e56e5))
+* improved algorithm for excluding resources ([a25c752](https://github.com/kubeshop/monokle/commit/a25c752343de1d5cab57fb0e9d9c7c41df05a4a8))
+* improved algorithm for excluding resources ([175cbf7](https://github.com/kubeshop/monokle/commit/175cbf74ec95d573d5a031b310cb16e2b30e3a62))
+* increase error badge size & add text next to it ([ed2f9e2](https://github.com/kubeshop/monokle/commit/ed2f9e2974ccc5887bfd73e5b42f36b162c61ca0))
+* listener for removing terminal ([201fe74](https://github.com/kubeshop/monokle/commit/201fe742052db550e71521dee7270587bc88ca07))
+* null/empty entries ([02ca4e0](https://github.com/kubeshop/monokle/commit/02ca4e071f72d76f459421d22c5ef9971cd6e7b9))
+* resource highlights after processing refs ([3faa772](https://github.com/kubeshop/monokle/commit/3faa77247045d9b903560c945962e72c1ce7c7c6))
+* unused import ([34538b7](https://github.com/kubeshop/monokle/commit/34538b75617c54a3c1c2ade462279090ff2f21f6))
+* update menu items ([3656633](https://github.com/kubeshop/monokle/commit/3656633e0747de58f8548d540ef9f4893ed9ef38))
+* update project config ([9147cde](https://github.com/kubeshop/monokle/commit/9147cdeb44621ffbd9b144d5dd1a97711c308598))
+
+### [2.0.6](https://github.com/kubeshop/monokle/compare/v2.0.6-nightly-2023-03-31.0...v2.0.6) (2023-03-31)
+
+
+### Bug Fixes
+
+* added APP_QUIT telemetry event ([6a1c9c8](https://github.com/kubeshop/monokle/commit/6a1c9c863fd072cfaf2e3fdb0505fe179b933d1d))
+* added number of Kustomize overlays and helmCharts to the open_project event ([270a467](https://github.com/kubeshop/monokle/commit/270a467ab317cfbb1544b0ba037bc10fd1f36bce))
+* update cluster resources errors ([fb8d58b](https://github.com/kubeshop/monokle/commit/fb8d58befbe318909938ee78f152f9f842dcc7b4))
+* update resource in cluster mode ([a391f2f](https://github.com/kubeshop/monokle/commit/a391f2f4cb244ba97bb2dfd5a2b28fe91e8751a0))
+
+### [2.0.5](https://github.com/kubeshop/monokle/compare/v2.0.5-nightly-2023-03-20.0...v2.0.5) (2023-03-20)
+
+
+### Features
+
+* collapsed state for navigator kinds ([585ee63](https://github.com/kubeshop/monokle/commit/585ee632867d3b7ab18da766ec0ce05974d08b5e))
+* initial virtualization of navigator ([2925779](https://github.com/kubeshop/monokle/commit/2925779e03f5e063d19f96ec6b4a8a29310bc9db))
+* Navigator collapse all button ([a667893](https://github.com/kubeshop/monokle/commit/a667893890189c010d35486639a1346981205bb4))
+* navigator scroll resource into view ([0a65b79](https://github.com/kubeshop/monokle/commit/0a65b79b5efc78f6cb769b9887b10cdde7de9563))
+* reject with value ([5528617](https://github.com/kubeshop/monokle/commit/552861728599e8b23fbbd99a3056c968ff3f5e08))
+
+
+### Bug Fixes
+
+* empty resource navigator ([6e90492](https://github.com/kubeshop/monokle/commit/6e9049283743fcd71e02868620a916edad35e4ee))
+* filter kustomization patches out of navigator ([3bb2340](https://github.com/kubeshop/monokle/commit/3bb2340175f96b5f5952da7b99f4b17e42cef8e4))
+* filter kustomizations out of navigator ([84ae5cc](https://github.com/kubeshop/monokle/commit/84ae5cca90b4c5d30ba2b479c0f161546faa85e0))
+* nav virtualization container ([2197737](https://github.com/kubeshop/monokle/commit/2197737b5014f0e43983a3a8a662691b2a0237d4))
+* PR comments ([31f33cb](https://github.com/kubeshop/monokle/commit/31f33cba56c6e1958a5802a3f85f9cc49241f894))
+* ref selector ([92d8b28](https://github.com/kubeshop/monokle/commit/92d8b2885d5167d2454fc298bbb5b8dec1e86d38))
+* refs file path ([fff5eb0](https://github.com/kubeshop/monokle/commit/fff5eb033cbaecfe164739ce353e8f3529171a45))
+* resource counter ([d0dada6](https://github.com/kubeshop/monokle/commit/d0dada66c3737f8c6058462369a70a29b7ef189a))
+* select explorer section to image ([7a00ba7](https://github.com/kubeshop/monokle/commit/7a00ba762ba42efbb5a6a176fae88ad35427199c))
+* show alert when no resources are created on preview ([35e9576](https://github.com/kubeshop/monokle/commit/35e957664a57371d3f29892905d11eeaa8f7a395))
+* transient resources in navigator ([335e6eb](https://github.com/kubeshop/monokle/commit/335e6eb69e6c0b0a5c016e4b24d7aff458df478f))
+* update package version ([a0f317a](https://github.com/kubeshop/monokle/commit/a0f317a6447f1485a215d7842c1171eec00b23de))
+* versions ([79375bb](https://github.com/kubeshop/monokle/commit/79375bbc8d04119f96b6709250fc67e436be3d09))
+* windows kustomization refs ([f1773ec](https://github.com/kubeshop/monokle/commit/f1773eccacb17a5c0f48463c0bae34a1525f9a04))
+
+### [2.0.5](https://github.com/kubeshop/monokle/compare/v2.0.5-nightly-2023-03-20.0...v2.0.5) (2023-03-20)
+
+
+### Features
+
+* collapsed state for navigator kinds ([585ee63](https://github.com/kubeshop/monokle/commit/585ee632867d3b7ab18da766ec0ce05974d08b5e))
+* initial virtualization of navigator ([2925779](https://github.com/kubeshop/monokle/commit/2925779e03f5e063d19f96ec6b4a8a29310bc9db))
+* Navigator collapse all button ([a667893](https://github.com/kubeshop/monokle/commit/a667893890189c010d35486639a1346981205bb4))
+* navigator scroll resource into view ([0a65b79](https://github.com/kubeshop/monokle/commit/0a65b79b5efc78f6cb769b9887b10cdde7de9563))
+* reject with value ([5528617](https://github.com/kubeshop/monokle/commit/552861728599e8b23fbbd99a3056c968ff3f5e08))
+
+
+### Bug Fixes
+
+* empty resource navigator ([6e90492](https://github.com/kubeshop/monokle/commit/6e9049283743fcd71e02868620a916edad35e4ee))
+* filter kustomization patches out of navigator ([3bb2340](https://github.com/kubeshop/monokle/commit/3bb2340175f96b5f5952da7b99f4b17e42cef8e4))
+* filter kustomizations out of navigator ([84ae5cc](https://github.com/kubeshop/monokle/commit/84ae5cca90b4c5d30ba2b479c0f161546faa85e0))
+* nav virtualization container ([2197737](https://github.com/kubeshop/monokle/commit/2197737b5014f0e43983a3a8a662691b2a0237d4))
+* PR comments ([31f33cb](https://github.com/kubeshop/monokle/commit/31f33cba56c6e1958a5802a3f85f9cc49241f894))
+* ref selector ([92d8b28](https://github.com/kubeshop/monokle/commit/92d8b2885d5167d2454fc298bbb5b8dec1e86d38))
+* refs file path ([fff5eb0](https://github.com/kubeshop/monokle/commit/fff5eb033cbaecfe164739ce353e8f3529171a45))
+* resource counter ([d0dada6](https://github.com/kubeshop/monokle/commit/d0dada66c3737f8c6058462369a70a29b7ef189a))
+* select explorer section to image ([7a00ba7](https://github.com/kubeshop/monokle/commit/7a00ba762ba42efbb5a6a176fae88ad35427199c))
+* show alert when no resources are created on preview ([35e9576](https://github.com/kubeshop/monokle/commit/35e957664a57371d3f29892905d11eeaa8f7a395))
+* transient resources in navigator ([335e6eb](https://github.com/kubeshop/monokle/commit/335e6eb69e6c0b0a5c016e4b24d7aff458df478f))
+* windows kustomization refs ([f1773ec](https://github.com/kubeshop/monokle/commit/f1773eccacb17a5c0f48463c0bae34a1525f9a04))
+
+### [2.0.4](https://github.com/kubeshop/monokle/compare/v2.0.4-nightly-2023-03-14.0...v2.0.4) (2023-03-14)
+
+
+### Features
+
+* show alert when opening project if in cluster mode ([7ccb848](https://github.com/kubeshop/monokle/commit/7ccb848e4c55612e0d1f44347578c58ea457bb28))
+
+
+### Bug Fixes
+
+* bring back use kubectl proxy ([766e889](https://github.com/kubeshop/monokle/commit/766e889815b96a1a6b9c0bc6f908bc11f25d11b5))
+* compare git branches ([0184d7d](https://github.com/kubeshop/monokle/commit/0184d7d997fe4b1087f89cc2b415b9b98114a445))
+* dependencies ([e8c21c3](https://github.com/kubeshop/monokle/commit/e8c21c3020eb07b35aa78ec1ebdd42c073434655))
+* initial compare state on setRootFolder ([36806db](https://github.com/kubeshop/monokle/commit/36806dbdd7fda3eb857b94fdf517e989c766f4d5))
+* remove shared from gitignore ([ea390f5](https://github.com/kubeshop/monokle/commit/ea390f50eead15b88b1c0b6fe955f08d2c590f89))
+
 ### [2.0.3](https://github.com/kubeshop/monokle/compare/v2.0.3-nightly-2023-03-09.0...v2.0.3) (2023-03-09)
 
 

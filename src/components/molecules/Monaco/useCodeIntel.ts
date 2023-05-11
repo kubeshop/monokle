@@ -15,12 +15,13 @@ import {
   HelmChartMapType,
   HelmTemplatesMapType,
   HelmValuesMapType,
-  ImagesListType,
+  ImageMapType,
   ResourceFilterType,
 } from '@shared/models/appState';
 import {K8sResource, ResourceIdentifier, ResourceMetaMap, ResourceStorage} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
 
+import {EDITOR_DISPOSABLES} from './disposables';
 import {clearDecorations, setDecorations, setMarkers} from './editorHelpers';
 
 interface CodeIntelProps {
@@ -30,7 +31,7 @@ interface CodeIntelProps {
   code: string | undefined;
   resourceMetaMap: ResourceMetaMap;
   fileMap: FileMapType;
-  imagesList: ImagesListType;
+  imageMap: ImageMapType;
   selectResource: (resourceIdentifier: ResourceIdentifier) => void;
   selectFilePath: (filePath: string) => void;
   createResource: ((outgoingRef: ResourceRef, namespace?: string, targetFolder?: string) => void) | undefined;
@@ -49,7 +50,7 @@ function useCodeIntel(props: CodeIntelProps) {
     editorRef,
     selectedResource,
     code,
-    imagesList,
+    imageMap,
     resourceMetaMap,
     fileMap,
     selectResource,
@@ -133,6 +134,7 @@ function useCodeIntel(props: CodeIntelProps) {
           }
           if (newDisposables) {
             disposablesRef.current = newDisposables;
+            EDITOR_DISPOSABLES.push(...newDisposables);
           }
 
           if (editorRef.current) {
@@ -183,7 +185,7 @@ function useCodeIntel(props: CodeIntelProps) {
       debouncedUpdate.current.cancel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, selectedResource, resourceMetaMap, editorRef, imagesList, helmTemplatesMap, helmValuesMap]);
+  }, [code, selectedResource, resourceMetaMap, editorRef, imageMap, helmTemplatesMap, helmValuesMap]);
 
   // useEffect(() => {
   //   if (completionDisposableRef.current && completionDisposableRef.current.dispose) {

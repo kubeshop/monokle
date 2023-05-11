@@ -1,5 +1,9 @@
 import log from 'loglevel';
 
+import {promiseTimeout} from '@shared/utils/promises';
+
+const WORKER_TIMEOUT_MS = 60000;
+
 export interface WorkerMessage {
   type: string;
   input: any;
@@ -8,19 +12,40 @@ export interface WorkerMessage {
 
 export const matchWorkerEvent = (event: MessageEvent, type: string) => event.data.type === type;
 
-// TODO: add a promise timeout
-export const createWorkerEventPromise = <Output extends any>(args: {worker: Worker; type: string; input: any}) => {
+export const createWorkerEventPromise = async <Output extends any>(args: {
+  worker: Worker;
+  type: string;
+  input: any;
+}) => {
   const {worker, type, input} = args;
   worker.postMessage({type, input});
-  return new Promise<Output>(resolve => {
-    worker.onmessage = event => {
-      if (!matchWorkerEvent(event, type)) {
-        return;
-      }
-      log.info('[WORKER_EVENT_FULFILLED]', event);
-      resolve(event.data.output);
-    };
-  });
+
+  const abortController = new AbortController();
+
+  try {
+    const workerEventPromise = promiseTimeout(
+      new Promise<Output>(resolve => {
+        const onMessage = (event: MessageEvent) => {
+          if (!matchWorkerEvent(event, type)) {
+            return;
+          }
+          log.info('[WORKER_EVENT_FULFILLED]', event);
+          worker.removeEventListener('message', onMessage);
+          resolve(event.data.output);
+        };
+        worker.addEventListener('message', onMessage, {signal: abortController.signal});
+      }),
+      WORKER_TIMEOUT_MS
+    );
+
+    const output = await workerEventPromise;
+    return output;
+  } catch (e: any) {
+    if ('name' in e && e.name === 'TimeoutError') {
+      abortController.abort();
+    }
+    throw e;
+  }
 };
 
 export const handleEvent = <Message extends WorkerMessage>(

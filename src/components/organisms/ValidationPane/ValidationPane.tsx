@@ -3,35 +3,41 @@ import {useMeasure} from 'react-use';
 import {Image} from 'antd';
 import Link from 'antd/lib/typography/Link';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
+import {ReloadOutlined} from '@ant-design/icons';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
+import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
 import {useValidationSelector} from '@redux/validation/validation.selectors';
-import {setSelectedProblem} from '@redux/validation/validation.slice';
+import {setSelectedProblem, setValidationFilters} from '@redux/validation/validation.slice';
+import {validateResources} from '@redux/validation/validation.thunks';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
+
+import {useRefSelector} from '@utils/hooks';
 
 import ValidationFigure from '@assets/NewValidationFigure.svg';
 
 import {Icon, TitleBar, ValidationOverview} from '@monokle/components';
+import {trackEvent} from '@shared/utils';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ValidationPane.styled';
 
 const ValidationPane: React.FC = () => {
   const dispatch = useAppDispatch();
+  const activeStorageRef = useRefSelector(activeResourceStorageSelector);
   const lastResponse = useValidationSelector(state => state.lastResponse);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const newProblemsIntroducedType = useValidationSelector(state => state.validationOverview.newProblemsIntroducedType);
   const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem);
   const status = useValidationSelector(state => state.status);
+  const validationFilters = useValidationSelector(state => state.validationOverview.filters);
 
   const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
   const height = usePaneHeight();
-
-  if (!lastResponse) {
-    return null;
-  }
 
   return (
     <S.ValidationPaneContainer>
@@ -60,17 +66,43 @@ const ValidationPane: React.FC = () => {
         />
       </div>
 
-      <ValidationOverview
-        containerStyle={{marginTop: '20px'}}
-        showOnlyByResource={isInClusterMode}
-        height={height - titleBarHeight - 40}
-        newProblemsIntroducedType={newProblemsIntroducedType}
-        selectedProblem={selectedProblem?.problem}
-        validationResponse={lastResponse}
-        onProblemSelect={problem => dispatch(setSelectedProblem(problem))}
-        status={status}
-        skeletonStyle={{marginTop: '20px'}}
-      />
+      {status === 'error' ? (
+        <S.ErrorEmptyMessageContainer>
+          <S.ErrorMessage>
+            <S.ExclamationCircleOutlined /> <span>There was an error with validating your resources.</span>
+          </S.ErrorMessage>
+
+          <S.RevalidateButton
+            icon={<ReloadOutlined />}
+            type="primary"
+            onClick={() => dispatch(validateResources({type: 'full', resourceStorage: activeStorageRef.current}))}
+          >
+            Try again
+          </S.RevalidateButton>
+        </S.ErrorEmptyMessageContainer>
+      ) : lastResponse ? (
+        <ValidationOverview
+          containerStyle={{marginTop: '20px'}}
+          showOnlyByResource={isInClusterMode || isInPreviewMode}
+          filters={validationFilters}
+          height={height - titleBarHeight - 60}
+          newProblemsIntroducedType={newProblemsIntroducedType}
+          selectedProblem={selectedProblem?.problem}
+          validationResponse={lastResponse}
+          onProblemSelect={problem => {
+            dispatch(setSelectedProblem(problem));
+            trackEvent('explore/select_problem', {
+              ruleId: problem.problem.ruleId,
+              source: activeStorageRef.current,
+            });
+          }}
+          status={isInClusterMode ? 'loaded' : status}
+          skeletonStyle={{marginTop: '20px'}}
+          onFiltersChange={filters => dispatch(setValidationFilters(filters))}
+        />
+      ) : (
+        <S.ErrorEmptyMessageContainer>There are no errors or warnings found.</S.ErrorEmptyMessageContainer>
+      )}
     </S.ValidationPaneContainer>
   );
 };

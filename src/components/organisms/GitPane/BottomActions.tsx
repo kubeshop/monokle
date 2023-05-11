@@ -1,18 +1,18 @@
 import {useCallback, useMemo, useState} from 'react';
 
-import {Modal, Tooltip} from 'antd';
+import {Tooltip} from 'antd';
 
 import {ArrowDownOutlined, ArrowUpOutlined, DownOutlined} from '@ant-design/icons';
 
-import {GIT_ERROR_MODAL_DESCRIPTION, TOOLTIP_DELAY} from '@constants/constants';
+import {TOOLTIP_DELAY} from '@constants/constants';
 import {GitCommitDisabledTooltip, GitCommitEnabledTooltip} from '@constants/tooltips';
 
 import {addGitBranch, setGitLoading} from '@redux/git';
+import {fetchRepo, publishLocalBranch, pullChanges, pushChanges} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
-import {addDefaultCommandTerminal} from '@utils/terminal';
+import {showGitErrorModal} from '@utils/terminal';
 
 import {AlertEnum} from '@shared/models/alert';
 
@@ -21,14 +21,11 @@ import CommitModal from './CommitModal';
 
 const BottomActions: React.FC = () => {
   const dispatch = useAppDispatch();
-  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const changedFiles = useAppSelector(state => state.git.changedFiles);
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
-  const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
   const gitLoading = useAppSelector(state => state.git.loading);
   const gitRepo = useAppSelector(state => state.git.repo);
-  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
-  const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder) || '';
 
   const [showCommitModal, setShowCommitModal] = useState(false);
 
@@ -55,52 +52,35 @@ const BottomActions: React.FC = () => {
 
   const pullPushChangesHandler = useCallback(
     async (type: 'pull' | 'push') => {
-      if (!gitRepo) {
+      if (!gitRepo || !selectedProjectRootFolder) {
         return;
       }
 
-      const result = await promiseFromIpcRenderer('git.pushChanges', 'git.pushChanges.result', {
-        localPath: selectedProjectRootFolder,
-        branchName: currentBranch || 'main',
-      });
-
-      if (result.error) {
-        Modal.warning({
-          title: `${type === 'pull' ? 'Pull' : 'Push'} failed`,
-          content: <div>{GIT_ERROR_MODAL_DESCRIPTION}</div>,
-          zIndex: 100000,
-          onCancel: () => {
-            addDefaultCommandTerminal(
-              terminalsMap,
-              `git ${type} origin ${gitRepo.currentBranch}`,
-              defaultShell,
-              bottomSelection,
-              dispatch
-            );
-          },
-          onOk: () => {
-            addDefaultCommandTerminal(
-              terminalsMap,
-              `git ${type} origin ${gitRepo.currentBranch}`,
-              defaultShell,
-              bottomSelection,
-              dispatch
-            );
-          },
-        });
-      } else {
-        dispatch(
-          setAlert({
-            title: `${type === 'pull' ? 'Pulled' : 'Pushed'} changes successfully`,
-            message: '',
-            type: AlertEnum.Success,
-          })
-        );
+      if (type === 'pull') {
+        try {
+          await pullChanges({path: selectedProjectRootFolder});
+        } catch (e) {
+          showGitErrorModal('Pull failed', undefined, `git pull origin ${gitRepo.currentBranch}`, dispatch);
+          return {error: true};
+        }
+      } else if (type === 'push') {
+        try {
+          await pushChanges({localPath: selectedProjectRootFolder, branchName: currentBranch || 'main'});
+        } catch (e) {
+          showGitErrorModal('Push failed', undefined, `git push origin ${gitRepo.currentBranch}`, dispatch);
+          return {error: true};
+        }
       }
 
-      return result.error;
+      dispatch(
+        setAlert({
+          title: `${type === 'pull' ? 'Pulled' : 'Pushed'} changes successfully`,
+          message: '',
+          type: AlertEnum.Success,
+        })
+      );
     },
-    [bottomSelection, currentBranch, defaultShell, dispatch, gitRepo, selectedProjectRootFolder, terminalsMap]
+    [currentBranch, dispatch, gitRepo, selectedProjectRootFolder]
   );
 
   const publishHandler = useCallback(async () => {
@@ -110,13 +90,21 @@ const BottomActions: React.FC = () => {
 
     dispatch(setGitLoading(true));
 
-    await promiseFromIpcRenderer('git.publishLocalBranch', 'git.publishLocalBranch.result', {
-      localPath: selectedProjectRootFolder,
-      branchName: currentBranch || 'main',
-    });
-    dispatch(addGitBranch(`origin/${currentBranch}`));
-    dispatch(setAlert({title: 'Branch published successfully', message: '', type: AlertEnum.Success}));
+    try {
+      await publishLocalBranch({localPath: selectedProjectRootFolder, branchName: currentBranch || 'main'});
+      dispatch(setAlert({title: 'Branch published successfully', message: '', type: AlertEnum.Success}));
+    } catch (e) {
+      showGitErrorModal(
+        'Publishing local branch failed',
+        undefined,
+        `git push -u origin ${currentBranch || 'main'}`,
+        dispatch
+      );
+      setGitLoading(false);
+      return;
+    }
 
+    dispatch(addGitBranch(`origin/${currentBranch}`));
     dispatch(setGitLoading(false));
   }, [currentBranch, dispatch, gitRepo, selectedProjectRootFolder]);
 
@@ -150,9 +138,19 @@ const BottomActions: React.FC = () => {
         key: 'fetch',
         label: 'Fetch',
         onClick: async () => {
+          if (!selectedProjectRootFolder) {
+            return;
+          }
+
           dispatch(setGitLoading(true));
-          await promiseFromIpcRenderer('git.fetchRepo', 'git.fetchRepo.result', selectedProjectRootFolder);
-          dispatch(setAlert({title: 'Repository fetched successfully', message: '', type: AlertEnum.Success}));
+
+          try {
+            await fetchRepo({path: selectedProjectRootFolder});
+            dispatch(setAlert({title: 'Repository fetched successfully', message: '', type: AlertEnum.Success}));
+          } catch (e) {
+            showGitErrorModal('Fetch failed', undefined, `git fetch`, dispatch);
+            dispatch(setGitLoading(false));
+          }
         },
       },
       {
@@ -185,20 +183,25 @@ const BottomActions: React.FC = () => {
     dispatch(setGitLoading(true));
 
     if (gitRepo.commits.behind) {
-      const error = await pullPushChangesHandler('pull');
+      const result = await pullPushChangesHandler('pull');
 
-      if (error) {
+      if (result?.error) {
         dispatch(setGitLoading(false));
         return;
       }
     }
 
     if (gitRepo.commits.ahead) {
-      const error = await pullPushChangesHandler('push');
+      const result = await pullPushChangesHandler('push');
 
-      if (error) {
+      if (result?.error) {
         dispatch(setGitLoading(false));
+        return;
       }
+    }
+
+    if (!gitRepo.commits.ahead && !gitRepo.commits.behind) {
+      dispatch(setGitLoading(false));
     }
   };
 

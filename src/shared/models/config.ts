@@ -1,3 +1,5 @@
+import {Cluster, Context, User} from '@kubernetes/client-node';
+
 import {ClusterColors} from './cluster';
 import {KustomizeCommandType} from './kustomize';
 
@@ -46,9 +48,7 @@ interface AppConfig {
   fileIncludes: string[];
   /** maximum recursion depth when reading nested folders */
   folderReadsMaxDepth: number;
-  useKubectlProxy: boolean;
   loadLastProjectOnStartup: boolean;
-  isClusterSelectorVisible: boolean;
   settings: Settings;
   newVersion: {
     code: NewVersionCode;
@@ -71,20 +71,13 @@ interface AppConfig {
   favoriteTemplates: string[];
   disableEventTracking: boolean;
   disableErrorReporting: boolean;
-  clusterAccess: Array<ClusterAccess>;
   isAccessLoading?: boolean;
   kubeConfigContextsColors: {
     [name: string]: ClusterColors;
   };
   fileExplorerSortOrder: FileExplorerSortOrder;
+  isNewVersionAvailable: boolean;
 }
-
-type ClusterAccess = {
-  permissions: KubePermissions[];
-  hasFullAccess: boolean;
-  namespace: string;
-  context: string;
-};
 
 type FileExplorerSortOrder = 'folders' | 'files' | 'mixed';
 
@@ -99,9 +92,39 @@ type HelmPreviewConfiguration = {
 
 type KubeConfig = {
   path?: string; // It can be `undefined` until refactor
+
+  /**
+   * @deprecated
+   */
   isPathValid?: boolean; // It can be `undefined` until refactor
+
+  /**
+   * @deprecated
+   */
   contexts?: Array<KubeConfigContext>;
+
+  /**
+   * @deprecated
+   */
   currentContext?: string;
+};
+
+export type ModernKubeConfig = InvalidKubeConfig | ValidKubeConfig;
+
+export type ValidKubeConfig = {
+  isValid: true;
+  path: string;
+  currentContext: string;
+  contexts: Context[];
+  clusters: Cluster[];
+  users: User[];
+};
+
+export type InvalidKubeConfig = {
+  isValid: false;
+  path: string;
+  code: 'not_found' | 'malformed' | 'unknown' | 'empty' | 'not_file';
+  reason: string;
 };
 
 // Parsed from kubernetes config file
@@ -162,8 +185,6 @@ type Settings = {
   autoZoomGraphOnSelection?: boolean;
   helmPreviewMode?: 'template' | 'install';
   kustomizeCommand?: KustomizeCommandType;
-  hideExcludedFilesInFileExplorer?: boolean;
-  hideUnsupportedFilesInFileExplorer?: boolean;
   enableHelmWithKustomize?: boolean;
   createDefaultObjects?: boolean;
   setDefaultPrimitiveValues?: boolean;
@@ -173,7 +194,6 @@ type Settings = {
 
 export type {
   AppConfig,
-  ClusterAccess,
   FileExplorerSortOrder,
   HelmPreviewConfiguration,
   KubeConfig,

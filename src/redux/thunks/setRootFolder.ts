@@ -1,22 +1,22 @@
-import {Modal} from 'antd';
-
 import {createAsyncThunk} from '@reduxjs/toolkit';
+
+import log from 'loglevel';
 
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
-import {SetRootFolderPayload} from '@redux/reducers/main';
+import {getChangedFiles, getRepoInfo, isFolderGitRepo} from '@redux/git/git.ipc';
+import {SetRootFolderArgs, SetRootFolderPayload} from '@redux/reducers/main';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
+import {isKustomizationResource} from '@redux/services/kustomize';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {getFileStats} from '@utils/files';
-import {promiseFromIpcRenderer} from '@utils/promises';
-import {addDefaultCommandTerminal} from '@utils/terminal';
+import {showGitErrorModal} from '@utils/terminal';
 
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
-import {GitChangedFile, GitRepo} from '@shared/models/git';
 import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -27,15 +27,14 @@ import {trackEvent} from '@shared/utils/telemetry';
 
 export const setRootFolder = createAsyncThunk<
   SetRootFolderPayload,
-  string | null,
+  SetRootFolderArgs,
   {
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/setRootFolder', async (rootFolder, thunkAPI) => {
+>('main/setRootFolder', async ({rootFolder, isReload}, thunkAPI) => {
   const startTime = new Date().getTime();
   const projectConfig = currentConfigSelector(thunkAPI.getState());
-  const terminalState = thunkAPI.getState().terminal;
 
   const resourceMetaMap: ResourceMetaMap<'local'> = {};
   const resourceContentMap: ResourceContentMap<'local'> = {};
@@ -90,67 +89,64 @@ export const setRootFolder = createAsyncThunk<
 
   monitorRootFolder(rootFolder, thunkAPI);
 
+  const filesNumber = Object.values(fileMap).filter(f => !f.children).length;
+  const resourcesNumber = Object.values(resourceMetaMap).length;
+  const helmChartsNumber = Object.values(helmChartMap).length;
+  const overlaysNumber = Object.values(resourceMetaMap).filter(r => isKustomizationResource(r)).length;
+
   const generatedAlert = {
     title: 'Folder Import',
-    message: `${Object.values(resourceMetaMap).length} resources found in ${
-      Object.values(fileMap).filter(f => !f.children).length
-    } files`,
+    message: `Found ${resourcesNumber} resources, ${helmChartsNumber} Helm charts and ${overlaysNumber} Kustomize overlays configurations in ${filesNumber} files processed.`,
     type: AlertEnum.Success,
+    silent: true,
   };
 
-  const isFolderGitRepo = await promiseFromIpcRenderer<boolean>(
-    'git.isFolderGitRepo',
-    'git.isFolderGitRepo.result',
-    rootFolder
-  );
+  let isGitRepo: boolean;
 
-  if (isFolderGitRepo) {
+  try {
+    isGitRepo = await isFolderGitRepo({path: rootFolder});
+  } catch (err) {
+    isGitRepo = false;
+  }
+
+  if (isGitRepo) {
     thunkAPI.dispatch(setGitLoading(true));
 
-    Promise.all([
-      promiseFromIpcRenderer<GitRepo>('git.getGitRepoInfo', 'git.getGitRepoInfo.result', rootFolder),
-      promiseFromIpcRenderer<GitChangedFile[]>('git.getChangedFiles', 'git.getChangedFiles.result', {
-        localPath: rootFolder,
-        fileMap,
-      }),
-    ]).then(([repo, changedFiles]) => {
-      thunkAPI.dispatch(setRepo(repo));
-      thunkAPI.dispatch(setChangedFiles(changedFiles));
-      thunkAPI.dispatch(setGitLoading(false));
+    Promise.allSettled([getRepoInfo({path: rootFolder}), getChangedFiles({localPath: rootFolder, fileMap})]).then(
+      ([repo, changedFiles]) => {
+        if (repo.status === 'rejected' || changedFiles.status === 'rejected') {
+          const errorMessage =
+            'reason' in repo ? repo.reason : 'reason' in changedFiles ? changedFiles.reason : undefined;
+          log.error(errorMessage);
+          showGitErrorModal('Git error', errorMessage);
+          thunkAPI.dispatch(setGitLoading(false));
+          return;
+        }
 
-      if (repo.remoteRepo.authRequired) {
-        Modal.warning({
-          title: 'Authentication failed',
-          content: `${repo.remoteRepo.errorMessage}. Please sign in using the terminal.`,
-          zIndex: 100000,
-          onCancel: () => {
-            addDefaultCommandTerminal(
-              terminalState.terminalsMap,
-              `git remote show origin`,
-              terminalState.settings.defaultShell,
-              thunkAPI.getState().ui.leftMenu.bottomSelection,
-              thunkAPI.dispatch
-            );
-          },
-          onOk: () => {
-            addDefaultCommandTerminal(
-              terminalState.terminalsMap,
-              `git remote show origin`,
-              terminalState.settings.defaultShell,
-              thunkAPI.getState().ui.leftMenu.bottomSelection,
-              thunkAPI.dispatch
-            );
-          },
-        });
+        if (typeof repo.value !== 'object') {
+          thunkAPI.dispatch(setRepo(undefined));
+          thunkAPI.dispatch(setGitLoading(false));
+          return;
+        }
+
+        thunkAPI.dispatch(setRepo(repo.value));
+        thunkAPI.dispatch(setChangedFiles(changedFiles.value));
+        thunkAPI.dispatch(setGitLoading(false));
+
+        if (repo.value.remoteRepo.authRequired) {
+          showGitErrorModal('Authentication failed', undefined, `git remote show origin`, thunkAPI.dispatch);
+        }
       }
-    });
+    );
   }
 
   const endTime = new Date().getTime();
 
   trackEvent('app_start/open_project', {
-    numberOfFiles: Object.values(fileMap).filter(f => !f.children).length,
-    numberOfResources: Object.values(resourceMetaMap).length,
+    numberOfFiles: filesNumber,
+    numberOfResources: resourcesNumber,
+    numberOfOverlays: overlaysNumber,
+    numberOfHelmCharts: helmChartsNumber,
     executionTime: endTime - startTime,
   });
 
@@ -167,6 +163,7 @@ export const setRootFolder = createAsyncThunk<
     isScanExcludesUpdated: 'applied',
     isScanIncludesUpdated: 'applied',
     alert: rootFolder ? generatedAlert : undefined,
-    isGitRepo: isFolderGitRepo,
+    isGitRepo,
+    isReload,
   };
 });

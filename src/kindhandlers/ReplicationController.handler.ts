@@ -15,10 +15,12 @@ const ReplicationControllerHandler: ResourceKindHandler = {
   isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta): Promise<any> {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    k8sCoreV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     return k8sCoreV1Api.readNamespacedReplicationController(resource.name, resource.namespace || 'default', 'true');
   },
   async listResourcesInCluster(kubeconfig: k8s.KubeConfig, {namespace}) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    k8sCoreV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     const response = namespace
       ? await k8sCoreV1Api.listNamespacedReplicationController(namespace)
       : await k8sCoreV1Api.listReplicationControllerForAllNamespaces();
@@ -26,6 +28,7 @@ const ReplicationControllerHandler: ResourceKindHandler = {
   },
   async deleteResourceInCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sCoreV1Api = kubeconfig.makeApiClient(k8s.CoreV1Api);
+    k8sCoreV1Api.setDefaultAuthentication(new k8s.VoidAuth());
     await k8sCoreV1Api.deleteNamespacedReplicationController(resource.name, resource.namespace || 'default');
   },
   helpLink: 'https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/',

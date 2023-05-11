@@ -35,6 +35,7 @@ const AboutModal = () => {
   const dispatch = useAppDispatch();
   const aboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
   const appVersion = useAppVersion();
+  const [minorVersion, setMinorVersion] = useState<string>();
   const [about, setAbout] = useState<About>();
 
   const handleClose = () => {
@@ -48,6 +49,7 @@ const AboutModal = () => {
         return;
       }
       const releaseVersion = `${parsedVersion.major}.${parsedVersion.minor}`;
+      setMinorVersion(releaseVersion);
       const rawVersionInfo = loadResource(path.join('releaseNotes', releaseVersion, `${releaseVersion}.json`));
       if (!rawVersionInfo) {
         return;
@@ -81,9 +83,11 @@ const AboutModal = () => {
           <S.ContentDiv>
             <img src={MonokleAbout} />
             <S.TextContainer>
-              <Text>Version: {appVersion}</Text>
-              <Text>Released in {about?.when}</Text>
+              <Text>Current Version: {appVersion}</Text>
               <Divider style={{margin: '8px 0'}} />
+              <Text>
+                {minorVersion} was released in {about?.when}
+              </Text>
               <Text>
                 {about?.title}
                 <ul>

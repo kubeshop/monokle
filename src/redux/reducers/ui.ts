@@ -1,16 +1,20 @@
 import {webFrame} from 'electron';
 
-import {Draft, PayloadAction, createSlice, isAnyOf} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import path from 'path';
 import {Entries} from 'type-fest';
 
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
-import {activeProjectSelector} from '@redux/appConfig';
+import {setOpenProject} from '@redux/appConfig';
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import initialState from '@redux/initialState';
-import {AppListenerFn} from '@redux/listeners/base';
-import {loadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
+import {previewSavedCommand} from '@redux/services/previewCommand';
+import {stopClusterConnection} from '@redux/thunks/cluster';
+import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
+import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -238,25 +242,56 @@ export const uiSlice = createSlice({
 
       state.isStartProjectPaneVisible = !state.isStartProjectPaneVisible;
     },
-    collapseNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
-      const expandedSections = action.payload.filter(s => !state.navPane.collapsedNavSectionNames.includes(s));
-      if (expandedSections.length > 0) {
-        state.navPane.collapsedNavSectionNames.push(...expandedSections);
+    collapsePreviewConfigurationsHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.collapsedPreviewConfigurationsHelmCharts.push(action.payload);
+    },
+
+    togglePreviewConfigurationsHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.collapsedPreviewConfigurationsHelmCharts = state.collapsedPreviewConfigurationsHelmCharts.filter(
+        chart => chart !== action.payload
+      );
+    },
+
+    collapseHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.collapsedHelmCharts.push(action.payload);
+    },
+
+    toggleHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.collapsedHelmCharts = state.collapsedHelmCharts.filter(chart => chart !== action.payload);
+    },
+
+    collapseKustomizeKinds: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      const kindsToCollapse = action.payload.filter(s => !state.collapsedKustomizeKinds.includes(s));
+      if (kindsToCollapse.length > 0) {
+        state.collapsedKustomizeKinds.push(...kindsToCollapse);
       }
     },
-    expandNavSections: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
-      const collapsedSections = action.payload.filter(s => state.navPane.collapsedNavSectionNames.includes(s));
-      if (collapsedSections.length > 0) {
-        state.navPane.collapsedNavSectionNames = state.navPane.collapsedNavSectionNames.filter(
-          n => !collapsedSections.includes(n)
+    expandKustomizeKinds: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      const kindsToExpand = action.payload.filter(s => state.collapsedKustomizeKinds.includes(s));
+      if (kindsToExpand.length > 0) {
+        state.collapsedKustomizeKinds = state.collapsedKustomizeKinds.filter(n => !kindsToExpand.includes(n));
+      }
+    },
+
+    collapseResourceKinds: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      const kindsToCollapse = action.payload.filter(s => !state.navigator.collapsedResourceKinds.includes(s));
+      if (kindsToCollapse.length > 0) {
+        state.navigator.collapsedResourceKinds.push(...kindsToCollapse);
+      }
+    },
+    expandResourceKinds: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
+      const kindsToExpand = action.payload.filter(s => state.navigator.collapsedResourceKinds.includes(s));
+      if (kindsToExpand.length > 0) {
+        state.navigator.collapsedResourceKinds = state.navigator.collapsedResourceKinds.filter(
+          n => !kindsToExpand.includes(n)
         );
       }
     },
-    closeWelcomePopup: (state: Draft<UiState>) => {
-      state.welcomePopup.isVisible = false;
+    closeWelcomeModal: (state: Draft<UiState>) => {
+      state.welcomeModal.isVisible = false;
     },
-    openWelcomePopup: (state: Draft<UiState>) => {
-      state.welcomePopup.isVisible = true;
+    openWelcomeModal: (state: Draft<UiState>) => {
+      state.welcomeModal.isVisible = true;
     },
     setExpandedFolders: (state: Draft<UiState>, action: PayloadAction<React.Key[]>) => {
       state.leftMenu.expandedFolders = action.payload;
@@ -330,6 +365,12 @@ export const uiSlice = createSlice({
         filePath: '',
       };
     },
+    showNewVersionNotice: (state: Draft<UiState>) => {
+      state.newVersionNotice.isVisible = true;
+    },
+    hideNewVersionNotice: (state: Draft<UiState>) => {
+      state.newVersionNotice.isVisible = false;
+    },
     setShowOpenProjectAlert: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
       state.showOpenProjectAlert = action.payload;
       electronStore.set('ui.showOpenProjectAlert', action.payload);
@@ -396,9 +437,35 @@ export const uiSlice = createSlice({
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;
       })
-      .addCase(loadClusterResources.fulfilled, state => {
+      .addCase(connectCluster.fulfilled, state => {
+        state.leftMenu.activityBeforeClusterConnect = state.leftMenu.selection;
         state.leftMenu.selection = 'dashboard';
         state.leftMenu.isActive = true;
+        state.navigator.collapsedResourceKinds = [];
+      })
+      .addCase(stopClusterConnection.fulfilled, state => {
+        state.leftMenu.selection = state.leftMenu.activityBeforeClusterConnect ?? 'explorer';
+        state.leftMenu.activityBeforeClusterConnect = undefined;
+        state.navigator.collapsedResourceKinds = [];
+      })
+      .addCase(connectCluster.rejected, state => {
+        state.leftMenu.selection = 'dashboard';
+      })
+      .addCase(setOpenProject.fulfilled, state => {
+        state.leftMenu.selection = 'explorer';
+        state.navigator.collapsedResourceKinds = [];
+      })
+      .addCase(previewKustomization.fulfilled, state => {
+        state.navigator.collapsedResourceKinds = [];
+      })
+      .addCase(previewHelmValuesFile.fulfilled, state => {
+        state.navigator.collapsedResourceKinds = [];
+      })
+      .addCase(previewSavedCommand.fulfilled, state => {
+        state.navigator.collapsedResourceKinds = [];
+      })
+      .addCase(runPreviewConfiguration.fulfilled, state => {
+        state.navigator.collapsedResourceKinds = [];
       });
   },
 });
@@ -420,9 +487,14 @@ export const {
   closeSaveEditCommandModal,
   closeSaveResourcesToFileFolderModal,
   closeTemplateExplorer,
-  closeWelcomePopup,
-  collapseNavSections,
-  expandNavSections,
+  closeWelcomeModal,
+  collapseHelmChart,
+  collapseKustomizeKinds,
+  collapsePreviewConfigurationsHelmChart,
+  collapseResourceKinds,
+  expandKustomizeKinds,
+  expandResourceKinds,
+  hideNewVersionNotice,
   highlightItem,
   openAboutModal,
   openCreateFileFolderModal,
@@ -440,7 +512,7 @@ export const {
   openSaveEditCommandModal,
   openSaveResourcesToFileFolderModal,
   openTemplateExplorer,
-  openWelcomePopup,
+  openWelcomeModal,
   resetLayout,
   setActiveSettingsPanel,
   setExpandedFolders,
@@ -461,9 +533,12 @@ export const {
   setStartPageLearnTopic,
   setStartPageMenuOption,
   setTemplateProjectCreate,
+  showNewVersionNotice,
   toggleExpandActionsPaneFooter,
+  toggleHelmChart,
   toggleLeftMenu,
   toggleNotifications,
+  togglePreviewConfigurationsHelmChart,
   toggleResourceFilters,
   toggleRightMenu,
   toggleStartProjectPane,
@@ -480,24 +555,3 @@ export const {
   setHelmRepoPane,
 } = uiSlice.actions;
 export default uiSlice.reducer;
-
-// Listeners
-
-export const stopClusterConnectionListener: AppListenerFn = listen => {
-  listen({
-    matcher: isAnyOf(stopClusterConnection.fulfilled),
-    effect: async (action, {getState, dispatch}) => {
-      const activeProject = activeProjectSelector(getState());
-
-      if (activeProject) {
-        return;
-      }
-
-      const leftMenuSelection = getState().ui.leftMenu.selection;
-
-      if (leftMenuSelection === 'validation') {
-        dispatch(setLeftMenuSelection('dashboard'));
-      }
-    },
-  });
-};

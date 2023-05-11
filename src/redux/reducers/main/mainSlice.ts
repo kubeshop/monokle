@@ -1,17 +1,25 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {isEqual} from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import initialState from '@redux/initialState';
 import {processResourceRefs} from '@redux/parsing/parser.thunks';
+import {RESOURCE_PARSER} from '@redux/parsing/resourceParser';
 import {setAlert} from '@redux/reducers/alert';
 import {getResourceContentMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
+import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
-import {isResourceSelected, saveResource, splitK8sResource, splitK8sResourceMap} from '@redux/services/resource';
+import {
+  isResourceSelected,
+  isSupportedResource,
+  saveResource,
+  splitK8sResource,
+  splitK8sResourceMap,
+} from '@redux/services/resource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
@@ -28,6 +36,7 @@ import {parseYamlDocument} from '@utils/yaml';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AlertType} from '@shared/models/alert';
 import {
+  ActionPaneTab,
   AppState,
   FileMapType,
   HelmChartMapType,
@@ -50,14 +59,20 @@ import {
 } from '@shared/models/k8sResource';
 import {PreviewType} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
-import {AppSelection} from '@shared/models/selection';
+import {AppSelection, isResourceSelection} from '@shared/models/selection';
 import electronStore from '@shared/utils/electronStore';
+import {isEqual} from '@shared/utils/isEqual';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {filterReducers} from './filterReducers';
 import {imageReducers} from './imageReducers';
 import {clearPreviewReducer, previewExtraReducers, previewReducers} from './previewReducers';
-import {clearSelectionReducer, selectResourceReducer, selectionReducers} from './selectionReducers';
+import {
+  clearSelectionReducer,
+  createResourceHighlights,
+  selectResourceReducer,
+  selectionReducers,
+} from './selectionReducers';
 
 export type SetRootFolderPayload = {
   projectConfig: ProjectConfig;
@@ -71,6 +86,12 @@ export type SetRootFolderPayload = {
   isScanExcludesUpdated: 'outdated' | 'applied';
   isScanIncludesUpdated: 'outdated' | 'applied';
   isGitRepo: boolean;
+  isReload?: boolean;
+};
+
+export type SetRootFolderArgs = {
+  rootFolder: string | null;
+  isReload?: boolean;
 };
 
 export type UpdateMultipleResourcesPayload = {
@@ -79,6 +100,7 @@ export type UpdateMultipleResourcesPayload = {
 }[];
 
 export type UpdateFileEntryPayload = {
+  isUpdateFromEditor?: boolean; // this is used by the editor listeners
   path: string;
   text: string;
 };
@@ -92,8 +114,6 @@ export type SetPreviewDataPayload = {
   previewResourceMetaMap?: ResourceMetaMap<'preview'>;
   previewResourceContentMap?: ResourceContentMap<'preview'>;
   alert?: AlertType;
-  previewKubeConfigPath?: string;
-  previewKubeConfigContext?: string;
 };
 
 export type SetDiffDataPayload = {
@@ -241,7 +261,7 @@ export const mainSlice = createSlice({
     },
     openPreviewConfigurationEditor: (
       state: Draft<AppState>,
-      action: PayloadAction<{helmChartId: string; previewConfigurationId?: string}>
+      action: PayloadAction<{helmChartId?: string; previewConfigurationId?: string}>
     ) => {
       const {helmChartId, previewConfigurationId} = action.payload;
       state.prevConfEditor = {
@@ -258,6 +278,10 @@ export const mainSlice = createSlice({
       };
     },
 
+    setPreviewConfigurationEditorHelmChartId: (state: Draft<AppState>, action: PayloadAction<string>) => {
+      state.prevConfEditor.helmChartId = action.payload;
+    },
+
     setLastChangedLine: (state: Draft<AppState>, action: PayloadAction<number>) => {
       state.lastChangedLine = action.payload;
     },
@@ -270,8 +294,18 @@ export const mainSlice = createSlice({
         if (!isClusterResource(r)) {
           return;
         }
+        // TODO: this action should probably receive only the new content? and then we check if anything has changed in the meta?
+        // because right now if we do changes to the meta, for example setting refs after processing, if we replace the whole meta,
+        // we lose the refs.
+        // Old code for context:
+        // const {meta, content} = splitK8sResource(r);
+        // state.resourceMetaMapByStorage.cluster[r.id] = meta;
+        // state.resourceContentMapByStorage.cluster[r.id] = content;
+        // Quick fix:
+        const originalResourceMeta = state.resourceMetaMapByStorage.cluster[r.id];
         const {meta, content} = splitK8sResource(r);
-        state.resourceMetaMapByStorage.cluster[r.id] = meta;
+        const newMeta = {...originalResourceMeta, ...meta, refs: originalResourceMeta?.refs};
+        state.resourceMetaMapByStorage.cluster[r.id] = newMeta;
         state.resourceContentMapByStorage.cluster[r.id] = content;
       });
     },
@@ -280,6 +314,24 @@ export const mainSlice = createSlice({
         delete state.resourceMetaMapByStorage.cluster[r.id];
         delete state.resourceContentMapByStorage.cluster[r.id];
       });
+
+      RESOURCE_PARSER.clear(action.payload.map((r: K8sResource) => r.id));
+
+      // clear the selection if the selected resource has been deleted
+      const selection = state.selection;
+      if (isResourceSelection(selection)) {
+        const selectedResourceIdentifier = selection.resourceIdentifier;
+        if (
+          action.payload.some(
+            r => r.id === selectedResourceIdentifier.id && r.storage === selectedResourceIdentifier.storage
+          )
+        ) {
+          clearSelectionReducer(state);
+        }
+      }
+    },
+    setActiveEditorTab: (state: Draft<AppState>, action: PayloadAction<ActionPaneTab>) => {
+      state.activeEditorTab = action.payload;
     },
   },
   extraReducers: builder => {
@@ -295,6 +347,16 @@ export const mainSlice = createSlice({
     });
 
     previewExtraReducers(builder);
+
+    builder.addCase(connectCluster.rejected, state => {
+      state.clusterConnectionOptions.isLoading = false;
+    });
+    builder.addCase(connectCluster.pending, state => {
+      state.clusterConnectionOptions.isLoading = true;
+    });
+    builder.addCase(connectCluster.fulfilled, state => {
+      state.clusterConnectionOptions.isLoading = false;
+    });
 
     builder
       .addCase(loadClusterResources.pending, state => {
@@ -327,6 +389,7 @@ export const mainSlice = createSlice({
     builder
       .addCase(reloadClusterResources.pending, state => {
         state.clusterConnectionOptions.isLoading = true;
+        disconnectFromCluster();
       })
       .addCase(reloadClusterResources.fulfilled, (state, action) => {
         state.clusterConnectionOptions.isLoading = false;
@@ -378,6 +441,11 @@ export const mainSlice = createSlice({
       state.helmValuesMap = action.payload.helmValuesMap;
       state.helmTemplatesMap = action.payload.helmTemplatesMap;
 
+      if (!action.payload.isReload) {
+        state.resourceMetaMapByStorage.transient = {};
+        state.resourceContentMapByStorage.transient = {};
+      }
+
       clearSelectionReducer(state);
       clearPreviewReducer(state);
       resetSelectionHistory(state);
@@ -405,9 +473,12 @@ export const mainSlice = createSlice({
           resourceFileEntry.timestamp = resourcePayload.fileTimestamp;
         } else {
           const extension = path.extname(relativeFilePath);
+
+          //
           const newFileEntry: FileEntry = {
-            ...createFileEntry({fileEntryPath: relativeFilePath, fileMap: state.fileMap, extension}),
-            isSupported: true,
+            ...createFileEntry({fileEntryPath: relativeFilePath, fileMap: state.fileMap, extension, projectConfig: {}}),
+            isExcluded: resourcePayload.isExcluded,
+            isSupported: isSupportedResource(resourceMeta),
             timestamp: resourcePayload.fileTimestamp,
           };
           state.fileMap[relativeFilePath] = newFileEntry;
@@ -482,6 +553,10 @@ export const mainSlice = createSlice({
       return action.payload.nextMainState;
     });
 
+    builder.addCase(updateResource.pending, state => {
+      state.autosaving.status = true;
+    });
+
     builder.addCase(updateResource.fulfilled, (state, action) => {
       return action.payload.nextMainState;
     });
@@ -492,6 +567,10 @@ export const mainSlice = createSlice({
 
     builder.addCase(updateMultipleResources.fulfilled, (state, action) => {
       return action.payload.nextMainState;
+    });
+
+    builder.addCase(updateFileEntry.pending, state => {
+      state.autosaving.status = true;
     });
 
     builder.addCase(updateFileEntry.fulfilled, (state, action) => {
@@ -508,6 +587,18 @@ export const mainSlice = createSlice({
           resourceContentMap[resource.id] = content;
         }
       });
+
+      const selection = state.selection;
+      if (selection?.type === 'resource') {
+        const resourceIdentifier = selection.resourceIdentifier;
+        // TODO: 2.0+ should processResourceRefs return the storage as well so we can first check if the selection matches it?
+        const resource = action.payload.find(
+          r => r.id === resourceIdentifier.id && r.storage === resourceIdentifier.storage
+        );
+        if (resource) {
+          state.highlights = createResourceHighlights(resource);
+        }
+      }
     });
 
     // TODO: 2.0+ how do we make this work with the new resource storage?
@@ -576,8 +667,9 @@ export const {
   setAutosavingError,
   setAutosavingStatus,
   setFiltersToBeChanged,
-  setImagesList,
+  setImageMap,
   setImagesSearchedValue,
+  setPreviewConfigurationEditorHelmChartId,
   setSelectionHistory,
   uncheckAllResourceIds,
   uncheckMultipleResourceIds,
@@ -587,5 +679,6 @@ export const {
   setLastChangedLine,
   updateMultipleClusterResources,
   deleteMultipleClusterResources,
+  setActiveEditorTab,
 } = mainSlice.actions;
 export default mainSlice.reducer;

@@ -2,9 +2,11 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {set} from 'lodash';
 
-import {startClusterConnection, stopClusterConnection} from '@redux/thunks/cluster';
+import {connectCluster} from '@redux/cluster/thunks/connect';
+import {stopClusterConnection} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
+import {ValidationFiltersValueType} from '@monokle/components';
 import {ValidationIntegrationId} from '@shared/models/integrations';
 import {SelectedProblem, ValidationState} from '@shared/models/validation';
 import electronStore from '@shared/utils/electronStore';
@@ -65,6 +67,10 @@ export const validationSlice = createSlice({
 
     clearValidation: (state: Draft<ValidationState>) => {
       state.lastResponse = undefined;
+    },
+
+    setValidationFilters: (state: Draft<ValidationState>, action: PayloadAction<ValidationFiltersValueType>) => {
+      state.validationOverview.filters = action.payload;
     },
 
     setSelectedProblem: (state: Draft<ValidationState>, action: PayloadAction<SelectedProblem>) => {
@@ -151,6 +157,7 @@ export const validationSlice = createSlice({
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, state => {
       state.validationOverview.selectedProblem = undefined;
+      state.lastResponse = undefined;
       state.validationOverview.newProblemsIntroducedType = 'initial';
     });
 
@@ -175,6 +182,12 @@ export const validationSlice = createSlice({
       state.status = 'loading';
     });
 
+    builder.addCase(validateResources.rejected, state => {
+      state.status = 'error';
+      state.lastResponse = undefined;
+      state.loadRequestId = undefined;
+    });
+
     builder.addCase(validateResources.fulfilled, (state, action) => {
       if (action.payload) {
         // @ts-ignore
@@ -184,10 +197,10 @@ export const validationSlice = createSlice({
     });
 
     builder
-      .addCase(startClusterConnection.fulfilled, state => {
+      .addCase(stopClusterConnection.fulfilled, state => {
         state.validationOverview.selectedProblem = undefined;
       })
-      .addCase(stopClusterConnection.fulfilled, state => {
+      .addCase(connectCluster.fulfilled, state => {
         state.validationOverview.selectedProblem = undefined;
       });
   },
@@ -197,6 +210,7 @@ export const {
   changeRuleLevel,
   clearValidation,
   setConfigK8sSchemaVersion,
+  setValidationFilters,
   setSelectedProblem,
   toggleRule,
   toggleValidation,

@@ -5,6 +5,7 @@ import {CLUSTER_RESOURCE_IGNORED_PATHS} from '@constants/clusterResource';
 
 import {removeNestedEmptyObjects} from '@utils/objects';
 
+import {ResourceRef} from '@monokle/validation';
 import {ResourceFilterType} from '@shared/models/appState';
 import {
   K8sResource,
@@ -17,6 +18,7 @@ import {
 } from '@shared/models/k8sResource';
 import {ValidationResource} from '@shared/models/validation';
 import {isPassingKeyValueFilter} from '@shared/utils/filter';
+import {isEqual} from '@shared/utils/isEqual';
 
 export function isResourcePassingFilter(resourceMeta: ResourceMeta, filters: ResourceFilterType) {
   if (filters.name && filters.name.length && !resourceMeta.name.toLowerCase().includes(filters.name.toLowerCase())) {
@@ -27,8 +29,14 @@ export function isResourcePassingFilter(resourceMeta: ResourceMeta, filters: Res
     return false;
   }
 
-  if (filters.namespaces?.length && !filters.namespaces?.includes(resourceMeta?.namespace || 'default')) {
-    return false;
+  if (filters.namespaces?.length) {
+    if (filters.namespaces.includes('<none>') && !resourceMeta.namespace) {
+      return true;
+    }
+
+    if (!filters.namespaces?.includes(resourceMeta?.namespace || 'default')) {
+      return false;
+    }
   }
 
   if (
@@ -103,7 +111,7 @@ export function diffLocalToClusterResources(localResource: K8sResource, clusterR
   const cleanLocalResourceObject = removeNestedEmptyObjects(localResource.object);
 
   return {
-    areDifferent: !_.isEqual(cleanLocalResourceObject, cleanClusterResourceObject),
+    areDifferent: !isEqual(cleanLocalResourceObject, cleanClusterResourceObject),
     cleanLocalResourceObject,
     cleanClusterResourceObject,
   };
@@ -159,7 +167,7 @@ export function transformResourceForValidation(r: K8sResource): ValidationResour
   let fileOffset = 0;
 
   if (isLocalResource(r)) {
-    filePath = r.origin.filePath;
+    filePath = r.origin.filePath.replaceAll('\\', '/');
     fileOffset = r.origin.fileOffset;
   } else if (isClusterResource(r)) {
     filePath = r.origin.context;
@@ -180,4 +188,12 @@ export function transformResourceForValidation(r: K8sResource): ValidationResour
     fileId: filePath,
     content: r.object,
   };
+}
+
+export function transformRefsFilePath(ref: ResourceRef) {
+  if (!ref.target || ref.target.type !== 'file') {
+    return ref;
+  }
+
+  return {...ref, target: {...ref.target, filePath: ref.target.filePath.replaceAll('/', '\\')}};
 }

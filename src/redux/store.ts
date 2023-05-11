@@ -2,10 +2,13 @@ import {Middleware, combineReducers, configureStore, createAction} from '@reduxj
 
 import {createLogger} from 'redux-logger';
 
-import {sectionBlueprintMiddleware} from '@src/navsections/sectionBlueprintMiddleware';
+import {editorSlice} from '@editor/editor.slice';
+import {editorListeners} from '@editor/listeners';
 
-import {configSlice, crdsPathChangedListener, k8sVersionSchemaListener} from './appConfig';
+import {configSlice} from './appConfig';
 import {appConfigListeners} from './appConfig/appConfig.listeners';
+import {clusterListeners} from './cluster/listeners';
+import {clusterSlice} from './cluster/slice';
 import * as compareListeners from './compare/listeners';
 import {compareSlice} from './compare/slice';
 import {dashboardSlice} from './dashboard';
@@ -16,9 +19,8 @@ import {alertSlice} from './reducers/alert';
 import {extensionSlice} from './reducers/extension';
 import {mainSlice} from './reducers/main';
 import {imageListParserListener} from './reducers/main/mainListeners';
-import {navigatorSlice, updateNavigatorInstanceState} from './reducers/navigator';
-import {killTerminalProcessesListener, terminalSlice} from './reducers/terminal';
-import {stopClusterConnectionListener, uiSlice} from './reducers/ui';
+import {killTerminalProcessesListener, removeTerminalListener, terminalSlice} from './reducers/terminal';
+import {uiSlice} from './reducers/ui';
 import {validationListeners} from './validation/validation.listeners';
 import {validationSlice} from './validation/validation.slice';
 
@@ -26,7 +28,6 @@ const middlewares: Middleware[] = [];
 
 if (process.env.NODE_ENV === `development`) {
   const reduxLoggerMiddleware = createLogger({
-    predicate: (getState, action) => action.type !== updateNavigatorInstanceState.type,
     collapsed: (getState, action, logEntry) => !logEntry?.error,
   });
 
@@ -36,17 +37,17 @@ if (process.env.NODE_ENV === `development`) {
 export const resetStore = createAction('app/reset');
 
 combineListeners([
+  ...editorListeners,
   compareListeners.resourceFetchListener('left'),
   compareListeners.resourceFetchListener('right'),
   compareListeners.compareListener,
   compareListeners.filterListener,
   killTerminalProcessesListener,
-  k8sVersionSchemaListener,
-  crdsPathChangedListener,
+  removeTerminalListener,
   ...validationListeners,
   ...appConfigListeners,
+  ...clusterListeners,
   imageListParserListener,
-  stopClusterConnectionListener,
 ]);
 
 const appReducer = combineReducers({
@@ -55,13 +56,14 @@ const appReducer = combineReducers({
   config: configSlice.reducer,
   extension: extensionSlice.reducer,
   main: mainSlice.reducer,
-  navigator: navigatorSlice.reducer,
   terminal: terminalSlice.reducer,
   ui: uiSlice.reducer,
   git: gitSlice.reducer,
   form: formSlice.reducer,
   validation: validationSlice.reducer,
   dashboard: dashboardSlice.reducer,
+  cluster: clusterSlice.reducer,
+  editor: editorSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {
@@ -82,8 +84,7 @@ const store = configureStore({
       immutableCheck: false,
     })
       .prepend(listenerMiddleware.middleware)
-      .concat(middlewares)
-      .concat(sectionBlueprintMiddleware),
+      .concat(middlewares),
 });
 
 export default store;

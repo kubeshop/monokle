@@ -1,3 +1,5 @@
+import {sep} from 'path';
+
 import {PREDEFINED_K8S_VERSION} from './k8s';
 
 export const electronStoreSchema = {
@@ -39,9 +41,6 @@ export const electronStoreSchema = {
         type: 'string',
       },
       useKubectlProxy: {
-        type: 'boolean',
-      },
-      isClusterSelectorVisible: {
         type: 'boolean',
       },
       loadLastProjectOnStartup: {
@@ -258,31 +257,6 @@ export const electronStoreSchema = {
       },
     },
   },
-  pluginConfig: {
-    type: 'object',
-    properties: {
-      policies: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            id: {
-              type: 'string',
-            },
-            enabled: {
-              type: 'boolean',
-            },
-            enabledRules: {
-              type: 'array',
-              items: {
-                type: 'string',
-              },
-            },
-          },
-        },
-      },
-    },
-  },
   terminal: {
     type: 'object',
     properties: {
@@ -309,10 +283,9 @@ export const electronStoreDefaults = {
     kubeConfigContextsColors: {},
     lastNamespaceLoaded: 'default',
     useKubectlProxy: false,
-    isClusterSelectorVisible: true,
     loadLastProjectOnStartup: false,
     fileExplorerSortOrder: 'folders',
-    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', '.monokle'],
+    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', `${sep}.github`],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {
       theme: 'dark',
@@ -322,6 +295,7 @@ export const electronStoreDefaults = {
       createDefaultObjects: false,
       setDefaultPrimitiveValues: true,
       allowEditInClusterMode: true,
+      enableHelmWithKustomize: true,
     },
     recentFolders: [],
     newVersion: 0,
@@ -352,9 +326,6 @@ export const electronStoreDefaults = {
   kubeConfig: {
     namespaces: [],
     contextsWithRemovedNamespace: [],
-  },
-  pluginConfig: {
-    policies: [],
   },
   terminal: {
     settings: {

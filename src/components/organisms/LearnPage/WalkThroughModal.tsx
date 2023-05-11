@@ -30,7 +30,8 @@ const WalkThroughModal = () => {
 
               <WalkThroughCard.Text>
                 Create a project - then find here all the resource inputs contained in it. Switch between them for
-                different views. Click on <MenuOutlinedIcon /> to change project or create a new one.
+                different views. Click on the Monokle logo, the three lines icon, or the project name in the top bar to
+                change the project or create a new one.
               </WalkThroughCard.Text>
             </WalkThroughCard.Slice>,
 

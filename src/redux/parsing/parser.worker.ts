@@ -25,7 +25,8 @@ onmessage = async event => {
     const processedResources = processRefs(
       transformedResources,
       RESOURCE_PARSER,
-      input.incremental
+      input.incremental,
+      input.files
     ) as ValidationResource[];
 
     return {validationResources: processedResources};

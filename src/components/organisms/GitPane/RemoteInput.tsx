@@ -6,15 +6,16 @@ import {useForm} from 'antd/es/form/Form';
 import {CheckOutlined} from '@ant-design/icons';
 
 import {updateRemoteRepo} from '@redux/git';
+import {setRemote} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
 
 import * as S from './RemoteInput.styled';
 
 const RemoteInput: React.FC = () => {
   const dispatch = useAppDispatch();
-  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder) || '';
 
   const [loading, setLoading] = useState(false);
 
@@ -24,12 +25,12 @@ const RemoteInput: React.FC = () => {
     setLoading(true);
 
     form.validateFields().then(async values => {
-      await promiseFromIpcRenderer('git.setRemote', 'git.setRemote.result', {
-        localPath: selectedProjectRootFolder,
-        remoteURL: values.remoteURL,
-      });
-
-      dispatch(updateRemoteRepo({exists: true, authRequired: false}));
+      try {
+        await setRemote({localPath: selectedProjectRootFolder, remoteURL: values.remoteURL});
+        dispatch(updateRemoteRepo({exists: true, authRequired: false}));
+      } catch (e: any) {
+        showGitErrorModal('Setting remote failed', e.message);
+      }
 
       form.resetFields();
     });

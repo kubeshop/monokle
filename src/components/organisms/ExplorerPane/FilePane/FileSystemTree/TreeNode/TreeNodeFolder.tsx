@@ -1,33 +1,35 @@
-import {useCallback, useRef, useState} from 'react';
+import {memo, useCallback, useRef, useState} from 'react';
 import {useMeasure} from 'react-use';
 
 import {Tooltip} from 'antd';
 
-import {join} from 'path';
+import {basename, join} from 'path';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
 
 import {ContextMenu, Dots} from '@components/atoms';
 
 import {Spinner} from '@monokle/components';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileEntry} from '@shared/models/fileEntry';
+import {isEqual} from '@shared/utils/isEqual';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './TreeNode.styled';
 import {useDelete, useFolderMenuItems, useIsDisabled} from './hooks';
 
 type Props = {
   folderPath: string;
+  disabledNode: boolean;
 };
 
 const TreeNodeFolder: React.FC<Props> = props => {
-  const {folderPath} = props;
+  const {disabledNode, folderPath} = props;
   const folderEntry: FileEntry | undefined = useAppSelector(state => state.main.fileMap[folderPath]);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -51,13 +53,13 @@ const TreeNodeFolder: React.FC<Props> = props => {
 
   return (
     <S.NodeContainer
-      $isDisabled={isDisabled}
+      $isDisabled={isDisabled || disabledNode}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onContextMenu={onContextMenu}
     >
       <S.TitleContainer $actionButtonsWidth={actionButtonsWidth} $isHovered={isHovered}>
-        <S.TitleText>
+        <S.TitleText $isExcluded={folderEntry.isExcluded} $isSupported={!disabledNode}>
           <Tooltip
             overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
             mouseEnterDelay={TOOLTIP_DELAY}
@@ -68,7 +70,7 @@ const TreeNodeFolder: React.FC<Props> = props => {
             }
             placement="bottom"
           >
-            <span>{folderEntry.name}</span>
+            <span>{folderPath === ROOT_FILE_ENTRY ? `[${basename(folderEntry.filePath)}]` : folderEntry.name}</span>
           </Tooltip>
         </S.TitleText>
       </S.TitleContainer>
@@ -92,4 +94,4 @@ const TreeNodeFolder: React.FC<Props> = props => {
   );
 };
 
-export default TreeNodeFolder;
+export default memo(TreeNodeFolder, isEqual);

@@ -65,13 +65,14 @@ const StartPage: React.FC = () => {
               key={key}
               $active={!isStartPageLearnVisible && key === selectedOption}
               onClick={() => {
+                trackEvent('app_start/select_page', {page: key});
+
                 if (key === 'quick-cluster-mode') {
                   onClickQuickClusterLoad();
                   return;
                 }
 
                 dispatch(setStartPageMenuOption(key as StartPageMenuOptions));
-
                 if (isStartPageLearnVisible) {
                   dispatch(setShowStartPageLearn(false));
                 }

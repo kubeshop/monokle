@@ -1,33 +1,66 @@
 import * as k8s from '@kubernetes/client-node';
 
 import invariant from 'tiny-invariant';
-import {stringify} from 'yaml';
+import {Document, isScalar, visit} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
+
+import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {AlertEnum} from '@shared/models/alert';
 import {K8sObject} from '@shared/models/k8s';
-import {K8sResource} from '@shared/models/k8sResource';
-import {createKubeClient} from '@shared/utils/kubeclient';
+import {ResourceMeta} from '@shared/models/k8sResource';
+
+/**
+ * Preprocess for proper serialization:
+ * - remove pairs with null values
+ * - change Date objects to properly quoted strings
+ */
+
+export function processK8sResourceDoc(doc: Document, removeNullValues?: boolean) {
+  visit(doc, {
+    Pair(_, pair) {
+      if (removeNullValues === true && isScalar(pair.value) && pair.value.value === null) {
+        return visit.REMOVE;
+      }
+    },
+    Scalar(key, node) {
+      // change dates to properly formatted and quoted strings
+      if (node.value instanceof Date) {
+        node.value = node.value.toISOString();
+        node.type = 'QUOTE_SINGLE';
+      }
+    },
+  });
+  return doc;
+}
+
+function preprocessClusterResource(item: any) {
+  let doc = new Document(item, {schema: 'yaml-1.1'});
+  return processK8sResourceDoc(doc, true);
+}
 
 /**
  * Utility to convert list of objects returned by k8s api to a single YAML document
  */
 
 export function getK8sObjectsAsYaml(items: any[], kind?: string, apiVersion?: string): string {
-  return items
+  const result = items
     .map(item => {
       delete item.metadata?.managedFields;
 
+      let doc = preprocessClusterResource(item);
       if (kind && apiVersion && !item.apiVersion && !item.kind) {
-        return `apiVersion: ${apiVersion}\nkind: ${kind}\n${stringify(item)}`;
+        return `apiVersion: ${apiVersion}\nkind: ${kind}\n${doc.toString()}`;
       }
 
-      return stringify(item);
+      return doc.toString();
     })
     .join(YAML_DOCUMENT_DELIMITER_NEW_LINE);
+
+  return result;
 }
 
 /**
@@ -45,21 +78,33 @@ export function createRejectionWithAlert(thunkAPI: any, title: string, message: 
 }
 
 export async function getResourceFromCluster(
-  resource: K8sResource,
-  kubeconfigPath: string,
-  context?: string
+  resourceMeta: ResourceMeta,
+  kubeconfigPath: string | undefined,
+  context: string
 ): Promise<K8sObject | undefined> {
-  const resourceKindHandler = getResourceKindHandler(resource.kind);
+  const resourceKindHandler = getResourceKindHandler(resourceMeta.kind);
 
-  if (resource && resource.text && resourceKindHandler) {
-    const kubeClient = createKubeClient(kubeconfigPath, context);
-    const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kubeClient, resource);
+  if (resourceKindHandler) {
+    const kubeClient = await createKubeClientWithSetup({
+      kubeconfig: kubeconfigPath,
+      context,
+      skipHealthCheck: true,
+    });
+    const resourceFromCluster = await resourceKindHandler.getResourceFromCluster(kubeClient, resourceMeta);
     return toPojo(resourceFromCluster.body);
   }
 }
 
-export async function removeNamespaceFromCluster(namespace: string, kubeconfigPath: string, context?: string) {
-  const kubeClient = createKubeClient(kubeconfigPath, context);
+export async function removeNamespaceFromCluster(
+  namespace: string,
+  kubeconfigPath: string | undefined,
+  context: string
+) {
+  const kubeClient = await createKubeClientWithSetup({
+    kubeconfig: kubeconfigPath,
+    context,
+    skipHealthCheck: true,
+  });
   const k8sCoreV1Api = kubeClient.makeApiClient(k8s.CoreV1Api);
   await k8sCoreV1Api.deleteNamespace(namespace);
 }

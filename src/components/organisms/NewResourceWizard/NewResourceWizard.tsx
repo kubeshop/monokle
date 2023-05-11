@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useHotkeys} from 'react-hotkeys-hook';
 
 import {Checkbox, Form, Input, Modal, Select, TreeSelect} from 'antd';
@@ -24,7 +24,7 @@ import {useFileSelectOptions} from '@hooks/useFileSelectOptions';
 import {useFileFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 import {useNamespaces} from '@hooks/useNamespaces';
 
-import {useSelectorWithRef, useStateWithRef} from '@utils/hooks';
+import {useRefSelector, useSelectorWithRef, useStateWithRef} from '@utils/hooks';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
@@ -83,10 +83,10 @@ const NewResourceWizard = () => {
   const localResourceMetaMapRef = useRef(localResourceMetaMap);
   localResourceMetaMapRef.current = localResourceMetaMap;
   const localResourceContentMapRef = useResourceContentMapRef('local');
-  const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
+  const fileMapRef = useRefSelector(state => state.main.fileMap);
   const [rootFolderEntry, rootFolderEntryRef] = useSelectorWithRef(state => state.main.fileMap[ROOT_FILE_ENTRY]);
-  const [, userDataDirRef] = useSelectorWithRef(state => state.config.userDataDir);
-  const [, k8sVersionRef] = useSelectorWithRef(state => state.config.k8sVersion);
+  const userDataDirRef = useRefSelector(state => state.config.userDataDir);
+  const k8sVersionRef = useRefSelector(state => state.config.k8sVersion);
 
   const [filteredResources, setFilteredResources] = useState<ResourceMeta[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
@@ -419,6 +419,7 @@ const NewResourceWizard = () => {
         apiVersion: formValues.apiVersion,
       },
       dispatch,
+      'local',
       jsonTemplate
     );
 
@@ -688,4 +689,4 @@ const NewResourceWizard = () => {
   );
 };
 
-export default NewResourceWizard;
+export default memo(NewResourceWizard);

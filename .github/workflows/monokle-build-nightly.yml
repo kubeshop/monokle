@@ -3,9 +3,10 @@ name: monokle-build-nightly
 on:
   schedule:
     - cron: '0 2 * * *'
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      ref:
+        description: 'The SHA to release - avoid tags and branches.'
 
 jobs:
   build-nightly-mac:
@@ -22,6 +23,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout Project
         uses: actions/checkout@v2
+        with:
+          ref: '${{ github.event.inputs.ref }}'
 
       # Check memory and cpu
       - name: Verify Runner Resources
@@ -68,9 +71,17 @@ jobs:
       #     ls -la
       #     npm list --depth=1
 
-      - name: Generate and apply tag
+      - if: github.event.inputs.ref == ''
+        name: Generate and apply tag
         run: |
           npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true --skip.tag true
+          git push --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+      - if: github.event.inputs.ref != ''
+        name: Generate and apply tag
+        run: |
+          npm run release:patch -- --prerelease prerelease-${{github.event.inputs.ref}} --skip.changelog true --skip.commit true --skip.tag true
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -163,6 +174,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout Project
         uses: actions/checkout@v2
+        with:
+          ref: '${{ github.event.inputs.ref }}'
 
       - name: Install Tools
         run: |
@@ -197,11 +210,19 @@ jobs:
       #     cmd /r dir
       #     npm list --depth=1
 
-      - name: Generate and apply tag
+      - if: github.event.inputs.ref == ''
+        name: Generate and apply tag
         run: |
           Set-PSDebug -Trace 1
           $datetoday = Get-Date -Format "yyyy-MM-dd"
           npm run release:patch -- --prerelease nightly-$datetoday --skip.changelog true --skip.commit true --skip.tag true
+          git push --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+      - if: github.event.inputs.ref != ''
+        name: Generate and apply tag
+        run: |
+          npm run release:patch -- --prerelease prerelease-${{github.event.inputs.ref}} --skip.changelog true --skip.commit true --skip.tag true
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -287,6 +308,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout Project
         uses: actions/checkout@v2
+        with:
+          ref: '${{ github.event.inputs.ref }}'
 
       - name: Get Node Version
         run: |
@@ -316,9 +339,17 @@ jobs:
         run: |
           sudo apt-get install jq
 
-      - name: Generate and apply tag
+      - if: github.event.inputs.ref == ''
+        name: Generate and apply tag
         run: |
           npm run release:patch -- --prerelease nightly-$(date +%Y-%m-%d) --skip.changelog true --skip.commit true --skip.tag true
+          git push --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+      - if: github.event.inputs.ref != ''
+        name: Generate and apply tag
+        run: |
+          npm run release:patch -- --prerelease prerelease-${{github.event.inputs.ref}} --skip.changelog true --skip.commit true --skip.tag true
           git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -351,7 +382,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage'
+          artifacts: 'dist/latest-linux.yml,dist/latest-linux-arm64.yml,dist/*.deb,dist/*.AppImage,dist/*.rpm'
           draft: false
           prerelease: true
           omitBody: true

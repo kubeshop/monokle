@@ -8,7 +8,7 @@ import {runCommandInMainThread} from '@shared/utils/commands';
 
 interface ApplyToClusterParams {
   yaml: string;
-  context: string;
+  context?: string;
   kubeconfig?: string;
   namespace?: {
     name: string;
@@ -17,7 +17,8 @@ interface ApplyToClusterParams {
 }
 
 export function applyYamlToCluster({yaml, context, namespace, kubeconfig}: ApplyToClusterParams) {
-  const kubectlArgs = ['--context', context, 'apply', '-f', '-'];
+  const globalFlags = context ? ['--context', context] : [];
+  const kubectlArgs = [...globalFlags, 'apply', '-f', '-'];
 
   if (namespace) {
     kubectlArgs.unshift(...['--namespace', namespace.name]);

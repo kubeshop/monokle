@@ -19,7 +19,7 @@ export const BottomPaneManagerContainer = styled.div<{$isLeftMenuActive: boolean
 
   ${({$isLeftMenuActive}) => {
     if ($isLeftMenuActive) {
-      return `border-left: 9px solid ${PanelColors.toolBar}`;
+      return `border-left: 12px solid ${PanelColors.toolBar}`;
     }
   }}
 `;

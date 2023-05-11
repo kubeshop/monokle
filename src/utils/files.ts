@@ -2,9 +2,6 @@ import fs from 'fs';
 import {lstat, rm} from 'fs/promises';
 import log from 'loglevel';
 import path from 'path';
-import textExtensions from 'text-extensions';
-
-import {ADDITIONAL_SUPPORTED_FILES} from '@constants/constants';
 
 import {setAlert} from '@redux/reducers/alert';
 
@@ -208,17 +205,13 @@ export const isFileEntryDisabled = (fileEntry?: FileEntry) => {
     return true;
   }
   const isFolder = isDefined(fileEntry.children);
-  const fileName = path.basename(fileEntry.filePath);
-  const fileExtension = path.extname(fileName);
-  const isSupported =
-    textExtensions.some(supportedExtension => supportedExtension === fileExtension.slice(1)) ||
-    ADDITIONAL_SUPPORTED_FILES.some(supportedExtension => supportedExtension === fileName);
+  const isSupported = fileEntry.isSupported;
 
   if (isFolder) {
     return false;
   }
 
-  return !isSupported;
+  return !isSupported || fileEntry.isExcluded;
 };
 
 const getParentFolderPath = (relativePath: string): string | undefined => {

@@ -11,20 +11,20 @@ import {
   SaveTransientResourceTooltip,
 } from '@constants/tooltips';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {selectedHelmConfigSelector, selectedImageSelector} from '@redux/selectors';
 import {startPreview} from '@redux/services/preview';
+import {selectFromHistory} from '@redux/thunks/selectFromHistory';
 
 import {TitleBarWrapper} from '@components/atoms';
 
-import {useSelectorWithRef} from '@utils/hooks';
+import {useRefSelector} from '@utils/hooks';
 
 import {TitleBar} from '@monokle/components';
 import {ResourceMeta} from '@shared/models/k8sResource';
-import {selectFromHistory} from '@shared/utils/selectionHistory';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ActionsPaneHeader.styled';
 import Diff from './Diff/Diff';
@@ -41,11 +41,8 @@ interface IProps {
 const ActionsPaneHeader: React.FC<IProps> = props => {
   const {selectedResourceMeta, applySelection, actionsPaneWidth} = props;
   const dispatch = useAppDispatch();
-  const [, fileMapRef] = useSelectorWithRef(state => state.main.fileMap);
-  const [, resourceMetaMapByStorageRef] = useSelectorWithRef(state => state.main.resourceMetaMapByStorage);
-  const [, helmChartMapRef] = useSelectorWithRef(state => state.main.helmChartMap);
-  const [, imagesListRef] = useSelectorWithRef(state => state.main.imagesList);
-  const [selectionHistory, selectionHistoryRef] = useSelectorWithRef(state => state.main.selectionHistory);
+  const helmChartMapRef = useRefSelector(state => state.main.helmChartMap);
+  const selectionHistory = useAppSelector(state => state.main.selectionHistory);
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const selectedHelmConfig = useAppSelector(selectedHelmConfigSelector);
@@ -76,28 +73,12 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   }, [dispatch, selectedHelmConfig]);
 
   const onClickLeftArrow = useCallback(() => {
-    selectFromHistory(
-      'left',
-      selectionHistoryRef.current.index,
-      selectionHistoryRef.current.current,
-      resourceMetaMapByStorageRef.current,
-      fileMapRef.current,
-      imagesListRef.current,
-      dispatch
-    );
-  }, [dispatch, fileMapRef, imagesListRef, resourceMetaMapByStorageRef, selectionHistoryRef]);
+    dispatch(selectFromHistory('left'));
+  }, [dispatch]);
 
   const onClickRightArrow = useCallback(() => {
-    selectFromHistory(
-      'right',
-      selectionHistoryRef.current.index,
-      selectionHistoryRef.current.current,
-      resourceMetaMapByStorageRef.current,
-      fileMapRef.current,
-      imagesListRef.current,
-      dispatch
-    );
-  }, [dispatch, fileMapRef, imagesListRef, resourceMetaMapByStorageRef, selectionHistoryRef]);
+    dispatch(selectFromHistory('right'));
+  }, [dispatch]);
 
   const isLeftArrowEnabled = useMemo(
     () =>
@@ -192,7 +173,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   }
 
   return (
-    <TitleBarWrapper>
+    <TitleBarWrapper $editor>
       <TitleBar
         type="secondary"
         title="Editor"

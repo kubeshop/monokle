@@ -3,6 +3,8 @@ import log from 'loglevel';
 import micromatch from 'micromatch';
 import path from 'path';
 
+import {ADDITIONAL_SUPPORTED_FILES, SUPPORTED_TEXT_EXTENSIONS} from '@constants/constants';
+
 import {clearSelectionReducer, selectFileReducer, selectResourceReducer} from '@redux/reducers/main/selectionReducers';
 import {
   HelmChartEventEmitter,
@@ -13,10 +15,7 @@ import {
   getHelmChartFromFileEntry,
   getHelmChartName,
   getHelmValuesFile,
-  isHelmChartFile,
   isHelmChartFolder,
-  isHelmTemplateFile,
-  isHelmValuesFile,
   processHelmChartFolder,
 } from '@redux/services/helm';
 import {createChildrenResourcesHighlights} from '@redux/services/selection';
@@ -43,14 +42,9 @@ import {
   ResourceMetaMap,
 } from '@shared/models/k8sResource';
 import {AppSelection, ResourceSelection} from '@shared/models/selection';
+import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
 
-import {
-  deleteResource,
-  extractK8sResources,
-  hasSupportedResourceContent,
-  joinK8sResource,
-  splitK8sResource,
-} from './resource';
+import {deleteResource, extractK8sResources, isSupportedResource, joinK8sResource, splitK8sResource} from './resource';
 
 type PathRemovalSideEffect = {
   removedResources: ResourceIdentifier[];
@@ -67,16 +61,19 @@ interface CreateFileEntryArgs {
   fileMap: FileMapType;
   helmChartId?: string;
   extension: string;
+  projectConfig: ProjectConfig;
 }
 
 // TODO: Maybe text shouldn't be optional
-export function createFileEntry({fileEntryPath, fileMap, helmChartId, extension}: CreateFileEntryArgs) {
+export function createFileEntry({fileEntryPath, fileMap, helmChartId, extension, projectConfig}: CreateFileEntryArgs) {
   const fileEntry: FileEntry = {
     name: path.basename(fileEntryPath),
     filePath: fileEntryPath,
     rootFolderPath: fileMap[ROOT_FILE_ENTRY].filePath,
-    isExcluded: false,
-    isSupported: false,
+    isExcluded: Boolean(fileIsExcluded(fileEntryPath, projectConfig)),
+    isSupported:
+      SUPPORTED_TEXT_EXTENSIONS.some(supportedExtension => supportedExtension === extension) ||
+      ADDITIONAL_SUPPORTED_FILES.some(supportedExtension => supportedExtension === path.basename(fileEntryPath)),
     helmChartId,
     extension,
   };
@@ -112,7 +109,11 @@ export function createRootFileEntry(rootFolder: string, fileMap: FileMapType) {
  */
 
 export function fileIsExcluded(filePath: FileEntry['filePath'], projectConfig: ProjectConfig) {
-  return projectConfig.scanExcludes?.some(e => micromatch.isMatch(filePath, e));
+  return (
+    projectConfig.scanExcludes?.some(
+      e => micromatch.isMatch(filePath, e) || micromatch.isMatch(path.dirname(filePath), e)
+    ) && !ADDITIONAL_SUPPORTED_FILES.includes(path.basename(filePath))
+  );
 }
 
 /**
@@ -143,7 +144,7 @@ export function extractResourcesForFileEntry(fileEntry: FileEntry, rootFolderPat
     fileEntry.isSupported = true;
     extractK8sResourcesFromFile(fileEntry.filePath, rootFolderPath).forEach(resource => {
       // TODO: shouldn't we filter out resources that are not supported?
-      if (!hasSupportedResourceContent(resource)) {
+      if (!isSupportedResource(resource)) {
         fileEntry.isSupported = false;
         return;
       }
@@ -224,7 +225,7 @@ export function readFiles(
 
       let extension = isDir ? '' : path.extname(fileEntryPath);
 
-      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, extension});
+      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, extension, projectConfig});
       // TODO: should we handle these differenly?
       // fileEntry.isExcluded = Boolean(isExcluded);
       // fileEntry.isSupported = Boolean(isIncluded);
@@ -235,7 +236,9 @@ export function readFiles(
 
       if (isExcluded) {
         fileEntry.isExcluded = true;
-      } else if (isDir) {
+      }
+
+      if (isDir) {
         const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
         if (depth === folderReadsMaxDepth) {
           log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
@@ -336,14 +339,6 @@ export function getAbsoluteResourcePath(resource: ResourceMeta<'local'>, fileMap
 
 export function getAbsoluteFilePath(relativePath: string, fileMap: FileMapType) {
   return path.join(fileMap[ROOT_FILE_ENTRY].filePath, relativePath);
-}
-
-/**
- * Returns the relative path for the specified absolute path
- */
-export function getRelativeFilePath(absolutePath: string) {
-  const pathArr = absolutePath.split('/');
-  return `/${pathArr[pathArr.length - 1]}`;
 }
 
 /**
@@ -516,7 +511,7 @@ export function reloadFile(
 
   if (fileEntry.timestamp && absolutePathTimestamp && absolutePathTimestamp <= fileEntry.timestamp) {
     log.info(`ignoring changed file ${absolutePath} because of timestamp`);
-    return;
+    return false;
   }
 
   // const fileStats = getFileStats(absolutePath);
@@ -536,6 +531,8 @@ export function reloadFile(
     selectFileReducer(state, {filePath: fileEntry.filePath});
     state.selectionOptions.shouldEditorReload = true;
   }
+
+  return true;
 }
 
 /**
@@ -630,7 +627,7 @@ function addFile(absolutePath: string, state: AppState, projectConfig: ProjectCo
   const rootFolderEntry = state.fileMap[ROOT_FILE_ENTRY];
   const relativePath = absolutePath.substring(rootFolderEntry.filePath.length);
   const extension = path.extname(absolutePath);
-  const fileEntry = createFileEntry({fileEntryPath: relativePath, fileMap: state.fileMap, extension});
+  const fileEntry = createFileEntry({fileEntryPath: relativePath, fileMap: state.fileMap, extension, projectConfig});
 
   if (!fileIsIncluded(fileEntry.filePath, projectConfig)) {
     return fileEntry;
@@ -670,6 +667,7 @@ function addFolder(absolutePath: string, state: AppState, projectConfig: Project
       fileEntryPath: absolutePath.substring(rootFolder.length),
       fileMap: state.fileMap,
       extension: path.extname(absolutePath),
+      projectConfig,
     });
     folderEntry.children = readFiles(
       absolutePath,

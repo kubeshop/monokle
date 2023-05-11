@@ -14,6 +14,7 @@ import {TemplateFormRenderer} from '@components/molecules';
 import {K8sResource} from '@shared/models/k8sResource';
 import {isReferencedHelmChartTemplate, isVanillaTemplate} from '@shared/models/template';
 import {trackEvent} from '@shared/utils/telemetry';
+import {formatFormData} from '@shared/utils/templateForm';
 
 import CreatedResources from '../CreatedResources';
 import * as S from './TemplateForm.styled';
@@ -64,7 +65,7 @@ const TemplateForm: React.FC<IProps> = props => {
       if (isVanillaTemplate(template)) {
         trackEvent('edit/template_use', {templateID: template.id});
         setLoading(true);
-        createTransientResourcesFromVanillaTemplate(template, formDataList, dispatch)
+        createTransientResourcesFromVanillaTemplate(template, formDataList, 'local', dispatch)
           .then(({message, resources}) => {
             setResultMessage(message);
             setCreatedResources(resources);
@@ -111,7 +112,7 @@ const TemplateForm: React.FC<IProps> = props => {
   const setFormData = useCallback(
     (formIndex: number, formData: Record<string, Primitive>) => {
       const newFormDataList = currentFormDataList.slice(0);
-      newFormDataList.splice(formIndex, 1, formData);
+      newFormDataList.splice(formIndex, 1, formatFormData(formData));
       setCurrentFormDataList(newFormDataList);
       setActiveFormIndex(formIndex + 1);
 

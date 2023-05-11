@@ -21,6 +21,8 @@ if (process.platform === 'win32') {
   autoUpdater = new AppImageUpdater(options);
 }
 autoUpdater.logger = console;
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
 
 if (isDev) {
   autoUpdater.updateConfigPath = join(__dirname, '..', '..', '..', 'dev-app-update.yml');

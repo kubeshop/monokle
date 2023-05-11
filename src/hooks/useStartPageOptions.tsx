@@ -13,6 +13,18 @@ import {Icon} from '@monokle/components';
 export function useStartPageOptions() {
   const options = useMemo(
     () => ({
+      'new-project': {
+        icon: <StyledPlusOutlined />,
+        label: 'New project',
+        content: <NewProject />,
+        title: 'Start something new',
+      },
+      'quick-cluster-mode': {
+        icon: <Icon name="cluster-dashboard" style={{fontSize: '16px'}} />,
+        label: 'Connect to Cluster',
+        content: null,
+        title: '',
+      },
       'recent-projects': {
         icon: <StyledSendOutlined />,
         label: 'Recent projects',
@@ -30,18 +42,6 @@ export function useStartPageOptions() {
         label: 'Settings',
         content: <SettingsPane />,
         title: 'Settings',
-      },
-      'new-project': {
-        icon: <StyledPlusOutlined />,
-        label: 'New project',
-        content: <NewProject />,
-        title: 'Start something new',
-      },
-      'quick-cluster-mode': {
-        icon: <Icon name="cluster-dashboard" style={{fontSize: '16px'}} />,
-        label: 'Connect to Cluster',
-        content: null,
-        title: '',
       },
       learn: {
         icon: null,

@@ -19,13 +19,13 @@ module.exports = {
 
     'arrow-body-style': 'off', // warn
     'arrow-parens': 'off', // warn
-
+    'class-methods-use-this': 'off',
     'comma-dangle': 'off',
     'consistent-return': 'off', // warn. Look at api calls closely before enabling this. api.ts.
 
     'default-param-last': 'off',
     'dot-notation': 'off', // required for our env variables currently
-
+    'no-await-in-loop': 'off',
     'import/no-named-as-default': 'off',
     'import/no-cycle': 'off',
     'import/no-extraneous-dependencies': 'off',
@@ -81,6 +81,8 @@ module.exports = {
     'no-nested-ternary': 'off', // warn
     'no-param-reassign': 'off',
     'no-restricted-exports': 'off',
+    'no-restricted-syntax': 'off',
+    'no-continue': 'off',
     'no-shadow': 'off',
     'no-underscore-dangle': 'off',
     'no-undef': 'off',

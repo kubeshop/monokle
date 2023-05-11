@@ -1,8 +1,11 @@
 import {TypedUseSelectorHook} from 'react-redux';
 
-import {createSelector} from '@reduxjs/toolkit';
+import {createSelector} from 'reselect';
 
 import {useAppSelector} from '@redux/hooks';
+import {activeResourceStorageSelector, transientResourceMetaMapSelector} from '@redux/selectors/resourceMapSelectors';
+import {filteredResourcesIdsSelector} from '@redux/selectors/resourceSelectors';
+import {createDeepEqualSelector} from '@redux/selectors/utils';
 
 import {
   RuleLevel,
@@ -12,9 +15,11 @@ import {
   getResourceId,
   getResourceLocation,
 } from '@monokle/validation';
+import {ResourceStorage} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {MonacoRange} from '@shared/models/ui';
 import {ValidationState} from '@shared/models/validation';
+import {isDefined} from '@shared/utils/filter';
 
 import {VALIDATOR} from './validator';
 
@@ -24,7 +29,7 @@ export const useValidationSelector: TypedUseSelectorHook<ValidationState> = (sel
 /* * * * * * * * * * * * * * * * * *
  * All problems
  * * * * * * * * * * * * * * * * * */
-export const problemsSelector = createSelector(
+export const problemsSelector = createDeepEqualSelector(
   [(state: ValidationState) => state.lastResponse, (_: ValidationState, level?: RuleLevel) => level],
   (response, level) => {
     const allProblems = response?.runs.flatMap(r => r.results) ?? [];
@@ -38,7 +43,7 @@ export const warningsSelector = (state: ValidationState) => problemsSelector(sta
 /* * * * * * * * * * * * * * * * * *
  * Problems by resource
  * * * * * * * * * * * * * * * * * */
-export const problemsByResourcesSelector = createSelector(
+export const problemsByResourcesSelector = createDeepEqualSelector(
   [(state: ValidationState) => problemsSelector(state), (_: ValidationState, level?: RuleLevel) => level],
   (problems, level): Record<string, ValidationResult[] | undefined> => {
     const problemsByResources: Map<string, ValidationResult[]> = new Map();
@@ -68,7 +73,7 @@ export const problemsByResourcesSelector = createSelector(
 export const errorsByResourcesSelector = (state: ValidationState) => problemsByResourcesSelector(state, 'error');
 export const warningsByResourcesSelector = (state: ValidationState) => problemsByResourcesSelector(state, 'warning');
 
-export const problemsByResourceSelector = createSelector(
+export const problemsByResourceSelector = createDeepEqualSelector(
   [
     (state: ValidationState, _resource?: string, level?: RuleLevel) => {
       return problemsByResourcesSelector(state, level);
@@ -85,10 +90,24 @@ export const warningsByResourceSelector = (state: ValidationState, resource?: st
   return problemsByResourceSelector(state, resource, 'warning');
 };
 
+export const errorsByResourcesFilterCountSelector = createSelector(
+  [filteredResourcesIdsSelector, state => errorsByResourcesSelector(state.validation)],
+  (filteredResources, errorsByResourceMap) => {
+    return filteredResources.map(id => errorsByResourceMap[id]?.length || 0).reduce((a, b) => a + b, 0);
+  }
+);
+
+export const warningsByResourcesFilterCountSelector = createSelector(
+  [filteredResourcesIdsSelector, state => warningsByResourcesSelector(state.validation)],
+  (filteredResources, warningsByResourceMap) => {
+    return filteredResources.map(id => warningsByResourceMap[id]?.length || 0).reduce((a, b) => a + b, 0);
+  }
+);
+
 /* * * * * * * * * * * * * * * * * *
  * Problems by file path
  * * * * * * * * * * * * * * * * * */
-export const problemsByFilePathsSelector = createSelector(
+export const problemsByFilePathsSelector = createDeepEqualSelector(
   [(state: ValidationState) => problemsSelector(state), (_: ValidationState, level?: RuleLevel) => level],
   (problems, level): Record<string, ValidationResult[] | undefined> => {
     const problemsByFile: Map<string, ValidationResult[]> = new Map();
@@ -118,7 +137,7 @@ export const problemsByFilePathsSelector = createSelector(
 export const errorsByFilePathsSelector = (state: ValidationState) => problemsByFilePathsSelector(state, 'error');
 export const warningsByFilePathsSelector = (state: ValidationState) => problemsByFilePathsSelector(state, 'warning');
 
-export const problemsByFilePathSelector = createSelector(
+export const problemsByFilePathSelector = createDeepEqualSelector(
   [
     (state: ValidationState, _path: string, level?: RuleLevel) => problemsByFilePathsSelector(state, level),
     (_state: ValidationState, path?: string) => path,
@@ -138,7 +157,7 @@ export const warningsByFilePathSelector = (state: ValidationState, path: string)
  * Problems by rule
  * * * * * * * * * * * * * * * * * */
 
-export const problemsByRulesSelector = createSelector(
+export const problemsByRulesSelector = createDeepEqualSelector(
   [(state: ValidationState) => problemsSelector(state), (_: ValidationState, level?: RuleLevel) => level],
   (problems, level): Record<string, ValidationResult[] | undefined> => {
     const problemsByRule: Map<string, ValidationResult[]> = new Map();
@@ -169,12 +188,12 @@ export const problemsByRulesSelector = createSelector(
  * Miscellaneous
  * * * * * * * * * * * * * * * * * */
 
-export const pluginMetadataSelector = createSelector(
+export const pluginMetadataSelector = createDeepEqualSelector(
   [(state: ValidationState) => state.metadata, (state: ValidationState, plugin?: string) => plugin],
   (metadata, plugin) => (!plugin ? undefined : metadata?.[plugin])
 );
 
-export const pluginRulesSelector = createSelector(
+export const pluginRulesSelector = createDeepEqualSelector(
   [(state: ValidationState) => state.rules, (state: ValidationState, plugin?: string) => plugin],
   (rules, plugin) => (!plugin ? [] : rules?.[plugin] ?? [])
 );
@@ -191,13 +210,13 @@ export const opaRuleCountSelector = (state: ValidationState) => {
   }, 0);
 };
 
-export const pluginEnabledSelector = createSelector(
+export const pluginEnabledSelector = createDeepEqualSelector(
   (state: RootState, id: string) => state.validation.config?.plugins?.[id],
   (_: RootState, id: string) => id,
   (_config, id): boolean => VALIDATOR.getPlugin(id)?.enabled ?? false
 );
 
-export const problemFilePathAndRangeSelector = createSelector(
+export const problemFilePathAndRangeSelector = createDeepEqualSelector(
   (state: ValidationState) => state.validationOverview.selectedProblem?.problem ?? null,
   (problem: ValidationResult | null) => {
     if (!problem) {
@@ -223,19 +242,24 @@ export const problemFilePathAndRangeSelector = createSelector(
   }
 );
 
-export const problemResourceIdAndRangeSelector = createSelector(
-  (state: ValidationState) => state.validationOverview.selectedProblem?.problem ?? null,
-  (problem: ValidationResult | null) => {
+export const problemResourceAndRangeSelector = createDeepEqualSelector(
+  (state: RootState) => state.validation.validationOverview.selectedProblem?.problem ?? null,
+  activeResourceStorageSelector,
+  transientResourceMetaMapSelector,
+  (problem: ValidationResult | null, activeStorage, transientMetaMap) => {
     if (!problem) {
-      return {resourceId: '', range: undefined};
+      return {resourceId: '', storage: 'local' as ResourceStorage, range: undefined};
     }
 
     const resourceId = getResourceId(problem) ?? '';
     const location = getResourceLocation(problem);
     const region = location.physicalLocation?.region;
 
+    // need to check if the resource might be in transient storage since the validation problem does not know
+    const storage = activeStorage === 'local' && isDefined(transientMetaMap[resourceId]) ? 'transient' : activeStorage;
+
     if (!region) {
-      return {resourceId, range: undefined};
+      return {resourceId, storage, range: undefined};
     }
 
     const range: MonacoRange = {
@@ -245,6 +269,6 @@ export const problemResourceIdAndRangeSelector = createSelector(
       startLineNumber: region.startLine,
     };
 
-    return {resourceId, range};
+    return {resourceId, storage, range};
   }
 );

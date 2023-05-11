@@ -1,9 +1,9 @@
-import {keyBy, size} from 'lodash';
+import {keyBy, size, uniq} from 'lodash';
 import {Selector, createSelector} from 'reselect';
 
 import {useAppSelector} from '@redux/hooks';
 import {isKustomizationResource} from '@redux/services/kustomize';
-import {joinK8sResource, joinK8sResourceMap} from '@redux/services/resource';
+import {joinK8sResource} from '@redux/services/resource';
 
 import {useRefSelector} from '@utils/hooks';
 import {mapKeyValuesFromNestedObjects} from '@utils/objects';
@@ -11,62 +11,25 @@ import {isResourcePassingFilter} from '@utils/resources';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {
-  K8sResource,
-  ResourceContentMap,
-  ResourceMap,
-  ResourceMetaMap,
-  ResourceStorage,
-} from '@shared/models/k8sResource';
+import {K8sResource, ResourceContentMap, ResourceMetaMap, ResourceStorage} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {isDefined} from '@shared/utils/filter';
 
 import {knownResourceKindsSelector} from './resourceKindSelectors';
 import {createDeepEqualSelector} from './utils';
 
-// TODO: do the same thing for resource maps as I did for resource selectors
-export const createResourceMapSelector = <Storage extends ResourceStorage>(
-  storage: Storage
-): Selector<RootState, ResourceMetaMap<Storage>> => {
-  return createDeepEqualSelector(
-    [
-      (state: RootState) => state.main.resourceMetaMapByStorage[storage],
-      (state: RootState) => state.main.resourceContentMapByStorage[storage],
-    ],
-    (resourceMetaMap, resourceContentMap): ResourceMap<Storage> => {
-      return joinK8sResourceMap(resourceMetaMap, resourceContentMap);
+export const activeResourceStorageSelector = createSelector(
+  [(state: RootState) => state.main.clusterConnection, (state: RootState) => state.main.preview],
+  (clusterConnection, preview): ResourceStorage => {
+    if (clusterConnection) {
+      return 'cluster';
     }
-  );
-};
-
-const localResourceMapSelector = createResourceMapSelector('local');
-const clusterResourceMapSelector = createResourceMapSelector('cluster');
-const previewResourceMapSelector = createResourceMapSelector('preview');
-const transientResourceMapSelector = createResourceMapSelector('transient');
-
-const getResourceMapSelector = <Storage extends ResourceStorage>(
-  storage: Storage
-): Selector<RootState, ResourceMap<Storage>> => {
-  if (storage === 'cluster') return clusterResourceMapSelector as Selector<RootState, ResourceMap<typeof storage>>;
-  if (storage === 'preview') return previewResourceMapSelector as Selector<RootState, ResourceMap<typeof storage>>;
-  if (storage === 'transient') return transientResourceMapSelector as Selector<RootState, ResourceMap<typeof storage>>;
-  if (storage === 'local') return localResourceMapSelector as Selector<RootState, ResourceMap<typeof storage>>;
-  throw new Error(`Unknown resource storage: ${storage}`);
-};
-
-export const useResourceMap = <Storage extends ResourceStorage>(storage: Storage): ResourceMap<Storage> => {
-  return useAppSelector(getResourceMapSelector(storage));
-};
-
-export const useActiveResourceMap = (): ResourceMap<ResourceStorage> => {
-  const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
-  return useAppSelector(getResourceMapSelector(activeResourceStorage));
-};
-
-export const useActiveResourceMapRef = (): React.MutableRefObject<ResourceMap<ResourceStorage>> => {
-  const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
-  return useRefSelector(getResourceMapSelector(activeResourceStorage));
-};
+    if (preview) {
+      return 'preview';
+    }
+    return 'local';
+  }
+);
 
 export const createResourceMetaMapSelector = <Storage extends ResourceStorage>(
   storage: Storage
@@ -77,10 +40,10 @@ export const createResourceMetaMapSelector = <Storage extends ResourceStorage>(
   );
 };
 
-const localResourceMetaMapSelector = createResourceMetaMapSelector('local');
-const clusterResourceMetaMapSelector = createResourceMetaMapSelector('cluster');
-const previewResourceMetaMapSelector = createResourceMetaMapSelector('preview');
-const transientResourceMetaMapSelector = createResourceMetaMapSelector('transient');
+export const localResourceMetaMapSelector = createResourceMetaMapSelector('local');
+export const clusterResourceMetaMapSelector = createResourceMetaMapSelector('cluster');
+export const previewResourceMetaMapSelector = createResourceMetaMapSelector('preview');
+export const transientResourceMetaMapSelector = createResourceMetaMapSelector('transient');
 
 const getResourceMetaMapSelector = <Storage extends ResourceStorage>(
   storage: Storage
@@ -112,6 +75,11 @@ export const useActiveResourceMetaMapRef = () => {
   const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
   return useRefSelector(getResourceMetaMapSelector(activeResourceStorage));
 };
+
+export const activeResourceMetaMapSelector = createDeepEqualSelector(
+  [activeResourceStorageSelector, (state: RootState) => state.main.resourceMetaMapByStorage],
+  (activeStorage, resourceMetaMapByStorage) => resourceMetaMapByStorage[activeStorage]
+);
 
 export const createResourceContentMapSelector = <Storage extends ResourceStorage>(
   storage: Storage
@@ -162,19 +130,6 @@ export const useActiveResourceContentMapRef = () => {
   const activeResourceStorage = useAppSelector(activeResourceStorageSelector);
   return useRefSelector(getResourceContentMapSelector(activeResourceStorage));
 };
-
-export const activeResourceStorageSelector = createSelector(
-  (state: RootState) => state.main,
-  (mainState): ResourceStorage => {
-    if (mainState.clusterConnection) {
-      return 'cluster';
-    }
-    if (mainState.preview) {
-      return 'preview';
-    }
-    return 'local';
-  }
-);
 
 export const activeResourceCountSelector = createSelector(
   [activeResourceStorageSelector, (state: RootState) => state.main.resourceMetaMapByStorage],
@@ -253,11 +208,52 @@ export const allResourcesMetaSelector = createDeepEqualSelector(
   }
 );
 
+export const navigatorResourcesMetaSelector = createDeepEqualSelector(
+  [
+    (state: RootState) => state.main.resourceMetaMapByStorage.local,
+    (state: RootState) => state.main.resourceMetaMapByStorage.cluster,
+    (state: RootState) => state.main.resourceMetaMapByStorage.preview,
+    (state: RootState) => state.main.resourceMetaMapByStorage.transient,
+    activeResourceStorageSelector,
+  ],
+  (localMetaMap, clusterMetaMap, previewMetaMap, transientMetaMap, activeStorage) => {
+    if (activeStorage === 'local') {
+      return [
+        ...Object.values(localMetaMap),
+        ...Object.values(transientMetaMap).filter(r => r.origin.createdIn === 'local'),
+      ];
+    }
+    if (activeStorage === 'cluster') {
+      return [
+        ...Object.values(clusterMetaMap),
+        ...Object.values(transientMetaMap).filter(r => r.origin.createdIn === 'cluster'),
+      ];
+    }
+    if (activeStorage === 'preview') {
+      return [...Object.values(previewMetaMap)];
+    }
+    if (activeStorage === 'transient') {
+      return [...Object.values(transientMetaMap)];
+    }
+
+    return [];
+  }
+);
+
 export const allResourceKindsSelector = createDeepEqualSelector(
   [knownResourceKindsSelector, allResourcesMetaSelector],
   (knownResourceKinds, allResourceMetas) => {
-    return allResourceMetas.filter(r => knownResourceKinds.includes(r.kind)).map(r => r.kind);
+    return uniq(allResourceMetas.filter(r => knownResourceKinds.includes(r.kind)).map(r => r.kind));
   }
+);
+
+export const resourceKindsSelector = createDeepEqualSelector(allResourcesMetaSelector, allResourceMetas =>
+  uniq(allResourceMetas.map(r => r.kind))
+);
+
+export const navigatorResourceKindsSelector = createDeepEqualSelector(
+  navigatorResourcesMetaSelector,
+  navigatorResourceMetas => uniq(navigatorResourceMetas.map(r => r.kind))
 );
 
 export const allResourceLabelsSelector = createSelector(allResourcesMetaSelector, allResourceMetas => {

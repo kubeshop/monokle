@@ -1,25 +1,19 @@
-import {memo, useEffect, useLayoutEffect, useRef} from 'react';
+import {useLayoutEffect, useRef} from 'react';
 import {useMeasure} from 'react-use';
 
-import {DataNode} from 'antd/lib/tree';
-
-import fastDeepEqual from 'fast-deep-equal';
 import {isString} from 'lodash';
-import path from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile} from '@redux/reducers/main';
+import {selectFile, selectHelmValuesFile} from '@redux/reducers/main';
 import {setFileExplorerExpandedFolders} from '@redux/reducers/ui';
-import {selectedFilePathSelector} from '@redux/selectors';
+import {helmValuesMapByFilePathSelector, projectFileTreeSelector, selectionFilePathSelector} from '@redux/selectors';
 
-import {getAllParentFolderPaths, isFileEntryDisabled} from '@utils/files';
+import {getAllParentFolderPaths} from '@utils/files';
 import {useSelectorWithRef} from '@utils/hooks';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {FileMapType} from '@shared/models/appState';
-import {FileExplorerSortOrder} from '@shared/models/config';
 import {isFileSelection} from '@shared/models/selection';
-import {isDefined} from '@shared/utils/filter';
+import {isHelmValuesFile, trackEvent} from '@shared/utils';
 
 import * as S from './FileSystemTree.styled';
 import FileSystemTreeNode from './TreeNode';
@@ -29,44 +23,45 @@ const FileSystemTree: React.FC = () => {
   const [fileExplorerExpandedFolders, fileExplorerExpandedFoldersRef] = useSelectorWithRef(
     state => state.ui.fileExplorerExpandedFolders
   );
-  const selectedFilePath = useAppSelector(selectedFilePathSelector);
-  const firstHighlightedFile = useAppSelector(state => state.main.highlights.find(isFileSelection));
+  const [helmValuesMapByFilePath] = useSelectorWithRef(helmValuesMapByFilePathSelector);
+  const selectedFilePath = useAppSelector(selectionFilePathSelector);
+  const [firstHighlightedFile, firstHighlightedFileRef] = useSelectorWithRef(state =>
+    state.main.highlights.find(isFileSelection)
+  );
 
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
 
   const treeRef = useRef<any>(null);
 
-  const treeData = useAppSelector(state => {
-    const rootEntry = state.main.fileMap[ROOT_FILE_ENTRY];
-
-    const rootFileNodes = createFileNodes(path.sep, state.main.fileMap);
-    const rootFolderNodes =
-      rootEntry?.children
-        ?.map(folderPath =>
-          createFolderTree(`${path.sep}${folderPath}`, state.main.fileMap, state.config.fileExplorerSortOrder)
-        )
-        .filter(isDefined) || [];
-
-    return sortNodes(rootFolderNodes, rootFileNodes, state.config.fileExplorerSortOrder);
-  }, fastDeepEqual);
-
-  useEffect(() => {
-    if (!firstHighlightedFile) {
-      return;
-    }
-
-    const parentFolderPaths = getAllParentFolderPaths(firstHighlightedFile.filePath);
-    dispatch(
-      setFileExplorerExpandedFolders([...new Set([...fileExplorerExpandedFoldersRef.current, ...parentFolderPaths])])
-    );
-  }, [dispatch, fileExplorerExpandedFoldersRef, firstHighlightedFile]);
+  const treeData = useAppSelector(projectFileTreeSelector);
 
   useLayoutEffect(() => {
     if (!firstHighlightedFile) {
       return;
     }
-    treeRef.current?.scrollTo({key: firstHighlightedFile.filePath});
-  }, [firstHighlightedFile]);
+
+    const parentFolderPaths = getAllParentFolderPaths(firstHighlightedFile.filePath).filter(
+      folderPath => !fileExplorerExpandedFoldersRef.current.includes(folderPath)
+    );
+
+    if (parentFolderPaths.length) {
+      dispatch(
+        setFileExplorerExpandedFolders([...new Set([...fileExplorerExpandedFoldersRef.current, ...parentFolderPaths])])
+      );
+    } else {
+      treeRef.current?.scrollTo({key: firstHighlightedFile.filePath});
+    }
+  }, [dispatch, fileExplorerExpandedFoldersRef, firstHighlightedFile]);
+
+  useLayoutEffect(() => {
+    if (!firstHighlightedFileRef.current) {
+      return;
+    }
+
+    setTimeout(() => {
+      treeRef.current?.scrollTo({key: firstHighlightedFileRef.current?.filePath});
+    }, 50);
+  }, [fileExplorerExpandedFolders, firstHighlightedFileRef]);
 
   return (
     <S.TreeContainer ref={containerRef}>
@@ -75,6 +70,10 @@ const FileSystemTree: React.FC = () => {
         ref={treeRef}
         expandedKeys={fileExplorerExpandedFolders}
         onExpand={(keys, info) => {
+          if (info.node.key === ROOT_FILE_ENTRY) {
+            return;
+          }
+
           dispatch(
             setFileExplorerExpandedFolders(
               keys.filter(
@@ -94,11 +93,18 @@ const FileSystemTree: React.FC = () => {
         virtual
         onClick={(mouseEvent, nodeEvent) => {
           mouseEvent.preventDefault();
-          if (nodeEvent.selectable === false) {
+          if (nodeEvent.selectable === false || nodeEvent.key === ROOT_FILE_ENTRY) {
             return;
           }
           if (typeof nodeEvent.key === 'string' && !nodeEvent.disabled) {
-            dispatch(selectFile({filePath: nodeEvent.key}));
+            if (isHelmValuesFile(nodeEvent.key) && helmValuesMapByFilePath[nodeEvent.key]) {
+              const valuesFileId = helmValuesMapByFilePath[nodeEvent.key].id;
+              dispatch(selectHelmValuesFile({valuesFileId}));
+              trackEvent('explore/select_values_file');
+            } else {
+              dispatch(selectFile({filePath: nodeEvent.key}));
+              trackEvent('explore/select_file');
+            }
           }
         }}
       />
@@ -106,56 +112,4 @@ const FileSystemTree: React.FC = () => {
   );
 };
 
-const sortNodes = (folderNodes: DataNode[], fileNodes: DataNode[], fileExplorerSortOrder: FileExplorerSortOrder) => {
-  if (fileExplorerSortOrder === 'folders') {
-    return [...folderNodes, ...fileNodes];
-  }
-
-  if (fileExplorerSortOrder === 'files') {
-    return [...fileNodes, ...folderNodes];
-  }
-
-  return [...folderNodes, ...fileNodes].sort((a, b) => a.key.toLocaleString().localeCompare(b.key.toLocaleString()));
-};
-
-function createFileNodes(folderPath: string, fileMap: FileMapType) {
-  const fileEntries = Object.values(fileMap).filter(entry => {
-    const entryFolderPath = path.dirname(entry.filePath);
-    return folderPath === entryFolderPath && !isDefined(entry.children);
-  });
-
-  const fileNodes: DataNode[] = fileEntries.map(entry => ({
-    key: entry.filePath,
-    title: path.basename(entry.filePath),
-    isLeaf: true,
-    disabled: isFileEntryDisabled(entry),
-  }));
-
-  return fileNodes;
-}
-
-function createFolderTree(folderPath: string, fileMap: FileMapType, fileExplorerSortOrder: FileExplorerSortOrder) {
-  const folderEntry = fileMap[folderPath];
-  if (!folderEntry || !isDefined(folderEntry.children)) {
-    return undefined;
-  }
-
-  const fileNodes = createFileNodes(folderPath, fileMap);
-  const folderNodes =
-    folderEntry.children
-      ?.map(childPath => createFolderTree(path.join(folderPath, childPath), fileMap, fileExplorerSortOrder))
-      .filter(isDefined) || [];
-
-  let children: DataNode[] = sortNodes(folderNodes, fileNodes, fileExplorerSortOrder);
-
-  const treeNode: DataNode = {
-    key: folderEntry.filePath,
-    title: path.basename(folderEntry.filePath),
-    children,
-    selectable: false,
-  };
-
-  return treeNode;
-}
-
-export default memo(FileSystemTree);
+export default FileSystemTree;

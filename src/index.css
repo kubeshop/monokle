@@ -475,20 +475,37 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
   background-color: currentColor !important;
 }
 
-.welcome-popup .ant-popover-inner {
-  background: #dbdbdb;
-  padding: 30px;
-  position: relative;
+.welcome-modal .ant-modal-content .ant-modal-body {
+  background-color: #dbdbdb;
 }
 
-.welcome-popup .ant-popover-inner-content {
-  padding: 0px;
+.root-folder-tree-node .ant-tree-switcher {
+  display: none;
+  width: 0;
 }
 
-.welcome-popup .ant-popover-arrow {
-  top: 8px;
+.root-folder-tree-node .ant-tree-node-content-wrapper {
+  padding-left: 1px;
 }
 
-.welcome-popup .ant-popover-arrow-content::before {
-  background: #dbdbdb !important;
+.root-folder-tree-node .ant-tree-title {
+  padding-left: 9px;
+}
+
+.new-version-notice-tooltip  {
+  max-width: 310px;
+}
+
+.new-version-notice-tooltip .ant-tooltip-inner {
+  background-color: #5273E0;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 8px;
+}
+
+.new-version-notice-tooltip .ant-tooltip-arrow-content::before {
+  background: #5273E0;
+
 }

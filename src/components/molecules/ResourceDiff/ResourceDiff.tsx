@@ -6,20 +6,14 @@ import {Button, Switch} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
-import {parse, stringify} from 'yaml';
+import {parse} from 'yaml';
 
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
 
-import {
-  currentConfigSelector,
-  isInClusterModeSelector,
-  kubeConfigContextColorSelector,
-  kubeConfigContextSelector,
-} from '@redux/appConfig';
+import {kubeConfigContextColorSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
 import {isKustomizationResource} from '@redux/services/kustomize';
-import {applyResource} from '@redux/thunks/applyResource';
+import {applyResourceToCluster} from '@redux/thunks/applyResource';
 import {updateResource} from '@redux/thunks/updateResource';
 
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
@@ -27,9 +21,11 @@ import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 import {useWindowSize} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {removeIgnoredPathsFromResourceObject} from '@utils/resources';
+import {stringifyK8sResource} from '@utils/yaml';
 
 import {Icon} from '@monokle/components';
 import {K8sResource} from '@shared/models/k8sResource';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import ModalConfirmWithNamespaceSelect from '../ModalConfirmWithNamespaceSelect';
 import * as S from './ResourceDiff.styled';
@@ -55,12 +51,9 @@ const ResourceDiff = (props: {
   const localResourceRef = useRef(localResource);
   localResourceRef.current = localResource;
 
-  const fileMap = useAppSelector(state => state.main.fileMap);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const kubeConfigContextColor = useAppSelector(kubeConfigContextColorSelector);
-  const projectConfig = useAppSelector(currentConfigSelector);
-  const localResourceMap = useResourceMap('local');
   const userDataDir = useAppSelector(state => state.config.userDataDir);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
@@ -83,7 +76,7 @@ const ResourceDiff = (props: {
 
   // TODO: can't we just use localResource.text here?
   const localResourceText = useMemo(() => {
-    return stringify(localResource.object, {sortMapEntries: true});
+    return stringifyK8sResource(localResource.object, {sortMapEntries: true});
   }, [localResource]);
 
   const cleanClusterResourceText = useMemo(() => {
@@ -93,7 +86,7 @@ const ResourceDiff = (props: {
     const originalClusterResourceContent = parse(clusterResourceText);
     const cleanClusterResourceContent = removeIgnoredPathsFromResourceObject(originalClusterResourceContent);
 
-    return stringify(cleanClusterResourceContent, {sortMapEntries: true});
+    return stringifyK8sResource(cleanClusterResourceContent, {sortMapEntries: true});
   }, [clusterResourceText, shouldDiffIgnorePaths]);
 
   const areResourcesDifferent = useMemo(() => {
@@ -126,10 +119,16 @@ const ResourceDiff = (props: {
       onApply();
     }
 
-    applyResource(localResource.id, localResourceMap, fileMap, dispatch, projectConfig, kubeConfigContext, namespace, {
-      isInClusterMode,
-      shouldPerformDiff: true,
-    });
+    dispatch(
+      applyResourceToCluster({
+        resourceIdentifier: {id: localResource.id, storage: 'local'},
+        namespace,
+        options: {
+          isInClusterMode,
+          shouldPerformDiff: true,
+        },
+      })
+    );
     setIsApplyModalVisible(false);
   };
 

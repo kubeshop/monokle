@@ -4,7 +4,8 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {isAnyOf} from '@reduxjs/toolkit';
 
-import {isEmpty, isEqual} from 'lodash';
+import {isEmpty, uniqWith} from 'lodash';
+import log from 'loglevel';
 
 import {
   activeProjectSelector,
@@ -14,7 +15,15 @@ import {
   updateProjectK8sVersion,
 } from '@redux/appConfig';
 import {AppListenerFn} from '@redux/listeners/base';
-import {addMultipleResources, addResource, clearPreview, clearPreviewAndSelectionHistory} from '@redux/reducers/main';
+import {
+  addMultipleResources,
+  addResource,
+  clearPreview,
+  clearPreviewAndSelectionHistory,
+  deleteMultipleClusterResources,
+  multiplePathsRemoved,
+  updateMultipleClusterResources,
+} from '@redux/reducers/main';
 import {setIsInQuickClusterMode} from '@redux/reducers/ui';
 import {getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
 import {previewSavedCommand} from '@redux/services/previewCommand';
@@ -35,9 +44,21 @@ import {doesSchemaExist} from '@utils/index';
 
 import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
 import {isDefined} from '@shared/utils/filter';
+import {isEqual} from '@shared/utils/isEqual';
 
 import {changeRuleLevel, setConfigK8sSchemaVersion, toggleRule, toggleValidation} from './validation.slice';
 import {loadValidation, validateResources} from './validation.thunks';
+
+type IncrementalValidationStatus = {
+  isRunning: boolean;
+  nextBatch: ResourceIdentifier[];
+  abortController?: AbortController;
+};
+
+let incrementalValidationStatus: IncrementalValidationStatus = {
+  isRunning: false,
+  nextBatch: [],
+};
 
 const loadListener: AppListenerFn = listen => {
   listen({
@@ -64,6 +85,8 @@ const loadListener: AppListenerFn = listen => {
   });
 };
 
+// TODO: should we have a separate listener for each resource storage?
+// for example I'm thinking that a preview might cancel the validation of the cluster
 const validateListener: AppListenerFn = listen => {
   listen({
     matcher: isAnyOf(
@@ -74,12 +97,28 @@ const validateListener: AppListenerFn = listen => {
       previewHelmValuesFile.fulfilled,
       runPreviewConfiguration.fulfilled,
       previewSavedCommand.fulfilled,
+      previewKustomization.rejected,
+      previewHelmValuesFile.rejected,
+      runPreviewConfiguration.rejected,
+      previewSavedCommand.rejected,
       stopClusterConnection.fulfilled,
+      deleteMultipleClusterResources,
+      multiplePathsRemoved,
       clearPreviewAndSelectionHistory,
       clearPreview
     ),
     async effect(_action, {dispatch, getState, cancelActiveListeners, signal, delay}) {
+      if (_action.type === 'main/clearPreviewAndSelectionHistory' && _action.payload.revalidate === false) {
+        return;
+      }
+
       cancelActiveListeners();
+
+      if (incrementalValidationStatus.isRunning) {
+        incrementalValidationStatus.abortController?.abort();
+        incrementalValidationStatus.abortController = undefined;
+        incrementalValidationStatus.isRunning = false;
+      }
 
       const validatorsLoading = getState().validation.status === 'loading';
       if (validatorsLoading) return;
@@ -104,7 +143,17 @@ const validateListener: AppListenerFn = listen => {
         resourceStorage = 'preview';
       }
 
-      if (isAnyOf(stopClusterConnection.fulfilled, clearPreviewAndSelectionHistory, clearPreview)(_action)) {
+      if (
+        isAnyOf(
+          stopClusterConnection.fulfilled,
+          clearPreviewAndSelectionHistory,
+          clearPreview,
+          previewKustomization.rejected,
+          previewHelmValuesFile.rejected,
+          runPreviewConfiguration.rejected,
+          previewSavedCommand.rejected
+        )(_action)
+      ) {
         resourceStorage = 'local';
       }
 
@@ -122,6 +171,7 @@ const incrementalValidationListener: AppListenerFn = listen => {
       addMultipleResources,
       updateResource.fulfilled,
       updateMultipleResources.fulfilled,
+      updateMultipleClusterResources,
       updateFileEntry.fulfilled,
       removeResources.fulfilled,
       multiplePathsAdded.fulfilled,
@@ -147,22 +197,35 @@ const incrementalValidationListener: AppListenerFn = listen => {
         resourceIdentifiers = [_action.payload];
       }
 
-      if (isAnyOf(addMultipleResources)(_action)) {
+      if (isAnyOf(addMultipleResources, updateMultipleClusterResources)(_action)) {
         resourceIdentifiers = _action.payload;
       }
 
       if (resourceIdentifiers.length === 0) return;
 
-      // TODO: should we cancel active listeners or not?
-      // I think it depends on the resource storage?
-      // but maybe validation should actually be cancelled while the processing of refs should not?!
-      // cancelActiveListeners();
+      if (incrementalValidationStatus.isRunning) {
+        incrementalValidationStatus.nextBatch.push(...resourceIdentifiers);
+        log.info('Incremental validation is already running, adding to the next batch', resourceIdentifiers);
+        return;
+      }
 
-      await delay(200);
+      await delay(1);
       if (signal.aborted) return;
+
+      resourceIdentifiers = uniqWith([...resourceIdentifiers, ...incrementalValidationStatus.nextBatch], isEqual);
+      incrementalValidationStatus = {
+        isRunning: true,
+        nextBatch: [],
+        abortController: new AbortController(),
+      };
+
       const response = dispatch(validateResources({type: 'incremental', resourceIdentifiers}));
       signal.addEventListener('abort', () => response.abort());
+      incrementalValidationStatus.abortController?.signal.addEventListener('abort', () => response.abort());
       await response;
+
+      incrementalValidationStatus.isRunning = false;
+      incrementalValidationStatus.abortController = undefined;
     },
   });
 };

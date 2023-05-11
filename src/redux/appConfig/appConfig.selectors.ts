@@ -1,5 +1,6 @@
-import {has, isEmpty} from 'lodash';
-import {createSelector} from 'reselect';
+import {createSelector} from '@reduxjs/toolkit';
+
+import {has} from 'lodash';
 
 import {createDeepEqualSelector} from '@redux/selectors/utils';
 import {mergeConfigs, populateProjectConfig} from '@redux/services/projectConfig';
@@ -7,33 +8,22 @@ import {mergeConfigs, populateProjectConfig} from '@redux/services/projectConfig
 import {HelmPreviewConfiguration, ProjectConfig} from '@shared/models/config';
 import {RootState} from '@shared/models/rootState';
 import {Colors} from '@shared/styles';
-import {isDefined} from '@shared/utils/filter';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 
 export {activeProjectSelector, kubeConfigPathValidSelector} from '@shared/utils/selectors';
 
 export const kubeConfigContextSelector = createSelector(
-  [
-    (state: RootState) => state.config.projectConfig?.kubeConfig?.currentContext,
-    (state: RootState) => state.config.kubeConfig.currentContext,
-  ],
-  (projectCurrentContext, currentContext) => {
-    return projectCurrentContext || currentContext || '';
+  (state: RootState) => selectKubeconfig(state),
+  kubeconfig => {
+    return kubeconfig?.isValid ? kubeconfig.currentContext : '';
   }
 );
 
 export const kubeConfigContextColorSelector = createSelector(
-  [
-    (state: RootState) => state.config.projectConfig?.kubeConfig?.currentContext,
-    (state: RootState) => state.config.kubeConfig.currentContext,
-    (state: RootState) => state.config.kubeConfigContextsColors,
-  ],
-  (projectContext, currentContext, kubeConfigContextsColors) => {
-    if (projectContext) {
-      return kubeConfigContextsColors[projectContext] || Colors.volcano8;
-    }
-
-    if (currentContext) {
-      return kubeConfigContextsColors[currentContext] || Colors.volcano8;
+  [(state: RootState) => kubeConfigContextSelector(state), (state: RootState) => state.config.kubeConfigContextsColors],
+  (context, kubeConfigContextsColors) => {
+    if (context) {
+      return kubeConfigContextsColors[context] || Colors.volcano8;
     }
 
     return Colors.volcano8;
@@ -41,28 +31,15 @@ export const kubeConfigContextColorSelector = createSelector(
 );
 
 export const kubeConfigContextsSelector = createSelector(
-  [
-    (state: RootState) => state.config.projectConfig?.kubeConfig?.contexts,
-    (state: RootState) => state.config.kubeConfig.contexts,
-  ],
-  (projectContexts = [], contexts = []) => {
-    return !isEmpty(projectContexts) ? projectContexts : contexts;
+  (state: RootState) => selectKubeconfig(state),
+  kubeconfig => {
+    return kubeconfig?.isValid ? kubeconfig.contexts : [];
   }
 );
 
 export const currentKubeContextSelector = createSelector(
-  (state: RootState) => state.config.kubeConfig.currentContext,
-  context => context
-);
-
-export const currentClusterAccessSelector = createSelector(
-  [currentKubeContextSelector, (state: RootState) => state.config.clusterAccess],
-  (currentContext, clusterAccess) => {
-    if (!currentContext) {
-      return [];
-    }
-    return clusterAccess?.filter(ca => ca.context === currentContext) || [];
-  }
+  (state: RootState) => selectKubeconfig(state),
+  kubeconfig => (kubeconfig?.isValid ? kubeconfig.currentContext : undefined)
 );
 
 export const kubeConfigPathSelector = createSelector(
@@ -70,7 +47,7 @@ export const kubeConfigPathSelector = createSelector(
     (state: RootState) => state.config.projectConfig?.kubeConfig?.path,
     (state: RootState) => state.config.kubeConfig.path,
   ],
-  (projectKubeConfigPath, kubeConfigPath) => projectKubeConfigPath || kubeConfigPath || ''
+  (projectKubeConfigPath, kubeConfigPath) => projectKubeConfigPath ?? kubeConfigPath ?? undefined
 );
 
 export const currentConfigSelector = createDeepEqualSelector(
@@ -104,15 +81,7 @@ export const selectCurrentKubeConfig = createSelector(
   (projectKubeConfig, kubeConfig) => projectKubeConfig || kubeConfig
 );
 
-export const isInClusterModeSelector = createSelector(
-  [selectCurrentKubeConfig, state => state.main.clusterConnection?.context],
-  (kubeConfig, clusterConnectionContext) => {
-    return kubeConfig && isDefined(clusterConnectionContext) && clusterConnectionContext === kubeConfig.currentContext;
-  }
-);
-
 export const isProjectKubeConfigSelector = createSelector(
-  (state: RootState) => state.config,
-  config =>
-    has(config, 'projectConfig.kubeConfig.isPathValid') && Boolean(config.projectConfig?.kubeConfig?.isPathValid)
+  (state: RootState) => state.config.projectConfig?.kubeConfig,
+  kubeConfig => has(kubeConfig, 'isPathValid') && Boolean(kubeConfig?.isPathValid)
 );

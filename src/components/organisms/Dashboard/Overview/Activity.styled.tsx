@@ -8,6 +8,7 @@ export const Container = styled.div`
   padding: 12px 8px 3px 8px;
   overflow-y: auto;
   height: calc(100% - 32px);
+  width: 100%;
 `;
 
 export const EventRow = styled.div<{$type: string}>`
@@ -87,6 +88,7 @@ export const ScrollToLatest = styled.div`
   display: flex;
   align-items: center;
   margin-left: 16px;
+  z-index: 5;
 `;
 export const ScrollToOldest = styled.div`
   position: absolute;
@@ -97,6 +99,7 @@ export const ScrollToOldest = styled.div`
   display: flex;
   align-items: center;
   margin-left: 16px;
+  z-index: 5;
 `;
 export const CloseOutlined = styled(RawCloseOutlined)`
   color: ${Colors.grey8};
@@ -106,4 +109,12 @@ export const CloseOutlined = styled(RawCloseOutlined)`
   :hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
+`;
+
+export const VirtualItem = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
 `;

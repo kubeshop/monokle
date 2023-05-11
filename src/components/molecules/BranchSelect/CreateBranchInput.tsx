@@ -8,9 +8,10 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {CommitTooltip} from '@constants/tooltips';
 
 import {setCurrentBranch, setGitLoading, setRepo} from '@redux/git';
+import {createLocalBranch, getRepoInfo} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
 
 import * as S from './CreateBranchInput.styled';
 
@@ -21,13 +22,12 @@ type IProps = {
 const CreateBranchInput: React.FC<IProps> = props => {
   const dispatch = useAppDispatch();
   const {hideCreateBranchInputHandler} = props;
+  const isLoading = useAppSelector(state => state.git.loading);
   const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
-
   const gitRepoBranches = useAppSelector(state => state.git.repo?.branches || []);
-  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder) || '';
 
   const [errorMessage, setErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
   const [branchName, setBranchName] = useState('');
 
   const handleCommit = async () => {
@@ -41,20 +41,26 @@ const CreateBranchInput: React.FC<IProps> = props => {
       return;
     }
 
-    setLoading(true);
+    dispatch(setGitLoading(true));
 
-    await promiseFromIpcRenderer('git.createLocalBranch', 'git.createLocalBranch.result', {
-      localPath: selectedProjectRootFolder,
-      branchName,
-    });
+    try {
+      await createLocalBranch({localPath: selectedProjectRootFolder, branchName});
+    } catch (e) {
+      showGitErrorModal(`Creating ${branchName} failed`, undefined, `git checkout -b ${branchName}`, dispatch);
+      setBranchName('');
+      return;
+    }
 
     setBranchName('');
-    setLoading(false);
-    await promiseFromIpcRenderer('git.getGitRepoInfo', 'git.getGitRepoInfo.result', projectRootFolder).then(result => {
-      dispatch(setRepo(result));
-      dispatch(setCurrentBranch(result.currentBranch));
+
+    try {
+      const repo = await getRepoInfo({path: projectRootFolder || ''});
+      dispatch(setRepo(repo));
+      dispatch(setCurrentBranch(branchName));
       dispatch(setGitLoading(false));
-    });
+    } catch (e: any) {
+      showGitErrorModal('Git repo error', e.message);
+    }
 
     hideCreateBranchInputHandler();
   };
@@ -81,7 +87,7 @@ const CreateBranchInput: React.FC<IProps> = props => {
         />
 
         <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={CommitTooltip}>
-          <Button loading={loading} type="primary" onClick={handleCommit}>
+          <Button loading={isLoading} type="primary" onClick={handleCommit}>
             <CheckOutlined />
           </Button>
         </Tooltip>

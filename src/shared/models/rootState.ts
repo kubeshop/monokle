@@ -1,12 +1,12 @@
 import {AlertState} from './alert';
 import {AppState} from './appState';
+import {ClusterState} from './clusterState';
 import {CompareState} from './compare';
 import {AppConfig} from './config';
 import {DashboardState} from './dashboard';
 import {ExtensionState} from './extension';
 import {FormsState} from './form';
 import {GitSliceState} from './git';
-import {NavigatorState} from './navigator';
 import {TerminalState} from './terminal';
 import {UiState} from './ui';
 import {ValidationState} from './validation';
@@ -23,11 +23,25 @@ type RootState = {
   form: FormsState;
   git: GitSliceState;
   main: AppState;
-  navigator: NavigatorState;
   terminal: TerminalState;
   ui: UiState;
   validation: ValidationState;
   dashboard: DashboardState;
+  cluster: ClusterState;
 };
 
-export type {RootState};
+type ElectronMenuDataType = {
+  config: Pick<
+    RootState['config'],
+    'projects' | 'newVersion' | 'selectedProjectRootFolder' | 'kubeConfig' | 'projectConfig'
+  >;
+} & {
+  main: Pick<RootState['main'], 'selection' | 'preview' | 'clusterConnection'>;
+} & {
+  ui: Pick<
+    RootState['ui'],
+    'isStartProjectPaneVisible' | 'isInQuickClusterMode' | 'isStartProjectPaneVisible' | 'monacoEditor' | 'leftMenu'
+  >;
+};
+
+export type {RootState, ElectronMenuDataType};

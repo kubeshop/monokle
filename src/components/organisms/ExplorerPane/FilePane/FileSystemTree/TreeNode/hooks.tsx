@@ -5,7 +5,8 @@ import {ItemType as AntdMenuItem} from 'antd/lib/menu/hooks/useItems';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
-import {basename, dirname, join, sep} from 'path';
+import micromatch from 'micromatch';
+import {basename, dirname, join} from 'path';
 
 import {scanExcludesSelector, updateProjectConfig} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -18,19 +19,23 @@ import {
 } from '@redux/reducers/ui';
 import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
-import {getHelmValuesFile, isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@redux/services/helm';
+import {getHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile, isKustomizationResource} from '@redux/services/kustomize';
 import {startPreview} from '@redux/services/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+
+import {useFilterByFileOrFolder} from '@hooks/fileTreeHooks';
 
 import {deleteFileEntry, dispatchDeleteAlert, duplicateEntity, isFileEntryDisabled} from '@utils/files';
 import {useOpenOnGithub} from '@utils/git';
 import {useRefSelector} from '@utils/hooks';
 
 import {isYamlFile} from '@monokle/validation';
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AlertEnum} from '@shared/models/alert';
 import {FileEntry} from '@shared/models/fileEntry';
 import {isDefined} from '@shared/utils/filter';
+import {isHelmChartFile, isHelmTemplateFile, isHelmValuesFile} from '@shared/utils/helm';
 import {showItemInFolder} from '@shared/utils/shell';
 
 export const useCanPreview = (fileEntry?: FileEntry, isDisabled?: boolean) => {
@@ -57,11 +62,23 @@ export const useDelete = () => {
       if (!fileEntry) {
         return;
       }
-      setIsLoading(true);
-      setImmediate(async () => {
-        const result = await deleteFileEntry(fileEntry);
-        dispatchDeleteAlert(dispatch, result);
-        setIsLoading(false);
+
+      let title = `Delete ${isDefined(fileEntry.children) ? 'folder' : 'file'} [${fileEntry.name}]?`;
+
+      Modal.confirm({
+        title,
+        onOk() {
+          return new Promise(resolve => {
+            setImmediate(async () => {
+              setIsLoading(true);
+              const result = await deleteFileEntry(fileEntry);
+              dispatchDeleteAlert(dispatch, result);
+              setIsLoading(false);
+            });
+            resolve({});
+          });
+        },
+        onCancel() {},
       });
     },
     [dispatch]
@@ -228,25 +245,23 @@ export const useFileScanning = (onConfirm: () => void) => {
 
 export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void}, fileEntry?: FileEntry) => {
   const {deleteEntry} = props;
-  const dispatch = useAppDispatch();
   const osPlatform = useAppSelector(state => state.config.osPlatform);
   const platformFileManagerName = useMemo(() => (osPlatform === 'darwin' ? 'Finder' : 'Explorer'), [osPlatform]);
+  const duplicate = useDuplicate();
 
-  const {canOpenOnGithub, openOnGithub} = useOpenOnGithub(fileEntry?.filePath);
+  const {canOpenOnGithub, openOnGithub} = useOpenOnGithub(
+    fileEntry?.name === ROOT_FILE_ENTRY ? '' : fileEntry?.filePath
+  );
   const renameFileEntry = useRename();
-  const reloadRootFolder = useCallback(() => {
-    if (!fileEntry) {
-      return;
-    }
-    dispatch(setRootFolder(fileEntry.rootFolderPath));
-  }, [fileEntry, dispatch]);
-
-  const {addEntryToScanExcludes, removeEntryFromScanExcludes} = useFileScanning(reloadRootFolder);
 
   const menuItems = useMemo(() => {
     if (!fileEntry) {
       return [];
     }
+
+    const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
+    const filePath = isRoot ? '' : fileEntry.filePath;
+
     const newMenuItems: AntdMenuItem[] = [];
 
     newMenuItems.push({
@@ -255,16 +270,35 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
     });
 
     newMenuItems.push({
-      key: 'update_scanning',
-      label: `${fileEntry.isExcluded ? 'Remove from' : 'Add to'} Files: Exclude`,
+      key: 'rename',
+      label: 'Rename',
+      disabled: isRoot || fileEntry.isExcluded,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
-        if (fileEntry.isExcluded) {
-          removeEntryFromScanExcludes(fileEntry.filePath);
-        } else {
-          addEntryToScanExcludes(fileEntry.filePath);
-        }
+        renameFileEntry(fileEntry);
       },
+    });
+
+    newMenuItems.push({
+      key: 'duplicate',
+      label: 'Duplicate',
+      onClick: () => {
+        duplicate(fileEntry);
+      },
+    });
+
+    newMenuItems.push({
+      key: 'delete',
+      label: 'Delete',
+      disabled: isRoot,
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        deleteEntry(fileEntry);
+      },
+    });
+
+    newMenuItems.push({
+      type: 'divider',
     });
 
     newMenuItems.push({
@@ -272,7 +306,7 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
       label: 'Copy path',
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
-        navigator.clipboard.writeText(join(fileEntry.rootFolderPath, fileEntry.filePath));
+        navigator.clipboard.writeText(join(fileEntry.rootFolderPath, filePath));
       },
     });
 
@@ -281,26 +315,12 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
       label: 'Copy relative path',
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
-        navigator.clipboard.writeText(fileEntry.filePath);
+        navigator.clipboard.writeText(filePath);
       },
     });
 
     newMenuItems.push({
-      key: 'rename',
-      label: 'Rename',
-      onClick: (e: any) => {
-        e.domEvent.stopPropagation();
-        renameFileEntry(fileEntry);
-      },
-    });
-
-    newMenuItems.push({
-      key: 'delete',
-      label: 'Delete',
-      onClick: (e: any) => {
-        e.domEvent.stopPropagation();
-        deleteEntry(fileEntry);
-      },
+      type: 'divider',
     });
 
     newMenuItems.push({
@@ -318,21 +338,18 @@ export const useCommonMenuItems = (props: {deleteEntry: (e: FileEntry) => void},
       label: `Reveal in ${platformFileManagerName}`,
       onClick: (e: any) => {
         e.domEvent.stopPropagation();
-        showItemInFolder(join(fileEntry.rootFolderPath, fileEntry.filePath));
+
+        if (fileEntry.name === ROOT_FILE_ENTRY) {
+          showItemInFolder(fileEntry.rootFolderPath);
+          return;
+        }
+
+        showItemInFolder(join(fileEntry.rootFolderPath, filePath));
       },
     });
 
     return newMenuItems;
-  }, [
-    fileEntry,
-    platformFileManagerName,
-    addEntryToScanExcludes,
-    removeEntryFromScanExcludes,
-    openOnGithub,
-    canOpenOnGithub,
-    renameFileEntry,
-    deleteEntry,
-  ]);
+  }, [fileEntry, canOpenOnGithub, platformFileManagerName, renameFileEntry, deleteEntry, openOnGithub, duplicate]);
 
   return menuItems;
 };
@@ -344,11 +361,22 @@ export const useFileMenuItems = (
   const {deleteEntry, canBePreviewed} = props;
   const dispatch = useAppDispatch();
   const commonMenuItems = useCommonMenuItems({deleteEntry}, fileEntry);
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const localResourceMetaMapRef = useResourceMetaMapRef('local');
   const createNewResource = useCreateResource();
+  const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
+  const projectConfig = useAppSelector(state => state.config.projectConfig);
+
+  const reloadRootFolder = useCallback(() => {
+    if (!fileEntry) {
+      return;
+    }
+    dispatch(setRootFolder({rootFolder: fileEntry.rootFolderPath, isReload: true}));
+  }, [fileEntry, dispatch]);
+
+  const {addEntryToScanExcludes, removeEntryFromScanExcludes} = useFileScanning(reloadRootFolder);
 
   const preview = usePreview();
-  const duplicate = useDuplicate();
 
   const menuItems = useMemo(() => {
     const isFolder = isDefined(fileEntry?.children);
@@ -362,9 +390,12 @@ export const useFileMenuItems = (
       isHelmValuesFile(fileEntry.filePath) ||
       isHelmTemplateFile(fileEntry.filePath) ||
       !fileEntry.isSupported ||
-      !fileEntry.isExcluded;
+      fileEntry.isExcluded;
 
     const newMenuItems: AntdMenuItem[] = [];
+
+    const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
+    const filePath = isRoot ? '' : fileEntry?.filePath;
 
     if (canBePreviewed) {
       newMenuItems.push({
@@ -377,32 +408,6 @@ export const useFileMenuItems = (
     }
 
     newMenuItems.push({
-      key: 'new-file',
-      label: 'New File',
-      onClick: () => {
-        dispatch(
-          openCreateFileFolderModal({
-            rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath.split(sep).slice(0, -1).join(sep)),
-            type: 'file',
-          })
-        );
-      },
-    });
-
-    newMenuItems.push({
-      key: 'new-folder',
-      label: 'New Folder',
-      onClick: () => {
-        dispatch(
-          openCreateFileFolderModal({
-            rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath.split(sep).slice(0, -1).join(sep)),
-            type: 'folder',
-          })
-        );
-      },
-    });
-
-    newMenuItems.push({
       key: 'add-resource',
       label: 'Add Resource',
       disabled: isNonResourceFile,
@@ -412,22 +417,47 @@ export const useFileMenuItems = (
     });
 
     newMenuItems.push({
-      key: 'filter_on_file',
-      label: 'Filter on this file',
-      disabled: isNonResourceFile,
+      type: 'divider',
     });
 
     newMenuItems.push({
-      key: 'duplicate',
-      label: 'Duplicate',
+      key: 'filter_on_file',
+      label:
+        fileOrFolderContainedInFilter && fileEntry.filePath === fileOrFolderContainedInFilter
+          ? 'Remove from filter'
+          : 'Filter on this file',
+      disabled: isNonResourceFile,
       onClick: () => {
-        duplicate(fileEntry);
+        if (fileOrFolderContainedInFilter && fileEntry.filePath === fileOrFolderContainedInFilter) {
+          onFilterByFileOrFolder(undefined);
+        } else {
+          onFilterByFileOrFolder(fileEntry.filePath);
+        }
+      },
+    });
+
+    newMenuItems.push({
+      disabled: isRoot || (!fileEntry.children && !fileEntry.isSupported),
+      key: 'update_scanning',
+      label: `${
+        fileEntry.isExcluded && projectConfig?.scanExcludes?.some(e => micromatch.isMatch(filePath, e))
+          ? 'Remove from'
+          : 'Add to'
+      } Files: Exclude`,
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        if (fileEntry.isExcluded) {
+          removeEntryFromScanExcludes(filePath);
+        } else {
+          addEntryToScanExcludes(filePath);
+        }
       },
     });
 
     if (isYamlFile(fileEntry.filePath)) {
       newMenuItems.push({
         key: 'compare',
+        disabled: fileEntry.isExcluded,
         label: 'Compare with another file',
         onClick: () => {
           dispatch(openFileCompareModal(fileEntry.filePath));
@@ -440,13 +470,17 @@ export const useFileMenuItems = (
     return newMenuItems;
   }, [
     fileEntry,
+    localResourceMetaMapRef,
     canBePreviewed,
     commonMenuItems,
-    createNewResource,
     preview,
-    duplicate,
-    localResourceMetaMapRef,
     dispatch,
+    createNewResource,
+    fileOrFolderContainedInFilter,
+    onFilterByFileOrFolder,
+    addEntryToScanExcludes,
+    removeEntryFromScanExcludes,
+    projectConfig,
   ]);
 
   return menuItems;
@@ -458,8 +492,10 @@ export const useFolderMenuItems = (
 ) => {
   const {deleteEntry, isInClusterMode, isInPreviewMode} = stateArgs;
   const dispatch = useAppDispatch();
+  const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const commonMenuItems = useCommonMenuItems({deleteEntry}, fileEntry);
   const createNewResource = useCreateResource();
+  const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
 
   const menuItems = useMemo(() => {
     const isFolder = isDefined(fileEntry?.children);
@@ -467,15 +503,16 @@ export const useFolderMenuItems = (
       return [];
     }
 
+    const isRoot = fileEntry.name === ROOT_FILE_ENTRY;
+    const filePath = isRoot ? '' : fileEntry?.filePath;
+
     const newMenuItems: AntdMenuItem[] = [];
 
     newMenuItems.push({
       key: 'new-folder',
       label: 'New Folder',
       onClick: () => {
-        dispatch(
-          openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath), type: 'folder'})
-        );
+        dispatch(openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, filePath), type: 'folder'}));
       },
     });
 
@@ -483,9 +520,7 @@ export const useFolderMenuItems = (
       key: 'new-file',
       label: 'New File',
       onClick: () => {
-        dispatch(
-          openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, fileEntry.filePath), type: 'file'})
-        );
+        dispatch(openCreateFileFolderModal({rootDir: join(fileEntry.rootFolderPath, filePath), type: 'file'}));
       },
     });
 
@@ -498,10 +533,38 @@ export const useFolderMenuItems = (
       },
     });
 
+    newMenuItems.push({
+      type: 'divider',
+    });
+
+    newMenuItems.push({
+      key: 'filter_on_folder',
+      label:
+        fileOrFolderContainedInFilter && filePath === fileOrFolderContainedInFilter
+          ? 'Remove from filter'
+          : 'Filter on this folder',
+      onClick: () => {
+        if (fileOrFolderContainedInFilter && filePath === fileOrFolderContainedInFilter) {
+          onFilterByFileOrFolder(undefined);
+        } else {
+          onFilterByFileOrFolder(filePath);
+        }
+      },
+    });
+
     newMenuItems.push(...commonMenuItems);
 
     return newMenuItems;
-  }, [fileEntry, commonMenuItems, isInClusterMode, isInPreviewMode, createNewResource, dispatch]);
+  }, [
+    fileEntry,
+    isInClusterMode,
+    isInPreviewMode,
+    fileOrFolderContainedInFilter,
+    commonMenuItems,
+    dispatch,
+    createNewResource,
+    onFilterByFileOrFolder,
+  ]);
 
   return menuItems;
 };

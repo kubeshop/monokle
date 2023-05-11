@@ -4,7 +4,7 @@ import {highlightResourcesFromFile} from '@redux/services/fileEntry';
 
 import {AppState} from '@shared/models/appState';
 import {ImageType} from '@shared/models/image';
-import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
+import {ResourceIdentifier, ResourceMeta, ResourceStorage, isLocalResourceMeta} from '@shared/models/k8sResource';
 import {AppSelection} from '@shared/models/selection';
 import {createSliceReducers} from '@shared/utils/redux';
 
@@ -22,6 +22,43 @@ export const selectFileReducer = (state: AppState, payload: {filePath: string; i
 
     updateSelectionHistory(state.selection, Boolean(payload.isVirtualSelection), state);
   }
+};
+
+export const createResourceHighlights = (resourceMeta: ResourceMeta): AppSelection[] => {
+  const newHighlights: AppSelection[] = [];
+
+  resourceMeta.refs?.forEach(ref => {
+    if (ref.target?.type === 'resource' && ref.target.resourceId) {
+      newHighlights.push({
+        type: 'resource',
+        resourceIdentifier: {
+          id: ref.target.resourceId,
+          storage: resourceMeta.storage,
+        },
+      });
+    }
+    if (ref.target?.type === 'file' && ref.target.filePath) {
+      newHighlights.push({
+        type: 'file',
+        filePath: ref.target.filePath,
+      });
+    }
+    if (ref.target?.type === 'image' && ref.target.tag) {
+      newHighlights.push({
+        type: 'image',
+        imageId: `${ref.name}:${ref.target.tag}`,
+      });
+    }
+  });
+
+  if (isLocalResourceMeta(resourceMeta)) {
+    newHighlights.push({
+      type: 'file',
+      filePath: resourceMeta.origin.filePath,
+    });
+  }
+
+  return newHighlights;
 };
 
 export const selectResourceReducer = (
@@ -47,40 +84,7 @@ export const selectResourceReducer = (
     },
   };
 
-  const newHighlights: AppSelection[] = [];
-
-  resource.refs?.forEach(ref => {
-    if (ref.target?.type === 'resource' && ref.target.resourceId) {
-      newHighlights.push({
-        type: 'resource',
-        resourceIdentifier: {
-          id: ref.target.resourceId,
-          storage: resource.storage,
-        },
-      });
-    }
-    if (ref.target?.type === 'file' && ref.target.filePath) {
-      newHighlights.push({
-        type: 'file',
-        filePath: ref.target.filePath,
-      });
-    }
-    if (ref.target?.type === 'image' && ref.target.tag) {
-      newHighlights.push({
-        type: 'image',
-        imageId: ref.target.tag,
-      });
-    }
-  });
-
-  if (resource.storage === 'local') {
-    newHighlights.push({
-      type: 'file',
-      filePath: resource.origin.filePath,
-    });
-  }
-
-  state.highlights = newHighlights;
+  state.highlights = createResourceHighlights(resource);
 
   updateSelectionHistory(state.selection, Boolean(payload.isVirtualSelection), state);
 };
@@ -143,7 +147,7 @@ export const selectionReducers = createSliceReducers('main', {
       type: 'image',
       imageId: action.payload.imageId,
     };
-    const image = state.imagesList.find(img => img.id === action.payload.imageId);
+    const image = state.imageMap[action.payload.imageId];
     if (image) {
       highlightResourcesUsingImage(image, state);
     }

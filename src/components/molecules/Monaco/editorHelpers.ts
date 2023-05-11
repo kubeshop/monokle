@@ -19,7 +19,7 @@ import {
 } from './editorConstants';
 
 export function clearDecorations(editor: monaco.editor.IStandaloneCodeEditor, idsOfDecorations: string[]) {
-  editor.deltaDecorations(idsOfDecorations, []);
+  editor.removeDecorations(idsOfDecorations);
 }
 
 export function setDecorations(

@@ -1,15 +1,14 @@
+import type {ValidationFiltersValueType} from '@monokle/components';
 import type {
   Config,
   PluginMetadataWithConfig,
   PluginName,
-  RefPosition,
   RuleMetadataWithConfig,
   ValidationResponse,
   ValidationResult,
 } from '@monokle/validation';
 
 import {K8sResource, ResourceIdentifier, ResourceStorage} from './k8sResource';
-import type {SarifRule} from './policy';
 
 type Initialization = 'uninitialized' | 'loading' | 'error' | 'loaded';
 export type NewProblemsIntroducedType = 'initial' | 'k8s-schema' | 'rule';
@@ -34,22 +33,10 @@ export type ValidationState = {
    */
   rules?: Record<PluginName, RuleMetadataWithConfig[]>;
   validationOverview: {
+    filters: ValidationFiltersValueType;
     selectedProblem?: SelectedProblem;
     newProblemsIntroducedType: NewProblemsIntroducedType;
   };
-};
-
-export type ResourceValidationError = {
-  property: string;
-  message: string;
-  errorPos?: RefPosition;
-  description?: string;
-  rule?: SarifRule;
-};
-
-export type ResourceValidation = {
-  isValid: boolean;
-  errors: ResourceValidationError[];
 };
 
 export type LoadValidationResult = {

@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 import {Button} from 'antd';
 
@@ -10,28 +10,38 @@ import {Merge} from 'type-fest';
 
 import {setActiveDashboardMenu, setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch} from '@redux/hooks';
-import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
+import {useResourceContentMap} from '@redux/selectors/resourceMapSelectors';
 
 import {useStateWithRef} from '@utils/hooks';
 import {timeAgo} from '@utils/timeAgo';
 
 import EventHandler from '@src/kindhandlers/EventHandler';
 
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceContent} from '@shared/models/k8sResource';
+import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import * as S from './Activity.styled';
 
+const ROW_HEIGHT = 80;
+
 export const Activity = ({paused}: {paused?: boolean}) => {
   const dispatch = useAppDispatch();
-  const clusterResourceMap = useResourceMap('cluster');
+  const clusterResourceContentMap = useResourceContentMap('cluster');
   const [isToLatestVisible, setIsToLatestVisible] = useState<boolean>(false);
   const [isToOldestVisible, setIsToOldestVisible] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [events, setEvents, eventsRef] = useStateWithRef<Merge<K8sResource, {eventTime: string}>[]>([]);
+  const [events, setEvents, eventsRef] = useStateWithRef<Merge<ResourceContent, {eventTime: string}>[]>([]);
   const [tempEventLength, setTempEventLength] = useState(0);
 
-  const pausedResource = useMemo<K8sResource | undefined>(() => {
+  const rowVirtualizer = useVirtualizer({
+    count: events.length,
+    estimateSize: () => ROW_HEIGHT,
+    getScrollElement: () => containerRef.current,
+    scrollToFn: elementScroll,
+  });
+
+  const pausedResource = useMemo<ResourceContent | undefined>(() => {
     if (paused) {
       return eventsRef.current[0];
     }
@@ -54,24 +64,22 @@ export const Activity = ({paused}: {paused?: boolean}) => {
     }
   }, [scrollPosition, containerRef]);
 
-  const handleScroll = useCallback(
-    () => (event: any) => {
-      setScrollPosition(event.target.scrollTop);
-    },
-    []
-  );
+  const handleScroll = () => (event: any) => {
+    setScrollPosition(event.target.scrollTop);
+    setIsToLatestVisible(false);
+  };
 
-  const handleCloseToLatest = useCallback((e: any) => {
+  const handleCloseToLatest = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
     setIsToLatestVisible(false);
-  }, []);
+  };
 
-  const handleCloseToOldest = useCallback((e: any) => {
+  const handleCloseToOldest = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
     setIsToOldestVisible(false);
-  }, []);
+  };
 
   useEffect(() => {
     if (containerRef && containerRef.current && !pausedResource && eventsRef.current.length !== tempEventLength) {
@@ -81,10 +89,11 @@ export const Activity = ({paused}: {paused?: boolean}) => {
     }
     setEvents(
       sortBy(
-        Object.values(clusterResourceMap)
+        Object.values(clusterResourceContentMap)
           .filter(
             resource =>
-              resource.object.apiVersion === EventHandler.clusterApiVersion && resource.kind === EventHandler.kind
+              resource.object.apiVersion === EventHandler.clusterApiVersion &&
+              resource.object.kind === EventHandler.kind
           )
           .map(resource => ({
             ...resource,
@@ -92,9 +101,11 @@ export const Activity = ({paused}: {paused?: boolean}) => {
               resource.object.eventTime || resource.object.deprecatedLastTimestamp || resource.object.lastTimestamp,
           })),
         'eventTime'
-      ).reverse()
+      )
+        .reverse()
+        .slice(0, 100)
     );
-  }, [clusterResourceMap, tempEventLength, pausedResource, setEvents, eventsRef]);
+  }, [clusterResourceContentMap, tempEventLength, pausedResource, setEvents, eventsRef]);
 
   return (
     <S.Container ref={containerRef} onScroll={handleScroll}>
@@ -133,52 +144,71 @@ export const Activity = ({paused}: {paused?: boolean}) => {
           </Button>
         </S.ScrollToOldest>
       )}
-      {events.map(({object, eventTime, id}) => (
-        <S.EventRow
-          key={object.metadata.uid}
-          $type={object.type}
-          onClick={() => {
-            dispatch(
-              setActiveDashboardMenu({
-                key: `${EventHandler.clusterApiVersion}-${EventHandler.kind}`,
-                label: EventHandler.kind,
-              })
-            );
-            dispatch(setDashboardSelectedResourceId(id));
-          }}
-        >
-          <S.TimeInfo>
-            <S.MessageTime>{timeAgo(eventTime)}</S.MessageTime>
-            <S.MessageCount>
-              <span>{object.deprecatedCount || object.count}</span>
-              <span> times in the last </span>
-              <span>
-                {
-                  DateTime.fromISO(object.deprecatedLastTimestamp || object.lastTimestamp)
-                    .diff(DateTime.fromISO(eventTime), ['hours', 'minutes', 'seconds', 'milliseconds'])
-                    .toObject().hours
-                }
-              </span>
-              <span> hours</span>
-            </S.MessageCount>
-          </S.TimeInfo>
-          <S.MessageInfo>
-            <S.MessageText>{object.message || object.note}</S.MessageText>
-            <S.MessageHost>
-              <span>
-                {object?.deprecatedSource?.host ||
-                  object?.deprecatedSource?.component ||
-                  object?.source?.host ||
-                  object?.reportingController ||
-                  '- '}
-                :
-              </span>
-              <span> {object.metadata.name}</span>
-            </S.MessageHost>
-          </S.MessageInfo>
-          <S.NamespaceInfo>{object.metadata.namespace || '-'}</S.NamespaceInfo>
-        </S.EventRow>
-      ))}
+      <div
+        style={{
+          height: `${rowVirtualizer.getTotalSize()}px`,
+          width: '100%',
+          position: 'relative',
+        }}
+      >
+        {rowVirtualizer.getVirtualItems().map(virtualItem => {
+          const {object, eventTime, id} = events[virtualItem.index];
+          return (
+            <S.VirtualItem
+              key={virtualItem.key}
+              style={{
+                height: `${virtualItem.size}px`,
+                transform: `translateY(${virtualItem.start}px)`,
+              }}
+            >
+              <S.EventRow
+                key={object.metadata.uid}
+                $type={object.type}
+                onClick={() => {
+                  dispatch(
+                    setActiveDashboardMenu({
+                      key: `${EventHandler.clusterApiVersion}-${EventHandler.kind}`,
+                      label: EventHandler.kind,
+                    })
+                  );
+                  dispatch(setDashboardSelectedResourceId(id));
+                }}
+              >
+                <S.TimeInfo>
+                  <S.MessageTime>{timeAgo(eventTime)}</S.MessageTime>
+                  <S.MessageCount>
+                    <span>{object.deprecatedCount || object.count}</span>
+                    <span> times in the last </span>
+                    <span>
+                      {
+                        DateTime.fromISO(object.deprecatedLastTimestamp || object.lastTimestamp)
+                          .diff(DateTime.fromISO(eventTime), ['hours', 'minutes', 'seconds', 'milliseconds'])
+                          .toObject().hours
+                      }
+                    </span>
+                    <span> hours</span>
+                  </S.MessageCount>
+                </S.TimeInfo>
+                <S.MessageInfo>
+                  <S.MessageText>{object.message || object.note}</S.MessageText>
+                  <S.MessageHost>
+                    <span>
+                      {object?.deprecatedSource?.host ||
+                        object?.deprecatedSource?.component ||
+                        object?.source?.host ||
+                        object?.reportingController ||
+                        '- '}
+                      :
+                    </span>
+                    <span> {object.metadata.name}</span>
+                  </S.MessageHost>
+                </S.MessageInfo>
+                <S.NamespaceInfo>{object.metadata.namespace || '-'}</S.NamespaceInfo>
+              </S.EventRow>
+            </S.VirtualItem>
+          );
+        })}
+      </div>
     </S.Container>
   );
 };

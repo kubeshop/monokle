@@ -25,10 +25,10 @@ export const previewHelmValuesFile = createAsyncThunk<
   try {
     const startTime = new Date().getTime();
     const state = thunkAPI.getState().main;
+    const valuesFile = state.helmValuesMap[valuesFileId];
 
     trackEvent('preview/helm/start');
 
-    const valuesFile = state.helmValuesMap[valuesFileId];
     if (!valuesFile) {
       throw new Error(`Values File with id ${valuesFileId} not found`);
     }
@@ -54,6 +54,8 @@ export const previewHelmValuesFile = createAsyncThunk<
       preview,
     };
   } catch (err) {
-    return createRejectionWithAlert(thunkAPI, 'Helm Error', errorMsg(err));
+    let reason = errorMsg(err);
+    trackEvent('preview/helm/fail', {reason});
+    return createRejectionWithAlert(thunkAPI, 'Helm Error', reason);
   }
 });

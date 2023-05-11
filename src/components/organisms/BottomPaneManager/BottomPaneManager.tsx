@@ -3,7 +3,6 @@ import {useMeasure} from 'react-use';
 
 import {Dropdown, Popconfirm, Tooltip} from 'antd';
 
-import {size} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
@@ -20,6 +19,7 @@ import {useNewTerminalMenuItems, useTerminalOptionsMenuItems} from '@hooks/menuI
 
 import {Icon} from '@monokle/components';
 import {TerminalType} from '@shared/models/terminal';
+import {trackEvent} from '@shared/utils';
 
 import TerminalPane from '../TerminalPane';
 import * as S from './BottomPaneManager.styled';
@@ -78,6 +78,7 @@ const BottomPaneManager: React.FC = () => {
     const newTerminalId = uuidv4();
     dispatch(addTerminal({id: newTerminalId, isRunning: false, shell: settings.defaultShell}));
     dispatch(setSelectedTerminal(newTerminalId));
+    trackEvent('terminal/open');
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bottomSelection, selectedTerminal, shellsMap]);
@@ -114,11 +115,7 @@ const BottomPaneManager: React.FC = () => {
                   onConfirm={e => {
                     e?.stopPropagation();
                     setTerminalToKill(terminal.id);
-
-                    if (size(terminalsMap) === 1) {
-                      dispatch(setLeftBottomMenuSelection(undefined));
-                      dispatch(setSelectedTerminal(undefined));
-                    }
+                    trackEvent('terminal/kill');
                   }}
                   onCancel={e => {
                     e?.stopPropagation();

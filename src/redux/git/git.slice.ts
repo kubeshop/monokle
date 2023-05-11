@@ -2,6 +2,7 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
+import {GitAheadBehindCommitsCountResult} from '@shared/ipc';
 import {GitBranchCommit, GitChangedFile, GitRemoteRepo, GitRepo, GitSliceState} from '@shared/models/git';
 
 import {gitInitialState} from './git.initialState';
@@ -45,13 +46,6 @@ export const gitSlice = createSlice({
       state.changedFiles = action.payload;
     },
 
-    setCommits: (state: Draft<GitSliceState>, action: PayloadAction<{ahead: number; behind: number}>) => {
-      if (state.repo) {
-        state.repo.commits.ahead = action.payload.ahead;
-        state.repo.commits.behind = action.payload.behind;
-      }
-    },
-
     setCurrentBranch: (state: Draft<GitSliceState>, action: PayloadAction<string>) => {
       if (state.repo) {
         state.loading = true;
@@ -82,8 +76,22 @@ export const gitSlice = createSlice({
 
       state.repo.remoteRepo = action.payload;
     },
+
+    setCommitsCount: (state: Draft<GitSliceState>, action: PayloadAction<GitAheadBehindCommitsCountResult>) => {
+      if (!state.repo) {
+        return;
+      }
+
+      state.repo.commits.ahead = action.payload.aheadCount;
+      state.repo.commits.behind = action.payload.behindCount;
+    },
   },
   extraReducers: builder => {
+    builder.addCase(setRootFolder.pending, state => {
+      state.repo = undefined;
+      state.changedFiles = [];
+    });
+
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
       if (!action.payload.isGitRepo) {
         state.repo = undefined;
@@ -102,7 +110,7 @@ export const {
   openGitCloneModal,
   setBranchCommits,
   setChangedFiles,
-  setCommits,
+  setCommitsCount,
   setCurrentBranch,
   setGitLoading,
   setIsGitInstalled,

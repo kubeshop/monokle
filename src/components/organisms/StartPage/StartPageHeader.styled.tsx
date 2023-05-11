@@ -1,4 +1,4 @@
-import {Button} from 'antd';
+import {Badge, Button} from 'antd';
 
 import styled from 'styled-components';
 
@@ -32,11 +32,19 @@ export const LearnButton = styled(Button)<{$isActive: boolean}>`
 
 export const Logo = styled.img`
   height: 31px;
+  cursor: pointer;
 `;
 
-export const LogoContainer = styled.div`
+export const LogoContainer = styled.div<{$isNewVersionNoticeVisible: boolean}>`
   border-right: ${AppBorders.sectionDivider};
   width: 50px;
+  padding-right: ${({$isNewVersionNoticeVisible}) => ($isNewVersionNoticeVisible ? '356px' : '0px')};
+`;
+
+export const NewVersionBadge = styled(Badge)`
+  & .ant-badge-dot {
+    background: ${Colors.geekblue7};
+  }
 `;
 
 export const StartPageHeaderContainer = styled.div`

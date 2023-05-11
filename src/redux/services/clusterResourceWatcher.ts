@@ -4,8 +4,7 @@ import * as k8s from '@kubernetes/client-node';
 import log from 'loglevel';
 
 import {deleteMultipleClusterResources, updateMultipleClusterResources} from '@redux/reducers/main';
-
-import {jsonToYaml} from '@utils/yaml';
+import {getK8sObjectsAsYaml} from '@redux/thunks/utils';
 
 import {getRegisteredKindHandlers, registerCrdKindHandlers} from '@src/kindhandlers';
 import CustomResourceDefinitionHandler from '@src/kindhandlers/CustomResourceDefinition.handler';
@@ -106,6 +105,10 @@ const watchResource = async (
       watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.CONNECTED;
       const resource: K8sResource = extractClusterResourceFromObject(apiObj, kubeConfig);
 
+      if (!resource) {
+        return;
+      }
+
       if (type === 'ADDED' && !previewResources[resource.id]) {
         if (kindHandler.kind === CustomResourceDefinitionHandler.kind) {
           registerCrdKindHandlers(JSON.stringify(apiObj));
@@ -131,7 +134,7 @@ const watchResource = async (
     (error: any) => {
       log.warn(kindHandler.clusterApiVersion, kindHandler.kind, error?.message);
       watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.REFUSED;
-      if (resourceKindRequestURLs[kindHandler.kind] && error.message !== 'aborted') {
+      if (resourceKindRequestURLs[kindHandler.kind] && error?.message !== 'aborted') {
         watchers[`${kindHandler.clusterApiVersion}-${kindHandler.kind}`].status = ClusterConnectionStatus.ABORTED;
         watchResource(dispatch, kindHandler, kubeConfig, previewResources);
       }
@@ -145,7 +148,7 @@ const watchResource = async (
 };
 
 export const extractClusterResourceFromObject = (apiObj: any, kubeConfig: k8s.KubeConfig): K8sResource => {
-  const [resource]: K8sResource[] = extractK8sResources(jsonToYaml(apiObj), 'cluster', {
+  const [resource]: K8sResource[] = extractK8sResources(getK8sObjectsAsYaml([apiObj]), 'cluster', {
     context: kubeConfig.currentContext,
   });
   return resource;

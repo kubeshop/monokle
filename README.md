@@ -67,18 +67,18 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
   </tr>
   <tr>
     <td>
-      <div align="center">
-        <img src="docs/docs/img/windows.svg" height="50" width="50" />
+      <div align="center"><a href="https://github.com/kubeshop/monokle/releases/download/downloads/Monokle-win-x64.exe">
+        <img src="docs/docs/img/windows.svg" height="50" width="50" /></a>
       </div>
     </td>
     <td>
       <div align="center">
-        <img src="docs/docs/img/macos.svg" height="50" width="50" />
+         <a href="https://github.com/kubeshop/monokle/releases/download/downloads/Monokle-mac-universal.dmg"><img src="docs/docs/img/macos.svg" height="50" width="50" /></a>
       </div>
     </td>
     <td>
       <div align="center">
-        <img src="docs/docs/img/linux.svg" height="50" width="50" />
+       <a href="https://github.com/kubeshop/monokle/releases/download/downloads/Monokle-linux-x86_64.AppImage"><img src="docs/docs/img/linux.svg" height="50" width="50" /></a>
       </div>
     </td>
   </tr>
@@ -90,7 +90,7 @@ Read the [Feature Overview](https://kubeshop.github.io/monokle/features/) docume
       <a href="https://github.com/kubeshop/monokle/releases/download/downloads/Monokle-mac-universal.dmg">Download .dmg</a>
     </td>
     <td>
-      <a href="https://github.com/kubeshop/monokle/releases/download/downloads/Monokle-linux-x86_64.AppImage">Download .appImage</a>
+      <a href="https://github.com/kubeshop/monokle/releases/tag/downloads">Download .rpm/.deb/.appImage </a>
     </td>
   </tr>
 </table>

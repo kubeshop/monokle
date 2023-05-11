@@ -1,27 +1,20 @@
-import {memo} from 'react';
-import {useMeasure} from 'react-use';
+import {memo, useMemo} from 'react';
 
 import {CollapsePanelProps, Input, Typography} from 'antd';
 
 import {size} from 'lodash';
 import styled from 'styled-components';
 
-import {isInClusterModeSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {searchHelmRepo, setHelmRepoPane, setHideNavigatorPane} from '@redux/reducers/ui';
-
-import {SectionRenderer} from '@molecules';
-
-import {SectionBlueprintList} from '@atoms';
-
-import RootHelmChartsSectionBlueprint from '@src/navsections/HelmChartSectionBlueprint';
 
 import {Icon, TitleBar, TitleBarCount} from '@monokle/components';
 import {InjectedPanelProps} from '@shared/models/explorer';
 import {Colors} from '@shared/styles';
+import {isInClusterModeSelector} from '@shared/utils';
 
 import AccordionPanel from '../AccordionPanel';
-import {AccordionTitleBarContainer} from '../AccordionPanel/AccordionTitleBarContainer';
+import HelmList from './HelmList';
 
 const HelmPane: React.FC<InjectedPanelProps> = props => {
   const dispatch = useAppDispatch();
@@ -30,7 +23,10 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
-  const [containerRef, {width: containerWidth}] = useMeasure<HTMLDivElement>();
+  const count = useMemo(
+    () => size(Object.values(helmChartMap).filter(chart => !chart.name.includes('Unnamed Chart:'))),
+    [helmChartMap]
+  );
 
   const onHelmRepoSearchChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(searchHelmRepo(e.target.value));
@@ -48,16 +44,14 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
   return (
     <AccordionPanel
       {...props}
-      disabled={isInClusterMode}
+      collapsible={isInClusterMode ? 'disabled' : undefined}
       header={
-        <AccordionTitleBarContainer ref={containerRef}>
-          <TitleBar
-            title="Helm"
-            expandable
-            isOpen={Boolean(isActive)}
-            actions={<TitleBarCount count={size(helmChartMap)} isActive={Boolean(isActive)} />}
-          />
-        </AccordionTitleBarContainer>
+        <TitleBar
+          title="Helm Charts"
+          expandable
+          isOpen={Boolean(isActive)}
+          actions={<TitleBarCount count={count} isActive={Boolean(isActive)} />}
+        />
       }
       showArrow={false}
       key={panelKey as CollapsePanelProps['key']}
@@ -73,12 +67,8 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
             onBlur={onHelmRepoSearchBlurHandler}
           />
         </HelmExplorer>
-        <div style={{overflowY: 'auto'}}>
-          <SectionBlueprintList id="helm-sections-container" $width={containerWidth + 15}>
-            <SectionRenderer sectionId={RootHelmChartsSectionBlueprint.id} level={0} isLastSection={false} />
-          </SectionBlueprintList>
-        </div>
       </Content>
+      <HelmList />
     </AccordionPanel>
   );
 };
@@ -98,7 +88,7 @@ const HelmExplorer = styled.div`
   top: 0;
   height: 100px;
   background-color: rgba(82, 115, 224, 0.3);
-  margin: 0px 24px 16px 16px;
+  margin: 0px 24px 16px 24px;
   display: flex;
   flex-direction: column;
   gap: 12px;

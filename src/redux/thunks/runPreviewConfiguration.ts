@@ -17,6 +17,7 @@ import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/mod
 import {K8sResource} from '@shared/models/k8sResource';
 import {HelmConfigPreview} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {runCommandInMainThread} from '@shared/utils/commands';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -39,12 +40,18 @@ export const runPreviewConfiguration = createAsyncThunk<
   const configState = thunkAPI.getState().config;
   const mainState = thunkAPI.getState().main;
   const previewConfigurationMap = configState.projectConfig?.helm?.previewConfigurationMap;
-  const kubeconfig = configState.kubeConfig.path;
-  const currentContext = thunkAPI.getState().config.kubeConfig.currentContext;
+  const kubeconfig = selectKubeconfig(thunkAPI.getState());
 
+  if (!kubeconfig?.isValid) {
+    return createRejectionWithAlert(
+      thunkAPI,
+      'Preview Configuration Error',
+      `Could not preview due to invalid kubeconfig`
+    );
+  }
+
+  const currentContext = kubeconfig.currentContext;
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
-
-  trackEvent('preview/helm_config/start');
 
   let previewConfiguration: HelmPreviewConfiguration | null | undefined;
   if (previewConfigurationMap) {
@@ -103,6 +110,8 @@ export const runPreviewConfiguration = createAsyncThunk<
     );
   }
 
+  trackEvent('preview/helm_config/start');
+
   const args = buildHelmCommand(
     chart,
     orderedValuesFilePaths,
@@ -122,12 +131,11 @@ export const runPreviewConfiguration = createAsyncThunk<
   const result = await runCommandInMainThread(commandOptions);
 
   if (result.error) {
+    trackEvent('preview/helm_config/fail', {reason: result.error});
     return createRejectionWithAlert(thunkAPI, 'Helm Error', `${result.error} - ${result.stderr}`);
   }
 
   const endTime = new Date().getTime();
-
-  trackEvent('preview/helm_config/end', {executionTime: endTime - startTime});
 
   if (result.stdout) {
     const preview: HelmConfigPreview = {type: 'helm-config', configId: previewConfiguration.id};
@@ -136,11 +144,15 @@ export const runPreviewConfiguration = createAsyncThunk<
       preview,
     });
 
+    trackEvent('preview/helm_config/end', {resourcesCount: resources.length, executionTime: endTime - startTime});
+
     return {
       resources,
       preview,
     };
   }
+
+  trackEvent('preview/helm_config/end', {executionTime: endTime - startTime});
 
   return createRejectionWithAlert(
     thunkAPI,

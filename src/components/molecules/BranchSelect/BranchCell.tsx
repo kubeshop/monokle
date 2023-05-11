@@ -1,11 +1,15 @@
 import {Modal, Space} from 'antd';
 
-import {useAppSelector} from '@redux/hooks';
+import {setGitLoading} from '@redux/git';
+import {deleteLocalBranch} from '@redux/git/git.ipc';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 
 import {CopyButton} from '@components/atoms';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
 
+import {AlertEnum} from '@shared/models/alert';
 import {GitBranch} from '@shared/models/git';
 
 import * as S from './BranchCell.styled';
@@ -17,8 +21,9 @@ type IProps = {
 const BranchCell: React.FC<IProps> = props => {
   const {branch} = props;
 
+  const dispatch = useAppDispatch();
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
-  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+  const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder) || '';
 
   const deleteBranch = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     e.stopPropagation();
@@ -26,10 +31,18 @@ const BranchCell: React.FC<IProps> = props => {
     Modal.confirm({
       title: `Are you sure you want to delete ${branch.name}?`,
       onOk() {
-        promiseFromIpcRenderer('git.deleteLocalBranch', 'git.deleteLocalBranch.result', {
-          localPath: selectedProjectRootFolder,
-          branchName: branch.name,
-        });
+        dispatch(setGitLoading(true));
+
+        deleteLocalBranch({localPath: selectedProjectRootFolder, branchName: branch.name})
+          .then(() => {
+            dispatch(
+              setAlert({type: AlertEnum.Success, title: `Branch ${branch.name} deleted successfully`, message: ''})
+            );
+          })
+          .catch(() => {
+            dispatch(setGitLoading(false));
+            showGitErrorModal(`Deleting ${branch.name} failed`, undefined, `git branch -d ${branch.name}`, dispatch);
+          });
       },
       onCancel() {},
       zIndex: 100000,

@@ -1,12 +1,19 @@
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
+import log from 'loglevel';
+
 import {UpdateMultipleResourcesPayload, selectImage} from '@redux/reducers/main';
+import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
+import {joinK8sResourceMap} from '@redux/services/resource';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ImageType} from '@shared/models/image';
 import {ResourceMap} from '@shared/models/k8sResource';
+import {ThunkApi} from '@shared/models/thunk';
 
 import {updateMultipleResources} from './updateMultipleResources';
 
-export const replaceImageTag = (
+export const _replaceImageTag = (
   image: ImageType,
   newImageTag: string,
   resourceMap: ResourceMap,
@@ -50,3 +57,24 @@ export const replaceImageTag = (
   // TODO: do we have to update the imageList / imageMap or will that happen by updating the resources?
   dispatch(selectImage({imageId: `${image.name}:${newImageTag}`}));
 };
+
+export const replaceImageTag = createAsyncThunk<void, {image: ImageType; tag: string}, ThunkApi>(
+  'main/replaceImageTag',
+  ({image, tag}, {getState, dispatch}) => {
+    const activeResourceStorage = activeResourceStorageSelector(getState());
+    if (activeResourceStorage !== 'local') {
+      log.warn('Cannot replace image tag for non-local resources');
+      return;
+    }
+
+    const resourceMap = joinK8sResourceMap(
+      getState().main.resourceMetaMapByStorage.local,
+      getState().main.resourceContentMapByStorage.local,
+      meta => {
+        return image.resourcesIds.includes(meta.id);
+      }
+    );
+
+    _replaceImageTag(image, tag, resourceMap, dispatch);
+  }
+);

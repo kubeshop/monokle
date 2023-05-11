@@ -1,144 +1,67 @@
 import {ipcRenderer} from 'electron';
 
-import React, {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {useEffectOnce, useMount} from 'react-use';
 
-import {Modal} from 'antd';
-
-import fs from 'fs';
 import lodash from 'lodash';
 import log from 'loglevel';
 import path from 'path';
-import semver from 'semver';
-
-import {TelemetryDocumentationUrl} from '@constants/tooltips';
 
 import {
   activeProjectSelector,
-  isInClusterModeSelector,
   setCreateProject,
-  setDeleteProject,
+  setKubeConfig,
   setLoadingProject,
   setOpenProject,
 } from '@redux/appConfig';
-import {toggleForm} from '@redux/forms';
+import {startWatchingKubeconfig} from '@redux/cluster/listeners/kubeconfig';
 import {setIsGitInstalled} from '@redux/git';
+import {isGitInstalled} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reducers/main';
-import {closeFolderExplorer, closeReleaseNotesDrawer, openWelcomePopup, toggleNotifications} from '@redux/reducers/ui';
+import {closeFolderExplorer, closeReleaseNotesDrawer, toggleNotifications} from '@redux/reducers/ui';
 import {loadValidation} from '@redux/validation/validation.thunks';
 
-import {GitCloneModal, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, PaneManager, UpdateNotice} from '@organisms';
+import {GlobalModals, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, PaneManager} from '@organisms';
 
 import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
-import {fetchAppVersion} from '@utils/appVersion';
 import {getFileStats} from '@utils/files';
-import {fetchIsGitInstalled} from '@utils/git';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
 import {useWindowSize} from '@utils/hooks';
 import {restartEditorPreview} from '@utils/restartEditorPreview';
 import {StartupFlag} from '@utils/startupFlag';
 
-import {AlertEnum, ExtraContentType} from '@shared/models/alert';
-import {NewVersionCode, Project} from '@shared/models/config';
+import {AlertEnum} from '@shared/models/alert';
+import {Project} from '@shared/models/config';
 import {Size} from '@shared/models/window';
 import electronStore from '@shared/utils/electronStore';
 import {setMainProcessEnv} from '@shared/utils/env';
+import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './App.styled';
 import AppContext from './AppContext';
 
-const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
-const ChangeFiltersConfirmModal = React.lazy(() => import('@molecules/ChangeFiltersConfirmModal'));
-const ClusterResourceDiffModal = React.lazy(() => import('@organisms/ClusterResourceDiffModal'));
-const CreateFileFolderModal = React.lazy(() => import('@organisms/CreateFileFolderModal'));
-const CreateProjectModal = React.lazy(() => import('@organisms/CreateProjectModal'));
-const FileCompareModal = React.lazy(() => import('@organisms/FileCompareModal'));
-const FiltersPresetModal = React.lazy(() => import('@organisms/FiltersPresetModal'));
-const FormEditorModal = React.lazy(() => import('@components/organisms/FormEditorModal'));
-const KeyboardShortcuts = React.lazy(() => import('@organisms/KeyboardShortcuts'));
-const LocalResourceDiffModal = React.lazy(() => import('@organisms/LocalResourceDiffModal'));
-const NewResourceWizard = React.lazy(() => import('@organisms/NewResourceWizard'));
 const NotificationsManager = React.lazy(() => import('@organisms/NotificationsManager'));
-const QuickSearchActions = React.lazy(() => import('@organisms/QuickSearchActions'));
 const PreviewConfigurationEditor = React.lazy(() => import('@organisms/PreviewConfigurationEditor'));
 const ReleaseNotes = React.lazy(() => import('@organisms/ReleaseNotes'));
-const RenameEntityModal = React.lazy(() => import('@organisms/RenameEntityModal'));
-const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceModal'));
-const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
-const SaveEditCommandModal = React.lazy(() => import('@organisms/SaveEditCommandModal'));
-const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
-const TemplateExplorer = React.lazy(() => import('@organisms/TemplateExplorer'));
 
 const App = () => {
   const dispatch = useAppDispatch();
 
-  const [showReleaseNotes, setShowReleaseNotes] = useState<boolean>(false);
-  const [appVersion, setAppVersion] = useState<string>();
-
   const activeProject = useAppSelector(activeProjectSelector);
-  const isChangeFiltersConfirmModalVisible = useAppSelector(state => state.main.filtersToBeChanged);
-  const isCreateFileFolderModalVisible = useAppSelector(state => state.ui.createFileFolderModal.isOpen);
-  const isCreateProjectModalVisible = useAppSelector(state => state.ui.createProjectModal.isOpen);
-  const isFileCompareModalVisible = useAppSelector(state => state.ui.fileCompareModal.isVisible);
-  const isFiltersPresetModalVisible = useAppSelector(state => state.ui.filtersPresetModal?.isOpen);
-  const isGitCloneModalVisible = useAppSelector(state => state.git.gitCloneModal.open);
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isNewResourceWizardVisible = useAppSelector(state => state.ui.newResourceWizard.isOpen);
   const isReleaseNotesDrawerOpen = useAppSelector(state => state.ui.isReleaseNotesDrawerOpen);
   const isNotificationsDrawerVisible = useAppSelector(state => state.ui.isNotificationsOpen);
-  const isQuickSearchActionsVisible = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
   const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
-  const isRenameEntityModalVisible = useAppSelector(state => state.ui.renameEntityModal.isOpen);
-  const isRenameResourceModalVisible = useAppSelector(state => state.ui.renameResourceModal?.isOpen);
-  const isReplaceImageModalVisible = useAppSelector(state => state.ui.replaceImageModal?.isOpen);
-  const isSaveEditCommandModalVisible = useAppSelector(state => state.ui.saveEditCommandModal.isOpen);
-  const isSaveResourcesToFileFolderModalVisible = useAppSelector(
-    state => state.ui.saveResourcesToFileFolderModal.isOpen
-  );
-  const isFormModalVisible = useAppSelector(state => state.form.isOpen);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
-  const isAboutModalVisible = useAppSelector(state => state.ui.isAboutModalOpen);
-  const isKeyboardShortcutsVisible = useAppSelector(state => state.ui.isKeyboardShortcutsModalOpen);
-  const isTemplateExplorerVisible = useAppSelector(state => state.ui.templateExplorer.isVisible);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
-  const newVersion = useAppSelector(state => state.config.newVersion);
   const previewConfigurationEditorState = useAppSelector(state => state.main.prevConfEditor);
   const projects: Project[] = useAppSelector(state => state.config.projects);
-  const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
-  const disableEventTracking = useAppSelector(state => state.config.disableEventTracking);
-  const disableErrorReporting = useAppSelector(state => state.config.disableErrorReporting);
 
   const size: Size = useWindowSize();
-
-  const isClusterResourceDiffModalVisible = useMemo(
-    () => Boolean(targetResourceId) && isInClusterMode,
-    [isInClusterMode, targetResourceId]
-  );
-  const isLocalResourceDiffModalVisible = useMemo(
-    () => Boolean(targetResourceId) && !isInClusterMode,
-    [isInClusterMode, targetResourceId]
-  );
-  const isUpdateNoticeVisible = useMemo(() => {
-    if (!appVersion) {
-      return false;
-    }
-
-    return (
-      semver.patch(appVersion) === 0 &&
-      ((newVersion.code < NewVersionCode.Idle && !newVersion.data?.initial) ||
-        newVersion.code === NewVersionCode.Downloaded)
-    );
-  }, [appVersion, newVersion]);
-
-  const shouldTriggerTelemetryNotification = useMemo(
-    () => disableEventTracking === undefined && disableErrorReporting === undefined,
-    [disableEventTracking, disableErrorReporting]
-  );
 
   const onExecutedFrom = useCallback(
     (_: any, data: any) => {
@@ -167,21 +90,10 @@ const App = () => {
   );
 
   useEffect(() => {
-    if (!shouldTriggerTelemetryNotification) {
-      return;
-    }
-
-    dispatch(
-      setAlert({
-        title: 'Monokle telemetry',
-        message: `We have enabled telemetry to learn more about Monokle use and be able to offer the best features around. **Data gathering is *(and will always be!)* anonymous**. We want to make sure you are cool with that, though! [Read more about this in our documentation.](${TelemetryDocumentationUrl})`,
-        type: AlertEnum.Info,
-        extraContentType: ExtraContentType.Telemetry,
-        duration: 5,
-        id: 'monokle_telemetry_alert',
-      })
-    );
-  }, [shouldTriggerTelemetryNotification, dispatch]);
+    const kubeconfig = electronStore.get('appConfig.kubeConfig');
+    dispatch(setKubeConfig({path: kubeconfig}));
+    dispatch(startWatchingKubeconfig());
+  }, [dispatch]);
 
   useEffect(() => {
     ipcRenderer.on('executed-from', onExecutedFrom);
@@ -197,68 +109,18 @@ const App = () => {
     };
   }, []);
 
-  useEffect(() => {
-    fetchAppVersion().then(version => {
-      setAppVersion(version);
-
-      const lastSeenReleaseNotesVersion = electronStore.get('appConfig.lastSeenReleaseNotesVersion');
-
-      const nextMajorReleaseVersion = semver.inc(lastSeenReleaseNotesVersion, 'minor');
-
-      // new user
-      if (!semver.valid(lastSeenReleaseNotesVersion)) {
-        dispatch(openWelcomePopup());
-        electronStore.set('appConfig.lastSeenReleaseNotesVersion', version);
-      } else if (
-        // check if the current version is the next big release version for showing the modal with release notes
-        semver.valid(lastSeenReleaseNotesVersion) &&
-        semver.satisfies(version, `>=${nextMajorReleaseVersion}`)
-      ) {
-        setShowReleaseNotes(true);
-      }
-
-      // if middle release, show silent notification
-      else if (semver.satisfies(version, `>${lastSeenReleaseNotesVersion} <${nextMajorReleaseVersion}`)) {
-        dispatch(
-          setAlert({
-            title: 'A new version of Monokle has been installed!',
-            message: '',
-            type: AlertEnum.Success,
-            silent: true,
-          })
-        );
-
-        electronStore.set('appConfig.lastSeenReleaseNotesVersion', version);
-      }
-    });
-
-    // check if current projects root folder still exists, otherwise delete it
-    projects.forEach(project => {
-      if (!fs.existsSync(project.rootFolder)) {
-        dispatch(setDeleteProject(project));
-        dispatch(
-          setAlert({
-            title: 'Project removed',
-            message: `We removed project ${project.name} from Monokle because its root folder no longer exists`,
-            type: AlertEnum.Warning,
-          })
-        );
-      }
-    });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   useMount(() => {
-    fetchIsGitInstalled().then(isGitInstalled => {
-      dispatch(setIsGitInstalled(isGitInstalled));
-    });
-  });
+    const fetchIsGitInstalled = async () => {
+      try {
+        await isGitInstalled({});
+        dispatch(setIsGitInstalled(true));
+      } catch (error) {
+        dispatch(setIsGitInstalled(false));
+      }
+    };
 
-  const onCloseReleaseNotes = useCallback(() => {
-    setShowReleaseNotes(false);
-    electronStore.set('appConfig.lastSeenReleaseNotesVersion', appVersion);
-  }, [appVersion]);
+    fetchIsGitInstalled();
+  });
 
   // called from main thread because thunks cannot be dispatched by main
   const onOpenProjectFolderFromMainThread = useCallback((_: any, project: Project) => {
@@ -274,9 +136,7 @@ const App = () => {
         if (!newData || !oldData) {
           return;
         }
-        if (
-          lodash.isEqual(lodash.sortBy(newData.map((d: any) => d.name)), lodash.sortBy(oldData.map((d: any) => d.name)))
-        ) {
+        if (isEqual(lodash.sortBy(newData.map((d: any) => d.name)), lodash.sortBy(oldData.map((d: any) => d.name)))) {
           return;
         }
 
@@ -372,10 +232,6 @@ const App = () => {
     dispatch(closeReleaseNotesDrawer());
   }, [dispatch]);
 
-  const onCloseFormModal = useCallback(() => {
-    dispatch(toggleForm(false));
-  }, [dispatch]);
-
   return (
     <AppContext.Provider value={{windowSize: size}}>
       <S.AppContainer>
@@ -409,41 +265,7 @@ const App = () => {
           <ReleaseNotes onClose={onCloseReleaseNotesDrawer} singleColumn />
         </LazyDrawer>
 
-        {isUpdateNoticeVisible && <UpdateNotice />}
-
-        <Suspense fallback={null}>
-          {isAboutModalVisible && <AboutModal />}
-          {isChangeFiltersConfirmModalVisible && <ChangeFiltersConfirmModal />}
-          {isClusterResourceDiffModalVisible && <ClusterResourceDiffModal />}
-          {isFileCompareModalVisible && <FileCompareModal />}
-          {isFormModalVisible && <FormEditorModal visible={isFormModalVisible} onClose={onCloseFormModal} />}
-          {isCreateFileFolderModalVisible && <CreateFileFolderModal />}
-          {isCreateProjectModalVisible && <CreateProjectModal />}
-          {isFiltersPresetModalVisible && <FiltersPresetModal />}
-          {isGitCloneModalVisible && <GitCloneModal />}
-          {isKeyboardShortcutsVisible && <KeyboardShortcuts />}
-          {isLocalResourceDiffModalVisible && <LocalResourceDiffModal />}
-          {isNewResourceWizardVisible && <NewResourceWizard />}
-          {isQuickSearchActionsVisible && <QuickSearchActions />}
-          {isRenameEntityModalVisible && <RenameEntityModal />}
-          {isRenameResourceModalVisible && <RenameResourceModal />}
-          {isReplaceImageModalVisible && <ReplaceImageModal />}
-          {isSaveEditCommandModalVisible && <SaveEditCommandModal />}
-          {isSaveResourcesToFileFolderModalVisible && <SaveResourcesToFileFolderModal />}
-          {showReleaseNotes && (
-            <Modal
-              width="900px"
-              title="New Release"
-              open={showReleaseNotes}
-              onCancel={onCloseReleaseNotes}
-              centered
-              footer={null}
-            >
-              <ReleaseNotes onClose={onCloseReleaseNotes} />
-            </Modal>
-          )}
-          {isTemplateExplorerVisible && <TemplateExplorer />}
-        </Suspense>
+        <GlobalModals />
       </S.AppContainer>
     </AppContext.Provider>
   );

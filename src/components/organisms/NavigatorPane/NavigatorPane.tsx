@@ -1,32 +1,35 @@
-import {memo, useCallback, useMemo} from 'react';
-import {useMeasure} from 'react-use';
+import {useCallback, useMemo} from 'react';
 
 import {Dropdown, Tooltip} from 'antd';
 
 import {PlusOutlined} from '@ant-design/icons';
 
+import styled from 'styled-components';
+
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {NewResourceTooltip} from '@constants/tooltips';
+import {DisabledAddResourceTooltip, NewResourceTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {toggleResourceFilters} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew} from '@redux/selectors';
+import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
+import {navigatorResourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
 
-import {CheckedResourcesActionsMenu, ResourceFilter, SectionRenderer} from '@molecules';
+import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
 import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import {useNewResourceMenuItems} from '@hooks/menuItemsHooks';
-import {usePaneHeight} from '@hooks/usePaneHeight';
 
-import K8sResourceSectionBlueprint from '@src/navsections/K8sResourceSectionBlueprint';
-import UnknownResourceSectionBlueprint from '@src/navsections/UnknownResourceSectionBlueprint';
+import {useRefSelector} from '@utils/hooks';
 
-import {ResizableRowsPanel, TitleBar} from '@monokle/components';
+import {Icon, TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {Colors} from '@shared/styles';
+import {trackEvent} from '@shared/utils';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
+import NavigatorDescription from './NavigatorDescription';
 import * as S from './NavigatorPane.styled';
-import NavigatorTitle from './NavigatorTitle';
+import ResourceNavigator from './ResourceNavigator';
 
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -34,14 +37,17 @@ const NavPane: React.FC = () => {
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
   const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
 
-  const [resourceFilterRef, {height: resourceFilterHeight}] = useMeasure<HTMLDivElement>();
-
-  const height = usePaneHeight();
   const newResourceMenuItems = useNewResourceMenuItems();
+
+  const isAddResourceDisabled = useMemo(
+    () => !isFolderOpen || isInPreviewMode || isInClusterMode,
+    [isFolderOpen, isInClusterMode, isInPreviewMode]
+  );
 
   const resourceFilterButtonHandler = useCallback(() => {
     dispatch(toggleResourceFilters());
@@ -59,56 +65,85 @@ const NavPane: React.FC = () => {
           <CheckedResourcesActionsMenu />
         </S.SelectionBar>
       ) : (
-        <TitleBarWrapper>
+        <TitleBarWrapper $navigator>
           <TitleBar
             type="secondary"
-            title={<NavigatorTitle />}
+            title="Kubernetes Resources"
+            description={<NavigatorDescription />}
+            descriptionStyle={{paddingTop: '5px'}}
             actions={
               <S.TitleBarRightButtons>
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewResourceTooltip}>
-                  <Dropdown
-                    trigger={['click']}
-                    menu={{items: newResourceMenuItems}}
-                    overlayClassName="dropdown-secondary"
+                <CollapseAction />
+
+                <Dropdown
+                  trigger={['click']}
+                  menu={{items: newResourceMenuItems}}
+                  overlayClassName="dropdown-secondary"
+                  disabled={isAddResourceDisabled}
+                >
+                  <Tooltip
+                    mouseEnterDelay={TOOLTIP_DELAY}
+                    title={
+                      isAddResourceDisabled
+                        ? DisabledAddResourceTooltip({
+                            type: isInClusterMode ? 'cluster' : isInPreviewMode ? 'preview' : 'other',
+                          })
+                        : NewResourceTooltip
+                    }
                   >
                     <S.PlusButton
                       id="create-resource-button"
-                      $disabled={!isFolderOpen || isInPreviewMode}
+                      $disabled={isAddResourceDisabled}
                       $highlighted={isHighlighted}
                       className={isHighlighted ? 'animated-highlight' : ''}
-                      disabled={!isFolderOpen || isInPreviewMode}
+                      disabled={isAddResourceDisabled}
                       icon={<PlusOutlined />}
                       size="small"
                       type="link"
                     />
-                  </Dropdown>
-                </Tooltip>
+                  </Tooltip>
+                </Dropdown>
               </S.TitleBarRightButtons>
             }
           />
         </TitleBarWrapper>
       )}
 
-      <ResizableRowsPanel
-        layout={{top: isResourceFiltersOpen ? 0.34 : resourceFilterHeight / height + (height < 800 ? 0.014 : 0.004)}}
-        splitterStyle={{display: isResourceFiltersOpen ? 'block' : 'none'}}
-        top={
-          <div ref={resourceFilterRef}>
-            <ResourceFilter active={isResourceFiltersOpen} onToggle={resourceFilterButtonHandler} />
-          </div>
-        }
-        bottom={
-          <S.List id="navigator-sections-container">
-            <SectionRenderer sectionId={K8sResourceSectionBlueprint.id} level={0} isLastSection={false} />
-            <SectionRenderer sectionId={UnknownResourceSectionBlueprint.id} level={0} isLastSection={false} />
-          </S.List>
-        }
-        height={height - 40}
-        bottomPaneMaxSize={isResourceFiltersOpen ? height - (height < 1000 ? 200 : 400) : height - 100}
-        bottomPaneMinSize={500}
-      />
+      <ResourceFilter active={isResourceFiltersOpen} onToggle={resourceFilterButtonHandler} />
+
+      <S.List id="navigator-sections-container">
+        <ResourceNavigator />
+      </S.List>
     </S.NavigatorPaneContainer>
   );
 };
 
-export default memo(NavPane);
+export default NavPane;
+
+function CollapseAction() {
+  const dispatch = useAppDispatch();
+  const navigatorKinds = useRefSelector(navigatorResourceKindsSelector);
+  const collapsedKinds = useRefSelector(s => s.ui.navigator.collapsedResourceKinds);
+
+  const onClick = useCallback(() => {
+    if (collapsedKinds.current.length === navigatorKinds.current.length) {
+      dispatch(expandResourceKinds(navigatorKinds.current));
+      trackEvent('navigator/expand_all');
+      return;
+    }
+    dispatch(collapseResourceKinds(navigatorKinds.current));
+    trackEvent('navigator/collapse_all');
+  }, [dispatch, collapsedKinds, navigatorKinds]);
+
+  return (
+    <CollapseIconWrapper onClick={onClick}>
+      <Icon name="collapse" />
+    </CollapseIconWrapper>
+  );
+}
+
+const CollapseIconWrapper = styled.div`
+  color: ${Colors.blue6};
+  cursor: pointer;
+  padding-right: 8px;
+`;

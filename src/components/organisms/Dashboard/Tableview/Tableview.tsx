@@ -12,6 +12,7 @@ import {ResourceMeta} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 
 import {Drawer} from './Drawer';
+import NoResourcesFound from './NoResourcesFound';
 import * as S from './Tableview.styled';
 
 export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; columns: ColumnsType<any>}) => {
@@ -20,7 +21,8 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
   const [filteredDataSource, setFilteredDataSource] = useState(dataSource);
   const [filterText, setFilterText] = useState<string>('');
   const selectedResourceId = useAppSelector((state: RootState) => state.dashboard.tableDrawer.selectedResourceId);
-  const clusterConnectionOptions = useAppSelector(state => state.main.clusterConnectionOptions);
+  const terminalHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
 
   useEffect(() => {
     if (!filterText) {
@@ -32,11 +34,6 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
     );
   }, [dataSource, filterText]);
 
-  useEffect(() => {
-    dispatch(setDashboardSelectedResourceId());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clusterConnectionOptions]);
-
   return (
     <S.Container>
       <S.FilterContainer>
@@ -47,16 +44,15 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
           onChange={(event: any) => setFilterText(event.target.value)}
           allowClear
         />
-        {/* <S.BulkAction size="large" disabled>
-          Bulk action
-        </S.BulkAction> */}
       </S.FilterContainer>
+
       <S.TableContainer>
         <S.Table
+          locale={{emptyText: <NoResourcesFound />}}
           dataSource={filteredDataSource}
           columns={columns}
           rowKey="id"
-          scroll={{y: height - 212}}
+          scroll={{y: height - 212 - (bottomSelection === 'terminal' ? terminalHeight : 0)}}
           rowClassName={(record: ResourceMeta | any) => (record.id === selectedResourceId ? 'selected' : '')}
           pagination={false}
           sticky

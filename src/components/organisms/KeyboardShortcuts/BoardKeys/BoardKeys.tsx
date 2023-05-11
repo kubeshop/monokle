@@ -1,3 +1,5 @@
+import {macOSKeyIcon} from '@constants/tooltips';
+
 import * as S from './BoardKeys.styled';
 
 type BoardKeysProps = {
@@ -13,7 +15,9 @@ const BoardKeys = ({bindings}: BoardKeysProps) => {
         <S.StyledShortCell key={command}>
           {command.split('+').map((keyboardKey: string) => (
             <S.StyledKey key={`${command}_${keyboardKey}`}>
-              {keyboardKey === 'command' ? 'Cmd' : keyboardKey.charAt(0).toUpperCase() + keyboardKey.slice(1) || ','}
+              {keyboardKey.trim() === 'Meta'
+                ? macOSKeyIcon['Meta']
+                : keyboardKey.charAt(0).toUpperCase() + keyboardKey.slice(1) || ','}
             </S.StyledKey>
           ))}
         </S.StyledShortCell>

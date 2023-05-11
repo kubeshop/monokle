@@ -8,6 +8,7 @@ import {restartEditorPreview} from '@utils/restartEditorPreview';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {FileMapType} from '@shared/models/appState';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 function useEditorKeybindings(
   editorRef: React.MutableRefObject<monaco.editor.IStandaloneCodeEditor | null>,
@@ -18,6 +19,8 @@ function useEditorKeybindings(
 ) {
   const dispatch = useAppDispatch();
   const isQuickSearchActionsOpen = useAppSelector(state => state.ui.quickSearchActionsPopup.isOpen);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const applySelectionDisposableRef = useRef<monaco.IDisposable | null>(null);
   const diffSelectedResourceDisposableRef = useRef<monaco.IDisposable | null>(null);
 
@@ -70,7 +73,7 @@ function useEditorKeybindings(
         // eslint-disable-next-line no-bitwise
         keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyN],
         run: () => {
-          if (fileMapRef.current[ROOT_FILE_ENTRY]) {
+          if (fileMapRef.current[ROOT_FILE_ENTRY] && !isInPreviewMode && !isInClusterMode) {
             dispatch(openNewResourceWizard());
           }
         },

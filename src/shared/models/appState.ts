@@ -73,8 +73,7 @@ type AppState = {
   deviceID: string;
   imagesSearchedValue?: string;
   filtersPresets: FiltersPresetsType;
-  // TODO: imagesList should probably be transformed to a map "imageMap"
-  imagesList: ImagesListType;
+  imageMap: ImageMapType;
   validationIntegration: ValidationIntegration | undefined;
   autosaving: {
     status?: boolean;
@@ -84,6 +83,7 @@ type AppState = {
     };
   };
   lastChangedLine: number;
+  activeEditorTab: ActionPaneTab;
 };
 
 /**
@@ -116,9 +116,11 @@ type HelmValuesMapType = {
 };
 
 /**
- * List of images from current project
+ * Map of images from current project
  */
-type ImagesListType = ImageType[];
+type ImageMapType = {[id: string]: ImageType};
+
+type ImageNode = {type: 'image'; id: string};
 
 type MatchParamProps = {
   matchCase: boolean;
@@ -157,8 +159,11 @@ export type {
   HelmChartMapType,
   HelmValuesMapType,
   HelmTemplatesMapType,
-  ImagesListType,
+  ImageMapType,
+  ImageNode,
   MatchParamProps,
   PreviewLoaderType,
   ResourceRefsProcessingOptions,
 };
+
+export type ActionPaneTab = 'source' | 'form' | 'graph' | 'logs' | 'metadataForm';

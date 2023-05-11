@@ -1,19 +1,15 @@
 import {useCallback, useState} from 'react';
 
-import {Modal} from 'antd';
-
 import {BranchesOutlined} from '@ant-design/icons';
 
-import {GIT_ERROR_MODAL_DESCRIPTION} from '@constants/constants';
-
 import {setCurrentBranch} from '@redux/git';
+import {checkoutGitBranch} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {rootFolderSelector} from '@redux/selectors';
 
 import {TableSelect} from '@atoms';
 
-import {promiseFromIpcRenderer} from '@utils/promises';
-import {addDefaultCommandTerminal} from '@utils/terminal';
+import {showGitErrorModal} from '@utils/terminal';
 
 import {GitBranch} from '@shared/models/git';
 
@@ -22,11 +18,8 @@ import BranchTable from './BranchTable';
 function BranchSelect() {
   const dispatch = useAppDispatch();
 
-  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
   const currentBranch = useAppSelector(state => state.git.repo?.currentBranch);
-  const defaultShell = useAppSelector(state => state.terminal.settings.defaultShell);
   const rootFolderPath = useAppSelector(rootFolderSelector);
-  const terminalsMap = useAppSelector(state => state.terminal.terminalsMap);
 
   const [visible, setVisible] = useState(false);
 
@@ -41,41 +34,16 @@ function BranchSelect() {
     (branch: GitBranch) => {
       const branchName = branch.type === 'local' ? branch.name : branch.name.replace('origin/', '');
 
-      promiseFromIpcRenderer('git.checkoutGitBranch', 'git.checkoutGitBranch.result', {
-        localPath: rootFolderPath,
-        branchName,
-      }).then(result => {
-        if (result.error) {
-          Modal.warning({
-            title: 'Checkout failed',
-            content: <div>{GIT_ERROR_MODAL_DESCRIPTION}</div>,
-            zIndex: 100000,
-            onCancel: () => {
-              addDefaultCommandTerminal(
-                terminalsMap,
-                `git checkout ${branchName}`,
-                defaultShell,
-                bottomSelection,
-                dispatch
-              );
-            },
-            onOk: () => {
-              addDefaultCommandTerminal(
-                terminalsMap,
-                `git checkout ${branchName}`,
-                defaultShell,
-                bottomSelection,
-                dispatch
-              );
-            },
-          });
-        } else {
+      checkoutGitBranch({localPath: rootFolderPath, branchName})
+        .then(() => {
           dispatch(setCurrentBranch(branchName));
           setVisible(false);
-        }
-      });
+        })
+        .catch(() => {
+          showGitErrorModal('Checkout failed', undefined, `git checkout ${branchName}`, dispatch);
+        });
     },
-    [rootFolderPath, terminalsMap, bottomSelection, dispatch, defaultShell]
+    [rootFolderPath, dispatch]
   );
 
   return (

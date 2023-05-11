@@ -3,11 +3,10 @@ import {useCallback, useEffect, useState} from 'react';
 import {Checkbox, Dropdown, List, Modal, Space, Tooltip} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
 
-import {isEqual} from 'lodash';
-
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {setGitLoading, setSelectedItem} from '@redux/git';
+import {stageChangedFiles, unstageFiles} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {clearSelection, selectFile} from '@redux/reducers/main';
@@ -17,12 +16,13 @@ import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {Dots} from '@components/atoms';
 
 import {createFileWithContent} from '@utils/files';
-import {promiseFromIpcRenderer} from '@utils/promises';
+import {showGitErrorModal} from '@utils/terminal';
 
 import {AlertEnum} from '@shared/models/alert';
 import {GitChangedFile} from '@shared/models/git';
 import {Colors} from '@shared/styles/colors';
 import {deleteFile} from '@shared/utils/fileSystem';
+import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './FileList.styled';
 
@@ -64,19 +64,35 @@ const FileList: React.FC<IProps> = props => {
       {
         key: 'stage_unstage_changes',
         label: item.status === 'staged' ? 'Unstage changes' : 'Stage changes',
-        onClick: () => {
+        onClick: async () => {
+          if (!selectedProjectRootFolder) return;
+
           dispatch(setGitLoading(true));
 
           if (item.status === 'unstaged') {
-            promiseFromIpcRenderer('git.stageChangedFiles', 'git.stageChangedFiles.result', {
-              localPath: selectedProjectRootFolder,
-              filePaths: [item.fullGitPath],
-            });
+            try {
+              await stageChangedFiles({localPath: selectedProjectRootFolder, filePaths: [item.fullGitPath]});
+            } catch (e) {
+              showGitErrorModal(
+                'Staging changes failed!',
+                undefined,
+                `git add ${[item.fullGitPath].join(' ')}`,
+                dispatch
+              );
+              setGitLoading(false);
+            }
           } else {
-            promiseFromIpcRenderer('git.unstageFiles', 'git.unstageFiles.result', {
-              localPath: selectedProjectRootFolder,
-              filePaths: [item.fullGitPath],
-            });
+            try {
+              await unstageFiles({localPath: selectedProjectRootFolder, filePaths: [item.fullGitPath]});
+            } catch (e) {
+              showGitErrorModal(
+                'Unstage changes failed!',
+                undefined,
+                `git reset ${[item.fullGitPath].join(' ')}`,
+                dispatch
+              );
+              setGitLoading(false);
+            }
           }
         },
       },
@@ -88,14 +104,14 @@ const FileList: React.FC<IProps> = props => {
               onClick: () => {
                 Modal.confirm({
                   title: discardTitle(item),
-                  onOk() {
+                  async onOk() {
                     dispatch(setGitLoading(true));
 
                     try {
                       if (item.type === 'modified') {
                         dispatch(updateFileEntry({path: item.path, text: item.originalContent}));
                       } else if (item.type === 'added' || item.type === 'untracked') {
-                        deleteFile(item.fullGitPath);
+                        await deleteFile(item.fullGitPath);
                       } else if (item.type === 'deleted') {
                         createFileWithContent(item.fullGitPath, item.originalContent);
                       }
@@ -184,7 +200,11 @@ const FileList: React.FC<IProps> = props => {
         >
           <Checkbox
             onChange={e => handleSelect(e, item)}
-            checked={Boolean(selectedFiles.find(searchItem => searchItem.name === item.name))}
+            checked={Boolean(
+              selectedFiles.find(
+                searchItem => searchItem.name === item.name && searchItem.displayPath === item.displayPath
+              )
+            )}
           />
 
           <S.FileItem>

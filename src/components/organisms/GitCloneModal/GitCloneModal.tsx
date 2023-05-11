@@ -4,12 +4,15 @@ import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
 
 import fs from 'fs';
+import {rm} from 'fs/promises';
 import {sep} from 'path';
+import styled from 'styled-components';
 
 import {DEFAULT_GIT_REPO_PLACEHOLDER, VALID_URL_REGEX} from '@constants/constants';
 
 import {setCreateProject} from '@redux/appConfig';
 import {closeGitCloneModal} from '@redux/git';
+import {cloneGitRepo} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {FileExplorer} from '@atoms';
@@ -17,14 +20,14 @@ import {FileExplorer} from '@atoms';
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {doesPathExist} from '@utils/files';
-import {promiseFromIpcRenderer} from '@utils/promises';
+
+import {trackEvent} from '@shared/utils';
 
 const GitCloneModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
 
   const [loading, setLoading] = useState(false);
-
   const [form] = useForm();
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
@@ -43,38 +46,37 @@ const GitCloneModal: React.FC = () => {
   };
 
   const onOk = () => {
-    form.validateFields().then(values => {
+    form.validateFields().then(async values => {
       setLoading(true);
 
       const {localPath, repoURL} = values;
       const repoName = repoURL.split('/').pop();
-      const localGitPath = `${localPath}${sep}${repoName}`;
+      const localGitPath = `${localPath}${sep}${repoName.replace('.git', '')}`;
 
       if (!doesPathExist(localPath)) {
         fs.mkdirSync(localPath, {recursive: true});
       }
 
-      promiseFromIpcRenderer('git.cloneGitRepo', 'git.cloneGitRepo.result', {
-        localPath: localGitPath,
-        repoPath: repoURL,
-      }).then(result => {
+      try {
+        await cloneGitRepo({localPath: localGitPath, repoPath: repoURL});
+        setLoading(false);
+        dispatch(closeGitCloneModal());
+        dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName.replace('.git', '')}`}));
+        trackEvent('app_start/create_project', {from: 'git'});
+      } catch (error: any) {
         setLoading(false);
         dispatch(closeGitCloneModal());
 
-        if (result.error) {
-          Modal.warning({
-            title: 'Clone failed!',
-            content: <div>{result.error}</div>,
-            zIndex: 100000,
-          });
+        Modal.warning({
+          title: 'Clone failed!',
+          content: <div>{error.message}</div>,
+          zIndex: 100000,
+        });
 
-          if (doesPathExist(localGitPath)) {
-            fs.rmdirSync(localGitPath, {recursive: true});
-          }
-        } else {
-          dispatch(setCreateProject({rootFolder: `${localPath}${sep}${repoName}`}));
+        if (doesPathExist(localGitPath)) {
+          rm(localGitPath, {recursive: true});
         }
-      });
+      }
     });
   };
 
@@ -82,6 +84,7 @@ const GitCloneModal: React.FC = () => {
     <Modal open confirmLoading={loading} onCancel={onCancel} onOk={onOk}>
       <Form form={form} initialValues={{repoURL: '', localPath: projectsRootPath}} layout="vertical">
         <Form.Item
+          style={{marginBottom: '0px'}}
           name="repoURL"
           label="Repository URL"
           rules={[
@@ -95,8 +98,31 @@ const GitCloneModal: React.FC = () => {
             },
           ]}
         >
-          <Input placeholder={DEFAULT_GIT_REPO_PLACEHOLDER} />
+          <Input
+            onKeyDown={e => {
+              if (form.getFieldValue('repoURL')) {
+                return;
+              }
+
+              if (e.key === 'Tab') {
+                e.preventDefault();
+                form.setFieldValue('repoURL', DEFAULT_GIT_REPO_PLACEHOLDER);
+                form.validateFields();
+              }
+            }}
+            placeholder={DEFAULT_GIT_REPO_PLACEHOLDER}
+          />
         </Form.Item>
+
+        <SampleButton
+          type="link"
+          onClick={() => {
+            form.setFieldValue('repoURL', DEFAULT_GIT_REPO_PLACEHOLDER);
+            onOk();
+          }}
+        >
+          Use Monokle Sample Repo
+        </SampleButton>
 
         <Form.Item label="Location" required>
           <Input.Group compact>
@@ -146,3 +172,10 @@ const GitCloneModal: React.FC = () => {
 };
 
 export default GitCloneModal;
+
+// Styled Components
+
+const SampleButton = styled(Button)`
+  padding: 4px 0px 4px 0px;
+  margin: 8px 0px;
+`;

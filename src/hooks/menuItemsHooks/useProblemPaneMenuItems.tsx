@@ -3,14 +3,12 @@ import MonacoEditor, {monaco} from 'react-monaco-editor';
 
 import {TabsProps} from 'antd';
 
-import fastDeepEqual from 'fast-deep-equal';
 import {sep} from 'path';
 
 import {useAppSelector} from '@redux/hooks';
-import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
 import {
   problemFilePathAndRangeSelector,
-  problemResourceIdAndRangeSelector,
+  problemResourceAndRangeSelector,
   useValidationSelector,
 } from '@redux/validation/validation.selectors';
 
@@ -19,7 +17,9 @@ import {Monaco} from '@components/molecules';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {getRuleForResult} from '@monokle/validation';
+import {ResourceStorage} from '@shared/models/k8sResource';
 import {ResourceSelection} from '@shared/models/selection';
+import {isEqual} from '@shared/utils/isEqual';
 
 const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   readOnly: true,
@@ -30,28 +30,35 @@ const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
 };
 
 export function useProblemPaneMenuItems(width: number, height: number) {
-  const activeStorage = useAppSelector(activeResourceStorageSelector);
   const lastResponse = useValidationSelector(state => state.lastResponse);
   const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem?.problem ?? null);
-  const selectedProblemMonacoData = useValidationSelector(state => {
-    const selectedFrom = state.validationOverview.selectedProblem?.selectedFrom ?? '';
+  const selectedProblemMonacoData = useAppSelector(state => {
+    const selectedFrom = state.validation.validationOverview.selectedProblem?.selectedFrom ?? '';
     if (!selectedFrom) return undefined;
-    const monacoData = {filePath: '', range: {}, resourceId: ''};
+    const monacoData: {filePath: ''; range: {}; resourceId: ''; storage: ResourceStorage} = {
+      filePath: '',
+      range: {},
+      resourceId: '',
+      storage: 'local',
+    };
 
     if (selectedFrom === 'file') {
-      return {...monacoData, ...problemFilePathAndRangeSelector(state)};
+      return {...monacoData, ...problemFilePathAndRangeSelector(state.validation)};
     }
 
     if (selectedFrom === 'resource') {
-      return {...monacoData, ...problemResourceIdAndRangeSelector(state)};
+      return {...monacoData, ...problemResourceAndRangeSelector(state)};
     }
-  }, fastDeepEqual);
+  }, isEqual);
 
   const resourceSelection: ResourceSelection | undefined = useMemo(() => {
     if (!selectedProblemMonacoData?.resourceId) return undefined;
 
-    return {type: 'resource', resourceIdentifier: {id: selectedProblemMonacoData.resourceId, storage: activeStorage}};
-  }, [activeStorage, selectedProblemMonacoData]);
+    return {
+      type: 'resource',
+      resourceIdentifier: {id: selectedProblemMonacoData.resourceId, storage: selectedProblemMonacoData.storage},
+    };
+  }, [selectedProblemMonacoData]);
 
   const rule = useMemo(() => {
     if (!lastResponse || !selectedProblem) {

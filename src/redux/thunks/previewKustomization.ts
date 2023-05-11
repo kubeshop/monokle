@@ -31,7 +31,6 @@ export const previewKustomization = createAsyncThunk<
   string,
   {dispatch: AppDispatch; state: RootState}
 >('main/previewKustomization', async (resourceId, thunkAPI) => {
-  trackEvent('preview/kustomize/start');
   const startTime = new Date().getTime();
   const state = thunkAPI.getState().main;
   const projectConfig = currentConfigSelector(thunkAPI.getState());
@@ -44,6 +43,7 @@ export const previewKustomization = createAsyncThunk<
     return {};
   }
 
+  trackEvent('preview/kustomize/start');
   const kustomization = joinK8sResource(kustomizationMeta, kustomizationContent);
 
   const rootFolder = state.fileMap[ROOT_FILE_ENTRY].filePath;
@@ -51,19 +51,18 @@ export const previewKustomization = createAsyncThunk<
 
   log.info(`Previewing kustomization with id ${kustomization.id} in folder ${folder}`);
   const result = await runKustomize(folder, projectConfig);
+  const endTime = new Date().getTime();
 
   if (hasCommandFailed(result)) {
     const msg = result.error ?? result.stderr ?? ERROR_MSG_FALLBACK;
+    trackEvent('preview/kustomize/fail', {reason: msg});
     return createRejectionWithAlert(thunkAPI, 'Kustomize Error', msg);
   }
 
-  const endTime = new Date().getTime();
-
-  trackEvent('preview/kustomize/end', {executionTime: endTime - startTime});
-
   if (!result.stdout) {
+    trackEvent('preview/kustomize/end', {executionTime: endTime - startTime});
     log.warn("Couldn't find any resources in the preview output");
-    return {};
+    return createRejectionWithAlert(thunkAPI, "Couldn't find any resources in the preview output", '');
   }
 
   const preview = {type: 'kustomize', kustomizationId: kustomization.id} as const;
@@ -71,6 +70,13 @@ export const previewKustomization = createAsyncThunk<
   const resources = extractK8sResources(result.stdout, 'preview', {
     preview,
   });
+
+  trackEvent('preview/kustomize/end', {resourcesCount: resources.length, executionTime: endTime - startTime});
+
+  if (!resources.length) {
+    log.warn("Couldn't find any resources in the preview output");
+    return createRejectionWithAlert(thunkAPI, "Couldn't find any resources in the preview output", '');
+  }
 
   return {
     resources,

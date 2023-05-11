@@ -7,7 +7,6 @@ import {AlertState} from '@shared/models/alert';
 import {AppState} from '@shared/models/appState';
 import {AppConfig, NewVersionCode, SettingsPanel} from '@shared/models/config';
 import {ExtensionState} from '@shared/models/extension';
-import {NavigatorState} from '@shared/models/navigator';
 import {TerminalState} from '@shared/models/terminal';
 import {LeftMenuSelectionOptions, PaneConfiguration, UiState} from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
@@ -63,10 +62,11 @@ const initialAppState: AppState = {
   },
   deviceID: electronStore.get('main.deviceID'),
   filtersPresets: electronStore.get('main.filtersPresets') || {},
-  imagesList: [],
+  imageMap: {},
   validationIntegration: undefined,
   autosaving: {},
   lastChangedLine: 0,
+  activeEditorTab: 'source',
 };
 
 const initialAppConfigState: AppConfig = {
@@ -78,22 +78,19 @@ const initialAppConfigState: AppConfig = {
     theme: electronStore.get('appConfig.settings.theme'),
     textSize: electronStore.get('appConfig.settings.textSize'),
     language: electronStore.get('appConfig.settings.language'),
-    hideExcludedFilesInFileExplorer: electronStore.get('appConfig.settings.hideExcludedFilesInFileExplorer'),
-    hideUnsupportedFilesInFileExplorer: electronStore.get('appConfig.settings.hideUnsupportedFilesInFileExplorer'),
     enableHelmWithKustomize: electronStore.get('appConfig.settings.enableHelmWithKustomize'),
     createDefaultObjects: electronStore.get('appConfig.settings.createDefaultObjects', false),
     setDefaultPrimitiveValues: electronStore.get('appConfig.settings.setDefaultPrimitiveValues', true),
     allowEditInClusterMode: electronStore.get('appConfig.settings.allowEditInClusterMode', true),
   },
   fileExplorerSortOrder: electronStore.get('appConfig.fileExplorerSortOrder') || 'folders',
-  useKubectlProxy: electronStore.get('appConfig.useKubectlProxy') || false,
-  isClusterSelectorVisible: electronStore.get('appConfig.isClusterSelectorVisible', true),
   loadLastProjectOnStartup: electronStore.get('appConfig.loadLastProjectOnStartup'),
   scanExcludes: electronStore.get('appConfig.scanExcludes') || [],
   isScanExcludesUpdated: 'applied',
   fileIncludes: electronStore.get('appConfig.fileIncludes') || [],
   isScanIncludesUpdated: 'applied',
   folderReadsMaxDepth: electronStore.get('appConfig.folderReadsMaxDepth') || 10,
+  isNewVersionAvailable: false,
   newVersion: {
     code: electronStore.get('appConfig.newVersion') || NewVersionCode.Idle,
     data: {
@@ -114,7 +111,6 @@ const initialAppConfigState: AppConfig = {
   favoriteTemplates: electronStore.get('appConfig.favoriteTemplates') || [],
   disableEventTracking: electronStore.get('appConfig.disableEventTracking'),
   disableErrorReporting: electronStore.get('appConfig.disableErrorReporting'),
-  clusterAccess: [],
   isAccessLoading: false,
   kubeConfigContextsColors: electronStore.get('appConfig.kubeConfigContextsColors') || {},
 };
@@ -144,6 +140,9 @@ const initialUiState: UiState = {
   isReleaseNotesDrawerOpen: false,
   isAboutModalOpen: false,
   isKeyboardShortcutsModalOpen: false,
+  collapsedKustomizeKinds: [],
+  collapsedHelmCharts: [],
+  collapsedPreviewConfigurationsHelmCharts: [],
   isScaleModalOpen: false,
   isNotificationsOpen: false,
   isFolderLoading: false,
@@ -175,12 +174,16 @@ const initialUiState: UiState = {
     entityName: '',
     absolutePathToEntity: '',
   },
+  newVersionNotice: {
+    isVisible: false,
+  },
   leftMenu: {
     bottomSelection: uiLeftMenuBottomSelection,
     expandedFolders: [],
     expandedSearchedFiles: ['filter'],
     isValidationDrawerVisible: false,
     selection: uiLeftMenuSelection,
+    activityBeforeClusterConnect: undefined,
     isActive:
       !uiLeftMenuSelection || uiLeftMenuSelection.trim() === '' ? false : electronStore.get('ui.leftMenu.isActive'),
     activeTab: null,
@@ -203,8 +206,8 @@ const initialUiState: UiState = {
     apply: false,
     diff: false,
   },
-  navPane: {
-    collapsedNavSectionNames: [],
+  navigator: {
+    collapsedResourceKinds: [],
   },
   paneConfiguration,
   layoutSize: {header: 0},
@@ -225,7 +228,7 @@ const initialUiState: UiState = {
   templateExplorer: {
     isVisible: false,
   },
-  welcomePopup: {
+  welcomeModal: {
     isVisible: false,
   },
   activeSettingsPanel: SettingsPanel.GlobalSettings,
@@ -239,13 +242,6 @@ const initialUiState: UiState = {
   explorerSelectedSection: 'files',
   fileExplorerExpandedFolders: [],
   showOpenProjectAlert: electronStore.get('ui.showOpenProjectAlert', true),
-};
-
-const initialNavigatorState: NavigatorState = {
-  sectionInstanceMap: {},
-  itemInstanceMap: {},
-  collapsedSectionIds: [],
-  registeredSectionBlueprintIds: [],
 };
 
 const initialExtensionState: ExtensionState = {
@@ -271,7 +267,6 @@ export default {
   config: initialAppConfigState,
   extension: initialExtensionState,
   main: initialAppState,
-  navigator: initialNavigatorState,
   terminal: initialTerminalState,
   ui: initialUiState,
 };

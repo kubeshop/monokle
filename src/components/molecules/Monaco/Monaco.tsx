@@ -1,7 +1,7 @@
 /* eslint-disable import/order */
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 import MonacoEditor, {monaco} from 'react-monaco-editor';
-import {useMeasure} from 'react-use';
+import {useMeasure, useUnmount} from 'react-use';
 
 import fs from 'fs';
 import log from 'loglevel';
@@ -13,7 +13,7 @@ import 'monaco-yaml';
 import path from 'path';
 import {Document, ParsedNode, isMap} from 'yaml';
 
-import {isInClusterModeSelector, settingsSelector} from '@redux/appConfig';
+import {settingsSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   editorHasReloadedSelectedPath,
@@ -21,17 +21,15 @@ import {
   selectFile,
   selectImage,
   selectResource,
-  setAutosavingStatus,
 } from '@redux/reducers/main';
 import {openNewResourceWizard} from '@redux/reducers/ui';
-import {isInPreviewModeSelectorNew, selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
+import {selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
 import {
   activeResourceStorageSelector,
   useActiveResourceContentMapRef,
   useActiveResourceMetaMap,
-  useResourceContentMap,
   useResourceContentMapRef,
-  useResourceMetaMap,
+  useResourceMetaMapRef,
 } from '@redux/selectors/resourceMapSelectors';
 import {useResource, useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {getLocalResourcesForPath} from '@redux/services/fileEntry';
@@ -39,7 +37,7 @@ import {getLocalResourcesForPath} from '@redux/services/fileEntry';
 import useResourceYamlSchema from '@hooks/useResourceYamlSchema';
 
 import {getFileStats} from '@utils/files';
-import {useSelectorWithRef, useStateWithRef} from '@utils/hooks';
+import {useRefSelector, useSelectorWithRef, useStateWithRef} from '@utils/hooks';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {parseAllYamlDocuments} from '@utils/yaml';
 
@@ -49,11 +47,12 @@ import {ResourceRef} from '@monokle/validation';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceFilterType} from '@shared/models/appState';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
-import {isHelmPreview} from '@shared/models/preview';
-import {ResourceSelection, isHelmValuesFileSelection} from '@shared/models/selection';
+import {ResourceSelection} from '@shared/models/selection';
 import {MonacoRange, NewResourceWizardInput} from '@shared/models/ui';
+import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './Monaco.styled';
+import {EDITOR_DISPOSABLES} from './disposables';
 import useCodeIntel from './useCodeIntel';
 import useDebouncedCodeSave from './useDebouncedCodeSave';
 import useEditorKeybindings from './useEditorKeybindings';
@@ -103,24 +102,26 @@ const Monaco: React.FC<IProps> = props => {
   const stateSelectedResource = useSelectedResource();
   const providedResource = useResource(providedResourceSelection?.resourceIdentifier);
 
-  const selectedResource = providedResourceSelection ? providedResource : stateSelectedResource;
+  const selectedResource = providedResourceSelection
+    ? providedResource
+    : providedFilePath
+    ? undefined
+    : stateSelectedResource;
   const selectedResourceRef = useRef(selectedResource);
   selectedResourceRef.current = selectedResource;
 
-  const [, autosavingStatusRef] = useSelectorWithRef(state => state.main.autosaving.status);
-  const [, activeResourceStorageRef] = useSelectorWithRef(activeResourceStorageSelector);
+  const activeResourceStorageRef = useRefSelector(activeResourceStorageSelector);
 
   const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmTemplatesMap = useAppSelector(state => state.main.helmTemplatesMap);
   const helmValuesMap = useAppSelector(state => state.main.helmValuesMap);
-  const imagesList = useAppSelector(state => state.main.imagesList);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelectorNew);
+  const imageMap = useAppSelector(state => state.main.imageMap);
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const k8sVersion = useAppSelector(state => state.config.projectConfig?.k8sVersion);
-  const preview = useAppSelector(state => state.main.preview);
 
-  const localResourceMetaMap = useResourceMetaMap('local');
-  const localResourceContentMap = useResourceContentMap('local');
+  const localResourceMetaMapRef = useResourceMetaMapRef('local');
+  const localResourceContentMapRef = useResourceContentMapRef('local');
   // TODO: 2.0+ as a quick fix for Monaco, we're including the selectedHelmValuesFile in this selector
   const [selectedFilePath, selectedFilePathRef] = useSelectorWithRef(state => {
     if (providedFilePath) {
@@ -149,10 +150,10 @@ const Monaco: React.FC<IProps> = props => {
       return [];
     }
     return getLocalResourcesForPath(selectedFilePath, {
-      resourceMetaMap: localResourceMetaMap,
-      resourceContentMap: localResourceContentMap,
+      resourceMetaMap: localResourceMetaMapRef.current,
+      resourceContentMap: localResourceContentMapRef.current,
     });
-  }, [selectedFilePath, localResourceMetaMap, localResourceContentMap]);
+  }, [selectedFilePath, localResourceMetaMapRef, localResourceContentMapRef]);
 
   const [containerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -179,7 +180,7 @@ const Monaco: React.FC<IProps> = props => {
   };
 
   const selectImageHandler = (imageId: string) => {
-    const image = imagesList.find(im => im.id === imageId);
+    const image = imageMap[imageId];
 
     if (image) {
       dispatch(selectImage({imageId: image.id}));
@@ -202,6 +203,10 @@ const Monaco: React.FC<IProps> = props => {
     }
   };
 
+  useUnmount(() => {
+    EDITOR_DISPOSABLES.forEach(disposable => disposable.dispose());
+  });
+
   useCodeIntel({
     editorRef,
     selectedResource:
@@ -209,10 +214,10 @@ const Monaco: React.FC<IProps> = props => {
     code,
     resourceMetaMap: activeResourceMetaMap,
     fileMap,
-    imagesList,
+    imageMap,
     selectResource: triggerSelectResource,
     selectFilePath,
-    createResource: isInPreviewMode ? undefined : createResource,
+    createResource: isInPreviewMode || isInClusterMode ? undefined : createResource,
     filterResources,
     selectImageHandler,
     selectedPath: selectedFilePath,
@@ -241,12 +246,7 @@ const Monaco: React.FC<IProps> = props => {
     fileMapRef
   );
 
-  const debouncedSaveContent = useDebouncedCodeSave(
-    originalCodeRef,
-    activeResourceMetaMapRef,
-    selectedResourceIdRef,
-    selectedFilePathRef
-  );
+  const debouncedSaveContent = useDebouncedCodeSave(originalCodeRef, selectedResourceRef, selectedFilePathRef);
 
   useMonacoUiState(editorRef.current, selectedResourceIdRef.current, selectedFilePath);
 
@@ -272,10 +272,6 @@ const Monaco: React.FC<IProps> = props => {
       isDirtyRef.current = originalCodeRef.current !== newValue;
       setCode(newValue);
 
-      if (!autosavingStatusRef.current) {
-        dispatch(setAutosavingStatus(true));
-      }
-
       if (selectedResourceIdRef.current) {
         // this will slow things down if document gets large - need to find a better solution...
         const documents = parseAllYamlDocuments(newValue);
@@ -294,7 +290,7 @@ const Monaco: React.FC<IProps> = props => {
         debouncedSaveContent(newValue);
       }
     },
-    [autosavingStatusRef, debouncedSaveContent, dispatch, setCode]
+    [debouncedSaveContent, setCode]
   );
 
   useEffect(() => {
@@ -317,6 +313,8 @@ const Monaco: React.FC<IProps> = props => {
       const resourceContent =
         selectedResource.storage === 'transient'
           ? transientResourceContentMapRef.current[selectedResource.id]
+          : selectedResource.kind === 'Kustomization'
+          ? localResourceContentMapRef.current?.[selectedResource.id]
           : activeResourceContentMapRef.current?.[selectedResource.id];
       if (resourceContent) {
         if (codeRef.current === resourceContent.text) {
@@ -351,13 +349,13 @@ const Monaco: React.FC<IProps> = props => {
     isDirtyRef.current = false;
   }, [
     selectedFilePath,
-    selectedResource?.id,
-    selectedResource?.storage,
+    selectedResource,
     codeRef,
     activeResourceContentMapRef,
     transientResourceContentMapRef,
     fileMapRef,
     setCode,
+    localResourceContentMapRef,
   ]);
 
   useEffect(() => {
@@ -395,26 +393,25 @@ const Monaco: React.FC<IProps> = props => {
 
   // read-only if we're in preview mode and another resource is selected - or if nothing is selected at all - or allowEditInClusterMode is false
   const isReadOnlyMode = useMemo(() => {
-    if (isInClusterMode && !settings.allowEditInClusterMode) {
+    if (!selection && !selectedFilePath && !selectedResource) {
       return true;
     }
+
     if (
-      isInPreviewMode &&
-      isHelmPreview(preview) &&
-      isHelmValuesFileSelection(selection) &&
-      preview.valuesFileId === selection.valuesFileId
+      (isInClusterMode && !settings.allowEditInClusterMode) ||
+      (isInPreviewMode && selection?.type === 'resource' && selection.resourceIdentifier.storage === 'preview')
     ) {
       return true;
     }
+
     return !selectedFilePath && !selectedResource;
   }, [
-    isInPreviewMode,
     isInClusterMode,
-    selectedResource,
-    selectedFilePath,
     settings.allowEditInClusterMode,
-    preview,
+    isInPreviewMode,
     selection,
+    selectedFilePath,
+    selectedResource,
   ]);
 
   const options = useMemo(() => {
@@ -434,9 +431,11 @@ const Monaco: React.FC<IProps> = props => {
   useEffect(() => {
     if (!providedRange || !editorRef.current) return;
 
-    editorRef.current.setSelection(providedRange);
-    editorRef.current.revealLineInCenter(providedRange.startLineNumber);
-  }, [providedRange]);
+    setImmediate(() => {
+      editorRef.current?.setSelection(providedRange);
+      editorRef.current?.revealLineInCenter(providedRange.startLineNumber);
+    });
+  }, [dispatch, providedRange]);
 
   return (
     <S.MonacoContainer ref={containerRef} $height={height}>

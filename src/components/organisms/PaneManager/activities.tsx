@@ -5,7 +5,7 @@ import {size} from 'lodash';
 
 import {FileExplorerTabTooltip, SettingsTooltip, TerminalPaneTooltip} from '@constants/tooltips';
 
-import {activeProjectSelector, isInClusterModeSelector} from '@redux/appConfig';
+import {activeProjectSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
@@ -13,6 +13,7 @@ import {BottomPaneManager, DashboardPane, GitPane} from '@organisms';
 
 import {ActivityType, Icon} from '@monokle/components';
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@shared/models/ui';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import CompareSyncPane from '../CompareSyncPane';
 import ExplorerPane from '../ExplorerPane';
@@ -54,7 +55,11 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     type: 'panel',
     name: 'git',
     tooltip: 'View Git operations',
-    icon: () => <Icon name="git-ops" style={{fontSize: '18px', marginTop: 4}} />,
+    icon: () => {
+      const changedFiles = useAppSelector(state => state.git.changedFiles);
+
+      return <Icon name="git-ops" style={{fontSize: '18px', marginTop: changedFiles.length ? '0px' : '4px'}} />;
+    },
     component: <GitPane />,
     useBadge: () => {
       const changedFiles = useAppSelector(state => state.git.changedFiles);

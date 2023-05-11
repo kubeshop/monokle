@@ -1,15 +1,15 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {useEffect, useState} from 'react';
+import {memo, useEffect, useRef, useState} from 'react';
 
 import log from 'loglevel';
 import stream from 'stream';
 import {v4 as uuidv4} from 'uuid';
 
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 
+import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
 import * as S from './Logs.styled';
@@ -27,14 +27,27 @@ const logOptions = {
 };
 
 const Logs = () => {
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
+  const kubeconfig = useAppSelector(selectKubeconfig);
   const selectedResource = useSelectedResource();
   const [logs, setLogs] = useState<LogLineType[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
+    if (containerRef && containerRef.current) {
+      const position = containerRef.current.scrollHeight - containerRef.current.clientHeight;
+      containerRef.current.scrollTop = position;
+    }
+  }, [logs]);
+
+  useEffect(() => {
+    if (!kubeconfig?.isValid) {
+      return;
+    }
+
     setLogs([]);
-    const kc = createKubeClient(kubeConfigPath, kubeConfigContext);
+    const kc = createKubeClient(kubeconfig.path, kubeconfig.currentContext);
     const k8sLog = new k8s.Log(kc);
     const logStream = new stream.PassThrough();
     if (selectedResource && selectedResource.kind === 'Pod') {
@@ -53,25 +66,38 @@ const Logs = () => {
       if (selectedResource.namespace) {
         k8sLog
           .log(selectedResource.namespace, selectedResource.name, containerName, logStream, logOptions)
+          .then(() => {
+            setErrorMessage('');
+          })
           .catch((err: Error) => {
+            setErrorMessage(`${err.name}: ${err.message}`);
             log.error(err);
           });
       }
     }
 
     return () => {
-      logStream.destroy();
+      if (logStream) {
+        logStream.destroy();
+      }
     };
-  }, [kubeConfigContext, kubeConfigPath, selectedResource]);
+  }, [kubeconfig, selectedResource]);
+
+  if (errorMessage) {
+    return <S.ErrorContainer>{errorMessage}</S.ErrorContainer>;
+  }
 
   return (
-    <S.LogContainer>
+    <S.LogContainer ref={containerRef}>
       {logs.map(logLine => (
-        <S.LogText key={logLine.id}>{logLine.text}</S.LogText>
+        <LogItem key={logLine.id} logLine={logLine} />
       ))}
-      ;
     </S.LogContainer>
   );
 };
 
 export default Logs;
+
+export const LogItem = memo(({logLine}: any) => {
+  return <S.LogText key={logLine.id}>{logLine.text}</S.LogText>;
+});

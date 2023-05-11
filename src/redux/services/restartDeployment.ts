@@ -5,8 +5,8 @@ import {execute} from '@shared/utils/commands';
 type RestartDeploymentOptions = {
   name: string;
   namespace: string;
-  currentContext: string;
-  kubeConfigPath: string;
+  currentContext?: string;
+  kubeConfigPath?: string;
 };
 
 async function restartDeployment(options: RestartDeploymentOptions) {

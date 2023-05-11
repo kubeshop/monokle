@@ -64,7 +64,7 @@ type NewResourceWizardInput = {
   targetFile?: string;
 };
 
-export const ExplorerCollapsibleSections = ['files', 'kustomize', 'helm', 'images'] as const;
+export const ExplorerCollapsibleSections = ['files', 'kustomize', 'helm', 'preview-configuration', 'images'] as const;
 export type ExplorerCollapsibleSectionsType = typeof ExplorerCollapsibleSections[number];
 
 export const LeftMenuSelectionOptions = [
@@ -83,7 +83,6 @@ type PaneConfiguration = {
   navPane: number;
   editPane: number;
   bottomPaneHeight: number;
-  recentProjectsPaneWidth: number;
 };
 
 type RightMenuSelectionType = 'logs' | 'graph';
@@ -100,6 +99,9 @@ type UiState = {
   isScaleModalOpen: boolean;
   isNotificationsOpen: boolean;
   isAboutModalOpen: boolean;
+  newVersionNotice: {
+    isVisible: boolean;
+  };
   newResourceWizard: {
     isOpen: boolean;
     defaultInput?: NewResourceWizardInput;
@@ -148,6 +150,7 @@ type UiState = {
     isActive: boolean;
     isValidationDrawerVisible: boolean;
     selection: LeftMenuSelectionType;
+    activityBeforeClusterConnect: LeftMenuSelectionType | undefined;
     activeTab: string | null;
   };
   quickSearchActionsPopup: {
@@ -157,8 +160,8 @@ type UiState = {
     selection?: RightMenuSelectionType;
     isActive: boolean;
   };
-  navPane: {
-    collapsedNavSectionNames: string[];
+  navigator: {
+    collapsedResourceKinds: string[];
   };
   folderExplorer: {
     isOpen: boolean;
@@ -190,7 +193,10 @@ type UiState = {
     projectCreate?: Project;
   };
   isInQuickClusterMode?: boolean;
-  welcomePopup: {
+  collapsedKustomizeKinds: string[];
+  collapsedHelmCharts: string[];
+  collapsedPreviewConfigurationsHelmCharts: string[];
+  welcomeModal: {
     isVisible: boolean;
   };
   fileCompareModal: {

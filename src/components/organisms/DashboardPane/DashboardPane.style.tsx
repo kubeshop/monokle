@@ -20,27 +20,51 @@ export const HeaderContainer = styled.div`
   padding: 0px 16px 16px 16px;
 `;
 
-export const MainSection = styled.div<{$active: boolean; $clickable: boolean}>`
+export const MainSection = styled.div<{$active: boolean; $clickable: boolean; $isHovered: boolean}>`
   padding: 0 0 0 16px;
   font-size: 16px;
   line-height: 36px;
   font-weight: 600;
 
-  ${props =>
+  /* ${props =>
     props.$clickable &&
     `
     :hover {
       background-color: rgba(255, 255, 255, 0.08);
       color: ${Colors.grey9};
     }
-  `}
+  `} */
 
   ${props => `
     color: ${props.$active ? Colors.grey2 : Colors.whitePure};
     background-color: ${props.$active ? Colors.blue9 : 'transparent'};
     cursor:${props.$clickable ? 'pointer' : 'inherit'};`}
+
+  ${props => {
+    if (props.$active) {
+      if (props.$isHovered && props.$clickable) {
+        return `background: ${Colors.selectionColorHover};`;
+      }
+      return `background: ${Colors.selectionColor};font-weight: 700;`;
+    }
+    if (props.$isHovered && props.$clickable) {
+      return `background: ${Colors.blackPearl};`;
+    }
+  }};
+
+  ${props => {
+    if (props.$active) {
+      return `font-weight: 700;`;
+    }
+  }};
+  ${props => {
+    if (props.$active) {
+      return `color: ${Colors.blackPure};`;
+    }
+    return `color: ${Colors.whitePure};`;
+  }};
 `;
-export const SubSection = styled.div<{$active: boolean}>`
+export const SubSection = styled.div<{$active: boolean; $isHovered: boolean}>`
   padding: 0 0 0 16px;
   font-size: 14px;
   line-height: 36px;
@@ -48,14 +72,29 @@ export const SubSection = styled.div<{$active: boolean}>`
   display: flex;
   align-items: center;
 
-  :hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    color: ${Colors.grey9};
-  }
+  ${props => {
+    if (props.$active) {
+      if (props.$isHovered) {
+        return `background: ${Colors.selectionColorHover};`;
+      }
+      return `background: ${Colors.selectionColor};font-weight: 700;`;
+    }
+    if (props.$isHovered) {
+      return `background: ${Colors.blackPearl};`;
+    }
+  }};
 
-  ${props => `
-    color: ${props.$active ? Colors.grey2 : Colors.grey9};
-    background-color: ${props.$active ? Colors.blue9 : 'transparent'}`}
+  ${props => {
+    if (props.$active) {
+      return `font-weight: 700;`;
+    }
+  }};
+  ${props => {
+    if (props.$active) {
+      return `color: ${Colors.blackPure};`;
+    }
+    return `color: ${Colors.grey9};`;
+  }};
 `;
 
 export const ClusterName = styled(TitleBar)`

@@ -67,6 +67,8 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
 
   useEffect(() => {
     try {
+      setIsLoading(true);
+      setFormData(defaultFormData);
       const schemas = readTemplateFormSchemas(templateForm);
       setSchema(JSON.parse(schemas.schema));
       setUiSchema(JSON.parse(schemas.uiSchema));
@@ -79,10 +81,10 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
       setErrorMessage("Couldn't read the schemas for this template form.");
       setIsLoading(false);
     }
-  }, [templateForm]);
+  }, [defaultFormData, templateForm]);
 
   if (isLoading) {
-    return <Skeleton />;
+    return <Skeleton active />;
   }
 
   if (errorMessage) {

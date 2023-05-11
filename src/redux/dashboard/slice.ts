@@ -1,6 +1,7 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {startClusterConnection} from '@redux/thunks/cluster';
+import {setCurrentContext} from '@redux/appConfig';
+import {connectCluster} from '@redux/cluster/thunks/connect';
 
 import {DashboardMenu, DashboardState} from '@shared/models/dashboard';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -26,8 +27,10 @@ export const dashboardSlice = createSlice({
     },
   },
   extraReducers: builder => {
-    builder.addCase(startClusterConnection.fulfilled, state => {
+    builder.addCase(connectCluster.fulfilled, state => {
       state.tableDrawer.selectedResourceId = undefined;
+    });
+    builder.addCase(setCurrentContext, state => {
       state.ui.activeMenu = {key: 'Overview', label: 'Overview'};
     });
   },

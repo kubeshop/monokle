@@ -2,8 +2,7 @@ import {HotkeyLabel} from '@atoms';
 
 export const macOSKeyIcon: Record<string, string> = {
   alt: '⌥',
-  command: '⌘',
-  cmd: '⌘',
+  Meta: '⌘',
   shift: '⇧',
 };
 
@@ -106,3 +105,11 @@ export const GitCommitEnabledTooltip = ({branchName}: {branchName: string}) => (
 export const ClusterDashboardErrorsWarningTooltip = ({type}: {type: 'errors' | 'warnings'}) => (
   <div>Click to see all your cluster {type}</div>
 );
+export const DisabledAddResourceTooltip = ({type, kind}: {type: 'cluster' | 'preview' | 'other'; kind?: string}) =>
+  type === 'other' ? (
+    <div>Adding a resource is not possible</div>
+  ) : (
+    <div>
+      Adding a {kind || 'resource'} is not possible in {type === 'cluster' ? 'cluster' : 'preview'} mode
+    </div>
+  );

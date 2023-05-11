@@ -3,9 +3,9 @@ import {useInterval} from 'react-use';
 
 import {Tooltip} from 'antd';
 
-import {useResourceMap} from '@redux/selectors/resourceMapSelectors';
+import {useAppSelector} from '@redux/hooks';
+import {useResourceContentMap} from '@redux/selectors/resourceMapSelectors';
 import {NodeMetric, getClusterUtilization} from '@redux/services/clusterDashboard';
-import {KubeConfigManager} from '@redux/services/kubeConfigManager';
 
 import {convertBytesToGigabyte, memoryParser} from '@utils/unit-converter';
 
@@ -13,34 +13,26 @@ import InfoCircle from '@assets/InfoCircle.svg';
 
 import NodeHandler from '@src/kindhandlers/NodeHandler';
 
-import {K8sResource} from '@shared/models/k8sResource';
+import {ResourceContent} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
 
 import * as S from './Utilization.styled';
 
 export const Utilization = () => {
-  const clusterResourceMap = useResourceMap('cluster');
+  const clusterResourceContentMap = useResourceContentMap('cluster');
   const [averageCpuUsage, setAverageCpuUsage] = useState(0);
   const [totalCpu, setTotalCpu] = useState(0);
   const [averageMemoryUsage, setAverageMemoryUsage] = useState(0);
   const [totalMemory, setTotalMemory] = useState(0);
   const [utilizationData, setUtilizationData] = useState<NodeMetric[]>([]);
-  const [heartbeat, setHeartbeat] = useState(0);
-
-  useEffect(() => {
-    const k8sApiClient = new KubeConfigManager().getV1ApiClient();
-    const metricClient = new KubeConfigManager().getMetricsClient();
-    if (metricClient && k8sApiClient) {
-      getClusterUtilization(k8sApiClient, metricClient)
-        .then(data => setUtilizationData(data))
-        .catch(() => setUtilizationData([]));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [heartbeat]);
+  const connection = useAppSelector(s => s.main.clusterConnection);
 
   useInterval(() => {
-    setHeartbeat(heartbeat + 1);
-  }, 5000);
+    if (!connection) return;
+    getClusterUtilization(connection?.kubeConfigPath, connection?.context)
+      .then(data => setUtilizationData(data))
+      .catch(() => setUtilizationData([]));
+  }, 8000);
 
   useEffect(() => {
     setTotalCpu(utilizationData.reduce((total, u) => u.cpuCapacity + total, 0));
@@ -50,18 +42,19 @@ export const Utilization = () => {
   }, [utilizationData]);
 
   const getTotalCapacity = useCallback(() => {
-    return Object.values(clusterResourceMap)
+    return Object.values(clusterResourceContentMap)
       .filter(
-        (resource: K8sResource) =>
-          resource.object.apiVersion === NodeHandler.clusterApiVersion && resource.kind === NodeHandler.kind
+        resourceContent =>
+          resourceContent.object.apiVersion === NodeHandler.clusterApiVersion &&
+          resourceContent.object.kind === NodeHandler.kind
       )
-      .reduce((total: number, node: K8sResource) => {
+      .reduce((total: number, node: ResourceContent) => {
         if (node.object?.status?.capacity && node.object?.status?.capacity['ephemeral-storage']) {
           return total + memoryParser(node.object?.status?.capacity['ephemeral-storage']);
         }
         return total;
       }, 0);
-  }, [clusterResourceMap]);
+  }, [clusterResourceContentMap]);
 
   return (
     <S.Container>

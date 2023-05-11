@@ -26,7 +26,7 @@ const shortcutsTools = Object.values(hotkeys)
     return hotkey.category === 'tool';
   })
   .map(hotkey => {
-    return {name: hotkey.name, value: defineHotkey(hotkey.key)};
+    return {name: hotkey.name, value: defineHotkey(hotkey.key).trim()};
   });
 
 const KeyboardShortcuts = () => {
