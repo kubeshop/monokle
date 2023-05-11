@@ -114,6 +114,9 @@ export type EventMap = {
   'dashboard/selectKind': {kind: string};
   'dashboard/selectTab': {tab: string};
   'dashboard/changeNamespace': undefined;
+  'dashboard/select_event': undefined;
+  'dashboard/select_errors': undefined;
+  'dashboard/select_warnings': undefined;
   'terminal/open': undefined;
   'terminal/add': undefined;
   'terminal/kill': undefined;
