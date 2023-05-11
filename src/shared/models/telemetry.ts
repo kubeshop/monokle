@@ -117,6 +117,8 @@ export type EventMap = {
   'dashboard/select_event': undefined;
   'dashboard/select_errors': undefined;
   'dashboard/select_warnings': undefined;
+  'dashboard/start_activity': undefined;
+  'dashboard/pause_activity': undefined;
   'terminal/open': undefined;
   'terminal/add': undefined;
   'terminal/kill': undefined;
