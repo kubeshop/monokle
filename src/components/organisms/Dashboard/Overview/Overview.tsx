@@ -1,6 +1,7 @@
 import {useState} from 'react';
 
 import {TitleBar} from '@monokle/components';
+import {trackEvent} from '@shared/utils';
 
 import {Activity} from './Activity';
 import {InventoryInfo} from './InventoryInfo';
@@ -28,7 +29,12 @@ export const Overview = () => {
           title="Activity"
           description={<Activity paused={isActivityPaused} />}
           actions={
-            <S.ActionWrapper onClick={() => setIsActivityPaused(!isActivityPaused)}>
+            <S.ActionWrapper
+              onClick={() => {
+                trackEvent(isActivityPaused ? 'dashboard/start_activity' : 'dashboard/pause_activity');
+                setIsActivityPaused(!isActivityPaused);
+              }}
+            >
               {!isActivityPaused ? <S.PauseCircleFilled /> : <S.PlayCircleFilled />}
               {!isActivityPaused ? <span>Pause</span> : <span>Play</span>}
             </S.ActionWrapper>
