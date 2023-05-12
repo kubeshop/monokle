@@ -241,18 +241,15 @@
       ]
     },
     "nsis": {
-      "oneClick": false,
+      "menuCategory": "Kubeshop",
+      "shortcutName": "Monokle",
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
       "installerHeaderIcon": "build/icon.ico",
-      "differentialPackage": true,
-      "perMachine": true,
+      "oneClick": false,
       "allowElevation": true,
-      "allowToChangeInstallationDirectory": true,
-      "runAfterFinish": true,
-      "createDesktopShortcut": false,
-      "menuCategory": "Kubeshop",
-      "shortcutName": "Monokle"
+      "createDesktopShortcut": true,
+      "allowToChangeInstallationDirectory": true
     },
     "linux": {
       "target": [
