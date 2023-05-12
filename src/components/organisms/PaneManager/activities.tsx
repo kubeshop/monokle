@@ -17,6 +17,7 @@ import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import CompareSyncPane from '../CompareSyncPane';
 import ExplorerPane from '../ExplorerPane';
+import HelmRepoPane from '../HelmRepoPane/HelmRepoPane';
 import SettingsPane from '../SettingsPane';
 import ValidationPane from '../ValidationPane';
 
@@ -82,6 +83,14 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     tooltip: <SettingsTooltip />,
     icon: () => <SettingOutlined style={{fontSize: '16px', marginTop: 4}} />,
     component: <SettingsPane />,
+    useBadge: () => undefined,
+  },
+  {
+    type: 'panel',
+    name: 'helm',
+    tooltip: 'Helm',
+    icon: () => <Icon name="helm" style={{fontSize: '18px', marginTop: 4}} />,
+    component: <HelmRepoPane />,
     useBadge: () => undefined,
   },
 ];

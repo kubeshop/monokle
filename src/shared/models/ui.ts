@@ -75,6 +75,7 @@ export const LeftMenuSelectionOptions = [
   'search',
   'settings',
   'dashboard',
+  'helm',
 ] as const;
 type LeftMenuSelectionType = typeof LeftMenuSelectionOptions[number];
 
@@ -91,8 +92,6 @@ type UiState = {
   helmRepo: {
     search: string;
   };
-  showHelmRepoPane: boolean;
-  hideNavigatorPane: boolean;
   isResourceFiltersOpen: boolean;
   isReleaseNotesDrawerOpen: boolean;
   isKeyboardShortcutsModalOpen: boolean;

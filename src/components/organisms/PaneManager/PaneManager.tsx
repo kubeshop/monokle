@@ -6,7 +6,7 @@ import {activeProjectSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
 
-import {ActionsPane, BottomPaneManager, Dashboard, GitOpsView, HelmRepoPane, NavigatorPane} from '@organisms';
+import {ActionsPane, BottomPaneManager, Dashboard, GitOpsView, HelmRepoView, NavigatorPane} from '@organisms';
 import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 
 import {ClosedPanePlaceholder} from '@molecules';
@@ -30,7 +30,6 @@ const PaneManager: React.FC = () => {
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isProjectLoading = useAppSelector(state => state.config.isProjectLoading);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
-  const showHelmRepoPane = useAppSelector(state => state.ui.showHelmRepoPane);
   const layout = useAppSelector(state => state.ui.paneConfiguration);
   const leftMenuActive = useAppSelector(state => state.ui.leftMenu.isActive);
   const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
@@ -165,8 +164,8 @@ const PaneManager: React.FC = () => {
                       <Dashboard />
                     ) : currentActivity?.name === 'validation' ? (
                       <ProblemPane />
-                    ) : showHelmRepoPane ? (
-                      <HelmRepoPane />
+                    ) : currentActivity?.name === 'helm' ? (
+                      <HelmRepoView />
                     ) : (
                       <ActionsPane />
                     )

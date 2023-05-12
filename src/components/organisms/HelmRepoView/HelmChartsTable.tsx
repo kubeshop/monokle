@@ -1,5 +1,5 @@
-import {useCallback, useMemo, useState} from 'react';
-import {useAsync, useMeasure} from 'react-use';
+import {useCallback, useMemo, useRef, useState} from 'react';
+import {useAsync} from 'react-use';
 
 import {Button, Typography} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
@@ -7,6 +7,8 @@ import {ColumnsType} from 'antd/lib/table';
 import {RightOutlined} from '@ant-design/icons';
 
 import {useAppSelector} from '@redux/hooks';
+
+import {useMainPaneDimensions} from '@utils/hooks';
 
 import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
 
@@ -28,6 +30,7 @@ const createColumns = (onItemClick: (chartName: string) => void): ColumnsType<Ta
     key: 'name',
     ellipsis: true,
     sorter: true,
+    responsive: ['sm'],
   },
   {
     title: 'Description',
@@ -35,24 +38,25 @@ const createColumns = (onItemClick: (chartName: string) => void): ColumnsType<Ta
     key: 'description',
     ellipsis: true,
     sorter: true,
-    responsive: ['lg'],
+    responsive: ['sm'],
   },
   {
     title: 'Version',
     dataIndex: 'version',
     key: 'version',
-    responsive: ['lg'],
+    responsive: ['sm'],
   },
   {
     title: 'App Version',
     dataIndex: 'app_version',
     key: 'app_version',
-    responsive: ['lg'],
+    responsive: ['sm'],
   },
   {
     title: '',
     dataIndex: '',
     key: 'x',
+    responsive: ['sm'],
 
     render: (_text: string, record: TableDataType) => (
       <S.HoverArea>
@@ -67,8 +71,12 @@ const createColumns = (onItemClick: (chartName: string) => void): ColumnsType<Ta
 
 const HelmChartsTable = () => {
   const helmRepoSearch = useAppSelector(state => state.ui.helmRepo.search);
+  const {height, width} = useMainPaneDimensions();
+  const terminalHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
+
+  const ref = useRef<HTMLDivElement>(null);
   const [selectedChart, setSelectedChart] = useState<string | null>(null);
-  const [ref, {height: contentHeight}] = useMeasure<HTMLDivElement>();
   const onItemClick = useCallback((chart: string) => {
     setSelectedChart(chart);
   }, []);
@@ -86,14 +94,13 @@ const HelmChartsTable = () => {
   }, [helmRepoSearch]);
 
   const searchResultCount = data.length;
-
   return (
     <>
-      <Typography.Text>
+      <Typography.Text style={{height: 'fit-content'}}>
         {searchResultCount} Helm Charts found. You can
         <Typography.Link> add more Helm Charts repositories</Typography.Link> to extend your search.
       </Typography.Text>
-      <div ref={ref} style={{height: '100%', overflow: 'hidden'}}>
+      <div ref={ref} style={{overflow: 'hidden', flex: 1}}>
         <S.Table
           showSorterTooltip
           sticky
@@ -103,7 +110,7 @@ const HelmChartsTable = () => {
           sortDirections={['ascend', 'descend']}
           loading={loading}
           pagination={false}
-          scroll={{y: contentHeight - 56}}
+          scroll={{y: height - 212 - (bottomSelection === 'terminal' ? terminalHeight : 0)}}
           rowClassName={(record: TableDataType) => (record.name === selectedChart ? 'row-selected' : '')}
         />
       </div>

@@ -402,12 +402,6 @@ export const uiSlice = createSlice({
     setStartPageMenuOption: (state: Draft<UiState>, action: PayloadAction<StartPageMenuOptions>) => {
       state.startPage.selectedMenuOption = action.payload;
     },
-    setHideNavigatorPane: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.hideNavigatorPane = action.payload;
-    },
-    setHelmRepoPane: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
-      state.showHelmRepoPane = action.payload;
-    },
     searchHelmRepo: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.helmRepo.search = action.payload;
     },
@@ -550,8 +544,6 @@ export const {
   openScaleModal,
   closeScaleModal,
   setIsInQuickClusterMode,
-  setHideNavigatorPane,
   searchHelmRepo,
-  setHelmRepoPane,
 } = uiSlice.actions;
 export default uiSlice.reducer;

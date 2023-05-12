@@ -134,8 +134,6 @@ if (
 }
 
 const initialUiState: UiState = {
-  showHelmRepoPane: false,
-  hideNavigatorPane: false,
   isResourceFiltersOpen: false,
   isReleaseNotesDrawerOpen: false,
   isAboutModalOpen: false,
