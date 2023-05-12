@@ -8,16 +8,17 @@ const SentryWebpackPlugin = require('@sentry/webpack-plugin');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-const additionalWebpackPlugins = isDevelopment
-  ? []
-  : [
-      new SentryWebpackPlugin({
-        org: 'kubeshop',
-        project: 'monokle-desktop',
-        include: './build',
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-      }),
-    ];
+const additionalWebpackPlugins =
+  isDevelopment || !process.env.SENTRY_AUTH_TOKEN
+    ? []
+    : [
+        new SentryWebpackPlugin({
+          org: 'kubeshop',
+          project: 'monokle-desktop',
+          include: './build',
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+        }),
+      ];
 
 module.exports = {
   webpack: {
@@ -53,7 +54,7 @@ module.exports = {
         path: path.resolve(__dirname, 'build'),
       };
       webpackConfig.externals = {
-        'fsevents': "require('fsevents')",
+        fsevents: "require('fsevents')",
       };
       // Temporary solution until react-scripts 5.0.1 is released
       webpackConfig.ignoreWarnings = [/Failed to parse source map/];
