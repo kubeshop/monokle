@@ -32,17 +32,16 @@ const PaneManagerLeftMenu: React.FC = () => {
       value={leftMenuSelection}
       extraValue={leftMenuBottomSelection}
       onChange={activityName => {
-        if (
-          !['compare', 'settings', 'dashboard'].includes(activityName) &&
-          activityName === leftMenuSelection &&
-          leftActive
-        ) {
-          dispatch(setLeftMenuIsActive(false));
-          return;
+        if (!leftActive && activityName === 'explorer') {
+          dispatch(setLeftMenuIsActive(true));
         }
 
-        if (!leftActive) {
+        if (!leftActive && activityName === leftMenuSelection && leftMenuSelection === 'explorer') {
           dispatch(setLeftMenuIsActive(true));
+        }
+
+        if (activityName === leftMenuSelection) {
+          return;
         }
 
         dispatch(setLeftMenuSelection(activityName));

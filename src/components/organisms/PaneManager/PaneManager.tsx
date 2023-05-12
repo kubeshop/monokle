@@ -155,7 +155,7 @@ const PaneManager: React.FC = () => {
                   isLeftActive={leftMenuActive}
                   key={currentActivity?.name}
                   paneCloseIconStyle={{top: '20px', right: '-8px'}}
-                  left={leftMenuActive ? currentActivity?.component : undefined}
+                  left={leftMenuActive || currentActivity?.name !== 'explorer' ? currentActivity?.component : undefined}
                   center={currentActivity?.name === 'explorer' ? <NavigatorPane /> : undefined}
                   right={
                     currentActivity?.name === 'git' ? (
