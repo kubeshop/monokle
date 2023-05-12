@@ -249,6 +249,7 @@
       "oneClick": false,
       "allowElevation": true,
       "createDesktopShortcut": true,
+      "differentialPackage": true,
       "allowToChangeInstallationDirectory": true
     },
     "linux": {
