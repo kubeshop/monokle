@@ -109,11 +109,9 @@ export function createRootFileEntry(rootFolder: string, fileMap: FileMapType) {
  */
 
 export function fileIsExcluded(filePath: FileEntry['filePath'], projectConfig: ProjectConfig) {
-  return (
-    projectConfig.scanExcludes?.some(
-      e => micromatch.isMatch(filePath, e) || micromatch.isMatch(path.dirname(filePath), e)
-    ) && !ADDITIONAL_SUPPORTED_FILES.includes(path.basename(filePath))
-  );
+  return projectConfig.scanExcludes?.some(e => {
+    return micromatch.isMatch(filePath, e) || filePath.startsWith(e);
+  });
 }
 
 /**
