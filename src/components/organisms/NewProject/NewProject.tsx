@@ -47,7 +47,9 @@ const NewProject: React.FC = () => {
       itemTitle: 'Sample project',
       itemDescription:
         'Not sure where to start? Explore a sample project containing everything you need to get started with just one click.',
-      itemAction: () => {},
+      itemAction: () => {
+        dispatch(openGitCloneModal({fromSampleProject: true}));
+      },
     },
     {
       disabled: false,
@@ -89,7 +91,7 @@ const NewProject: React.FC = () => {
       itemDescription: 'Explore K8s resources from a public Git repo or one your own.',
       itemAction: () => {
         if (isGitInstalled) {
-          dispatch(openGitCloneModal());
+          dispatch(openGitCloneModal({}));
         }
       },
     },

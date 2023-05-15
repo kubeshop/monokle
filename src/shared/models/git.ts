@@ -51,6 +51,7 @@ type GitSliceState = {
   changedFiles: GitChangedFile[];
   gitCloneModal: {
     open: boolean;
+    fromSampleProject?: boolean;
   };
   isGitInstalled: boolean;
   loading: boolean;
