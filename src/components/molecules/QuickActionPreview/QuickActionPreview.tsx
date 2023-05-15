@@ -41,7 +41,7 @@ const QuickActionPreview: React.FC<IProps> = props => {
           </S.PreviewSpan>
         ) : (
           <S.PreviewSpan isItemSelected={isItemSelected} onClick={selectAndPreview}>
-            Preview
+            Dry-run
           </S.PreviewSpan>
         )}
       </Tooltip>
