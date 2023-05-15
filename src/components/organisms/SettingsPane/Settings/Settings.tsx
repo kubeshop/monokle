@@ -25,7 +25,6 @@ import {
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {FilePatternList} from '@atoms';
 
@@ -361,9 +360,7 @@ export const Settings = ({
             onChange={onChangeFileIncludes}
             tooltip={AddInclusionPatternTooltip}
             showApplyButton={isScanIncludesUpdated === 'outdated'}
-            onApplyClick={() => {
-              dispatch(setRootFolder({rootFolder: filePath}));
-            }}
+            filePath={filePath}
           />
         </S.Div>
         <S.Div>
@@ -373,9 +370,7 @@ export const Settings = ({
             onChange={onChangeScanExcludes}
             tooltip={AddExclusionPatternTooltip}
             showApplyButton={isScanExcludesUpdated === 'outdated'}
-            onApplyClick={() => {
-              dispatch(setRootFolder({rootFolder: filePath}));
-            }}
+            filePath={filePath}
           />
         </S.Div>
       </S.SettingsColumnContainer>
