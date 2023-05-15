@@ -20,7 +20,7 @@ const ImageFilteredTag: React.FC = () => {
   }
 
   if (isInPreviewMode) {
-    return <PreviewOutputTag>Filtered By Preview Mode</PreviewOutputTag>;
+    return <PreviewOutputTag>Filtered By Dry-running Mode</PreviewOutputTag>;
   }
 
   return null;

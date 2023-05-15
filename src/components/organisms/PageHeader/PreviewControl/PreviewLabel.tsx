@@ -22,7 +22,7 @@ export function PreviewLabel() {
       <LabelBox>
         {PREVIEW_ICON_MAP[preview.type]}
         <LabelContent>
-          Previewing <span style={{fontWeight: 700}}>{previewDisplayContent.name}</span>
+          Dry-running <span style={{fontWeight: 700}}>{previewDisplayContent.name}</span>
         </LabelContent>
       </LabelBox>
     </Tooltip>

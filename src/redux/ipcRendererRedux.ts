@@ -64,7 +64,7 @@ const getWindowTitle = (state: RootState) => {
 
   if (preview?.type === 'kustomize') {
     const kustomization = localResourceMetaMap[preview.kustomizationId];
-    windowTitle = kustomization ? `Monokle - previewing [${kustomization.name}] kustomization` : `Monokle`;
+    windowTitle = kustomization ? `Monokle - dry-running [${kustomization.name}] kustomization` : `Monokle`;
     return windowTitle;
   }
 
@@ -72,7 +72,7 @@ const getWindowTitle = (state: RootState) => {
     const valuesFile = helmValuesMap[preview.valuesFileId];
     const helmChart = helmChartMap[valuesFile.helmChartId];
 
-    windowTitle = `Monokle - previewing ${valuesFile?.name} for ${helmChart?.name} Helm chart`;
+    windowTitle = `Monokle - dry-running ${valuesFile?.name} for ${helmChart?.name} Helm chart`;
     return windowTitle;
   }
 
