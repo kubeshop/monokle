@@ -1,6 +1,12 @@
 import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
+import {
+  openCreateProjectModal,
+  openFolderExplorer,
+  setIsInQuickClusterMode,
+  setLeftMenuSelection,
+  toggleStartProjectPane,
+} from '@redux/reducers/ui';
 
 import ClusterLive from '@assets/newProject/ClusterLive.svg';
 import SelectFolder from '@assets/newProject/FromFolder.svg';
@@ -8,6 +14,8 @@ import CreateFromGit from '@assets/newProject/FromGit.svg';
 import SampleProject from '@assets/newProject/FromSampleProject.svg';
 import CreateFromScratch from '@assets/newProject/FromScratch.svg';
 import CreateFromTemplate from '@assets/newProject/FromTemplate.svg';
+
+import {trackEvent} from '@shared/utils/telemetry';
 
 import ActionCard from './ActionCard';
 import * as S from './NewProject.styled';
@@ -22,6 +30,13 @@ const NewProject: React.FC = () => {
 
   const handleCreateProject = (fromTemplate: boolean) => {
     dispatch(openCreateProjectModal({fromTemplate}));
+  };
+
+  const handleOpenLiveCluster = () => {
+    trackEvent('dashboard/open', {from: 'start-screen-new-project-live-cluster'});
+    dispatch(setLeftMenuSelection('dashboard'));
+    dispatch(setIsInQuickClusterMode(true));
+    dispatch(toggleStartProjectPane());
   };
 
   const START_PROJECT_OPTIONS = [
@@ -40,7 +55,7 @@ const NewProject: React.FC = () => {
       itemLogo: ClusterLive,
       itemTitle: 'Your cluster live',
       itemDescription: 'Quickly connect to your cluster and check out activity, performance, misconfigurations & more.',
-      itemAction: () => {},
+      itemAction: handleOpenLiveCluster,
     },
     {
       disabled: false,
