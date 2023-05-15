@@ -2,10 +2,12 @@ import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
 
-import SelectFolder from '@assets/FromFolder.svg';
-import CreateFromGit from '@assets/FromGit.svg';
-import CreateFromScratch from '@assets/FromScratch.svg';
-import CreateFromTemplate from '@assets/FromTemplate.svg';
+import ClusterLive from '@assets/newProject/ClusterLive.svg';
+import SelectFolder from '@assets/newProject/FromFolder.svg';
+import CreateFromGit from '@assets/newProject/FromGit.svg';
+import SampleProject from '@assets/newProject/FromSampleProject.svg';
+import CreateFromScratch from '@assets/newProject/FromScratch.svg';
+import CreateFromTemplate from '@assets/newProject/FromTemplate.svg';
 
 import ActionCard from './ActionCard';
 import * as S from './NewProject.styled';
@@ -23,6 +25,23 @@ const NewProject: React.FC = () => {
   };
 
   const START_PROJECT_OPTIONS = [
+    {
+      disabled: false,
+      itemId: 'sample-project',
+      itemLogo: SampleProject,
+      itemTitle: 'Sample project',
+      itemDescription:
+        'Not sure where to start? Explore a sample project containing everything you need to get started with just one click.',
+      itemAction: () => {},
+    },
+    {
+      disabled: false,
+      itemId: 'cluster-live',
+      itemLogo: ClusterLive,
+      itemTitle: 'Your cluster live',
+      itemDescription: 'Quickly connect to your cluster and check out activity, performance, misconfigurations & more.',
+      itemAction: () => {},
+    },
     {
       disabled: false,
       itemId: 'select-existing-folder',
