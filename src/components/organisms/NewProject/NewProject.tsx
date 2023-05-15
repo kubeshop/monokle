@@ -55,7 +55,7 @@ const NewProject: React.FC = () => {
       disabled: false,
       itemId: 'cluster-live',
       itemLogo: ClusterLive,
-      itemTitle: 'Your cluster live',
+      itemTitle: 'Explore your Cluster',
       itemDescription: 'Quickly connect to your cluster and check out activity, performance, misconfigurations & more.',
       itemAction: handleOpenLiveCluster,
     },
