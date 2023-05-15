@@ -190,7 +190,7 @@ const GitCloneModal: React.FC = () => {
         </Form.Item>
       </Form>
 
-      {isGitInstalled && (
+      {!isGitInstalled && (
         <GitNotInstalledNote>
           *Note: you need to have Git installed to perform this operation. Download Git{' '}
           <DownloadLink onClick={onDownloadGitLinkClick}>here</DownloadLink>.
