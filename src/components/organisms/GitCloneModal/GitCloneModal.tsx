@@ -41,6 +41,7 @@ const GitCloneModal: React.FC = () => {
     ({folderPath}) => {
       if (folderPath) {
         form.setFieldValue('localPath', folderPath);
+        form.validateFields();
       }
     },
     {isDirectoryExplorer: true}
