@@ -91,7 +91,7 @@ export const Labels = ({labels}: {labels: any}) => {
 export const Annotations = ({annotations}: {annotations: any}) => {
   return (
     <S.Row>
-      <S.Title>Annotations</S.Title>
+      <S.Title style={{marginBottom: '6px'}}>Annotations</S.Title>
       <div>
         {Object.keys(annotations).map(key => (
           <Tag key={`${key}=${annotations[key]}`} color="geekblue" style={{marginBottom: '4px'}}>
