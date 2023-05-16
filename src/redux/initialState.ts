@@ -222,6 +222,7 @@ const initialUiState: UiState = {
     learn: {
       isVisible: false,
     },
+    fromBackToStart: false,
   },
   templateExplorer: {
     isVisible: false,

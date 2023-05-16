@@ -246,6 +246,10 @@ export const uiSlice = createSlice({
       state.collapsedPreviewConfigurationsHelmCharts.push(action.payload);
     },
 
+    setIsFromBackToStart: (state: Draft<UiState>, action: PayloadAction<boolean>) => {
+      state.startPage.fromBackToStart = action.payload;
+    },
+
     togglePreviewConfigurationsHelmChart: (state: Draft<UiState>, action: PayloadAction<string>) => {
       state.collapsedPreviewConfigurationsHelmCharts = state.collapsedPreviewConfigurationsHelmCharts.filter(
         chart => chart !== action.payload
@@ -510,6 +514,7 @@ export const {
   setExpandedSearchedFiles,
   setExplorerSelectedSection,
   setFileExplorerExpandedFolders,
+  setIsFromBackToStart,
   setLayoutSize,
   setLeftBottomMenuSelection,
   setLeftMenuIsActive,

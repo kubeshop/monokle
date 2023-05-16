@@ -1,7 +1,11 @@
+import {shell} from 'electron';
+
 import {useState} from 'react';
+import {useEffectOnce} from 'react-use';
 
 import {Button, Form, Input, Modal} from 'antd';
 import {useForm} from 'antd/lib/form/Form';
+import Link from 'antd/lib/typography/Link';
 
 import fs from 'fs';
 import {rm} from 'fs/promises';
@@ -21,10 +25,13 @@ import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {doesPathExist} from '@utils/files';
 
-import {trackEvent} from '@shared/utils';
+import {Colors} from '@shared/styles/colors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 const GitCloneModal: React.FC = () => {
   const dispatch = useAppDispatch();
+  const fromSampleProject = useAppSelector(state => state.git.gitCloneModal.fromSampleProject);
+  const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
 
   const [loading, setLoading] = useState(false);
@@ -43,6 +50,14 @@ const GitCloneModal: React.FC = () => {
     if (!loading) {
       dispatch(closeGitCloneModal());
     }
+  };
+
+  const onDownloadGitLinkClick = () => {
+    shell.openExternal('https://git-scm.com/downloads');
+  };
+
+  const onSampleProjectClick = () => {
+    shell.openExternal('https://github.com/kubeshop/monokle-demo');
   };
 
   const onOk = () => {
@@ -80,8 +95,23 @@ const GitCloneModal: React.FC = () => {
     });
   };
 
+  useEffectOnce(() => {
+    if (fromSampleProject) {
+      form.setFieldValue('repoURL', DEFAULT_GIT_REPO_PLACEHOLDER);
+    }
+  });
+
   return (
-    <Modal open confirmLoading={loading} onCancel={onCancel} onOk={onOk}>
+    <Modal open confirmLoading={loading} onCancel={onCancel} onOk={onOk} okButtonProps={{disabled: !isGitInstalled}}>
+      {fromSampleProject && (
+        <SampleProjectContext>
+          To set up your Sample Project, we will clone our{' '}
+          <Link onClick={onSampleProjectClick}>GitHub sample repository</Link> into a local folder of your choosing.
+          Feel free to modify the location if desired. Simply click OK to proceed and get started with the sample
+          project immediately.
+        </SampleProjectContext>
+      )}
+
       <Form form={form} initialValues={{repoURL: '', localPath: projectsRootPath}} layout="vertical">
         <Form.Item
           style={{marginBottom: '0px'}}
@@ -166,6 +196,13 @@ const GitCloneModal: React.FC = () => {
         </Form.Item>
       </Form>
 
+      {!isGitInstalled && (
+        <GitNotInstalledNote>
+          *Note: you need to have Git installed to perform this operation. Download Git{' '}
+          <DownloadLink onClick={onDownloadGitLinkClick}>here</DownloadLink>.
+        </GitNotInstalledNote>
+      )}
+
       <FileExplorer {...fileExplorerProps} />
     </Modal>
   );
@@ -175,7 +212,28 @@ export default GitCloneModal;
 
 // Styled Components
 
+const DownloadLink = styled.span`
+  font-style: italic;
+  cursor: pointer;
+
+  &:hover {
+    color: ${Colors.red4};
+  }
+`;
+
 const SampleButton = styled(Button)`
   padding: 4px 0px 4px 0px;
   margin: 8px 0px;
+`;
+
+const SampleProjectContext = styled.div`
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: ${Colors.grey8};
+`;
+
+const GitNotInstalledNote = styled.div`
+  margin-top: 16px;
+  color: ${Colors.red5};
+  font-size: 12px;
 `;
