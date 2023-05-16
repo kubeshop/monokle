@@ -10,6 +10,12 @@ import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from './ui';
 
 const machineId: string = machineIdSync();
 
+export const translateNamespaceToTrackableName = (namespace: string) => {
+  return ['<all>', '<not-namespaced>', 'default', 'kube-system', 'kube-public'].includes(namespace)
+    ? namespace
+    : 'custom';
+};
+
 export const trackEvent = <TEvent extends Event>(eventName: TEvent, payload?: EventMap[TEvent]) => {
   if (isRendererThread()) {
     ipcRenderer.send('track-event', {eventName, payload});
@@ -88,7 +94,7 @@ export type EventMap = {
   'preview/kustomize/start': undefined;
   'preview/kustomize/fail': {reason: string};
   'preview/kustomize/end': {resourcesCount?: number; executionTime: number};
-  'preview/cluster/start': undefined;
+  'preview/cluster/start': {namespace?: string};
   'preview/cluster/fail': {reason: string};
   'preview/cluster/end': {resourcesCount: number; executionTime: number};
   'preview/command/start': undefined;
@@ -112,8 +118,8 @@ export type EventMap = {
   'git/error': {action: string; reason: string};
   'dashboard/open': {from: string};
   'dashboard/selectKind': {kind: string};
-  'dashboard/selectTab': {tab: string};
-  'dashboard/changeNamespace': undefined;
+  'dashboard/selectTab': {tab: string; kind?: string};
+  'dashboard/changeNamespace': {name: string};
   'dashboard/select_event': undefined;
   'dashboard/select_errors': undefined;
   'dashboard/select_warnings': undefined;

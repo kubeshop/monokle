@@ -18,6 +18,7 @@ import {getRegisteredKindHandlers, getResourceKindHandler} from '@src/kindhandle
 import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sResource, ResourceMap} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
+import {translateNamespaceToTrackableName} from '@shared/models/telemetry';
 import {createKubeClient} from '@shared/utils/kubeclient';
 import {isPromiseFulfilledResult} from '@shared/utils/promises';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -97,7 +98,7 @@ const loadClusterResourcesHandler = async (
 
   let currentNamespace: string = namespace ?? 'default';
 
-  trackEvent('preview/cluster/start');
+  trackEvent('preview/cluster/start', {namespace: translateNamespaceToTrackableName(currentNamespace)});
 
   try {
     let namespaces: Array<string> = [];

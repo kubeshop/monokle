@@ -81,7 +81,7 @@ export const Drawer = () => {
           defaultActiveKey={activeTab}
           activeKey={activeTab}
           onChange={(key: string) => {
-            dispatch(setActiveTab(key as any));
+            dispatch(setActiveTab({tab: key as any, kind: selectedResource?.kind}));
           }}
           items={[
             {
