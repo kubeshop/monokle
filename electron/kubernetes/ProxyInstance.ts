@@ -1,5 +1,6 @@
+import log from 'electron-log';
+
 import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
-import log from 'loglevel';
 
 import type {ProxyLog} from '@shared/ipc';
 
