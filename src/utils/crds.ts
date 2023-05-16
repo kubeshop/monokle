@@ -12,7 +12,7 @@ export async function saveCRD(crdsDir: string, crdContent: string) {
       await createFolder(crdsDir);
     }
   } catch (error) {
-    log.error(`Failed to create CRDs directory at ${crdsDir}. The dir already exists.`);
+    log.warn(`Failed to create CRDs directory at ${crdsDir}. The dir already exists.`);
   }
 
   try {
