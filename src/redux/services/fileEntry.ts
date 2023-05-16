@@ -219,16 +219,12 @@ export function readFiles(
       const isDir = getFileStats(filePath)?.isDirectory();
 
       const isExcluded = fileIsExcluded(fileEntryPath, projectConfig);
-      // const isIncluded = fileIsIncluded(fileEntryPath, projectConfig);
 
       let extension = isDir ? '' : path.extname(fileEntryPath);
 
       const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, extension, projectConfig});
-      // TODO: should we handle these differenly?
-      // fileEntry.isExcluded = Boolean(isExcluded);
-      // fileEntry.isSupported = Boolean(isIncluded);
 
-      if (helmChart && isHelmTemplateFile(fileEntry.filePath)) {
+      if (helmChart && isHelmTemplateFile(fileEntry.filePath) && !isExcluded) {
         createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
       }
 
@@ -240,6 +236,8 @@ export function readFiles(
         const folderReadsMaxDepth = projectConfig.folderReadsMaxDepth;
         if (depth === folderReadsMaxDepth) {
           log.warn(`[readFiles]: Ignored ${filePath} because max depth was reached.`);
+        } else if (isExcluded) {
+          fileEntry.children = [];
         } else {
           fileEntry.children = readFiles(
             filePath,
@@ -256,14 +254,14 @@ export function readFiles(
             helmChart
           );
         }
-      } else if (helmChart && isHelmValuesFile(fileEntry.name)) {
+      } else if (helmChart && isHelmValuesFile(fileEntry.name) && !isExcluded) {
         createHelmValuesFile({
           fileEntry,
           helmChart,
           helmValuesMap,
           fileMap,
         });
-      } else if (fileIsIncluded(fileEntry.filePath, projectConfig)) {
+      } else if (fileIsIncluded(fileEntry.filePath, projectConfig) && !isExcluded) {
         // log.info('Extracting resources for file entry: ', fileEntry.name);
         const resourcesFromFile = extractResourcesForFileEntry(fileEntry, rootFolder);
         resourcesFromFile.forEach(resource => {
@@ -602,7 +600,7 @@ function addHelmChartFile(
             : path.join(parentFolderEntry.filePath, fileName);
 
         const valuesFileEntry = fileMap[valuesFilePath];
-        if (valuesFileEntry) {
+        if (valuesFileEntry && helmChart) {
           createHelmValuesFile({
             fileEntry: valuesFileEntry,
             helmChart,
