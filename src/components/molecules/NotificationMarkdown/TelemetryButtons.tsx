@@ -1,9 +1,10 @@
 import {notification} from 'antd';
 
-import {toggleErrorReporting, toggleEventTracking, updateTelemetry} from '@redux/appConfig';
+import {toggleErrorReporting, updateTelemetry} from '@redux/appConfig';
 import {setAlert} from '@redux/reducers/alert';
 import {setActiveSettingsPanel, toggleNotifications} from '@redux/reducers/ui';
 import store from '@redux/store';
+import {toggleEventTracking} from '@redux/thunks/project';
 
 import {AlertEnum} from '@shared/models/alert';
 import {SettingsPanel} from '@shared/models/config';

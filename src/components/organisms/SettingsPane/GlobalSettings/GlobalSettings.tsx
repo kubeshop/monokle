@@ -13,11 +13,11 @@ import {AutoLoadLastProjectTooltip, TelemetryDocumentationUrl} from '@constants/
 import {
   changeProjectsRootPath,
   toggleErrorReporting,
-  toggleEventTracking,
   updateFileExplorerSortOrder,
   updateLoadLastProjectOnStartup,
 } from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {toggleEventTracking} from '@redux/thunks/project';
 
 import {FileExplorer} from '@components/atoms';
 

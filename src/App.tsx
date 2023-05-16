@@ -7,13 +7,7 @@ import lodash from 'lodash';
 import log from 'loglevel';
 import path from 'path';
 
-import {
-  activeProjectSelector,
-  setCreateProject,
-  setKubeConfig,
-  setLoadingProject,
-  setOpenProject,
-} from '@redux/appConfig';
+import {activeProjectSelector, setKubeConfig, setLoadingProject} from '@redux/appConfig';
 import {startWatchingKubeconfig} from '@redux/cluster/listeners/kubeconfig';
 import {setIsGitInstalled} from '@redux/git';
 import {isGitInstalled} from '@redux/git/git.ipc';
@@ -21,6 +15,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {clearNotifications, closePreviewConfigurationEditor} from '@redux/reducers/main';
 import {closeFolderExplorer, closeReleaseNotesDrawer, toggleNotifications} from '@redux/reducers/ui';
+import {setCreateProject, setOpenProject} from '@redux/thunks/project';
 import {loadValidation} from '@redux/validation/validation.thunks';
 
 import {GlobalModals, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, PaneManager} from '@organisms';
