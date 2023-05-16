@@ -1,10 +1,10 @@
 import * as k8s from '@kubernetes/client-node';
 
 import {BrowserWindow, app, ipcMain} from 'electron';
+import log from 'electron-log';
 
 import asyncLib from 'async';
 import {spawn} from 'child_process';
-import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
 import * as path from 'path';
 import stream from 'stream';
