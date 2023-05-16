@@ -19,6 +19,8 @@ import {IconButton} from '@atoms';
 
 import {useHelpMenuItems} from '@hooks/menuItemsHooks';
 
+import {useRefSelector} from '@utils/hooks';
+
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {SearchInput} from '@monokle/components';
@@ -33,6 +35,8 @@ const StartPageHeader: React.FC = () => {
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const projects = useAppSelector(state => _.sortBy(state.config.projects, p => p?.name?.toLowerCase()));
   const selectedProjectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
+
+  const isStartProjectPaneVisibleRef = useRefSelector(state => state.ui.isStartProjectPaneVisible);
 
   const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
 
@@ -70,7 +74,13 @@ const StartPageHeader: React.FC = () => {
               id="monokle-logo-header"
               src={MonokleKubeshopLogo}
               alt="Monokle"
-              onClick={() => dispatch(setStartPageMenuOption('new-project'))}
+              onClick={() => {
+                if (isStartProjectPaneVisibleRef.current) {
+                  return;
+                }
+
+                dispatch(setStartPageMenuOption('new-project'));
+              }}
             />
           </NewVersionNotice>
         </S.NewVersionBadge>

@@ -105,9 +105,10 @@ const GitCloneModal: React.FC = () => {
     <Modal open confirmLoading={loading} onCancel={onCancel} onOk={onOk} okButtonProps={{disabled: !isGitInstalled}}>
       {fromSampleProject && (
         <SampleProjectContext>
-          To set up your <Link onClick={onSampleProjectClick}>Sample Project</Link>, we will clone our GitHub sample
-          repository into a local folder of your choosing. Feel free to modify the location if desired. Simply click OK
-          to proceed and get started with the sample project immediately.
+          To set up your Sample Project, we will clone our{' '}
+          <Link onClick={onSampleProjectClick}>GitHub sample repository</Link> into a local folder of your choosing.
+          Feel free to modify the location if desired. Simply click OK to proceed and get started with the sample
+          project immediately.
         </SampleProjectContext>
       )}
 
