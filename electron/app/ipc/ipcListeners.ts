@@ -110,7 +110,7 @@ ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
       properties,
     });
   } else if (process.env.NODE_ENV === `development`) {
-    console.log(`telemetry event ${eventName}`, payload);
+    log.info(`telemetry event ${eventName}`, payload);
   }
 });
 
