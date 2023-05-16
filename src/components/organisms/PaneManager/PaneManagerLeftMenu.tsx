@@ -32,10 +32,6 @@ const PaneManagerLeftMenu: React.FC = () => {
       value={leftMenuSelection}
       extraValue={leftMenuBottomSelection}
       onChange={activityName => {
-        if (!leftActive && activityName === 'explorer') {
-          dispatch(setLeftMenuIsActive(true));
-        }
-
         if (!leftActive && activityName === leftMenuSelection && leftMenuSelection === 'explorer') {
           dispatch(setLeftMenuIsActive(true));
         }
