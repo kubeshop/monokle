@@ -353,7 +353,7 @@ export const RefLinks = ({type, resource}: {type: 'incoming' | 'outgoing'; resou
       return;
     }
     selectForDashboard(resource);
-    dispatch(setActiveTab('Manifest'));
+    dispatch(setActiveTab({tab: 'Manifest', kind: resource.kind}));
   };
 
   const selectForDashboard = (r: ResourceMeta) => {

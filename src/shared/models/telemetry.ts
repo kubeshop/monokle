@@ -112,7 +112,7 @@ export type EventMap = {
   'git/error': {action: string; reason: string};
   'dashboard/open': {from: string};
   'dashboard/selectKind': {kind: string};
-  'dashboard/selectTab': {tab: string};
+  'dashboard/selectTab': {tab: string; kind?: string};
   'dashboard/changeNamespace': undefined;
   'dashboard/select_event': undefined;
   'dashboard/select_errors': undefined;

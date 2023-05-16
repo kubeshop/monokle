@@ -16,10 +16,11 @@ import * as S from './ErrorCell.styled';
 
 type IProps = {
   resourceId: string;
+  resourceKind: string;
 };
 
 const ErrorCell: React.FC<IProps> = props => {
-  const {resourceId} = props;
+  const {resourceId, resourceKind} = props;
 
   const {level, errors, warnings} = useValidationLevel(resourceId);
   const dispatch = useAppDispatch();
@@ -27,7 +28,7 @@ const ErrorCell: React.FC<IProps> = props => {
   const onMessageClickHandler = useCallback(
     (result: ValidationResult) => {
       dispatch(setDashboardSelectedResourceId(resourceId));
-      dispatch(setActiveTab('Manifest'));
+      dispatch(setActiveTab({tab: 'Manifest', kind: resourceKind}));
 
       const location = getResourceLocation(result);
       const region = location.physicalLocation?.region;
