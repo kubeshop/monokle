@@ -6,10 +6,15 @@ import {parseAllYamlDocuments} from '@utils/yaml';
 import {createFolder, deleteFile, doesPathExist, writeFile} from '@shared/utils/fileSystem';
 
 export async function saveCRD(crdsDir: string, crdContent: string) {
-  const doesPluginsDirExist = await doesPathExist(crdsDir);
-  if (!doesPluginsDirExist) {
-    await createFolder(crdsDir);
+  try {
+    const doesPluginsDirExist = await doesPathExist(crdsDir);
+    if (!doesPluginsDirExist) {
+      await createFolder(crdsDir);
+    }
+  } catch (error) {
+    log.warn(`Failed to create CRDs directory at ${crdsDir}. The dir already exists.`);
   }
+
   try {
     const documents = parseAllYamlDocuments(crdContent);
     for (let i = 0; i < documents.length; i += 1) {
