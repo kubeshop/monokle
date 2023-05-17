@@ -121,6 +121,12 @@ export const uiSlice = createSlice({
         state.newResourceWizard.defaultInput = action.payload.defaultInput;
       }
     },
+    openNewAiResourceWizard: (state: Draft<UiState>) => {
+      state.newAiResourceWizard.isOpen = true;
+    },
+    closeNewAiResourceWizard: (state: Draft<UiState>) => {
+      state.newAiResourceWizard.isOpen = false;
+    },
     closeNewResourceWizard: (state: Draft<UiState>) => {
       state.newResourceWizard.isOpen = false;
       state.newResourceWizard.defaultInput = undefined;
@@ -473,6 +479,7 @@ export const {
   closeFiltersPresetModal,
   closeFolderExplorer,
   closeKeyboardShortcutsModal,
+  closeNewAiResourceWizard,
   closeNewResourceWizard,
   closeQuickSearchActionsPopup,
   closeReleaseNotesDrawer,
@@ -498,6 +505,7 @@ export const {
   openFiltersPresetModal,
   openFolderExplorer,
   openKeyboardShortcutsModal,
+  openNewAiResourceWizard,
   openNewResourceWizard,
   openQuickSearchActionsPopup,
   openReleaseNotesDrawer,

@@ -42,6 +42,7 @@ const SaveEditCommandModal = React.lazy(() => import('@organisms/SaveEditCommand
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
 const TemplateExplorer = React.lazy(() => import('@organisms/TemplateExplorer'));
 const WelcomeModal = React.lazy(() => import('@organisms/WelcomeModal'));
+const NewAiResourceWizard = React.lazy(() => import('@molecules/MonokleHackathon/MonokleHackathon'));
 
 const GlobalModals = () => {
   const dispatch = useAppDispatch();
@@ -72,6 +73,7 @@ const GlobalModals = () => {
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
   const isWelcomeModalVisible = useAppSelector(state => state.ui.welcomeModal.isVisible);
+  const isNewAiResourceWizardVisible = useAppSelector(state => state.ui.newAiResourceWizard.isOpen);
 
   const isClusterResourceDiffModalVisible = useMemo(
     () => Boolean(targetResourceId) && isInClusterMode,
@@ -187,6 +189,7 @@ const GlobalModals = () => {
         {isRenameResourceModalVisible && <RenameResourceModal />}
         {isReplaceImageModalVisible && <ReplaceImageModal />}
         {isSaveEditCommandModalVisible && <SaveEditCommandModal />}
+        {isNewAiResourceWizardVisible && <NewAiResourceWizard />}
         {isSaveResourcesToFileFolderModalVisible && <SaveResourcesToFileFolderModal />}
         {showReleaseNotes && (
           <Modal

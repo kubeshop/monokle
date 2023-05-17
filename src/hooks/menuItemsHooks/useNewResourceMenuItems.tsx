@@ -7,7 +7,7 @@ import {FileAddOutlined as RawFileAddOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
-import {openNewResourceWizard, openTemplateExplorer} from '@redux/reducers/ui';
+import {openNewAiResourceWizard, openNewResourceWizard, openTemplateExplorer} from '@redux/reducers/ui';
 
 import TemplateSmallWhiteSvg from '@assets/TemplateSmallWhite.svg';
 
@@ -26,8 +26,17 @@ export function useNewResourceMenuItems() {
             New from model
           </MenuItem>
         ),
-
         onClick: () => dispatch(openNewResourceWizard()),
+      },
+      {
+        key: 'from-ai',
+        label: (
+          <MenuItem>
+            <FileAddOutlined />
+            New from AI model
+          </MenuItem>
+        ),
+        onClick: () => dispatch(openNewAiResourceWizard()),
       },
       {
         key: 'from-template',

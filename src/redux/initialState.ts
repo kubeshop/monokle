@@ -150,6 +150,9 @@ const initialUiState: UiState = {
   newResourceWizard: {
     isOpen: false,
   },
+  newAiResourceWizard: {
+    isOpen: false,
+  },
   createFileFolderModal: {
     isOpen: false,
     rootDir: '',

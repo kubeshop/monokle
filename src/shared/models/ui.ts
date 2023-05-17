@@ -101,6 +101,9 @@ type UiState = {
     isOpen: boolean;
     defaultInput?: NewResourceWizardInput;
   };
+  newAiResourceWizard: {
+    isOpen: boolean;
+  };
   createFileFolderModal: {
     isOpen: boolean;
     rootDir: string;
