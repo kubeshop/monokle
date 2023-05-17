@@ -493,9 +493,19 @@ export const useFolderMenuItems = (
   const {deleteEntry, isInClusterMode, isInPreviewMode} = stateArgs;
   const dispatch = useAppDispatch();
   const fileOrFolderContainedInFilter = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
+  const projectConfig = useAppSelector(state => state.config.projectConfig);
   const commonMenuItems = useCommonMenuItems({deleteEntry}, fileEntry);
   const createNewResource = useCreateResource();
   const {onFilterByFileOrFolder} = useFilterByFileOrFolder();
+
+  const reloadRootFolder = useCallback(() => {
+    if (!fileEntry) {
+      return;
+    }
+    dispatch(setRootFolder({rootFolder: fileEntry.rootFolderPath, isReload: true}));
+  }, [fileEntry, dispatch]);
+
+  const {addEntryToScanExcludes, removeEntryFromScanExcludes} = useFileScanning(reloadRootFolder);
 
   const menuItems = useMemo(() => {
     const isFolder = isDefined(fileEntry?.children);
@@ -552,6 +562,24 @@ export const useFolderMenuItems = (
       },
     });
 
+    newMenuItems.push({
+      disabled: isRoot || (!fileEntry.children && !fileEntry.isSupported),
+      key: 'update_scanning',
+      label: `${
+        fileEntry.isExcluded && projectConfig?.scanExcludes?.some(e => micromatch.isMatch(filePath, e))
+          ? 'Remove from'
+          : 'Add to'
+      } Files: Exclude`,
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        if (fileEntry.isExcluded) {
+          removeEntryFromScanExcludes(filePath);
+        } else {
+          addEntryToScanExcludes(filePath);
+        }
+      },
+    });
+
     newMenuItems.push(...commonMenuItems);
 
     return newMenuItems;
@@ -560,6 +588,7 @@ export const useFolderMenuItems = (
     isInClusterMode,
     isInPreviewMode,
     fileOrFolderContainedInFilter,
+    projectConfig?.scanExcludes,
     commonMenuItems,
     dispatch,
     createNewResource,

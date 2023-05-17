@@ -7,9 +7,9 @@ import {existsSync} from 'fs';
 import {includes, isEmpty} from 'lodash';
 import path from 'path';
 
-import {setCreateProject} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeCreateProjectModal, openTemplateExplorer, setTemplateProjectCreate} from '@redux/reducers/ui';
+import {setCreateProject} from '@redux/thunks/project';
 
 import {FileExplorer} from '@atoms';
 

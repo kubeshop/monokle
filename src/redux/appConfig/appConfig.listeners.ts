@@ -2,13 +2,14 @@ import {isAnyOf} from '@reduxjs/toolkit';
 
 import {AppListenerFn} from '@redux/listeners/base';
 import {getResourceKindSchema} from '@redux/services/schema';
+import {setOpenProject} from '@redux/thunks/project';
 import {VALIDATOR} from '@redux/validation/validator';
 
 import {ResourceKindHandlers, readSavedCrdKindHandlers} from '@src/kindhandlers';
 
 import {CustomSchema} from '@monokle/validation';
 
-import {setOpenProject, setUserDirs} from './appConfig.slice';
+import {setUserDirs} from './appConfig.slice';
 
 const crdsPathChangedListener: AppListenerFn = listen => {
   listen({

@@ -12,10 +12,10 @@ import {
   loadProjectKubeConfig,
   setCurrentContext,
   setKubeConfig,
-  setOpenProject,
   updateProjectConfig,
 } from '@redux/appConfig';
 import {AppListenerFn} from '@redux/listeners/base';
+import {setOpenProject} from '@redux/thunks/project';
 
 import {KubeConfig, ModernKubeConfig} from '@shared/models/config';
 

@@ -4,6 +4,10 @@ import {Button, Input, InputRef, Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
+import {useAppDispatch} from '@redux/hooks';
+import {setExplorerSelectedSection, setLeftMenuSelection} from '@redux/reducers/ui';
+import {setRootFolder} from '@redux/thunks/setRootFolder';
+
 import {useOnClickOutside} from '@hooks/useOnClickOutside';
 
 import {useFocus} from '@utils/hooks';
@@ -12,21 +16,29 @@ import * as S from './FilePatternList.styled';
 import FilePatternListItem from './FilePatternListItem';
 
 type FilePatternListProps = {
+  filePath: string;
   tooltip: string;
   value: string[];
   onChange: (patterns: string[]) => void;
   showApplyButton?: boolean;
   showButtonLabel?: string;
-  onApplyClick?: () => void;
 };
 
 const FilePatternList: React.FC<FilePatternListProps> = props => {
-  const {value, onChange, tooltip, showButtonLabel, showApplyButton, onApplyClick} = props;
+  const {value, onChange, tooltip, showButtonLabel, showApplyButton, filePath} = props;
   const [isAddingPattern, setIsAddingPattern] = useState<Boolean>(false);
   const [patternInput, setPatternInput] = useState<string>('');
   const [inputRef, focusInput] = useFocus<InputRef>();
   const filePatternInputRef = useRef<any>();
   const isValueNotEmpty = useMemo(() => value.length > 0, [value]);
+
+  const dispatch = useAppDispatch();
+
+  const onApplyClick = () => {
+    dispatch(setRootFolder({rootFolder: filePath}));
+    dispatch(setLeftMenuSelection('explorer'));
+    dispatch(setExplorerSelectedSection('files'));
+  };
 
   useOnClickOutside(filePatternInputRef, () => {
     setIsAddingPattern(false);

@@ -10,6 +10,10 @@ export const Container = styled.div`
 
 export const Row = styled.div`
   margin-bottom: 24px;
+
+  & .ant-tag {
+    white-space: normal;
+  }
 `;
 
 export const Title = styled.div`

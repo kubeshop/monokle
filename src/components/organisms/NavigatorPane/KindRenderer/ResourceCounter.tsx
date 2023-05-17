@@ -16,7 +16,7 @@ type Props = {
 function ResourceCounter({kind, isSelected, onClick}: Props) {
   const isCollapsed = useAppSelector(state => state.ui.navigator.collapsedResourceKinds.includes(kind));
   const navigatorResources = useAppSelector(navigatorResourcesSelector);
-  const count = useMemo(() => navigatorResources.filter(r => r.kind === kind).length, [navigatorResources]);
+  const count = useMemo(() => navigatorResources.filter(r => r.kind === kind).length, [kind, navigatorResources]);
 
   return (
     <Counter selected={isSelected && isCollapsed} onClick={onClick}>

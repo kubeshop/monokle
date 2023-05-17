@@ -1,6 +1,6 @@
 import {app} from 'electron';
+import log from 'electron-log';
 
-import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';

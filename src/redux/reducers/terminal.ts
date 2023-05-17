@@ -4,9 +4,9 @@ import {Draft, PayloadAction, createSlice, isAnyOf} from '@reduxjs/toolkit';
 
 import {size} from 'lodash';
 
-import {setOpenProject} from '@redux/appConfig';
 import initialState from '@redux/initialState';
 import {AppListenerFn} from '@redux/listeners/base';
+import {setOpenProject} from '@redux/thunks/project';
 
 import {ShellsMapType, TerminalSettingsType, TerminalState, TerminalType} from '@shared/models/terminal';
 import electronStore from '@shared/utils/electronStore';

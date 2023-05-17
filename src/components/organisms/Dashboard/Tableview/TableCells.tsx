@@ -104,7 +104,7 @@ export const CellError = {
   dataIndex: '',
   key: 'error',
   width: '150px',
-  render: (resource: K8sResource) => <ErrorCell resourceId={resource.id} />,
+  render: (resource: K8sResource) => <ErrorCell resourceId={resource.id} resourceKind={resource.kind} />,
   sorter: () => UNSORTED_VALUE,
 };
 

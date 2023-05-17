@@ -27,8 +27,9 @@ export const gitSlice = createSlice({
       state.gitCloneModal.open = false;
     },
 
-    openGitCloneModal: (state: Draft<GitSliceState>) => {
+    openGitCloneModal: (state: Draft<GitSliceState>, action: PayloadAction<{fromSampleProject?: boolean}>) => {
       state.gitCloneModal.open = true;
+      state.gitCloneModal.fromSampleProject = action.payload.fromSampleProject;
     },
 
     setBranchCommits: (

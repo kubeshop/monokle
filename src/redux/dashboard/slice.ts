@@ -8,6 +8,11 @@ import {trackEvent} from '@shared/utils/telemetry';
 
 import {initialState} from './state';
 
+export type SelectedTab = {
+  tab: 'Info' | 'Manifest' | 'Logs' | 'Shell';
+  kind?: string;
+};
+
 export const dashboardSlice = createSlice({
   name: 'dashboard',
   initialState,
@@ -21,9 +26,9 @@ export const dashboardSlice = createSlice({
     setDashboardSelectedResourceId: (state: Draft<DashboardState>, action: PayloadAction<string | undefined>) => {
       state.tableDrawer.selectedResourceId = action.payload;
     },
-    setActiveTab: (state: Draft<DashboardState>, action: PayloadAction<'Info' | 'Manifest'>) => {
-      state.ui.activeTab = action.payload;
-      trackEvent('dashboard/selectTab', {tab: action.payload});
+    setActiveTab: (state: Draft<DashboardState>, action: PayloadAction<SelectedTab>) => {
+      state.ui.activeTab = action.payload.tab;
+      trackEvent('dashboard/selectTab', {tab: action.payload.tab, kind: action.payload.kind});
     },
   },
   extraReducers: builder => {

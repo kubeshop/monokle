@@ -56,7 +56,9 @@ export enum Colors {
 
   redError = '#E84749',
   redErrorCompliment = '#F4BAB8',
+  red3 = '#58181c',
   red4 = '#791A1F',
+  red5 = '#a61d24',
   red6 = '#D32029',
   red7 = '#E84749', // Dust Red
   red10 = '#58181C',

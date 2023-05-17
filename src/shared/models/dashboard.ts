@@ -13,7 +13,7 @@ export type DashboardState = {
   isOpen: boolean;
   ui: {
     activeMenu: DashboardMenu;
-    activeTab: 'Info' | 'Manifest';
+    activeTab: 'Info' | 'Manifest' | 'Logs' | 'Shell';
     menuList: Array<DashboardMenu>;
   };
   tableDrawer: {

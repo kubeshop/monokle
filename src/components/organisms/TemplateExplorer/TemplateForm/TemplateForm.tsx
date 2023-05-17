@@ -4,10 +4,11 @@ import {Skeleton} from 'antd';
 
 import {Primitive} from 'type-fest';
 
-import {kubeConfigContextSelector, kubeConfigPathSelector, setCreateProject} from '@redux/appConfig';
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {createTransientResourcesFromVanillaTemplate} from '@redux/services/templates';
 import {previewReferencedHelmChart} from '@redux/thunks/previewReferencedHelmChart';
+import {setCreateProject} from '@redux/thunks/project';
 
 import {TemplateFormRenderer} from '@components/molecules';
 

@@ -10,7 +10,7 @@ import {trackEvent} from '@shared/utils/telemetry';
 import {previewSavedCommand} from './previewCommand';
 
 export const startPreview = (preview: AnyPreview, dispatch: AppDispatch) => {
-  dispatch(clearPreviewAndSelectionHistory({revalidate: false}));
+  dispatch(clearPreviewAndSelectionHistory());
 
   if (preview.type === 'kustomize') {
     dispatch(previewKustomization(preview.kustomizationId));
@@ -34,5 +34,5 @@ export const restartPreview = (preview: AnyPreview, dispatch: AppDispatch) => {
 };
 
 export const stopPreview = (dispatch: AppDispatch) => {
-  dispatch(clearPreviewAndSelectionHistory({revalidate: true}));
+  dispatch(clearPreviewAndSelectionHistory());
 };

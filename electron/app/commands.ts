@@ -1,7 +1,7 @@
 import {BrowserWindow, dialog} from 'electron';
+import log from 'electron-log';
 
 import {spawn} from 'child_process';
-import log from 'loglevel';
 import {AnyAction} from 'redux';
 import {VM} from 'vm2';
 

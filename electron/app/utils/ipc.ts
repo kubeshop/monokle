@@ -1,6 +1,5 @@
 import {ipcMain} from 'electron';
-
-import log from 'loglevel';
+import log from 'electron-log';
 
 import {IpcResult} from '@shared/ipc';
 

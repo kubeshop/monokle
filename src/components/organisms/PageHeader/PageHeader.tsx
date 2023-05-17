@@ -17,7 +17,14 @@ import {setCurrentBranch, setRepo} from '@redux/git';
 import {getRepoInfo, initGitRepo} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAutosavingError} from '@redux/reducers/main';
-import {setIsInQuickClusterMode, setLayoutSize, toggleNotifications, toggleStartProjectPane} from '@redux/reducers/ui';
+import {
+  setIsFromBackToStart,
+  setIsInQuickClusterMode,
+  setLayoutSize,
+  setStartPageMenuOption,
+  toggleNotifications,
+  toggleStartProjectPane,
+} from '@redux/reducers/ui';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
 import {stopPreview} from '@redux/services/preview';
 import store from '@redux/store';
@@ -26,6 +33,7 @@ import {BranchSelect, NewVersionNotice} from '@molecules';
 
 import {useHelpMenuItems} from '@hooks/menuItemsHooks';
 
+import {useRefSelector} from '@utils/hooks';
 import {showGitErrorModal} from '@utils/terminal';
 
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
@@ -49,14 +57,16 @@ const PageHeader = () => {
   const hasGitRepo = useAppSelector(state => Boolean(state.git.repo));
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
-  const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
-  const isInQuickClusterMode = useAppSelector(state => state.ui.isInQuickClusterMode);
   const isNewVersionAvailable = useAppSelector(state => state.config.isNewVersionAvailable);
   const isNewVersionNoticeVisible = useAppSelector(state => state.ui.newVersionNotice.isVisible);
+
+  const isInClusterModeRef = useRefSelector(isInClusterModeSelector);
+  const isInQuickClusterModeRef = useRefSelector(state => state.ui.isInQuickClusterMode);
+  const isStartProjectPaneVisibleRef = useRefSelector(state => state.ui.isStartProjectPaneVisible);
+  const projectRootFolderRef = useRefSelector(state => state.config.selectedProjectRootFolder);
+  const startPageSelectedMenuOption = useRefSelector(state => state.ui.startPage.selectedMenuOption);
 
   let timeoutRef = useRef<any>(null);
 
@@ -73,17 +83,20 @@ const PageHeader = () => {
   };
 
   const onClickLogoHandler = () => {
-    if (!isStartProjectPaneVisible) {
+    if (!isStartProjectPaneVisibleRef.current) {
       dispatch(toggleStartProjectPane());
+      dispatch(setIsFromBackToStart(true));
     }
 
-    if (isInQuickClusterMode) {
+    if (isInQuickClusterModeRef.current) {
       dispatch(setIsInQuickClusterMode(false));
     }
 
-    if (isInClusterMode) {
+    if (isInClusterModeRef.current) {
       stopPreview(dispatch);
     }
+
+    dispatch(setStartPageMenuOption(startPageSelectedMenuOption.current));
   };
 
   const createGitHubIssue = useCallback(() => {
@@ -104,7 +117,7 @@ const PageHeader = () => {
   }, [autosavingError]);
 
   const initGitRepoHandler = async () => {
-    if (!projectRootFolder) {
+    if (!projectRootFolderRef.current) {
       return;
     }
 
@@ -112,7 +125,7 @@ const PageHeader = () => {
     setIsInitializingGitRepo(true);
 
     try {
-      await initGitRepo({path: projectRootFolder});
+      await initGitRepo({path: projectRootFolderRef.current});
       trackEvent('git/init');
     } catch (e: any) {
       showGitErrorModal('Failed to initialize git repo', e.message);
@@ -121,14 +134,14 @@ const PageHeader = () => {
       return;
     }
 
-    monitorGitFolder(projectRootFolder, store);
+    monitorGitFolder(projectRootFolderRef.current, store);
 
     try {
-      await getRepoInfo({path: projectRootFolder || ''}).then(repo => {
+      await getRepoInfo({path: projectRootFolderRef.current || ''}).then(repo => {
         dispatch(setRepo(repo));
         dispatch(setCurrentBranch(repo.currentBranch));
         setIsInitializingGitRepo(false);
-        dispatch(updateProjectsGitRepo([{path: projectRootFolder, isGitRepo: true}]));
+        dispatch(updateProjectsGitRepo([{path: projectRootFolderRef.current || '', isGitRepo: true}]));
       });
     } catch (e: any) {
       showGitErrorModal('Git repo error', e.message);
@@ -139,11 +152,11 @@ const PageHeader = () => {
   const onClickProjectHandler = () => {
     dispatch(toggleStartProjectPane());
 
-    if (isInQuickClusterMode) {
+    if (isInQuickClusterModeRef.current) {
       dispatch(setIsInQuickClusterMode(false));
     }
 
-    if (isInClusterMode) {
+    if (isInClusterModeRef.current) {
       stopPreview(dispatch);
     }
   };
@@ -192,7 +205,18 @@ const PageHeader = () => {
           <S.LogoContainer $isNewVersionNoticeVisible={isNewVersionNoticeVisible}>
             <S.NewVersionBadge dot={isNewVersionAvailable}>
               <NewVersionNotice>
-                <S.Logo id="monokle-logo-header" onClick={onClickLogoHandler} src={MonokleKubeshopLogo} alt="Monokle" />
+                <S.Logo
+                  id="monokle-logo-header"
+                  onClick={() => {
+                    if (isStartProjectPaneVisibleRef.current) {
+                      return;
+                    }
+
+                    onClickLogoHandler();
+                  }}
+                  src={MonokleKubeshopLogo}
+                  alt="Monokle"
+                />
               </NewVersionNotice>
             </S.NewVersionBadge>
           </S.LogoContainer>
@@ -229,7 +253,7 @@ const PageHeader = () => {
             </>
           ) : (
             <S.BackProjectsButton type="primary" size="small" onClick={onClickLogoHandler}>
-              Back to projects
+              Back to Start
             </S.BackProjectsButton>
           )}
 

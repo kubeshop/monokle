@@ -194,7 +194,8 @@ export function processHelmChartFolder(
     extension: path.extname(helmChartFilePath),
     projectConfig,
   });
-  const helmChart = createHelmChart(helmChartFileEntry, helmChartFilePath, helmChartMap);
+  const helmChart = createHelmChart(helmChartFileEntry, helmChartFilePath, helmChartMap, projectConfig);
+
   result.push(helmChartFileEntry.name);
 
   files
@@ -203,7 +204,7 @@ export function processHelmChartFolder(
       const filePath = path.join(folder, file);
       const extension = path.extname(filePath);
       const fileEntryPath = filePath.substring(rootFolder.length);
-      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart.id, extension, projectConfig});
+      const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, extension, projectConfig});
 
       if (fileIsExcluded(fileEntry.filePath, projectConfig)) {
         fileEntry.isExcluded = true;
@@ -228,7 +229,7 @@ export function processHelmChartFolder(
             helmChart
           );
         }
-      } else if (isHelmValuesFile(file)) {
+      } else if (helmChart && isHelmValuesFile(file)) {
         createHelmValuesFile({
           fileEntry,
           helmChart,
@@ -242,7 +243,7 @@ export function processHelmChartFolder(
           resourceMetaMap[meta.id] = meta;
           resourceContentMap[meta.id] = content;
         });
-      } else if (isHelmTemplateFile(fileEntry.filePath)) {
+      } else if (helmChart && isHelmTemplateFile(fileEntry.filePath)) {
         createHelmTemplate(fileEntry, helmChart, fileMap, helmTemplatesMap);
       }
 
@@ -276,7 +277,17 @@ export function getHelmChartName(chartFilePath: string) {
  * Creates a HelmChart for the specified fileEntry
  */
 
-export function createHelmChart(fileEntry: FileEntry, absolutePath: string, helmChartMap: HelmChartMapType) {
+export function createHelmChart(
+  fileEntry: FileEntry,
+  absolutePath: string,
+  helmChartMap: HelmChartMapType,
+  projectConfig?: ProjectConfig
+) {
+  const isExcluded = fileIsExcluded(fileEntry.filePath, projectConfig || {});
+  if (isExcluded) {
+    return undefined;
+  }
+
   const helmChart: HelmChart = {
     id: uuidv4(),
     filePath: fileEntry.filePath,

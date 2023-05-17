@@ -1,11 +1,21 @@
 import {openGitCloneModal} from '@redux/git';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openCreateProjectModal, openFolderExplorer} from '@redux/reducers/ui';
+import {
+  openCreateProjectModal,
+  openFolderExplorer,
+  setIsInQuickClusterMode,
+  setLeftMenuSelection,
+  toggleStartProjectPane,
+} from '@redux/reducers/ui';
 
-import SelectFolder from '@assets/FromFolder.svg';
-import CreateFromGit from '@assets/FromGit.svg';
-import CreateFromScratch from '@assets/FromScratch.svg';
-import CreateFromTemplate from '@assets/FromTemplate.svg';
+import ClusterLive from '@assets/newProject/ClusterLive.svg';
+import SelectFolder from '@assets/newProject/FromFolder.svg';
+import CreateFromGit from '@assets/newProject/FromGit.svg';
+import SampleProject from '@assets/newProject/FromSampleProject.svg';
+import CreateFromScratch from '@assets/newProject/FromScratch.svg';
+import CreateFromTemplate from '@assets/newProject/FromTemplate.svg';
+
+import {trackEvent} from '@shared/utils/telemetry';
 
 import ActionCard from './ActionCard';
 import * as S from './NewProject.styled';
@@ -22,7 +32,33 @@ const NewProject: React.FC = () => {
     dispatch(openCreateProjectModal({fromTemplate}));
   };
 
+  const handleOpenLiveCluster = () => {
+    trackEvent('dashboard/open', {from: 'start-screen-new-project-live-cluster'});
+    dispatch(setLeftMenuSelection('dashboard'));
+    dispatch(setIsInQuickClusterMode(true));
+    dispatch(toggleStartProjectPane());
+  };
+
   const START_PROJECT_OPTIONS = [
+    {
+      disabled: false,
+      itemId: 'sample-project',
+      itemLogo: SampleProject,
+      itemTitle: 'Sample project',
+      itemDescription:
+        'Not sure where to start? Explore a sample project containing everything you need to get started with just one click.',
+      itemAction: () => {
+        dispatch(openGitCloneModal({fromSampleProject: true}));
+      },
+    },
+    {
+      disabled: false,
+      itemId: 'cluster-live',
+      itemLogo: ClusterLive,
+      itemTitle: 'Explore your Cluster',
+      itemDescription: 'Quickly connect to your cluster and check out activity, performance, misconfigurations & more.',
+      itemAction: handleOpenLiveCluster,
+    },
     {
       disabled: false,
       itemId: 'select-existing-folder',
@@ -55,7 +91,7 @@ const NewProject: React.FC = () => {
       itemDescription: 'Explore K8s resources from a public Git repo or one your own.',
       itemAction: () => {
         if (isGitInstalled) {
-          dispatch(openGitCloneModal());
+          dispatch(openGitCloneModal({}));
         }
       },
     },

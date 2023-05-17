@@ -1,5 +1,6 @@
+import log from 'electron-log';
+
 import asyncLib from 'async';
-import log from 'loglevel';
 import path from 'path';
 import semver from 'semver';
 

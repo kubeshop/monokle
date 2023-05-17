@@ -1,11 +1,11 @@
 import * as k8s from '@kubernetes/client-node';
 
 import {BrowserWindow} from 'electron';
+import log from 'electron-log';
 
 import {FSWatcher, watch} from 'chokidar';
 import fs from 'fs-extra';
 import {size, uniq} from 'lodash';
-import log from 'loglevel';
 
 import {InvalidKubeConfig, ValidKubeConfig} from '@shared/models/config';
 

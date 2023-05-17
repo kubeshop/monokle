@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.1](https://github.com/kubeshop/monokle/compare/v2.1.1-nightly-2023-05-17.0...v2.1.1) (2023-05-17)
+
 ## [2.1.0](https://github.com/kubeshop/monokle/compare/v2.0.11-nightly-2023-05-10.0...v2.1.0) (2023-05-11)
 
 

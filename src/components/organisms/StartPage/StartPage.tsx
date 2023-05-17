@@ -2,6 +2,7 @@ import {useEffect} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
+  setIsFromBackToStart,
   setIsInQuickClusterMode,
   setLeftMenuSelection,
   setShowStartPageLearn,
@@ -26,6 +27,7 @@ const StartPage: React.FC = () => {
   const isStartPageLearnVisible = useAppSelector(state => state.ui.startPage.learn.isVisible);
   const projects = useAppSelector(state => state.config.projects);
   const selectedOption = useAppSelector(state => state.ui.startPage.selectedMenuOption);
+  const isFromBackToStart = useAppSelector(state => state.ui.startPage.fromBackToStart);
 
   const {height} = useWindowSize();
 
@@ -47,8 +49,12 @@ const StartPage: React.FC = () => {
   }, [dispatch, isStartPageLearnVisible, selectedOption]);
 
   useEffect(() => {
-    if (projects.length && selectedOption !== 'recent-projects') {
+    if (projects.length && selectedOption !== 'recent-projects' && !isFromBackToStart) {
       dispatch(setStartPageMenuOption('recent-projects'));
+    }
+
+    if (isFromBackToStart) {
+      dispatch(setIsFromBackToStart(false));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

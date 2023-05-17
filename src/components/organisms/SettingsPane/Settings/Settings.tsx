@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 import {Button, Checkbox, Form, Input, InputNumber, InputRef, Select, Tooltip} from 'antd';
@@ -25,9 +25,10 @@ import {
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {FilePatternList} from '@atoms';
+import {FileExplorer, FilePatternList} from '@atoms';
+
+import {useFileExplorer} from '@hooks/useFileExplorer';
 
 import {useFocus, useStateWithRef} from '@utils/hooks';
 import {doesSchemaExist} from '@utils/index';
@@ -66,10 +67,9 @@ export const Settings = ({
   const isScanIncludesUpdated = useAppSelector(state => state.config.isScanIncludesUpdated);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const filePath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]?.filePath);
-  const [isKubeConfigBrowseSettingsOpen, setIsKubeConfigBrowseSettingsOpen] = useState(false);
+  const [isKubeConfigBrowseLoading, setIsKubeConfigBrowseLoading] = useState(false);
 
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const fileInput = useRef<HTMLInputElement>(null);
   const [inputRef, focusInput] = useFocus<InputRef>();
   const wasRehydrated = useAppSelector(state => state.main.wasRehydrated);
   const [isClusterActionDisabled, setIsClusterActionDisabled] = useState(
@@ -84,6 +84,18 @@ export const Settings = ({
   const [isSchemaDownloading, setIsSchemaDownloading] = useState<boolean>(false);
   const [localConfig, setLocalConfig, localConfigRef] = useStateWithRef<ProjectConfig | null | undefined>(config);
 
+  const {openFileExplorer, fileExplorerProps} = useFileExplorer(
+    ({existingFilePath}) => {
+      if (existingFilePath === currentKubeConfigPath) {
+        setIsKubeConfigBrowseLoading(false);
+        return;
+      }
+
+      setCurrentKubeConfigPath(existingFilePath);
+    },
+    {isDirectoryExplorer: false}
+  );
+
   const handleConfigChange = useCallback(() => {
     if (onConfigChange && !isEqual(localConfigRef.current, config)) {
       onConfigChange(localConfig);
@@ -93,7 +105,6 @@ export const Settings = ({
   useEffect(() => {
     setIsClusterActionDisabled(Boolean(!config?.kubeConfig?.path) || Boolean(!config?.kubeConfig?.isPathValid));
     setCurrentKubeConfigPath(config?.kubeConfig?.path);
-    setIsKubeConfigBrowseSettingsOpen(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.kubeConfig]);
 
@@ -101,7 +112,6 @@ export const Settings = ({
     // If config prop is changed externally, This code will make localConfig even with config prop
     setLocalConfig(config);
     setSelectedK8SVersion(String(config?.k8sVersion));
-    setIsKubeConfigBrowseSettingsOpen(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config]);
 
@@ -188,13 +198,16 @@ export const Settings = ({
     if (isEditingDisabled) {
       return;
     }
-    fileInput && fileInput.current?.click();
+
+    setIsKubeConfigBrowseLoading(true);
+    openFileExplorer();
   };
 
   useDebounce(
     () => {
       if (currentKubeConfigPath !== localConfig?.kubeConfig?.path) {
         setLocalConfig({...localConfig, kubeConfig: {path: currentKubeConfigPath}});
+        setIsKubeConfigBrowseLoading(false);
       }
     },
     DEFAULT_KUBECONFIG_DEBOUNCE,
@@ -215,20 +228,9 @@ export const Settings = ({
     if (isEditingDisabled) {
       return;
     }
-    setCurrentKubeConfigPath(e.target.value);
-    setIsKubeConfigBrowseSettingsOpen(false);
-  };
 
-  const onSelectFile = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    if (fileInput.current?.files && fileInput.current.files.length > 0) {
-      const file: any = fileInput.current.files[0];
-      if (file.path) {
-        const selectedFilePath = file.path;
-        setCurrentKubeConfigPath(selectedFilePath);
-        setIsKubeConfigBrowseSettingsOpen(false);
-      }
-    }
+    setIsKubeConfigBrowseLoading(true);
+    setCurrentKubeConfigPath(e.target.value);
   };
 
   const handleK8SVersionChange = (k8sVersion: string) => {
@@ -308,13 +310,12 @@ export const Settings = ({
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={BrowseKubeconfigTooltip} placement="right">
             <S.Button
               onClick={openFileSelect}
-              disabled={isEditingDisabled || !isKubeConfigBrowseSettingsOpen}
-              loading={!isKubeConfigBrowseSettingsOpen}
+              disabled={isEditingDisabled || isKubeConfigBrowseLoading}
+              loading={isKubeConfigBrowseLoading}
             >
               Browse
             </S.Button>
           </Tooltip>
-          <S.HiddenInput type="file" onChange={onSelectFile} ref={fileInput} />
         </S.Div>
 
         <S.Div>
@@ -361,9 +362,7 @@ export const Settings = ({
             onChange={onChangeFileIncludes}
             tooltip={AddInclusionPatternTooltip}
             showApplyButton={isScanIncludesUpdated === 'outdated'}
-            onApplyClick={() => {
-              dispatch(setRootFolder({rootFolder: filePath}));
-            }}
+            filePath={filePath}
           />
         </S.Div>
         <S.Div>
@@ -373,9 +372,7 @@ export const Settings = ({
             onChange={onChangeScanExcludes}
             tooltip={AddExclusionPatternTooltip}
             showApplyButton={isScanExcludesUpdated === 'outdated'}
-            onApplyClick={() => {
-              dispatch(setRootFolder({rootFolder: filePath}));
-            }}
+            filePath={filePath}
           />
         </S.Div>
       </S.SettingsColumnContainer>
@@ -479,6 +476,8 @@ export const Settings = ({
           </Checkbox>
         </S.Div>
       </S.SettingsColumnContainer>
+
+      <FileExplorer {...fileExplorerProps} />
     </S.SettingsContainer>
   );
 };

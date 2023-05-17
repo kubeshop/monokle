@@ -18,6 +18,7 @@ import {timeAgo} from '@utils/timeAgo';
 import EventHandler from '@src/kindhandlers/EventHandler';
 
 import {ResourceContent} from '@shared/models/k8sResource';
+import {trackEvent} from '@shared/utils';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import * as S from './Activity.styled';
@@ -172,6 +173,7 @@ export const Activity = ({paused}: {paused?: boolean}) => {
                     })
                   );
                   dispatch(setDashboardSelectedResourceId(id));
+                  trackEvent('dashboard/select_event');
                 }}
               >
                 <S.TimeInfo>

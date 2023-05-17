@@ -8,6 +8,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+:root {
+  --separator-border: #262626;
+}
+
 #root {
   height: 100%;
   width: 100%;

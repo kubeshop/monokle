@@ -1,29 +1,15 @@
-import {ipcRenderer} from 'electron';
-
-import {Draft, PayloadAction, createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import flatten from 'flat';
 import {existsSync, mkdirSync} from 'fs';
 import _ from 'lodash';
 import log from 'loglevel';
-import path, {join} from 'path';
+import path from 'path';
 
-import {isFolderGitRepo} from '@redux/git/git.ipc';
-import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
-import {
-  CONFIG_PATH,
-  keysToDelete,
-  keysToUpdateStateBulk,
-  populateProjectConfig,
-  readProjectConfig,
-  writeProjectConfigFile,
-} from '@redux/services/projectConfig';
-import {monitorProjectConfigFile} from '@redux/services/projectConfigMonitor';
+import {CONFIG_PATH, keysToDelete, keysToUpdateStateBulk, writeProjectConfigFile} from '@redux/services/projectConfig';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
-import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {init as sentryInit} from '@sentry/electron/renderer';
-import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
 import {ClusterColors} from '@shared/models/cluster';
 import {
   AppConfig,
@@ -37,90 +23,10 @@ import {
   TextSizes,
   Themes,
 } from '@shared/models/config';
-import {UiState} from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
 import {isEqual} from '@shared/utils/isEqual';
 
 import initialState from '../initialState';
-import {setLeftMenuSelection, toggleStartProjectPane} from '../reducers/ui';
-
-export const setCreateProject = createAsyncThunk('config/setCreateProject', async (project: Project, thunkAPI: any) => {
-  let isGitRepo: boolean;
-
-  try {
-    isGitRepo = await isFolderGitRepo({path: project.rootFolder});
-  } catch (err) {
-    isGitRepo = false;
-  }
-
-  thunkAPI.dispatch(configSlice.actions.createProject({...project, isGitRepo}));
-  thunkAPI.dispatch(setOpenProject(project.rootFolder));
-});
-
-export const setDeleteProject = createAsyncThunk('config/setDeleteProject', async (project: Project, thunkAPI: any) => {
-  const selectedProjectRootFolder: string = thunkAPI.getState().config.selectedProjectRootFolder;
-  thunkAPI.dispatch(configSlice.actions.deleteProject(project));
-  if (project.rootFolder === selectedProjectRootFolder) {
-    thunkAPI.dispatch(setOpenProject(null));
-  }
-});
-
-export const setOpenProject = createAsyncThunk(
-  'config/setOpenProject',
-  async (projectRootPath: string | null, thunkAPI: any) => {
-    const appConfig: AppConfig = thunkAPI.getState().config;
-    const appUi: UiState = thunkAPI.getState().ui;
-
-    if (projectRootPath && !existsSync(projectRootPath)) {
-      return createRejectionWithAlert(thunkAPI, 'Project not found', 'The project folder does not exist');
-    }
-
-    if (projectRootPath && appUi.isStartProjectPaneVisible) {
-      thunkAPI.dispatch(toggleStartProjectPane());
-    }
-
-    if (appUi.leftMenu.selection !== 'explorer') {
-      thunkAPI.dispatch(setLeftMenuSelection('explorer'));
-    }
-
-    monitorGitFolder(projectRootPath, thunkAPI);
-
-    const projectConfig = readProjectConfig(projectRootPath);
-
-    monitorProjectConfigFile(thunkAPI.dispatch, projectRootPath);
-    // First open the project so state.selectedProjectRootFolder is set
-    thunkAPI.dispatch(configSlice.actions.openProject(projectRootPath));
-    const config = projectConfig || populateProjectConfig(appConfig);
-
-    if (
-      config &&
-      !(
-        config.k8sVersion &&
-        existsSync(join(String(appConfig.userDataDir), path.sep, 'schemas', `${config?.k8sVersion}.json`))
-      )
-    ) {
-      config.k8sVersion = PREDEFINED_K8S_VERSION;
-    }
-
-    // Then set project config by reading .monokle or populating it
-    thunkAPI.dispatch(configSlice.actions.updateProjectConfig({config, fromConfigFile: false}));
-    // Last set rootFolder so function can read the latest projectConfig
-    thunkAPI.dispatch(setRootFolder({rootFolder: projectRootPath}));
-  }
-);
-
-export const setLoadingProject = createAsyncThunk('config/loadingProject', async (loading: boolean, thunkAPI: any) => {
-  thunkAPI.dispatch(configSlice.actions.setLoadingProject(loading));
-});
-
-export const toggleEventTracking = createAsyncThunk(
-  'config/toggleEventTracking',
-  async (disableEventTracking: boolean, thunkAPI: any) => {
-    thunkAPI.dispatch(setEventTracking(disableEventTracking));
-    electronStore.set('appConfig.disableEventTracking', disableEventTracking);
-    ipcRenderer.invoke('analytics:toggleTracking', {disableEventTracking});
-  }
-);
 
 type UpdateProjectConfigPayload = {config: ProjectConfig | null; fromConfigFile: boolean};
 
@@ -225,7 +131,6 @@ export const configSlice = createSlice({
     },
     deleteProject: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
       state.projects = _.remove(state.projects, (p: Project) => p.rootFolder !== action.payload.rootFolder);
-      state.projects = sortProjects(state.projects, Boolean(state.selectedProjectRootFolder));
       electronStore.set('appConfig.projects', state.projects);
     },
     toggleProjectPin: (state: Draft<AppConfig>, action: PayloadAction<Project>) => {
@@ -512,8 +417,11 @@ export const {
   changeCurrentProjectName,
   changeProjectsRootPath,
   createProject,
+  deleteProject,
   handleFavoriteTemplate,
   initRendererSentry,
+  openProject,
+  setLoadingProject,
   setAccessLoading,
   setAutoZoom,
   setCurrentContext,

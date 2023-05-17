@@ -11,6 +11,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {useTargetClusterNamespaces} from '@hooks/useTargetClusterNamespaces';
 
+import {translateNamespaceToTrackableName} from '@shared/models/telemetry';
 import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils';
 
@@ -25,7 +26,10 @@ export function NamespaceSelect() {
   const onNamespaceChanged = useCallback(
     (namespace: any) => {
       dispatch(connectCluster({context: kubeConfigContext, namespace, reload: true}));
-      trackEvent('dashboard/changeNamespace');
+
+      trackEvent('dashboard/changeNamespace', {
+        name: translateNamespaceToTrackableName(namespace),
+      });
     },
     [dispatch, kubeConfigContext]
   );

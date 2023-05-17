@@ -1,8 +1,8 @@
 import {BrowserWindow, Menu, app, globalShortcut, nativeImage} from 'electron';
 import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
+import log from 'electron-log';
 import ElectronStore from 'electron-store';
 
-import log from 'loglevel';
 import * as path from 'path';
 
 import {trackEvent} from '@shared/utils';
