@@ -6,10 +6,12 @@ import MonacoEditor from 'react-monaco-editor/lib/editor';
 import {Button, Input, Modal, Skeleton} from 'antd';
 
 import styled from 'styled-components';
+import YAML from 'yaml';
 
 import {createChatCompletion} from '@redux/hackathon/hackathon.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewAiResourceWizard} from '@redux/reducers/ui';
+import {createTransientResource} from '@redux/services/transientResource';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
@@ -86,6 +88,29 @@ const MonokleHackathon: React.FC = () => {
     setIsLoading(false);
   };
 
+  const onOkHandler = async () => {
+    try {
+      const parsedManifest = YAML.parse(manifestContentCode);
+      createTransientResource(
+        {
+          name: parsedManifest.metadata.name,
+          kind: parsedManifest.kind,
+          namespace: parsedManifest.metadata.namespace || '',
+          apiVersion: parsedManifest.apiVersion,
+        },
+        dispatch,
+        'local',
+        parsedManifest
+      );
+      dispatch(closeNewAiResourceWizard());
+    } catch (error: any) {
+      Modal.error({
+        title: 'Could not create resource',
+        content: error.message,
+      });
+    }
+  };
+
   return (
     <Modal
       title="Create Resource using AI"
@@ -93,6 +118,7 @@ const MonokleHackathon: React.FC = () => {
       onCancel={onCancel}
       width="60%"
       okText="Create"
+      onOk={onOkHandler}
     >
       <Note>
         Please provide precise and specific details for creating your desired Kubernetes resource. Feel free to ask for
