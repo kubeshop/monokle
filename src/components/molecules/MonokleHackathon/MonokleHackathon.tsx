@@ -94,6 +94,12 @@ const MonokleHackathon: React.FC = () => {
       width="60%"
       okText="Create"
     >
+      <Note>
+        Please provide precise and specific details for creating your desired Kubernetes resource. Feel free to ask for
+        further explanations or additional information from the model regarding your requirements. Accurate details will
+        help us meet your specific needs effectively.
+      </Note>
+
       <Input
         value={inputValue}
         onChange={e => {
@@ -167,5 +173,11 @@ const NoContent = styled.div`
 const Title = styled.div`
   font-size: 18px;
   color: ${Colors.grey9};
+  margin-bottom: 16px;
+`;
+
+const Note = styled.div`
+  font-size: 12px;
+  color: ${Colors.grey7};
   margin-bottom: 16px;
 `;

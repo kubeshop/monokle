@@ -2,7 +2,7 @@ import {useMemo} from 'react';
 
 import {MenuProps} from 'antd';
 
-import {FileAddOutlined as RawFileAddOutlined} from '@ant-design/icons';
+import {FileAddOutlined as RawFileAddOutlined, RobotOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -32,8 +32,8 @@ export function useNewResourceMenuItems() {
         key: 'from-ai',
         label: (
           <MenuItem>
-            <FileAddOutlined />
-            New from AI model
+            <RobotOutlined />
+            New from AI generated
           </MenuItem>
         ),
         onClick: () => dispatch(openNewAiResourceWizard()),
