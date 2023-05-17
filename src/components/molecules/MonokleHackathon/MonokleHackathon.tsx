@@ -100,7 +100,8 @@ const MonokleHackathon: React.FC = () => {
         help us meet your specific needs effectively.
       </Note>
 
-      <Input
+      <Input.TextArea
+        autoSize={{minRows: 2, maxRows: 6}}
         value={inputValue}
         onChange={e => {
           setErrorMessage('');
