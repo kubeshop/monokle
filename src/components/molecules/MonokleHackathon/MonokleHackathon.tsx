@@ -47,6 +47,9 @@ const MonokleHackathon: React.FC = () => {
     }
 
     setIsLoading(true);
+    setManifestContentCode('');
+    setAdditionalContent('');
+    setErrorMessage('');
 
     try {
       const message = `You will create just k8s manifest with the following requirements. The manifest should be between code blocks. ${inputValue}.`;
@@ -55,6 +58,7 @@ const MonokleHackathon: React.FC = () => {
 
       if (!content) {
         setErrorMessage('No resource content was found! Please try to give a better description.');
+        setIsLoading(false);
         return;
       }
 
@@ -63,6 +67,7 @@ const MonokleHackathon: React.FC = () => {
 
       if (!code) {
         setErrorMessage('No resource content was found! Please try to give a better description.');
+        setIsLoading(false);
         return;
       }
 
