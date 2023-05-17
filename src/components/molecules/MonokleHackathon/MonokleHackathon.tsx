@@ -52,7 +52,7 @@ const MonokleHackathon: React.FC = () => {
     setErrorMessage('');
 
     try {
-      const message = `You will create just k8s manifest with the following requirements. The manifest should be between code blocks. ${inputValue}.`;
+      const message = `You will create just k8s manifest based on the following needs. The manifest should be between code blocks. Needs: ${inputValue}.`;
 
       const content = await createChatCompletion({message});
 
@@ -137,7 +137,7 @@ const MonokleHackathon: React.FC = () => {
           <div>
             <Title>Additional information</Title>
 
-            <ReactMarkdown>{additionalContent}</ReactMarkdown>
+            <ReactMarkdown>{additionalContent || 'There is no additional content.'}</ReactMarkdown>
           </div>
         </Container>
       )}
