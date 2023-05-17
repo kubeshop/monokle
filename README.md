@@ -1,6 +1,5 @@
 <p align="center">
-  <img src="src/assets/MonokleLogoLight.svg#gh-light-mode-only" alt="Monokle Logo Light"/>
-  <img src="src/assets/MonokleLogoDark.svg#gh-dark-mode-only" alt="Monokle Logo Dark" />
+  <a href="https://monokle.io"><img src="src/assets/MonokleLogoLight.svg#gh-light-mode-only" alt="Monokle Logo Light"/></a>
 </p>
 
 <p align="center">
