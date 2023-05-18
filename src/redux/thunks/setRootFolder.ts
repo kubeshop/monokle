@@ -6,6 +6,7 @@ import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {getChangedFiles, getRepoInfo, isFolderGitRepo} from '@redux/git/git.ipc';
 import {SetRootFolderArgs, SetRootFolderPayload} from '@redux/reducers/main';
+import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {isKustomizationResource} from '@redux/services/kustomize';
@@ -19,6 +20,7 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
 import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
+import {isInClusterModeSelector} from '@shared/utils';
 import {trackEvent} from '@shared/utils/telemetry';
 
 /**
@@ -63,6 +65,10 @@ export const setRootFolder = createAsyncThunk<
 
   if (!stats.isDirectory()) {
     return createRejectionWithAlert(thunkAPI, 'Invalid path', `Specified path ${rootFolder} is not a folder`);
+  }
+
+  if (isInClusterModeSelector(thunkAPI.getState())) {
+    disconnectFromCluster();
   }
 
   const rootEntry = createRootFileEntry(rootFolder, fileMap);
