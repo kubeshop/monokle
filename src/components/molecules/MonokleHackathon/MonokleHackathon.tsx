@@ -8,6 +8,8 @@ import {Button, Input, Modal, Skeleton} from 'antd';
 import styled from 'styled-components';
 import YAML from 'yaml';
 
+import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
+
 import {createChatCompletion} from '@redux/hackathon/hackathon.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewAiResourceWizard} from '@redux/reducers/ui';
@@ -168,7 +170,7 @@ Remember, the output code may span across multiple documents if that's what's ne
               height="450px"
               language="yaml"
               theme={KUBESHOP_MONACO_THEME}
-              value={manifestContentCode.join('\n')}
+              value={manifestContentCode.join(`\n${YAML_DOCUMENT_DELIMITER}\n`)}
               options={editorOptions}
             />
           </div>
