@@ -6,7 +6,7 @@ import {Button, Input, Modal, Skeleton} from 'antd';
 
 import {ChatCompletionRequestMessage} from 'openai';
 import styled from 'styled-components';
-import YAML, {Document, ParsedNode, isMap} from 'yaml';
+import YAML from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
@@ -19,7 +19,6 @@ import {VALIDATOR} from '@redux/validation/validator';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {transformResourceForValidation} from '@utils/resources';
-import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
@@ -32,13 +31,8 @@ const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   },
 };
 
-function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
-  return d.errors.length === 0 && isMap(d.contents);
-}
-
 function isValidKubernetesYaml(yaml: string) {
-  const documents = parseAllYamlDocuments(yaml);
-  return documents.length === 1 && isValidResourceDocument(documents[0]);
+  return yaml.includes('apiVersion') && yaml.includes('kind') && yaml.includes('metadata');
 }
 
 const GENERATION_ERROR_MESSAGE = 'No resource content was generated. Please try to give a better description.';
@@ -248,12 +242,6 @@ const ErrorMessage = styled.div`
 
 const NoContent = styled.div`
   color: ${Colors.grey7};
-`;
-
-const Title = styled.div`
-  font-size: 18px;
-  color: ${Colors.grey9};
-  margin-bottom: 16px;
 `;
 
 const Note = styled.div`
