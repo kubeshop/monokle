@@ -1,9 +1,9 @@
-<center>
+<p align="center">
 
 ![Monokle Logo Light](src/assets/MonokleLogoLight.svg#gh-light-mode-only)
 ![Monokle Logo Dark](src/assets/MonokleLogoDark.svg#gh-dark-mode-only)
 
-</center>
+</p>
 
 <p align="center">
   <a href="https://monokle.io">Website</a> |
