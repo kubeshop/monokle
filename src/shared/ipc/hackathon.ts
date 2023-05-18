@@ -1,4 +1,5 @@
+import {ChatCompletionRequestMessage} from 'openai';
+
 export type CreateChatCompletionParams = {
-  systemPrompt: string;
-  message: string;
+  messages: ChatCompletionRequestMessage[];
 };

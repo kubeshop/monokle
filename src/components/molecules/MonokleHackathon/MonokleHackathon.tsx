@@ -1,23 +1,28 @@
 import {useState} from 'react';
-import {ReactMarkdown} from 'react-markdown/lib/react-markdown';
 import {monaco} from 'react-monaco-editor';
 import MonacoEditor from 'react-monaco-editor/lib/editor';
 
 import {Button, Input, Modal, Skeleton} from 'antd';
 
+import {ChatCompletionRequestMessage} from 'openai';
 import styled from 'styled-components';
-import YAML from 'yaml';
+import YAML, {Document, ParsedNode, isMap} from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
 import {createChatCompletion} from '@redux/hackathon/hackathon.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeNewAiResourceWizard} from '@redux/reducers/ui';
+import {extractK8sResources} from '@redux/services/resource';
 import {createTransientResource} from '@redux/services/transientResource';
+import {VALIDATOR} from '@redux/validation/validator';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
+import {transformResourceForValidation} from '@utils/resources';
+import {parseAllYamlDocuments} from '@utils/yaml';
 
 import {Colors} from '@shared/styles/colors';
+import {isDefined} from '@shared/utils/filter';
 
 const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   readOnly: true,
@@ -27,7 +32,39 @@ const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   },
 };
 
+function isValidResourceDocument(d: Document.Parsed<ParsedNode>) {
+  return d.errors.length === 0 && isMap(d.contents);
+}
+
+function isValidKubernetesYaml(yaml: string) {
+  const documents = parseAllYamlDocuments(yaml);
+  return documents.length === 1 && isValidResourceDocument(documents[0]);
+}
+
+const GENERATION_ERROR_MESSAGE = 'No resource content was generated. Please try to give a better description.';
+
 const codeRegex = /`{3}[\s\S]*?`{3}|`{1}[\s\S]*?`{1}/g;
+
+const systemPrompt: ChatCompletionRequestMessage = {
+  role: 'system',
+  content: `
+In this interaction, we'll be focusing on creating Kubernetes YAML code based on specific user inputs.
+The aim is to generate a precise and functioning YAML code that matches the user's requirements.
+Your output should consist exclusively of the YAML code necessary to fulfill the given task.
+Remember, the output code may span across multiple documents if that's what's needed to incorporate all necessary Kubernetes objects.`,
+};
+
+const extractYamlDocuments = (content: string) => {
+  const codeMatch = content.match(codeRegex);
+  const documents = codeMatch?.map(match => {
+    let formatted = match.replaceAll('`', '');
+    if (formatted.startsWith('yaml')) {
+      formatted = formatted.substring(4);
+    }
+    return formatted;
+  });
+  return documents?.filter(isValidKubernetesYaml);
+};
 
 const MonokleHackathon: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -37,7 +74,6 @@ const MonokleHackathon: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [manifestContentCode, setManifestContentCode] = useState<Array<string>>([]);
-  const [additionalContent, setAdditionalContent] = useState('');
 
   const onCancel = () => {
     setInputValue('');
@@ -52,47 +88,67 @@ const MonokleHackathon: React.FC = () => {
 
     setIsLoading(true);
     setManifestContentCode([]);
-    setAdditionalContent('');
     setErrorMessage('');
 
     try {
-      const systemPrompt = `
-In this interaction, we'll be focusing on creating Kubernetes YAML code based on specific user inputs.
-The aim is to generate a precise and functioning YAML code that matches the user's requirements.
-Your output should consist exclusively of the YAML code necessary to fulfill the given task.
-Remember, the output code may span across multiple documents if that's what's needed to incorporate all necessary Kubernetes objects.`;
-
-      const content = await createChatCompletion({systemPrompt, message: inputValue});
+      const messages: ChatCompletionRequestMessage[] = [systemPrompt, {role: 'user', content: inputValue}];
+      let content = await createChatCompletion({messages});
 
       if (!content) {
-        setErrorMessage('No resource content was found! Please try to give a better description.');
+        setErrorMessage(GENERATION_ERROR_MESSAGE);
         setIsLoading(false);
         return;
       }
-      const codeMatch = content.match(codeRegex);
 
-      const code = codeMatch?.map(match => {
-        let formatted = match.replaceAll('`', '');
-        if (formatted.startsWith('yaml')) {
-          formatted = formatted.substring(4);
-        }
-        return formatted;
+      messages.push({role: 'assistant', content});
+
+      let yamlDocuments = extractYamlDocuments(content);
+      if (!yamlDocuments) {
+        setErrorMessage(GENERATION_ERROR_MESSAGE);
+        setIsLoading(false);
+        return;
+      }
+
+      const resources = extractK8sResources(yamlDocuments.join('\n---\n'), 'transient', {createdIn: 'local'});
+      const {response} = await VALIDATOR.runValidation({
+        resources: resources.map(transformResourceForValidation).filter(isDefined),
       });
 
-      if (!code) {
-        setErrorMessage('No resource content was found! Please try to give a better description.');
-        setIsLoading(false);
-        return;
+      const hasAnyErrors = response.runs.some(run => run.results.length > 0);
+
+      if (hasAnyErrors) {
+        let newPrompt = `
+We will provide a list containing issues and possible fixes.
+Based on that list, please rewrite the previous code blocks to fix all issues.
+In the YAML code, write comments to explain what you changed and why.
+`;
+        response.runs
+          .filter(run => run.tool.driver.name !== 'resource-links')
+          .forEach(run => {
+            run.results.forEach(result => {
+              const help = run.tool.driver.rules.find(rule => rule.id === result.ruleId)?.help;
+              newPrompt += `An issue is that ${result.message.text} and a possible fix is that ${help?.text}\n`;
+            });
+          });
+
+        messages.push({role: 'user', content: newPrompt});
+        content = await createChatCompletion({messages});
+
+        if (!content) {
+          setErrorMessage(GENERATION_ERROR_MESSAGE);
+          setIsLoading(false);
+          return;
+        }
+
+        yamlDocuments = extractYamlDocuments(content);
+        if (!yamlDocuments) {
+          setErrorMessage(GENERATION_ERROR_MESSAGE);
+          setIsLoading(false);
+          return;
+        }
       }
 
-      // Remove code block from Markdown
-      const additionalContentText = content.replace(codeRegex, '');
-
-      if (additionalContentText) {
-        setAdditionalContent(additionalContentText);
-      }
-
-      setManifestContentCode(code);
+      setManifestContentCode(yamlDocuments);
     } catch (e: any) {
       setErrorMessage(e.message);
     }
@@ -130,7 +186,8 @@ Remember, the output code may span across multiple documents if that's what's ne
       title="Create Resource using AI"
       open={newAiResourceWizardState.isOpen}
       onCancel={onCancel}
-      width="60%"
+      width="90vw"
+      bodyStyle={{maxHeight: '1000px', overflowY: 'auto'}}
       okText="Create"
       onOk={onOkHandler}
     >
@@ -161,26 +218,16 @@ Remember, the output code may span across multiple documents if that's what's ne
       ) : !manifestContentCode ? (
         <NoContent>There is not content yet to be shown</NoContent>
       ) : (
-        <Container>
-          <div>
-            <Title>Resource content</Title>
-
-            <MonacoEditor
-              width="100%"
-              height="450px"
-              language="yaml"
-              theme={KUBESHOP_MONACO_THEME}
-              value={manifestContentCode.join(`\n${YAML_DOCUMENT_DELIMITER}\n`)}
-              options={editorOptions}
-            />
-          </div>
-
-          <div>
-            <Title>Additional information</Title>
-
-            <ReactMarkdown>{additionalContent || 'There is no additional content.'}</ReactMarkdown>
-          </div>
-        </Container>
+        <div>
+          <MonacoEditor
+            width="100%"
+            height="450px"
+            language="yaml"
+            theme={KUBESHOP_MONACO_THEME}
+            value={manifestContentCode.join(`\n${YAML_DOCUMENT_DELIMITER}\n`)}
+            options={editorOptions}
+          />
+        </div>
       )}
     </Modal>
   );
@@ -197,14 +244,6 @@ const CreateButton = styled(Button)`
 const ErrorMessage = styled.div`
   color: ${Colors.redError};
   margin-top: 4px;
-`;
-
-const Container = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 16px;
-  height: 500px;
-  overflow-y: auto;
 `;
 
 const NoContent = styled.div`

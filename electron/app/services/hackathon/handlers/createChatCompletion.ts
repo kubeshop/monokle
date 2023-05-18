@@ -7,16 +7,10 @@ const openAiConfiguration = new Configuration({
 });
 const openai = new OpenAIApi(openAiConfiguration);
 
-export async function createChatCompletion({
-  systemPrompt,
-  message,
-}: CreateChatCompletionParams): Promise<string | undefined> {
+export async function createChatCompletion({messages}: CreateChatCompletionParams): Promise<string | undefined> {
   const completion = await openai.createChatCompletion({
     model: 'gpt-3.5-turbo',
-    messages: [
-      {role: 'system', content: systemPrompt},
-      {role: 'user', content: message},
-    ],
+    messages,
   });
 
   const content = completion.data.choices[0].message?.content;
