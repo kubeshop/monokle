@@ -54,9 +54,10 @@ const MonokleHackathon: React.FC = () => {
     setErrorMessage('');
 
     try {
-      const message = `You will create just k8s manifest based on the following needs. The manifest should be between code blocks. Needs: ${inputValue}.`;
+      const systemPrompt = `You will create just k8s manifest based on the following needs. The manifest should be between code blocks. Needs: \n ${inputValue}.`;
+      let message = inputValue;
 
-      const content = await createChatCompletion({message});
+      const content = await createChatCompletion({systemPrompt, message});
 
       if (!content) {
         setErrorMessage('No resource content was found! Please try to give a better description.');
