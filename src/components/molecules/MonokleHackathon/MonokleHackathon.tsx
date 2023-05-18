@@ -54,10 +54,13 @@ const MonokleHackathon: React.FC = () => {
     setErrorMessage('');
 
     try {
-      const systemPrompt = `You will create just k8s manifest based on the following needs. The manifest should be between code blocks. use separate code blocks.\n.`;
-      let message = `Needs: ${inputValue}`;
+      const systemPrompt = `
+In this interaction, we'll be focusing on creating Kubernetes YAML code based on specific user inputs.
+The aim is to generate a precise and functioning YAML code that matches the user's requirements.
+Your output should consist exclusively of the YAML code necessary to fulfill the given task.
+Remember, the output code may span across multiple documents if that's what's needed to incorporate all necessary Kubernetes objects.`;
 
-      const content = await createChatCompletion({systemPrompt, message});
+      const content = await createChatCompletion({systemPrompt, message: inputValue});
 
       if (!content) {
         setErrorMessage('No resource content was found! Please try to give a better description.');
@@ -66,7 +69,13 @@ const MonokleHackathon: React.FC = () => {
       }
       const codeMatch = content.match(codeRegex);
 
-      const code = codeMatch?.map(s => s.replaceAll('`', ''));
+      const code = codeMatch?.map(match => {
+        let formatted = match.replaceAll('`', '');
+        if (formatted.startsWith('yaml')) {
+          formatted = formatted.substring(4);
+        }
+        return formatted;
+      });
 
       if (!code) {
         setErrorMessage('No resource content was found! Please try to give a better description.');
