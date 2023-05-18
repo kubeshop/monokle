@@ -1,6 +1,6 @@
 import {useMeasure} from 'react-use';
 
-import {Button, Image, Modal} from 'antd';
+import {Image} from 'antd';
 import Link from 'antd/lib/typography/Link';
 
 import {ReloadOutlined} from '@ant-design/icons';
@@ -8,7 +8,7 @@ import {ReloadOutlined} from '@ant-design/icons';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
-import {errorsSelector, useValidationSelector, warningsSelector} from '@redux/validation/validation.selectors';
+import {useValidationSelector} from '@redux/validation/validation.selectors';
 import {setSelectedProblem, setValidationFilters} from '@redux/validation/validation.slice';
 import {validateResources} from '@redux/validation/validation.thunks';
 
@@ -22,7 +22,6 @@ import {Icon, TitleBar, ValidationOverview} from '@monokle/components';
 import {trackEvent} from '@shared/utils';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
-import ProblemsSummary from './ProblemsSummary';
 import * as S from './ValidationPane.styled';
 
 const ValidationPane: React.FC = () => {
@@ -35,9 +34,6 @@ const ValidationPane: React.FC = () => {
   const selectedProblem = useValidationSelector(state => state.validationOverview.selectedProblem);
   const status = useValidationSelector(state => state.status);
   const validationFilters = useValidationSelector(state => state.validationOverview.filters);
-
-  const warningsMessages = useValidationSelector(warningsSelector).map(w => w.message.text);
-  const errorsMessages = useValidationSelector(errorsSelector).map(w => w.message.text);
 
   const [titleBarRef, {height: titleBarHeight}] = useMeasure<HTMLDivElement>();
 
@@ -70,19 +66,6 @@ const ValidationPane: React.FC = () => {
         />
       </div>
 
-      <Button
-        type="primary"
-        style={{marginTop: '8px'}}
-        onClick={() => {
-          Modal.info({
-            title: 'Validation Summary',
-            content: <ProblemsSummary errorsMessages={errorsMessages} warningsMessages={warningsMessages} />,
-          });
-        }}
-      >
-        Summary
-      </Button>
-
       {status === 'error' ? (
         <S.ErrorEmptyMessageContainer>
           <S.ErrorMessage>
@@ -99,10 +82,10 @@ const ValidationPane: React.FC = () => {
         </S.ErrorEmptyMessageContainer>
       ) : lastResponse ? (
         <ValidationOverview
-          containerStyle={{marginTop: '16px'}}
+          containerStyle={{marginTop: '20px'}}
           showOnlyByResource={isInClusterMode || isInPreviewMode}
           filters={validationFilters}
-          height={height - titleBarHeight - 100}
+          height={height - titleBarHeight - 60}
           newProblemsIntroducedType={newProblemsIntroducedType}
           selectedProblem={selectedProblem?.problem}
           validationResponse={lastResponse}
