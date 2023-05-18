@@ -25,7 +25,7 @@ const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   },
 };
 
-const codeRegex = /```[\s\S]*?([\s\S]+?)```/;
+const codeRegex = /`{3}[\s\S]*?`{3}|`{1}[\s\S]*?`{1}/g;
 
 const MonokleHackathon: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -34,7 +34,7 @@ const MonokleHackathon: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [manifestContentCode, setManifestContentCode] = useState('');
+  const [manifestContentCode, setManifestContentCode] = useState<Array<string>>([]);
   const [additionalContent, setAdditionalContent] = useState('');
 
   const onCancel = () => {
@@ -49,13 +49,13 @@ const MonokleHackathon: React.FC = () => {
     }
 
     setIsLoading(true);
-    setManifestContentCode('');
+    setManifestContentCode([]);
     setAdditionalContent('');
     setErrorMessage('');
 
     try {
-      const systemPrompt = `You will create just k8s manifest based on the following needs. The manifest should be between code blocks. Needs: \n ${inputValue}.`;
-      let message = inputValue;
+      const systemPrompt = `You will create just k8s manifest based on the following needs. The manifest should be between code blocks. use separate code blocks.\n.`;
+      let message = `Needs: ${inputValue}`;
 
       const content = await createChatCompletion({systemPrompt, message});
 
@@ -64,9 +64,9 @@ const MonokleHackathon: React.FC = () => {
         setIsLoading(false);
         return;
       }
-
       const codeMatch = content.match(codeRegex);
-      const code = codeMatch && codeMatch.length >= 2 ? codeMatch[1] : '';
+
+      const code = codeMatch?.map(s => s.replaceAll('`', ''));
 
       if (!code) {
         setErrorMessage('No resource content was found! Please try to give a better description.');
@@ -90,26 +90,28 @@ const MonokleHackathon: React.FC = () => {
   };
 
   const onOkHandler = async () => {
-    try {
-      const parsedManifest = YAML.parse(manifestContentCode);
-      createTransientResource(
-        {
-          name: parsedManifest.metadata.name,
-          kind: parsedManifest.kind,
-          namespace: parsedManifest.metadata.namespace || '',
-          apiVersion: parsedManifest.apiVersion,
-        },
-        dispatch,
-        'local',
-        parsedManifest
-      );
-      dispatch(closeNewAiResourceWizard());
-    } catch (error: any) {
-      Modal.error({
-        title: 'Could not create resource',
-        content: error.message,
-      });
-    }
+    manifestContentCode.forEach(code => {
+      try {
+        const parsedManifest = YAML.parse(code);
+        createTransientResource(
+          {
+            name: parsedManifest.metadata.name,
+            kind: parsedManifest.kind,
+            namespace: parsedManifest.metadata.namespace || '',
+            apiVersion: parsedManifest.apiVersion,
+          },
+          dispatch,
+          'local',
+          parsedManifest
+        );
+      } catch (error: any) {
+        Modal.error({
+          title: 'Could not create resource',
+          content: error.message,
+        });
+      }
+    });
+    dispatch(closeNewAiResourceWizard());
   };
 
   return (
@@ -157,7 +159,7 @@ const MonokleHackathon: React.FC = () => {
               height="450px"
               language="yaml"
               theme={KUBESHOP_MONACO_THEME}
-              value={manifestContentCode}
+              value={manifestContentCode.join('\n')}
               options={editorOptions}
             />
           </div>
