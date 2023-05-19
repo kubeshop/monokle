@@ -127,6 +127,7 @@ In the YAML code, write comments to explain what you changed and why.
     manifestContentCode.forEach(code => {
       try {
         const parsedManifest = YAML.parse(code);
+
         const newResource = createTransientResource(
           {
             name: parsedManifest.metadata.name,
@@ -136,7 +137,7 @@ In the YAML code, write comments to explain what you changed and why.
           },
           dispatch,
           'local',
-          parsedManifest
+          parsedManifest.spec
         );
 
         dispatch(setAlert({title: 'Resource created successfully', message: '', type: AlertEnum.Success}));
