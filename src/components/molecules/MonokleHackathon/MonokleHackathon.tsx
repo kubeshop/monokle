@@ -1,8 +1,8 @@
 import {useState} from 'react';
-import {monaco} from 'react-monaco-editor';
 import MonacoEditor from 'react-monaco-editor/lib/editor';
+import {useMeasure} from 'react-use';
 
-import {Button, Input, Modal, Skeleton} from 'antd';
+import {Button, Input, Modal, Spin} from 'antd';
 
 import {ChatCompletionRequestMessage} from 'openai';
 import styled from 'styled-components';
@@ -12,6 +12,8 @@ import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
 import {createChatCompletion} from '@redux/hackathon/hackathon.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
+import {selectResource} from '@redux/reducers/main';
 import {closeNewAiResourceWizard} from '@redux/reducers/ui';
 import {extractK8sResources} from '@redux/services/resource';
 import {createTransientResource} from '@redux/services/transientResource';
@@ -20,45 +22,12 @@ import {VALIDATOR} from '@redux/validation/validator';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {transformResourceForValidation} from '@utils/resources';
 
+import {AlertEnum} from '@shared/models/alert';
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
 
-const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
-  readOnly: true,
-  fontWeight: 'bold',
-  minimap: {
-    enabled: false,
-  },
-};
-
-function isValidKubernetesYaml(yaml: string) {
-  return yaml.includes('apiVersion') && yaml.includes('kind') && yaml.includes('metadata');
-}
-
-const GENERATION_ERROR_MESSAGE = 'No resource content was generated. Please try to give a better description.';
-
-const codeRegex = /`{3}[\s\S]*?`{3}|`{1}[\s\S]*?`{1}/g;
-
-const systemPrompt: ChatCompletionRequestMessage = {
-  role: 'system',
-  content: `
-In this interaction, we'll be focusing on creating Kubernetes YAML code based on specific user inputs.
-The aim is to generate a precise and functioning YAML code that matches the user's requirements.
-Your output should consist exclusively of the YAML code necessary to fulfill the given task.
-Remember, the output code may span across multiple documents if that's what's needed to incorporate all necessary Kubernetes objects.`,
-};
-
-const extractYamlDocuments = (content: string) => {
-  const codeMatch = content.match(codeRegex);
-  const documents = codeMatch?.map(match => {
-    let formatted = match.replaceAll('`', '');
-    if (formatted.startsWith('yaml')) {
-      formatted = formatted.substring(4);
-    }
-    return formatted;
-  });
-  return documents?.filter(isValidKubernetesYaml);
-};
+import {EDITOR_OPTIONS, GENERATION_ERROR_MESSAGE, SYSTEM_PROMPT} from './constants';
+import {extractYamlDocuments} from './utils';
 
 const MonokleHackathon: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -68,6 +37,8 @@ const MonokleHackathon: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [manifestContentCode, setManifestContentCode] = useState<Array<string>>([]);
+
+  const [monacoContainerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
   const onCancel = () => {
     setInputValue('');
@@ -85,7 +56,7 @@ const MonokleHackathon: React.FC = () => {
     setErrorMessage('');
 
     try {
-      const messages: ChatCompletionRequestMessage[] = [systemPrompt, {role: 'user', content: inputValue}];
+      const messages: ChatCompletionRequestMessage[] = [SYSTEM_PROMPT, {role: 'user', content: inputValue}];
       let content = await createChatCompletion({messages});
 
       if (!content) {
@@ -151,10 +122,12 @@ In the YAML code, write comments to explain what you changed and why.
   };
 
   const onOkHandler = async () => {
+    let firstResourceCreated = false;
+
     manifestContentCode.forEach(code => {
       try {
         const parsedManifest = YAML.parse(code);
-        createTransientResource(
+        const newResource = createTransientResource(
           {
             name: parsedManifest.metadata.name,
             kind: parsedManifest.kind,
@@ -165,65 +138,70 @@ In the YAML code, write comments to explain what you changed and why.
           'local',
           parsedManifest
         );
+
+        dispatch(setAlert({title: 'Resource created successfully', message: '', type: AlertEnum.Success}));
+
+        if (!firstResourceCreated) {
+          firstResourceCreated = true;
+          dispatch(selectResource({resourceIdentifier: {id: newResource.id, storage: 'transient'}}));
+        }
       } catch (error: any) {
-        Modal.error({
-          title: 'Could not create resource',
-          content: error.message,
-        });
+        dispatch(setAlert({title: 'Could not create resource', message: error.message, type: AlertEnum.Error}));
       }
     });
+
     dispatch(closeNewAiResourceWizard());
   };
 
   return (
-    <Modal
+    <StyledModal
       title="Create Resource using AI"
       open={newAiResourceWizardState.isOpen}
       onCancel={onCancel}
-      width="90vw"
-      bodyStyle={{maxHeight: '1000px', overflowY: 'auto'}}
+      width="90%"
       okText="Create"
       onOk={onOkHandler}
     >
       <Note>
-        Please provide precise and specific details for creating your desired Kubernetes resource. Feel free to ask for
-        further explanations or additional information from the model regarding your requirements. Accurate details will
-        help us meet your specific needs effectively.
+        Please provide precise and specific details for creating your desired Kubernetes resources. Accurate details
+        will help us meet your specific needs effectively.
       </Note>
 
       <Input.TextArea
-        autoSize={{minRows: 2, maxRows: 6}}
+        autoSize={{minRows: 3, maxRows: 8}}
         value={inputValue}
         onChange={e => {
           setErrorMessage('');
           setInputValue(e.target.value);
         }}
-        placeholder="Enter resource specifications..."
+        placeholder="Enter resource specifications ( e.g. Create deployment of nginx with 2 replicas )"
       />
 
       {errorMessage && <ErrorMessage>*{errorMessage}</ErrorMessage>}
 
-      <CreateButton onClick={onPreviewHandler} loading={isLoading}>
+      <CreateButton type="primary" onClick={onPreviewHandler} loading={isLoading}>
         Preview
       </CreateButton>
 
       {isLoading ? (
-        <Skeleton active />
-      ) : !manifestContentCode ? (
-        <NoContent>There is not content yet to be shown</NoContent>
+        <Spin tip="Your manifest is being generated. This might take a few minutes.">
+          <SpinContainer />
+        </Spin>
+      ) : !manifestContentCode.length ? (
+        <NoContent>No resources to preview.</NoContent>
       ) : (
-        <div>
+        <div ref={monacoContainerRef} style={{height: 'calc(100% - 200px)', width: '100%'}}>
           <MonacoEditor
-            width="100%"
-            height="450px"
+            width={containerWidth}
+            height={containerHeight}
             language="yaml"
             theme={KUBESHOP_MONACO_THEME}
             value={manifestContentCode.join(`\n${YAML_DOCUMENT_DELIMITER}\n`)}
-            options={editorOptions}
+            options={EDITOR_OPTIONS}
           />
         </div>
       )}
-    </Modal>
+    </StyledModal>
   );
 };
 
@@ -241,11 +219,34 @@ const ErrorMessage = styled.div`
 `;
 
 const NoContent = styled.div`
-  color: ${Colors.grey7};
+  color: ${Colors.grey6};
 `;
 
 const Note = styled.div`
   font-size: 12px;
   color: ${Colors.grey7};
   margin-bottom: 16px;
+`;
+
+const SpinContainer = styled.div`
+  padding: 50px;
+`;
+
+const StyledModal = styled(Modal)`
+  height: 85%;
+  top: 45px;
+  padding-bottom: 0px;
+
+  .ant-modal-content {
+    height: 100%;
+  }
+
+  .ant-modal-header,
+  .ant-modal-body {
+    background-color: #131515;
+  }
+
+  .ant-modal-body {
+    height: 100%;
+  }
 `;
