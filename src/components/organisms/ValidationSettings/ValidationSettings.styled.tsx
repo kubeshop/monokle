@@ -12,4 +12,5 @@ export const ValidationSettingsTitle = styled.div`
   font-size: 16px;
   font-weight: 700;
   color: ${Colors.whitePure};
+  margin-left: 25%;
 `;
