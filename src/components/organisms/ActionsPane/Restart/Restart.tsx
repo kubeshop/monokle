@@ -13,11 +13,18 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import restartDeployment from '@redux/services/restartDeployment';
 
-import {PrimaryButton} from '@atoms';
+import {PrimaryButton, SecondaryButton} from '@atoms';
 
 import {isInClusterModeSelector} from '@shared/utils/selectors';
+import styled from 'styled-components';
 
-const Restart: React.FC = () => {
+type IProps = {
+  clusterDashboardStyling?: boolean;
+};
+
+const Restart: React.FC<IProps> = props => {
+  const {clusterDashboardStyling} = props;
+
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(kubeConfigContextSelector);
   const currentResource = useSelectedResource();
@@ -45,11 +52,24 @@ const Restart: React.FC = () => {
 
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RestartTooltip} placement="bottomLeft">
-      <PrimaryButton type="link" size="small" onClick={handleClick} disabled={!isBtnEnabled}>
-        Restart
-      </PrimaryButton>
+      {clusterDashboardStyling ? (
+        <Button onClick={handleClick} disabled={!isBtnEnabled}>
+          Restart
+        </Button>
+      ) : (
+        <PrimaryButton type="link" size="small" onClick={handleClick} disabled={!isBtnEnabled}>
+          Restart
+        </PrimaryButton>
+      )}
     </Tooltip>
   );
 };
 
 export default Restart;
+
+// Styled Components
+
+const Button = styled(SecondaryButton)`
+  font-size: 12px;
+  border-radius: 2px;
+`;

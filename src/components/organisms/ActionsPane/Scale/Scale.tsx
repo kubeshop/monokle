@@ -12,11 +12,18 @@ import {closeScaleModal, openScaleModal} from '@redux/reducers/ui';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import scaleDeployment from '@redux/services/scaleDeployment';
 
-import {PrimaryButton} from '@atoms';
+import {PrimaryButton, SecondaryButton} from '@atoms';
 
 import {isInClusterModeSelector} from '@shared/utils/selectors';
+import styled from 'styled-components';
 
-const Scale: React.FC = () => {
+type IProps = {
+  clusterDashboardStyling?: boolean;
+};
+
+const Scale: React.FC<IProps> = props => {
+  const {clusterDashboardStyling} = props;
+
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(kubeConfigContextSelector);
   const currentResource = useSelectedResource();
@@ -54,15 +61,21 @@ const Scale: React.FC = () => {
   return (
     <>
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ScaleTooltip} placement="bottomLeft">
-        <PrimaryButton
-          loading={Boolean(scaling)}
-          type="link"
-          size="small"
-          onClick={() => dispatch(openScaleModal())}
-          disabled={!isBtnEnabled}
-        >
-          Scale
-        </PrimaryButton>
+        {clusterDashboardStyling ? (
+          <Button loading={Boolean(scaling)} onClick={() => dispatch(openScaleModal())} disabled={!isBtnEnabled}>
+            Scale
+          </Button>
+        ) : (
+          <PrimaryButton
+            loading={Boolean(scaling)}
+            type="link"
+            size="small"
+            onClick={() => dispatch(openScaleModal())}
+            disabled={!isBtnEnabled}
+          >
+            Scale
+          </PrimaryButton>
+        )}
       </Tooltip>
 
       <Modal title="Set number of replicas" open={isScaleModalOpen} onOk={handleScaleOk} onCancel={handleCancel}>
@@ -91,3 +104,10 @@ const Scale: React.FC = () => {
 };
 
 export default Scale;
+
+// Styled Components
+
+const Button = styled(SecondaryButton)`
+  font-size: 12px;
+  border-radius: 2px;
+`;

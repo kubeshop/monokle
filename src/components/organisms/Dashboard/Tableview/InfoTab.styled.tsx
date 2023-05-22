@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
-  padding: 24px;
+  padding: 16px;
   height: 100%;
   overflow-y: scroll;
 `;

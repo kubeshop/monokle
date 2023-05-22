@@ -1,8 +1,7 @@
 import {setActiveTab, setDashboardSelectedResourceId} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
+
 import {useResource} from '@redux/selectors/resourceSelectors';
-import {applyResourceToCluster} from '@redux/thunks/applyResource';
 
 import {Logs, ResourceRefsIconPopover} from '@components/molecules';
 
@@ -13,37 +12,14 @@ import CodeEditor from '@editor/CodeEditor';
 import * as S from './Drawer.styled';
 import {InfoTab} from './InfoTab';
 import {TerminalTab} from './TerminalTab';
+import ResourceActions from './ResourceActions';
 
 export const Drawer = () => {
   const dispatch = useAppDispatch();
-  const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
-  const clusterResourceMetaMap = useResourceMetaMap('cluster');
   const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
-  const isApplyingResource = useAppSelector(state => state.main.isApplyingResource);
+  const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
 
   const selectedResource = useResource(selectedResourceId ? {id: selectedResourceId, storage: 'cluster'} : undefined);
-
-  const handleApplyResource = () => {
-    if (
-      selectedResource &&
-      selectedResource.namespace &&
-      selectedResourceId &&
-      clusterResourceMetaMap[selectedResourceId]
-    ) {
-      dispatch(
-        applyResourceToCluster({
-          resourceIdentifier: {
-            id: selectedResourceId,
-            storage: 'cluster',
-          },
-          namespace: selectedResource.namespace ? {name: selectedResource.namespace, new: false} : undefined,
-          options: {
-            isInClusterMode: true,
-          },
-        })
-      );
-    }
-  };
 
   return (
     <S.Drawer
@@ -78,6 +54,7 @@ export const Drawer = () => {
     >
       <S.TabsContainer>
         <S.Tabs
+          tabBarExtraContent={<ResourceActions resource={selectedResource} />}
           defaultActiveKey={activeTab}
           activeKey={activeTab}
           onChange={(key: string) => {
@@ -114,19 +91,6 @@ export const Drawer = () => {
               : []),
           ]}
         />
-        <S.TabsFooter>
-          <S.ActionButtons>
-            {activeTab === 'Manifest' && (
-              <S.ActionButton
-                loading={isApplyingResource}
-                disabled={!selectedResource}
-                onClick={() => handleApplyResource()}
-              >
-                Update
-              </S.ActionButton>
-            )}
-          </S.ActionButtons>
-        </S.TabsFooter>
       </S.TabsContainer>
     </S.Drawer>
   );
