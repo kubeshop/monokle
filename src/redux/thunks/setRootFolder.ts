@@ -22,6 +22,7 @@ import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {isInClusterModeSelector} from '@shared/utils';
 import {trackEvent} from '@shared/utils/telemetry';
+import {abortAllRunningValidation} from '@redux/validation/validation.thunks';
 
 /**
  * Thunk to set the specified root folder
@@ -94,6 +95,7 @@ export const setRootFolder = createAsyncThunk<
   rootEntry.children = files;
 
   monitorRootFolder(rootFolder, thunkAPI);
+  abortAllRunningValidation();
 
   const filesNumber = Object.values(fileMap).filter(f => !f.children).length;
   const resourcesNumber = Object.values(resourceMetaMap).length;
