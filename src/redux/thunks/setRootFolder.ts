@@ -23,6 +23,7 @@ import {RootState} from '@shared/models/rootState';
 import {isInClusterModeSelector} from '@shared/utils';
 import {trackEvent} from '@shared/utils/telemetry';
 import {abortAllRunningValidation} from '@redux/validation/validation.thunks';
+import {abortAllRunningRefsProcessing} from '@redux/parsing/parser.thunks';
 
 /**
  * Thunk to set the specified root folder
@@ -96,6 +97,7 @@ export const setRootFolder = createAsyncThunk<
 
   monitorRootFolder(rootFolder, thunkAPI);
   abortAllRunningValidation();
+  abortAllRunningRefsProcessing();
 
   const filesNumber = Object.values(fileMap).filter(f => !f.children).length;
   const resourcesNumber = Object.values(resourceMetaMap).length;
