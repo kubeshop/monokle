@@ -10,6 +10,7 @@ import YAML from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
+import {setUserApiKey} from '@redux/appConfig';
 import {createChatCompletion} from '@redux/hackathon/hackathon.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
@@ -39,7 +40,9 @@ const MonokleHackathon: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [manifestContentCode, setManifestContentCode] = useState<Array<string>>([]);
+  const apiKey = useAppSelector(state => state.config.userApiKeys.OpenAI);
   const isOpaValidationEnabled = useAppSelector(state => pluginEnabledSelector(state, 'open-policy-agent'));
+  const [inputApiKey, setInputApiKey] = useState<string | undefined>();
 
   const [monacoContainerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -172,6 +175,16 @@ In the YAML code, write comments to explain what you changed and why.
       okText="Create"
       onOk={onOkHandler}
     >
+      {!apiKey && (
+        <div>
+          Please provide your OpenAI API key:{' '}
+          <Input value={inputApiKey} onChange={e => setInputApiKey(e.target.value)} />
+          <Button onClick={() => inputApiKey && dispatch(setUserApiKey({vendor: 'OpenAI', apiKey: inputApiKey}))}>
+            Save
+          </Button>
+        </div>
+      )}
+
       <Note>
         Please provide precise and specific details for creating your desired Kubernetes resources. Accurate details
         will help us meet your specific needs effectively.

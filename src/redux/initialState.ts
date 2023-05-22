@@ -113,6 +113,7 @@ const initialAppConfigState: AppConfig = {
   disableErrorReporting: electronStore.get('appConfig.disableErrorReporting'),
   isAccessLoading: false,
   kubeConfigContextsColors: electronStore.get('appConfig.kubeConfigContextsColors') || {},
+  userApiKeys: electronStore.get('appConfig.userApiKeys') || {},
 };
 
 const initialAlertState: AlertState = {};

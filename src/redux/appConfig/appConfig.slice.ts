@@ -12,6 +12,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {init as sentryInit} from '@sentry/electron/renderer';
 import {ClusterColors} from '@shared/models/cluster';
 import {
+  ApiKeyVendor,
   AppConfig,
   FileExplorerSortOrder,
   KubeConfig,
@@ -390,6 +391,10 @@ export const configSlice = createSlice({
     setClusterProxyPort: (state: Draft<AppConfig>, action: PayloadAction<number | undefined>) => {
       state.clusterProxyPort = action.payload;
     },
+    setUserApiKey: (state: Draft<AppConfig>, action: PayloadAction<{vendor: ApiKeyVendor; apiKey: string}>) => {
+      state.userApiKeys[action.payload.vendor] = action.payload.apiKey;
+      electronStore.set('appConfig.userApiKeys', state.userApiKeys);
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
@@ -451,5 +456,6 @@ export const {
   updateTextSize,
   updateTheme,
   setClusterProxyPort,
+  setUserApiKey,
 } = configSlice.actions;
 export default configSlice.reducer;
