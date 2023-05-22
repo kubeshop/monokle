@@ -56,7 +56,7 @@ export const Tabs = styled(RawTabs)`
       color: ${Colors.grey9};
 
       .ant-tabs-tab {
-        padding: 16px 0 24px 0;
+        padding: 16px 0px;
       }
 
       .ant-tabs-tab-active {
