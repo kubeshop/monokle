@@ -1,4 +1,4 @@
-import {Menu as AntMenu, Table as AntTable, Typography} from 'antd';
+import {Input as AntInput, Menu as AntMenu, Table as AntTable, Typography} from 'antd';
 
 import styled from 'styled-components';
 
@@ -6,14 +6,14 @@ import {Colors} from '@shared/styles';
 
 export const Container = styled.div`
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 56px 1fr;
-  row-gap: 16px;
-  padding: 12px 12px 12px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 12px 12px 16px;
   overflow: hidden;
   height: 100%;
   place-content: start;
+  background-color: ${Colors.grey10};
 `;
 
 export const Header = styled.div`
@@ -35,20 +35,46 @@ export const Menu = styled(AntMenu)`
   &.ant-menu-horizontal {
     border-bottom: unset;
   }
+  &.ant-menu-horizontal > .ant-menu-item {
+    color: ${Colors.grey7};
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  &.ant-menu-horizontal > .ant-menu-item:hover {
+    color: ${Colors.geekblue8};
+  }
+  &.ant-menu-horizontal > .ant-menu-item:hover::after {
+    border-bottom: 2px solid ${Colors.geekblue8};
+  }
+
   &.ant-menu-horizontal > .ant-menu-item-selected {
-    color: ${Colors.whitePure};
+    color: ${Colors.grey9};
   }
 
   &.ant-menu-horizontal > .ant-menu-item-selected::after {
-    border-bottom: 2px solid ${Colors.whitePure};
+    border-bottom: 2px solid ${Colors.grey9};
   }
 `;
 
 export const Title = styled(Typography.Text)`
-  font-size: 16px;
+  font-weight: 700;
+  font-size: 24px;
   line-height: 22px;
-  font-weight: bold;
-  color: ${Colors.whitePure};
+  color: ${Colors.grey9};
+  margin-right: 20px;
+  margin-bottom: 38px;
+`;
+
+export const Link = styled(Typography.Link)`
+  &.ant-typography {
+    color: ${Colors.geekblue8} !important;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 24px;
+    border-bottom: 1px dashed ${Colors.geekblue8};
+  }
 `;
 
 export const Table = styled(props => <AntTable {...props} />)`
@@ -58,7 +84,7 @@ export const Table = styled(props => <AntTable {...props} />)`
   }
 
   .ant-table-header {
-    background-color: ${Colors.grey2};
+    background-color: #1f2628;
     color: ${Colors.grey9};
     text-transform: uppercase;
     font-size: 14px !important;
@@ -78,7 +104,7 @@ export const Table = styled(props => <AntTable {...props} />)`
   }
 
   .ant-table-body .ant-table-row {
-    background-color: ${Colors.grey1};
+    background-color: #191f21;
     border-bottom: 1px solid ${Colors.grey4};
     font-size: 14px;
     font-weight: 400;
@@ -95,8 +121,7 @@ export const Table = styled(props => <AntTable {...props} />)`
   }
 
   .row-selected {
-    background-color: ${Colors.cyan8} !important;
-    color: ${Colors.grey1} !important;
+    background-color: #2a3437 !important;
   }
 `;
 
@@ -106,4 +131,11 @@ export const HoverArea = styled.div.attrs({
   display: flex;
   align-items: center;
   visibility: hidden;
+`;
+
+export const Input = styled(AntInput)`
+  align-self: flex-start;
+  margin-top: 8px;
+  margin-bottom: 24px;
+  width: unset;
 `;

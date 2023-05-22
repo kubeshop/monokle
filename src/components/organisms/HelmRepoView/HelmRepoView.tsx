@@ -1,8 +1,7 @@
 import {useState} from 'react';
 
-// import {Button} from 'antd';
-// import {LeftOutlined} from '@ant-design/icons';
 import HelmChartsTable from './HelmChartsTable';
+import HelmReposTable from './HelmReposTable';
 
 import * as S from './styled';
 
@@ -21,6 +20,10 @@ const HelmRepoView = () => {
 
   return (
     <S.Container>
+      <div>
+        <S.Title>Helm</S.Title>
+        <S.Link>Working with Helm in Monokle</S.Link>
+      </div>
       <S.Header>
         <S.Menu
           style={{width: '100%'}}
@@ -29,12 +32,10 @@ const HelmRepoView = () => {
           onSelect={onSelectItemMenuHandler}
           selectedKeys={[selectedMenuItem]}
         />
-        {/* <Button size="large" type="primary" icon={<LeftOutlined />}>
-          Back to Editor view
-        </Button> */}
       </S.Header>
       <div style={{display: 'flex', flexDirection: 'column'}}>
         {selectedMenuItem === 'browse-charts' && <HelmChartsTable />}
+        {selectedMenuItem === 'manage-repositories' && <HelmReposTable />}
       </div>
     </S.Container>
   );

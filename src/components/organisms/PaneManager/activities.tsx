@@ -9,7 +9,7 @@ import {activeProjectSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
-import {BottomPaneManager, DashboardPane, GitPane} from '@organisms';
+import {BottomPaneManager, DashboardPane, GitPane, HelmRepoView} from '@organisms';
 
 import {ActivityType, Icon} from '@monokle/components';
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from '@shared/models/ui';
@@ -17,7 +17,6 @@ import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import CompareSyncPane from '../CompareSyncPane';
 import ExplorerPane from '../ExplorerPane';
-import HelmRepoPane from '../HelmRepoPane/HelmRepoPane';
 import SettingsPane from '../SettingsPane';
 import ValidationPane from '../ValidationPane';
 
@@ -86,11 +85,11 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     useBadge: () => undefined,
   },
   {
-    type: 'panel',
+    type: 'fullscreen',
     name: 'helm',
     tooltip: 'Helm',
     icon: () => <Icon name="helm" style={{fontSize: '18px', marginTop: 4}} />,
-    component: <HelmRepoPane />,
+    component: <HelmRepoView />,
     useBadge: () => undefined,
   },
 ];

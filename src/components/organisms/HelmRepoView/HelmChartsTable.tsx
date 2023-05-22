@@ -1,10 +1,12 @@
 import {useCallback, useMemo, useRef, useState} from 'react';
 import {useAsync} from 'react-use';
 
-import {Button, Typography} from 'antd';
+import {Typography} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 
-import {RightOutlined} from '@ant-design/icons';
+import {RightOutlined, SearchOutlined} from '@ant-design/icons';
+
+import {debounce} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 
@@ -60,18 +62,15 @@ const createColumns = (onItemClick: (chartName: string) => void): ColumnsType<Ta
 
     render: (_text: string, record: TableDataType) => (
       <S.HoverArea>
-        <Button type="primary" onClick={() => onItemClick(record.name)}>
-          Details & Download
-        </Button>
-        <RightOutlined style={{fontSize: 14, marginLeft: 8}} />
+        <RightOutlined style={{fontSize: 14}} onClick={() => onItemClick(record.name)} />
       </S.HoverArea>
     ),
   },
 ];
 
 const HelmChartsTable = () => {
-  const helmRepoSearch = useAppSelector(state => state.ui.helmRepo.search);
-  const {height, width} = useMainPaneDimensions();
+  const [helmRepoSearch, setHelmRepoSearch] = useState('');
+  const {height} = useMainPaneDimensions();
   const terminalHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
 
@@ -94,9 +93,19 @@ const HelmChartsTable = () => {
   }, [helmRepoSearch]);
 
   const searchResultCount = data.length;
+
+  const onChangeSearchInputHandler = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    setHelmRepoSearch(e.target.value);
+  });
+
   return (
     <>
-      <Typography.Text style={{height: 'fit-content'}}>
+      <S.Input
+        placeholder="Search for a Helm Chart"
+        prefix={<SearchOutlined />}
+        onChange={onChangeSearchInputHandler}
+      />
+      <Typography.Text style={{height: 'fit-content', marginBottom: 24}}>
         {searchResultCount} Helm Charts found. You can
         <Typography.Link> add more Helm Charts repositories</Typography.Link> to extend your search.
       </Typography.Text>
@@ -110,7 +119,7 @@ const HelmChartsTable = () => {
           sortDirections={['ascend', 'descend']}
           loading={loading}
           pagination={false}
-          scroll={{y: height - 212 - (bottomSelection === 'terminal' ? terminalHeight : 0)}}
+          scroll={{y: height - 360 - (bottomSelection === 'terminal' ? terminalHeight : 0)}}
           rowClassName={(record: TableDataType) => (record.name === selectedChart ? 'row-selected' : '')}
         />
       </div>

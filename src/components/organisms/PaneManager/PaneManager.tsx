@@ -6,7 +6,7 @@ import {activeProjectSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setPaneConfiguration, toggleLeftMenu} from '@redux/reducers/ui';
 
-import {ActionsPane, BottomPaneManager, Dashboard, GitOpsView, HelmRepoView, NavigatorPane} from '@organisms';
+import {ActionsPane, BottomPaneManager, Dashboard, GitOpsView, NavigatorPane} from '@organisms';
 import {EmptyDashboard} from '@organisms/Dashboard/EmptyDashboard';
 
 import {ClosedPanePlaceholder} from '@molecules';
@@ -164,8 +164,6 @@ const PaneManager: React.FC = () => {
                       <Dashboard />
                     ) : currentActivity?.name === 'validation' ? (
                       <ProblemPane />
-                    ) : currentActivity?.name === 'helm' ? (
-                      <HelmRepoView />
                     ) : (
                       <ActionsPane />
                     )
