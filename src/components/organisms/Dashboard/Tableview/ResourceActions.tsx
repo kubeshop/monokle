@@ -116,7 +116,7 @@ const Button = styled(SecondaryButton)<{$delete?: Boolean}>`
 
   ${({$delete}) => {
     if ($delete) {
-      return `color: ${Colors.redError}`;
+      return `color: ${Colors.red5}`;
     }
   }}
 `;
