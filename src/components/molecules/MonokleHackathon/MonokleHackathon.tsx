@@ -17,11 +17,13 @@ import {selectResource} from '@redux/reducers/main';
 import {closeNewAiResourceWizard} from '@redux/reducers/ui';
 import {extractK8sResources} from '@redux/services/resource';
 import {createTransientResource} from '@redux/services/transientResource';
+import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
 import {VALIDATOR} from '@redux/validation/validator';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 import {transformResourceForValidation} from '@utils/resources';
 
+import {ValidationResponse} from '@monokle/validation';
 import {AlertEnum} from '@shared/models/alert';
 import {Colors} from '@shared/styles/colors';
 import {isDefined} from '@shared/utils/filter';
@@ -37,6 +39,7 @@ const MonokleHackathon: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [manifestContentCode, setManifestContentCode] = useState<Array<string>>([]);
+  const isOpaValidationEnabled = useAppSelector(state => pluginEnabledSelector(state, 'open-policy-agent'));
 
   const [monacoContainerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -74,12 +77,17 @@ const MonokleHackathon: React.FC = () => {
         return;
       }
 
-      const resources = extractK8sResources(yamlDocuments.join('\n---\n'), 'transient', {createdIn: 'local'});
-      const {response} = await VALIDATOR.runValidation({
-        resources: resources.map(transformResourceForValidation).filter(isDefined),
-      });
+      let hasAnyErrors = false;
+      let validationResponse: ValidationResponse | undefined;
 
-      const hasAnyErrors = response.runs.some(run => run.results.length > 0);
+      if (isOpaValidationEnabled) {
+        const resources = extractK8sResources(yamlDocuments.join('\n---\n'), 'transient', {createdIn: 'local'});
+        const {response} = await VALIDATOR.runValidation({
+          resources: resources.map(transformResourceForValidation).filter(isDefined),
+        });
+        validationResponse = response;
+        hasAnyErrors = response.runs.some(run => run.results.length > 0);
+      }
 
       if (hasAnyErrors) {
         let newPrompt = `
@@ -87,7 +95,7 @@ We will provide a list containing issues and possible fixes.
 Based on that list, please rewrite the previous code blocks to fix all issues.
 In the YAML code, write comments to explain what you changed and why.
 `;
-        response.runs
+        validationResponse?.runs
           .filter(run => run.tool.driver.name !== 'resource-links')
           .forEach(run => {
             run.results.forEach(result => {
@@ -124,7 +132,8 @@ In the YAML code, write comments to explain what you changed and why.
   const onOkHandler = async () => {
     let firstResourceCreated = false;
 
-    manifestContentCode.forEach(code => {
+    const manifests = manifestContentCode.map(m => m.split(YAML_DOCUMENT_DELIMITER)).flat();
+    manifests.forEach(code => {
       try {
         const parsedManifest = YAML.parse(code);
 
@@ -234,7 +243,7 @@ const SpinContainer = styled.div`
 `;
 
 const StyledModal = styled(Modal)`
-  height: 85%;
+  height: 75%;
   top: 45px;
   padding-bottom: 0px;
 
