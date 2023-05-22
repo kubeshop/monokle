@@ -56,7 +56,7 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
           rowClassName={(record: ResourceMeta | any) => (record.id === selectedResourceId ? 'selected' : '')}
           pagination={false}
           sticky
-          onRow={(record: ResourceMeta | any) => {
+          onRow={(record: ResourceMeta | any, index) => {
             return {
               onClick: () => {
                 dispatch(setDashboardSelectedResourceId(record.id));

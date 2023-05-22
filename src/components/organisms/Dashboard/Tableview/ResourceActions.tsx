@@ -1,23 +1,21 @@
-import {ExclamationCircleOutlined} from '@ant-design/icons';
 import {SecondaryButton} from '@atoms';
-import Restart from '@components/organisms/ActionsPane/Restart/Restart';
-import Scale from '@components/organisms/ActionsPane/Scale/Scale';
 
-import {setDashboardSelectedResourceId} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setAlert} from '@redux/reducers/alert';
-import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
+
 import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {applyResourceToCluster} from '@redux/thunks/applyResource';
 
-import {removeResources} from '@redux/thunks/removeResources';
-import {AlertEnum} from '@shared/models/alert';
 import {K8sResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles';
-import {Modal} from 'antd';
-import {useCallback} from 'react';
-
 import styled from 'styled-components';
+import {useMemo} from 'react';
+import {openScaleModal} from '@redux/reducers/ui';
+import {ExclamationCircleOutlined} from '@ant-design/icons';
+import {Modal} from 'antd';
+import restartDeployment from '@redux/services/restartDeployment';
+import {connectCluster} from '@redux/cluster/thunks/connect';
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {deleteResourceHandler} from './utils';
 
 type IProps = {
   resource?: K8sResource<'cluster'>;
@@ -28,27 +26,12 @@ const ResourceActions: React.FC<IProps> = props => {
 
   const dispatch = useAppDispatch();
   const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
-  const clusterResourceMetaMap = useResourceMetaMap('cluster');
   const isApplyingResource = useAppSelector(state => state.main.isApplyingResource);
+  const clusterResourceMetaMap = useResourceMetaMap('cluster');
+  const currentContext = useAppSelector(kubeConfigContextSelector);
+  const kubeConfigPath = useAppSelector(kubeConfigPathSelector);
 
-  const deleteResourceHandler = useCallback(() => {
-    if (!resource) return;
-
-    Modal.confirm({
-      title: `This action will delete the resource from the Cluster.\n Are you sure you want to delete ${resource.name}?`,
-      icon: <ExclamationCircleOutlined />,
-      onOk() {
-        return new Promise(resolve => {
-          dispatch(removeResources([resource]));
-          dispatch(editorHasReloadedSelectedPath(true));
-          dispatch(setDashboardSelectedResourceId());
-          dispatch(setAlert({title: 'Resource deleted from the cluster', message: '', type: AlertEnum.Success}));
-          resolve({});
-        });
-      },
-      onCancel() {},
-    });
-  }, [dispatch, resource]);
+  const isResourceDeployment = useMemo(() => resource?.kind === 'Deployment', [resource?.kind]);
 
   const handleApplyResource = () => {
     if (!resource || !resource.namespace || !clusterResourceMetaMap[resource.id]) return;
@@ -67,6 +50,21 @@ const ResourceActions: React.FC<IProps> = props => {
     );
   };
 
+  const handleRestartResource = () => {
+    Modal.confirm({
+      title: 'Do you want to restart the deployment?',
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        if (!resource?.name || !resource?.namespace) return;
+
+        restartDeployment({currentContext, kubeConfigPath, name: resource.name, namespace: resource.namespace});
+        // TODO: we should have a way of updating a single resource instead of restarting the whole cluster
+        dispatch(connectCluster({context: currentContext, namespace: resource.namespace, reload: true}));
+      },
+      onCancel() {},
+    });
+  };
+
   return (
     <Container>
       {activeTab === 'Manifest' && (
@@ -75,10 +73,27 @@ const ResourceActions: React.FC<IProps> = props => {
         </Button>
       )}
 
-      <Scale clusterDashboardStyling />
-      <Restart clusterDashboardStyling />
+      <Button
+        onClick={() => {
+          if (!resource) return;
+          dispatch(openScaleModal(resource));
+        }}
+        disabled={!isResourceDeployment}
+      >
+        Scale
+      </Button>
 
-      <Button onClick={deleteResourceHandler} $delete>
+      <Button
+        disabled={!isResourceDeployment}
+        onClick={() => {
+          if (!resource) return;
+          handleRestartResource();
+        }}
+      >
+        Restart
+      </Button>
+
+      <Button onClick={() => deleteResourceHandler(dispatch, resource)} $delete>
         Delete
       </Button>
     </Container>

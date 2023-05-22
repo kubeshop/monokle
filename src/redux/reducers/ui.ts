@@ -19,7 +19,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Project, SavedCommand, SettingsPanel} from '@shared/models/config';
-import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {K8sResource, ResourceIdentifier} from '@shared/models/k8sResource';
 import {
   ExplorerCollapsibleSectionsType,
   HighlightItems,
@@ -379,11 +379,14 @@ export const uiSlice = createSlice({
       state.showOpenProjectAlert = action.payload;
       electronStore.set('ui.showOpenProjectAlert', action.payload);
     },
-    openScaleModal: (state: Draft<UiState>) => {
-      state.isScaleModalOpen = true;
+    openScaleModal: (state: Draft<UiState>, action: PayloadAction<K8sResource>) => {
+      state.scaleModal = {
+        isOpen: true,
+        resource: action.payload,
+      };
     },
     closeScaleModal: (state: Draft<UiState>) => {
-      state.isScaleModalOpen = false;
+      state.scaleModal.isOpen = false;
     },
     closeReleaseNotesDrawer: (state: Draft<UiState>) => {
       state.isReleaseNotesDrawerOpen = false;

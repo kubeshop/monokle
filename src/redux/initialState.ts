@@ -141,7 +141,7 @@ const initialUiState: UiState = {
   collapsedKustomizeKinds: [],
   collapsedHelmCharts: [],
   collapsedPreviewConfigurationsHelmCharts: [],
-  isScaleModalOpen: false,
+
   isNotificationsOpen: false,
   isFolderLoading: false,
   quickSearchActionsPopup: {
@@ -158,6 +158,9 @@ const initialUiState: UiState = {
   createProjectModal: {
     isOpen: false,
     fromTemplate: false,
+  },
+  scaleModal: {
+    isOpen: false,
   },
   saveEditCommandModal: {
     isOpen: false,
