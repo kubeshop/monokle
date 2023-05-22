@@ -15,6 +15,8 @@ import {setValidationFilters} from '@redux/validation/validation.slice';
 
 import {useRefSelector} from '@utils/hooks';
 
+import {trackEvent} from '@shared/utils';
+
 import * as S from './Status.styled';
 
 export const Status = () => {
@@ -31,6 +33,7 @@ export const Status = () => {
   const handleSetFilters = (type: 'warning' | 'error') => {
     dispatch(setValidationFilters({...currentFilters.current, type}));
     dispatch(setLeftMenuSelection('validation'));
+    trackEvent(type === 'error' ? 'dashboard/select_errors' : 'dashboard/select_warnings');
   };
 
   return (

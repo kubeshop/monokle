@@ -185,6 +185,7 @@ type UiState = {
       isVisible: boolean;
       learnTopic?: LearnTopicType;
     };
+    fromBackToStart: boolean;
   };
   templateExplorer: {
     isVisible: boolean;

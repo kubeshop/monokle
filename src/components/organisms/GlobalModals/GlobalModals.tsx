@@ -5,11 +5,11 @@ import {Image, Modal} from 'antd';
 import fs from 'fs';
 import semver from 'semver';
 
-import {setDeleteProject} from '@redux/appConfig';
 import {toggleForm} from '@redux/forms';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {openWelcomeModal} from '@redux/reducers/ui';
+import {setDeleteProject} from '@redux/thunks/project';
 
 import {fetchAppVersion} from '@utils/appVersion';
 

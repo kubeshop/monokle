@@ -1,4 +1,5 @@
 import {dialog} from 'electron';
+import log from 'electron-log';
 
 import {AnyAction} from '@reduxjs/toolkit';
 
@@ -6,7 +7,6 @@ import {spawnSync} from 'child_process';
 import {existsSync, mkdirSync, writeFileSync} from 'fs';
 import gitUrlParse from 'git-url-parse';
 import _ from 'lodash';
-import log from 'loglevel';
 import os from 'os';
 import path, {join} from 'path';
 import semver from 'semver';

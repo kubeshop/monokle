@@ -95,16 +95,12 @@ const PaneManager: React.FC = () => {
       return [leftPaneWidth, 350, 1 - leftPaneWidth - 350];
     }
 
-    if (leftMenuActive && currentActivity?.name === 'explorer') {
+    if (currentActivity?.name === 'explorer') {
       return [leftPaneWidth, navPaneWidth, editPaneWidth];
     }
 
-    if (currentActivity?.name !== 'explorer') {
-      return [leftPaneWidth, 0, width - leftPaneWidth];
-    }
-
-    return [navPaneWidth, 0, editPaneWidth];
-  }, [currentActivity?.name, layout.editPane, layout.leftPane, layout.navPane, leftMenuActive, width]);
+    return [leftPaneWidth, 0, width - leftPaneWidth];
+  }, [currentActivity?.name, layout.editPane, layout.leftPane, layout.navPane, width]);
 
   const rowsSizes = useMemo(() => {
     return [height - layout.bottomPaneHeight, layout.bottomPaneHeight];
@@ -153,9 +149,12 @@ const PaneManager: React.FC = () => {
               ) : (
                 <ResizableColumnsPanel
                   isLeftActive={leftMenuActive}
-                  key={currentActivity?.name}
                   paneCloseIconStyle={{top: '20px', right: '-8px'}}
-                  left={leftMenuActive ? currentActivity?.component : undefined}
+                  left={
+                    currentActivity?.name !== 'explorer' || (leftMenuActive && currentActivity.name === 'explorer')
+                      ? currentActivity?.component
+                      : undefined
+                  }
                   center={currentActivity?.name === 'explorer' ? <NavigatorPane /> : undefined}
                   right={
                     currentActivity?.name === 'git' ? (

@@ -1,5 +1,6 @@
+import log from 'electron-log';
+
 import {readFileSync} from 'fs';
-import log from 'loglevel';
 import path from 'path';
 import tar from 'tar';
 

@@ -26,8 +26,8 @@ interface ElectronStoreChangePropagate<P, T> {
 const projectNameChange: ElectronStoreChangePropagate<Project[], ProjectNameChange> = {
   keyName: 'appConfig.projects',
   action: (newProjects, oldProjects) => {
-    // means that a new project has been created and we should not update that
-    if (newProjects.length > oldProjects.length) {
+    // means that a new project has been created/removed and we should not update that
+    if (newProjects.length !== oldProjects.length) {
       return {shouldTriggerAcrossWindows: false};
     }
 

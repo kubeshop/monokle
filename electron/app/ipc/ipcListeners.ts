@@ -1,10 +1,10 @@
 import * as k8s from '@kubernetes/client-node';
 
 import {BrowserWindow, app, ipcMain} from 'electron';
+import log from 'electron-log';
 
 import asyncLib from 'async';
 import {spawn} from 'child_process';
-import log from 'loglevel';
 import {machineIdSync} from 'node-machine-id';
 import * as path from 'path';
 import stream from 'stream';
@@ -110,7 +110,7 @@ ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
       properties,
     });
   } else if (process.env.NODE_ENV === `development`) {
-    console.log(`telemetry event ${eventName}`, payload);
+    log.info(`telemetry event ${eventName}`, payload);
   }
 });
 

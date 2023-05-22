@@ -1,4 +1,5 @@
-import log from 'loglevel';
+import log from 'electron-log';
+
 import path from 'path';
 import semver from 'semver';
 
