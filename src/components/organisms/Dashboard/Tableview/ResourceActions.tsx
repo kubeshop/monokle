@@ -116,7 +116,13 @@ const Button = styled(SecondaryButton)<{$delete?: Boolean}>`
 
   ${({$delete}) => {
     if ($delete) {
-      return `color: ${Colors.red5}`;
+      return `
+        color: ${Colors.red5};
+
+        &:hover { 
+          color: ${Colors.red5};
+        }
+      `;
     }
   }}
 `;
