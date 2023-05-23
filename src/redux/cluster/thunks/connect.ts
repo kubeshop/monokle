@@ -5,6 +5,8 @@ import {loadClusterResources, reloadClusterResources} from '@redux/thunks/cluste
 import {ThunkApi} from '@shared/models/thunk';
 import {selectKubeContext} from '@shared/utils/cluster/selectors';
 
+import {abortAllRunningRefsProcessing} from '@redux/parsing/parser.thunks';
+import {abortAllRunningValidation} from '@redux/validation/validation.thunks';
 import {selectCurrentContextId} from '../selectors';
 import {setup} from '../service/kube-control';
 import {setupCluster} from './setup';
@@ -48,6 +50,9 @@ export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, Thu
     if (!context) {
       throw new Error('no_cluster_context_found');
     }
+
+    abortAllRunningValidation();
+    abortAllRunningRefsProcessing();
 
     if (payload.reload) {
       await dispatch(

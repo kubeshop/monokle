@@ -431,6 +431,9 @@ export const mainSlice = createSlice({
       if (existingHelmCharts.length) {
         setImmediate(() => existingHelmCharts.forEach(chart => HelmChartEventEmitter.emit('remove', chart.id)));
       }
+
+      state.resourceMetaMapByStorage.cluster = {};
+      state.resourceContentMapByStorage.cluster = {};
     });
 
     builder.addCase(setRootFolder.fulfilled, (state, action) => {
