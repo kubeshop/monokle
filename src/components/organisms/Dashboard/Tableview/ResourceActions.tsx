@@ -2,7 +2,7 @@ import {useMemo} from 'react';
 
 import {Modal} from 'antd';
 
-import {ExclamationCircleOutlined} from '@ant-design/icons';
+import {DeleteOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -40,18 +40,24 @@ const ResourceActions: React.FC<IProps> = props => {
   const handleApplyResource = () => {
     if (!resource || !resource.namespace || !clusterResourceMetaMap[resource.id]) return;
 
-    dispatch(
-      applyResourceToCluster({
-        resourceIdentifier: {
-          id: resource.id,
-          storage: 'cluster',
-        },
-        namespace: resource.namespace ? {name: resource.namespace, new: false} : undefined,
-        options: {
-          isInClusterMode: true,
-        },
-      })
-    );
+    Modal.confirm({
+      title: `Are you sure you want to update ${resource.name}?`,
+      onOk() {
+        dispatch(
+          applyResourceToCluster({
+            resourceIdentifier: {
+              id: resource.id,
+              storage: 'cluster',
+            },
+            namespace: resource.namespace ? {name: resource.namespace, new: false} : undefined,
+            options: {
+              isInClusterMode: true,
+            },
+          })
+        );
+      },
+      onCancel() {},
+    });
   };
 
   const handleRestartResource = () => {
@@ -98,7 +104,7 @@ const ResourceActions: React.FC<IProps> = props => {
       </Button>
 
       <Button onClick={() => deleteResourceHandler(dispatch, resource)} $delete>
-        Delete
+        <DeleteOutlined />
       </Button>
     </Container>
   );
@@ -121,6 +127,7 @@ const Button = styled(SecondaryButton)<{$delete?: Boolean}>`
   ${({$delete}) => {
     if ($delete) {
       return `
+        font-size: 14px;
         color: ${Colors.red5};
 
         &:hover { 
