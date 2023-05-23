@@ -1,15 +1,22 @@
-import {Dots} from '@atoms';
-import {K8sResource} from '@shared/models/k8sResource';
-import {Dropdown, MenuProps, Modal} from 'antd';
 import {useMemo} from 'react';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import styled from 'styled-components';
-import {Colors} from '@shared/styles/colors';
-import {openScaleModal} from '@redux/reducers/ui';
+
+import {Dropdown, MenuProps, Modal} from 'antd';
+
 import {ExclamationCircleOutlined} from '@ant-design/icons';
-import restartDeployment from '@redux/services/restartDeployment';
-import {connectCluster} from '@redux/cluster/thunks/connect';
+
+import styled from 'styled-components';
+
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {connectCluster} from '@redux/cluster/thunks/connect';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openScaleModal} from '@redux/reducers/ui';
+import restartDeployment from '@redux/services/restartDeployment';
+
+import {Dots} from '@atoms';
+
+import {K8sResource} from '@shared/models/k8sResource';
+import {Colors} from '@shared/styles/colors';
+
 import {deleteResourceHandler} from './utils';
 
 type IProps = {

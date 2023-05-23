@@ -1,20 +1,24 @@
-import {SecondaryButton} from '@atoms';
+import {useMemo} from 'react';
 
+import {Modal} from 'antd';
+
+import {ExclamationCircleOutlined} from '@ant-design/icons';
+
+import styled from 'styled-components';
+
+import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-
+import {openScaleModal} from '@redux/reducers/ui';
 import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
+import restartDeployment from '@redux/services/restartDeployment';
 import {applyResourceToCluster} from '@redux/thunks/applyResource';
+
+import {SecondaryButton} from '@atoms';
 
 import {K8sResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles';
-import styled from 'styled-components';
-import {useMemo} from 'react';
-import {openScaleModal} from '@redux/reducers/ui';
-import {ExclamationCircleOutlined} from '@ant-design/icons';
-import {Modal} from 'antd';
-import restartDeployment from '@redux/services/restartDeployment';
-import {connectCluster} from '@redux/cluster/thunks/connect';
-import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
+
 import {deleteResourceHandler} from './utils';
 
 type IProps = {

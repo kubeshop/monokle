@@ -1,6 +1,5 @@
 import {setActiveTab, setDashboardSelectedResourceId} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-
 import {useResource} from '@redux/selectors/resourceSelectors';
 
 import {Logs, ResourceRefsIconPopover} from '@components/molecules';
@@ -11,8 +10,8 @@ import CodeEditor from '@editor/CodeEditor';
 
 import * as S from './Drawer.styled';
 import {InfoTab} from './InfoTab';
-import {TerminalTab} from './TerminalTab';
 import ResourceActions from './ResourceActions';
+import {TerminalTab} from './TerminalTab';
 
 export const Drawer = () => {
   const dispatch = useAppDispatch();
