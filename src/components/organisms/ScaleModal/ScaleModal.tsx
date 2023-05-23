@@ -1,10 +1,14 @@
+import {useState} from 'react';
+
+import {Col, InputNumber, Modal, Row} from 'antd';
+
 import {currentKubeContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closeScaleModal} from '@redux/reducers/ui';
 import scaleDeployment from '@redux/services/scaleDeployment';
-import {Col, InputNumber, Modal, Row} from 'antd';
-import {useState} from 'react';
+
+import {trackEvent} from '@shared/utils/telemetry';
 
 const ScaleModal: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -19,6 +23,8 @@ const ScaleModal: React.FC = () => {
       dispatch(closeScaleModal());
       return;
     }
+
+    trackEvent('cluster/actions/scale', {replicasNumber: replicas});
 
     await scaleDeployment({
       name: resource.name,

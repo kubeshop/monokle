@@ -1,13 +1,16 @@
-import {ExclamationCircleOutlined} from '@ant-design/icons';
-import {setDashboardSelectedResourceId} from '@redux/dashboard';
+import {Modal} from 'antd';
 
+import {ExclamationCircleOutlined} from '@ant-design/icons';
+
+import {setDashboardSelectedResourceId} from '@redux/dashboard';
 import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
 import {removeResources} from '@redux/thunks/removeResources';
+
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sResource} from '@shared/models/k8sResource';
-import {Modal} from 'antd';
+import {trackEvent} from '@shared/utils/telemetry';
 
 export const deleteResourceHandler = (dispatch: AppDispatch, resource?: K8sResource<'cluster'>) => {
   if (!resource) {
@@ -19,6 +22,7 @@ export const deleteResourceHandler = (dispatch: AppDispatch, resource?: K8sResou
     icon: <ExclamationCircleOutlined />,
     onOk() {
       return new Promise(resolve => {
+        trackEvent('cluster/actions/delete');
         dispatch(removeResources([resource]));
         dispatch(editorHasReloadedSelectedPath(true));
         dispatch(setDashboardSelectedResourceId());

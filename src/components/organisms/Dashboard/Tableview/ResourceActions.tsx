@@ -18,6 +18,7 @@ import {SecondaryButton} from '@atoms';
 
 import {K8sResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {deleteResourceHandler} from './utils';
 
@@ -43,6 +44,7 @@ const ResourceActions: React.FC<IProps> = props => {
     Modal.confirm({
       title: `Are you sure you want to update ${resource.name}?`,
       onOk() {
+        trackEvent('cluster/actions/update_manifest');
         dispatch(
           applyResourceToCluster({
             resourceIdentifier: {
@@ -67,6 +69,7 @@ const ResourceActions: React.FC<IProps> = props => {
       onOk() {
         if (!resource?.name || !resource?.namespace) return;
 
+        trackEvent('cluster/actions/restart');
         restartDeployment({currentContext, kubeConfigPath, name: resource.name, namespace: resource.namespace});
         // TODO: we should have a way of updating a single resource instead of restarting the whole cluster
         dispatch(connectCluster({context: currentContext, namespace: resource.namespace, reload: true}));

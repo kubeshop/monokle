@@ -16,6 +16,7 @@ import {Dots} from '@atoms';
 
 import {K8sResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles/colors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {deleteResourceHandler} from './utils';
 
@@ -54,6 +55,7 @@ const ResourceActionsDropdown: React.FC<IProps> = props => {
             onOk() {
               if (!resource?.name || !resource?.namespace) return;
 
+              trackEvent('cluster/actions/restart');
               restartDeployment({currentContext, kubeConfigPath, name: resource.name, namespace: resource.namespace});
               // TODO: we should have a way of updating a single resource instead of restarting the whole cluster
               dispatch(connectCluster({context: currentContext, namespace: resource.namespace, reload: true}));
