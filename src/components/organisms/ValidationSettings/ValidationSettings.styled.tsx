@@ -20,7 +20,7 @@ export const CheckoutErrorsButton = styled(PrimaryButton)`
   align-self: center;
   height: 40px;
   width: auto;
-  margin-left: 2%;
+  margin-left: 4%;
 `;
 
 export const ValidationSettingsDescriptionAndButtonContainer = styled.div`
