@@ -5,10 +5,10 @@ import {selectResource} from '@redux/reducers/main';
 import {useResourceMeta} from '@redux/selectors/resourceSelectors';
 import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
+import {renderKustomizeName} from '@utils/kustomize';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {ResourceIdentifier} from '@shared/models/k8sResource';
-import {isLocalOrigin} from '@shared/models/origin';
 import {trackEvent} from '@shared/utils';
 import {isEqual} from '@shared/utils/isEqual';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
@@ -68,9 +68,7 @@ const KustomizeRenderer: React.FC<IProps> = props => {
       </S.PrefixContainer>
 
       <S.ItemName isDisabled={isDisabled} isSelected={isSelected} isHighlighted={isHighlighted}>
-        {isLocalOrigin(resourceMeta.origin) && resourceMeta.origin.filePath.lastIndexOf('/') > 1
-          ? resourceMeta.origin.filePath.substring(0, resourceMeta.origin.filePath.lastIndexOf('/'))
-          : resourceMeta.name}
+        {renderKustomizeName(resourceMeta, resourceMeta.name)}
       </S.ItemName>
 
       <S.SuffixContainer>

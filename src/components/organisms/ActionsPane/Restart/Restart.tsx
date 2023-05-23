@@ -16,6 +16,7 @@ import restartDeployment from '@redux/services/restartDeployment';
 import {PrimaryButton} from '@atoms';
 
 import {isInClusterModeSelector} from '@shared/utils/selectors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 const Restart: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -34,6 +35,7 @@ const Restart: React.FC = () => {
       icon: <ExclamationCircleOutlined />,
       onOk() {
         if (name && namespace) {
+          trackEvent('cluster/actions/restart');
           restartDeployment({currentContext, kubeConfigPath, name, namespace});
           // TODO: we should have a way of updating a single resource instead of restarting the whole cluster
           dispatch(connectCluster({context: currentContext, namespace, reload: true}));
