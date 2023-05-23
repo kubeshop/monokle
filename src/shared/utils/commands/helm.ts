@@ -68,11 +68,11 @@ export function indexHelmRepoCommand({dir}: {dir: string}, env?: HelmEnv): Comma
   };
 }
 
-export function searchHelmRepoCommand({q}: {q: string}, env?: HelmEnv): CommandOptions {
+export function searchHelmRepoCommand({q}: {q: string}, versions?: boolean, env?: HelmEnv): CommandOptions {
   return {
     commandId: uuid(),
     cmd: 'helm',
-    args: ['search', 'repo', q, '-o json'],
+    args: ['search', 'repo', q, versions ? '--versions' : '', '-o json'],
     env,
   };
 }
@@ -113,11 +113,14 @@ export function helmChartValuesCommand({name}: {name: string}, env?: HelmEnv): C
   };
 }
 
-export function helmPullChartCommand({name, path}: {name: string; path: string}, env?: HelmEnv): CommandOptions {
+export function helmPullChartCommand(
+  {name, path, version}: {name: string; path: string; version?: string},
+  env?: HelmEnv
+): CommandOptions {
   return {
     commandId: uuid(),
     cmd: 'helm',
-    args: ['pull', name, '--untar', '--untardir', path],
+    args: ['pull', name, '--untar', '--untardir', path, version ? `--version ${version}` : ''],
     env,
   };
 }

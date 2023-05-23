@@ -3,6 +3,7 @@ import {Input as AntInput, Menu as AntMenu, Table as AntTable, Typography} from 
 import styled from 'styled-components';
 
 import {Colors} from '@shared/styles';
+import {Icon} from '@monokle/components';
 
 export const Container = styled.div`
   position: relative;
@@ -40,6 +41,7 @@ export const Menu = styled(AntMenu)`
     font-weight: 600;
     font-size: 16px;
     line-height: 24px;
+    padding-bottom: 8px;
   }
 
   &.ant-menu-horizontal > .ant-menu-item:hover {
@@ -67,7 +69,7 @@ export const Title = styled(Typography.Text)`
   margin-bottom: 38px;
 `;
 
-export const Link = styled(Typography.Link)`
+export const Link = styled(Typography.Text)`
   &.ant-typography {
     color: ${Colors.geekblue8} !important;
     font-weight: 400;
@@ -86,7 +88,6 @@ export const Table = styled(props => <AntTable {...props} />)`
   .ant-table-header {
     background-color: #1f2628;
     color: ${Colors.grey9};
-    text-transform: uppercase;
     font-size: 14px !important;
     font-weight: 700 !important;
     border-bottom: 1px solid ${Colors.grey4};
@@ -113,7 +114,7 @@ export const Table = styled(props => <AntTable {...props} />)`
   }
 
   .ant-table-body .ant-table-row:hover {
-    background-color: ${Colors.grey2};
+    background-color: #2a3437;
   }
 
   .ant-table-body .ant-table-row:hover .hover-area {
@@ -121,7 +122,8 @@ export const Table = styled(props => <AntTable {...props} />)`
   }
 
   .row-selected {
-    background-color: #2a3437 !important;
+    background-color: ${Colors.cyan8} !important;
+    color: ${Colors.grey2} !important;
   }
 `;
 
@@ -138,4 +140,34 @@ export const Input = styled(AntInput)`
   margin-top: 8px;
   margin-bottom: 24px;
   width: unset;
+  min-width: fit-content;
+`;
+
+export const HighlightedIcon = styled(Icon)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-bottom: 8px;
+  background: ${Colors.geekblue7};
+  svg {
+    width: 24px;
+    height: 24px;
+    color: ${Colors.cyan9};
+  }
+`;
+
+export const DescriptionContainer = styled.div`
+  ul > li {
+    font-size: 14px;
+    line-height: 24px;
+  }
+`;
+
+export const DescriptionTitle = styled(Typography.Text)`
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 700;
 `;

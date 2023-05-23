@@ -1,14 +1,28 @@
-import {useAsync} from 'react-use';
+import {useCallback, useEffect, useMemo} from 'react';
 
-import {Typography} from 'antd';
+import {useAsyncFn} from 'react-use';
 
-import {SearchOutlined} from '@ant-design/icons';
+import {Button, Form, Input, Typography} from 'antd';
+import {DeleteOutlined} from '@ant-design/icons';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
+import {useMainPaneDimensions} from '@utils/hooks';
 
-import {listHelmRepoCommand, runCommandInMainThread} from '@shared/utils/commands';
+import {errorAlert, successAlert} from '@utils/alert';
+
+import {
+  addHelmRepoCommand,
+  listHelmRepoCommand,
+  removeHelmRepoCommand,
+  runCommandInMainThread,
+  updateHelmRepoCommand,
+} from '@shared/utils/commands';
 
 import * as S from './styled';
 
-const columns = [
+type onRepoCellClick = (repoName: string) => void;
+
+const createColumns = (onUpdateHelmRepoClick: onRepoCellClick, onDeleteHelmRepoClick: onRepoCellClick) => [
   {
     title: 'Name',
     dataIndex: 'name',
@@ -23,10 +37,38 @@ const columns = [
     key: 'url',
     responsive: ['sm'],
   },
+  {
+    title: '',
+    dataIndex: '',
+    key: 'x',
+    responsive: ['sm'],
+
+    render: (_text: string, record: any) => {
+      return (
+        <S.HoverArea>
+          <Button
+            id="updateHelm"
+            type="primary"
+            style={{marginRight: 24}}
+            onClick={() => onUpdateHelmRepoClick(record.name)}
+          >
+            Update
+          </Button>
+          <DeleteOutlined id="deleteHelm" style={{color: 'red'}} onClick={() => onDeleteHelmRepoClick(record.name)} />
+        </S.HoverArea>
+      );
+    },
+  },
 ];
 
 const HelmReposTable = () => {
-  const {value: data = [], loading} = useAsync(async () => {
+  const dispatch = useAppDispatch();
+  const [form] = Form.useForm();
+  const {height} = useMainPaneDimensions();
+  const terminalHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
+
+  const [{value: data = [], loading}, refetchRepos] = useAsyncFn(async () => {
     const result = await runCommandInMainThread(listHelmRepoCommand());
     if (result.stderr) {
       throw new Error(result.stderr);
@@ -36,12 +78,81 @@ const HelmReposTable = () => {
 
   const reposCount = data.length;
 
+  useEffect(() => {
+    refetchRepos();
+  }, [refetchRepos]);
+
+  const onAddRepoHandler = async (values: {name: string; url: string}) => {
+    const result = await runCommandInMainThread(addHelmRepoCommand(values));
+    if (result.stdout) {
+      dispatch(setAlert(successAlert(`${values.name} added successfully`)));
+
+      form.resetFields();
+      refetchRepos();
+    }
+    if (result.stderr) {
+      dispatch(setAlert(errorAlert(result.stderr)));
+    }
+  };
+
+  const onUpdateRepoHandler = useCallback(
+    async (repoName: string) => {
+      try {
+        await runCommandInMainThread(updateHelmRepoCommand({repos: [repoName]}));
+        refetchRepos();
+        dispatch(setAlert(successAlert('Repository updated successfully')));
+      } catch (e: any) {
+        dispatch(setAlert(errorAlert(e.message)));
+      }
+    },
+    [dispatch, refetchRepos]
+  );
+
+  const onDeleteRepoHandler = useCallback(
+    async (repoName: string) => {
+      try {
+        await runCommandInMainThread(removeHelmRepoCommand({repos: [repoName]}));
+        dispatch(setAlert(successAlert('Repository deleted successfully')));
+        refetchRepos();
+      } catch (e: any) {
+        dispatch(setAlert(errorAlert(e.message)));
+      }
+    },
+    [dispatch, refetchRepos]
+  );
+
+  const columns = useMemo(
+    () => createColumns(onUpdateRepoHandler, onDeleteRepoHandler),
+    [onUpdateRepoHandler, onDeleteRepoHandler]
+  );
+
   return (
     <>
       <Typography.Text>Add a new Helm Chart repository</Typography.Text>
-      <S.Input placeholder="Enter a valid repository URL and click to proceed" prefix={<SearchOutlined />} />
+      <Form layout="inline" form={form} onFinish={onAddRepoHandler}>
+        <Form.Item name="name" rules={[{required: true, type: 'string'}]}>
+          <Input placeholder="Enter a name to identify it" />
+        </Form.Item>
+        <Form.Item name="url" rules={[{required: true, type: 'url'}]}>
+          <Input placeholder="Enter a valid repository URL and click to proceed" />
+        </Form.Item>
+
+        <Button type="primary" htmlType="submit">
+          Add
+        </Button>
+      </Form>
+
       <Typography.Text>{reposCount} Helm Chart repositories added. You can update or delete them.</Typography.Text>
-      <S.Table rowKey="name" columns={columns} dataSource={data} pagination={false} loading={loading} />
+      <S.Table
+        sticky
+        rowKey="name"
+        columns={columns}
+        dataSource={data}
+        pagination={false}
+        loading={loading}
+        sortDirections={['ascend', 'descend']}
+        scroll={{y: height - 360 - (bottomSelection === 'terminal' ? terminalHeight : 0)}}
+      />
     </>
   );
 };

@@ -11,10 +11,12 @@ const PullHelmChartModal = ({
   open,
   dismissModal,
   chartName,
+  chartVersion,
 }: {
   open: boolean;
   dismissModal: () => void;
   chartName: string;
+  chartVersion: string;
 }) => {
   const [form] = Form.useForm<{name: string; path: string}>();
   const dispatch = useAppDispatch();
@@ -31,7 +33,7 @@ const PullHelmChartModal = ({
   const onOkClickHandler = async () => {
     form.submit();
     const {name, path} = await form.validateFields();
-    dispatch(pullHelmChart({name, path}));
+    dispatch(pullHelmChart({name, path, version: chartVersion}));
     dismissModal();
   };
 

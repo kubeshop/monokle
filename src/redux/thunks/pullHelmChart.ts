@@ -9,10 +9,10 @@ import {helmPullChartCommand, runCommandInMainThread} from '@shared/utils/comman
 
 export const pullHelmChart = createAsyncThunk<
   void,
-  {name: string; path: string},
+  {name: string; path: string; version?: string},
   {dispatch: AppDispatch; state: RootState}
->('main/pullHelmChart', async ({name, path}, {dispatch}) => {
-  const result = await runCommandInMainThread(helmPullChartCommand({name, path}));
+>('main/pullHelmChart', async ({name, path, version}, {dispatch}) => {
+  const result = await runCommandInMainThread(helmPullChartCommand({name, path, version}));
   if (result.stderr) {
     dispatch(setAlert({type: AlertEnum.Error, title: 'Pull Helm Chart', message: "Couldn't pull chart"}));
     throw new Error(result.stderr);
