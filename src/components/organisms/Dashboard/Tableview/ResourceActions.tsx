@@ -2,16 +2,16 @@ import {useMemo} from 'react';
 
 import {Modal} from 'antd';
 
-import {DeleteOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
+import {DeleteOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
-import {connectCluster} from '@redux/cluster/thunks/connect';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openScaleModal} from '@redux/reducers/ui';
 import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
-import restartDeployment from '@redux/services/restartDeployment';
+
 import {applyResourceToCluster} from '@redux/thunks/applyResource';
 
 import {SecondaryButton} from '@atoms';
@@ -20,7 +20,7 @@ import {K8sResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils/telemetry';
 
-import {deleteResourceHandler} from './utils';
+import {deleteResourceHandler, restartResourceHandler} from './utils';
 
 type IProps = {
   resource?: K8sResource<'cluster'>;
@@ -44,7 +44,7 @@ const ResourceActions: React.FC<IProps> = props => {
     Modal.confirm({
       title: `Are you sure you want to update ${resource.name}?`,
       onOk() {
-        trackEvent('cluster/actions/update_manifest');
+        trackEvent('cluster/actions/update_manifest', {kind: resource.kind});
         dispatch(
           applyResourceToCluster({
             resourceIdentifier: {
@@ -57,22 +57,6 @@ const ResourceActions: React.FC<IProps> = props => {
             },
           })
         );
-      },
-      onCancel() {},
-    });
-  };
-
-  const handleRestartResource = () => {
-    Modal.confirm({
-      title: 'Do you want to restart the deployment?',
-      icon: <ExclamationCircleOutlined />,
-      onOk() {
-        if (!resource?.name || !resource?.namespace) return;
-
-        trackEvent('cluster/actions/restart');
-        restartDeployment({currentContext, kubeConfigPath, name: resource.name, namespace: resource.namespace});
-        // TODO: we should have a way of updating a single resource instead of restarting the whole cluster
-        dispatch(connectCluster({context: currentContext, namespace: resource.namespace, reload: true}));
       },
       onCancel() {},
     });
@@ -98,10 +82,7 @@ const ResourceActions: React.FC<IProps> = props => {
 
       <Button
         disabled={!isResourceDeployment}
-        onClick={() => {
-          if (!resource) return;
-          handleRestartResource();
-        }}
+        onClick={() => restartResourceHandler(dispatch, currentContext, kubeConfigPath, resource)}
       >
         Restart
       </Button>

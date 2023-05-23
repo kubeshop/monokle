@@ -145,7 +145,7 @@ const ResourceKindContextMenu = (props: Props) => {
       }
 
       if (isInClusterMode) {
-        trackEvent('cluster/actions/update_manifest');
+        trackEvent('cluster/actions/update_manifest', {kind: resource.kind});
       }
 
       dispatch(

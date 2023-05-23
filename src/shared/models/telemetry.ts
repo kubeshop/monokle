@@ -106,10 +106,10 @@ export type EventMap = {
   'cluster/deploy_file': undefined;
   'cluster/deploy_helm_chart': undefined;
   'cluster/deploy_kustomization': undefined;
-  'cluster/actions/update_manifest': undefined;
+  'cluster/actions/update_manifest': {kind: string};
   'cluster/actions/scale': {replicasNumber: number};
   'cluster/actions/restart': undefined;
-  'cluster/actions/delete': undefined;
+  'cluster/actions/delete': {kind: string};
   'compare/opened': {from?: string};
   'compare/compared': {left?: string; right?: string; operation: string};
   'compare/inspected': {type?: string};
