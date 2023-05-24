@@ -20,8 +20,6 @@ import {getResourceKindSchema} from '@redux/services/schema';
 import {createTransientResource} from '@redux/services/transientResource';
 import {saveTransientResources} from '@redux/thunks/saveTransientResources';
 
-import MonokleHackathon from '@components/molecules/MonokleHackathon/MonokleHackathon';
-
 import {useFileSelectOptions} from '@hooks/useFileSelectOptions';
 import {useFileFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
 import {useNamespaces} from '@hooks/useNamespaces';
@@ -516,8 +514,6 @@ const NewResourceWizard = () => {
         disabled: isSubmitDisabled,
       }}
     >
-      <MonokleHackathon />
-
       <Form
         form={form}
         layout="vertical"

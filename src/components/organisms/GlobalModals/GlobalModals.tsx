@@ -43,7 +43,7 @@ const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveR
 const ScaleModal = React.lazy(() => import('@organisms/ScaleModal'));
 const TemplateExplorer = React.lazy(() => import('@organisms/TemplateExplorer'));
 const WelcomeModal = React.lazy(() => import('@organisms/WelcomeModal'));
-const NewAiResourceWizard = React.lazy(() => import('@molecules/MonokleHackathon/MonokleHackathon'));
+const AIGenerationModal = React.lazy(() => import('@molecules/AIGenerationModal'));
 
 const GlobalModals = () => {
   const dispatch = useAppDispatch();
@@ -191,7 +191,7 @@ const GlobalModals = () => {
         {isRenameResourceModalVisible && <RenameResourceModal />}
         {isReplaceImageModalVisible && <ReplaceImageModal />}
         {isSaveEditCommandModalVisible && <SaveEditCommandModal />}
-        {isNewAiResourceWizardVisible && <NewAiResourceWizard />}
+        {isNewAiResourceWizardVisible && <AIGenerationModal />}
         {isScaleModalVisible && <ScaleModal />}
         {isSaveResourcesToFileFolderModalVisible && <SaveResourcesToFileFolderModal />}
         {showReleaseNotes && (

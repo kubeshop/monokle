@@ -20,11 +20,11 @@ import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {AlertEnum} from '@shared/models/alert';
 
-import * as S from './MonokleHackathon.styled';
+import * as S from './AIGenerationModal.styled';
 import {generateYamlUsingAI} from './ai';
 import {EDITOR_OPTIONS} from './constants';
 
-const MonokleHackathon: React.FC = () => {
+const AIGenerationModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const newAiResourceWizardState = useAppSelector(state => state.ui.newAiResourceWizard);
 
@@ -174,4 +174,4 @@ const MonokleHackathon: React.FC = () => {
   );
 };
 
-export default MonokleHackathon;
+export default AIGenerationModal;
