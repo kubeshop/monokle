@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import {Skeleton} from 'antd';
 
 import {useGetHelmChartChangelog} from '@hooks/useGetHelmChartChangelog';
+
 import {openUrlInExternalBrowser} from '@shared/utils';
 
 interface IProps {

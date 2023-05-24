@@ -2,8 +2,8 @@ import {Input as AntInput, Menu as AntMenu, Table as AntTable, Typography} from 
 
 import styled from 'styled-components';
 
-import {Colors} from '@shared/styles';
 import {Icon} from '@monokle/components';
+import {Colors} from '@shared/styles';
 
 export const Container = styled.div`
   position: relative;

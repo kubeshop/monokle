@@ -1,7 +1,9 @@
+import {Tabs as AntTabs, Typography} from 'antd';
+
+import styled from 'styled-components';
+
 import {IconButton} from '@monokle/components';
 import {Colors} from '@shared/styles';
-import {Typography, Tabs as AntTabs} from 'antd';
-import styled from 'styled-components';
 
 export const Container = styled.div`
   position: absolute;

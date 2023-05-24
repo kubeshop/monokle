@@ -17,7 +17,7 @@ import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import CompareSyncPane from '../CompareSyncPane';
 import ExplorerPane from '../ExplorerPane';
-import HelmRepoPane from '../HelmRepoView';
+import HelmRepoPane from '../HelmRepoPane';
 import SettingsPane from '../SettingsPane';
 import ValidationPane from '../ValidationPane';
 

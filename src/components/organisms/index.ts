@@ -41,4 +41,4 @@ export {default as ValidationPane} from './ValidationPane';
 export {default as ValidationSettings} from './ValidationSettings';
 export {default as GlobalModals} from './GlobalModals';
 export {default as WelcomeModal} from './WelcomeModal';
-export {default as HelmRepoView} from './HelmRepoView';
+export {default as HelmRepoPane} from './HelmRepoPane';
