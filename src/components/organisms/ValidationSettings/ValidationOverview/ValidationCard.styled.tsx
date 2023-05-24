@@ -3,7 +3,7 @@ import {Button as RawButton, Switch as RawSwitch} from 'antd';
 import styled from 'styled-components';
 
 import {PrimaryButton} from '@atoms';
-
+import {Device} from '@shared/styles/device';
 import {Icon as BaseIcon} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
 
@@ -61,4 +61,10 @@ export const ValidationCardContainer = styled.div`
   grid-template-columns: max-content 1fr max-content;
   grid-column-gap: 25px;
   height: 145px;
+  width: 100%;
+
+  @media ${Device.laptopS} {
+    width: 50%;
+    margin-left: 25%;
+  }
 `;
