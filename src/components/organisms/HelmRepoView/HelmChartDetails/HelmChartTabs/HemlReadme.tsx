@@ -1,21 +1,35 @@
 import ReactMarkdown from 'react-markdown';
-import {useAsync} from 'react-use';
 
 import {Skeleton} from 'antd';
 
-import {helmChartReadmeCommand, runCommandInMainThread} from '@shared/utils/commands';
+import {useGetHelmChartChangelog} from '@hooks/useGetHelmChartChangelog';
+import {openUrlInExternalBrowser} from '@shared/utils';
 
 interface IProps {
   chartName: string;
 }
 
 const HelmReadme = ({chartName}: IProps) => {
-  const {value = '', loading} = useAsync(async () => {
-    const result = await runCommandInMainThread(helmChartReadmeCommand({name: chartName}));
-    return result.stdout;
-  }, [chartName]);
-
-  return loading ? <Skeleton active={loading} /> : <ReactMarkdown>{value}</ReactMarkdown>;
+  const {value = '', loading} = useGetHelmChartChangelog(chartName);
+  return loading ? (
+    <Skeleton active={loading} />
+  ) : (
+    <div style={{height: 'calc(100vh - 200px)', overflow: 'auto'}}>
+      <ReactMarkdown
+        components={{
+          a({href, children, ...restProps}) {
+            return (
+              <a onClick={() => openUrlInExternalBrowser(href)} {...restProps}>
+                {children}
+              </a>
+            );
+          },
+        }}
+      >
+        {value}
+      </ReactMarkdown>
+    </div>
+  );
 };
 
 export default HelmReadme;

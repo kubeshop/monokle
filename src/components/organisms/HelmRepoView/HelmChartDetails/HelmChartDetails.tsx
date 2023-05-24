@@ -28,8 +28,8 @@ const createTabItems = (chartName: string): Tab[] => [
     children: <HelmValues chartName={chartName} />,
   },
   {
-    key: 'readme',
-    label: 'Readme',
+    key: 'changelog',
+    label: 'Changelog',
     children: <HelmReadme chartName={chartName} />,
   },
 ];

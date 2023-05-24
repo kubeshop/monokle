@@ -1,18 +1,18 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useState} from 'react';
 import ReactMarkdown from 'react-markdown';
-import {useAsync} from 'react-use';
-import {first} from 'lodash';
 
-import {Dropdown, Skeleton} from 'antd';
+import {Dropdown, Skeleton, Typography} from 'antd';
 import {CloudDownloadOutlined, DownOutlined} from '@ant-design/icons';
 import {useAppDispatch} from '@redux/hooks';
 
 import styled from 'styled-components';
 import {Icon} from '@monokle/components';
-import {installHelmRepoChart} from '@redux/thunks/InstallHelmRepoChart';
 
+import {installHelmRepoChart} from '@redux/thunks/InstallHelmRepoChart';
+import {useGetHelmChartInfo} from '@hooks/useGetHelmChartInfo';
+import helmPlaceholder from '@assets/helm-default-ico.svg';
 import {Colors} from '@shared/styles';
-import {helmChartInfoCommand, runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
+import {openUrlInExternalBrowser} from '@shared/utils';
 
 import {HelmChartModalConfirmWithNamespaceSelect} from '@components/molecules';
 import PullHelmChartModal from '../PullHelmChartModal';
@@ -26,22 +26,8 @@ const HelmInfo = ({chartName}: IProps) => {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [installModalOpen, setInstallModalOpen] = useState(false);
   const [chartVersion, setChartVersion] = useState('');
-  const {value = '', loading} = useAsync(async () => {
-    const result = await runCommandInMainThread(helmChartInfoCommand({name: chartName}));
-    return result.stdout;
-  }, [chartName]);
 
-  const {value: data = [], loading: loadingVersions} = useAsync(async () => {
-    const result = await runCommandInMainThread(searchHelmRepoCommand({q: chartName}, true));
-    if (result.stderr) {
-      throw new Error(result.stderr);
-    }
-    return JSON.parse(result.stdout || '[]');
-  }, [chartName]);
-
-  useEffect(() => {
-    setChartVersion(data[0]?.version);
-  }, [data]);
+  const {value: helmChartInfo, loading: loadingHelmInfo} = useGetHelmChartInfo(chartName);
 
   const onClickApplyHelmChart = useCallback(
     async (namespace?: string) => {
@@ -54,16 +40,12 @@ const HelmInfo = ({chartName}: IProps) => {
     [chartName, chartVersion, dispatch]
   );
 
-  const items = data.map((i: any) => ({
+  const items = helmChartInfo?.available_versions.map((i: any) => ({
     label: i.version,
     key: i.version,
-    onClick: () => {
-      setChartVersion(i.version);
-      setInstallModalOpen(true);
-    },
   }));
 
-  const latestVersion = first<{version: string}>(data)?.version || '';
+  const latestVersion = helmChartInfo?.version || '';
 
   const onDownloadLatestHelmChartHandler = () => {
     setChartVersion(latestVersion);
@@ -75,18 +57,63 @@ const HelmInfo = ({chartName}: IProps) => {
     setInstallModalOpen(true);
   };
 
-  return loading || loadingVersions ? (
-    <Skeleton active={loading} />
+  return loadingHelmInfo ? (
+    <Skeleton active={loadingHelmInfo} />
   ) : (
     <Container>
-      <div>
-        <ReactMarkdown>{value}</ReactMarkdown>
-      </div>
+      <Content>
+        <div>
+          <Header>
+            <Logo
+              width="100"
+              height="100"
+              loading="lazy"
+              decoding="async"
+              src={getHelmRepoLogo(helmChartInfo?.logo_image_id)}
+            />
+            <ChartInfo>
+              <Label>
+                Author<Typography.Text> {helmChartInfo?.repository?.name}</Typography.Text>
+              </Label>
+              <Label>
+                Repository<Typography.Link> {helmChartInfo?.repository?.url}</Typography.Link>
+              </Label>
+              <Label>
+                apiVersion<Typography.Text> {helmChartInfo?.data?.apiVersion}</Typography.Text>
+              </Label>
+              <Label>
+                appVersion
+                <Typography.Text> {helmChartInfo?.app_version}</Typography.Text>
+              </Label>
+            </ChartInfo>
+          </Header>
+        </div>
+
+        <ReactMarkdown
+          components={{
+            a({href, children, ...restProps}) {
+              return (
+                <a onClick={() => openUrlInExternalBrowser(href)} {...restProps}>
+                  {children}
+                </a>
+              );
+            },
+          }}
+        >
+          {helmChartInfo?.readme || ''}
+        </ReactMarkdown>
+      </Content>
 
       <Footer>
-        <MenuDropdownList id="versions" style={{height: 300}} />
+        <MenuDropdownList id="versions" style={{height: 300, position: 'absolute'}} />
         <Dropdown.Button
-          menu={{items}}
+          menu={{
+            items,
+            onClick: ({key}) => {
+              setChartVersion(key);
+              setConfirmModalOpen(true);
+            },
+          }}
           size="large"
           type="primary"
           icon={<DownOutlined />}
@@ -97,7 +124,13 @@ const HelmInfo = ({chartName}: IProps) => {
           Download locally ({latestVersion})
         </Dropdown.Button>
         <Dropdown.Button
-          menu={{items}}
+          menu={{
+            items,
+            onClick: ({key}) => {
+              setChartVersion(key);
+              setInstallModalOpen(true);
+            },
+          }}
           size="large"
           type="primary"
           icon={<DownOutlined />}
@@ -128,10 +161,45 @@ const HelmInfo = ({chartName}: IProps) => {
 
 export default HelmInfo;
 
+const getHelmRepoLogo = (logoImageId?: string) => {
+  if (logoImageId) {
+    return `https://artifacthub.io/image/${logoImageId}`;
+  }
+  return helmPlaceholder;
+};
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
+`;
+
+const Header = styled.div`
+  display: flex;
+  gap: 20px;
+`;
+
+const Logo = styled.img`
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  object-position: center;
+`;
+
+const Label = styled(Typography.Text)`
+  color: ${Colors.grey8};
+`;
+
+const ChartInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const Content = styled.div`
+  overflow: auto;
+  min-height: 0;
+  max-height: calc(100vh - 292px);
 `;
 
 const Footer = styled.div`
@@ -140,7 +208,7 @@ const Footer = styled.div`
   left: 0;
   right: 0;
   height: 75px;
-  padding: 16px 0;
+
   display: flex;
   gap: 16px;
   border-top: 1px solid ${Colors.grey4};
