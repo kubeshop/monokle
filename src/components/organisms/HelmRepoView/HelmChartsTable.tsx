@@ -1,8 +1,7 @@
-import {useCallback, useMemo, useRef, useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
 import {useAsync} from 'react-use';
 
 import {Typography} from 'antd';
-import {ColumnsType} from 'antd/lib/table';
 
 import {RightOutlined, SearchOutlined} from '@ant-design/icons';
 
@@ -25,7 +24,7 @@ interface TableDataType {
   app_version: string;
 }
 
-const createColumns = (onItemClick: (chartName: string) => void): ColumnsType<TableDataType> => [
+const columns = [
   {
     title: 'Name',
     dataIndex: 'name',
@@ -59,10 +58,11 @@ const createColumns = (onItemClick: (chartName: string) => void): ColumnsType<Ta
     dataIndex: '',
     key: 'x',
     responsive: ['sm'],
+    width: 40,
 
-    render: (_text: string, record: TableDataType) => (
+    render: () => (
       <S.HoverArea>
-        <RightOutlined style={{fontSize: 14}} onClick={() => onItemClick(record.name)} />
+        <RightOutlined style={{fontSize: 14}} />
       </S.HoverArea>
     ),
   },
@@ -79,10 +79,6 @@ const HelmChartsTable = () => {
   const onItemClick = useCallback((chart: string) => {
     setSelectedChart(chart);
   }, []);
-
-  const columns = useMemo(() => {
-    return createColumns(onItemClick);
-  }, [onItemClick]);
 
   const {value: data = [], loading} = useAsync(async () => {
     const result = await runCommandInMainThread(searchHelmRepoCommand({q: helmRepoSearch}));
@@ -105,7 +101,7 @@ const HelmChartsTable = () => {
         prefix={<SearchOutlined />}
         onChange={onChangeSearchInputHandler}
       />
-      <Typography.Text style={{height: 'fit-content', marginBottom: 24}}>
+      <Typography.Text style={{height: 'fit-content', marginBottom: 12}}>
         {searchResultCount} Helm Charts found. You can
         <Typography.Link> add more Helm Charts repositories</Typography.Link> to extend your search.
       </Typography.Text>
@@ -121,6 +117,9 @@ const HelmChartsTable = () => {
           pagination={false}
           scroll={{y: height - 360 - (bottomSelection === 'terminal' ? terminalHeight : 0)}}
           rowClassName={(record: TableDataType) => (record.name === selectedChart ? 'row-selected' : '')}
+          onRow={(record: TableDataType) => ({
+            onClick: () => onItemClick(record.name),
+          })}
         />
       </div>
       {selectedChart && <HelmChartDetails chart={selectedChart} onDismissPane={setSelectedChart} />}

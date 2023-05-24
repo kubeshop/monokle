@@ -124,3 +124,15 @@ export function helmPullChartCommand(
     env,
   };
 }
+
+export function installHelmRepoChartCommand(
+  {name, chart, namespace, version}: {name: string; chart: string; namespace?: string; version?: string},
+  env?: HelmEnv
+) {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['install', name, chart, namespace ? `--namespace ${namespace}` : '', version ? `--version ${version}` : ''],
+    env,
+  };
+}

@@ -137,8 +137,8 @@ export const HoverArea = styled.div.attrs({
 
 export const Input = styled(AntInput)`
   align-self: flex-start;
-  margin-top: 8px;
-  margin-bottom: 24px;
+  margin-top: 20px;
+  margin-bottom: 22px;
   width: unset;
   min-width: fit-content;
 `;

@@ -128,7 +128,7 @@ const HelmReposTable = () => {
 
   return (
     <>
-      <Typography.Text>Add a new Helm Chart repository</Typography.Text>
+      <Typography.Text style={{marginTop: 24, marginBottom: 16}}>Add a new Helm Chart repository</Typography.Text>
       <Form layout="inline" form={form} onFinish={onAddRepoHandler}>
         <Form.Item name="name" rules={[{required: true, type: 'string'}]}>
           <Input placeholder="Enter a name to identify it" />
@@ -142,7 +142,9 @@ const HelmReposTable = () => {
         </Button>
       </Form>
 
-      <Typography.Text>{reposCount} Helm Chart repositories added. You can update or delete them.</Typography.Text>
+      <Typography.Text style={{marginTop: 32, marginBottom: 24}}>
+        {reposCount} Helm Chart repositories added. You can update or delete them.
+      </Typography.Text>
       <S.Table
         sticky
         rowKey="name"
