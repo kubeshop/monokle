@@ -39,17 +39,13 @@ export const DrawerTitle = styled.div`
 
 export const TabsContainer = styled.div`
   height: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: calc(100% - 75px) 75px;
-  grid-template-areas:
-    'tab-content'
-    'footer';
 `;
 
 export const Tabs = styled(RawTabs)`
   overflow: hidden;
   grid-area: tab-content;
+  height: 100%;
+
   & .ant-tabs-nav {
     padding: 0 24px;
     margin: 0;
@@ -60,7 +56,7 @@ export const Tabs = styled(RawTabs)`
       color: ${Colors.grey9};
 
       .ant-tabs-tab {
-        padding: 16px 0 24px 0;
+        padding: 16px 0px;
       }
 
       .ant-tabs-tab-active {
@@ -71,6 +67,7 @@ export const Tabs = styled(RawTabs)`
 
   & .ant-tabs-content {
     height: 100%;
+    padding: 8px;
 
     & .ant-tabs-tabpane {
       height: 100%;

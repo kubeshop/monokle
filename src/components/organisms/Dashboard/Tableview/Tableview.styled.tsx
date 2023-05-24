@@ -65,6 +65,12 @@ export const Table = styled(RawTable)`
       border-top: 1px solid ${Colors.grey4};
       height: 54px;
 
+      .ant-table-cell:last-child {
+        padding: 0px;
+        height: 54px;
+        width: 100%;
+      }
+
       svg {
         path {
           color: ${Colors.grey9} !important;
