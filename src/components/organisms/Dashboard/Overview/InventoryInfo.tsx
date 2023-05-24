@@ -1,4 +1,7 @@
-import {useCallback} from 'react';
+import {useCallback, useEffect, useState} from 'react';
+
+import log from 'loglevel';
+import {v4 as uuidv4} from 'uuid';
 
 import {CLUSTER_DASHBOARD_HELP_URL} from '@constants/constants';
 
@@ -15,12 +18,15 @@ import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
 
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {openDocumentation, openUrlInExternalBrowser} from '@shared/utils';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 import * as S from './InventoryInfo.styled';
 
 export const InventoryInfo = () => {
   const dispatch = useAppDispatch();
   const clusterResourceContentMap = useResourceContentMap('cluster');
+
+  const [kubernetesVersion, setKubernetesVersion] = useState<string>('');
 
   const filterResources = useCallback(
     (kind: string, apiVersion?: string) => {
@@ -51,6 +57,28 @@ export const InventoryInfo = () => {
     );
     dispatch(setDashboardSelectedResourceId());
   };
+
+  useEffect(() => {
+    const getVersion = async () => {
+      try {
+        const result = await runCommandInMainThread({
+          commandId: uuidv4(),
+          cmd: 'kubectl version --client -o json',
+          args: [],
+        });
+
+        if (!result?.stdout) {
+          return;
+        }
+
+        setKubernetesVersion(JSON.parse(result.stdout).clientVersion.gitVersion);
+      } catch (err: any) {
+        log.error(err.message);
+      }
+    };
+
+    getVersion();
+  }, []);
 
   return (
     <S.Container>
@@ -100,7 +128,7 @@ export const InventoryInfo = () => {
       <S.ClusterInfoContainer>
         <S.ClusterInfoRow>
           <S.Title>Kubernetes Version</S.Title>
-          <S.Description>{getNodes()[0]?.object?.status?.nodeInfo?.kubeletVersion || '-'}</S.Description>
+          <S.Description>{kubernetesVersion || '-'}</S.Description>
         </S.ClusterInfoRow>
         <S.ClusterInfoRow>
           <S.Title>Container Runtime</S.Title>
