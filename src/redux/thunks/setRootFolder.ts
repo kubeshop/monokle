@@ -5,11 +5,14 @@ import log from 'loglevel';
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {getChangedFiles, getRepoInfo, isFolderGitRepo} from '@redux/git/git.ipc';
+import {abortAllRunningRefsProcessing} from '@redux/parsing/parser.thunks';
 import {SetRootFolderArgs, SetRootFolderPayload} from '@redux/reducers/main';
+import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
+import {abortAllRunningValidation} from '@redux/validation/validation.thunks';
 
 import {getFileStats} from '@utils/files';
 import {showGitErrorModal} from '@utils/terminal';
@@ -19,6 +22,7 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType, HelmChartMapType, HelmTemplatesMapType, HelmValuesMapType} from '@shared/models/appState';
 import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
+import {isInClusterModeSelector} from '@shared/utils';
 import {trackEvent} from '@shared/utils/telemetry';
 
 /**
@@ -65,6 +69,10 @@ export const setRootFolder = createAsyncThunk<
     return createRejectionWithAlert(thunkAPI, 'Invalid path', `Specified path ${rootFolder} is not a folder`);
   }
 
+  if (isInClusterModeSelector(thunkAPI.getState())) {
+    disconnectFromCluster();
+  }
+
   const rootEntry = createRootFileEntry(rootFolder, fileMap);
 
   // this Promise is needed for `setRootFolder.pending` action to be dispatched correctly
@@ -88,6 +96,8 @@ export const setRootFolder = createAsyncThunk<
   rootEntry.children = files;
 
   monitorRootFolder(rootFolder, thunkAPI);
+  abortAllRunningValidation();
+  abortAllRunningRefsProcessing();
 
   const filesNumber = Object.values(fileMap).filter(f => !f.children).length;
   const resourcesNumber = Object.values(resourceMetaMap).length;

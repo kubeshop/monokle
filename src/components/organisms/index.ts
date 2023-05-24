@@ -33,6 +33,7 @@ export {default as RenameResourceModal} from './RenameResourceModal';
 export {default as ReplaceImageModal} from './ReplaceImageModal';
 export {default as SaveEditCommandModal} from './SaveEditCommandModal';
 export {default as SettingsPane} from './SettingsPane';
+export {default as ScaleModal} from './ScaleModal';
 export {default as StartPage} from './StartPage';
 export {default as TemplateExplorer} from './TemplateExplorer';
 export {default as TerminalPane} from './TerminalPane';

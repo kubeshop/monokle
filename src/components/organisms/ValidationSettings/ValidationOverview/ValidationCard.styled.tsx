@@ -6,6 +6,7 @@ import {PrimaryButton} from '@atoms';
 
 import {Icon as BaseIcon} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
+import {Device} from '@shared/styles/device';
 
 export const Button = styled(RawButton)`
   align-self: center;
@@ -61,4 +62,10 @@ export const ValidationCardContainer = styled.div`
   grid-template-columns: max-content 1fr max-content;
   grid-column-gap: 25px;
   height: 145px;
+  width: 100%;
+
+  @media ${Device.laptopS} {
+    width: 50%;
+    margin-left: 25%;
+  }
 `;

@@ -67,6 +67,13 @@ function shouldResourceBeValidated(resourceMeta: ResourceMeta) {
   return true;
 }
 
+let abortController = new AbortController();
+
+export const abortAllRunningValidation = () => {
+  abortController.abort();
+  abortController = new AbortController();
+};
+
 export const validateResources = createAsyncThunk<ValidationResponse | undefined, ValidationArgs | undefined, ThunkApi>(
   'validation/validate',
   async (payload, {getState, dispatch, signal, rejectWithValue}) => {
@@ -75,6 +82,7 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
 
     if (payload?.type === 'full') {
       let resourceStorage = payload.resourceStorage || activeResourceStorageSelector(getState());
+
       resources = Object.values(
         getResourceMapFromState(getState(), resourceStorage, shouldResourceBeValidated) || {}
       ).filter(isDefined);
@@ -133,6 +141,10 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
       references.abort();
     });
 
+    abortController.signal.addEventListener('abort', () => {
+      references.abort();
+    });
+
     let resourcesWithRefs: ValidationResource[] = [];
     try {
       resourcesWithRefs = await references.unwrap();
@@ -140,6 +152,7 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
       return rejectWithValue(e);
     }
     signal.throwIfAborted();
+    abortController.signal.throwIfAborted();
 
     // TODO: could the active resource map change while the validation is running? before we get the refs?
     try {
@@ -147,6 +160,10 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
         resources: resourcesWithRefs,
         incremental: incrementalResourceIds ? {resourceIds: incrementalResourceIds} : undefined,
       });
+
+      signal.throwIfAborted();
+      abortController.signal.throwIfAborted();
+
       return response;
     } catch (e) {
       rejectWithValue(e);
