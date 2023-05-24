@@ -11,6 +11,7 @@ import {useAppSelector} from '@redux/hooks';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
+import {trackEvent} from '@shared/utils';
 import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
 
 import HelmChartDetails from './HelmChartDetails/HelmChartDetails';
@@ -76,9 +77,13 @@ const HelmChartsTable = () => {
 
   const ref = useRef<HTMLDivElement>(null);
   const [selectedChart, setSelectedChart] = useState<string | null>(null);
-  const onItemClick = useCallback((chart: string) => {
-    setSelectedChart(chart);
-  }, []);
+  const onItemClick = useCallback(
+    (chart: string) => {
+      setSelectedChart(chart);
+      trackEvent('helm_repo/select', {chart});
+    },
+    [setSelectedChart]
+  );
 
   const {value: data = [], loading} = useAsync(async () => {
     const result = await runCommandInMainThread(searchHelmRepoCommand({q: helmRepoSearch}));
@@ -92,6 +97,7 @@ const HelmChartsTable = () => {
 
   const onChangeSearchInputHandler = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     setHelmRepoSearch(e.target.value);
+    trackEvent('helm_repo/search', {query: e.target.value});
   });
 
   return (

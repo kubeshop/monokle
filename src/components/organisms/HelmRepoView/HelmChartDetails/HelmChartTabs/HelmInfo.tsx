@@ -15,7 +15,7 @@ import {useGetHelmChartInfo} from '@hooks/useGetHelmChartInfo';
 import helmPlaceholder from '@assets/helm-default-ico.svg';
 
 import {Icon} from '@monokle/components';
-import {openUrlInExternalBrowser} from '@shared/utils';
+import {openUrlInExternalBrowser, trackEvent} from '@shared/utils';
 
 import PullHelmChartModal from '../PullHelmChartModal';
 import * as S from './HelmInfo.styled';
@@ -39,6 +39,7 @@ const HelmInfo = ({chartName}: IProps) => {
         installHelmRepoChart({name: repoName, chart: chartName, namespace, version: chartVersion})
       ).unwrap();
       setInstallModalOpen(false);
+      trackEvent('helm_repo/install', {chart: chartName, version: chartVersion});
     },
     [chartName, chartVersion, dispatch]
   );

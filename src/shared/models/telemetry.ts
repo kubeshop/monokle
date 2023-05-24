@@ -135,6 +135,13 @@ export type EventMap = {
   'left-menu/activity-changed': {activity: LeftMenuSelectionType; section?: string};
   'bottom-left-menu/select-option': {option: LeftMenuBottomSelectionType};
   'notifications/toggle': undefined;
+  'helm_repo/search': {query: string};
+  'helm_repo/select': {chart: string};
+  'helm_repo/add': {repo: string};
+  'helm_repo/remove': {repo: string};
+  'helm_repo/update': {repo: string};
+  'helm_repo/download': {chart: string; version: string};
+  'helm_repo/install': {chart: string; version: string};
 };
 export const APP_INSTALLED = 'APP_INSTALLED';
 export const APP_SESSION = 'APP_SESSION';

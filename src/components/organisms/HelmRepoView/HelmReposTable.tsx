@@ -1,15 +1,17 @@
 import {useCallback, useEffect, useMemo} from 'react';
-
 import {useAsyncFn} from 'react-use';
 
 import {Button, Form, Input, Typography} from 'antd';
+
 import {DeleteOutlined} from '@ant-design/icons';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {useMainPaneDimensions} from '@utils/hooks';
 
 import {errorAlert, successAlert} from '@utils/alert';
+import {useMainPaneDimensions} from '@utils/hooks';
 
+import {trackEvent} from '@shared/utils';
 import {
   addHelmRepoCommand,
   listHelmRepoCommand,
@@ -89,6 +91,7 @@ const HelmReposTable = () => {
 
       form.resetFields();
       refetchRepos();
+      trackEvent('helm_repo/add', {repo: values.name});
     }
     if (result.stderr) {
       dispatch(setAlert(errorAlert(result.stderr)));
@@ -101,6 +104,7 @@ const HelmReposTable = () => {
         await runCommandInMainThread(updateHelmRepoCommand({repos: [repoName]}));
         refetchRepos();
         dispatch(setAlert(successAlert('Repository updated successfully')));
+        trackEvent('helm_repo/update', {repo: repoName});
       } catch (e: any) {
         dispatch(setAlert(errorAlert(e.message)));
       }
@@ -114,6 +118,7 @@ const HelmReposTable = () => {
         await runCommandInMainThread(removeHelmRepoCommand({repos: [repoName]}));
         dispatch(setAlert(successAlert('Repository deleted successfully')));
         refetchRepos();
+        trackEvent('helm_repo/remove', {repo: repoName});
       } catch (e: any) {
         dispatch(setAlert(errorAlert(e.message)));
       }

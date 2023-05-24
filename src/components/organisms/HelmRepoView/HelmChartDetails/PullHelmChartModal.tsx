@@ -7,6 +7,8 @@ import {FileExplorer} from '@components/atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import {trackEvent} from '@shared/utils';
+
 const PullHelmChartModal = ({
   open,
   dismissModal,
@@ -35,6 +37,7 @@ const PullHelmChartModal = ({
     const {name, path} = await form.validateFields();
     dispatch(pullHelmChart({name, path, version: chartVersion}));
     dismissModal();
+    trackEvent('helm_repo/download', {chart: chartName, version: chartVersion});
   };
 
   return (
