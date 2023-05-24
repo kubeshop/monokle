@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import {PrimaryButton} from '@atoms';
-
+import {Device} from '@shared/styles/device';
 import {Colors} from '@shared/styles/colors';
 
 export const ValidationSettingsContainer = styled.div`
@@ -27,9 +27,13 @@ export const ValidationSettingsDescriptionAndButtonContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-left: 25%;
-  width: 50%;
+  width: 100%;
   margin-bottom: 10px;
+
+  @media ${Device.laptopS} {
+    width: 50%;
+    margin-left: 25%;
+  }
 `;
 
 export const Link = styled.a`
