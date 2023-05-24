@@ -183,6 +183,7 @@ const HelmContextMenu: React.FC<IProps> = props => {
       dispatch,
       fileOrFolderContainedInFilter,
       helmItem,
+      helmChartMap,
       isInPreviewMode,
       isInClusterMode,
       onDuplicate,
