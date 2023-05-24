@@ -234,9 +234,6 @@ const initialUiState: UiState = {
     isVisible: false,
   },
   activeSettingsPanel: SettingsPanel.GlobalSettings,
-  helmRepo: {
-    search: '',
-  },
   fileCompareModal: {
     isVisible: false,
     filePath: '',
