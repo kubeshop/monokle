@@ -3,8 +3,9 @@ import {Card as AntdCard} from 'antd';
 import {QuestionCircleFilled} from '@ant-design/icons';
 
 import styled from 'styled-components';
-import {Device} from '@shared/styles/device';
+
 import {Colors} from '@shared/styles/colors';
+import {Device} from '@shared/styles/device';
 
 export const Card = styled(AntdCard)`
   border: 2px dashed #31393c;

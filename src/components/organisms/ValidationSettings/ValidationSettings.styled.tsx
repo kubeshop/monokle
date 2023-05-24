@@ -1,7 +1,9 @@
 import styled from 'styled-components';
+
 import {PrimaryButton} from '@atoms';
-import {Device} from '@shared/styles/device';
+
 import {Colors} from '@shared/styles/colors';
+import {Device} from '@shared/styles/device';
 
 export const ValidationSettingsContainer = styled.div`
   display: flex;

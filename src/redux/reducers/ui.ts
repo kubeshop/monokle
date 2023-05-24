@@ -9,8 +9,8 @@ import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import initialState from '@redux/initialState';
-import {previewSavedCommand} from '@redux/services/previewCommand';
 import {stopClusterConnection} from '@redux/thunks/cluster';
+import {previewSavedCommand} from '@redux/thunks/previewCommand';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {setOpenProject} from '@redux/thunks/project';

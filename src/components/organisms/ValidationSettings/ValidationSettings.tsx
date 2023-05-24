@@ -1,6 +1,8 @@
 import {useMemo} from 'react';
+
 import {CheckCircleOutlined} from '@ant-design/icons';
-import {useAppSelector, useAppDispatch} from '@redux/hooks';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 
 import CRDsSchemaValidation from './CRDsSchemaValidation';

@@ -3,9 +3,10 @@ import {Button as RawButton, Switch as RawSwitch} from 'antd';
 import styled from 'styled-components';
 
 import {PrimaryButton} from '@atoms';
-import {Device} from '@shared/styles/device';
+
 import {Icon as BaseIcon} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
+import {Device} from '@shared/styles/device';
 
 export const Button = styled(RawButton)`
   align-self: center;
