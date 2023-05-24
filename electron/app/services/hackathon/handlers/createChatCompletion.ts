@@ -10,13 +10,14 @@ export async function createChatCompletion({messages}: CreateChatCompletionParam
     return;
   }
   const startTime = new Date().getTime();
+  log.info('[createChatCompletion]: Waiting for OpenAI response...');
   const completion = await openai.createChatCompletion({
     model: 'gpt-3.5-turbo',
     messages,
     n: 1,
   });
   const endTime = new Date().getTime();
-  log.info('createChatCompletion execution time: ', (endTime - startTime) / 1000);
+  log.info('[createChatCompletion]: Execution time: ', (endTime - startTime) / 1000);
   const content = completion.data.choices[0].message?.content;
   return content;
 }

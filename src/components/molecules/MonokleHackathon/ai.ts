@@ -15,7 +15,7 @@ const GENERATION_PROMPT_START = `In this interaction, the goal is to produce Kub
 Generate YAML code that FULLY adheres to the requirements below, in the context of Kubernetes.
 Start of the requirements:`;
 
-const GENERATION_PROMPT_END = ` End of the requirements!
+const GENERATION_PROMPT_END = `End of the requirements!
 The output should consist exclusively of the YAML code necessary to fulfill the given task.
 Remember, the output code may span across multiple YAML documents if that's what's needed to incorporate all necessary Kubernetes objects.
 \`\`\`yaml\n`;
@@ -72,14 +72,14 @@ const createValidationPrompt = async (payload: {
 
   const validationText = validationErrors
     .map(({errorText, helpText}) => {
-      return `- ${errorText}. ${helpText ? `${helpText}` : ''}`;
+      return `- ${errorText.trim()}. ${helpText ? `${helpText.trim()}` : ''}`;
     })
     .join('\n  ');
 
   return [
     {
       role: 'user',
-      content: `${generatedYaml}
+      content: `\`\`\`yaml\n${generatedYaml}\n\`\`\`\n
 ${VALIDATION_PROMPT_START}
 ${userPrompt}
 ${VALIDATION_PROMPT_MIDDLE}
@@ -94,7 +94,9 @@ export const generateYamlUsingAI = async (payload: {
   shouldValidate?: boolean;
 }): Promise<string | undefined> => {
   const {userPrompt, shouldValidate} = payload;
-  let content = await createChatCompletion({messages: createGenerationPrompt({userPrompt})});
+  const generationPrompt = createGenerationPrompt({userPrompt});
+  log.info('[generateYamlUsingAI]: Generation prompt: ', {generationPrompt});
+  let content = await createChatCompletion({messages: generationPrompt});
   if (!content) {
     log.info('[generateYamlUsingAI]: No content generated.');
     return;
@@ -104,6 +106,7 @@ export const generateYamlUsingAI = async (payload: {
     log.info('[generateYamlUsingAI]: No YAML generated.');
     return;
   }
+  log.info('[generateYamlUsingAI]: Generated YAML: ', {generatedYaml});
   if (!shouldValidate) {
     log.info('[generateYamlUsingAI]: Skipping validation.');
     return generatedYaml;
@@ -113,6 +116,7 @@ export const generateYamlUsingAI = async (payload: {
     log.info('[generateYamlUsingAI]: No validation prompt generated.');
     return generatedYaml;
   }
+  log.info('[generateYamlUsingAI]: Validation prompt: ', {validationPrompt});
   content = await createChatCompletion({messages: validationPrompt});
   if (!content) {
     log.info('[generateYamlUsingAI]: No content generated after validation. Returning initial YAML.');
