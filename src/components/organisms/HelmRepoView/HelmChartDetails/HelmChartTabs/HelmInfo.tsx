@@ -2,20 +2,23 @@ import {useCallback, useState} from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import {Dropdown, Skeleton, Typography} from 'antd';
+
 import {CloudDownloadOutlined, DownOutlined} from '@ant-design/icons';
+
 import {useAppDispatch} from '@redux/hooks';
-
-import styled from 'styled-components';
-import {Icon} from '@monokle/components';
-
 import {installHelmRepoChart} from '@redux/thunks/InstallHelmRepoChart';
-import {useGetHelmChartInfo} from '@hooks/useGetHelmChartInfo';
-import helmPlaceholder from '@assets/helm-default-ico.svg';
-import {Colors} from '@shared/styles';
-import {openUrlInExternalBrowser} from '@shared/utils';
 
 import {HelmChartModalConfirmWithNamespaceSelect} from '@components/molecules';
+
+import {useGetHelmChartInfo} from '@hooks/useGetHelmChartInfo';
+
+import helmPlaceholder from '@assets/helm-default-ico.svg';
+
+import {Icon} from '@monokle/components';
+import {openUrlInExternalBrowser} from '@shared/utils';
+
 import PullHelmChartModal from '../PullHelmChartModal';
+import * as S from './HelmInfo.styled';
 
 interface IProps {
   chartName: string;
@@ -60,33 +63,33 @@ const HelmInfo = ({chartName}: IProps) => {
   return loadingHelmInfo ? (
     <Skeleton active={loadingHelmInfo} />
   ) : (
-    <Container>
-      <Content>
+    <S.Container>
+      <S.Content>
         <div>
-          <Header>
-            <Logo
+          <S.Header>
+            <S.Logo
               width="100"
               height="100"
               loading="lazy"
               decoding="async"
               src={getHelmRepoLogo(helmChartInfo?.logo_image_id)}
             />
-            <ChartInfo>
-              <Label>
+            <S.ChartInfo>
+              <S.Label>
                 Author<Typography.Text> {helmChartInfo?.repository?.name}</Typography.Text>
-              </Label>
-              <Label>
+              </S.Label>
+              <S.Label>
                 Repository<Typography.Link> {helmChartInfo?.repository?.url}</Typography.Link>
-              </Label>
-              <Label>
+              </S.Label>
+              <S.Label>
                 apiVersion<Typography.Text> {helmChartInfo?.data?.apiVersion}</Typography.Text>
-              </Label>
-              <Label>
+              </S.Label>
+              <S.Label>
                 appVersion
                 <Typography.Text> {helmChartInfo?.app_version}</Typography.Text>
-              </Label>
-            </ChartInfo>
-          </Header>
+              </S.Label>
+            </S.ChartInfo>
+          </S.Header>
         </div>
 
         <ReactMarkdown
@@ -102,10 +105,10 @@ const HelmInfo = ({chartName}: IProps) => {
         >
           {helmChartInfo?.readme || ''}
         </ReactMarkdown>
-      </Content>
+      </S.Content>
 
-      <Footer>
-        <MenuDropdownList id="versions" style={{height: 300, position: 'absolute'}} />
+      <S.Footer>
+        <S.MenuDropdownList id="versions" style={{height: 300, position: 'absolute'}} />
         <Dropdown.Button
           menu={{
             items,
@@ -140,7 +143,7 @@ const HelmInfo = ({chartName}: IProps) => {
           <Icon name="cluster-dashboard" />
           Install in cluster ({latestVersion})
         </Dropdown.Button>
-      </Footer>
+      </S.Footer>
 
       <PullHelmChartModal
         open={confirmModalOpen}
@@ -155,7 +158,7 @@ const HelmInfo = ({chartName}: IProps) => {
         onCancel={() => setInstallModalOpen(false)}
         onOk={selectedNamespace => onClickApplyHelmChart(selectedNamespace)}
       />
-    </Container>
+    </S.Container>
   );
 };
 
@@ -167,87 +170,3 @@ const getHelmRepoLogo = (logoImageId?: string) => {
   }
   return helmPlaceholder;
 };
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
-`;
-
-const Header = styled.div`
-  display: flex;
-  gap: 20px;
-`;
-
-const Logo = styled.img`
-  width: 100px;
-  height: 100px;
-  object-fit: contain;
-  object-position: center;
-`;
-
-const Label = styled(Typography.Text)`
-  color: ${Colors.grey8};
-`;
-
-const ChartInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Content = styled.div`
-  overflow: auto;
-  min-height: 0;
-  max-height: calc(100vh - 292px);
-`;
-
-const Footer = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 75px;
-
-  display: flex;
-  gap: 16px;
-  border-top: 1px solid ${Colors.grey4};
-  padding: 20px 28px;
-
-  .ant-space-compact-block {
-    width: unset;
-  }
-`;
-
-const MenuDropdownList = styled.div`
-  position: relative;
-
-  ul {
-    overflow: overlay;
-    height: 200px;
-  }
-
-  ul::-webkit-scrollbar {
-    width: 8px;
-    background-color: transparent;
-    transition: 0.3s;
-  }
-
-  ul::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-  }
-
-  .ant-dropdown-menu {
-    background-color: ${Colors.grey1};
-    overflow-x: hidden;
-    box-shadow: none;
-  }
-  .ant-dropdown-menu-item {
-    height: 24px;
-  }
-
-  .ant-dropdown-menu-item:hover {
-    background-color: ${Colors.grey2};
-  }
-`;
