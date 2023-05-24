@@ -2,7 +2,7 @@ import {webFrame} from 'electron';
 
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import path from 'path';
+import path, {sep} from 'path';
 import {Entries} from 'type-fest';
 
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
@@ -35,6 +35,9 @@ import {
   UiState,
 } from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
+import {generateExpandedPaths} from '@shared/utils/file';
+
+import {selectFile} from './main';
 
 export const uiSlice = createSlice({
   name: 'ui',
@@ -435,11 +438,25 @@ export const uiSlice = createSlice({
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;
       })
-      .addCase(connectCluster.fulfilled, state => {
+      .addCase(selectFile, (state, action) => {
+        if (!action.payload.filePath) {
+          return;
+        }
+
+        const items = action.payload.filePath.split(sep).filter(item => item);
+        state.fileExplorerExpandedFolders = [
+          ...state.fileExplorerExpandedFolders,
+          ...generateExpandedPaths(items, state.fileExplorerExpandedFolders),
+        ];
+      })
+      .addCase(connectCluster.fulfilled, (state, action) => {
         state.leftMenu.activityBeforeClusterConnect = state.leftMenu.selection;
-        state.leftMenu.selection = 'dashboard';
         state.leftMenu.isActive = true;
         state.navigator.collapsedResourceKinds = [];
+
+        if (!action.payload.reload) {
+          state.leftMenu.selection = 'dashboard';
+        }
       })
       .addCase(stopClusterConnection.fulfilled, state => {
         state.leftMenu.selection = state.leftMenu.activityBeforeClusterConnect ?? 'explorer';

@@ -1,12 +1,12 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
+import {abortAllRunningRefsProcessing} from '@redux/parsing/parser.thunks';
 import {loadClusterResources, reloadClusterResources} from '@redux/thunks/cluster';
+import {abortAllRunningValidation} from '@redux/validation/validation.thunks';
 
 import {ThunkApi} from '@shared/models/thunk';
 import {selectKubeContext} from '@shared/utils/cluster/selectors';
 
-import {abortAllRunningRefsProcessing} from '@redux/parsing/parser.thunks';
-import {abortAllRunningValidation} from '@redux/validation/validation.thunks';
 import {selectCurrentContextId} from '../selectors';
 import {setup} from '../service/kube-control';
 import {setupCluster} from './setup';
@@ -20,6 +20,7 @@ type ConnectArgs = {
 
 type ConnectResponse = {
   proxyPort: number;
+  reload: boolean;
 };
 
 /**
@@ -72,6 +73,6 @@ export const connectCluster = createAsyncThunk<ConnectResponse, ConnectArgs, Thu
       );
     }
 
-    return {proxyPort: setupResponse.port};
+    return {proxyPort: setupResponse.port, reload: payload.reload ?? false};
   }
 );
