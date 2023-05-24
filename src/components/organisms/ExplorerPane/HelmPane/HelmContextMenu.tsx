@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 
-import {Modal} from 'antd';
+import {Modal, Tooltip} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
@@ -75,15 +75,15 @@ const HelmContextMenu: React.FC<IProps> = props => {
 
   const menuItems = useMemo(
     () => [
-      {
+      helmChartMap[id] && {
         key: 'update_dependencies',
-        label: 'Update Dependencies',
+        label: <Tooltip title="Run 'helm dependency update' on this Helm Chart">Update Dependencies</Tooltip>,
         disabled: isInPreviewMode || isInClusterMode,
         onClick: () => {
           dispatch(runHelmCommand({chart: id, command: ['dependency', 'update']}));
         },
       },
-      {key: 'divider-1', type: 'divider'},
+      helmChartMap[id] && {key: 'divider-1', type: 'divider'},
       {
         key: 'show_file',
         label: 'Go to file',
@@ -189,6 +189,7 @@ const HelmContextMenu: React.FC<IProps> = props => {
       onRename,
       platformFileManagerName,
       fileEntry,
+      id,
     ]
   );
 

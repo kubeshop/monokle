@@ -26,7 +26,6 @@ export const runHelmCommand = createAsyncThunk<
     state: RootState;
   }
 >('main/runHelmCommand', async (payload, thunkAPI) => {
-  const startTime = new Date().getTime();
   const rootFolderPath = thunkAPI.getState().main.fileMap[ROOT_FILE_ENTRY]?.filePath;
   const helmChartMap = thunkAPI.getState().main.helmChartMap;
   const {chart, command} = payload;
