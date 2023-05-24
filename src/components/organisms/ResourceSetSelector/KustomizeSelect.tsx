@@ -7,6 +7,8 @@ import invariant from 'tiny-invariant';
 import {resourceSetSelected, selectKustomizeResourceSet} from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
+import {renderKustomizeName} from '@utils/kustomize';
+
 import {PartialResourceSet} from '@shared/models/compare';
 
 import * as S from './ResourceSetSelectColor.styled';
@@ -41,7 +43,7 @@ export const KustomizeSelect: React.FC<Props> = ({side}) => {
         {allKustomizations.map(kustomization => {
           return (
             <Select.Option key={kustomization.id} value={kustomization.id}>
-              {kustomization.name}
+              {renderKustomizeName(kustomization, kustomization.name)}
             </Select.Option>
           );
         })}

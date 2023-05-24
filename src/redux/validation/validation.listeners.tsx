@@ -102,13 +102,14 @@ const validateListener: AppListenerFn = listen => {
       runPreviewConfiguration.rejected,
       previewSavedCommand.rejected,
       stopClusterConnection.fulfilled,
+      removeResources.fulfilled,
       deleteMultipleClusterResources,
       multiplePathsRemoved,
       clearPreviewAndSelectionHistory,
       clearPreview
     ),
     async effect(_action, {dispatch, getState, cancelActiveListeners, signal, delay}) {
-      if (_action.type === 'main/clearPreviewAndSelectionHistory' && _action.payload.revalidate === false) {
+      if (_action.type === 'main/clearPreviewAndSelectionHistory' && _action.payload?.revalidate === false) {
         return;
       }
 
@@ -173,7 +174,6 @@ const incrementalValidationListener: AppListenerFn = listen => {
       updateMultipleResources.fulfilled,
       updateMultipleClusterResources,
       updateFileEntry.fulfilled,
-      removeResources.fulfilled,
       multiplePathsAdded.fulfilled,
       multiplePathsChanged.fulfilled
     ),
@@ -185,7 +185,6 @@ const incrementalValidationListener: AppListenerFn = listen => {
           updateResource.fulfilled,
           updateMultipleResources.fulfilled,
           updateFileEntry.fulfilled,
-          removeResources.fulfilled,
           multiplePathsAdded.fulfilled,
           multiplePathsChanged.fulfilled
         )(_action)
