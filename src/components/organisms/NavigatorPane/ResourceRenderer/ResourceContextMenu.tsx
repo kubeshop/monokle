@@ -41,6 +41,7 @@ import {K8sResource, ResourceMeta, ResourceMetaMap, isLocalResource} from '@shar
 import {Colors} from '@shared/styles/colors';
 import {defineHotkey} from '@shared/utils/hotkey';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 const StyledActionsMenuIconContainer = styled.span<{isSelected: boolean}>`
   cursor: pointer;
@@ -142,6 +143,11 @@ const ResourceKindContextMenu = (props: Props) => {
         setIsApplyModalVisible(false);
         return;
       }
+
+      if (isInClusterMode) {
+        trackEvent('cluster/actions/update_manifest', {kind: resource.kind});
+      }
+
       dispatch(
         applyResourceToCluster({
           resourceIdentifier: resource,
