@@ -2,10 +2,9 @@ import {useState} from 'react';
 import MonacoEditor from 'react-monaco-editor/lib/editor';
 import {useMeasure} from 'react-use';
 
-import {Button, Input, Modal, Spin} from 'antd';
+import {Button, Input, Spin} from 'antd';
 
 import log from 'loglevel';
-import styled from 'styled-components';
 import YAML from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
@@ -20,8 +19,8 @@ import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
 import {AlertEnum} from '@shared/models/alert';
-import {Colors} from '@shared/styles/colors';
 
+import * as S from './MonokleHackathon.styled';
 import {generateYamlUsingAI} from './ai';
 import {EDITOR_OPTIONS} from './constants';
 
@@ -114,7 +113,7 @@ const MonokleHackathon: React.FC = () => {
   };
 
   return (
-    <StyledModal
+    <S.Modal
       title="Create Resources using AI"
       open={newAiResourceWizardState.isOpen}
       onCancel={onCancel}
@@ -132,10 +131,10 @@ const MonokleHackathon: React.FC = () => {
         </div>
       )}
 
-      <Note>
+      <S.Note>
         Please provide <strong>precise and specific details</strong> for creating your desired Kubernetes resources.
         Accurate details will help us meet your specific needs effectively.
-      </Note>
+      </S.Note>
 
       <Input.TextArea
         autoSize={{minRows: 3, maxRows: 8}}
@@ -147,18 +146,18 @@ const MonokleHackathon: React.FC = () => {
         placeholder="Enter requirements ( e.g. Create a Deployment using the nginx image, with 2 replicas, and expose port 80 through a ClusterIP Service )"
       />
 
-      {errorMessage && <ErrorMessage>*{errorMessage}</ErrorMessage>}
+      {errorMessage && <S.ErrorMessage>*{errorMessage}</S.ErrorMessage>}
 
-      <CreateButton type="primary" onClick={onGenerateHandler} loading={isLoading}>
+      <S.CreateButton type="primary" onClick={onGenerateHandler} loading={isLoading}>
         Generate
-      </CreateButton>
+      </S.CreateButton>
 
       {isLoading ? (
         <Spin tip="Your manifest is being generated. This might take a few minutes.">
-          <SpinContainer />
+          <S.SpinContainer />
         </Spin>
       ) : !editorCode ? (
-        <NoContent>No resources to preview.</NoContent>
+        <S.NoContent>No resources to preview.</S.NoContent>
       ) : (
         <div ref={monacoContainerRef} style={{height: 'calc(100% - 200px)', width: '100%'}}>
           <MonacoEditor
@@ -171,52 +170,8 @@ const MonokleHackathon: React.FC = () => {
           />
         </div>
       )}
-    </StyledModal>
+    </S.Modal>
   );
 };
 
 export default MonokleHackathon;
-
-// Styled Components
-
-const CreateButton = styled(Button)`
-  margin: 16px 0px 32px 0px;
-`;
-
-const ErrorMessage = styled.div`
-  color: ${Colors.redError};
-  margin-top: 4px;
-`;
-
-const NoContent = styled.div`
-  color: ${Colors.grey6};
-`;
-
-const Note = styled.div`
-  font-size: 12px;
-  color: ${Colors.grey7};
-  margin-bottom: 16px;
-`;
-
-const SpinContainer = styled.div`
-  padding: 50px;
-`;
-
-const StyledModal = styled(Modal)`
-  height: 75%;
-  top: 45px;
-  padding-bottom: 0px;
-
-  .ant-modal-content {
-    height: 100%;
-  }
-
-  .ant-modal-header,
-  .ant-modal-body {
-    background-color: #131515;
-  }
-
-  .ant-modal-body {
-    height: 100%;
-  }
-`;
