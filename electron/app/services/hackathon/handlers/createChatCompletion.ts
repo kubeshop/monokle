@@ -13,6 +13,7 @@ export async function createChatCompletion({messages}: CreateChatCompletionParam
   const completion = await openai.createChatCompletion({
     model: 'gpt-3.5-turbo',
     messages,
+    n: 1,
   });
   const endTime = new Date().getTime();
   log.info('createChatCompletion execution time: ', (endTime - startTime) / 1000);
