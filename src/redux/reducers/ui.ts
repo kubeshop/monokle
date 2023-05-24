@@ -435,11 +435,14 @@ export const uiSlice = createSlice({
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;
       })
-      .addCase(connectCluster.fulfilled, state => {
+      .addCase(connectCluster.fulfilled, (state, action) => {
         state.leftMenu.activityBeforeClusterConnect = state.leftMenu.selection;
-        state.leftMenu.selection = 'dashboard';
         state.leftMenu.isActive = true;
         state.navigator.collapsedResourceKinds = [];
+
+        if (!action.payload.reload) {
+          state.leftMenu.selection = 'dashboard';
+        }
       })
       .addCase(stopClusterConnection.fulfilled, state => {
         state.leftMenu.selection = state.leftMenu.activityBeforeClusterConnect ?? 'explorer';
