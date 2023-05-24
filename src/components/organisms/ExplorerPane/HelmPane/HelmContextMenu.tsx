@@ -9,7 +9,7 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
-import {setLeftMenuSelection} from '@redux/reducers/ui';
+import {setExplorerSelectedSection, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {ContextMenu, Dots} from '@atoms';
 
@@ -84,6 +84,7 @@ const HelmContextMenu: React.FC<IProps> = props => {
           }
 
           dispatch(setLeftMenuSelection('explorer'));
+          dispatch(setExplorerSelectedSection('files'));
           dispatch(selectFile({filePath: helmItem.filePath}));
         },
       },
