@@ -4,33 +4,26 @@ import {useMeasure} from 'react-use';
 
 import {Button, Input, Modal, Spin} from 'antd';
 
-import {ChatCompletionRequestMessage} from 'openai';
+import log from 'loglevel';
 import styled from 'styled-components';
 import YAML from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
 import {setUserApiKey} from '@redux/appConfig';
-import {createChatCompletion} from '@redux/hackathon/hackathon.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
-import {selectResource} from '@redux/reducers/main';
 import {closeNewAiResourceWizard} from '@redux/reducers/ui';
-import {extractK8sResources} from '@redux/services/resource';
 import {createTransientResource} from '@redux/services/transientResource';
 import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
-import {VALIDATOR} from '@redux/validation/validator';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
-import {transformResourceForValidation} from '@utils/resources';
 
-import {ValidationResponse} from '@monokle/validation';
 import {AlertEnum} from '@shared/models/alert';
 import {Colors} from '@shared/styles/colors';
-import {isDefined} from '@shared/utils/filter';
 
-import {EDITOR_OPTIONS, GENERATION_ERROR_MESSAGE, SYSTEM_PROMPT} from './constants';
-import {extractYamlDocuments} from './utils';
+import {generateYamlUsingAI} from './ai';
+import {EDITOR_OPTIONS} from './constants';
 
 const MonokleHackathon: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -38,8 +31,8 @@ const MonokleHackathon: React.FC = () => {
 
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [manifestContentCode, setManifestContentCode] = useState<Array<string>>([]);
+  const [errorMessage, setErrorMessage] = useState<string>();
+  const [editorCode, setEditorCode] = useState<string>();
   const apiKey = useAppSelector(state => state.config.userApiKeys.OpenAI);
   const isOpaValidationEnabled = useAppSelector(state => pluginEnabledSelector(state, 'open-policy-agent'));
   const [inputApiKey, setInputApiKey] = useState<string | undefined>();
@@ -51,80 +44,19 @@ const MonokleHackathon: React.FC = () => {
     dispatch(closeNewAiResourceWizard());
   };
 
-  const onPreviewHandler = async () => {
+  const onGenerateHandler = async () => {
     if (!inputValue) {
       setErrorMessage('Input must not be empty!');
       return;
     }
 
     setIsLoading(true);
-    setManifestContentCode([]);
-    setErrorMessage('');
+    setEditorCode(undefined);
+    setErrorMessage(undefined);
 
     try {
-      const messages: ChatCompletionRequestMessage[] = [SYSTEM_PROMPT, {role: 'user', content: inputValue}];
-      let content = await createChatCompletion({messages});
-
-      if (!content) {
-        setErrorMessage(GENERATION_ERROR_MESSAGE);
-        setIsLoading(false);
-        return;
-      }
-
-      messages.push({role: 'assistant', content});
-
-      let yamlDocuments = extractYamlDocuments(content);
-      if (!yamlDocuments) {
-        setErrorMessage(GENERATION_ERROR_MESSAGE);
-        setIsLoading(false);
-        return;
-      }
-
-      let hasAnyErrors = false;
-      let validationResponse: ValidationResponse | undefined;
-
-      if (isOpaValidationEnabled) {
-        const resources = extractK8sResources(yamlDocuments.join('\n---\n'), 'transient', {createdIn: 'local'});
-        const {response} = await VALIDATOR.runValidation({
-          resources: resources.map(transformResourceForValidation).filter(isDefined),
-        });
-        validationResponse = response;
-        hasAnyErrors = response.runs.some(run => run.results.length > 0);
-      }
-
-      if (hasAnyErrors) {
-        let newPrompt = `
-We will provide a list containing issues and possible fixes.
-Based on that list, please rewrite the previous code blocks to fix all issues.
-In the YAML code, write comments to explain what you changed and why.
-`;
-        validationResponse?.runs
-          .filter(run => run.tool.driver.name !== 'resource-links')
-          .forEach(run => {
-            run.results.forEach(result => {
-              const help = run.tool.driver.rules.find(rule => rule.id === result.ruleId)?.help;
-              newPrompt += `An issue is that ${result.message.text} and a possible fix is that ${help?.text}\n`;
-            });
-          });
-
-        messages.push({role: 'user', content: newPrompt});
-        content = await createChatCompletion({messages});
-
-        if (!content) {
-          setErrorMessage(GENERATION_ERROR_MESSAGE);
-          setIsLoading(false);
-          return;
-        }
-
-        yamlDocuments = extractYamlDocuments(content);
-        if (!yamlDocuments) {
-          setErrorMessage(GENERATION_ERROR_MESSAGE);
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      setManifestContentCode(yamlDocuments);
+      const generatedYaml = await generateYamlUsingAI({userPrompt: inputValue, shouldValidate: isOpaValidationEnabled});
+      setEditorCode(generatedYaml);
     } catch (e: any) {
       setErrorMessage(e.message);
     }
@@ -133,10 +65,11 @@ In the YAML code, write comments to explain what you changed and why.
   };
 
   const onOkHandler = async () => {
-    let firstResourceCreated = false;
+    const manifests = editorCode?.split(YAML_DOCUMENT_DELIMITER);
 
-    const manifests = manifestContentCode.map(m => m.split(YAML_DOCUMENT_DELIMITER)).flat();
-    manifests.forEach(code => {
+    const namesOfCreatedResources: string[] = [];
+
+    manifests?.forEach(code => {
       try {
         const parsedManifest = YAML.parse(code);
 
@@ -152,23 +85,37 @@ In the YAML code, write comments to explain what you changed and why.
           parsedManifest.spec
         );
 
-        dispatch(setAlert({title: 'Resource created successfully', message: '', type: AlertEnum.Success}));
+        namesOfCreatedResources.push(newResource.name);
 
-        if (!firstResourceCreated) {
-          firstResourceCreated = true;
-          dispatch(selectResource({resourceIdentifier: {id: newResource.id, storage: 'transient'}}));
-        }
+        dispatch(setAlert({title: 'Resource created successfully', message: '', type: AlertEnum.Success}));
       } catch (error: any) {
-        dispatch(setAlert({title: 'Could not create resource', message: error.message, type: AlertEnum.Error}));
+        log.error(error.message);
       }
     });
 
-    dispatch(closeNewAiResourceWizard());
+    if (namesOfCreatedResources.length) {
+      dispatch(
+        setAlert({
+          title: 'Created resources successfully!',
+          message: namesOfCreatedResources.join('\n'),
+          type: AlertEnum.Success,
+        })
+      );
+      dispatch(closeNewAiResourceWizard());
+    } else {
+      dispatch(
+        setAlert({
+          title: 'Could not create resources from the generated YAML.',
+          message: '',
+          type: AlertEnum.Error,
+        })
+      );
+    }
   };
 
   return (
     <StyledModal
-      title="Create Resource using AI"
+      title="Create Resources using AI"
       open={newAiResourceWizardState.isOpen}
       onCancel={onCancel}
       width="90%"
@@ -186,8 +133,8 @@ In the YAML code, write comments to explain what you changed and why.
       )}
 
       <Note>
-        Please provide precise and specific details for creating your desired Kubernetes resources. Accurate details
-        will help us meet your specific needs effectively.
+        Please provide <strong>precise and specific details</strong> for creating your desired Kubernetes resources.
+        Accurate details will help us meet your specific needs effectively.
       </Note>
 
       <Input.TextArea
@@ -197,20 +144,20 @@ In the YAML code, write comments to explain what you changed and why.
           setErrorMessage('');
           setInputValue(e.target.value);
         }}
-        placeholder="Enter resource specifications ( e.g. Create deployment of nginx with 2 replicas )"
+        placeholder="Enter requirements ( e.g. Create a Deployment using the nginx image, with 2 replicas, and expose port 80 through a ClusterIP Service )"
       />
 
       {errorMessage && <ErrorMessage>*{errorMessage}</ErrorMessage>}
 
-      <CreateButton type="primary" onClick={onPreviewHandler} loading={isLoading}>
-        Preview
+      <CreateButton type="primary" onClick={onGenerateHandler} loading={isLoading}>
+        Generate
       </CreateButton>
 
       {isLoading ? (
         <Spin tip="Your manifest is being generated. This might take a few minutes.">
           <SpinContainer />
         </Spin>
-      ) : !manifestContentCode.length ? (
+      ) : !editorCode ? (
         <NoContent>No resources to preview.</NoContent>
       ) : (
         <div ref={monacoContainerRef} style={{height: 'calc(100% - 200px)', width: '100%'}}>
@@ -219,7 +166,7 @@ In the YAML code, write comments to explain what you changed and why.
             height={containerHeight}
             language="yaml"
             theme={KUBESHOP_MONACO_THEME}
-            value={manifestContentCode.join(`\n${YAML_DOCUMENT_DELIMITER}\n`)}
+            value={editorCode}
             options={EDITOR_OPTIONS}
           />
         </div>
