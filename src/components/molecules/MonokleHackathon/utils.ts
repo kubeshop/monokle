@@ -5,7 +5,7 @@ import {REGEX_CODE} from './constants';
 export function isValidYaml(text: string) {
   try {
     const documents = yaml.parseAllDocuments(text);
-    return documents.some(doc => doc.errors.length);
+    return !documents.some(doc => doc.errors.length);
   } catch (e) {
     return false;
   }
