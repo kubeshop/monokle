@@ -14,7 +14,7 @@ import {useMainPaneDimensions} from '@utils/hooks';
 import {trackEvent} from '@shared/utils';
 import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
 
-import HelmChartDetails from './HelmChartDetails/HelmChartDetails';
+import HelmChartDetails from './HelmChartDetails';
 
 import * as S from './styled';
 

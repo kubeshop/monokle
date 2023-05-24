@@ -1,1 +1,1 @@
-export {default} from './HelmRepoView';
+export {default} from './HelmRepoPane';

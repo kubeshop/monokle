@@ -1,9 +1,11 @@
 import {useState} from 'react';
+
 import {Tooltip} from 'antd';
+
 import {Colors} from '@shared/styles';
 
-import HelmChartsTable from './HelmChartsTable';
-import HelmReposTable from './HelmReposTable';
+import HelmChartsView from './HelmChartsView';
+import HelmReposView from './HelmReposView';
 
 import * as S from './styled';
 
@@ -59,8 +61,8 @@ const HelmRepoView = () => {
         />
       </S.Header>
       <div style={{display: 'flex', flexDirection: 'column', gap: 16}}>
-        {selectedMenuItem === 'browse-charts' && <HelmChartsTable />}
-        {selectedMenuItem === 'manage-repositories' && <HelmReposTable />}
+        {selectedMenuItem === 'browse-charts' && <HelmChartsView />}
+        {selectedMenuItem === 'manage-repositories' && <HelmReposView />}
       </div>
     </S.Container>
   );
