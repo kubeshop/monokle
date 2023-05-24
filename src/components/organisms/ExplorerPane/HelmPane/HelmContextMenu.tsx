@@ -9,7 +9,8 @@ import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectFile} from '@redux/reducers/main';
-import {setLeftMenuSelection} from '@redux/reducers/ui';
+import {setExplorerSelectedSection, setLeftMenuSelection} from '@redux/reducers/ui';
+import {runHelmCommand} from '@redux/thunks/runHelmCommand';
 
 import {ContextMenu, Dots} from '@atoms';
 
@@ -75,6 +76,15 @@ const HelmContextMenu: React.FC<IProps> = props => {
   const menuItems = useMemo(
     () => [
       {
+        key: 'update_dependencies',
+        label: 'Update Dependencies',
+        disabled: isInPreviewMode || isInClusterMode,
+        onClick: () => {
+          dispatch(runHelmCommand({chart: id, command: ['dependency', 'update']}));
+        },
+      },
+      {key: 'divider-1', type: 'divider'},
+      {
         key: 'show_file',
         label: 'Go to file',
         disabled: isInPreviewMode || isInClusterMode,
@@ -84,17 +94,18 @@ const HelmContextMenu: React.FC<IProps> = props => {
           }
 
           dispatch(setLeftMenuSelection('explorer'));
+          dispatch(setExplorerSelectedSection('files'));
           dispatch(selectFile({filePath: helmItem.filePath}));
         },
       },
-      {key: 'divider-1', type: 'divider'},
+      {key: 'divider-2', type: 'divider'},
       {
         key: 'create_resource',
         label: 'Add Resource',
         disabled: true,
         onClick: () => {},
       },
-      {key: 'divider-2', type: 'divider'},
+      {key: 'divider-3', type: 'divider'},
       {
         key: 'filter_on_this_file',
         label:
@@ -110,7 +121,7 @@ const HelmContextMenu: React.FC<IProps> = props => {
         disabled: true,
         onClick: () => {},
       },
-      {key: 'divider-3', type: 'divider'},
+      {key: 'divider-4', type: 'divider'},
       {
         key: 'copy_full_path',
         label: 'Copy Path',
@@ -125,7 +136,7 @@ const HelmContextMenu: React.FC<IProps> = props => {
           navigator.clipboard.writeText(helmItem.filePath);
         },
       },
-      {key: 'divider-4', type: 'divider'},
+      {key: 'divider-5', type: 'divider'},
       {
         key: 'duplicate_entity',
         label: 'Duplicate',
@@ -156,7 +167,7 @@ const HelmContextMenu: React.FC<IProps> = props => {
           });
         },
       },
-      {key: 'divider-5', type: 'divider'},
+      {key: 'divider-6', type: 'divider'},
       {
         key: 'reveal_in_finder',
         label: `Reveal in ${platformFileManagerName}`,

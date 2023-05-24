@@ -101,6 +101,9 @@ export type EventMap = {
   'preview/command/fail': {reason: string};
   'preview/command/end': {resourcesCount: number; executionTime: number};
   'preview/restart': {type: PreviewType};
+  'helm/command/start': {command: string[]};
+  'helm/command/fail': {reason: string};
+  'helm/command/end': undefined;
   'cluster/diff_resource': undefined;
   'cluster/deploy_resource': {kind: string};
   'cluster/deploy_file': undefined;
