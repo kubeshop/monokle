@@ -163,6 +163,7 @@ export const DescriptionContainer = styled.div`
   ul > li {
     font-size: 14px;
     line-height: 24px;
+    width: max-content;
   }
 `;
 

@@ -47,7 +47,12 @@ const HelmRepoView = () => {
     <S.Container>
       <div>
         <S.Title>Helm</S.Title>
-        <Tooltip title={<TooltipDescription />} placement="rightTop" color={Colors.grey4}>
+        <Tooltip
+          overlayStyle={{maxWidth: 'fit-content'}}
+          title={<TooltipDescription />}
+          placement="rightTop"
+          color={Colors.grey4}
+        >
           <S.Link>Working with Helm in Monokle</S.Link>
         </Tooltip>
       </div>
