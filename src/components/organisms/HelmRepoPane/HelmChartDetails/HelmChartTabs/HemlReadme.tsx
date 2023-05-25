@@ -1,6 +1,8 @@
 import ReactMarkdown from 'react-markdown';
 
-import {Skeleton} from 'antd';
+import {Skeleton, Typography} from 'antd';
+
+import styled from 'styled-components';
 
 import {useGetHelmChartChangelog} from '@hooks/useGetHelmChartChangelog';
 
@@ -25,6 +27,12 @@ const HelmReadme = ({chartName}: IProps) => {
               </a>
             );
           },
+          h1({children, ...restProps}) {
+            return <H1 {...restProps}>{children}</H1>;
+          },
+          h2({children, ...restProps}) {
+            return <H2 {...restProps}>{children}</H2>;
+          },
         }}
       >
         {value}
@@ -34,3 +42,13 @@ const HelmReadme = ({chartName}: IProps) => {
 };
 
 export default HelmReadme;
+
+export const H1 = styled(Typography.Text)`
+  font-size: 16px;
+  font-weight: bold;
+`;
+
+export const H2 = styled(Typography.Text)`
+  font-size: 14px;
+  font-weight: bold;
+`;
