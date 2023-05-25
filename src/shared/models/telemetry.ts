@@ -45,6 +45,7 @@ export type EventMap = {
   };
   'app_start/create_project': {from: 'scratch' | 'git' | 'template' | 'folder'; templateID?: string};
   'app_start/select_page': {page: string};
+  'app_start/select_project': undefined;
   'project_list/open_project': undefined;
   'project_list/pin_project': undefined;
   'project_list/unpin_project': undefined;

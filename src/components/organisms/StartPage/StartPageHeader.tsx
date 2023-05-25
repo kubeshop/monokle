@@ -24,6 +24,7 @@ import {useRefSelector} from '@utils/hooks';
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {SearchInput} from '@monokle/components';
+import {trackEvent} from '@shared/utils';
 
 import * as S from './StartPageHeader.styled';
 
@@ -61,6 +62,7 @@ const StartPageHeader: React.FC = () => {
   const onSelectProjectHandler = (value: string) => {
     const targetProject = projects.find(p => p.name === value);
     if (targetProject) {
+      trackEvent('app_start/select_project');
       dispatch(setOpenProject(targetProject.rootFolder));
     }
   };
@@ -90,7 +92,9 @@ const StartPageHeader: React.FC = () => {
         <AutoComplete
           style={{width: '340px'}}
           options={ProjectOptions}
-          filterOption={(inputValue, option) => Boolean(option?.value?.startsWith(inputValue))}
+          filterOption={(inputValue, option) =>
+            Boolean(option?.value?.toLowerCase().includes(inputValue.toLowerCase()))
+          }
           onSelect={onSelectProjectHandler}
           notFoundContent="Nothing found"
           getPopupContainer={() => document.getElementById('projectsList')!}
