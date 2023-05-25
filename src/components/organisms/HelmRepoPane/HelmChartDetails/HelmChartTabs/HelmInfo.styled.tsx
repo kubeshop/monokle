@@ -67,12 +67,10 @@ export const MenuDropdownList = styled.div`
 
   ul::-webkit-scrollbar {
     width: 8px;
-    background-color: transparent;
     transition: 0.3s;
   }
 
   ul::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
   }
 
@@ -80,6 +78,7 @@ export const MenuDropdownList = styled.div`
     background-color: ${Colors.grey2};
     overflow-x: hidden;
     box-shadow: none;
+    min-width: max-content;
   }
   .ant-dropdown-menu-item {
     height: 24px;

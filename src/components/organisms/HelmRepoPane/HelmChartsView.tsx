@@ -111,8 +111,8 @@ const HelmChartsTable = () => {
       <Typography.Text style={{height: 'fit-content', marginBottom: 12}}>
         {searchResultCount} Helm Charts found. You can
         <Typography.Link onClick={() => openUrlInExternalBrowser('https://artifacthub.io/')}>
-          add more Helm Charts repositories
-        </Typography.Link>{' '}
+          &nbsp;add more Helm Charts repositories&nbsp;
+        </Typography.Link>
         to extend your search.
       </Typography.Text>
       <div ref={ref} style={{overflow: 'hidden', flex: 1}}>

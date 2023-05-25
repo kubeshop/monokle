@@ -88,7 +88,7 @@ const HelmInfo = ({chartName}: IProps) => {
                 Author<Typography.Text> {helmChartInfo?.repository?.name}</Typography.Text>
               </S.Label>
               <S.Label>
-                Repository
+                Repository&nbsp;
                 <Typography.Link onClick={() => openUrlInExternalBrowser(helmChartInfo?.repository?.url)}>
                   {helmChartInfo?.repository?.url}
                 </Typography.Link>
