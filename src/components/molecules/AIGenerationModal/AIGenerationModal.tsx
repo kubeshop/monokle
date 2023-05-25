@@ -2,19 +2,19 @@ import {useState} from 'react';
 import MonacoEditor from 'react-monaco-editor/lib/editor';
 import {useMeasure} from 'react-use';
 
-import {Button, Input, Spin} from 'antd';
+import {Button, Divider, Input, Spin, Switch, Tooltip} from 'antd';
+
+import {InfoCircleOutlined} from '@ant-design/icons';
 
 import log from 'loglevel';
 import YAML from 'yaml';
 
 import {YAML_DOCUMENT_DELIMITER} from '@constants/constants';
 
-import {setUserApiKey} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 import {closeNewAiResourceWizard} from '@redux/reducers/ui';
 import {createTransientResource} from '@redux/services/transientResource';
-import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
@@ -24,8 +24,12 @@ import AIRobotColored from '@assets/AIRobotColored.svg';
 import {AlertEnum} from '@shared/models/alert';
 
 import * as S from './AIGenerationModal.styled';
+import ApiKeyModal from './ApiKeyModal';
 import {generateYamlUsingAI} from './ai';
 import {EDITOR_OPTIONS} from './constants';
+
+const VALIDATION_TOOLTIP = `This provides the option to validate the output based on your predefined validation settings.
+While enabling validation enhances the quality of the results, it may also increase the processing time due to the extra validation procedures involved.`;
 
 const AIGenerationModal: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -35,9 +39,10 @@ const AIGenerationModal: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>();
   const [editorCode, setEditorCode] = useState<string>();
+  const [isValidationEnabled, setIsValidationEnabled] = useState(true);
+
   const apiKey = useAppSelector(state => state.config.userApiKeys.OpenAI);
-  const isOpaValidationEnabled = useAppSelector(state => pluginEnabledSelector(state, 'open-policy-agent'));
-  const [inputApiKey, setInputApiKey] = useState<string | undefined>();
+  const [isApiKeyModalVisible, setIsApiKeyModalVisible] = useState(false);
 
   const [monacoContainerRef, {width: containerWidth, height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -52,12 +57,17 @@ const AIGenerationModal: React.FC = () => {
       return;
     }
 
+    if (!apiKey) {
+      setIsApiKeyModalVisible(true);
+      return;
+    }
+
     setIsLoading(true);
     setEditorCode(undefined);
     setErrorMessage(undefined);
 
     try {
-      const generatedYaml = await generateYamlUsingAI({userPrompt: inputValue, shouldValidate: isOpaValidationEnabled});
+      const generatedYaml = await generateYamlUsingAI({userPrompt: inputValue, shouldValidate: isValidationEnabled});
       setEditorCode(generatedYaml);
     } catch (e: any) {
       setErrorMessage(e.message);
@@ -126,15 +136,12 @@ const AIGenerationModal: React.FC = () => {
       okButtonProps={{disabled: !editorCode}}
     >
       <S.ModalBody>
-        {!apiKey && (
-          <div>
-            Please provide your OpenAI API key:{' '}
-            <Input value={inputApiKey} onChange={e => setInputApiKey(e.target.value)} />
-            <Button onClick={() => inputApiKey && dispatch(setUserApiKey({vendor: 'OpenAI', apiKey: inputApiKey}))}>
-              Save
-            </Button>
-          </div>
-        )}
+        <ApiKeyModal
+          isVisible={isApiKeyModalVisible}
+          onClose={() => {
+            setIsApiKeyModalVisible(false);
+          }}
+        />
 
         <S.LeftColumn>
           <img src={AIRobot} />
@@ -159,6 +166,23 @@ const AIGenerationModal: React.FC = () => {
           <S.CreateButton type="primary" onClick={onGenerateHandler} loading={isLoading}>
             Generate
           </S.CreateButton>
+          <S.Footer>
+            <h4>Settings</h4>
+            <Divider style={{marginTop: 0}} />
+            <div style={{marginBottom: 8}}>
+              <span style={{cursor: 'pointer', userSelect: 'none'}} onClick={() => setIsValidationEnabled(val => !val)}>
+                <Switch checked={isValidationEnabled} /> Enable validation
+              </span>
+              <Tooltip title={VALIDATION_TOOLTIP}>
+                <InfoCircleOutlined style={{marginLeft: 8}} />
+              </Tooltip>
+            </div>
+            <div>
+              <Button type="link" style={{padding: 0}} onClick={() => setIsApiKeyModalVisible(true)}>
+                Change API key
+              </Button>
+            </div>
+          </S.Footer>
         </S.LeftColumn>
 
         <S.RightColumn>

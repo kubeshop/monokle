@@ -86,3 +86,5 @@ export const NoContentTitle = styled.p`
   margin-top: 16px;
   margin-bottom: 4px;
 `;
+
+export const Footer = styled.div``;
