@@ -1,8 +1,10 @@
-import {Dispatch, useMemo} from 'react';
+import {Dispatch, useMemo, useRef} from 'react';
 
 import {CloseOutlined} from '@ant-design/icons';
 
 import {Tab} from 'rc-tabs/lib/interface';
+
+import {useOnClickOutside} from '@hooks/useOnClickOutside';
 
 import HelmInfo from './HelmChartTabs/HelmInfo';
 import HelmTemplate from './HelmChartTabs/HelmTemplate';
@@ -40,12 +42,14 @@ interface IProps {
 }
 
 const HelmChartDetails = ({chart, onDismissPane}: IProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const chartName = chart.split('/')[1];
 
   const tabItems = useMemo(() => createTabItems(chart), [chart]);
+  useOnClickOutside(containerRef, () => onDismissPane(null));
 
   return (
-    <S.Container>
+    <S.Container ref={containerRef}>
       <S.Content>
         <S.Header>
           <S.Title>{chartName}</S.Title>

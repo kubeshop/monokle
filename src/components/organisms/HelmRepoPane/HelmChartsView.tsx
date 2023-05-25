@@ -11,7 +11,7 @@ import {useAppSelector} from '@redux/hooks';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
-import {trackEvent} from '@shared/utils';
+import {openUrlInExternalBrowser, trackEvent} from '@shared/utils';
 import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
 
 import HelmChartDetails from './HelmChartDetails';
@@ -106,10 +106,14 @@ const HelmChartsTable = () => {
         placeholder="Search for a Helm Chart"
         prefix={<SearchOutlined />}
         onChange={onChangeSearchInputHandler}
+        size="large"
       />
       <Typography.Text style={{height: 'fit-content', marginBottom: 12}}>
         {searchResultCount} Helm Charts found. You can
-        <Typography.Link> add more Helm Charts repositories</Typography.Link> to extend your search.
+        <Typography.Link onClick={() => openUrlInExternalBrowser('https://artifacthub.io/')}>
+          add more Helm Charts repositories
+        </Typography.Link>{' '}
+        to extend your search.
       </Typography.Text>
       <div ref={ref} style={{overflow: 'hidden', flex: 1}}>
         <S.Table
