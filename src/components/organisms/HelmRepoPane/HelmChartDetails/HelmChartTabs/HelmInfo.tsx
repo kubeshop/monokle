@@ -111,6 +111,12 @@ const HelmInfo = ({chartName}: IProps) => {
                 </a>
               );
             },
+            h1({children, ...restProps}) {
+              return <S.H1 {...restProps}>{children}</S.H1>;
+            },
+            h2({children, ...restProps}) {
+              return <S.H2 {...restProps}>{children}</S.H2>;
+            },
           }}
         >
           {helmChartInfo?.readme || ''}
@@ -120,7 +126,7 @@ const HelmInfo = ({chartName}: IProps) => {
       <S.Footer>
         <S.MenuDropdownList
           id="versions"
-          style={{minHeight: 0, maxHeight: 300, minWidth: 200, position: 'absolute', backgroundColor: Colors.grey1}}
+          style={{minHeight: 0, maxHeight: 300, minWidth: 200, position: 'absolute', backgroundColor: Colors.grey3}}
         />
         <Dropdown.Button
           menu={{

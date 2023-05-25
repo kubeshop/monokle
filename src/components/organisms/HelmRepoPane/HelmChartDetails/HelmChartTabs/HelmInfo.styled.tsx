@@ -56,11 +56,13 @@ export const Footer = styled.div`
 `;
 
 export const MenuDropdownList = styled.div`
-  position: relative;
+  position: absolute;
 
   ul {
     overflow: overlay;
-    height: 200px;
+    min-width: 100px;
+    max-height: 200px;
+    min-height: 0;
   }
 
   ul::-webkit-scrollbar {
@@ -75,7 +77,7 @@ export const MenuDropdownList = styled.div`
   }
 
   .ant-dropdown-menu {
-    background-color: ${Colors.grey1};
+    background-color: ${Colors.grey2};
     overflow-x: hidden;
     box-shadow: none;
   }
@@ -84,6 +86,16 @@ export const MenuDropdownList = styled.div`
   }
 
   .ant-dropdown-menu-item:hover {
-    background-color: ${Colors.grey2};
+    background-color: ${Colors.grey3};
   }
+`;
+
+export const H1 = styled(Typography.Text)`
+  font-size: 16px;
+  font-weight: bold;
+`;
+
+export const H2 = styled(Typography.Text)`
+  font-size: 14px;
+  font-weight: bold;
 `;
