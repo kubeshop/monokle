@@ -140,7 +140,7 @@ export const Input = styled(AntInput)`
   margin-top: 20px;
   margin-bottom: 22px;
   width: unset;
-  min-width: fit-content;
+  min-width: 400px;
 `;
 
 export const HighlightedIcon = styled(Icon)`
