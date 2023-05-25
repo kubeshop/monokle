@@ -18,6 +18,9 @@ import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
+import AIRobot from '@assets/AIRobot.svg';
+import AIRobotColored from '@assets/AIRobotColored.svg';
+
 import {AlertEnum} from '@shared/models/alert';
 
 import * as S from './AIGenerationModal.styled';
@@ -117,59 +120,79 @@ const AIGenerationModal: React.FC = () => {
       title="Create Resources using AI"
       open={newAiResourceWizardState.isOpen}
       onCancel={onCancel}
-      width="90%"
-      okText="Create"
+      width="80%"
+      okText="Create resources from generated preview"
       onOk={onOkHandler}
+      okButtonProps={{disabled: !editorCode}}
     >
-      {!apiKey && (
-        <div>
-          Please provide your OpenAI API key:{' '}
-          <Input value={inputApiKey} onChange={e => setInputApiKey(e.target.value)} />
-          <Button onClick={() => inputApiKey && dispatch(setUserApiKey({vendor: 'OpenAI', apiKey: inputApiKey}))}>
-            Save
-          </Button>
-        </div>
-      )}
+      <S.ModalBody>
+        {!apiKey && (
+          <div>
+            Please provide your OpenAI API key:{' '}
+            <Input value={inputApiKey} onChange={e => setInputApiKey(e.target.value)} />
+            <Button onClick={() => inputApiKey && dispatch(setUserApiKey({vendor: 'OpenAI', apiKey: inputApiKey}))}>
+              Save
+            </Button>
+          </div>
+        )}
 
-      <S.Note>
-        Please provide <strong>precise and specific details</strong> for creating your desired Kubernetes resources.
-        Accurate details will help us meet your specific needs effectively.
-      </S.Note>
+        <S.LeftColumn>
+          <img src={AIRobot} />
 
-      <Input.TextArea
-        autoSize={{minRows: 3, maxRows: 8}}
-        value={inputValue}
-        onChange={e => {
-          setErrorMessage('');
-          setInputValue(e.target.value);
-        }}
-        placeholder="Enter requirements ( e.g. Create a Deployment using the nginx image, with 2 replicas, and expose port 80 through a ClusterIP Service )"
-      />
+          <S.Note>
+            Please provide <strong>precise and specific details</strong> for creating your desired Kubernetes resources.
+            Accurate details will help us meet your specific needs effectively.
+          </S.Note>
 
-      {errorMessage && <S.ErrorMessage>*{errorMessage}</S.ErrorMessage>}
-
-      <S.CreateButton type="primary" onClick={onGenerateHandler} loading={isLoading}>
-        Generate
-      </S.CreateButton>
-
-      {isLoading ? (
-        <Spin tip="Your manifest is being generated. This might take a few minutes.">
-          <S.SpinContainer />
-        </Spin>
-      ) : !editorCode ? (
-        <S.NoContent>No resources to preview.</S.NoContent>
-      ) : (
-        <div ref={monacoContainerRef} style={{height: 'calc(100% - 200px)', width: '100%'}}>
-          <MonacoEditor
-            width={containerWidth}
-            height={containerHeight}
-            language="yaml"
-            theme={KUBESHOP_MONACO_THEME}
-            value={editorCode}
-            options={EDITOR_OPTIONS}
+          <Input.TextArea
+            autoSize={{minRows: 8, maxRows: 16}}
+            value={inputValue}
+            onChange={e => {
+              setErrorMessage('');
+              setInputValue(e.target.value);
+            }}
+            placeholder="Enter requirements ( e.g. Create a Deployment using the nginx image, with 2 replicas, and expose port 80 through a ClusterIP Service )"
           />
-        </div>
-      )}
+
+          {errorMessage && <S.ErrorMessage>*{errorMessage}</S.ErrorMessage>}
+
+          <S.CreateButton type="primary" onClick={onGenerateHandler} loading={isLoading}>
+            Generate
+          </S.CreateButton>
+        </S.LeftColumn>
+
+        <S.RightColumn>
+          {isLoading ? (
+            <S.PlaceholderContainer>
+              <S.PlaceholderBody>
+                <Spin style={{width: '100%'}} tip="Resources are being generated. This might take a few minutes." />
+              </S.PlaceholderBody>
+            </S.PlaceholderContainer>
+          ) : !editorCode ? (
+            <S.PlaceholderContainer>
+              <S.PlaceholderBody>
+                <img src={AIRobotColored} alt="AI Robot" />
+                <S.NoContentTitle>Nothing to preview.</S.NoContentTitle>
+                <p>
+                  Ask the AI to generate resources using the top left input, then preview the output and create the
+                  resources if everything looks fine.
+                </p>
+              </S.PlaceholderBody>
+            </S.PlaceholderContainer>
+          ) : (
+            <div ref={monacoContainerRef} style={{height: '100%', width: '100%'}}>
+              <MonacoEditor
+                width={containerWidth}
+                height={containerHeight}
+                language="yaml"
+                theme={KUBESHOP_MONACO_THEME}
+                value={editorCode}
+                options={EDITOR_OPTIONS}
+              />
+            </div>
+          )}
+        </S.RightColumn>
+      </S.ModalBody>
     </S.Modal>
   );
 };
