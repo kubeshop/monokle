@@ -177,11 +177,13 @@ const AIGenerationModal: React.FC = () => {
                 <InfoCircleOutlined style={{marginLeft: 8}} />
               </Tooltip>
             </div>
-            <div>
-              <Button type="link" style={{padding: 0}} onClick={() => setIsApiKeyModalVisible(true)}>
-                Change API key
-              </Button>
-            </div>
+            {apiKey && (
+              <div>
+                <Button type="link" style={{padding: 0}} onClick={() => setIsApiKeyModalVisible(true)}>
+                  Change API key
+                </Button>
+              </div>
+            )}
           </S.Footer>
         </S.LeftColumn>
 
