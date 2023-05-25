@@ -1,4 +1,4 @@
-import {Input as AntInput, Menu as AntMenu, Table as AntTable, Button, Typography} from 'antd';
+import {Input as AntInput, Menu as AntMenu, Table as AntTable, Button, Form, Typography} from 'antd';
 
 import styled from 'styled-components';
 
@@ -176,5 +176,11 @@ export const DescriptionTitle = styled(Typography.Text)`
 export const DeleteButton = styled(Button)`
   &.ant-btn-text:hover {
     background-color: transparent !important;
+  }
+`;
+
+export const FormItem = styled(Form.Item)`
+  &.ant-form-item {
+    width: min(30%, 400px);
   }
 `;

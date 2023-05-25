@@ -140,12 +140,12 @@ const HelmReposTable = () => {
     <>
       <Typography.Text style={{marginTop: 24, marginBottom: 16}}>Add a new Helm Chart repository</Typography.Text>
       <Form layout="inline" form={form} onFinish={onAddRepoHandler}>
-        <Form.Item name="name" rules={[{required: true, type: 'string'}]}>
+        <S.FormItem name="name" rules={[{required: true, type: 'string'}]}>
           <Input size="large" placeholder="Enter a name to identify it" />
-        </Form.Item>
-        <Form.Item name="url" rules={[{required: true, type: 'url'}]}>
+        </S.FormItem>
+        <S.FormItem name="url" rules={[{required: true, type: 'url'}]}>
           <Input size="large" placeholder="Enter a valid repository URL and click to proceed" />
-        </Form.Item>
+        </S.FormItem>
 
         <Button size="large" type="primary" htmlType="submit">
           Add
