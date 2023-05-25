@@ -1,10 +1,6 @@
-import {Dispatch, useMemo, useRef} from 'react';
-
-import {CloseOutlined} from '@ant-design/icons';
+import {Dispatch, useMemo} from 'react';
 
 import {Tab} from 'rc-tabs/lib/interface';
-
-import {useOnClickOutside} from '@hooks/useOnClickOutside';
 
 import HelmInfo from './HelmChartTabs/HelmInfo';
 import HelmTemplate from './HelmChartTabs/HelmTemplate';
@@ -42,24 +38,21 @@ interface IProps {
 }
 
 const HelmChartDetails = ({chart, onDismissPane}: IProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
   const chartName = chart.split('/')[1];
 
   const tabItems = useMemo(() => createTabItems(chart), [chart]);
-  useOnClickOutside(containerRef, () => onDismissPane(null));
 
   return (
-    <S.Container ref={containerRef}>
-      <S.Content>
-        <S.Header>
-          <S.Title>{chartName}</S.Title>
-          <S.CloseButton onClick={() => onDismissPane(null)}>
-            <CloseOutlined />
-          </S.CloseButton>
-        </S.Header>
-        <S.Tabs style={{height: '100%'}} items={tabItems} />
-      </S.Content>
-    </S.Container>
+    <S.Drawer
+      placement="right"
+      size="large"
+      open={Boolean(chart)}
+      getContainer={false}
+      title={<S.Title>{chartName}</S.Title>}
+      onClose={() => onDismissPane(null)}
+    >
+      <S.Tabs style={{height: '100%'}} items={tabItems} />
+    </S.Drawer>
   );
 };
 

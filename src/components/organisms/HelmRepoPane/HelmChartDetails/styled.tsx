@@ -1,9 +1,34 @@
-import {Tabs as AntTabs, Typography} from 'antd';
+import {Tabs as AntTabs, Drawer as RawDrawer, Typography} from 'antd';
 
 import styled from 'styled-components';
 
 import {IconButton} from '@monokle/components';
 import {Colors} from '@shared/styles';
+
+export const Drawer = styled(RawDrawer)`
+  & .ant-drawer-content {
+    background: ${Colors.grey1};
+  }
+  z-index: 1000;
+
+  & .ant-drawer-close {
+    position: absolute;
+    right: 0px;
+  }
+
+  & .ant-drawer-extra {
+    margin-right: 20px;
+  }
+
+  & .ant-drawer-header {
+    border-bottom: none;
+  }
+
+  & .ant-drawer-body {
+    overflow: hidden;
+    padding: 0;
+  }
+`;
 
 export const Container = styled.div`
   position: absolute;
