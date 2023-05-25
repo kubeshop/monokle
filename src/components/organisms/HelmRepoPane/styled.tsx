@@ -1,4 +1,4 @@
-import {Input as AntInput, Menu as AntMenu, Table as AntTable, Typography} from 'antd';
+import {Input as AntInput, Menu as AntMenu, Table as AntTable, Button, Typography} from 'antd';
 
 import styled from 'styled-components';
 
@@ -171,4 +171,10 @@ export const DescriptionTitle = styled(Typography.Text)`
   font-size: 14px;
   line-height: 24px;
   font-weight: 700;
+`;
+
+export const DeleteButton = styled(Button)`
+  &.ant-btn-text:hover {
+    background-color: transparent !important;
+  }
 `;

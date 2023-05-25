@@ -56,7 +56,12 @@ const createColumns = (onUpdateHelmRepoClick: onRepoCellClick, onDeleteHelmRepoC
           >
             Update
           </Button>
-          <DeleteOutlined id="deleteHelm" style={{color: 'red'}} onClick={() => onDeleteHelmRepoClick(record.name)} />
+          <S.DeleteButton
+            id="deleteHelm"
+            type="text"
+            icon={<DeleteOutlined style={{color: 'red'}} />}
+            onClick={() => onDeleteHelmRepoClick(record.name)}
+          />
         </S.HoverArea>
       );
     },
