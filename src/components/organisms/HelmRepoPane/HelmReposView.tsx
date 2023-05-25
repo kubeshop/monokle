@@ -34,7 +34,7 @@ const createColumns = (onUpdateHelmRepoClick: onRepoCellClick, onDeleteHelmRepoC
     responsive: ['sm'],
   },
   {
-    title: 'url',
+    title: 'URL',
     dataIndex: 'url',
     key: 'url',
     responsive: ['sm'],

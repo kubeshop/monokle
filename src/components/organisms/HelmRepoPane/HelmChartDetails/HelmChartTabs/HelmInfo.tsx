@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import {Dropdown, Skeleton, Typography} from 'antd';
@@ -15,6 +15,7 @@ import {useGetHelmChartInfo} from '@hooks/useGetHelmChartInfo';
 import helmPlaceholder from '@assets/helm-default-ico.svg';
 
 import {Icon} from '@monokle/components';
+import {Colors} from '@shared/styles';
 import {openUrlInExternalBrowser, trackEvent} from '@shared/utils';
 
 import PullHelmChartModal from '../PullHelmChartModal';
@@ -43,13 +44,18 @@ const HelmInfo = ({chartName}: IProps) => {
     },
     [chartName, chartVersion, dispatch]
   );
-
-  const items = helmChartInfo?.available_versions.map((i: any) => ({
-    label: i.version,
-    key: i.version,
-  }));
-
   const latestVersion = helmChartInfo?.version || '';
+
+  const items = useMemo(
+    () =>
+      helmChartInfo?.available_versions
+        .filter(i => i.version !== helmChartInfo?.version)
+        .map((i: any) => ({
+          label: i.version,
+          key: i.version,
+        })),
+    [helmChartInfo]
+  );
 
   const onDownloadLatestHelmChartHandler = () => {
     setChartVersion(latestVersion);
@@ -80,7 +86,10 @@ const HelmInfo = ({chartName}: IProps) => {
                 Author<Typography.Text> {helmChartInfo?.repository?.name}</Typography.Text>
               </S.Label>
               <S.Label>
-                Repository<Typography.Link> {helmChartInfo?.repository?.url}</Typography.Link>
+                Repository
+                <Typography.Link onClick={() => openUrlInExternalBrowser(helmChartInfo?.repository?.url)}>
+                  {helmChartInfo?.repository?.url}
+                </Typography.Link>
               </S.Label>
               <S.Label>
                 apiVersion<Typography.Text> {helmChartInfo?.data?.apiVersion}</Typography.Text>
@@ -109,7 +118,10 @@ const HelmInfo = ({chartName}: IProps) => {
       </S.Content>
 
       <S.Footer>
-        <S.MenuDropdownList id="versions" style={{height: 300, position: 'absolute'}} />
+        <S.MenuDropdownList
+          id="versions"
+          style={{height: 300, minWidth: 200, position: 'absolute', backgroundColor: Colors.grey1}}
+        />
         <Dropdown.Button
           menu={{
             items,
