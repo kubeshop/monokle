@@ -6,6 +6,9 @@ import {IconButton} from '@monokle/components';
 import {Colors} from '@shared/styles';
 
 export const Drawer = styled(RawDrawer)`
+  & .ant-drawer-content-wrapper {
+    width: calc(100vw - 34%) !important;
+  }
   & .ant-drawer-content {
     background: ${Colors.grey1};
   }
