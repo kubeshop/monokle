@@ -25,7 +25,7 @@ import {AlertEnum} from '@shared/models/alert';
 
 import * as S from './AIGenerationModal.styled';
 import ApiKeyModal from './ApiKeyModal';
-import {generateYamlUsingAI} from './ai';
+import {generateYamlUsingAI} from './ai.prompt';
 import {EDITOR_OPTIONS} from './constants';
 
 const VALIDATION_TOOLTIP = `This provides the option to validate the output based on your predefined validation settings.

@@ -1,8 +1,11 @@
 import log from 'loglevel';
-
-import {CreateChatCompletionParams} from '@shared/ipc/hackathon';
+import {ChatCompletionRequestMessage} from 'openai';
 
 import {getOpenAIClient} from './ai.client';
+
+export type CreateChatCompletionParams = {
+  messages: ChatCompletionRequestMessage[];
+};
 
 export async function createChatCompletion({messages}: CreateChatCompletionParams): Promise<string | undefined> {
   const openai = getOpenAIClient();

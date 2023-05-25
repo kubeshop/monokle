@@ -1,7 +1,6 @@
 import log from 'loglevel';
 import {ChatCompletionRequestMessage} from 'openai';
 
-import {createChatCompletion} from '@redux/hackathon/hackathon.ipc';
 import {extractK8sResources} from '@redux/services/resource';
 import {VALIDATOR} from '@redux/validation/validator';
 
@@ -9,6 +8,7 @@ import {transformResourceForValidation} from '@utils/resources';
 
 import {isDefined} from '@shared/utils/filter';
 
+import {createChatCompletion} from './ai.completion';
 import {extractYaml} from './utils';
 
 const GENERATION_PROMPT_START = `In this interaction, the goal is to produce Kubernetes YAML code based on specific requirements and specifications.
