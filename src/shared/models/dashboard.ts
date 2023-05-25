@@ -9,11 +9,13 @@ export type DashboardMenu = {
   children?: DashboardMenu[];
 };
 
+export type DashboardActiveTab = 'Info' | 'Manifest' | 'Logs' | 'Shell';
+
 export type DashboardState = {
   isOpen: boolean;
   ui: {
     activeMenu: DashboardMenu;
-    activeTab: 'Info' | 'Manifest' | 'Logs' | 'Shell';
+    activeTab: DashboardActiveTab;
     menuList: Array<DashboardMenu>;
   };
   tableDrawer: {

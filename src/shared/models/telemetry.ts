@@ -45,6 +45,7 @@ export type EventMap = {
   };
   'app_start/create_project': {from: 'scratch' | 'git' | 'template' | 'folder'; templateID?: string};
   'app_start/select_page': {page: string};
+  'app_start/select_project': undefined;
   'project_list/open_project': undefined;
   'project_list/pin_project': undefined;
   'project_list/unpin_project': undefined;
@@ -101,11 +102,18 @@ export type EventMap = {
   'preview/command/fail': {reason: string};
   'preview/command/end': {resourcesCount: number; executionTime: number};
   'preview/restart': {type: PreviewType};
+  'helm/command/start': {command: string[]};
+  'helm/command/fail': {reason: string};
+  'helm/command/end': undefined;
   'cluster/diff_resource': undefined;
   'cluster/deploy_resource': {kind: string};
   'cluster/deploy_file': undefined;
   'cluster/deploy_helm_chart': undefined;
   'cluster/deploy_kustomization': undefined;
+  'cluster/actions/update_manifest': {kind: string};
+  'cluster/actions/scale': {replicasNumber: number};
+  'cluster/actions/restart': undefined;
+  'cluster/actions/delete': {kind: string};
   'compare/opened': {from?: string};
   'compare/compared': {left?: string; right?: string; operation: string};
   'compare/inspected': {type?: string};

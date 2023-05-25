@@ -69,7 +69,7 @@ const HotKeysHandler = () => {
     hotkeys.SCALE.key,
     () => {
       if (selectedResource?.kind === 'Deployment' && isInClusterMode) {
-        dispatch(openScaleModal());
+        dispatch(openScaleModal(selectedResource));
       }
     },
     [selectedResource, isInClusterMode]

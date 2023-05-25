@@ -26,11 +26,11 @@ import {
 } from '@redux/reducers/main';
 import {setIsInQuickClusterMode} from '@redux/reducers/ui';
 import {getResourceMapFromState} from '@redux/selectors/resourceMapGetters';
-import {previewSavedCommand} from '@redux/services/previewCommand';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
+import {previewSavedCommand} from '@redux/thunks/previewCommand';
 import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
 import {previewKustomization} from '@redux/thunks/previewKustomization';
 import {removeResources} from '@redux/thunks/removeResources';
@@ -109,7 +109,7 @@ const validateListener: AppListenerFn = listen => {
       clearPreview
     ),
     async effect(_action, {dispatch, getState, cancelActiveListeners, signal, delay}) {
-      if (_action.type === 'main/clearPreviewAndSelectionHistory' && _action.payload.revalidate === false) {
+      if (_action.type === 'main/clearPreviewAndSelectionHistory' && _action.payload?.revalidate === false) {
         return;
       }
 

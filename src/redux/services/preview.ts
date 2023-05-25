@@ -7,7 +7,7 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {AnyPreview} from '@shared/models/preview';
 import {trackEvent} from '@shared/utils/telemetry';
 
-import {previewSavedCommand} from './previewCommand';
+import {previewSavedCommand} from '../thunks/previewCommand';
 
 export const startPreview = (preview: AnyPreview, dispatch: AppDispatch) => {
   dispatch(clearPreviewAndSelectionHistory());

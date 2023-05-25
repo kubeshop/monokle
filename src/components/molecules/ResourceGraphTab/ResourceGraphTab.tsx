@@ -1,6 +1,6 @@
 import {useCallback, useMemo} from 'react';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectImage, selectResource} from '@redux/reducers/main';
 import {setExplorerSelectedSection} from '@redux/reducers/ui';
 import {
@@ -22,9 +22,10 @@ import {trackEvent} from '@shared/utils';
 
 const ResourceGraphTab: React.FC = () => {
   const dispatch = useAppDispatch();
-  const selectedResource = useSelectedResource();
+  const clusterConnectionNamespace = useAppSelector(state => state.main.clusterConnection?.namespace || '');
   const activeResoureMetaMap = useActiveResourceMetaMap();
   const activeResoureContentMap = useActiveResourceContentMap();
+  const selectedResource = useSelectedResource();
   const transientResourceMetaMap = useResourceMetaMap('transient');
   const transientResourceContentMap = useResourceContentMap('transient');
 
@@ -96,6 +97,13 @@ const ResourceGraphTab: React.FC = () => {
       onSelectResource={onSelectResource}
       onSelectImage={onSelectImage}
       elkWorker={elkWorker}
+      defaultNamespace={
+        clusterConnectionNamespace
+          ? clusterConnectionNamespace !== '<all>' && clusterConnectionNamespace !== '<not-namespaced>'
+            ? clusterConnectionNamespace
+            : undefined
+          : undefined
+      }
     />
   );
 };

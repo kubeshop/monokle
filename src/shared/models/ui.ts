@@ -1,5 +1,5 @@
 import {Project, SavedCommand, SettingsPanel} from './config';
-import {ResourceIdentifier} from './k8sResource';
+import {K8sResource, ResourceIdentifier} from './k8sResource';
 
 export type StartPageMenuOptions =
   | 'recent-projects'
@@ -91,7 +91,7 @@ type UiState = {
   isResourceFiltersOpen: boolean;
   isReleaseNotesDrawerOpen: boolean;
   isKeyboardShortcutsModalOpen: boolean;
-  isScaleModalOpen: boolean;
+
   isNotificationsOpen: boolean;
   isAboutModalOpen: boolean;
   newVersionNotice: {
@@ -113,6 +113,10 @@ type UiState = {
   renameResourceModal?: {
     isOpen: boolean;
     resourceIdentifier: ResourceIdentifier;
+  };
+  scaleModal: {
+    isOpen: boolean;
+    resource?: K8sResource;
   };
   replaceImageModal?: {
     isOpen: boolean;

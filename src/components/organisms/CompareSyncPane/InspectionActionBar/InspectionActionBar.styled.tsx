@@ -5,6 +5,7 @@ export const ActionBarDiv = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 9px 12px;
+  width: 100%;
 `;
 
 export const ActionBarRightDiv = styled.div`
