@@ -1,9 +1,12 @@
 import {useCallback, useMemo, useState} from 'react';
 import ReactMarkdown from 'react-markdown';
+import {useAsync} from 'react-use';
 
 import {Dropdown, Skeleton, Typography} from 'antd';
 
 import {CloudDownloadOutlined, DownOutlined} from '@ant-design/icons';
+
+import {first} from 'lodash';
 
 import {kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -18,6 +21,7 @@ import helmPlaceholder from '@assets/helm-default-ico.svg';
 import {Icon} from '@monokle/components';
 import {Colors} from '@shared/styles';
 import {openUrlInExternalBrowser, trackEvent} from '@shared/utils';
+import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
 
 import PullHelmChartModal from '../PullHelmChartModal';
 import * as S from './HelmInfo.styled';
@@ -34,6 +38,10 @@ const HelmInfo = ({chartName}: IProps) => {
   const [chartVersion, setChartVersion] = useState('');
 
   const {value: helmChartInfo, loading: loadingHelmInfo} = useGetHelmChartInfo(chartName);
+  const {value: versions = [], loading: isLoadingVersions} = useAsync(async (): Promise<{version: string}[]> => {
+    const result = await runCommandInMainThread(searchHelmRepoCommand({q: chartName}, true));
+    return JSON.parse(result.stdout || '[]');
+  });
 
   const onClickApplyHelmChart = useCallback(
     async (namespace?: string) => {
@@ -46,17 +54,17 @@ const HelmInfo = ({chartName}: IProps) => {
     },
     [chartName, chartVersion, dispatch]
   );
-  const latestVersion = helmChartInfo?.version || '';
+  const latestVersion = first<{version: string}>(versions)?.version || '';
 
   const items = useMemo(
     () =>
-      helmChartInfo?.available_versions
-        .filter(i => i.version !== helmChartInfo?.version)
+      versions
+        .filter(i => i.version !== latestVersion)
         .map((i: any) => ({
           label: i.version,
           key: i.version,
         })),
-    [helmChartInfo]
+    [versions, latestVersion]
   );
 
   const onDownloadLatestHelmChartHandler = () => {
@@ -69,8 +77,8 @@ const HelmInfo = ({chartName}: IProps) => {
     setInstallModalOpen(true);
   };
 
-  return loadingHelmInfo ? (
-    <Skeleton active={loadingHelmInfo} />
+  return loadingHelmInfo || isLoadingVersions ? (
+    <Skeleton active={loadingHelmInfo || isLoadingVersions} />
   ) : (
     <S.Container>
       <S.Content>
