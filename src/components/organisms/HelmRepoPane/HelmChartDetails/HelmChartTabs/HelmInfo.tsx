@@ -5,7 +5,8 @@ import {Dropdown, Skeleton, Typography} from 'antd';
 
 import {CloudDownloadOutlined, DownOutlined} from '@ant-design/icons';
 
-import {useAppDispatch} from '@redux/hooks';
+import {kubeConfigContextSelector} from '@redux/appConfig';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {installHelmRepoChart} from '@redux/thunks/InstallHelmRepoChart';
 
 import {HelmChartModalConfirmWithNamespaceSelect} from '@components/molecules';
@@ -27,6 +28,7 @@ interface IProps {
 
 const HelmInfo = ({chartName}: IProps) => {
   const dispatch = useAppDispatch();
+  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [installModalOpen, setInstallModalOpen] = useState(false);
   const [chartVersion, setChartVersion] = useState('');
@@ -173,7 +175,7 @@ const HelmInfo = ({chartName}: IProps) => {
 
       <HelmChartModalConfirmWithNamespaceSelect
         isVisible={installModalOpen}
-        title="Install Helm Chart"
+        title={`Install the ${chartName} Chart in cluster [${kubeConfigContext}]?`}
         onCancel={() => setInstallModalOpen(false)}
         onOk={selectedNamespace => onClickApplyHelmChart(selectedNamespace)}
       />

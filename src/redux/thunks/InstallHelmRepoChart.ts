@@ -2,11 +2,12 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {setAlert} from '@redux/reducers/alert';
 
+import {errorAlert, successAlert} from '@utils/alert';
+
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
-import {installHelmRepoChartCommand, runCommandInMainThread} from '@shared/utils/commands';
 import {kubeConfigPathSelector} from '@shared/utils';
-import {errorAlert, successAlert} from '@utils/alert';
+import {installHelmRepoChartCommand, runCommandInMainThread} from '@shared/utils/commands';
 
 export const installHelmRepoChart = createAsyncThunk<
   void,
@@ -23,7 +24,7 @@ export const installHelmRepoChart = createAsyncThunk<
     )
   );
   if (result.stderr) {
-    dispatch(setAlert(errorAlert('Install Helm Chart', "Couldn't install chart")));
+    dispatch(setAlert(errorAlert('Install Helm Chart', result.stderr)));
     throw new Error(result.stderr);
   }
 
