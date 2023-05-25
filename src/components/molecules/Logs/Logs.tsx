@@ -2,6 +2,8 @@ import * as k8s from '@kubernetes/client-node';
 
 import {useEffect, useMemo, useRef, useState} from 'react';
 
+import {Skeleton} from 'antd';
+
 import log from 'loglevel';
 import stream from 'stream';
 import {v4 as uuidv4} from 'uuid';
@@ -10,6 +12,7 @@ import {useAppSelector} from '@redux/hooks';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 
 import {SearchInput} from '@monokle/components';
+import {Colors} from '@shared/styles/colors';
 import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
@@ -27,20 +30,48 @@ const logOptions = {
   timestamps: false,
 };
 
+const matchingCharactersLabel = (label: string, searchingValue: string) => {
+  const inputValue = searchingValue.replaceAll('\\', '\\\\');
+  const regex = new RegExp(`(${inputValue})`, 'gi');
+  const parts = label.split(regex);
+
+  return parts.map((part, index) => {
+    const key = `${label}-${index}`;
+
+    if (part) {
+      if (part.toLowerCase() === searchingValue.toLowerCase()) {
+        return (
+          <span key={key} style={{color: Colors.geekblue9}}>
+            {part}
+          </span>
+        );
+      }
+      return part;
+    }
+
+    return '';
+  });
+};
+
 const Logs: React.FC = () => {
   const kubeconfig = useAppSelector(selectKubeconfig);
   const selectedResource = useSelectedResource();
 
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [logs, setLogs] = useState<LogLineType[]>([]);
   const [searchValue, setSearchValue] = useState('');
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const filteredLogs = useMemo(
-    () => logs.filter(l => l.text.toLowerCase().includes(searchValue.toLowerCase())),
-    [logs, searchValue]
-  );
+  const filteredLogs = useMemo(() => {
+    const currentLogs = logs.filter(l => l.text.toLowerCase().includes(searchValue.toLowerCase()));
+
+    return currentLogs.map(logLine => ({
+      id: logLine.id,
+      label: <span>{matchingCharactersLabel(logLine.text, searchValue)}</span>,
+    }));
+  }, [logs, searchValue]);
 
   useEffect(() => {
     if (containerRef && containerRef.current) {
@@ -54,6 +85,7 @@ const Logs: React.FC = () => {
       return;
     }
 
+    setIsLoading(true);
     setLogs([]);
     const kc = createKubeClient(kubeconfig.path, kubeconfig.currentContext);
     const k8sLog = new k8s.Log(kc);
@@ -69,6 +101,7 @@ const Logs: React.FC = () => {
             text: chunk.toString(),
           },
         ]);
+        setIsLoading(false);
       });
 
       if (selectedResource.namespace) {
@@ -104,9 +137,15 @@ const Logs: React.FC = () => {
         onChange={(e: any) => setSearchValue(e.target.value)}
       />
 
-      {filteredLogs.map(logLine => (
-        <S.LogText key={logLine.id}>{logLine.text}</S.LogText>
-      ))}
+      <S.LogsContainer>
+        {isLoading ? (
+          <Skeleton />
+        ) : !filteredLogs.length ? (
+          <S.LogText>No logs found</S.LogText>
+        ) : (
+          filteredLogs.map(logLine => <S.LogText key={logLine.id}>{logLine.label}</S.LogText>)
+        )}
+      </S.LogsContainer>
     </S.LogContainer>
   );
 };

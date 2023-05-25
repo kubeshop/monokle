@@ -10,8 +10,10 @@ export const ErrorContainer = styled.div`
 export const LogContainer = styled.div`
   padding: 12px;
   height: 100%;
-  overflow: auto;
+  overflow-x: auto;
   background-color: ${Colors.grey1};
+  display: grid;
+  grid-template-rows: max-content 1fr;
 `;
 
 export const LogText = styled.div`
@@ -20,4 +22,10 @@ export const LogText = styled.div`
   font-weight: 600;
   color: ${Colors.whitePure};
   white-space: nowrap;
+`;
+
+export const LogsContainer = styled.div`
+  overflow-y: auto;
+  height: 100%;
+  padding-right: 8px;
 `;
