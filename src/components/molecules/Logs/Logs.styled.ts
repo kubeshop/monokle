@@ -11,7 +11,7 @@ export const LogContainer = styled.div`
   padding: 12px;
   height: 100%;
   overflow: auto;
-  background-color: ${Colors.blackPure};
+  background-color: ${Colors.grey1};
 `;
 
 export const LogText = styled.div`
