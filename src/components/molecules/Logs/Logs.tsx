@@ -1,6 +1,6 @@
 import * as k8s from '@kubernetes/client-node';
 
-import {memo, useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 import log from 'loglevel';
 import stream from 'stream';
@@ -9,6 +9,7 @@ import {v4 as uuidv4} from 'uuid';
 import {useAppSelector} from '@redux/hooks';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 
+import {SearchInput} from '@monokle/components';
 import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {createKubeClient} from '@shared/utils/kubeclient';
 
@@ -26,13 +27,20 @@ const logOptions = {
   timestamps: false,
 };
 
-const Logs = () => {
+const Logs: React.FC = () => {
   const kubeconfig = useAppSelector(selectKubeconfig);
   const selectedResource = useSelectedResource();
-  const [logs, setLogs] = useState<LogLineType[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const [errorMessage, setErrorMessage] = useState('');
+  const [logs, setLogs] = useState<LogLineType[]>([]);
+  const [searchValue, setSearchValue] = useState('');
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const filteredLogs = useMemo(
+    () => logs.filter(l => l.text.toLowerCase().includes(searchValue.toLowerCase())),
+    [logs, searchValue]
+  );
 
   useEffect(() => {
     if (containerRef && containerRef.current) {
@@ -89,15 +97,18 @@ const Logs = () => {
 
   return (
     <S.LogContainer ref={containerRef}>
-      {logs.map(logLine => (
-        <LogItem key={logLine.id} logLine={logLine} />
+      <SearchInput
+        style={{marginBottom: '16px'}}
+        placeholder="Search through logs..."
+        value={searchValue}
+        onChange={(e: any) => setSearchValue(e.target.value)}
+      />
+
+      {filteredLogs.map(logLine => (
+        <S.LogText key={logLine.id}>{logLine.text}</S.LogText>
       ))}
     </S.LogContainer>
   );
 };
 
 export default Logs;
-
-export const LogItem = memo(({logLine}: any) => {
-  return <S.LogText key={logLine.id}>{logLine.text}</S.LogText>;
-});
