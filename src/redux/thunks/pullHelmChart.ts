@@ -2,7 +2,8 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {setAlert} from '@redux/reducers/alert';
 
-import {AlertEnum} from '@shared/models/alert';
+import {errorAlert, successAlert} from '@utils/alert';
+
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
 import {helmPullChartCommand, runCommandInMainThread} from '@shared/utils/commands';
@@ -14,9 +15,10 @@ export const pullHelmChart = createAsyncThunk<
 >('main/pullHelmChart', async ({name, path, version}, {dispatch}) => {
   const result = await runCommandInMainThread(helmPullChartCommand({name, path, version}));
   if (result.stderr) {
-    dispatch(setAlert({type: AlertEnum.Error, title: 'Pull Helm Chart', message: "Couldn't pull chart"}));
+    dispatch(setAlert(errorAlert("Couldn't pull chart", result.stderr)));
+
     throw new Error(result.stderr);
   }
 
-  dispatch(setAlert({type: AlertEnum.Success, title: 'Pull Helm Chart', message: `${name} Chart pulled successfully`}));
+  dispatch(setAlert(successAlert('Pull Helm Chart', `${name} Chart pulled successfully`)));
 });
