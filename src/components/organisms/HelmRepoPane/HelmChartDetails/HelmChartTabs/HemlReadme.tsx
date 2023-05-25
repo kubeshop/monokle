@@ -11,7 +11,7 @@ interface IProps {
 }
 
 const HelmReadme = ({chartName}: IProps) => {
-  const {value = '', loading} = useGetHelmChartChangelog(chartName);
+  const {value = 'No changelog', loading} = useGetHelmChartChangelog(chartName);
   return loading ? (
     <Skeleton active={loading} />
   ) : (

@@ -120,7 +120,7 @@ const HelmInfo = ({chartName}: IProps) => {
       <S.Footer>
         <S.MenuDropdownList
           id="versions"
-          style={{height: 300, minWidth: 200, position: 'absolute', backgroundColor: Colors.grey1}}
+          style={{minHeight: 0, maxHeight: 300, minWidth: 200, position: 'absolute', backgroundColor: Colors.grey1}}
         />
         <Dropdown.Button
           menu={{
