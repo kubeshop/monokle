@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import {Button, Input, Modal} from 'antd';
 
@@ -27,8 +27,10 @@ const ApiKeyModal = (props: ApiKeyModalProps) => {
   const apiKey = useAppSelector(state => state.config.userApiKeys.OpenAI);
   const [inputApiKey, setInputApiKey] = useState(apiKey);
 
+  const isInputEmpty = useMemo(() => !inputApiKey || inputApiKey.trim() === '', [inputApiKey]);
+
   const onSubmit = () => {
-    if (!inputApiKey) {
+    if (isInputEmpty) {
       return;
     }
     dispatch(setUserApiKey({vendor: 'OpenAI', apiKey: inputApiKey}));
@@ -55,7 +57,7 @@ const ApiKeyModal = (props: ApiKeyModalProps) => {
         </>
       }
       okText="Submit"
-      okButtonProps={{disabled: !inputApiKey}}
+      okButtonProps={{disabled: isInputEmpty}}
     >
       <p>
         Please enter your OpenAI API key. You can find it{' '}
@@ -68,7 +70,7 @@ const ApiKeyModal = (props: ApiKeyModalProps) => {
         >
           here
         </Button>
-        .<Strong>You only have to do this once.</Strong>
+        .{!apiKey && <Strong>You only have to do this once.</Strong>}
       </p>
       <Input value={inputApiKey} onChange={e => setInputApiKey(e.target.value)} placeholder="Enter API key" />
     </Modal>
