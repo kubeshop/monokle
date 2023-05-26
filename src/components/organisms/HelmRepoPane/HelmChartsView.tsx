@@ -100,7 +100,7 @@ const HelmChartsTable = () => {
   const onChangeSearchInputHandler = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     setHelmRepoSearch(e.target.value);
     trackEvent('helm_repo/search', {query: e.target.value});
-  });
+  }, 700);
 
   return (
     <>

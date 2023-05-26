@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useMemo} from 'react';
 import {useAsyncFn} from 'react-use';
 
-import {Button, Form, Input, Typography} from 'antd';
+import {Button, Form, Input, Modal, Typography} from 'antd';
 
 import {DeleteOutlined} from '@ant-design/icons';
 
@@ -98,7 +98,7 @@ const HelmReposTable = () => {
 
       form.resetFields();
       refetchRepos();
-      trackEvent('helm_repo/add', {repo: values.name});
+      trackEvent('helm_repo/add');
     }
     if (result.stderr) {
       dispatch(setAlert(errorAlert(result.stderr)));
@@ -111,7 +111,7 @@ const HelmReposTable = () => {
         await runCommandInMainThread(updateHelmRepoCommand({repos: [repoName]}));
         refetchRepos();
         dispatch(setAlert(successAlert('Repository updated successfully')));
-        trackEvent('helm_repo/update', {repo: repoName});
+        trackEvent('helm_repo/update');
       } catch (e: any) {
         dispatch(setAlert(errorAlert(e.message)));
       }
@@ -121,14 +121,19 @@ const HelmReposTable = () => {
 
   const onDeleteRepoHandler = useCallback(
     async (repoName: string) => {
-      try {
-        await runCommandInMainThread(removeHelmRepoCommand({repos: [repoName]}));
-        dispatch(setAlert(successAlert('Repository deleted successfully')));
-        refetchRepos();
-        trackEvent('helm_repo/remove', {repo: repoName});
-      } catch (e: any) {
-        dispatch(setAlert(errorAlert(e.message)));
-      }
+      Modal.confirm({
+        title: `Are you sure you want to delete [${repoName}] repo?`,
+        onOk: async () => {
+          try {
+            await runCommandInMainThread(removeHelmRepoCommand({repos: [repoName]}));
+            dispatch(setAlert(successAlert('Repository deleted successfully')));
+            refetchRepos();
+            trackEvent('helm_repo/remove');
+          } catch (e: any) {
+            dispatch(setAlert(errorAlert(e.message)));
+          }
+        },
+      });
     },
     [dispatch, refetchRepos]
   );

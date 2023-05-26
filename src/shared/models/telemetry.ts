@@ -141,9 +141,9 @@ export type EventMap = {
   'notifications/toggle': undefined;
   'helm_repo/search': {query: string};
   'helm_repo/select': {chart: string};
-  'helm_repo/add': {repo: string};
-  'helm_repo/remove': {repo: string};
-  'helm_repo/update': {repo: string};
+  'helm_repo/add': undefined;
+  'helm_repo/remove': undefined;
+  'helm_repo/update': undefined;
   'helm_repo/download': {chart: string; version: string};
   'helm_repo/install': {chart: string; version: string};
 };
