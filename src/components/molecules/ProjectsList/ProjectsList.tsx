@@ -1,9 +1,8 @@
 import {useMemo, useState} from 'react';
 
 import {Select} from 'antd';
-import {Colors} from '@shared/styles';
-import {PlusOutlined, ThunderboltFilled} from '@ant-design/icons';
-
+import {PlusOutlined} from '@ant-design/icons';
+import thunderIcon from '@assets/figures/thunderIcon.svg';
 import {orderBy, size} from 'lodash';
 
 import {activeProjectSelector, sortProjects} from '@redux/appConfig';
@@ -56,17 +55,19 @@ const ProjectsList: React.FC<IProps> = props => {
     );
 
     if (typeFilter === 'all') {
-      return searchInput.trim() === '' ? projects : projects.filter(p => p.name?.toLowerCase().includes(searchInput));
+      return searchInput.trim() === ''
+        ? projects
+        : projects.filter(p => p.name?.toLowerCase().includes(searchInput.toLowerCase()));
     }
 
     if (typeFilter === 'git') {
       return searchInput.trim() === ''
         ? projects.filter(p => p.isGitRepo)
-        : projects.filter(p => p.name?.toLowerCase().includes(searchInput) && p.isGitRepo);
+        : projects.filter(p => p.name?.toLowerCase().includes(searchInput.toLowerCase()) && p.isGitRepo);
     }
     return searchInput.trim() === ''
       ? projects.filter(p => !p.isGitRepo)
-      : projects.filter(p => p.name?.toLowerCase().includes(searchInput) && !p.isGitRepo);
+      : projects.filter(p => p.name?.toLowerCase().includes(searchInput.toLowerCase()) && !p.isGitRepo);
   }, [creationFilter, currentProjects, type, typeFilter, searchInput]);
 
   if (size(filteredAndSortedProjects) === 0 && searchInput.trim() === '') {
@@ -133,9 +134,10 @@ const ProjectsList: React.FC<IProps> = props => {
           </S.SortAndFiltersContainer>
 
           <S.SearchInputBar>
-            <ThunderboltFilled style={{color: `${Colors.grey7}`}} />
+            {/* <ThunderboltFilled style={{color: `${Colors.grey7}`}} /> */}
+            <S.ThunderIcon src={thunderIcon} />
             <S.SearchInput
-              placeholder="Quick Project Search"
+              placeholder="Quick project search"
               value={searchInput}
               onChange={e => {
                 setSearchInput(e.target.value);

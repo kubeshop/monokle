@@ -85,3 +85,8 @@ export const NoProjectsFoundContainer = styled.div`
   align-items: center;
   justify-content: center;
 `;
+
+export const ThunderIcon = styled.img`
+  height: 15px;
+  width: 15px;
+`;
