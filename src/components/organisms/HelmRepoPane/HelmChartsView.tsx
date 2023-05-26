@@ -31,7 +31,10 @@ const columns = [
     dataIndex: 'name',
     key: 'name',
     ellipsis: true,
-    sorter: true,
+    sorter: {
+      compare: (a: TableDataType, b: TableDataType) => a.name.localeCompare(b.name),
+      multiple: 3,
+    },
     responsive: ['sm'],
   },
   {
@@ -39,7 +42,6 @@ const columns = [
     dataIndex: 'description',
     key: 'description',
     ellipsis: true,
-    sorter: true,
     responsive: ['sm'],
   },
   {

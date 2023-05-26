@@ -30,8 +30,10 @@ const createColumns = (onUpdateHelmRepoClick: onRepoCellClick, onDeleteHelmRepoC
     dataIndex: 'name',
     key: 'name',
     ellipsis: true,
-    sorter: true,
     responsive: ['sm'],
+    sorter: {
+      compare: (a: {name: string}, b: {name: string}) => a.name.localeCompare(b.name),
+    },
   },
   {
     title: 'URL',
@@ -163,7 +165,7 @@ const HelmReposTable = () => {
         pagination={false}
         loading={loading}
         sortDirections={['ascend', 'descend']}
-        scroll={{y: height - 360 - (bottomSelection === 'terminal' ? terminalHeight : 0)}}
+        scroll={{y: height - 400 - (bottomSelection === 'terminal' ? terminalHeight : 0)}}
       />
     </>
   );
