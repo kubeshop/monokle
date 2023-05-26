@@ -18,13 +18,32 @@ import {getRelativeDate} from '@utils/index';
 import {Project} from '@shared/models/config';
 import {trackEvent} from '@shared/utils';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
+import {Colors} from '@shared/styles/colors';
 
 import * as S from './ProjectCard.styled';
 
-type IProps = {isActive: boolean; project: Project};
+type IProps = {isActive: boolean; project: Project; query?: string};
 
 export const ProjectCard: React.FC<IProps> = props => {
-  const {isActive, project} = props;
+  const {isActive, project, query} = props;
+
+  const highlightQuery = (text: string) => {
+    if (!query?.trim()) {
+      return <span>{text}</span>;
+    }
+    const parts = text.split(new RegExp(`(${query})`, 'gi'));
+    return (
+      <span>
+        {parts.map(part =>
+          part.toLowerCase() === query.toLowerCase() ? (
+            <b style={{backgroundColor: `${Colors.geekblue9}`}}>{part}</b>
+          ) : (
+            part
+          )
+        )}
+      </span>
+    );
+  };
 
   const dispatch = useAppDispatch();
   const showOpenProjectAlertRef = useRefSelector(state => state.ui.showOpenProjectAlert);
@@ -126,7 +145,7 @@ export const ProjectCard: React.FC<IProps> = props => {
         </Tooltip>
       </S.ActionsContainer>
 
-      <S.Name>{project.name}</S.Name>
+      <S.Name>{project.name && highlightQuery(project.name)}</S.Name>
 
       <S.ProjectInfo>
         <S.Type>{project.isGitRepo ? 'Git' : 'Local'}</S.Type>

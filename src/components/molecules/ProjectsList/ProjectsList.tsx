@@ -148,6 +148,7 @@ const ProjectsList: React.FC<IProps> = props => {
             key={project.rootFolder}
             isActive={project.rootFolder === activeProject?.rootFolder}
             project={project}
+            query={searchInput}
           />
         ))}
       </S.ProjectsListContainer>
