@@ -52,13 +52,23 @@ export const SortAndFiltersContainer = styled.div`
 `;
 
 export const SearchInput = styled.input`
+  border: none;
+  outline: none;
+  background-color: ${BackgroundColors.darkThemeBackground};
+  font-size: 14px;
+  margin-left: 5px;
+`;
+
+export const SearchInputBar = styled.div`
   border: 1px solid ${Colors.grey10};
   border-radius: 3px;
   padding: 5px 10px;
   outline: none;
   width: 300px;
   background-color: ${BackgroundColors.darkThemeBackground};
-  font-size: 16px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
 `;
 
 export const SortFilterAndSearchContainer = styled.div`
@@ -66,4 +76,12 @@ export const SortFilterAndSearchContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 99%;
+`;
+
+export const NoProjectsFoundContainer = styled.div`
+  color: ${Colors.grey7};
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;

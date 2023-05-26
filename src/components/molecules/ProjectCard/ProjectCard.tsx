@@ -18,7 +18,6 @@ import {getRelativeDate} from '@utils/index';
 import {Project} from '@shared/models/config';
 import {trackEvent} from '@shared/utils';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
-import {Colors} from '@shared/styles/colors';
 
 import * as S from './ProjectCard.styled';
 
@@ -29,18 +28,12 @@ export const ProjectCard: React.FC<IProps> = props => {
 
   const highlightQuery = (text: string) => {
     if (!query?.trim()) {
-      return <span>{text}</span>;
+      return <S.Span>{text}</S.Span>;
     }
     const parts = text.split(new RegExp(`(${query})`, 'gi'));
     return (
       <S.Span>
-        {parts.map(part =>
-          part.toLowerCase() === query.toLowerCase() ? (
-            <S.BoldSpan style={{backgroundColor: `${Colors.geekblue9}`}}>{part}</S.BoldSpan>
-          ) : (
-            part
-          )
-        )}
+        {parts.map(part => (part.toLowerCase() === query.toLowerCase() ? <S.BoldSpan>{part}</S.BoldSpan> : part))}
       </S.Span>
     );
   };

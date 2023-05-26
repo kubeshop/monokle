@@ -1,8 +1,8 @@
 import {useMemo, useState} from 'react';
 
 import {Select} from 'antd';
-
-import {PlusOutlined} from '@ant-design/icons';
+import {Colors} from '@shared/styles';
+import {PlusOutlined, ThunderboltFilled} from '@ant-design/icons';
 
 import {orderBy, size} from 'lodash';
 
@@ -69,7 +69,7 @@ const ProjectsList: React.FC<IProps> = props => {
       : projects.filter(p => p.name?.toLowerCase().includes(searchInput) && !p.isGitRepo);
   }, [creationFilter, currentProjects, type, typeFilter, searchInput]);
 
-  if (size(filteredAndSortedProjects) === 0) {
+  if (size(filteredAndSortedProjects) === 0 && searchInput.trim() === '') {
     return (
       <S.EmptyList>
         Click on
@@ -132,13 +132,16 @@ const ProjectsList: React.FC<IProps> = props => {
             </S.Select>
           </S.SortAndFiltersContainer>
 
-          <S.SearchInput
-            placeholder="Quick Project Search"
-            value={searchInput}
-            onChange={e => {
-              setSearchInput(e.target.value);
-            }}
-          />
+          <S.SearchInputBar>
+            <ThunderboltFilled style={{color: `${Colors.grey7}`}} />
+            <S.SearchInput
+              placeholder="Quick Project Search"
+              value={searchInput}
+              onChange={e => {
+                setSearchInput(e.target.value);
+              }}
+            />
+          </S.SearchInputBar>
         </S.SortFilterAndSearchContainer>
       )}
 
@@ -151,6 +154,9 @@ const ProjectsList: React.FC<IProps> = props => {
             query={searchInput}
           />
         ))}
+        {size(filteredAndSortedProjects) === 0 && searchInput.trim() !== '' && (
+          <S.NoProjectsFoundContainer>No matching projects found</S.NoProjectsFoundContainer>
+        )}
       </S.ProjectsListContainer>
     </>
   );
