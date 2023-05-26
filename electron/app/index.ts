@@ -13,7 +13,6 @@ import '@shared/utils/segment';
 import './ipc/ipcListeners';
 import {openApplication} from './openApplication';
 import './services/git/ipc';
-import './services/hackathon/ipc';
 import {initTelemetry, saveInitialK8sSchema, setProjectsRootFolder} from './utils';
 import {fixPath} from './utils/path';
 
