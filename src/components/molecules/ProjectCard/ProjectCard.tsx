@@ -33,15 +33,15 @@ export const ProjectCard: React.FC<IProps> = props => {
     }
     const parts = text.split(new RegExp(`(${query})`, 'gi'));
     return (
-      <span>
+      <S.Span>
         {parts.map(part =>
           part.toLowerCase() === query.toLowerCase() ? (
-            <b style={{backgroundColor: `${Colors.geekblue9}`}}>{part}</b>
+            <S.BoldSpan style={{backgroundColor: `${Colors.geekblue9}`}}>{part}</S.BoldSpan>
           ) : (
             part
           )
         )}
-      </span>
+      </S.Span>
     );
   };
 
