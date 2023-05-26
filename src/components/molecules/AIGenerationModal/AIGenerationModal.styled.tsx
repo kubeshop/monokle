@@ -13,14 +13,14 @@ export const ModalBody = styled.div`
 export const LeftColumn = styled.div`
   position: relative;
   height: 100%;
-  width: 40%;
+  width: 45%;
   padding-right: 24px;
 `;
 
 export const RightColumn = styled.div`
   position: relative;
   height: 100%;
-  width: 60%;
+  width: 55%;
 `;
 
 export const CreateButton = styled(Button)`
