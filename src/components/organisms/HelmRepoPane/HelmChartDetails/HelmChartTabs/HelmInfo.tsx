@@ -21,7 +21,7 @@ import helmPlaceholder from '@assets/helm-default-ico.svg';
 import {Icon} from '@monokle/components';
 import {Colors} from '@shared/styles';
 import {openUrlInExternalBrowser, trackEvent} from '@shared/utils';
-import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
+import {helmChartReadmeCommand, runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
 
 import PullHelmChartModal from '../PullHelmChartModal';
 import * as S from './HelmInfo.styled';
@@ -43,11 +43,22 @@ const HelmInfo = ({chartName}: IProps) => {
     return JSON.parse(result.stdout || '[]');
   });
 
+  const {value: readme} = useAsync(async (): Promise<string> => {
+    const result = await runCommandInMainThread(helmChartReadmeCommand({name: chartName}));
+    return result.stdout || '';
+  });
+
   const onClickApplyHelmChart = useCallback(
-    async (namespace?: string) => {
+    async (namespace?: string, shouldCreateNamespace?: boolean) => {
       const repoName = chartName.split('/')[0];
       await dispatch(
-        installHelmRepoChart({name: repoName, chart: chartName, namespace, version: chartVersion})
+        installHelmRepoChart({
+          name: repoName,
+          chart: chartName,
+          namespace,
+          version: chartVersion,
+          shouldCreateNamespace,
+        })
       ).unwrap();
       setInstallModalOpen(false);
       trackEvent('helm_repo/install', {chart: chartName, version: chartVersion});
@@ -89,24 +100,24 @@ const HelmInfo = ({chartName}: IProps) => {
               height="100"
               loading="lazy"
               decoding="async"
-              src={getHelmRepoLogo(helmChartInfo?.logo_image_id)}
+              src={getHelmRepoLogo(helmChartInfo?.icon)}
             />
             <S.ChartInfo>
               <S.Label>
-                Author<Typography.Text> {helmChartInfo?.repository?.name}</Typography.Text>
+                Author<Typography.Text> {helmChartInfo?.name}</Typography.Text>
               </S.Label>
               <S.Label>
                 Repository&nbsp;
-                <Typography.Link onClick={() => openUrlInExternalBrowser(helmChartInfo?.repository?.url)}>
-                  {helmChartInfo?.repository?.url}
+                <Typography.Link onClick={() => openUrlInExternalBrowser(helmChartInfo?.home)}>
+                  {helmChartInfo?.home}
                 </Typography.Link>
               </S.Label>
               <S.Label>
-                apiVersion<Typography.Text> {helmChartInfo?.data?.apiVersion}</Typography.Text>
+                apiVersion<Typography.Text> {helmChartInfo?.apiVersion}</Typography.Text>
               </S.Label>
               <S.Label>
                 appVersion
-                <Typography.Text> {helmChartInfo?.app_version}</Typography.Text>
+                <Typography.Text> {helmChartInfo?.appVersion}</Typography.Text>
               </S.Label>
             </S.ChartInfo>
           </S.Header>
@@ -129,7 +140,7 @@ const HelmInfo = ({chartName}: IProps) => {
             },
           }}
         >
-          {helmChartInfo?.readme || ''}
+          {readme || ''}
         </ReactMarkdown>
       </S.Content>
 
@@ -185,7 +196,9 @@ const HelmInfo = ({chartName}: IProps) => {
         isVisible={installModalOpen}
         title={`Install the ${chartName} Chart in cluster [${kubeConfigContext}]?`}
         onCancel={() => setInstallModalOpen(false)}
-        onOk={selectedNamespace => onClickApplyHelmChart(selectedNamespace)}
+        onOk={(selectedNamespace, shouldCreateNamespace) =>
+          onClickApplyHelmChart(selectedNamespace, shouldCreateNamespace)
+        }
       />
     </S.Container>
   );
