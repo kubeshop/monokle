@@ -140,12 +140,12 @@ export type EventMap = {
   'bottom-left-menu/select-option': {option: LeftMenuBottomSelectionType};
   'notifications/toggle': undefined;
   'helm_repo/search': {query: string};
-  'helm_repo/select': {chart: string};
+  'helm_repo/select': undefined;
   'helm_repo/add': undefined;
   'helm_repo/remove': undefined;
   'helm_repo/update': undefined;
-  'helm_repo/download': {chart: string; version: string};
-  'helm_repo/install': {chart: string; version: string};
+  'helm_repo/download': undefined;
+  'helm_repo/install': undefined;
 };
 export const APP_INSTALLED = 'APP_INSTALLED';
 export const APP_SESSION = 'APP_SESSION';

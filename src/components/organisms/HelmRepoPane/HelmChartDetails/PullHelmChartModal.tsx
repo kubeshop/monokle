@@ -37,7 +37,7 @@ const PullHelmChartModal = ({
     const {name, path} = await form.validateFields();
     dispatch(pullHelmChart({name, path, version: chartVersion}));
     dismissModal();
-    trackEvent('helm_repo/download', {chart: chartName, version: chartVersion});
+    trackEvent('helm_repo/download');
   };
 
   return (

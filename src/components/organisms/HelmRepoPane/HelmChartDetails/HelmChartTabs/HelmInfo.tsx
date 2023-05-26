@@ -61,7 +61,7 @@ const HelmInfo = ({chartName}: IProps) => {
         })
       ).unwrap();
       setInstallModalOpen(false);
-      trackEvent('helm_repo/install', {chart: chartName, version: chartVersion});
+      trackEvent('helm_repo/install');
     },
     [chartName, chartVersion, dispatch]
   );
