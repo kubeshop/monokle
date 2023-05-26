@@ -206,9 +206,6 @@ const HelmInfo = ({chartName}: IProps) => {
 
 export default HelmInfo;
 
-const getHelmRepoLogo = (logoImageId?: string) => {
-  if (logoImageId) {
-    return `https://artifacthub.io/image/${logoImageId}`;
-  }
-  return helmPlaceholder;
+const getHelmRepoLogo = (iconURL?: string) => {
+  return iconURL || helmPlaceholder;
 };
