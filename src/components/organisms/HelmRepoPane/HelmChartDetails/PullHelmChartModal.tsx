@@ -1,6 +1,6 @@
 import {Button, Form, Input, Modal} from 'antd';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {pullHelmChart} from '@redux/thunks/pullHelmChart';
 
 import {FileExplorer} from '@components/atoms';
@@ -22,6 +22,7 @@ const PullHelmChartModal = ({
 }) => {
   const [form] = Form.useForm<{name: string; path: string}>();
   const dispatch = useAppDispatch();
+  const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
@@ -51,6 +52,7 @@ const PullHelmChartModal = ({
           <Input.Group compact>
             <Form.Item
               name="path"
+              initialValue={projectRootFolder}
               noStyle
               rules={[
                 ({getFieldValue}) => ({
