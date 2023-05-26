@@ -37,6 +37,7 @@ export const Note = styled.div<{$small?: boolean}>`
   color: ${Colors.grey7};
   margin-top: ${props => (props.$small ? '8px' : '16px')};
   margin-bottom: ${props => (props.$small ? '12px' : '16px')};
+  ${props => props.$small && 'max-width: 50%;'};
 `;
 
 export const SpinContainer = styled.div`
