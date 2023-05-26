@@ -2,9 +2,9 @@ import {useState} from 'react';
 import MonacoEditor from 'react-monaco-editor/lib/editor';
 import {useMeasure} from 'react-use';
 
-import {Button, Divider, Input, Spin, Switch, Tooltip} from 'antd';
+import {Button, Input, Spin, Switch} from 'antd';
 
-import {InfoCircleOutlined} from '@ant-design/icons';
+import {SettingOutlined} from '@ant-design/icons';
 
 import log from 'loglevel';
 import YAML from 'yaml';
@@ -31,6 +31,8 @@ import {EDITOR_OPTIONS} from './constants';
 const VALIDATION_TOOLTIP = `This provides the option to validate the output based on your predefined validation settings.
 While enabling validation enhances the quality of the results, it may also increase the processing time due to the extra validation procedures involved.`;
 
+const CHANGE_API_KEY_TOOLTIP = `You can easily replace your current OpenAI API key with a new one to ensure secure and uninterrupted access to AI features.`;
+
 const AIGenerationModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const newAiResourceWizardState = useAppSelector(state => state.ui.newAiResourceWizard);
@@ -40,6 +42,7 @@ const AIGenerationModal: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [editorCode, setEditorCode] = useState<string>();
   const [isValidationEnabled, setIsValidationEnabled] = useState(true);
+  const [areSettingsVisible, setAreSettingsVisible] = useState(false);
 
   const apiKey = useAppSelector(state => state.config.userApiKeys.OpenAI);
   const [isApiKeyModalVisible, setIsApiKeyModalVisible] = useState(false);
@@ -143,81 +146,95 @@ const AIGenerationModal: React.FC = () => {
           }}
         />
 
-        <S.LeftColumn>
-          <img src={AIRobot} />
-
-          <S.Note>
-            Please provide <strong>precise and specific details</strong> for creating your desired Kubernetes resources.
-            Accurate details will help us meet your specific needs effectively.
-          </S.Note>
-
-          <Input.TextArea
-            autoSize={{minRows: 8, maxRows: 16}}
-            value={inputValue}
-            onChange={e => {
-              setErrorMessage('');
-              setInputValue(e.target.value);
-            }}
-            placeholder="Enter requirements ( e.g. Create a Deployment using the nginx image, with 2 replicas, and expose port 80 through a ClusterIP Service )"
-          />
-
-          {errorMessage && <S.ErrorMessage>*{errorMessage}</S.ErrorMessage>}
-
-          <S.CreateButton type="primary" onClick={onGenerateHandler} loading={isLoading}>
-            Generate
-          </S.CreateButton>
-          <S.Footer>
-            <h4>Settings</h4>
-            <Divider style={{marginTop: 0}} />
-            <div style={{marginBottom: 8}}>
-              <span style={{cursor: 'pointer', userSelect: 'none'}} onClick={() => setIsValidationEnabled(val => !val)}>
+        {areSettingsVisible ? (
+          <div>
+            <img src={AIRobot} />
+            <S.SettingsTitle>Settings</S.SettingsTitle>
+            <S.EnableValidationContainer>
+              <S.EnableValidationToggle onClick={() => setIsValidationEnabled(val => !val)}>
                 <Switch checked={isValidationEnabled} /> Enable validation
-              </span>
-              <Tooltip title={VALIDATION_TOOLTIP}>
-                <InfoCircleOutlined style={{marginLeft: 8}} />
-              </Tooltip>
-            </div>
+              </S.EnableValidationToggle>
+              <S.Note $small>{VALIDATION_TOOLTIP}</S.Note>
+            </S.EnableValidationContainer>
             {apiKey && (
-              <div>
-                <Button type="link" style={{padding: 0}} onClick={() => setIsApiKeyModalVisible(true)}>
-                  Change API key
-                </Button>
-              </div>
+              <>
+                <div>
+                  <Button type="link" style={{padding: 0}} onClick={() => setIsApiKeyModalVisible(true)}>
+                    Change API key
+                  </Button>
+                </div>
+                <S.Note $small>{CHANGE_API_KEY_TOOLTIP}</S.Note>
+              </>
             )}
-          </S.Footer>
-        </S.LeftColumn>
+            <Button type="primary" onClick={() => setAreSettingsVisible(false)} style={{marginTop: 16}}>
+              Done (Back)
+            </Button>
+          </div>
+        ) : (
+          <>
+            <S.LeftColumn>
+              <img src={AIRobot} />
 
-        <S.RightColumn>
-          {isLoading ? (
-            <S.PlaceholderContainer>
-              <S.PlaceholderBody>
-                <Spin style={{width: '100%'}} tip="Resources are being generated. This might take a few minutes." />
-              </S.PlaceholderBody>
-            </S.PlaceholderContainer>
-          ) : !editorCode ? (
-            <S.PlaceholderContainer>
-              <S.PlaceholderBody>
-                <img src={AIRobotColored} alt="AI Robot" />
-                <S.NoContentTitle>Nothing to preview.</S.NoContentTitle>
-                <p>
-                  Ask the AI to generate resources using the top left input, then preview the output and create the
-                  resources if everything looks fine.
-                </p>
-              </S.PlaceholderBody>
-            </S.PlaceholderContainer>
-          ) : (
-            <div ref={monacoContainerRef} style={{height: '100%', width: '100%'}}>
-              <MonacoEditor
-                width={containerWidth}
-                height={containerHeight}
-                language="yaml"
-                theme={KUBESHOP_MONACO_THEME}
-                value={editorCode}
-                options={EDITOR_OPTIONS}
+              <S.Note>
+                Please provide <strong>precise and specific details</strong> for creating your desired Kubernetes
+                resources. Accurate details will help us meet your specific needs effectively.
+              </S.Note>
+
+              <Input.TextArea
+                autoSize={{minRows: 8, maxRows: 16}}
+                value={inputValue}
+                onChange={e => {
+                  setErrorMessage('');
+                  setInputValue(e.target.value);
+                }}
+                placeholder="Enter requirements ( e.g. Create a Deployment using the nginx image, with 2 replicas, and expose port 80 through a ClusterIP Service )"
               />
-            </div>
-          )}
-        </S.RightColumn>
+
+              {errorMessage && <S.ErrorMessage>*{errorMessage}</S.ErrorMessage>}
+
+              <S.CreateButton type="primary" onClick={onGenerateHandler} loading={isLoading}>
+                Generate
+              </S.CreateButton>
+            </S.LeftColumn>
+
+            <S.RightColumn>
+              <S.SettingsButtonContainer>
+                <Button type="link" icon={<SettingOutlined />} onClick={() => setAreSettingsVisible(true)}>
+                  Settings
+                </Button>
+              </S.SettingsButtonContainer>
+              {isLoading ? (
+                <S.PlaceholderContainer>
+                  <S.PlaceholderBody>
+                    <Spin style={{width: '100%'}} tip="Resources are being generated. This might take a few minutes." />
+                  </S.PlaceholderBody>
+                </S.PlaceholderContainer>
+              ) : !editorCode ? (
+                <S.PlaceholderContainer>
+                  <S.PlaceholderBody>
+                    <img src={AIRobotColored} alt="AI Robot" />
+                    <S.NoContentTitle>Nothing to preview.</S.NoContentTitle>
+                    <p>
+                      Ask the AI to generate resources using the top left input, then preview the output and create the
+                      resources if everything looks fine.
+                    </p>
+                  </S.PlaceholderBody>
+                </S.PlaceholderContainer>
+              ) : (
+                <div ref={monacoContainerRef} style={{height: '100%', width: '100%'}}>
+                  <MonacoEditor
+                    width={containerWidth}
+                    height={containerHeight}
+                    language="yaml"
+                    theme={KUBESHOP_MONACO_THEME}
+                    value={editorCode}
+                    options={EDITOR_OPTIONS}
+                  />
+                </div>
+              )}
+            </S.RightColumn>
+          </>
+        )}
       </S.ModalBody>
     </S.Modal>
   );

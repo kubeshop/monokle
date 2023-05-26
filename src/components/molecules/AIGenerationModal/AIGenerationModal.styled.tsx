@@ -32,11 +32,11 @@ export const ErrorMessage = styled.div`
   margin-top: 4px;
 `;
 
-export const Note = styled.div`
+export const Note = styled.div<{$small?: boolean}>`
   font-size: 12px;
   color: ${Colors.grey7};
-  margin-top: 16px;
-  margin-bottom: 16px;
+  margin-top: ${props => (props.$small ? '8px' : '16px')};
+  margin-bottom: ${props => (props.$small ? '12px' : '16px')};
 `;
 
 export const SpinContainer = styled.div`
@@ -68,7 +68,7 @@ export const PlaceholderContainer = styled.div`
   color: ${Colors.grey6};
   border: 2px dashed ${Colors.grey6};
   border-radius: 4px;
-  height: 100%;
+  height: calc(100% - 32px);
 `;
 
 export const PlaceholderBody = styled.div`
@@ -87,4 +87,23 @@ export const NoContentTitle = styled.p`
   margin-bottom: 4px;
 `;
 
-export const Footer = styled.div``;
+export const SettingsButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+export const EnableValidationContainer = styled.div`
+  margin-top: 16px;
+  margin-bottom: 8px;
+`;
+
+export const EnableValidationToggle = styled.div`
+  cursor: pointer;
+  user-select: none;
+`;
+
+export const SettingsTitle = styled.h3`
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-weight: 600;
+`;
