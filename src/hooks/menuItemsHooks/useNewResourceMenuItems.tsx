@@ -2,12 +2,12 @@ import {useMemo} from 'react';
 
 import {MenuProps} from 'antd';
 
-import {FileAddOutlined as RawFileAddOutlined} from '@ant-design/icons';
+import {FileAddOutlined as RawFileAddOutlined, RobotOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
-import {openNewResourceWizard, openTemplateExplorer} from '@redux/reducers/ui';
+import {openNewAiResourceWizard, openNewResourceWizard, openTemplateExplorer} from '@redux/reducers/ui';
 
 import TemplateSmallWhiteSvg from '@assets/TemplateSmallWhite.svg';
 
@@ -23,18 +23,27 @@ export function useNewResourceMenuItems() {
         label: (
           <MenuItem>
             <FileAddOutlined />
-            New from model
+            New resource
           </MenuItem>
         ),
-
         onClick: () => dispatch(openNewResourceWizard()),
+      },
+      {
+        key: 'from-ai',
+        label: (
+          <MenuItem>
+            <RobotOutlined />
+            Generate using AI
+          </MenuItem>
+        ),
+        onClick: () => dispatch(openNewAiResourceWizard()),
       },
       {
         key: 'from-template',
         label: (
           <MenuItem>
             <img src={TemplateSmallWhiteSvg} />
-            New from advanced template
+            Use a template
           </MenuItem>
         ),
         onClick: () => dispatch(openTemplateExplorer()),
