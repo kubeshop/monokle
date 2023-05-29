@@ -25,6 +25,14 @@ export const electronStoreSchema = {
   appConfig: {
     type: 'object',
     properties: {
+      userApiKeys: {
+        type: 'object',
+        properties: {
+          OPENAI: {
+            type: 'string',
+          },
+        },
+      },
       kubeConfigContextsColors: {
         type: 'object',
       },
@@ -280,6 +288,7 @@ export const electronStoreDefaults = {
     filtersPresets: {},
   },
   appConfig: {
+    userApiKeys: {},
     kubeConfigContextsColors: {},
     lastNamespaceLoaded: 'default',
     useKubectlProxy: false,

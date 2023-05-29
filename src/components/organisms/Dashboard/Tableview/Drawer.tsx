@@ -9,6 +9,7 @@ import PodHandler from '@src/kindhandlers/Pod.handler';
 import CodeEditor from '@editor/CodeEditor';
 
 import * as S from './Drawer.styled';
+import GraphTab from './GraphTab';
 import {InfoTab} from './InfoTab';
 import ResourceActions from './ResourceActions';
 import {TerminalTab} from './TerminalTab';
@@ -88,6 +89,11 @@ export const Drawer = () => {
                     : []),
                 ]
               : []),
+            {
+              label: 'Graph',
+              key: 'Graph',
+              children: <GraphTab resource={selectedResource} />,
+            },
           ]}
         />
       </S.TabsContainer>
