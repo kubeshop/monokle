@@ -10,7 +10,7 @@ import {getAbsoluteResourceFolder} from '@redux/services/fileEntry';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {extractK8sResources} from '@redux/services/resource';
 import {applyYamlToCluster} from '@redux/thunks/applyYaml';
-import {runKustomize} from '@redux/thunks/previewKustomization';
+import {runKustomize} from '@redux/thunks/preview';
 import {updateResource} from '@redux/thunks/updateResource';
 import {getResourceFromCluster, removeNamespaceFromCluster} from '@redux/thunks/utils';
 

@@ -10,8 +10,7 @@ import {DeletePreviewConfigurationTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
-import {startPreview, stopPreview} from '@redux/services/preview';
-import {deletePreviewConfiguration} from '@redux/thunks/previewConfiguration';
+import {deletePreviewConfiguration, startPreview, stopPreview} from '@redux/thunks/preview';
 
 import {Colors} from '@shared/styles/colors';
 
@@ -63,11 +62,11 @@ const PreviewConfigurationQuickAction: React.FC<IProps> = props => {
       return;
     }
 
-    startPreview({type: 'helm-config', configId: previewConfiguration.id}, dispatch);
+    dispatch(startPreview({type: 'helm-config', configId: previewConfiguration.id}));
   }, [dispatch, previewConfiguration]);
 
   const onClickExit = useCallback(() => {
-    stopPreview(dispatch);
+    dispatch(stopPreview());
   }, [dispatch]);
 
   if (!previewConfiguration || !helmChart) {

@@ -15,7 +15,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {selectedHelmConfigSelector, selectedImageSelector} from '@redux/selectors';
-import {startPreview} from '@redux/services/preview';
+import {startPreview} from '@redux/thunks/preview';
 import {selectFromHistory} from '@redux/thunks/selectFromHistory';
 
 import {TitleBarWrapper} from '@components/atoms';
@@ -69,7 +69,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
       return;
     }
 
-    startPreview({type: 'helm-config', configId: selectedHelmConfig.id}, dispatch);
+    dispatch(startPreview({type: 'helm-config', configId: selectedHelmConfig.id}));
   }, [dispatch, selectedHelmConfig]);
 
   const onClickLeftArrow = useCallback(() => {

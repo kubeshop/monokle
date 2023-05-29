@@ -7,7 +7,7 @@ import {CloseCircleFilled} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
-import {stopPreview} from '@redux/services/preview';
+import {stopPreview} from '@redux/thunks/preview';
 
 import {Colors} from '@shared/styles';
 
@@ -15,7 +15,7 @@ export function ExitButton() {
   const dispatch = useAppDispatch();
 
   const onClickExit = useCallback(() => {
-    stopPreview(dispatch);
+    dispatch(stopPreview());
   }, [dispatch]);
 
   return (

@@ -14,7 +14,7 @@ import {hasCommandFailed, runCommandInMainThread} from '@shared/utils/commands';
 import {isDefined} from '@shared/utils/filter';
 import {trackEvent} from '@shared/utils/telemetry';
 
-import {extractK8sResources} from '../services/resource';
+import {extractK8sResources} from '../../services/resource';
 
 export const previewSavedCommand = createAsyncThunk<
   {
