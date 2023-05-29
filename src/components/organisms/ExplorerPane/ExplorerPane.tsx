@@ -49,11 +49,12 @@ const Collapse = styled(RawCollapse)`
   padding-top: 18px;
   box-sizing: border-box;
   height: 100%;
-  padding-bottom: 14px;
+  padding-bottom: 14px !important;
   overflow: hidden;
   max-height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   min-height: 0;
 
   .ant-collapse-header {

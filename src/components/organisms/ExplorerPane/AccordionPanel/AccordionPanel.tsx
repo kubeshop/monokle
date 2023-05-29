@@ -21,7 +21,12 @@ const AccordionPanel: React.FC<CollapsePanelProps & InjectedPanelProps> = props 
   const height = usePaneHeight() - PANEL_HEADER_HEIGHT - 130 - (props.panelKey === 'files' ? 35 : 25);
 
   return (
-    <Panel collapsible={props.disabled ? 'disabled' : undefined} id={id} $contentHeight={height + 12} {...props} />
+    <Panel
+      collapsible={props.disabled ? 'disabled' : undefined}
+      id={id}
+      $contentHeight={id !== 'accordion-panel-files' ? height + 12 : height}
+      {...props}
+    />
   );
 };
 
@@ -39,7 +44,7 @@ const Panel = styled(Collapse.Panel)<{$contentHeight: number}>`
   }
 
   .ant-collapse-content-box {
-    padding: 0 !important;
+    padding: 0;
     overflow-y: hidden;
     max-height: ${props => props.$contentHeight}px;
     height: ${props => props.$contentHeight}px;

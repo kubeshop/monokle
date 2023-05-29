@@ -7,7 +7,6 @@ import {Colors, FontColors} from '@shared/styles/colors';
 export const FileTreeContainer = styled.div`
   width: 100%;
   height: 100%;
-  padding: 0px 0px 15px 0px;
 
   & .ant-tree {
     font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
