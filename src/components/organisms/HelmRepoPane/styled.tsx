@@ -184,3 +184,9 @@ export const FormItem = styled(Form.Item)`
     width: min(30%, 400px);
   }
 `;
+
+export const ErrorText = styled(Typography.Text)`
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+`;

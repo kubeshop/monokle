@@ -11,7 +11,7 @@ import {useAppSelector} from '@redux/hooks';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
-import {trackEvent} from '@shared/utils';
+import {openUrlInExternalBrowser, trackEvent} from '@shared/utils';
 import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
 
 import HelmChartDetails from './HelmChartDetails';
@@ -91,7 +91,11 @@ const HelmChartsTable = ({
     [setSelectedChart]
   );
 
-  const {value: data = [], loading} = useAsync(async () => {
+  const {
+    value: data = [],
+    loading,
+    error,
+  } = useAsync(async () => {
     const result = await runCommandInMainThread(searchHelmRepoCommand({q: helmRepoSearch}));
     if (result.stderr) {
       throw new Error(result.stderr);
@@ -107,19 +111,31 @@ const HelmChartsTable = ({
 
   return (
     <>
-      <S.Input
-        placeholder="Search for a Helm Chart"
-        prefix={<SearchOutlined />}
-        onChange={onChangeSearchInputHandler}
-        size="large"
-      />
-      <Typography.Text style={{height: 'fit-content', marginBottom: 12}}>
-        {searchResultCount} Helm Charts found. You can
-        <Typography.Link onClick={() => setSelectedMenuItem('manage-repositories')}>
-          &nbsp;add more Helm Charts repositories&nbsp;
-        </Typography.Link>
-        to extend your search.
-      </Typography.Text>
+      {error ? (
+        <S.ErrorText>
+          Helm not found - please install it from{' '}
+          <Typography.Link onClick={() => openUrlInExternalBrowser('https://helm.sh/docs/intro/install/')}>
+            here
+          </Typography.Link>
+        </S.ErrorText>
+      ) : (
+        <>
+          <S.Input
+            placeholder="Search for a Helm Chart"
+            prefix={<SearchOutlined />}
+            onChange={onChangeSearchInputHandler}
+            size="large"
+          />
+          <Typography.Text style={{height: 'fit-content', marginBottom: 12}}>
+            {searchResultCount} Helm Charts found. You can
+            <Typography.Link onClick={() => setSelectedMenuItem('manage-repositories')}>
+              &nbsp;add more Helm Charts repositories&nbsp;
+            </Typography.Link>
+            to extend your search.
+          </Typography.Text>
+        </>
+      )}
+
       <div ref={ref} style={{overflow: 'hidden', flex: 1}}>
         <S.Table
           showSorterTooltip
