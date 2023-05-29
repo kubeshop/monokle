@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useMemo} from 'react';
 import {useAsyncFn} from 'react-use';
 
-import {Button, Form, Input, Modal, Typography} from 'antd';
+import {Button, Form, Input, Modal, Tooltip, Typography} from 'antd';
 
 import {DeleteOutlined} from '@ant-design/icons';
 
@@ -50,20 +50,24 @@ const createColumns = (onUpdateHelmRepoClick: onRepoCellClick, onDeleteHelmRepoC
     render: (_text: string, record: any) => {
       return (
         <S.HoverArea>
-          <Button
-            id="updateHelm"
-            type="primary"
-            style={{marginRight: 24}}
-            onClick={() => onUpdateHelmRepoClick(record.name)}
-          >
-            Update
-          </Button>
-          <S.DeleteButton
-            id="deleteHelm"
-            type="text"
-            icon={<DeleteOutlined style={{color: 'red'}} />}
-            onClick={() => onDeleteHelmRepoClick(record.name)}
-          />
+          <Tooltip title="helm repo update">
+            <Button
+              id="updateHelm"
+              type="primary"
+              style={{marginRight: 24}}
+              onClick={() => onUpdateHelmRepoClick(record.name)}
+            >
+              Update
+            </Button>
+          </Tooltip>
+          <Tooltip title="helm repo remove">
+            <S.DeleteButton
+              id="deleteHelm"
+              type="text"
+              icon={<DeleteOutlined style={{color: 'red'}} />}
+              onClick={() => onDeleteHelmRepoClick(record.name)}
+            />
+          </Tooltip>
         </S.HoverArea>
       );
     },

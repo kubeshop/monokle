@@ -71,11 +71,11 @@ const HelmChartDetails = ({chart, onDismissPane}: IProps) => {
 
   const onClickApplyHelmChart = useCallback(
     async (namespace?: string, shouldCreateNamespace?: boolean) => {
-      const repoName = chartName.split('/')[0];
+      const repoName = chart.split('/')[0];
       await dispatch(
         installHelmRepoChart({
           name: repoName,
-          chart: chartName,
+          chart,
           namespace,
           version: chartVersion,
           shouldCreateNamespace,
@@ -84,7 +84,7 @@ const HelmChartDetails = ({chart, onDismissPane}: IProps) => {
       setInstallModalOpen(false);
       trackEvent('helm_repo/install');
     },
-    [chartName, chartVersion, dispatch]
+    [chart, chartVersion, dispatch]
   );
 
   const latestVersion = first<{version: string}>(versions)?.version || '';
@@ -170,7 +170,7 @@ const HelmChartDetails = ({chart, onDismissPane}: IProps) => {
 
         <HelmChartModalConfirmWithNamespaceSelect
           isVisible={installModalOpen}
-          title={`Install the ${chartName} Chart in cluster [${kubeConfigContext}]?`}
+          title={`Install the ${chart} Chart in cluster [${kubeConfigContext}]?`}
           onCancel={() => setInstallModalOpen(false)}
           onOk={(selectedNamespace, shouldCreateNamespace) =>
             onClickApplyHelmChart(selectedNamespace, shouldCreateNamespace)
