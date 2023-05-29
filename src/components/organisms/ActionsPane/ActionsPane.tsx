@@ -159,8 +159,10 @@ const ActionsPane: React.FC = () => {
 
   const isSchemaAvailable = useMemo(
     () =>
-      schemaForSelectedPath ||
-      (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema)),
+      Boolean(
+        schemaForSelectedPath ||
+          (selectedResource && (isKustomization || resourceKindHandler?.formEditorOptions?.editorSchema))
+      ),
     [isKustomization, resourceKindHandler?.formEditorOptions?.editorSchema, schemaForSelectedPath, selectedResource]
   );
 
@@ -264,12 +266,7 @@ const ActionsPane: React.FC = () => {
   }, [onPerformResourceDiff]);
 
   useEffect(() => {
-    if (
-      activeEditorTab === 'form' &&
-      (!selectedFilePath || !schemaForSelectedPath) &&
-      !isKustomization &&
-      !resourceKindHandler?.formEditorOptions?.editorSchema
-    ) {
+    if (activeEditorTab === 'form' && !isSchemaAvailable) {
       dispatch(setActiveEditorTab('source'));
     }
 
@@ -280,20 +277,7 @@ const ActionsPane: React.FC = () => {
     if (activeEditorTab === 'logs' && selectedResource?.kind !== 'Pod') {
       dispatch(setActiveEditorTab('source'));
     }
-
-    if (!isGraphViewVisible) {
-      dispatch(setActiveEditorTab('source'));
-    }
-  }, [
-    selectedResource,
-    activeEditorTab,
-    resourceKindHandler,
-    isKustomization,
-    selectedFilePath,
-    schemaForSelectedPath,
-    isGraphViewVisible,
-    dispatch,
-  ]);
+  }, [selectedResource, activeEditorTab, resourceKindHandler, isKustomization, isSchemaAvailable, dispatch]);
 
   useEffect(() => {
     if (tabsList && tabsList.length && extraButton.current) {
