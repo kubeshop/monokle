@@ -3,9 +3,7 @@ import {Draft, PayloadAction} from '@reduxjs/toolkit';
 import {splitK8sResourceMap} from '@redux/services/resource';
 import {clearSelection} from '@redux/services/selection';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
-import {previewSavedCommand} from '@redux/thunks/previewCommand';
-import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
-import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {previewHelmValuesFile, previewKustomization, previewSavedCommand} from '@redux/thunks/preview';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 
 import {AppState} from '@shared/models/appState';

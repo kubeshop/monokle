@@ -26,8 +26,8 @@ import {rootFilePathSelector, selectedFilePathSelector} from '@redux/selectors';
 import {useSelectedResource} from '@redux/selectors/resourceSelectors';
 import {applyFileWithConfirm} from '@redux/services/applyFileWithConfirm';
 import {isKustomizationResource} from '@redux/services/kustomize';
-import {stopPreview} from '@redux/services/preview';
 import {applyResourceToCluster} from '@redux/thunks/applyResource';
+import {stopPreview} from '@redux/thunks/preview';
 import {selectFromHistory} from '@redux/thunks/selectFromHistory';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
@@ -203,7 +203,7 @@ const HotKeysHandler = () => {
     hotkeys.EXIT_PREVIEW_MODE.key,
     () => {
       if (isInPreviewMode && !isInClusterMode) {
-        stopPreview(dispatch);
+        dispatch(stopPreview());
       }
     },
     [isInPreviewMode, isInClusterMode]
