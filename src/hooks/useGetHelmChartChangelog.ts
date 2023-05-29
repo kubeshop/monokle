@@ -1,14 +1,11 @@
-import fetch from 'node-fetch';
 import {useAsync} from 'react-use';
+
+import {helmChartReadmeCommand, runCommandInMainThread} from '@shared/utils/commands';
 
 export const useGetHelmChartChangelog = (chartName: string) => {
   const state = useAsync(async () => {
-    const [repoName, chart] = chartName.split('/') as [string, string];
-    const result = await fetch(`https://artifacthub.io/api/v1/packages/helm/${repoName}/${chart}/changelog.md `);
-    if (result.status !== 200) {
-      throw new Error('Failed to fetch helm chart changelog');
-    }
-    return result.text();
+    const result = await runCommandInMainThread(helmChartReadmeCommand({name: chartName}));
+    return result.stdout || 'No changelog';
   }, [chartName]);
   return state;
 };

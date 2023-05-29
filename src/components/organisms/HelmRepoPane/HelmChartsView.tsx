@@ -1,4 +1,4 @@
-import {useCallback, useRef, useState} from 'react';
+import {Dispatch, SetStateAction, useCallback, useRef, useState} from 'react';
 import {useAsync} from 'react-use';
 
 import {Typography} from 'antd';
@@ -11,7 +11,7 @@ import {useAppSelector} from '@redux/hooks';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
-import {openUrlInExternalBrowser, trackEvent} from '@shared/utils';
+import {trackEvent} from '@shared/utils';
 import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
 
 import HelmChartDetails from './HelmChartDetails';
@@ -71,7 +71,11 @@ const columns = [
   },
 ];
 
-const HelmChartsTable = () => {
+const HelmChartsTable = ({
+  setSelectedMenuItem,
+}: {
+  setSelectedMenuItem: Dispatch<SetStateAction<'browse-charts' | 'manage-repositories'>>;
+}) => {
   const [helmRepoSearch, setHelmRepoSearch] = useState('');
   const {height} = useMainPaneDimensions();
   const terminalHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
@@ -111,7 +115,7 @@ const HelmChartsTable = () => {
       />
       <Typography.Text style={{height: 'fit-content', marginBottom: 12}}>
         {searchResultCount} Helm Charts found. You can
-        <Typography.Link onClick={() => openUrlInExternalBrowser('https://artifacthub.io/')}>
+        <Typography.Link onClick={() => setSelectedMenuItem('manage-repositories')}>
           &nbsp;add more Helm Charts repositories&nbsp;
         </Typography.Link>
         to extend your search.

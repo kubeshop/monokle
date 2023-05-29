@@ -66,7 +66,7 @@ const HelmRepoView = () => {
         />
       </S.Header>
       <div style={{display: 'flex', flexDirection: 'column', gap: 16}}>
-        {selectedMenuItem === 'browse-charts' && <HelmChartsView />}
+        {selectedMenuItem === 'browse-charts' && <HelmChartsView setSelectedMenuItem={setSelectedMenuItem} />}
         {selectedMenuItem === 'manage-repositories' && <HelmReposView />}
       </div>
     </S.Container>

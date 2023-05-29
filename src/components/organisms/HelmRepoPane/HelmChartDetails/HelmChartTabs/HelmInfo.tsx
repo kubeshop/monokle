@@ -1,29 +1,11 @@
-import {useCallback, useMemo, useState} from 'react';
-import ReactMarkdown from 'react-markdown';
-import {useAsync} from 'react-use';
-
-import {Dropdown, Skeleton, Typography} from 'antd';
-
-import {CloudDownloadOutlined, DownOutlined} from '@ant-design/icons';
-
-import {first} from 'lodash';
-
-import {kubeConfigContextSelector} from '@redux/appConfig';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {installHelmRepoChart} from '@redux/thunks/InstallHelmRepoChart';
-
-import {HelmChartModalConfirmWithNamespaceSelect} from '@components/molecules';
+import {Skeleton, Tag, Typography} from 'antd';
 
 import {useGetHelmChartInfo} from '@hooks/useGetHelmChartInfo';
 
 import helmPlaceholder from '@assets/helm-default-ico.svg';
 
-import {Icon} from '@monokle/components';
-import {Colors} from '@shared/styles';
-import {openUrlInExternalBrowser, trackEvent} from '@shared/utils';
-import {helmChartReadmeCommand, runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
+import {openUrlInExternalBrowser} from '@shared/utils';
 
-import PullHelmChartModal from '../PullHelmChartModal';
 import * as S from './HelmInfo.styled';
 
 interface IProps {
@@ -31,65 +13,10 @@ interface IProps {
 }
 
 const HelmInfo = ({chartName}: IProps) => {
-  const dispatch = useAppDispatch();
-  const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [installModalOpen, setInstallModalOpen] = useState(false);
-  const [chartVersion, setChartVersion] = useState('');
-
   const {value: helmChartInfo, loading: loadingHelmInfo} = useGetHelmChartInfo(chartName);
-  const {value: versions = [], loading: isLoadingVersions} = useAsync(async (): Promise<{version: string}[]> => {
-    const result = await runCommandInMainThread(searchHelmRepoCommand({q: chartName}, true));
-    return JSON.parse(result.stdout || '[]');
-  });
 
-  const {value: readme} = useAsync(async (): Promise<string> => {
-    const result = await runCommandInMainThread(helmChartReadmeCommand({name: chartName}));
-    return result.stdout || '';
-  });
-
-  const onClickApplyHelmChart = useCallback(
-    async (namespace?: string, shouldCreateNamespace?: boolean) => {
-      const repoName = chartName.split('/')[0];
-      await dispatch(
-        installHelmRepoChart({
-          name: repoName,
-          chart: chartName,
-          namespace,
-          version: chartVersion,
-          shouldCreateNamespace,
-        })
-      ).unwrap();
-      setInstallModalOpen(false);
-      trackEvent('helm_repo/install');
-    },
-    [chartName, chartVersion, dispatch]
-  );
-  const latestVersion = first<{version: string}>(versions)?.version || '';
-
-  const items = useMemo(
-    () =>
-      versions
-        .filter(i => i.version !== latestVersion)
-        .map((i: any) => ({
-          label: i.version,
-          key: i.version,
-        })),
-    [versions, latestVersion]
-  );
-
-  const onDownloadLatestHelmChartHandler = () => {
-    setChartVersion(latestVersion);
-    setConfirmModalOpen(true);
-  };
-
-  const onInstallLatestHelmChartHandler = () => {
-    setChartVersion(latestVersion);
-    setInstallModalOpen(true);
-  };
-
-  return loadingHelmInfo || isLoadingVersions ? (
-    <Skeleton active={loadingHelmInfo || isLoadingVersions} />
+  return loadingHelmInfo ? (
+    <Skeleton active={loadingHelmInfo} />
   ) : (
     <S.Container>
       <S.Content>
@@ -123,83 +50,67 @@ const HelmInfo = ({chartName}: IProps) => {
           </S.Header>
         </div>
 
-        <ReactMarkdown
-          components={{
-            a({href, children, ...restProps}) {
-              return (
-                <a onClick={() => openUrlInExternalBrowser(href)} {...restProps}>
-                  {children}
-                </a>
-              );
-            },
-            h1({children, ...restProps}) {
-              return <S.H1 {...restProps}>{children}</S.H1>;
-            },
-            h2({children, ...restProps}) {
-              return <S.H2 {...restProps}>{children}</S.H2>;
-            },
-          }}
-        >
-          {readme || ''}
-        </ReactMarkdown>
+        {helmChartInfo?.description && (
+          <S.Section>
+            <S.Heading>Description</S.Heading>
+            <S.Description>{helmChartInfo?.description}</S.Description>
+          </S.Section>
+        )}
+
+        {helmChartInfo?.keywords && (
+          <S.Section>
+            <S.Heading>Keywords</S.Heading>
+            <S.Description>
+              {helmChartInfo?.keywords.map(i => (
+                <Tag key={i}>{i}</Tag>
+              ))}
+            </S.Description>
+          </S.Section>
+        )}
+
+        {helmChartInfo?.kubeVersion && (
+          <S.Section>
+            <S.Heading>Kube Version</S.Heading>
+            <S.Description>{helmChartInfo?.kubeVersion}</S.Description>
+          </S.Section>
+        )}
+
+        {helmChartInfo?.maintainers && (
+          <S.Section>
+            <S.Heading>Maintainers</S.Heading>
+            <S.Description>
+              {helmChartInfo?.maintainers
+                .map<React.ReactNode>(m => (
+                  <Typography.Link
+                    key={m.name}
+                    onClick={() => openUrlInExternalBrowser(`https://github.com/${m.name}`)}
+                  >
+                    {m.name}
+                  </Typography.Link>
+                ))
+                .reduce((prev, curr) => [prev, ', ', curr])}
+            </S.Description>
+          </S.Section>
+        )}
+
+        {helmChartInfo?.sources && (
+          <S.Section>
+            <S.Heading>Sources</S.Heading>
+            {helmChartInfo?.sources.map(s => (
+              <S.Description key={s}>
+                <Typography.Link onClick={() => openUrlInExternalBrowser(s)}>{s}</Typography.Link>
+              </S.Description>
+            ))}
+          </S.Section>
+        )}
+
+        {helmChartInfo?.version && (
+          <S.Section>
+            <S.Heading>Version</S.Heading>
+            <S.Description>{helmChartInfo?.version}</S.Description>
+          </S.Section>
+        )}
       </S.Content>
-
-      <S.Footer>
-        <S.MenuDropdownList
-          id="versions"
-          style={{minHeight: 0, maxHeight: 300, minWidth: 200, position: 'absolute', backgroundColor: Colors.grey3}}
-        />
-        <Dropdown.Button
-          menu={{
-            items,
-            onClick: ({key}) => {
-              setChartVersion(key);
-              setConfirmModalOpen(true);
-            },
-          }}
-          size="large"
-          type="primary"
-          icon={<DownOutlined />}
-          onClick={onDownloadLatestHelmChartHandler}
-          getPopupContainer={() => document.getElementById('versions')!}
-        >
-          <CloudDownloadOutlined />
-          Download locally ({latestVersion})
-        </Dropdown.Button>
-        <Dropdown.Button
-          menu={{
-            items,
-            onClick: ({key}) => {
-              setChartVersion(key);
-              setInstallModalOpen(true);
-            },
-          }}
-          size="large"
-          type="primary"
-          icon={<DownOutlined />}
-          onClick={onInstallLatestHelmChartHandler}
-          getPopupContainer={() => document.getElementById('versions')!}
-        >
-          <Icon name="cluster-dashboard" />
-          Install in cluster ({latestVersion})
-        </Dropdown.Button>
-      </S.Footer>
-
-      <PullHelmChartModal
-        open={confirmModalOpen}
-        dismissModal={() => setConfirmModalOpen(false)}
-        chartName={chartName}
-        chartVersion={chartVersion}
-      />
-
-      <HelmChartModalConfirmWithNamespaceSelect
-        isVisible={installModalOpen}
-        title={`Install the ${chartName} Chart in cluster [${kubeConfigContext}]?`}
-        onCancel={() => setInstallModalOpen(false)}
-        onOk={(selectedNamespace, shouldCreateNamespace) =>
-          onClickApplyHelmChart(selectedNamespace, shouldCreateNamespace)
-        }
-      />
     </S.Container>
   );
 };

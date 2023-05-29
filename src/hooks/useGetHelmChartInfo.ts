@@ -35,4 +35,6 @@ interface HelmChartInfo {
   keywords: string[];
   maintainers: {name: string}[];
   annotations: {[key: string]: string};
+  kubeVersion: string;
+  changes: string[];
 }

@@ -38,63 +38,21 @@ export const Content = styled.div`
   max-height: calc(100vh - 292px);
 `;
 
-export const Footer = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 75px;
-
+export const Section = styled.div`
   display: flex;
-  gap: 16px;
-  border-top: 1px solid ${Colors.grey4};
-  padding: 20px 28px;
-
-  .ant-space-compact-block {
-    width: unset;
-  }
+  flex-direction: column;
+  margin-top: 20px;
+  gap: 4px;
 `;
 
-export const MenuDropdownList = styled.div`
-  position: absolute;
-
-  ul {
-    overflow: overlay;
-    min-width: 100px;
-    max-height: 200px;
-    min-height: 0;
-  }
-
-  ul::-webkit-scrollbar {
-    width: 8px;
-    transition: 0.3s;
-  }
-
-  ul::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-  }
-
-  .ant-dropdown-menu {
-    background-color: ${Colors.grey2};
-    overflow-x: hidden;
-    box-shadow: none;
-    min-width: max-content;
-  }
-  .ant-dropdown-menu-item {
-    height: 24px;
-  }
-
-  .ant-dropdown-menu-item:hover {
-    background-color: ${Colors.grey3};
-  }
-`;
-
-export const H1 = styled(Typography.Text)`
-  font-size: 16px;
-  font-weight: bold;
-`;
-
-export const H2 = styled(Typography.Text)`
+export const Heading = styled(Typography.Text)`
   font-size: 14px;
-  font-weight: bold;
+  line-height: 20px;
+  font-weight: 700;
+`;
+
+export const Description = styled(Typography.Text)`
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
 `;
