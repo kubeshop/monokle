@@ -24,7 +24,7 @@ import * as S from './styled';
 
 type onRepoCellClick = (repoName: string) => void;
 
-const createColumns = (onUpdateHelmRepoClick: onRepoCellClick, onDeleteHelmRepoClick: onRepoCellClick) => [
+const createColumns = (onUpdateHelmRepoClick: onRepoCellClick, onRemoveHelmRepoClick: onRepoCellClick) => [
   {
     title: 'Name',
     dataIndex: 'name',
@@ -51,21 +51,15 @@ const createColumns = (onUpdateHelmRepoClick: onRepoCellClick, onDeleteHelmRepoC
       return (
         <S.HoverArea>
           <Tooltip title="helm repo update">
-            <Button
-              id="updateHelm"
-              type="primary"
-              style={{marginRight: 24}}
-              onClick={() => onUpdateHelmRepoClick(record.name)}
-            >
+            <Button type="primary" style={{marginRight: 24}} onClick={() => onUpdateHelmRepoClick(record.name)}>
               Update
             </Button>
           </Tooltip>
           <Tooltip title="helm repo remove">
             <S.DeleteButton
-              id="deleteHelm"
               type="text"
               icon={<DeleteOutlined style={{color: 'red'}} />}
-              onClick={() => onDeleteHelmRepoClick(record.name)}
+              onClick={() => onRemoveHelmRepoClick(record.name)}
             />
           </Tooltip>
         </S.HoverArea>
@@ -123,7 +117,7 @@ const HelmReposTable = () => {
     [dispatch, refetchRepos]
   );
 
-  const onDeleteRepoHandler = useCallback(
+  const onRemoveRepoHandler = useCallback(
     async (repoName: string) => {
       Modal.confirm({
         title: `Are you sure you want to delete [${repoName}] repo?`,
@@ -143,8 +137,8 @@ const HelmReposTable = () => {
   );
 
   const columns = useMemo(
-    () => createColumns(onUpdateRepoHandler, onDeleteRepoHandler),
-    [onUpdateRepoHandler, onDeleteRepoHandler]
+    () => createColumns(onUpdateRepoHandler, onRemoveRepoHandler),
+    [onUpdateRepoHandler, onRemoveRepoHandler]
   );
 
   return (
