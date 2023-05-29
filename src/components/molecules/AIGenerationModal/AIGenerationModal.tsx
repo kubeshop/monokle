@@ -156,16 +156,12 @@ const AIGenerationModal: React.FC = () => {
               </S.EnableValidationToggle>
               <S.Note $small>{VALIDATION_TOOLTIP}</S.Note>
             </S.EnableValidationContainer>
-            {apiKey && (
-              <>
-                <div>
-                  <Button type="link" style={{padding: 0}} onClick={() => setIsApiKeyModalVisible(true)}>
-                    Change API key
-                  </Button>
-                </div>
-                <S.Note $small>{CHANGE_API_KEY_TOOLTIP}</S.Note>
-              </>
-            )}
+            <div>
+              <Button type="link" style={{padding: 0}} onClick={() => setIsApiKeyModalVisible(true)}>
+                {apiKey ? 'Change' : 'Set'} API key
+              </Button>
+            </div>
+            <S.Note $small>{CHANGE_API_KEY_TOOLTIP}</S.Note>
             <Button type="primary" onClick={() => setAreSettingsVisible(false)} style={{marginTop: 16}}>
               Done (Back)
             </Button>
