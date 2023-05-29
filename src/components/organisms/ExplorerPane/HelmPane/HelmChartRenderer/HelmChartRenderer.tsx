@@ -68,16 +68,18 @@ const HelmChartRenderer: React.FC<IProps> = props => {
         <S.SuffixContainer isSelected={isSelected}>{dirname(helmChart.filePath)}</S.SuffixContainer>
       </Tooltip>
 
-      <div
-        style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}
-        onClick={e => {
-          e.stopPropagation();
-        }}
-      >
-        <S.ContextMenuContainer>
-          <HelmContextMenu id={id} isSelected={isSelected} />
-        </S.ContextMenuContainer>
-      </div>
+      {isHovered && (
+        <div
+          style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}
+          onClick={e => {
+            e.stopPropagation();
+          }}
+        >
+          <S.ContextMenuContainer>
+            <HelmContextMenu id={id} isSelected={isSelected} />
+          </S.ContextMenuContainer>
+        </div>
+      )}
     </S.ItemContainer>
   );
 };
