@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import {Popconfirm} from 'antd';
 
@@ -10,7 +10,7 @@ import {DeletePreviewConfigurationTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
-import {startPreview} from '@redux/services/preview';
+import {startPreview, stopPreview} from '@redux/services/preview';
 import {deletePreviewConfiguration} from '@redux/thunks/previewConfiguration';
 
 import {Colors} from '@shared/styles/colors';
@@ -24,11 +24,20 @@ const PreviewConfigurationQuickAction: React.FC<IProps> = props => {
   const {id, isSelected} = props;
 
   const dispatch = useAppDispatch();
+  const preview = useAppSelector(state => state.main.preview);
   const previewConfiguration = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap?.[id]);
   const helmChart = useAppSelector(state =>
     previewConfiguration
       ? Object.values(state.main.helmChartMap).find(h => h.filePath === previewConfiguration.helmChartFilePath)
       : undefined
+  );
+
+  const isCurrentPreviewing = useMemo(
+    () =>
+      !previewConfiguration || !preview
+        ? false
+        : preview?.type === 'helm-config' && preview.configId === previewConfiguration.id,
+    [preview, previewConfiguration]
   );
 
   const onClickDelete = useCallback(() => {
@@ -57,14 +66,27 @@ const PreviewConfigurationQuickAction: React.FC<IProps> = props => {
     startPreview({type: 'helm-config', configId: previewConfiguration.id}, dispatch);
   }, [dispatch, previewConfiguration]);
 
+  const onClickExit = useCallback(() => {
+    stopPreview(dispatch);
+  }, [dispatch]);
+
   if (!previewConfiguration || !helmChart) {
     return null;
   }
 
   return (
     <>
-      <Button isItemSelected={isSelected} onClick={() => onClickRun()}>
-        Preview
+      <Button
+        isItemSelected={isSelected}
+        onClick={() => {
+          if (isCurrentPreviewing) {
+            onClickExit();
+          } else {
+            onClickRun();
+          }
+        }}
+      >
+        {isCurrentPreviewing ? 'Exit' : 'Preview'}
       </Button>
 
       <Button isItemSelected={isSelected} onClick={() => onClickEdit()}>
