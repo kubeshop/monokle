@@ -35,6 +35,7 @@ const Panel = styled(Collapse.Panel)<{$contentHeight: number}>`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    padding-bottom: 2px;
   }
 
   .ant-collapse-content-box {
