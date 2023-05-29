@@ -3,7 +3,7 @@ import {Tooltip} from 'antd';
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {stopPreview} from '@redux/services/preview';
+import {stopPreview} from '@redux/thunks/preview';
 
 import * as S from './QuickActionPreview.styled';
 
@@ -25,7 +25,7 @@ const QuickActionPreview: React.FC<IProps> = props => {
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
 
   const exitPreview = () => {
-    stopPreview(dispatch);
+    dispatch(stopPreview());
   };
 
   if (isPreviewLoading) {

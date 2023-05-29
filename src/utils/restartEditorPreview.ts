@@ -1,5 +1,5 @@
-import {restartPreview} from '@redux/services/preview';
 import store from '@redux/store';
+import {restartPreview} from '@redux/thunks/preview';
 
 // TODO: maybe we should refactor how we restart the preview
 // importing the store in this file and then using the following method anywhere in the code is not ideal
@@ -10,5 +10,6 @@ export const restartEditorPreview = () => {
   if (!preview) {
     return;
   }
-  restartPreview(preview, store.dispatch);
+
+  store.dispatch(restartPreview(preview));
 };

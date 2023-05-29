@@ -21,7 +21,7 @@ import {useResourceMetaMapRef} from '@redux/selectors/resourceMapSelectors';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {getHelmValuesFile} from '@redux/services/helm';
 import {isKustomizationFile, isKustomizationResource} from '@redux/services/kustomize';
-import {startPreview} from '@redux/services/preview';
+import {startPreview} from '@redux/thunks/preview';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {useFilterByFileOrFolder} from '@hooks/fileTreeHooks';
@@ -145,7 +145,7 @@ export const usePreview = () => {
         )
           return;
 
-        startPreview({type: 'kustomize', kustomizationId: resourceMetas[0].id}, dispatch);
+        dispatch(startPreview({type: 'kustomize', kustomizationId: resourceMetas[0].id}));
       } else {
         const fileEntry = fileMapRef.current[relativePath];
         if (fileEntry) {
@@ -154,7 +154,7 @@ export const usePreview = () => {
             if (currentPreviewRef.current?.type === 'helm' && currentPreviewRef.current.valuesFileId === valuesFile.id)
               return;
 
-            startPreview({type: 'helm', valuesFileId: valuesFile.id, chartId: valuesFile.helmChartId}, dispatch);
+            dispatch(startPreview({type: 'helm', valuesFileId: valuesFile.id, chartId: valuesFile.helmChartId}));
           }
         }
       }

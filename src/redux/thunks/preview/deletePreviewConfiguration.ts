@@ -4,10 +4,11 @@ import {cloneDeep} from 'lodash';
 
 import {updateProjectConfig} from '@redux/appConfig';
 import {clearSelection, selectFile} from '@redux/reducers/main';
-import {stopPreview} from '@redux/services/preview';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
+
+import {stopPreview} from './stopPreview';
 
 export const deletePreviewConfiguration = createAsyncThunk<void, string, {dispatch: AppDispatch; state: RootState}>(
   'main/deletePreviewConfiguration',
@@ -29,7 +30,7 @@ export const deletePreviewConfiguration = createAsyncThunk<void, string, {dispat
         thunkAPI.dispatch(clearSelection());
       }
 
-      stopPreview(thunkAPI.dispatch);
+      thunkAPI.dispatch(stopPreview());
     }
 
     if (
