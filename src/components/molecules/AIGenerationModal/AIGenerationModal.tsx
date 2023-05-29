@@ -6,6 +6,7 @@ import {Button, Input, Spin, Switch} from 'antd';
 
 import {SettingOutlined} from '@ant-design/icons';
 
+import {uniq} from 'lodash';
 import log from 'loglevel';
 import YAML from 'yaml';
 
@@ -22,6 +23,7 @@ import AIRobot from '@assets/AIRobot.svg';
 import AIRobotColored from '@assets/AIRobotColored.svg';
 
 import {AlertEnum} from '@shared/models/alert';
+import {trackEvent} from '@shared/utils';
 
 import * as S from './AIGenerationModal.styled';
 import ApiKeyModal from './ApiKeyModal';
@@ -70,8 +72,16 @@ const AIGenerationModal: React.FC = () => {
     setErrorMessage(undefined);
 
     try {
-      const generatedYaml = await generateYamlUsingAI({userPrompt: inputValue, shouldValidate: isValidationEnabled});
-      setEditorCode(generatedYaml);
+      const response = await generateYamlUsingAI({userPrompt: inputValue, shouldValidate: isValidationEnabled});
+      if (response) {
+        setEditorCode(response.yaml);
+        trackEvent('ai/generation/success', {
+          enabledValidation: isValidationEnabled,
+          executionTime: response.executionTime,
+        });
+      } else {
+        setErrorMessage('Could not generate YAML from the given input.');
+      }
     } catch (e: any) {
       setErrorMessage(e.message);
     }
@@ -83,6 +93,7 @@ const AIGenerationModal: React.FC = () => {
     const manifests = editorCode?.split(YAML_DOCUMENT_DELIMITER);
 
     const namesOfCreatedResources: string[] = [];
+    const listOfResourceKinds: string[] = [];
 
     manifests?.forEach(code => {
       try {
@@ -100,6 +111,7 @@ const AIGenerationModal: React.FC = () => {
           parsedManifest.spec
         );
 
+        listOfResourceKinds.push(newResource.kind);
         namesOfCreatedResources.push(newResource.name);
 
         dispatch(setAlert({title: 'Resource created successfully', message: '', type: AlertEnum.Success}));
@@ -117,6 +129,10 @@ const AIGenerationModal: React.FC = () => {
         })
       );
       dispatch(closeNewAiResourceWizard());
+      trackEvent('ai/generation/created-resources', {
+        resourceKinds: uniq(listOfResourceKinds),
+        resourcesCount: namesOfCreatedResources.length,
+      });
     } else {
       dispatch(
         setAlert({

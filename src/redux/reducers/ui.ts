@@ -34,6 +34,7 @@ import {
   StartPageMenuOptions,
   UiState,
 } from '@shared/models/ui';
+import {trackEvent} from '@shared/utils';
 import electronStore from '@shared/utils/electronStore';
 import {generateExpandedPaths} from '@shared/utils/file';
 
@@ -125,6 +126,7 @@ export const uiSlice = createSlice({
       }
     },
     openNewAiResourceWizard: (state: Draft<UiState>) => {
+      trackEvent('ai/generation/open');
       state.newAiResourceWizard.isOpen = true;
     },
     closeNewAiResourceWizard: (state: Draft<UiState>) => {

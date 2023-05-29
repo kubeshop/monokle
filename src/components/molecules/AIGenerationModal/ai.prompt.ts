@@ -92,9 +92,10 @@ ${VALIDATION_PROMPT_END}`,
 export const generateYamlUsingAI = async (payload: {
   userPrompt: string;
   shouldValidate?: boolean;
-}): Promise<string | undefined> => {
+}): Promise<{yaml: string; executionTime: number} | undefined> => {
   const {userPrompt, shouldValidate} = payload;
   const generationPrompt = createGenerationPrompt({userPrompt});
+  const startTime = new Date().getTime();
   log.info('[generateYamlUsingAI]: Generation prompt: ', {generationPrompt});
   let content = await createChatCompletion({messages: generationPrompt});
   if (!content) {
@@ -109,23 +110,28 @@ export const generateYamlUsingAI = async (payload: {
   log.info('[generateYamlUsingAI]: Generated YAML: ', {generatedYaml});
   if (!shouldValidate) {
     log.info('[generateYamlUsingAI]: Skipping validation.');
-    return generatedYaml;
+    return withExecutionTime({yaml: generatedYaml}, startTime);
   }
   const validationPrompt = await createValidationPrompt({userPrompt, generatedYaml});
   if (!validationPrompt) {
     log.info('[generateYamlUsingAI]: No validation prompt generated.');
-    return generatedYaml;
+    return withExecutionTime({yaml: generatedYaml}, startTime);
   }
   log.info('[generateYamlUsingAI]: Validation prompt: ', {validationPrompt});
   content = await createChatCompletion({messages: validationPrompt});
   if (!content) {
     log.info('[generateYamlUsingAI]: No content generated after validation. Returning initial YAML.');
-    return generatedYaml;
+    return withExecutionTime({yaml: generatedYaml}, startTime);
   }
   const validatedYaml = extractYaml(content);
   if (!validatedYaml) {
     log.info('[generateYamlUsingAI]: No YAML generated after validation. Returning initial YAML.');
-    return generatedYaml;
+    return withExecutionTime({yaml: generatedYaml}, startTime);
   }
-  return validatedYaml;
+  return withExecutionTime({yaml: validatedYaml}, startTime);
+};
+
+const withExecutionTime = <T extends object>(value: T, startTime: number): T & {executionTime: number} => {
+  const endTime = new Date().getTime();
+  return {...value, executionTime: (endTime - startTime) / 1000};
 };
