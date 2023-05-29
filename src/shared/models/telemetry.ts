@@ -139,6 +139,12 @@ export type EventMap = {
   'left-menu/activity-changed': {activity: LeftMenuSelectionType; section?: string};
   'bottom-left-menu/select-option': {option: LeftMenuBottomSelectionType};
   'notifications/toggle': undefined;
+  'ai/generation/open': undefined;
+  'ai/generation/success': {
+    enabledValidation: boolean;
+    executionTime: number;
+  };
+  'ai/generation/created-resources': {resourceKinds: string[]; resourcesCount: number};
 };
 export const APP_INSTALLED = 'APP_INSTALLED';
 export const APP_SESSION = 'APP_SESSION';
