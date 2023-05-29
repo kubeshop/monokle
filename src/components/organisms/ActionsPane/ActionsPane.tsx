@@ -277,7 +277,19 @@ const ActionsPane: React.FC = () => {
     if (activeEditorTab === 'logs' && selectedResource?.kind !== 'Pod') {
       dispatch(setActiveEditorTab('source'));
     }
-  }, [selectedResource, activeEditorTab, resourceKindHandler, isKustomization, isSchemaAvailable, dispatch]);
+
+    if (activeEditorTab === 'graph' && !isGraphViewVisible) {
+      dispatch(setActiveEditorTab('source'));
+    }
+  }, [
+    selectedResource,
+    activeEditorTab,
+    resourceKindHandler,
+    isKustomization,
+    isSchemaAvailable,
+    isGraphViewVisible,
+    dispatch,
+  ]);
 
   useEffect(() => {
     if (tabsList && tabsList.length && extraButton.current) {
