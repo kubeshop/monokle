@@ -1,6 +1,6 @@
 import {Dispatch, SetStateAction, useCallback, useRef, useState} from 'react';
 
-import {Checkbox, Modal, Typography} from 'antd';
+import {Modal, Typography} from 'antd';
 import {ColumnProps} from 'antd/lib/table';
 
 import {RightOutlined, SearchOutlined} from '@ant-design/icons';
@@ -129,10 +129,10 @@ const HelmChartsTable = ({
               onChange={onChangeSearchInputHandler}
               size="large"
             />
-            <Checkbox onChange={check => setIncludeHubSearch(check.target.checked)}>
+            <S.Checkbox onChange={check => setIncludeHubSearch(check.target.checked)}>
               {' '}
               Include Artifacthub in search
-            </Checkbox>
+            </S.Checkbox>
           </div>
           <Typography.Text style={{height: 'fit-content', marginBottom: 12}}>
             {searchResultCount} Helm Charts found. You can

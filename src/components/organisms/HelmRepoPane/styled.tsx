@@ -1,4 +1,12 @@
-import {Input as AntInput, Menu as AntMenu, Table as AntTable, Button, Form, Typography} from 'antd';
+import {
+  Checkbox as AntCheckbox,
+  Input as AntInput,
+  Menu as AntMenu,
+  Table as AntTable,
+  Button,
+  Form,
+  Typography,
+} from 'antd';
 
 import styled from 'styled-components';
 
@@ -193,4 +201,12 @@ export const ErrorText = styled(Typography.Text)`
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
+`;
+
+export const Checkbox = styled(AntCheckbox)`
+  .ant-checkbox + span {
+    text-decoration-style: dashed;
+    text-decoration-line: underline;
+    text-underline-offset: 10px;
+  }
 `;
