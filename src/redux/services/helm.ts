@@ -179,7 +179,8 @@ export function processHelmChartFolder(
     helmValuesMap: HelmValuesMapType;
     helmTemplatesMap: HelmTemplatesMapType;
   },
-  depth: number
+  depth: number,
+  parentChart?: HelmChart
 ) {
   const {projectConfig, resourceMetaMap, resourceContentMap, fileMap, helmChartMap, helmValuesMap, helmTemplatesMap} =
     stateArgs;
@@ -195,6 +196,9 @@ export function processHelmChartFolder(
     projectConfig,
   });
   const helmChart = createHelmChart(helmChartFileEntry, helmChartFilePath, helmChartMap, projectConfig);
+  if (helmChart && parentChart) {
+    helmChart.parentChartId = parentChart.id;
+  }
 
   result.push(helmChartFileEntry.name);
 
@@ -226,7 +230,7 @@ export function processHelmChartFolder(
               helmTemplatesMap,
             },
             depth + 1,
-            helmChart
+            helmChart || parentChart
           );
         }
       } else if (helmChart && isHelmValuesFile(file)) {
