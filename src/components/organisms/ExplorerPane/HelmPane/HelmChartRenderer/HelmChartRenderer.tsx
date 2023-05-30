@@ -53,7 +53,7 @@ const HelmChartRenderer: React.FC<IProps> = props => {
     }
 
     return name;
-  }, [helmChart, helmChartMap, dispatch]);
+  }, [helmChart, helmChartMap]);
 
   return (
     <S.ItemContainer
