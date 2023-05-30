@@ -12,6 +12,7 @@ import {openNewAiResourceWizard, openNewResourceWizard, openTemplateExplorer} fr
 import TemplateSmallWhiteSvg from '@assets/TemplateSmallWhite.svg';
 
 import {Colors} from '@shared/styles/colors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 export function useNewResourceMenuItems() {
   const dispatch = useAppDispatch();
@@ -26,7 +27,10 @@ export function useNewResourceMenuItems() {
             New from model
           </MenuItem>
         ),
-        onClick: () => dispatch(openNewResourceWizard()),
+        onClick: () => {
+          trackEvent('new_resource/create', {type: 'wizard', from: 'navigator_header'});
+          dispatch(openNewResourceWizard());
+        },
       },
       {
         key: 'from-template',
@@ -36,7 +40,10 @@ export function useNewResourceMenuItems() {
             New from advanced template
           </MenuItem>
         ),
-        onClick: () => dispatch(openTemplateExplorer()),
+        onClick: () => {
+          trackEvent('new_resource/create', {type: 'advanced_template', from: 'navigator_header'});
+          dispatch(openTemplateExplorer());
+        },
       },
       {
         key: 'from-ai',
@@ -46,7 +53,10 @@ export function useNewResourceMenuItems() {
             New from AI
           </MenuItem>
         ),
-        onClick: () => dispatch(openNewAiResourceWizard()),
+        onClick: () => {
+          trackEvent('new_resource/create', {type: 'AI', from: 'navigator_header'});
+          dispatch(openNewAiResourceWizard());
+        },
       },
     ],
     [dispatch]
