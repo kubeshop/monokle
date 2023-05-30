@@ -1,3 +1,5 @@
+import {AnyAction} from 'redux';
+
 /**
  * For displaying alerts - any action payload containing an alert object of the below type will automatically
  * be displayed - see the alert reducer
@@ -17,6 +19,12 @@ type AlertState = {
   alert?: AlertType;
 };
 
+type AlertButton = {
+  text: string;
+  action: AnyAction;
+  style?: React.CSSProperties;
+};
+
 type AlertType = {
   id?: string;
   title: string;
@@ -28,6 +36,7 @@ type AlertType = {
   extraContentType?: ExtraContentType;
   silent?: boolean;
   icon?: React.ReactNode;
+  buttons?: AlertButton[];
 };
 
 export type {AlertState, AlertType};
