@@ -1,4 +1,4 @@
-import {useLayoutEffect, useRef} from 'react';
+import {useLayoutEffect, useRef, useState} from 'react';
 import {useClickAway} from 'react-use';
 
 import {v4 as uuidv4} from 'uuid';
@@ -25,13 +25,14 @@ export const Drawer = () => {
   const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
   const selectedResource = useResource(selectedResourceId ? {id: selectedResourceId, storage: 'cluster'} : undefined);
+  const [isConfirmingUpdate, setIsConfirmingUpdate] = useState(false);
 
   const [warnUnsavedCodeChanges, UnsavedCodeChangesModal] = useWarnUnsavedChanges();
 
   const drawerClassName = useRef(uuidv4());
   const drawerRef = useRef<HTMLDivElement | null>(null);
   useClickAway(drawerRef, () => {
-    if (!selectedResourceId) return;
+    if (!selectedResourceId || isConfirmingUpdate) return;
     warnUnsavedCodeChanges();
   });
   useLayoutEffect(() => {
@@ -76,7 +77,13 @@ export const Drawer = () => {
       <UnsavedCodeChangesModal />
       <S.TabsContainer>
         <S.Tabs
-          tabBarExtraContent={<ResourceActions resource={selectedResource} />}
+          tabBarExtraContent={
+            <ResourceActions
+              resource={selectedResource}
+              isConfirmingUpdate={isConfirmingUpdate}
+              setIsConfirmingUpdate={setIsConfirmingUpdate}
+            />
+          }
           defaultActiveKey={activeTab}
           activeKey={activeTab}
           onChange={(key: string) => {

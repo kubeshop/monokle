@@ -121,7 +121,7 @@ export function createUseComponentHook<Props>(component: (props?: Props) => JSX.
       const hookComponent: HookComponent<Props> = () => component(hookComponent.componentProps);
       componentRef.current = hookComponent;
     }, []);
-    return componentRef.current as () => JSX.Element;
+    return (componentRef.current === null ? () => null : componentRef.current) as () => JSX.Element;
   };
   return useComponent;
 }
