@@ -77,6 +77,15 @@ export function searchHelmRepoCommand({q}: {q: string}, versions?: boolean, env?
   };
 }
 
+export function searchHelmHubCommand({q}: {q: string}, env?: HelmEnv): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['search', 'hub', q, '-o json'],
+    env,
+  };
+}
+
 export function helmChartInfoCommand({name}: {name: string}, env?: HelmEnv): CommandOptions {
   return {
     commandId: uuid(),

@@ -125,6 +125,10 @@ export const Table = styled(props => <AntTable {...props} />)`
     background-color: ${Colors.cyan8} !important;
     color: ${Colors.grey2} !important;
   }
+
+  .hub-search {
+    color: ${Colors.geekblue8} !important;
+  }
 `;
 
 export const HoverArea = styled.div.attrs({

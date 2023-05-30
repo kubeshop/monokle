@@ -1,7 +1,7 @@
 import {Dispatch, SetStateAction, useCallback, useRef, useState} from 'react';
-import {useAsync} from 'react-use';
 
-import {Typography} from 'antd';
+import {Checkbox, Modal, Typography} from 'antd';
+import {ColumnProps} from 'antd/lib/table';
 
 import {RightOutlined, SearchOutlined} from '@ant-design/icons';
 
@@ -9,30 +9,26 @@ import {debounce} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {useSearchHelmCharts} from '@hooks/useSearchHelmCharts';
+import type {ChartInfo} from '@hooks/useSearchHelmCharts';
+
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {openUrlInExternalBrowser, trackEvent} from '@shared/utils';
-import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
+import {addHelmRepoCommand, runCommandInMainThread} from '@shared/utils/commands';
 
 import HelmChartDetails from './HelmChartDetails';
 
 import * as S from './styled';
 
-interface TableDataType {
-  name: string;
-  description: string;
-  version: string;
-  app_version: string;
-}
-
-const columns = [
+const columns: ColumnProps<ChartInfo>[] = [
   {
     title: 'Name',
     dataIndex: 'name',
     key: 'name',
     ellipsis: true,
     sorter: {
-      compare: (a: TableDataType, b: TableDataType) => a.name.localeCompare(b.name),
+      compare: (a: ChartInfo, b: ChartInfo) => a.name.localeCompare(b.name),
       multiple: 3,
     },
     responsive: ['sm'],
@@ -77,37 +73,43 @@ const HelmChartsTable = ({
   setSelectedMenuItem: Dispatch<SetStateAction<'browse-charts' | 'manage-repositories'>>;
 }) => {
   const [helmRepoSearch, setHelmRepoSearch] = useState('');
+  const [includeHubSearch, setIncludeHubSearch] = useState(false);
   const {height} = useMainPaneDimensions();
   const terminalHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
 
   const ref = useRef<HTMLDivElement>(null);
-  const [selectedChart, setSelectedChart] = useState<string | null>(null);
+  const [selectedChart, setSelectedChart] = useState<ChartInfo | null>(null);
   const onItemClick = useCallback(
-    (chart: string) => {
-      setSelectedChart(chart);
-      trackEvent('helm_repo/select');
+    (chart: ChartInfo) => {
+      if (chart.isHubSearch) {
+        Modal.confirm({
+          title: 'This chart is not added to your local repository list yet. Do you want to add it?',
+          onOk: async () => {
+            if (chart.repository) {
+              const result = await runCommandInMainThread(addHelmRepoCommand(chart.repository));
+              if (result.stdout) {
+                setSelectedChart(chart);
+                trackEvent('helm_repo/select');
+              }
+            }
+          },
+        });
+      } else {
+        setSelectedChart(chart);
+        trackEvent('helm_repo/select');
+      }
     },
     [setSelectedChart]
   );
 
-  const {
-    value: data = [],
-    loading,
-    error,
-  } = useAsync(async () => {
-    const result = await runCommandInMainThread(searchHelmRepoCommand({q: helmRepoSearch}));
-    if (result.stderr) {
-      throw new Error(result.stderr);
-    }
-    return JSON.parse(result.stdout || '[]') as Array<TableDataType>;
-  }, [helmRepoSearch]);
+  const {result, error, loading} = useSearchHelmCharts(helmRepoSearch, includeHubSearch);
 
-  const searchResultCount = data.length;
+  const searchResultCount = result.length;
 
   const onChangeSearchInputHandler = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     setHelmRepoSearch(e.target.value);
-  });
+  }, 400);
 
   return (
     <>
@@ -120,12 +122,18 @@ const HelmChartsTable = ({
         </S.ErrorText>
       ) : (
         <>
-          <S.Input
-            placeholder="Search for a Helm Chart"
-            prefix={<SearchOutlined />}
-            onChange={onChangeSearchInputHandler}
-            size="large"
-          />
+          <div style={{display: 'flex', gap: 16, alignItems: 'center'}}>
+            <S.Input
+              placeholder="Search for a Helm Chart"
+              prefix={<SearchOutlined />}
+              onChange={onChangeSearchInputHandler}
+              size="large"
+            />
+            <Checkbox onChange={check => setIncludeHubSearch(check.target.checked)}>
+              {' '}
+              Include Artifacthub in search
+            </Checkbox>
+          </div>
           <Typography.Text style={{height: 'fit-content', marginBottom: 12}}>
             {searchResultCount} Helm Charts found. You can
             <Typography.Link onClick={() => setSelectedMenuItem('manage-repositories')}>
@@ -141,19 +149,21 @@ const HelmChartsTable = ({
           showSorterTooltip
           sticky
           rowKey="name"
-          dataSource={data}
+          dataSource={result}
           columns={columns}
           sortDirections={['ascend', 'descend']}
           loading={loading}
           pagination={false}
           scroll={{y: height - 360 - (bottomSelection === 'terminal' ? terminalHeight : 0)}}
-          rowClassName={(record: TableDataType) => (record.name === selectedChart ? 'row-selected' : '')}
-          onRow={(record: TableDataType) => ({
-            onClick: () => onItemClick(record.name),
+          rowClassName={(record: ChartInfo) =>
+            record.name === selectedChart?.name ? 'row-selected' : record.isHubSearch ? 'hub-search' : ''
+          }
+          onRow={(record: ChartInfo) => ({
+            onClick: () => onItemClick(record),
           })}
         />
       </div>
-      {selectedChart && <HelmChartDetails chart={selectedChart} onDismissPane={setSelectedChart} />}
+      {selectedChart && <HelmChartDetails chart={selectedChart.name} onDismissPane={setSelectedChart} />}
     </>
   );
 };
