@@ -84,7 +84,7 @@ export default EmptyResourceNavigator;
 // Styled Components
 
 const Container = styled.div`
-  padding: 20px;
+  padding: 10px 20px 20px 20px;
 `;
 
 const NewResourceCardsContainer = styled.div`

@@ -16,7 +16,7 @@ import {
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
-import {navigatorResourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
+import {activeResourceCountSelector, navigatorResourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
@@ -119,6 +119,9 @@ export default NavPane;
 
 function CollapseAction() {
   const dispatch = useAppDispatch();
+  const [hasAnyActiveResources, hasAnyActiveResourcesRef] = useSelectorWithRef(
+    state => activeResourceCountSelector(state) > 0
+  );
 
   const [collapsedKinds, collapsedKindsRef] = useSelectorWithRef(s => s.ui.navigator.collapsedResourceKinds);
   const [navigatorKinds, navigatorKindsRef] = useSelectorWithRef(navigatorResourceKindsSelector);
@@ -129,6 +132,10 @@ function CollapseAction() {
   );
 
   const onClick = useCallback(() => {
+    if (!hasAnyActiveResourcesRef.current) {
+      return;
+    }
+
     if (collapsedKindsRef.current.length === navigatorKindsRef.current.length) {
       dispatch(expandResourceKinds(navigatorKindsRef.current));
       trackEvent('navigator/expand_all');
@@ -137,15 +144,15 @@ function CollapseAction() {
 
     dispatch(collapseResourceKinds(navigatorKindsRef.current));
     trackEvent('navigator/collapse_all');
-  }, [collapsedKindsRef, navigatorKindsRef, dispatch]);
+  }, [hasAnyActiveResourcesRef, collapsedKindsRef, navigatorKindsRef, dispatch]);
 
   return (
     <>
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandResourcesTooltip : CollapseResourcesTooltip}>
         {isCollapsed ? (
-          <StyledFullscreenOutlined onClick={onClick} />
+          <StyledFullscreenOutlined onClick={onClick} $disabled={!hasAnyActiveResources} />
         ) : (
-          <StyledFullscreenExitOutlined onClick={onClick} />
+          <StyledFullscreenExitOutlined onClick={onClick} $disabled={!hasAnyActiveResources} />
         )}
       </Tooltip>
     </>
@@ -154,16 +161,16 @@ function CollapseAction() {
 
 // Styled Components
 
-const StyledFullscreenOutlined = styled(FullscreenOutlined)`
-  color: ${Colors.blue6};
-  cursor: pointer;
+const StyledFullscreenOutlined = styled(FullscreenOutlined)<{$disabled: boolean}>`
+  color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.blue6)};
+  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
   padding-right: 10px;
   font-size: 16px;
 `;
 
-const StyledFullscreenExitOutlined = styled(FullscreenExitOutlined)`
-  color: ${Colors.blue6};
-  cursor: pointer;
+const StyledFullscreenExitOutlined = styled(FullscreenExitOutlined)<{$disabled: boolean}>`
+  color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.blue6)};
+  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
   padding-right: 10px;
   font-size: 16px;
 `;
