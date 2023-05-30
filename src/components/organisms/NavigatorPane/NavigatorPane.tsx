@@ -7,7 +7,12 @@ import {FullscreenExitOutlined, FullscreenOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {DisabledAddResourceTooltip, NewResourceTooltip} from '@constants/tooltips';
+import {
+  CollapseResourcesTooltip,
+  DisabledAddResourceTooltip,
+  ExpandResourcesTooltip,
+  NewResourceTooltip,
+} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
@@ -142,11 +147,13 @@ function CollapseAction() {
 
   return (
     <>
-      {isCollapsed ? (
-        <StyledFullscreenOutlined onClick={onClick} />
-      ) : (
-        <StyledFullscreenExitOutlined onClick={onClick} />
-      )}
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandResourcesTooltip : CollapseResourcesTooltip}>
+        {isCollapsed ? (
+          <StyledFullscreenOutlined onClick={onClick} />
+        ) : (
+          <StyledFullscreenExitOutlined onClick={onClick} />
+        )}
+      </Tooltip>
     </>
   );
 }
