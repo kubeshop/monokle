@@ -1,3 +1,8 @@
+import {useLayoutEffect, useRef} from 'react';
+import {useClickAway} from 'react-use';
+
+import {v4 as uuidv4} from 'uuid';
+
 import {setActiveTab, setDashboardSelectedResourceId} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {useResource} from '@redux/selectors/resourceSelectors';
@@ -7,6 +12,7 @@ import {Logs, ResourceRefsIconPopover} from '@components/molecules';
 import PodHandler from '@src/kindhandlers/Pod.handler';
 
 import CodeEditor from '@editor/CodeEditor';
+import {useWarnUnsavedChanges} from '@editor/editor.cluster';
 
 import * as S from './Drawer.styled';
 import GraphTab from './GraphTab';
@@ -18,11 +24,26 @@ export const Drawer = () => {
   const dispatch = useAppDispatch();
   const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
-
   const selectedResource = useResource(selectedResourceId ? {id: selectedResourceId, storage: 'cluster'} : undefined);
+
+  const [warnUnsavedCodeChanges, UnsavedCodeChangesModal] = useWarnUnsavedChanges();
+
+  const drawerClassName = useRef(uuidv4());
+  const drawerRef = useRef<HTMLDivElement | null>(null);
+  useClickAway(drawerRef, () => {
+    if (!selectedResourceId) return;
+    warnUnsavedCodeChanges();
+  });
+  useLayoutEffect(() => {
+    const elements = document.getElementsByClassName(drawerClassName.current);
+    if (elements[0] instanceof HTMLDivElement) {
+      drawerRef.current = elements[0];
+    }
+  }, [selectedResourceId]);
 
   return (
     <S.Drawer
+      className={drawerClassName.current}
       placement="right"
       size="large"
       open={Boolean(selectedResourceId)}
@@ -52,13 +73,16 @@ export const Drawer = () => {
         dispatch(setDashboardSelectedResourceId());
       }}
     >
+      <UnsavedCodeChangesModal />
       <S.TabsContainer>
         <S.Tabs
           tabBarExtraContent={<ResourceActions resource={selectedResource} />}
           defaultActiveKey={activeTab}
           activeKey={activeTab}
           onChange={(key: string) => {
-            dispatch(setActiveTab({tab: key as any, kind: selectedResource?.kind}));
+            if (!warnUnsavedCodeChanges()) {
+              dispatch(setActiveTab({tab: key as any, kind: selectedResource?.kind}));
+            }
           }}
           items={[
             {
