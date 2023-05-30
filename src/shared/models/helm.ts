@@ -9,6 +9,7 @@ type HelmChart = {
   name: string;
   valueFileIds: string[]; // ids of contained Helm value files
   templateIds: string[]; // ids of contained Helm templates
+  parentChartId?: string;
 };
 
 type HelmChartMenuItem = {

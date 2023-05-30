@@ -18,8 +18,6 @@ import {AppListenerFn} from '@redux/listeners/base';
 import {
   addMultipleResources,
   addResource,
-  clearPreview,
-  clearPreviewAndSelectionHistory,
   deleteMultipleClusterResources,
   multiplePathsRemoved,
   updateMultipleClusterResources,
@@ -30,9 +28,13 @@ import {loadClusterResources, reloadClusterResources, stopClusterConnection} fro
 import {downloadK8sSchema} from '@redux/thunks/downloadK8sSchema';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
-import {previewSavedCommand} from '@redux/thunks/previewCommand';
-import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
-import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {
+  previewHelmValuesFile,
+  previewKustomization,
+  previewSavedCommand,
+  restartPreview,
+  stopPreview,
+} from '@redux/thunks/preview';
 import {removeResources} from '@redux/thunks/removeResources';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -93,26 +95,24 @@ const validateListener: AppListenerFn = listen => {
       loadValidation.fulfilled,
       loadClusterResources.fulfilled,
       reloadClusterResources.fulfilled,
-      previewKustomization.fulfilled,
-      previewHelmValuesFile.fulfilled,
-      runPreviewConfiguration.fulfilled,
-      previewSavedCommand.fulfilled,
-      previewKustomization.rejected,
-      previewHelmValuesFile.rejected,
-      runPreviewConfiguration.rejected,
-      previewSavedCommand.rejected,
       stopClusterConnection.fulfilled,
       removeResources.fulfilled,
       deleteMultipleClusterResources,
       multiplePathsRemoved,
-      clearPreviewAndSelectionHistory,
-      clearPreview
+      previewKustomization.fulfilled,
+      previewKustomization.rejected,
+      previewHelmValuesFile.fulfilled,
+      previewHelmValuesFile.rejected,
+      runPreviewConfiguration.fulfilled,
+      runPreviewConfiguration.rejected,
+      previewSavedCommand.fulfilled,
+      previewSavedCommand.rejected,
+      stopPreview.fulfilled,
+      stopPreview.rejected,
+      restartPreview.fulfilled,
+      restartPreview.rejected
     ),
     async effect(_action, {dispatch, getState, cancelActiveListeners, signal, delay}) {
-      if (_action.type === 'main/clearPreviewAndSelectionHistory' && _action.payload?.revalidate === false) {
-        return;
-      }
-
       cancelActiveListeners();
 
       if (incrementalValidationStatus.isRunning) {
@@ -147,8 +147,8 @@ const validateListener: AppListenerFn = listen => {
       if (
         isAnyOf(
           stopClusterConnection.fulfilled,
-          clearPreviewAndSelectionHistory,
-          clearPreview,
+          stopPreview.fulfilled,
+          stopPreview.rejected,
           previewKustomization.rejected,
           previewHelmValuesFile.rejected,
           runPreviewConfiguration.rejected,

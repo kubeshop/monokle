@@ -10,6 +10,10 @@ type ItemNameProps = {
   isHighlighted: boolean;
 };
 
+export const ContextMenuPlaceholder = styled.div`
+  width: 31px;
+`;
+
 export const ItemContainer = styled.span<ItemContainerProps>`
   display: flex;
   align-items: center;

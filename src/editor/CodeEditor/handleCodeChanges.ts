@@ -1,7 +1,7 @@
 import {debounce} from 'lodash';
 import log from 'loglevel';
 
-import {selectedFilePathSelector} from '@redux/selectors';
+import {selectedFilePathSelector, selectedHelmValuesSelector} from '@redux/selectors';
 import {selectedResourceIdentifierSelector} from '@redux/selectors/resourceSelectors';
 import store from '@redux/store';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
@@ -53,12 +53,13 @@ const onCodeChange = () => {
   }
   const state = store.getState();
   const selectedPath = selectedFilePathSelector(state);
+  const selectedHelmValuesFile = selectedHelmValuesSelector(state);
   const selectedResourceIdentifier = selectedResourceIdentifierSelector(state);
   const code = editor.getModel()?.getValue();
   if (code) {
     debouncedCodeSave({
       code,
-      selectedPath,
+      selectedPath: selectedPath ?? selectedHelmValuesFile?.filePath,
       selectedResourceIdentifier,
     });
   }

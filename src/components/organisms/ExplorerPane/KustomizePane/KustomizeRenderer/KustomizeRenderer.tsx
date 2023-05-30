@@ -85,9 +85,13 @@ const KustomizeRenderer: React.FC<IProps> = props => {
           <KustomizeQuickAction id={resourceMeta.id} isSelected={isSelected} />
         </S.QuickActionContainer>
 
-        <S.ContextMenuContainer>
-          <KustomizeContextMenu id={resourceMeta.id} isSelected={isSelected} />
-        </S.ContextMenuContainer>
+        {isHovered ? (
+          <S.ContextMenuContainer>
+            <KustomizeContextMenu id={resourceMeta.id} isSelected={isSelected} />
+          </S.ContextMenuContainer>
+        ) : (
+          <S.ContextMenuPlaceholder />
+        )}
       </div>
     </S.ItemContainer>
   );

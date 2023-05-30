@@ -9,7 +9,7 @@ export type DashboardMenu = {
   children?: DashboardMenu[];
 };
 
-export type DashboardActiveTab = 'Info' | 'Manifest' | 'Logs' | 'Shell';
+export type DashboardActiveTab = 'Info' | 'Manifest' | 'Logs' | 'Shell' | 'Graph';
 
 export type DashboardState = {
   isOpen: boolean;
