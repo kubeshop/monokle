@@ -141,15 +141,28 @@ function CollapseAction() {
   }, [collapsedKindsRef, navigatorKindsRef, dispatch]);
 
   return (
-    <CollapseIconWrapper onClick={onClick}>
-      {isCollapsed ? <FullscreenOutlined /> : <FullscreenExitOutlined />}
-    </CollapseIconWrapper>
+    <>
+      {isCollapsed ? (
+        <StyledFullscreenOutlined onClick={onClick} />
+      ) : (
+        <StyledFullscreenExitOutlined onClick={onClick} />
+      )}
+    </>
   );
 }
 
-const CollapseIconWrapper = styled.div`
+// Styled Components
+
+const StyledFullscreenOutlined = styled(FullscreenOutlined)`
   color: ${Colors.blue6};
   cursor: pointer;
   padding-right: 10px;
-  font-size: 15px;
+  font-size: 16px;
+`;
+
+const StyledFullscreenExitOutlined = styled(FullscreenExitOutlined)`
+  color: ${Colors.blue6};
+  cursor: pointer;
+  padding-right: 10px;
+  font-size: 16px;
 `;
