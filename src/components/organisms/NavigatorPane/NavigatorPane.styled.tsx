@@ -1,8 +1,8 @@
-import {Button} from 'antd';
-
 import styled from 'styled-components';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
+
+import {PrimaryButton} from '@components/atoms';
 
 import {AppBorders} from '@shared/styles/borders';
 import {BackgroundColors, Colors} from '@shared/styles/colors';
@@ -26,19 +26,9 @@ export const NavigatorPaneContainer = styled.div`
   background-color: ${Colors.black100};
 `;
 
-export const PlusButton = styled(Button)<{$highlighted: boolean; $disabled: boolean}>`
-  ${({$disabled, $highlighted}) => `
-    border-radius: ${$highlighted ? '100%' : 'inherit'} !important;
-    color: ${$highlighted ? Colors.whitePure : $disabled ? 'rgba(255, 255, 255, 0.3)' : Colors.blue6} !important`};
-
-  &:after {
-    ${({$highlighted}) => `
-      height: ${$highlighted ? '24px' : 'inherit'};
-      width: ${$highlighted ? '24px' : 'inherit'};
-      top: ${$highlighted ? '-1px' : 'inherit'};
-      left: ${$highlighted ? '-1px' : 'inherit'}
-    `};
-  }
+export const NewButton = styled(PrimaryButton)`
+  padding: 0px 8px;
+  font-size: 12px;
 `;
 
 export const SelectionBar = styled.div`

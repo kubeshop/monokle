@@ -2,7 +2,7 @@ import {useCallback, useMemo} from 'react';
 
 import {Dropdown, Tooltip} from 'antd';
 
-import {PlusOutlined} from '@ant-design/icons';
+import {FullscreenExitOutlined, FullscreenOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -19,9 +19,9 @@ import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrappe
 
 import {useNewResourceMenuItems} from '@hooks/menuItemsHooks';
 
-import {useRefSelector} from '@utils/hooks';
+import {useSelectorWithRef} from '@utils/hooks';
 
-import {Icon, TitleBar} from '@monokle/components';
+import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils';
@@ -91,16 +91,14 @@ const NavPane: React.FC = () => {
                         : NewResourceTooltip
                     }
                   >
-                    <S.PlusButton
+                    <S.NewButton
                       id="create-resource-button"
-                      $disabled={isAddResourceDisabled}
-                      $highlighted={isHighlighted}
-                      className={isHighlighted ? 'animated-highlight' : ''}
                       disabled={isAddResourceDisabled}
-                      icon={<PlusOutlined />}
                       size="small"
-                      type="link"
-                    />
+                      type="primary"
+                    >
+                      New
+                    </S.NewButton>
                   </Tooltip>
                 </Dropdown>
               </S.TitleBarRightButtons>
@@ -122,22 +120,29 @@ export default NavPane;
 
 function CollapseAction() {
   const dispatch = useAppDispatch();
-  const navigatorKinds = useRefSelector(navigatorResourceKindsSelector);
-  const collapsedKinds = useRefSelector(s => s.ui.navigator.collapsedResourceKinds);
+
+  const [collapsedKinds, collapsedKindsRef] = useSelectorWithRef(s => s.ui.navigator.collapsedResourceKinds);
+  const [navigatorKinds, navigatorKindsRef] = useSelectorWithRef(navigatorResourceKindsSelector);
+
+  const isCollapsed = useMemo(
+    () => collapsedKinds.length === navigatorKinds.length,
+    [collapsedKinds.length, navigatorKinds.length]
+  );
 
   const onClick = useCallback(() => {
-    if (collapsedKinds.current.length === navigatorKinds.current.length) {
-      dispatch(expandResourceKinds(navigatorKinds.current));
+    if (collapsedKindsRef.current.length === navigatorKindsRef.current.length) {
+      dispatch(expandResourceKinds(navigatorKindsRef.current));
       trackEvent('navigator/expand_all');
       return;
     }
-    dispatch(collapseResourceKinds(navigatorKinds.current));
+
+    dispatch(collapseResourceKinds(navigatorKindsRef.current));
     trackEvent('navigator/collapse_all');
-  }, [dispatch, collapsedKinds, navigatorKinds]);
+  }, [collapsedKindsRef, navigatorKindsRef, dispatch]);
 
   return (
     <CollapseIconWrapper onClick={onClick}>
-      <Icon name="collapse" />
+      {isCollapsed ? <FullscreenOutlined /> : <FullscreenExitOutlined />}
     </CollapseIconWrapper>
   );
 }
@@ -145,5 +150,6 @@ function CollapseAction() {
 const CollapseIconWrapper = styled.div`
   color: ${Colors.blue6};
   cursor: pointer;
-  padding-right: 8px;
+  padding-right: 10px;
+  font-size: 15px;
 `;
