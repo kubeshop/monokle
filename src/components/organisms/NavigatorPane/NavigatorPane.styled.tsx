@@ -29,6 +29,8 @@ export const NavigatorPaneContainer = styled.div`
 export const NewButton = styled(PrimaryButton)`
   padding: 0px 8px;
   font-size: 12px;
+  border-radius: 2px;
+  font-weight: 500;
 `;
 
 export const SelectionBar = styled.div`
