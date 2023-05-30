@@ -41,7 +41,6 @@ const NavPane: React.FC = () => {
 
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
-  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
@@ -57,11 +56,6 @@ const NavPane: React.FC = () => {
   const resourceFilterButtonHandler = useCallback(() => {
     dispatch(toggleResourceFilters());
   }, [dispatch]);
-
-  const isHighlighted = useMemo(
-    () => Boolean(highlightedItems.createResource || highlightedItems.browseTemplates),
-    [highlightedItems.browseTemplates, highlightedItems.createResource]
-  );
 
   return (
     <S.NavigatorPaneContainer>

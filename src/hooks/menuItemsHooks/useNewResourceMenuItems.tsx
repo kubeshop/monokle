@@ -23,30 +23,30 @@ export function useNewResourceMenuItems() {
         label: (
           <MenuItem>
             <FileAddOutlined />
-            New resource
+            New from model
           </MenuItem>
         ),
         onClick: () => dispatch(openNewResourceWizard()),
-      },
-      {
-        key: 'from-ai',
-        label: (
-          <MenuItem>
-            <RobotOutlined />
-            Generate using AI
-          </MenuItem>
-        ),
-        onClick: () => dispatch(openNewAiResourceWizard()),
       },
       {
         key: 'from-template',
         label: (
           <MenuItem>
             <img src={TemplateSmallWhiteSvg} />
-            Use a template
+            New from advanced template
           </MenuItem>
         ),
         onClick: () => dispatch(openTemplateExplorer()),
+      },
+      {
+        key: 'from-ai',
+        label: (
+          <MenuItem>
+            <RobotOutlined />
+            New from AI
+          </MenuItem>
+        ),
+        onClick: () => dispatch(openNewAiResourceWizard()),
       },
     ],
     [dispatch]
