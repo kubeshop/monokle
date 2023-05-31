@@ -58,14 +58,15 @@ class ValidationWorker {
   async registerCustomSchema(input: RegisterCustomSchemaMessage['input']) {
     try {
       await this.#validator.registerCustomSchema(input.schema);
-    } catch {
-      log.warn(`Failed to register custom schema for ${input.schema?.apiVersion}/${input.schema?.kind}`);
+
+      return createWorkerEventPromise<RegisterCustomSchemaMessage['output']>({
+        type: RegisterCustomSchemaMessageType,
+        worker: this.#worker,
+        input,
+      });
+    } catch (e: any) {
+      log.warn(`Failed to register custom schema: ${e.toString()}`, input.schema);
     }
-    return createWorkerEventPromise<RegisterCustomSchemaMessage['output']>({
-      type: RegisterCustomSchemaMessageType,
-      worker: this.#worker,
-      input,
-    });
   }
 
   isRuleEnabled(rule: string) {

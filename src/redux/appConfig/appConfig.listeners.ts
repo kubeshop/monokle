@@ -8,6 +8,7 @@ import {VALIDATOR} from '@redux/validation/validator';
 import {ResourceKindHandlers, readSavedCrdKindHandlers} from '@src/kindhandlers';
 
 import {CustomSchema} from '@monokle/validation';
+import {isDefined} from '@shared/utils/filter';
 
 import {setUserDirs} from './appConfig.slice';
 
@@ -37,14 +38,19 @@ const k8sVersionSchemaListener: AppListenerFn = listen => {
         return;
       }
 
-      const schemas: CustomSchema[] = ResourceKindHandlers.filter(h => !h.isCustom).map(kindHandler => {
-        const schema = getResourceKindSchema(kindHandler.kind, k8sVersion, userDataDir);
-        return {
-          apiVersion: kindHandler.clusterApiVersion,
-          kind: kindHandler.kind,
-          schema,
-        };
-      });
+      const schemas: CustomSchema[] = ResourceKindHandlers.filter(h => !h.isCustom)
+        .map(kindHandler => {
+          const schema = getResourceKindSchema(kindHandler.kind, k8sVersion, userDataDir);
+
+          return schema
+            ? {
+                apiVersion: kindHandler.clusterApiVersion,
+                kind: kindHandler.kind,
+                schema,
+              }
+            : undefined;
+        })
+        .filter(isDefined);
 
       await VALIDATOR.bulkRegisterCustomSchemas(schemas);
     },

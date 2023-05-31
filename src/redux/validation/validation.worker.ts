@@ -51,7 +51,7 @@ onmessage = async event => {
     } catch {
       // we cannot use loglevel here because this is a worker
       // eslint-disable-next-line no-console
-      console.warn(`Failed to register custom schema for ${input.schema?.apiVersion}/${input.schema?.kind}`);
+      console.warn(`Failed to register custom schema in worker`, input.schema);
     }
   });
 };
