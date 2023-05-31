@@ -116,7 +116,7 @@ const HelmChartDetails = () => {
       size="large"
       open={Boolean(chart)}
       getContainer={false}
-      title={<S.Title>{chartName}</S.Title>}
+      title={<S.Title>{chart}</S.Title>}
       onClose={() => dispatch(setHelmPaneSelectedChart(null))}
     >
       <div style={{display: 'flex', flexDirection: 'column'}}>
