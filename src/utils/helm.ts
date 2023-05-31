@@ -10,7 +10,11 @@ export function buildHelmCommand(
   rootFolderPath: string,
   clusterContext?: string
 ): string[] {
-  const chartFolderPath = path.join(rootFolderPath, path.dirname(helmChart.filePath));
+  let chartFolderPath = path.join(rootFolderPath, path.dirname(helmChart.filePath));
+
+  if (chartFolderPath.endsWith(path.sep)) {
+    chartFolderPath = chartFolderPath.slice(0, -1);
+  }
 
   const args = [
     'helm',

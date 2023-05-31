@@ -11,7 +11,7 @@ import {helmInstallOptions, helmTemplateOptions} from '@constants/helmOptions';
 import {updateProjectConfig} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {closePreviewConfigurationEditor} from '@redux/reducers/main';
-import {startPreview} from '@redux/services/preview';
+import {startPreview} from '@redux/thunks/preview';
 
 import {KeyValueInput} from '@atoms';
 
@@ -183,7 +183,7 @@ const PreviewConfigurationEditor = () => {
 
       dispatch(closePreviewConfigurationEditor());
       if (shouldRunPreview) {
-        startPreview({configId: input.id, type: 'helm-config'}, dispatch);
+        dispatch(startPreview({configId: input.id, type: 'helm-config'}));
       }
     },
     [

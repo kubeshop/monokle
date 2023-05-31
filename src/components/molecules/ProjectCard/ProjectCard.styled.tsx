@@ -73,3 +73,13 @@ export const Type = styled.div`
   font-size: 12px;
   color: ${Colors.geekblue8};
 `;
+
+export const BoldSpan = styled.span`
+  font-weight: 700;
+  background-color: ${Colors.geekblue9};
+  color: ${Colors.grey1};
+`;
+
+export const Span = styled.span`
+  font-weight: 400;
+`;

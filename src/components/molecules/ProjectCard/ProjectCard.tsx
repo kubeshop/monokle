@@ -21,10 +21,22 @@ import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './ProjectCard.styled';
 
-type IProps = {isActive: boolean; project: Project};
+type IProps = {isActive: boolean; project: Project; query?: string};
 
 export const ProjectCard: React.FC<IProps> = props => {
-  const {isActive, project} = props;
+  const {isActive, project, query} = props;
+
+  const highlightQuery = (text: string) => {
+    if (!query?.trim()) {
+      return <S.Span>{text}</S.Span>;
+    }
+    const parts = text.split(new RegExp(`(${query})`, 'gi'));
+    return (
+      <S.Span>
+        {parts.map(part => (part.toLowerCase() === query.toLowerCase() ? <S.BoldSpan>{part}</S.BoldSpan> : part))}
+      </S.Span>
+    );
+  };
 
   const dispatch = useAppDispatch();
   const showOpenProjectAlertRef = useRefSelector(state => state.ui.showOpenProjectAlert);
@@ -126,7 +138,7 @@ export const ProjectCard: React.FC<IProps> = props => {
         </Tooltip>
       </S.ActionsContainer>
 
-      <S.Name>{project.name}</S.Name>
+      <S.Name>{project.name && highlightQuery(project.name)}</S.Name>
 
       <S.ProjectInfo>
         <S.Type>{project.isGitRepo ? 'Git' : 'Local'}</S.Type>

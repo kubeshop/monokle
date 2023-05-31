@@ -1,9 +1,8 @@
 import {useMemo, useState} from 'react';
 
 import {Select} from 'antd';
-
 import {PlusOutlined} from '@ant-design/icons';
-
+import thunderIcon from '@assets/figures/thunderIcon.svg';
 import {orderBy, size} from 'lodash';
 
 import {activeProjectSelector, sortProjects} from '@redux/appConfig';
@@ -35,6 +34,7 @@ const ProjectsList: React.FC<IProps> = props => {
 
   const [typeFilter, setTypeFilter] = useState<FiltersType>('all');
   const [creationFilter, setCreationFilter] = useState<CreationFiltersType>('last-created');
+  const [searchInput, setSearchInput] = useState<string>('');
 
   const filteredAndSortedProjects = useMemo(() => {
     if (type === 'recent') {
@@ -55,17 +55,22 @@ const ProjectsList: React.FC<IProps> = props => {
     );
 
     if (typeFilter === 'all') {
-      return projects;
+      return searchInput.trim() === ''
+        ? projects
+        : projects.filter(p => p.name?.toLowerCase().includes(searchInput.toLowerCase()));
     }
 
     if (typeFilter === 'git') {
-      return projects.filter(p => p.isGitRepo);
+      return searchInput.trim() === ''
+        ? projects.filter(p => p.isGitRepo)
+        : projects.filter(p => p.name?.toLowerCase().includes(searchInput.toLowerCase()) && p.isGitRepo);
     }
+    return searchInput.trim() === ''
+      ? projects.filter(p => !p.isGitRepo)
+      : projects.filter(p => p.name?.toLowerCase().includes(searchInput.toLowerCase()) && !p.isGitRepo);
+  }, [creationFilter, currentProjects, type, typeFilter, searchInput]);
 
-    return projects.filter(p => !p.isGitRepo);
-  }, [creationFilter, currentProjects, type, typeFilter]);
-
-  if (size(filteredAndSortedProjects) === 0) {
+  if (size(filteredAndSortedProjects) === 0 && searchInput.trim() === '') {
     return (
       <S.EmptyList>
         Click on
@@ -83,49 +88,63 @@ const ProjectsList: React.FC<IProps> = props => {
   return (
     <>
       {type === 'all' && (
-        <S.SortAndFiltersContainer>
-          <S.Select
-            dropdownMatchSelectWidth={false}
-            value={typeFilter}
-            onChange={value => {
-              setTypeFilter(value as FiltersType);
-            }}
-          >
-            <Select.Option key="all" value="all">
-              All
-            </Select.Option>
-            <Select.Option key="local" value="local">
-              Local
-            </Select.Option>
-            <Select.Option key="git" value="git">
-              Git
-            </Select.Option>
-          </S.Select>
+        <S.SortFilterAndSearchContainer>
+          <S.SortAndFiltersContainer>
+            <S.Select
+              dropdownMatchSelectWidth={false}
+              value={typeFilter}
+              onChange={value => {
+                setTypeFilter(value as FiltersType);
+              }}
+            >
+              <Select.Option key="all" value="all">
+                All
+              </Select.Option>
+              <Select.Option key="local" value="local">
+                Local
+              </Select.Option>
+              <Select.Option key="git" value="git">
+                Git
+              </Select.Option>
+            </S.Select>
 
-          <S.Select
-            dropdownMatchSelectWidth={false}
-            value={creationFilter}
-            onChange={value => {
-              setCreationFilter(value as CreationFiltersType);
-            }}
-          >
-            <Select.Option key="last-created" value="last-created">
-              Sort by last created
-            </Select.Option>
-            <Select.Option key="first-created" value="first-created">
-              Sort by first created
-            </Select.Option>
-            <Select.Option key="name-asc" value="name-asc">
-              Sort by name A-Z
-            </Select.Option>
-            <Select.Option key="name-desc" value="name-desc">
-              Sort by name Z-A
-            </Select.Option>
-            <Select.Option key="last-opened" value="last-opened">
-              Sort by last opened
-            </Select.Option>
-          </S.Select>
-        </S.SortAndFiltersContainer>
+            <S.Select
+              dropdownMatchSelectWidth={false}
+              value={creationFilter}
+              onChange={value => {
+                setCreationFilter(value as CreationFiltersType);
+              }}
+            >
+              <Select.Option key="last-created" value="last-created">
+                Sort by last created
+              </Select.Option>
+              <Select.Option key="first-created" value="first-created">
+                Sort by first created
+              </Select.Option>
+              <Select.Option key="name-asc" value="name-asc">
+                Sort by name A-Z
+              </Select.Option>
+              <Select.Option key="name-desc" value="name-desc">
+                Sort by name Z-A
+              </Select.Option>
+              <Select.Option key="last-opened" value="last-opened">
+                Sort by last opened
+              </Select.Option>
+            </S.Select>
+          </S.SortAndFiltersContainer>
+
+          <S.SearchInputBar>
+            {/* <ThunderboltFilled style={{color: `${Colors.grey7}`}} /> */}
+            <S.ThunderIcon src={thunderIcon} />
+            <S.SearchInput
+              placeholder="Quick project search"
+              value={searchInput}
+              onChange={e => {
+                setSearchInput(e.target.value);
+              }}
+            />
+          </S.SearchInputBar>
+        </S.SortFilterAndSearchContainer>
       )}
 
       <S.ProjectsListContainer>
@@ -134,8 +153,12 @@ const ProjectsList: React.FC<IProps> = props => {
             key={project.rootFolder}
             isActive={project.rootFolder === activeProject?.rootFolder}
             project={project}
+            query={searchInput}
           />
         ))}
+        {size(filteredAndSortedProjects) === 0 && searchInput.trim() !== '' && (
+          <S.NoProjectsFoundContainer>No matching projects found</S.NoProjectsFoundContainer>
+        )}
       </S.ProjectsListContainer>
     </>
   );
