@@ -1,6 +1,7 @@
-import {useState} from 'react';
-
 import {Tooltip} from 'antd';
+
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setHelmPaneMenuItem} from '@redux/reducers/ui';
 
 import {Colors} from '@shared/styles';
 
@@ -13,8 +14,6 @@ const menuItems = [
   {label: 'Browse Charts', key: 'browse-charts'},
   {label: 'Manage Repositories', key: 'manage-repositories'},
 ];
-
-type MenuItemKeys = 'browse-charts' | 'manage-repositories';
 
 const TooltipDescription = () => {
   return (
@@ -38,9 +37,10 @@ const TooltipDescription = () => {
 };
 
 const HelmRepoView = () => {
-  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItemKeys>('browse-charts');
+  const dispatch = useAppDispatch();
+  const selectedMenuItem = useAppSelector(state => state.ui.helmPane.selectedMenuItem);
   const onSelectItemMenuHandler = ({key}: any) => {
-    setSelectedMenuItem(key);
+    dispatch(setHelmPaneMenuItem(key));
   };
 
   return (
@@ -66,7 +66,7 @@ const HelmRepoView = () => {
         />
       </S.Header>
       <div style={{display: 'flex', flexDirection: 'column', gap: 16}}>
-        {selectedMenuItem === 'browse-charts' && <HelmChartsView setSelectedMenuItem={setSelectedMenuItem} />}
+        {selectedMenuItem === 'browse-charts' && <HelmChartsView />}
         {selectedMenuItem === 'manage-repositories' && <HelmReposView />}
       </div>
     </S.Container>

@@ -1,4 +1,4 @@
-import {Dispatch, useCallback, useMemo, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {useAsync} from 'react-use';
 
 import {Dropdown} from 'antd';
@@ -10,11 +10,13 @@ import {Tab} from 'rc-tabs/lib/interface';
 
 import {kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setHelmPaneChartDetailsTab, setHelmPaneSelectedChart} from '@redux/reducers/ui';
 import {installHelmRepoChart} from '@redux/thunks/InstallHelmRepoChart';
 
 import {HelmChartModalConfirmWithNamespaceSelect} from '@components/molecules';
 
 import {Icon} from '@monokle/components';
+import {HelmChartDetailsTab} from '@shared/models/ui';
 import {trackEvent} from '@shared/utils';
 import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
 
@@ -49,17 +51,15 @@ const createTabItems = (chartName: string): Tab[] => [
   },
 ];
 
-interface IProps {
-  chart: string;
-  onDismissPane: Dispatch<null>;
-}
-
-const HelmChartDetails = ({chart, onDismissPane}: IProps) => {
+const HelmChartDetails = () => {
   const dispatch = useAppDispatch();
   const kubeConfigContext = useAppSelector(kubeConfigContextSelector);
+  const selectedChart = useAppSelector(state => state.ui.helmPane.selectedChart);
+  const chartDetailsTab = useAppSelector(state => state.ui.helmPane.chartDetailsTab);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [installModalOpen, setInstallModalOpen] = useState(false);
   const [chartVersion, setChartVersion] = useState('');
+  const chart = selectedChart?.name || '';
   const chartName = chart.split('/')[1];
 
   const tabItems = useMemo(() => createTabItems(chart), [chart]);
@@ -117,10 +117,14 @@ const HelmChartDetails = ({chart, onDismissPane}: IProps) => {
       open={Boolean(chart)}
       getContainer={false}
       title={<S.Title>{chartName}</S.Title>}
-      onClose={() => onDismissPane(null)}
+      onClose={() => dispatch(setHelmPaneSelectedChart(null))}
     >
       <div style={{display: 'flex', flexDirection: 'column'}}>
-        <S.Tabs items={tabItems} />
+        <S.Tabs
+          items={tabItems}
+          activeKey={chartDetailsTab}
+          onChange={(key: HelmChartDetailsTab) => dispatch(setHelmPaneChartDetailsTab(key))}
+        />
         <S.Footer>
           <S.MenuDropdownList id="versions" />
           <Dropdown.Button

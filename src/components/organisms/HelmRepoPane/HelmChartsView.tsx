@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 
 import {Form, Modal, Typography} from 'antd';
 import {ColumnProps} from 'antd/lib/table';
@@ -7,7 +7,13 @@ import {RightOutlined, SearchOutlined} from '@ant-design/icons';
 
 import {debounce} from 'lodash';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {
+  setHelmPaneChartSearch,
+  setHelmPaneMenuItem,
+  setHelmPaneSelectedChart,
+  toggleHelmPanSearchHub,
+} from '@redux/reducers/ui';
 
 import {sortChartsByName, useSearchHelmCharts} from '@hooks/useSearchHelmCharts';
 import type {ChartInfo} from '@hooks/useSearchHelmCharts';
@@ -71,6 +77,8 @@ const columns: ColumnProps<ChartInfo>[] = [
 
 const SearchForm = ({onChangeSearchInputHandler}: {onChangeSearchInputHandler: (q: string) => void}) => {
   const [form] = Form.useForm();
+  const initialValue = useAppSelector(state => state.ui.helmPane.chartSearchToken);
+
   const helmRepoSearch = Form.useWatch('searchToken', form);
   useEffect(() => {
     onChangeSearchInputHandler(helmRepoSearch);
@@ -86,6 +94,7 @@ const SearchForm = ({onChangeSearchInputHandler}: {onChangeSearchInputHandler: (
             message: 'Invalid input. please type a valid helm chart name.',
           },
         ]}
+        initialValue={initialValue}
       >
         <S.Input placeholder="Search for a Helm Chart" prefix={<SearchOutlined />} size="large" />
       </Form.Item>
@@ -93,19 +102,17 @@ const SearchForm = ({onChangeSearchInputHandler}: {onChangeSearchInputHandler: (
   );
 };
 
-const HelmChartsTable = ({
-  setSelectedMenuItem,
-}: {
-  setSelectedMenuItem: Dispatch<SetStateAction<'browse-charts' | 'manage-repositories'>>;
-}) => {
-  const [helmRepoSearch, setHelmRepoSearch] = useState('');
-  const [includeHubSearch, setIncludeHubSearch] = useState(false);
+const HelmChartsTable = () => {
+  const dispatch = useAppDispatch();
+  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
+  const helmRepoSearch = useAppSelector(state => state.ui.helmPane.chartSearchToken);
+  const isHelmSearchHubIncluded = useAppSelector(state => state.ui.helmPane.isSearchHubIncluded);
+  const selectedChart = useAppSelector(state => state.ui.helmPane.selectedChart);
   const {height} = useMainPaneDimensions();
   const terminalHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
 
   const ref = useRef<HTMLDivElement>(null);
-  const [selectedChart, setSelectedChart] = useState<ChartInfo | null>(null);
 
   const onItemClick = useCallback(
     (chart: ChartInfo) => {
@@ -116,26 +123,26 @@ const HelmChartsTable = ({
             if (chart.repository) {
               const result = await runCommandInMainThread(addHelmRepoCommand(chart.repository));
               if (result.stdout) {
-                setSelectedChart(chart);
+                dispatch(setHelmPaneSelectedChart(chart));
                 trackEvent('helm_repo/select');
               }
             }
           },
         });
       } else {
-        setSelectedChart(chart);
+        dispatch(setHelmPaneSelectedChart(chart));
         trackEvent('helm_repo/select');
       }
     },
-    [setSelectedChart]
+    [dispatch]
   );
 
-  const {result, error, loading} = useSearchHelmCharts(helmRepoSearch, includeHubSearch);
+  const {result, error, loading} = useSearchHelmCharts(helmRepoSearch, isHelmSearchHubIncluded);
 
   const searchResultCount = result.length;
   const debouncedSearchRef = useRef(
     debounce((search: string) => {
-      setHelmRepoSearch(search);
+      dispatch(setHelmPaneChartSearch(search));
     }, 400)
   );
 
@@ -147,7 +154,7 @@ const HelmChartsTable = ({
     <>
       <div style={{display: 'flex', gap: 16, alignItems: 'center', height: 72}}>
         <SearchForm onChangeSearchInputHandler={onChangeSearchInputHandler} />
-        <S.Checkbox onChange={check => setIncludeHubSearch(check.target.checked)}>
+        <S.Checkbox checked={isHelmSearchHubIncluded} onChange={() => dispatch(toggleHelmPanSearchHub())}>
           {' '}
           Include Artifacthub in search
         </S.Checkbox>
@@ -163,7 +170,7 @@ const HelmChartsTable = ({
       ) : (
         <Typography.Text style={{height: 'fit-content', marginBottom: 12}}>
           {searchResultCount} Helm Charts found. You can
-          <Typography.Link onClick={() => setSelectedMenuItem('manage-repositories')}>
+          <Typography.Link onClick={() => dispatch(setHelmPaneMenuItem('manage-repositories'))}>
             &nbsp;add more Helm Charts repositories&nbsp;
           </Typography.Link>
           to extend your search.
@@ -189,7 +196,7 @@ const HelmChartsTable = ({
           })}
         />
       </div>
-      {selectedChart && <HelmChartDetails chart={selectedChart.name} onDismissPane={setSelectedChart} />}
+      {leftMenuSelection === 'helm' && selectedChart && <HelmChartDetails />}
     </>
   );
 };

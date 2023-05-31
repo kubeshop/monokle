@@ -210,8 +210,27 @@ type UiState = {
   explorerSelectedSection: ExplorerCollapsibleSectionsType;
   fileExplorerExpandedFolders: string[];
   showOpenProjectAlert: boolean;
+  helmPane: {
+    selectedMenuItem: HelmRepoMenu;
+    chartSearchToken: string;
+    selectedChart: null | ChartInfo;
+    chartDetailsTab: HelmChartDetailsTab;
+    isSearchHubIncluded: boolean;
+  };
 };
 
+type HelmRepoMenu = 'browse-charts' | 'manage-repositories';
+
+type HelmChartDetailsTab = 'info' | 'templates' | 'defaultValues' | 'changelog';
+interface ChartInfo {
+  name: string;
+  url?: string;
+  description: string;
+  version: string;
+  app_version: string;
+  repository?: {name: string; url: string};
+  isHubSearch?: boolean;
+}
 type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {});
 
 export type {
@@ -228,4 +247,7 @@ export type {
   RightMenuSelectionType,
   UiState,
   LearnTopicType,
+  HelmRepoMenu,
+  HelmChartDetailsTab,
+  ChartInfo,
 };

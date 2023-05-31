@@ -245,6 +245,13 @@ const initialUiState: UiState = {
   explorerSelectedSection: 'files',
   fileExplorerExpandedFolders: [],
   showOpenProjectAlert: electronStore.get('ui.showOpenProjectAlert', true),
+  helmPane: {
+    selectedMenuItem: 'browse-charts',
+    chartSearchToken: '',
+    selectedChart: null,
+    chartDetailsTab: 'info',
+    isSearchHubIncluded: false,
+  },
 };
 
 const initialExtensionState: ExtensionState = {
