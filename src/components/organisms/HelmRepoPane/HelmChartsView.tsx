@@ -1,6 +1,6 @@
-import {Dispatch, SetStateAction, useCallback, useRef, useState} from 'react';
+import {Dispatch, SetStateAction, useCallback, useEffect, useRef, useState} from 'react';
 
-import {Modal, Typography} from 'antd';
+import {Form, Modal, Typography} from 'antd';
 import {ColumnProps} from 'antd/lib/table';
 
 import {RightOutlined, SearchOutlined} from '@ant-design/icons';
@@ -9,7 +9,7 @@ import {debounce} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 
-import {useSearchHelmCharts} from '@hooks/useSearchHelmCharts';
+import {sortChartsByName, useSearchHelmCharts} from '@hooks/useSearchHelmCharts';
 import type {ChartInfo} from '@hooks/useSearchHelmCharts';
 
 import {useMainPaneDimensions} from '@utils/hooks';
@@ -21,6 +21,8 @@ import HelmChartDetails from './HelmChartDetails';
 
 import * as S from './styled';
 
+const CHART_NAME_REGEX = /^[a-z]([-a-z0-9]*[a-z0-9])?(\/[a-z]([-a-z0-9]*[a-z0-9])?)*$/gi;
+
 const columns: ColumnProps<ChartInfo>[] = [
   {
     title: 'Name',
@@ -28,7 +30,7 @@ const columns: ColumnProps<ChartInfo>[] = [
     key: 'name',
     ellipsis: true,
     sorter: {
-      compare: (a: ChartInfo, b: ChartInfo) => a.name.localeCompare(b.name),
+      compare: sortChartsByName,
       multiple: 3,
     },
     responsive: ['sm'],
@@ -67,6 +69,30 @@ const columns: ColumnProps<ChartInfo>[] = [
   },
 ];
 
+const SearchForm = ({onChangeSearchInputHandler}: {onChangeSearchInputHandler: (q: string) => void}) => {
+  const [form] = Form.useForm();
+  const helmRepoSearch = Form.useWatch('searchToken', form);
+  useEffect(() => {
+    onChangeSearchInputHandler(helmRepoSearch);
+  }, [helmRepoSearch, onChangeSearchInputHandler]);
+
+  return (
+    <Form form={form} layout="inline">
+      <Form.Item
+        name="searchToken"
+        rules={[
+          {
+            pattern: CHART_NAME_REGEX,
+            message: 'Invalid input. please type a valid helm chart name.',
+          },
+        ]}
+      >
+        <S.Input placeholder="Search for a Helm Chart" prefix={<SearchOutlined />} size="large" />
+      </Form.Item>
+    </Form>
+  );
+};
+
 const HelmChartsTable = ({
   setSelectedMenuItem,
 }: {
@@ -80,6 +106,7 @@ const HelmChartsTable = ({
 
   const ref = useRef<HTMLDivElement>(null);
   const [selectedChart, setSelectedChart] = useState<ChartInfo | null>(null);
+
   const onItemClick = useCallback(
     (chart: ChartInfo) => {
       if (chart.isHubSearch) {
@@ -106,42 +133,41 @@ const HelmChartsTable = ({
   const {result, error, loading} = useSearchHelmCharts(helmRepoSearch, includeHubSearch);
 
   const searchResultCount = result.length;
+  const debouncedSearchRef = useRef(
+    debounce((search: string) => {
+      setHelmRepoSearch(search);
+    }, 400)
+  );
 
-  const onChangeSearchInputHandler = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-    setHelmRepoSearch(e.target.value);
-  }, 400);
+  const onChangeSearchInputHandler = useCallback((search: string) => {
+    debouncedSearchRef.current(search);
+  }, []);
 
   return (
     <>
+      <div style={{display: 'flex', gap: 16, alignItems: 'center', height: 72}}>
+        <SearchForm onChangeSearchInputHandler={onChangeSearchInputHandler} />
+        <S.Checkbox onChange={check => setIncludeHubSearch(check.target.checked)}>
+          {' '}
+          Include Artifacthub in search
+        </S.Checkbox>
+      </div>
+
       {error ? (
         <S.ErrorText>
-          Helm not found - please install it from{' '}
+          {error.message} - please check helm from{' '}
           <Typography.Link onClick={() => openUrlInExternalBrowser('https://helm.sh/docs/intro/install/')}>
             here
           </Typography.Link>
         </S.ErrorText>
       ) : (
-        <>
-          <div style={{display: 'flex', gap: 16, alignItems: 'center'}}>
-            <S.Input
-              placeholder="Search for a Helm Chart"
-              prefix={<SearchOutlined />}
-              onChange={onChangeSearchInputHandler}
-              size="large"
-            />
-            <S.Checkbox onChange={check => setIncludeHubSearch(check.target.checked)}>
-              {' '}
-              Include Artifacthub in search
-            </S.Checkbox>
-          </div>
-          <Typography.Text style={{height: 'fit-content', marginBottom: 12}}>
-            {searchResultCount} Helm Charts found. You can
-            <Typography.Link onClick={() => setSelectedMenuItem('manage-repositories')}>
-              &nbsp;add more Helm Charts repositories&nbsp;
-            </Typography.Link>
-            to extend your search.
-          </Typography.Text>
-        </>
+        <Typography.Text style={{height: 'fit-content', marginBottom: 12}}>
+          {searchResultCount} Helm Charts found. You can
+          <Typography.Link onClick={() => setSelectedMenuItem('manage-repositories')}>
+            &nbsp;add more Helm Charts repositories&nbsp;
+          </Typography.Link>
+          to extend your search.
+        </Typography.Text>
       )}
 
       <div ref={ref} style={{overflow: 'hidden', flex: 1}}>

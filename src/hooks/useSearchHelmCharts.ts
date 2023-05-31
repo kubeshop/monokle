@@ -1,3 +1,4 @@
+import {useMemo} from 'react';
 import {useAsync} from 'react-use';
 
 import {runCommandInMainThread, searchHelmHubCommand, searchHelmRepoCommand} from '@shared/utils/commands';
@@ -32,12 +33,23 @@ export const useSearchHelmCharts = (helmRepoSearch: string, includeHubSearch: bo
       .filter(item => !repoResultNames.includes(item.name));
   }, [helmRepoSearch, includeHubSearch]);
 
-  return {result: [...repoResult, ...hubResult], error, loading};
+  const result = useMemo(() => [...repoResult, ...hubResult].sort(sortChartsByName), [repoResult, hubResult]);
+
+  return {result, error, loading};
 };
 
 const extractChartName = (item: ChartInfo) => {
   const urlPath = item?.url?.split('/') || ['', ''];
   return `${urlPath[urlPath.length - 2]}/${urlPath[urlPath.length - 1]}`;
+};
+
+export const sortChartsByName = (a: ChartInfo, b: ChartInfo) => {
+  const [chartRepoA, chartNameA] = a.name.split('/');
+  const [chartRepoB, chartNameB] = b.name.split('/');
+  if (chartNameA.localeCompare(chartNameB) !== 0) {
+    return chartNameA.localeCompare(chartNameB);
+  }
+  return chartRepoA.localeCompare(chartRepoB);
 };
 
 export interface ChartInfo {
