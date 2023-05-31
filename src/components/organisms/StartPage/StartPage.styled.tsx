@@ -42,7 +42,7 @@ export const Menu = styled.div`
   gap: 20px;
   margin-top: 10px;
 
-  & div:nth-child(6) {
+  & div:last-child {
     display: none;
   }
 `;
