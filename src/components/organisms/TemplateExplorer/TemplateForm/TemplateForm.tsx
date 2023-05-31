@@ -113,6 +113,12 @@ const TemplateForm: React.FC<IProps> = props => {
   const setFormData = useCallback(
     (formIndex: number, formData: Record<string, Primitive>) => {
       const newFormDataList = currentFormDataList.slice(0);
+      if (newFormDataList[0].name && !/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(newFormDataList[0].name.toString())) {
+        alert(
+          "Name must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character"
+        );
+        return;
+      }
       newFormDataList.splice(formIndex, 1, formatFormData(formData));
       setCurrentFormDataList(newFormDataList);
       setActiveFormIndex(formIndex + 1);
