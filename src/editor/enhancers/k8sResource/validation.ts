@@ -2,7 +2,7 @@ import * as monaco from 'monaco-editor';
 
 import {problemsByResourceSelector} from '@redux/validation/validation.selectors';
 
-import {RuleMetadata, ValidationResult, getResourceLocation, getRuleForResult} from '@monokle/validation';
+import {RuleMetadata, ValidationResult, getResourceLocation, getRuleForResultV2} from '@monokle/validation';
 
 import {createEditorEnhancer} from '../createEnhancer';
 
@@ -19,7 +19,7 @@ export const applyEditorValidation = createEditorEnhancer(props => {
   }
 
   problems.forEach(problem => {
-    const rule = getRuleForResult(response, problem);
+    const rule = getRuleForResultV2(response.runs[0], problem);
     const region = getResourceLocation(problem).physicalLocation?.region;
 
     if (!region) {
