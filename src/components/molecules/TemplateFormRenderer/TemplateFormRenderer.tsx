@@ -11,7 +11,7 @@ import fs from 'fs';
 import log from 'loglevel';
 import {Primitive} from 'type-fest';
 
-import {VALID_IMAGE_NAME_REGEX} from '@constants/constants';
+import {VALID_IMAGE_NAME_REGEX, VALID_RESOURCE_NAME_REGEX} from '@constants/constants';
 
 import {getCustomFormWidgets} from '@molecules/FormEditor/FormWidgets';
 
@@ -50,17 +50,15 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
       return errors;
     }
 
-    Object.entries(fData).forEach(([key, value]) => {
-      if (!key.toLowerCase().includes('image') || !value || typeof value !== 'string') {
-        return;
-      }
+    if (fData.name && !VALID_RESOURCE_NAME_REGEX.test(fData.name.toString())) {
+      errors.name.addError(
+        "must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character"
+      );
+    }
 
-      if (VALID_IMAGE_NAME_REGEX.test(value)) {
-        return;
-      }
-
-      errors[key].addError(' name is not valid.');
-    });
+    if (fData.image && !VALID_IMAGE_NAME_REGEX.test(fData.image.toString())) {
+      errors.image.addError(`name must be in the format <registry>/<image>:<tag> and should not start with a \':\'`);
+    }
 
     return errors;
   };
