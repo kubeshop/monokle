@@ -159,7 +159,7 @@ const HelmReposTable = () => {
         </Form>
       </div>
       <Typography.Text style={{marginTop: 8}}>
-        {reposCount} Helm Chart repositories added. You can update or delete them.
+        Using {reposCount} Helm Chart repositories added. You can update or delete them.
       </Typography.Text>
       <S.Table
         sticky
