@@ -128,6 +128,7 @@ let paneConfiguration: PaneConfiguration = electronStore.get('ui.paneConfigurati
 if (
   !paneConfiguration ||
   paneConfiguration.leftPane === undefined ||
+  paneConfiguration.bottomPaneHeight === undefined ||
   paneConfiguration.leftPane === 0 ||
   paneConfiguration.navPane === 0
 ) {
