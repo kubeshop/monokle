@@ -14,7 +14,7 @@ interface IProps {
 const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   readOnly: true,
   minimap: {
-    enabled: false,
+    enabled: true,
   },
   lineNumbers: 'off',
 };

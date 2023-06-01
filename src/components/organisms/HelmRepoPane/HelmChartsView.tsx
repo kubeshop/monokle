@@ -156,7 +156,7 @@ const HelmChartsTable = () => {
         <SearchForm onChangeSearchInputHandler={onChangeSearchInputHandler} />
         <S.Checkbox checked={isHelmSearchHubIncluded} onChange={() => dispatch(toggleHelmPanSearchHub())}>
           {' '}
-          Include Artifacthub in search
+          Include Artifact Hub in search
         </S.Checkbox>
       </div>
 

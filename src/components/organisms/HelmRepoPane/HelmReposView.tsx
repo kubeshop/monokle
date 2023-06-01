@@ -120,11 +120,11 @@ const HelmReposTable = () => {
   const onRemoveRepoHandler = useCallback(
     async (repoName: string) => {
       Modal.confirm({
-        title: `Are you sure you want to delete [${repoName}] repo?`,
+        title: `Are you sure you want to remove [${repoName}] repo?`,
         onOk: async () => {
           try {
             await runCommandInMainThread(removeHelmRepoCommand({repos: [repoName]}));
-            dispatch(setAlert(successAlert('Repository deleted successfully')));
+            dispatch(setAlert(successAlert('Repository removed successfully')));
             refetchRepos();
             trackEvent('helm_repo/remove');
           } catch (e: any) {

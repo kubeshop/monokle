@@ -35,14 +35,14 @@ const createTabItems = (chartName: string): Tab[] => [
     children: <HelmInfo chartName={chartName} />,
   },
   {
-    key: 'templates',
-    label: 'Templates',
-    children: <HelmTemplate chartName={chartName} />,
-  },
-  {
     key: 'defaultValues',
     label: 'Default Values',
     children: <HelmValues chartName={chartName} />,
+  },
+  {
+    key: 'templates',
+    label: 'Dry-run Output',
+    children: <HelmTemplate chartName={chartName} />,
   },
   {
     key: 'changelog',
