@@ -34,14 +34,14 @@ const ValidationSettings: React.FC = () => {
     <S.ValidationSettingsContainer>
       <S.ValidationSettingsDescriptionAndButtonContainer>
         <S.ValidationSettingsDescription>
-          Configure your validation policies below and{' '}
-          <S.Link onClick={handleValidation}>check out changes in errors</S.Link>. Fully activate / deactivate sets of
-          policies through the switcher on the top right. Set up further configuration through the &quot;Configure&quot;
-          button where available.
+          Configure your validation policies below and see results in the
+          <S.Link onClick={handleValidation}>Validation Overview</S.Link>. Enable/disable entire policies with the
+          toggle on the top right of each section below. Configure individual rules and settings with the
+          &quot;Configure&quot; button where available.
         </S.ValidationSettingsDescription>
         <S.CheckoutErrorsButton type="primary" onClick={handleValidation}>
           <CheckCircleOutlined />
-          Checkout errors
+          See Validation Results
         </S.CheckoutErrorsButton>
       </S.ValidationSettingsDescriptionAndButtonContainer>
 

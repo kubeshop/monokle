@@ -30,7 +30,7 @@ export function openGitHubBot() {
 
 export function openMonokleCloud() {
   trackEvent('help/open_link', {linkType: 'monokle-cloud'});
-  shell.openExternal('https://app.monokle.com/');
+  shell.openExternal('https://monokle.io/cloud-ide');
 }
 
 export function openMonokleCli() {
