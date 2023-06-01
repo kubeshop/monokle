@@ -18,6 +18,33 @@ export function openGitHub() {
   shell.openExternal('https://github.com/kubeshop/monokle');
 }
 
+export function openGitHubAction() {
+  trackEvent('help/open_link', {linkType: 'github-action'});
+  shell.openExternal('https://github.com/marketplace/actions/monokle-validation');
+}
+
+export function openGitHubBot() {
+  trackEvent('help/open_link', {linkType: 'github-bot'});
+  shell.openExternal('https://github.com/kubeshop/monokle');
+}
+
+export function openMonokleCloud() {
+  trackEvent('help/open_link', {linkType: 'monokle-cloud'});
+  shell.openExternal('https://app.monokle.com/');
+}
+
+export function openMonokleCli() {
+  trackEvent('help/open_link', {linkType: 'monokle-cli'});
+  shell.openExternal('https://github.com/kubeshop/monokle-cli');
+}
+
+export function openMonokleChromeExtension() {
+  trackEvent('help/open_link', {linkType: 'monokle-chrome-extension'});
+  shell.openExternal(
+    'https://chrome.google.com/webstore/detail/monokle-cloud-chrome-exte/loojojkleiolidaodalflgbmaijeibob'
+  );
+}
+
 export function openDiscord() {
   trackEvent('help/open_link', {linkType: 'discord'});
   shell.openExternal('https://discord.gg/kMJxmuYTMu');
