@@ -143,21 +143,22 @@ const HelmReposTable = () => {
 
   return (
     <>
-      <Typography.Text style={{marginTop: 24, marginBottom: 16}}>Add a new Helm Chart repository</Typography.Text>
-      <Form layout="inline" form={form} onFinish={onAddRepoHandler}>
-        <S.FormItem name="name" rules={[{required: true, type: 'string'}]}>
-          <Input size="large" placeholder="Enter a name to identify it" />
-        </S.FormItem>
-        <S.FormItem name="url" rules={[{required: true, type: 'url'}]}>
-          <Input size="large" placeholder="Enter a valid repository URL and click to proceed" />
-        </S.FormItem>
+      <Typography.Text style={{marginTop: 16, marginBottom: 8}}>Add a new Helm Chart repository</Typography.Text>
+      <div style={{height: 60}}>
+        <Form layout="inline" form={form} onFinish={onAddRepoHandler}>
+          <S.FormItem name="name" rules={[{required: true, type: 'string'}]}>
+            <Input size="large" placeholder="Enter a name to identify it" />
+          </S.FormItem>
+          <S.FormItem name="url" rules={[{required: true, type: 'url'}]}>
+            <Input size="large" placeholder="Enter a valid repository URL and click to proceed" />
+          </S.FormItem>
 
-        <Button size="large" type="primary" htmlType="submit">
-          Add
-        </Button>
-      </Form>
-
-      <Typography.Text style={{marginTop: 32, marginBottom: 24}}>
+          <Button size="large" type="primary" htmlType="submit">
+            Add
+          </Button>
+        </Form>
+      </div>
+      <Typography.Text style={{marginTop: 8}}>
         {reposCount} Helm Chart repositories added. You can update or delete them.
       </Typography.Text>
       <S.Table
