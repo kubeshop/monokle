@@ -1,6 +1,7 @@
 import {useMemo} from 'react';
 import {useAsync} from 'react-use';
 
+import {ChartInfo} from '@shared/models/ui';
 import {runCommandInMainThread, searchHelmHubCommand, searchHelmRepoCommand} from '@shared/utils/commands';
 
 export const useSearchHelmCharts = (helmRepoSearch: string, includeHubSearch: boolean) => {
@@ -51,13 +52,3 @@ export const sortChartsByName = (a: ChartInfo, b: ChartInfo) => {
   }
   return chartRepoA.localeCompare(chartRepoB);
 };
-
-export interface ChartInfo {
-  name: string;
-  url?: string;
-  description: string;
-  version: string;
-  app_version: string;
-  repository?: {name: string; url: string};
-  isHubSearch?: boolean;
-}

@@ -16,10 +16,10 @@ import {
 } from '@redux/reducers/ui';
 
 import {sortChartsByName, useSearchHelmCharts} from '@hooks/useSearchHelmCharts';
-import type {ChartInfo} from '@hooks/useSearchHelmCharts';
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
+import {ChartInfo} from '@shared/models/ui';
 import {openUrlInExternalBrowser, trackEvent} from '@shared/utils';
 import {addHelmRepoCommand, runCommandInMainThread} from '@shared/utils/commands';
 
