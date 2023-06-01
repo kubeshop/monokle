@@ -2,6 +2,7 @@ import ReactMarkdown from 'react-markdown';
 
 import {Skeleton, Typography} from 'antd';
 
+import remarkGfm from 'remark-gfm';
 import styled from 'styled-components';
 
 import {useGetHelmChartChangelog} from '@hooks/useGetHelmChartChangelog';
@@ -19,6 +20,7 @@ const HelmReadme = ({chartName}: IProps) => {
   ) : (
     <div style={{height: 'calc(100vh - 200px)', overflow: 'auto'}}>
       <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
         components={{
           a({href, children, ...restProps}) {
             return (
