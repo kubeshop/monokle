@@ -4,8 +4,7 @@ import path from 'path';
 
 import {setAlert} from '@redux/reducers/alert';
 import {selectFile} from '@redux/reducers/main';
-import {setExplorerSelectedSection, setLeftMenuSelection} from '@redux/reducers/ui';
-import {setRootFolder} from '@redux/thunks/setRootFolder';
+import {setExplorerSelectedSection, setIsInQuickClusterMode, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {errorAlert, successAlert} from '@utils/alert';
 
@@ -13,14 +12,14 @@ import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
 import {helmPullChartCommand, runCommandInMainThread} from '@shared/utils/commands';
 
-import {setOpenProject} from './project';
+import {setCreateProject, setOpenProject} from './project';
 
 export const pullHelmChart = createAsyncThunk<
   void,
   {name: string; chartPath: string; version?: string},
   {dispatch: AppDispatch; state: RootState}
 >('main/pullHelmChart', async ({name, chartPath, version}, {dispatch, getState}) => {
-  const projectRootFolder = getState().config.selectedProjectRootFolder || chartPath;
+  const projectRootFolder = getState().config.selectedProjectRootFolder || '<no project selected>';
 
   const result = await runCommandInMainThread(helmPullChartCommand({name, path: chartPath, version}));
   if (result.stderr) {
@@ -31,11 +30,12 @@ export const pullHelmChart = createAsyncThunk<
   dispatch(setAlert(successAlert('Pull Helm Chart', `${name} Chart pulled successfully.`)));
 
   if (!chartPath.startsWith(projectRootFolder)) {
-    await dispatch(setOpenProject(chartPath));
+    dispatch(setCreateProject({rootFolder: chartPath, name}));
   } else {
     // force reloading before selecting the file below - otherwise it won't have been found/synced from the file system
-    await dispatch(setRootFolder({rootFolder: projectRootFolder, isReload: true}));
+    await dispatch(setOpenProject(projectRootFolder)).unwrap();
   }
+  dispatch(setIsInQuickClusterMode(false));
 
   const filePath = path.sep + path.join(name.substring(name.indexOf('/') + 1), 'Chart.yaml');
 
