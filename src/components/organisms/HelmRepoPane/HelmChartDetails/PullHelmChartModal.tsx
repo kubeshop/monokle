@@ -14,15 +14,21 @@ const PullHelmChartModal = ({
   dismissModal,
   chartName,
   chartVersion,
+  isLatestVersion,
 }: {
   open: boolean;
   dismissModal: () => void;
   chartName: string;
   chartVersion: string;
+  isLatestVersion: boolean;
 }) => {
   const [form] = Form.useForm<{name: string; path: string}>();
   const dispatch = useAppDispatch();
-  const downloadPath = useAppSelector(state => state.config.selectedProjectRootFolder || state.config.projectsRootPath);
+  const downloadFolder = useAppSelector(
+    state => state.config.selectedProjectRootFolder || state.config.projectsRootPath
+  );
+  const downloadPath = `${downloadFolder}/${chartName.split('/').pop()}/${isLatestVersion ? '' : chartVersion}`;
+
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
       if (folderPath) {

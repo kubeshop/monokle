@@ -170,6 +170,7 @@ const HelmChartDetails = () => {
           dismissModal={() => setConfirmModalOpen(false)}
           chartName={chart}
           chartVersion={chartVersion}
+          isLatestVersion={chartVersion === latestVersion}
         />
 
         <HelmChartModalConfirmWithNamespaceSelect
