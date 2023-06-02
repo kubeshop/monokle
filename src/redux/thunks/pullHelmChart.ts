@@ -19,7 +19,7 @@ export const pullHelmChart = createAsyncThunk<
   {name: string; chartPath: string; version?: string},
   {dispatch: AppDispatch; state: RootState}
 >('main/pullHelmChart', async ({name, chartPath, version}, {dispatch, getState}) => {
-  const projectRootFolder = getState().config.selectedProjectRootFolder || '<no project selected>';
+  const projectRootFolder = getState().config.selectedProjectRootFolder || getState().config.projectsRootPath;
 
   const result = await runCommandInMainThread(helmPullChartCommand({name, path: chartPath, version}));
   if (result.stderr) {
@@ -29,7 +29,8 @@ export const pullHelmChart = createAsyncThunk<
 
   dispatch(setAlert(successAlert('Pull Helm Chart', `${name} Chart pulled successfully.`)));
 
-  if (!chartPath.startsWith(projectRootFolder)) {
+  if (!getState().config.selectedProjectRootFolder || !chartPath.startsWith(projectRootFolder)) {
+    // create new project if no current project or specified folder is outside current project
     dispatch(setCreateProject({rootFolder: chartPath, name}));
   } else {
     // force reloading before selecting the file below - otherwise it won't have been found/synced from the file system

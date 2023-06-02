@@ -27,7 +27,7 @@ const PullHelmChartModal = ({
   const downloadFolder = useAppSelector(
     state => state.config.selectedProjectRootFolder || state.config.projectsRootPath
   );
-  const downloadPath = `${downloadFolder}/${chartName.split('/').pop()}/${isLatestVersion ? '' : chartVersion}`;
+  const downloadPath = `${downloadFolder}/${chartName.split('/').pop()}${isLatestVersion ? '' : `/${chartVersion}`}`;
 
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
