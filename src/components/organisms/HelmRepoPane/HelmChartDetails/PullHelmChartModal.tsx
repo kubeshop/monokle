@@ -22,8 +22,7 @@ const PullHelmChartModal = ({
 }) => {
   const [form] = Form.useForm<{name: string; path: string}>();
   const dispatch = useAppDispatch();
-  const projectRootFolder = useAppSelector(state => state.config.selectedProjectRootFolder);
-
+  const downloadPath = useAppSelector(state => state.config.selectedProjectRootFolder || state.config.projectsRootPath);
   const {openFileExplorer, fileExplorerProps} = useFileExplorer(
     ({folderPath}) => {
       if (folderPath) {
@@ -52,7 +51,7 @@ const PullHelmChartModal = ({
           <Input.Group compact>
             <Form.Item
               name="path"
-              initialValue={projectRootFolder}
+              initialValue={downloadPath}
               noStyle
               rules={[
                 ({getFieldValue}) => ({
