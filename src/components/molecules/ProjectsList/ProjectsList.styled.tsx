@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import {IconButton} from '@atoms';
 
-import {Colors, BackgroundColors} from '@shared/styles/colors';
+import {BackgroundColors, Colors} from '@shared/styles/colors';
 
 export const EmptyList = styled.div`
   display: flex;

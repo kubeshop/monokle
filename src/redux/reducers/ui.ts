@@ -19,7 +19,10 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Project, SavedCommand, SettingsPanel} from '@shared/models/config';
 import {K8sResource, ResourceIdentifier} from '@shared/models/k8sResource';
 import {
+  ChartInfo,
   ExplorerCollapsibleSectionsType,
+  HelmChartDetailsTab,
+  HelmRepoMenu,
   HighlightItems,
   LayoutSizeType,
   LearnTopicType,
@@ -424,6 +427,21 @@ export const uiSlice = createSlice({
     setFileExplorerExpandedFolders: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       state.fileExplorerExpandedFolders = action.payload;
     },
+    setHelmPaneMenuItem: (state: Draft<UiState>, action: PayloadAction<HelmRepoMenu>) => {
+      state.helmPane.selectedMenuItem = action.payload;
+    },
+    setHelmPaneChartSearch: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.helmPane.chartSearchToken = action.payload;
+    },
+    setHelmPaneSelectedChart: (state: Draft<UiState>, action: PayloadAction<ChartInfo | null>) => {
+      state.helmPane.selectedChart = action.payload;
+    },
+    setHelmPaneChartDetailsTab: (state: Draft<UiState>, action: PayloadAction<HelmChartDetailsTab>) => {
+      state.helmPane.chartDetailsTab = action.payload;
+    },
+    toggleHelmPanSearchHub: (state: Draft<UiState>) => {
+      state.helmPane.isSearchHubIncluded = !state.helmPane.isSearchHubIncluded;
+    },
   },
   extraReducers: builder => {
     builder
@@ -574,5 +592,10 @@ export const {
   openScaleModal,
   closeScaleModal,
   setIsInQuickClusterMode,
+  setHelmPaneMenuItem,
+  setHelmPaneChartSearch,
+  setHelmPaneSelectedChart,
+  setHelmPaneChartDetailsTab,
+  toggleHelmPanSearchHub,
 } = uiSlice.actions;
 export default uiSlice.reducer;
