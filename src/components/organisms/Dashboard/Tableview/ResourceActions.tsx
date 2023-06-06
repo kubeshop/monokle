@@ -7,11 +7,9 @@ import {DeleteOutlined} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
-
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openScaleModal} from '@redux/reducers/ui';
 import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
-
 import {applyResourceToCluster} from '@redux/thunks/applyResource';
 
 import {SecondaryButton} from '@atoms';

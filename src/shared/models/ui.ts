@@ -1,13 +1,7 @@
 import {Project, SavedCommand, SettingsPanel} from './config';
 import {K8sResource, ResourceIdentifier} from './k8sResource';
 
-export type StartPageMenuOptions =
-  | 'recent-projects'
-  | 'all-projects'
-  | 'settings'
-  | 'new-project'
-  | 'quick-cluster-mode'
-  | 'learn';
+export type StartPageMenuOptions = 'projects' | 'settings' | 'new-project' | 'quick-cluster-mode' | 'learn';
 
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',
@@ -65,7 +59,7 @@ type NewResourceWizardInput = {
 };
 
 export const ExplorerCollapsibleSections = ['files', 'kustomize', 'helm', 'preview-configuration', 'images'] as const;
-export type ExplorerCollapsibleSectionsType = typeof ExplorerCollapsibleSections[number];
+export type ExplorerCollapsibleSectionsType = (typeof ExplorerCollapsibleSections)[number];
 
 export const LeftMenuSelectionOptions = [
   'explorer',
@@ -75,8 +69,9 @@ export const LeftMenuSelectionOptions = [
   'search',
   'settings',
   'dashboard',
+  'helm',
 ] as const;
-type LeftMenuSelectionType = typeof LeftMenuSelectionOptions[number];
+type LeftMenuSelectionType = (typeof LeftMenuSelectionOptions)[number];
 
 type PaneConfiguration = {
   leftPane: number;
@@ -175,12 +170,6 @@ type UiState = {
   monacoEditor: MonacoUiState;
   paneConfiguration: PaneConfiguration;
   resetLayout: boolean;
-  highlightedItems: {
-    clusterPaneIcon: boolean;
-    createResource: boolean;
-    browseTemplates: boolean;
-    connectToCluster: boolean;
-  };
   activeSettingsPanel: SettingsPanel;
   startPage: {
     selectedMenuOption: StartPageMenuOptions;
@@ -209,8 +198,27 @@ type UiState = {
   explorerSelectedSection: ExplorerCollapsibleSectionsType;
   fileExplorerExpandedFolders: string[];
   showOpenProjectAlert: boolean;
+  helmPane: {
+    selectedMenuItem: HelmRepoMenu;
+    chartSearchToken: string;
+    selectedChart: null | ChartInfo;
+    chartDetailsTab: HelmChartDetailsTab;
+    isSearchHubIncluded: boolean;
+  };
 };
 
+type HelmRepoMenu = 'browse-charts' | 'manage-repositories';
+
+type HelmChartDetailsTab = 'info' | 'templates' | 'defaultValues' | 'changelog';
+interface ChartInfo {
+  name: string;
+  url?: string;
+  description: string;
+  version: string;
+  app_version: string;
+  repository?: {name: string; url: string};
+  isHubSearch?: boolean;
+}
 type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {});
 
 export type {
@@ -227,4 +235,7 @@ export type {
   RightMenuSelectionType,
   UiState,
   LearnTopicType,
+  HelmRepoMenu,
+  HelmChartDetailsTab,
+  ChartInfo,
 };
