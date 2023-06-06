@@ -1,12 +1,15 @@
 import {useMemo, useState} from 'react';
 
 import {Select} from 'antd';
+
 import {PlusOutlined} from '@ant-design/icons';
-import thunderIcon from '@assets/figures/thunderIcon.svg';
+
 import {orderBy, size} from 'lodash';
 
 import {activeProjectSelector, sortProjects} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
+
+import thunderIcon from '@assets/figures/thunderIcon.svg';
 
 import ProjectCard from '../ProjectCard';
 import * as S from './ProjectsList.styled';

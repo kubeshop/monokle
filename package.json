@@ -159,6 +159,7 @@
     "redux": "4.2.1",
     "redux-logger": "3.0.6",
     "redux-thunk": "2.4.2",
+    "remark-gfm": "^3.0.1",
     "reselect": "4.1.8",
     "runtypes": "6.6.0",
     "semver": "7.5.1",

@@ -2,17 +2,17 @@ import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import {setDashboardSelectedResourceId} from '@redux/dashboard';
 import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
+import restartDeployment from '@redux/services/restartDeployment';
 import {removeResources} from '@redux/thunks/removeResources';
 
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sResource} from '@shared/models/k8sResource';
 import {trackEvent} from '@shared/utils/telemetry';
-import restartDeployment from '@redux/services/restartDeployment';
-import {connectCluster} from '@redux/cluster/thunks/connect';
 
 export const deleteResourceHandler = (dispatch: AppDispatch, resource?: K8sResource<'cluster'>) => {
   if (!resource) {

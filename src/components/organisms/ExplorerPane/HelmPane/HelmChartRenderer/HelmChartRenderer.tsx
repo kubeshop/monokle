@@ -1,4 +1,4 @@
-import {memo, useState} from 'react';
+import {memo, useMemo, useState} from 'react';
 
 import {Tooltip} from 'antd';
 
@@ -27,6 +27,7 @@ const HelmChartRenderer: React.FC<IProps> = props => {
 
   const dispatch = useAppDispatch();
   const fileOrFolderContainedIn = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn || '');
+  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const helmChart = useAppSelector(state => state.main.helmChartMap[id]);
   const isDisabled = useAppSelector(state =>
     Boolean(
@@ -42,6 +43,17 @@ const HelmChartRenderer: React.FC<IProps> = props => {
   );
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
+
+  const chartName = useMemo(() => {
+    let name = helmChart.name;
+    let parentChart = helmChart.parentChartId ? helmChartMap[helmChart.parentChartId] : undefined;
+    while (parentChart) {
+      name = `${parentChart.name}/${name}`;
+      parentChart = parentChart.parentChartId ? helmChartMap[parentChart.parentChartId] : undefined;
+    }
+
+    return name;
+  }, [helmChart, helmChartMap]);
 
   return (
     <S.ItemContainer
@@ -61,7 +73,7 @@ const HelmChartRenderer: React.FC<IProps> = props => {
       </S.PrefixContainer>
 
       <S.ItemName isDisabled={isDisabled} isSelected={isSelected}>
-        {helmChart.name}
+        {chartName}
       </S.ItemName>
 
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={helmChart.filePath}>

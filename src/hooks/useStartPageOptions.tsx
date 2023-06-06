@@ -25,6 +25,12 @@ export function useStartPageOptions() {
         content: null,
         title: '',
       },
+      'helm-pane': {
+        icon: <Icon name="helm" style={{fontSize: '16px'}} />,
+        label: 'Browse Helm Charts',
+        content: null,
+        title: '',
+      },
       'recent-projects': {
         icon: <StyledSendOutlined />,
         label: 'Recent projects',
