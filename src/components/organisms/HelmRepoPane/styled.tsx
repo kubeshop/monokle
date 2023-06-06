@@ -199,6 +199,7 @@ export const ErrorText = styled(Typography.Text)`
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
+  color: ${Colors.red6};
 `;
 
 export const Checkbox = styled(AntCheckbox)`
