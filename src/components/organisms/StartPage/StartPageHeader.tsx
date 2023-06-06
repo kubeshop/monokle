@@ -100,7 +100,7 @@ const StartPageHeader: React.FC = () => {
           getPopupContainer={() => document.getElementById('projectsList')!}
           showAction={['focus']}
         >
-          <SearchInput placeholder="Find repositories & projects" autoFocus={false} />
+          <SearchInput placeholder="Find projects" autoFocus={false} />
         </AutoComplete>
         <div id="projectsList" />
       </S.SearchContainer>
