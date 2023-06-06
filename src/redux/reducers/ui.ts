@@ -23,7 +23,6 @@ import {
   ExplorerCollapsibleSectionsType,
   HelmChartDetailsTab,
   HelmRepoMenu,
-  HighlightItems,
   LayoutSizeType,
   LearnTopicType,
   LeftMenuBottomSelectionType,
@@ -354,12 +353,6 @@ export const uiSlice = createSlice({
       state.paneConfiguration = DEFAULT_PANE_CONFIGURATION;
       electronStore.set('ui.paneConfiguration', DEFAULT_PANE_CONFIGURATION);
     },
-    highlightItem: (state: Draft<UiState>, action: PayloadAction<string | null>) => {
-      state.highlightedItems.clusterPaneIcon = action.payload === HighlightItems.CLUSTER_PANE_ICON;
-      state.highlightedItems.createResource = action.payload === HighlightItems.CREATE_RESOURCE;
-      state.highlightedItems.browseTemplates = action.payload === HighlightItems.BROWSE_TEMPLATES;
-      state.highlightedItems.connectToCluster = action.payload === HighlightItems.CONNECT_TO_CLUSTER;
-    },
     openReleaseNotesDrawer: (state: Draft<UiState>) => {
       state.isReleaseNotesDrawerOpen = true;
     },
@@ -535,7 +528,6 @@ export const {
   expandKustomizeKinds,
   expandResourceKinds,
   hideNewVersionNotice,
-  highlightItem,
   openAboutModal,
   openCreateFileFolderModal,
   openCreateProjectModal,

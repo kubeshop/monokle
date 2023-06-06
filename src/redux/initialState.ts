@@ -219,12 +219,6 @@ const initialUiState: UiState = {
   layoutSize: {header: 0},
   resetLayout: false,
   isActionsPaneFooterExpanded: false,
-  highlightedItems: {
-    clusterPaneIcon: false,
-    createResource: false,
-    browseTemplates: false,
-    connectToCluster: false,
-  },
   startPage: {
     selectedMenuOption: 'new-project',
     learn: {

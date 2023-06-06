@@ -176,12 +176,6 @@ type UiState = {
   monacoEditor: MonacoUiState;
   paneConfiguration: PaneConfiguration;
   resetLayout: boolean;
-  highlightedItems: {
-    clusterPaneIcon: boolean;
-    createResource: boolean;
-    browseTemplates: boolean;
-    connectToCluster: boolean;
-  };
   activeSettingsPanel: SettingsPanel;
   startPage: {
     selectedMenuOption: StartPageMenuOptions;

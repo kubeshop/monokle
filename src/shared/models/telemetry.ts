@@ -6,6 +6,7 @@ import {getSegmentClient} from '@shared/utils/segment';
 import {isRendererThread} from '@shared/utils/thread';
 
 import {PreviewType} from './preview';
+import {NewResourceTelemtryFrom, NewResourceTelemtryType} from './resourceCreate';
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from './ui';
 
 const machineId: string = machineIdSync();
@@ -139,7 +140,7 @@ export type EventMap = {
   'left-menu/activity-changed': {activity: LeftMenuSelectionType; section?: string};
   'bottom-left-menu/select-option': {option: LeftMenuBottomSelectionType};
   'notifications/toggle': undefined;
-
+  'new_resource/create': {type: NewResourceTelemtryType; from: NewResourceTelemtryFrom};
   'helm_repo/search': {query: string};
   'helm_repo/select': undefined;
   'helm_repo/add': undefined;
