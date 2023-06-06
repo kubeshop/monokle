@@ -7,7 +7,7 @@ export const ErrorText = styled.div`
 `;
 
 export const ReadMoreLink = styled.a`
-  color: ${Colors.red7};
+  color: ${Colors.blue6};
   cursor: pointer;
 `;
 

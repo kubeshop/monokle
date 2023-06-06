@@ -2,6 +2,8 @@ import React, {useEffect, useState} from 'react';
 
 import {Button, Skeleton} from 'antd';
 
+import {ExportOutlined} from '@ant-design/icons';
+
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
 import {withTheme} from '@rjsf/core';
@@ -117,7 +119,8 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
                 window.open('https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names');
               }}
             >
-              Read more
+              Read more{` `}
+              <ExportOutlined />
             </S.ReadMoreLink>
             {` about the naming conventions for Kubernetes resources.`}
           </S.ErrorText>
