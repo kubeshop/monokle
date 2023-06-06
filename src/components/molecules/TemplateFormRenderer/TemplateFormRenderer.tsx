@@ -18,6 +18,7 @@ import {getCustomFormWidgets} from '@molecules/FormEditor/FormWidgets';
 import {TemplateForm} from '@shared/models/template';
 
 import TemplateFormErrorBoundary from './TemplateFormErrorBoundary';
+import * as S from './TemplateFormRenderer.styled';
 
 const Form = withTheme(AntDTheme);
 
@@ -44,6 +45,7 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [schema, setSchema] = useState<any>();
   const [uiSchema, setUiSchema] = useState<any>();
+  const [displayLink, setDisplayLink] = useState<boolean>(false);
 
   const customValidate = (fData: Record<string, Primitive>, errors: any) => {
     if (!fData) {
@@ -60,7 +62,23 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
       errors.image.addError(`name must be in the format <registry>/<image>:<tag> and should not start with a \':\'`);
     }
 
+    if (fData.namespace && !VALID_RESOURCE_NAME_REGEX.test(fData.namespace.toString())) {
+      errors.namespace.addError(
+        "must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character"
+      );
+    }
+
     return errors;
+  };
+
+  const handleErrorLink = () => {
+    if (
+      (formData.name && !VALID_RESOURCE_NAME_REGEX.test(formData.name.toString())) ||
+      (formData.image && !VALID_IMAGE_NAME_REGEX.test(formData.image.toString())) ||
+      (formData.namespace && !VALID_RESOURCE_NAME_REGEX.test(formData.namespace.toString()))
+    ) {
+      setDisplayLink(true);
+    }
   };
 
   useEffect(() => {
@@ -91,6 +109,20 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
 
   return (
     <TemplateFormErrorBoundary>
+      {displayLink && (
+        <S.ErrorContainer>
+          <S.ErrorText>
+            <S.ReadMoreLink
+              onClick={() => {
+                window.open('https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names');
+              }}
+            >
+              Read more
+            </S.ReadMoreLink>
+            {` about the naming conventions for Kubernetes resources.`}
+          </S.ErrorText>
+        </S.ErrorContainer>
+      )}
       <Form
         onSubmit={e => onSubmit(e.formData)}
         schema={schema}
@@ -108,7 +140,7 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
           </Button>
         )}
 
-        <Button htmlType="submit" type="primary" style={{marginTop: '16px'}}>
+        <Button htmlType="submit" onClick={handleErrorLink} type="primary" style={{marginTop: '16px'}}>
           {isLastForm ? 'Submit' : 'Next'}
         </Button>
       </Form>
