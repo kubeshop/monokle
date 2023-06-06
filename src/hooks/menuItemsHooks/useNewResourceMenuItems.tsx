@@ -24,7 +24,7 @@ export function useNewResourceMenuItems() {
         label: (
           <MenuItem>
             <FileAddOutlined />
-            New from model
+            Create manually
           </MenuItem>
         ),
         onClick: () => {
@@ -37,7 +37,7 @@ export function useNewResourceMenuItems() {
         label: (
           <MenuItem>
             <img src={TemplateSmallWhiteSvg} />
-            New from advanced template
+            Use Advanced Template
           </MenuItem>
         ),
         onClick: () => {
@@ -50,7 +50,7 @@ export function useNewResourceMenuItems() {
         label: (
           <MenuItem>
             <RobotOutlined />
-            New from AI
+            AI Assisted
           </MenuItem>
         ),
         onClick: () => {
