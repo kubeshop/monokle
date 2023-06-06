@@ -31,17 +31,11 @@ export function useStartPageOptions() {
         content: null,
         title: '',
       },
-      'recent-projects': {
+      projects: {
         icon: <StyledSendOutlined />,
-        label: 'Recent projects',
-        content: <ProjectsList type="recent" />,
-        title: 'Recent projects',
-      },
-      'all-projects': {
-        icon: <Icon name="all-projects" style={{fontSize: '16px'}} />,
-        label: 'All projects',
-        content: <ProjectsList type="all" />,
-        title: 'All projects',
+        label: 'Projects',
+        content: <ProjectsList />,
+        title: 'Projects',
       },
       settings: {
         icon: <StyledSettingsOutlined />,

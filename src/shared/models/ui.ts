@@ -1,13 +1,7 @@
 import {Project, SavedCommand, SettingsPanel} from './config';
 import {K8sResource, ResourceIdentifier} from './k8sResource';
 
-export type StartPageMenuOptions =
-  | 'recent-projects'
-  | 'all-projects'
-  | 'settings'
-  | 'new-project'
-  | 'quick-cluster-mode'
-  | 'learn';
+export type StartPageMenuOptions = 'projects' | 'settings' | 'new-project' | 'quick-cluster-mode' | 'learn';
 
 export enum HighlightItems {
   CLUSTER_PANE_ICON = 'CLUSTER_PANE_ICON',

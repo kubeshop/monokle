@@ -55,8 +55,8 @@ const StartPage: React.FC = () => {
   }, [dispatch, isStartPageLearnVisible, selectedOption]);
 
   useEffect(() => {
-    if (projects.length && selectedOption !== 'recent-projects' && !isFromBackToStart) {
-      dispatch(setStartPageMenuOption('recent-projects'));
+    if (projects.length && selectedOption !== 'projects' && !isFromBackToStart) {
+      dispatch(setStartPageMenuOption('projects'));
     }
 
     if (isFromBackToStart) {
