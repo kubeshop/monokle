@@ -51,7 +51,7 @@ const validateGeneratedYaml = async (payload: {
     .filter(run => run.tool.driver.name !== 'resource-links')
     .forEach(run => {
       run.results.forEach(result => {
-        const help = run.tool.driver.rules.find(rule => rule.id === result.ruleId)?.help;
+        const help = run.tool.driver.rules?.find(rule => rule.id === result.ruleId)?.help;
         list.push({errorText: result.message.text, helpText: help?.text});
       });
     });
