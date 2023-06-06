@@ -71,7 +71,7 @@ const EmptyResourceNavigator: React.FC = () => {
       ) : (
         <NewResourceCardsContainer>
           {newResourceActionsList.map(action => (
-            <NewResourceCard action={action} />
+            <NewResourceCard key={action.fromTypeLabel} action={action} />
           ))}
         </NewResourceCardsContainer>
       )}
