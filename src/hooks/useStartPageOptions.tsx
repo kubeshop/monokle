@@ -19,6 +19,12 @@ export function useStartPageOptions() {
         content: <NewProject />,
         title: 'Start something new',
       },
+      projects: {
+        icon: <StyledSendOutlined />,
+        label: 'Projects',
+        content: <ProjectsList />,
+        title: 'Projects',
+      },
       'quick-cluster-mode': {
         icon: <Icon name="cluster-dashboard" style={{fontSize: '16px'}} />,
         label: 'Connect to Cluster',
@@ -30,12 +36,6 @@ export function useStartPageOptions() {
         label: 'Browse Helm Charts',
         content: null,
         title: '',
-      },
-      projects: {
-        icon: <StyledSendOutlined />,
-        label: 'Projects',
-        content: <ProjectsList />,
-        title: 'Projects',
       },
       settings: {
         icon: <StyledSettingsOutlined />,
