@@ -33,8 +33,9 @@ export const ProjectCard: React.FC<IProps> = props => {
     const parts = text.split(new RegExp(`(${query})`, 'gi'));
     return (
       <S.Span>
-        {parts.map(part =>
-          part.toLowerCase() === query.toLowerCase() ? <S.BoldSpan key={part}>{part}</S.BoldSpan> : part
+        {parts.map((part, i) =>
+          // eslint-disable-next-line react/no-array-index-key
+          part.toLowerCase() === query.toLowerCase() ? <S.BoldSpan key={`${part}-${i}`}>{part}</S.BoldSpan> : part
         )}
       </S.Span>
     );
