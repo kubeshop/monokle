@@ -34,13 +34,15 @@ export const Illustration = styled.div<{$singleColumn?: boolean}>`
   display: flex;
   align-items: center;
   width: 700px;
+  padding: 40px;
+
   ${props =>
     props.$singleColumn &&
     `
     width: 350px;
     margin-top: 16px;
     margin-bottom: 40px;
-  `}
+  `};
 `;
 
 export const Image = styled.img`
