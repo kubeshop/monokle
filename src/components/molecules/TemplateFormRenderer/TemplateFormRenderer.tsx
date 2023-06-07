@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 import React, {useEffect, useState} from 'react';
 
 import {Button, Skeleton} from 'antd';
@@ -116,7 +118,7 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
           <S.ErrorText>
             <S.ReadMoreLink
               onClick={() => {
-                window.open('https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names');
+                shell.openExternal('https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names');
               }}
             >
               Read more{` `}
