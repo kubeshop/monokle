@@ -2,9 +2,18 @@ import {useCallback, useState} from 'react';
 
 import {Button, Modal} from 'antd';
 
+import {parse as parseYaml} from 'yaml';
+
+import {useAppDispatch} from '@redux/hooks';
+import {selectResource} from '@redux/reducers/main';
+import {useSelectedResource} from '@redux/selectors/resourceSelectors';
+import {applyResourceToCluster} from '@redux/thunks/applyResource';
+
 import {createUseComponentHook} from '@utils/hooks';
 
-import {didEditorContentChange} from './editor.instance';
+import {trackEvent} from '@shared/utils';
+
+import {didEditorContentChange, getEditor} from './editor.instance';
 
 type WarnUnsavedChangesModalProps = {
   open?: boolean;
@@ -13,15 +22,57 @@ type WarnUnsavedChangesModalProps = {
 
 const WarnUnsavedChangesModal = (props?: WarnUnsavedChangesModalProps) => {
   const {open, onClose} = props || {};
+  const dispatch = useAppDispatch();
+
+  const selectedResource = useSelectedResource();
+
+  const onDeploy = useCallback(() => {
+    if (!selectedResource) return;
+
+    const editor = getEditor();
+    const updatedResourceText = editor?.getModel()?.getValue();
+
+    if (!updatedResourceText) return;
+
+    const updatedResourceObject = parseYaml(updatedResourceText);
+
+    trackEvent('cluster/actions/update_manifest', {kind: selectedResource.kind});
+    dispatch(
+      applyResourceToCluster({
+        resourceIdentifier: {
+          id: selectedResource.id,
+          storage: 'cluster',
+        },
+        namespace: updatedResourceObject.metadata?.namespace
+          ? {name: updatedResourceObject.metadata.namespace, new: false}
+          : undefined,
+        options: {
+          isInClusterMode: true,
+          providedResourceObject: updatedResourceObject,
+        },
+      })
+    );
+
+    onClose && onClose();
+  }, [selectedResource, dispatch, onClose]);
+
+  const onDiscard = useCallback(() => {
+    if (!selectedResource) return;
+    dispatch(selectResource({resourceIdentifier: selectedResource}));
+    onClose && onClose();
+  }, [selectedResource, dispatch, onClose]);
+
   return (
     <Modal
       open={open}
       centered
       footer={
         <div>
+          <Button type="primary" onClick={onDeploy}>
+            Deploy changes
+          </Button>
+          <Button onClick={onDiscard}>Discard changes</Button>
           <Button onClick={onClose}>Cancel</Button>
-          <Button>Discard changes</Button>
-          <Button>Deploy changes</Button>
         </div>
       }
     >
@@ -44,7 +95,8 @@ export const useWarnUnsavedChanges = (): [() => boolean, () => JSX.Element] => {
     if (!didEditorContentChange() || isOpen) {
       return false;
     }
-    alert('You have unsaved changes in your code editor.');
+    // es-lint-disable-next-line no-alert
+    alert('You have unsaved changes in your code editor.'); // Prevents closing the drawer by blocking clicks outside.
     setIsOpen(true);
     return true;
   }, [isOpen]);

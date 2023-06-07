@@ -9,6 +9,7 @@ import {updateMultipleClusterResources} from '@redux/reducers/main';
 import {selectedFilePathSelector} from '@redux/selectors';
 import {getResourceContentFromState, getResourceMetaFromState} from '@redux/selectors/resourceGetters';
 import {editorResourceIdentifierSelector} from '@redux/selectors/resourceSelectors';
+import {applyResourceToCluster} from '@redux/thunks/applyResource';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateResource} from '@redux/thunks/updateResource';
@@ -24,7 +25,8 @@ export const editorTextUpdateListener: AppListenerFn = listen => {
       updateResource.fulfilled,
       updateMultipleClusterResources,
       updateFileEntry.fulfilled,
-      multiplePathsChanged.fulfilled
+      multiplePathsChanged.fulfilled,
+      applyResourceToCluster.fulfilled
     ),
     async effect(_action, {getState, delay, cancelActiveListeners}) {
       cancelActiveListeners();
@@ -40,7 +42,9 @@ export const editorTextUpdateListener: AppListenerFn = listen => {
 
       const editorResourceIdentifier = editorResourceIdentifierSelector(getState());
 
-      if (isAnyOf(updateResource.fulfilled, updateMultipleClusterResources)(_action)) {
+      if (
+        isAnyOf(updateResource.fulfilled, updateMultipleClusterResources, applyResourceToCluster.fulfilled)(_action)
+      ) {
         if (!editorResourceIdentifier) {
           return;
         }
