@@ -14,10 +14,11 @@ import {RootState} from '@shared/models/rootState';
 import {isEqual} from '@shared/utils/isEqual';
 
 export const removeResources = createAsyncThunk<
-  {nextMainState: AppState; affectedResourceIdentifiers?: ResourceIdentifier[]},
+  {nextMainState: AppState; affectedResourceIdentifiers?: ResourceIdentifier[]; error?: Error},
   ResourceIdentifier[]
 >('main/removeResources', async (resourceIdentifiers, thunkAPI: {getState: Function; dispatch: Function}) => {
   const state: RootState = thunkAPI.getState();
+  let error: Error | undefined;
 
   const nextMainState = await createNextState(state.main, async mainState => {
     let deletedCheckedResourcesIdentifiers: ResourceIdentifier[] = [];
@@ -64,13 +65,16 @@ export const removeResources = createAsyncThunk<
 
           const kindHandler = getResourceKindHandler(resourceMeta.kind);
           if (kindHandler?.deleteResourceInCluster) {
-            kindHandler.deleteResourceInCluster(kubeClient, resourceMeta);
+            await kindHandler.deleteResourceInCluster(kubeClient, resourceMeta);
             deleteResource(resourceMeta, {
               resourceMetaMap: mainState.resourceMetaMapByStorage.cluster,
               resourceContentMap: mainState.resourceContentMapByStorage.cluster,
             });
           }
         } catch (err) {
+          if (err instanceof Error) {
+            error = err;
+          }
           log.error(err);
           return original(mainState);
         }
@@ -82,5 +86,5 @@ export const removeResources = createAsyncThunk<
     );
   });
 
-  return {nextMainState, affectedResourceIdentifiers: resourceIdentifiers};
+  return {nextMainState, affectedResourceIdentifiers: resourceIdentifiers, error};
 });
