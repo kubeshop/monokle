@@ -72,14 +72,11 @@ const WarnUnsavedChangesModal = (props?: WarnUnsavedChangesModalProps) => {
             Deploy changes
           </Button>
           <Button onClick={onDiscard}>Discard changes</Button>
-          <Button onClick={onClose}>Cancel</Button>
         </div>
       }
     >
       <div>
-        <p>Pick what you would like to do with your changes.</p>
-        <p>If you deploy them, they will be applied to the cluster.</p>
-        <p>If you discard them, they will be lost.</p>
+        <p>You have unsaved changes.</p>
       </div>
     </Modal>
   );
