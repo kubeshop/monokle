@@ -7,3 +7,5 @@ export type NewResourceAction = {
   fromTypeLabel: 'AI' | 'advanced template' | 'model';
   onClick: () => void;
 };
+
+export type ResourceSavingDestination = 'doNotSave' | 'saveToFolder' | 'appendToFile';
