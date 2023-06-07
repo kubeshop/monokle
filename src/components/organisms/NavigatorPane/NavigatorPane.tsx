@@ -2,7 +2,7 @@ import {useCallback, useMemo} from 'react';
 
 import {Dropdown, Tooltip} from 'antd';
 
-import {FullscreenExitOutlined, FullscreenOutlined} from '@ant-design/icons';
+import AntdIcon from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -20,6 +20,7 @@ import {activeResourceCountSelector, navigatorResourceKindsSelector} from '@redu
 
 import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
+import {CollapseIcon, ExpandIcon} from '@components/atoms/Icons';
 import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import {useNewResourceMenuItems} from '@hooks/menuItemsHooks';
@@ -150,9 +151,9 @@ function CollapseAction() {
     <>
       <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandResourcesTooltip : CollapseResourcesTooltip}>
         {isCollapsed ? (
-          <StyledFullscreenOutlined onClick={onClick} $disabled={!hasAnyActiveResources} />
+          <StyledFullscreenOutlined component={ExpandIcon} onClick={onClick} $disabled={!hasAnyActiveResources} />
         ) : (
-          <StyledFullscreenExitOutlined onClick={onClick} $disabled={!hasAnyActiveResources} />
+          <StyledFullscreenExitOutlined component={CollapseIcon} onClick={onClick} $disabled={!hasAnyActiveResources} />
         )}
       </Tooltip>
     </>
@@ -161,14 +162,14 @@ function CollapseAction() {
 
 // Styled Components
 
-const StyledFullscreenOutlined = styled(FullscreenOutlined)<{$disabled: boolean}>`
+const StyledFullscreenOutlined = styled(AntdIcon)<{$disabled: boolean}>`
   color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.blue6)};
   cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
   padding-right: 10px;
   font-size: 16px;
 `;
 
-const StyledFullscreenExitOutlined = styled(FullscreenExitOutlined)<{$disabled: boolean}>`
+const StyledFullscreenExitOutlined = styled(AntdIcon)<{$disabled: boolean}>`
   color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.blue6)};
   cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
   padding-right: 10px;

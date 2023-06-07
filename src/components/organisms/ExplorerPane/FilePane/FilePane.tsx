@@ -2,7 +2,7 @@ import {memo, useMemo} from 'react';
 
 import {Button, CollapsePanelProps, Tooltip} from 'antd';
 
-import {ExclamationCircleOutlined, FullscreenExitOutlined, FullscreenOutlined, ReloadOutlined} from '@ant-design/icons';
+import AntdIcon, {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
@@ -10,6 +10,8 @@ import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolde
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setFileExplorerExpandedFolders} from '@redux/reducers/ui';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
+
+import {CollapseIcon, ExpandIcon} from '@components/atoms/Icons';
 
 import {useRefSelector} from '@utils/hooks';
 
@@ -81,7 +83,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
 
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}>
                   <Button
-                    icon={isCollapsed ? <FullscreenOutlined /> : <FullscreenExitOutlined />}
+                    icon={isCollapsed ? <AntdIcon component={ExpandIcon} /> : <AntdIcon component={CollapseIcon} />}
                     onClick={() => {
                       dispatch(setFileExplorerExpandedFolders(isCollapsed ? allFolderKeysRef.current : []));
                       trackEvent(isCollapsed ? 'explore/expand_all' : 'explore/collapse_all');
