@@ -19,6 +19,7 @@ import {sortChartsByName, useSearchHelmCharts} from '@hooks/useSearchHelmCharts'
 
 import {useMainPaneDimensions} from '@utils/hooks';
 
+import {Icon} from '@monokle/components';
 import {ChartInfo} from '@shared/models/ui';
 import {openUrlInExternalBrowser, trackEvent} from '@shared/utils';
 import {addHelmRepoCommand, runCommandInMainThread} from '@shared/utils/commands';
@@ -162,7 +163,8 @@ const HelmChartsTable = () => {
 
       {error ? (
         <S.ErrorText>
-          {error.message} - please check helm from{' '}
+          <Icon name="warning" style={{marginRight: 4}} />
+          Error: {error.message} <Typography.Text>- Please check helm from </Typography.Text>
           <Typography.Link onClick={() => openUrlInExternalBrowser('https://helm.sh/docs/intro/install/')}>
             here
           </Typography.Link>
