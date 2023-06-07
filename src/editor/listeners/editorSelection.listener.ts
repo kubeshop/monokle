@@ -14,7 +14,6 @@ import {editorResourceIdentifierSelector} from '@redux/selectors/resourceSelecto
 import {isKustomizationPatch} from '@redux/services/kustomize';
 import {isSupportedResource} from '@redux/services/resource';
 import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
-import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 
 import {MONACO_YAML_BASE_DIAGNOSTICS_OPTIONS} from '@editor/editor.constants';
 import {getEditor, getEditorType, recreateEditorModel} from '@editor/editor.instance';
@@ -28,14 +27,7 @@ import {RootState} from '@shared/models/rootState';
 
 export const editorSelectionListener: AppListenerFn = listen => {
   listen({
-    matcher: isAnyOf(
-      editorMounted,
-      selectResource,
-      selectFile,
-      selectHelmValuesFile,
-      setDashboardSelectedResourceId,
-      multiplePathsChanged.fulfilled
-    ),
+    matcher: isAnyOf(editorMounted, selectResource, selectFile, selectHelmValuesFile, setDashboardSelectedResourceId),
     async effect(_action, {getState, delay, dispatch, cancelActiveListeners}) {
       cancelActiveListeners();
       await delay(1);
@@ -47,12 +39,6 @@ export const editorSelectionListener: AppListenerFn = listen => {
 
       if (!editor || (editorType === 'local' && !rootFolderPath)) {
         return;
-      }
-
-      if (isAnyOf(multiplePathsChanged.fulfilled)(_action)) {
-        if (!_action.payload.reloadedFilePaths.some(filePath => filePath === selectedFilePath)) {
-          return;
-        }
       }
 
       let resourceIdentifier: ResourceIdentifier | undefined;
