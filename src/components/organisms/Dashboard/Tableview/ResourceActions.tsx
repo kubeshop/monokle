@@ -1,10 +1,11 @@
 import {useMemo} from 'react';
 
-import {Modal} from 'antd';
+import {Popconfirm} from 'antd';
 
 import {DeleteOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
+import {parse as parseYaml} from 'yaml';
 
 import {kubeConfigContextSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -14,6 +15,7 @@ import {applyResourceToCluster} from '@redux/thunks/applyResource';
 
 import {SecondaryButton} from '@atoms';
 
+import {getEditor} from '@editor/editor.instance';
 import {K8sResource} from '@shared/models/k8sResource';
 import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -22,10 +24,12 @@ import {deleteResourceHandler, restartResourceHandler} from './utils';
 
 type IProps = {
   resource?: K8sResource<'cluster'>;
+  isConfirmingUpdate: boolean;
+  setIsConfirmingUpdate: (isConfirmingUpdate: boolean) => void;
 };
 
 const ResourceActions: React.FC<IProps> = props => {
-  const {resource} = props;
+  const {resource, isConfirmingUpdate, setIsConfirmingUpdate} = props;
 
   const dispatch = useAppDispatch();
   const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
@@ -37,35 +41,46 @@ const ResourceActions: React.FC<IProps> = props => {
   const isResourceDeployment = useMemo(() => resource?.kind === 'Deployment', [resource?.kind]);
 
   const handleApplyResource = () => {
-    if (!resource || !resource.namespace || !clusterResourceMetaMap[resource.id]) return;
+    const editor = getEditor();
+    const updatedResourceText = editor?.getModel()?.getValue();
 
-    Modal.confirm({
-      title: `Are you sure you want to update ${resource.name}?`,
-      onOk() {
-        trackEvent('cluster/actions/update_manifest', {kind: resource.kind});
-        dispatch(
-          applyResourceToCluster({
-            resourceIdentifier: {
-              id: resource.id,
-              storage: 'cluster',
-            },
-            namespace: resource.namespace ? {name: resource.namespace, new: false} : undefined,
-            options: {
-              isInClusterMode: true,
-            },
-          })
-        );
-      },
-      onCancel() {},
-    });
+    if (!updatedResourceText || !resource || !resource.namespace || !clusterResourceMetaMap[resource.id]) return;
+
+    const updatedResourceObject = parseYaml(updatedResourceText);
+
+    trackEvent('cluster/actions/update_manifest', {kind: resource.kind});
+    dispatch(
+      applyResourceToCluster({
+        resourceIdentifier: {
+          id: resource.id,
+          storage: 'cluster',
+        },
+        namespace: updatedResourceObject.metadata?.namespace
+          ? {name: updatedResourceObject.metadata.namespace, new: false}
+          : undefined,
+        options: {
+          isInClusterMode: true,
+          providedResourceObject: updatedResourceObject,
+        },
+      })
+    );
+    setIsConfirmingUpdate(false);
   };
 
   return (
     <Container>
       {activeTab === 'Manifest' && (
-        <Button onClick={handleApplyResource} disabled={!resource} loading={isApplyingResource}>
-          Update
-        </Button>
+        <Popconfirm
+          open={isConfirmingUpdate}
+          title={`Are you sure you want to update ${resource?.name}?`}
+          placement="bottom"
+          onConfirm={handleApplyResource}
+          onCancel={() => setIsConfirmingUpdate(false)}
+        >
+          <Button onClick={() => setIsConfirmingUpdate(true)} disabled={!resource} loading={isApplyingResource}>
+            Update
+          </Button>
+        </Popconfirm>
       )}
 
       <Button
@@ -112,7 +127,7 @@ const Button = styled(SecondaryButton)<{$delete?: Boolean}>`
         font-size: 14px;
         color: ${Colors.red5};
 
-        &:hover { 
+        &:hover {
           color: ${Colors.red5};
         }
       `;

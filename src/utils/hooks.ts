@@ -102,3 +102,26 @@ export const useRefSelector = <T>(selector: (state: RootState) => T): MutableRef
 
   return valueRef;
 };
+
+type HookComponent<Props> = {
+  (props: Props): JSX.Element;
+  componentProps?: Props;
+};
+
+export function createUseComponentHook<Props>(component: (props?: Props) => JSX.Element) {
+  const useComponent = (componentProps: Props) => {
+    const componentRef = useRef<HookComponent<Props> | null>(null);
+    if (componentRef.current) {
+      componentRef.current.componentProps = componentProps;
+    }
+    useEffect(() => {
+      if (componentRef.current) {
+        return;
+      }
+      const hookComponent: HookComponent<Props> = () => component(hookComponent.componentProps);
+      componentRef.current = hookComponent;
+    }, []);
+    return (componentRef.current === null ? () => null : componentRef.current) as () => JSX.Element;
+  };
+  return useComponent;
+}
