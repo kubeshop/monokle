@@ -5,12 +5,14 @@ import log from 'loglevel';
 import {currentConfigSelector} from '@redux/appConfig';
 import {setChangedFiles, setGitLoading, setRepo} from '@redux/git';
 import {getChangedFiles, getRepoInfo, isFolderGitRepo} from '@redux/git/git.ipc';
+import {abortAllRunningRefsProcessing} from '@redux/parsing/parser.thunks';
 import {SetRootFolderArgs, SetRootFolderPayload} from '@redux/reducers/main';
 import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 import {createRootFileEntry, readFiles} from '@redux/services/fileEntry';
 import {monitorRootFolder} from '@redux/services/fileMonitor';
 import {isKustomizationResource} from '@redux/services/kustomize';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
+import {abortAllRunningValidation} from '@redux/validation/validation.thunks';
 
 import {getFileStats} from '@utils/files';
 import {showGitErrorModal} from '@utils/terminal';
@@ -22,8 +24,6 @@ import {ResourceContentMap, ResourceMetaMap} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {isInClusterModeSelector} from '@shared/utils';
 import {trackEvent} from '@shared/utils/telemetry';
-import {abortAllRunningValidation} from '@redux/validation/validation.thunks';
-import {abortAllRunningRefsProcessing} from '@redux/parsing/parser.thunks';
 
 /**
  * Thunk to set the specified root folder

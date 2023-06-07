@@ -19,8 +19,10 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Project, SavedCommand, SettingsPanel} from '@shared/models/config';
 import {K8sResource, ResourceIdentifier} from '@shared/models/k8sResource';
 import {
+  ChartInfo,
   ExplorerCollapsibleSectionsType,
-  HighlightItems,
+  HelmChartDetailsTab,
+  HelmRepoMenu,
   LayoutSizeType,
   LearnTopicType,
   LeftMenuBottomSelectionType,
@@ -351,12 +353,6 @@ export const uiSlice = createSlice({
       state.paneConfiguration = DEFAULT_PANE_CONFIGURATION;
       electronStore.set('ui.paneConfiguration', DEFAULT_PANE_CONFIGURATION);
     },
-    highlightItem: (state: Draft<UiState>, action: PayloadAction<string | null>) => {
-      state.highlightedItems.clusterPaneIcon = action.payload === HighlightItems.CLUSTER_PANE_ICON;
-      state.highlightedItems.createResource = action.payload === HighlightItems.CREATE_RESOURCE;
-      state.highlightedItems.browseTemplates = action.payload === HighlightItems.BROWSE_TEMPLATES;
-      state.highlightedItems.connectToCluster = action.payload === HighlightItems.CONNECT_TO_CLUSTER;
-    },
     openReleaseNotesDrawer: (state: Draft<UiState>) => {
       state.isReleaseNotesDrawerOpen = true;
     },
@@ -423,6 +419,21 @@ export const uiSlice = createSlice({
     },
     setFileExplorerExpandedFolders: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       state.fileExplorerExpandedFolders = action.payload;
+    },
+    setHelmPaneMenuItem: (state: Draft<UiState>, action: PayloadAction<HelmRepoMenu>) => {
+      state.helmPane.selectedMenuItem = action.payload;
+    },
+    setHelmPaneChartSearch: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.helmPane.chartSearchToken = action.payload;
+    },
+    setHelmPaneSelectedChart: (state: Draft<UiState>, action: PayloadAction<ChartInfo | null>) => {
+      state.helmPane.selectedChart = action.payload;
+    },
+    setHelmPaneChartDetailsTab: (state: Draft<UiState>, action: PayloadAction<HelmChartDetailsTab>) => {
+      state.helmPane.chartDetailsTab = action.payload;
+    },
+    toggleHelmPanSearchHub: (state: Draft<UiState>) => {
+      state.helmPane.isSearchHubIncluded = !state.helmPane.isSearchHubIncluded;
     },
   },
   extraReducers: builder => {
@@ -517,7 +528,6 @@ export const {
   expandKustomizeKinds,
   expandResourceKinds,
   hideNewVersionNotice,
-  highlightItem,
   openAboutModal,
   openCreateFileFolderModal,
   openCreateProjectModal,
@@ -574,5 +584,10 @@ export const {
   openScaleModal,
   closeScaleModal,
   setIsInQuickClusterMode,
+  setHelmPaneMenuItem,
+  setHelmPaneChartSearch,
+  setHelmPaneSelectedChart,
+  setHelmPaneChartDetailsTab,
+  toggleHelmPanSearchHub,
 } = uiSlice.actions;
 export default uiSlice.reducer;

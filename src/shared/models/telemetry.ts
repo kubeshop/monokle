@@ -6,6 +6,7 @@ import {getSegmentClient} from '@shared/utils/segment';
 import {isRendererThread} from '@shared/utils/thread';
 
 import {PreviewType} from './preview';
+import {NewResourceTelemtryFrom, NewResourceTelemtryType} from './resourceCreate';
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from './ui';
 
 const machineId: string = machineIdSync();
@@ -139,6 +140,14 @@ export type EventMap = {
   'left-menu/activity-changed': {activity: LeftMenuSelectionType; section?: string};
   'bottom-left-menu/select-option': {option: LeftMenuBottomSelectionType};
   'notifications/toggle': undefined;
+  'new_resource/create': {type: NewResourceTelemtryType; from: NewResourceTelemtryFrom};
+  'helm_repo/search': {query: string};
+  'helm_repo/select': undefined;
+  'helm_repo/add': undefined;
+  'helm_repo/remove': undefined;
+  'helm_repo/update': undefined;
+  'helm_repo/download': undefined;
+  'helm_repo/install': undefined;
   'ai/generation/open': undefined;
   'ai/generation/success': {
     enabledValidation: boolean;
@@ -146,6 +155,7 @@ export type EventMap = {
   };
   'ai/generation/created-resources': {resourceKinds: string[]; resourcesCount: number};
 };
+
 export const APP_INSTALLED = 'APP_INSTALLED';
 export const APP_SESSION = 'APP_SESSION';
 export const APP_UPDATED = 'APP_UPDATED';

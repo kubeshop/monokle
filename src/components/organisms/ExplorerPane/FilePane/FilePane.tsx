@@ -2,18 +2,18 @@ import {memo, useMemo} from 'react';
 
 import {Button, CollapsePanelProps, Tooltip} from 'antd';
 
-import {ExclamationCircleOutlined, FolderAddOutlined, ReloadOutlined} from '@ant-design/icons';
+import {ExclamationCircleOutlined, FullscreenExitOutlined, FullscreenOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {CollapseTreeTooltip, ExpandTreeTooltip, FileExplorerChanged, ReloadFolderTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {openCreateFileFolderModal, setFileExplorerExpandedFolders} from '@redux/reducers/ui';
+import {setFileExplorerExpandedFolders} from '@redux/reducers/ui';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {useRefSelector} from '@utils/hooks';
 
-import {Icon, TitleBar, TitleBarCount} from '@monokle/components';
+import {TitleBar, TitleBarCount} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {InjectedPanelProps} from '@shared/models/explorer';
 import {trackEvent} from '@shared/utils';
@@ -68,21 +68,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
                     <ExclamationCircleOutlined />
                   </Tooltip>
                 )}
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY}>
-                  <Button
-                    size="small"
-                    onClick={() => {
-                      dispatch(
-                        openCreateFileFolderModal({
-                          rootDir: rootEntry.filePath,
-                          type: 'folder',
-                        })
-                      );
-                    }}
-                    icon={<FolderAddOutlined />}
-                    type="link"
-                  />
-                </Tooltip>
+
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
                   <Button
                     size="small"
@@ -92,9 +78,10 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
                     disabled={isButtonDisabled}
                   />
                 </Tooltip>
+
                 <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}>
                   <Button
-                    icon={<Icon name="collapse" />}
+                    icon={isCollapsed ? <FullscreenOutlined /> : <FullscreenExitOutlined />}
                     onClick={() => {
                       dispatch(setFileExplorerExpandedFolders(isCollapsed ? allFolderKeysRef.current : []));
                       trackEvent(isCollapsed ? 'explore/expand_all' : 'explore/collapse_all');

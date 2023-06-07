@@ -329,7 +329,7 @@ export function findContainingHelmCharts(helmChartMap: HelmChartMapType, fileEnt
  * @param prefix
  */
 export const getObjectKeys = (obj: any, prefix = ''): string[] =>
-  Object.keys(obj).reduce((res: any, el) => {
+  Object.keys(obj || {}).reduce((res: any, el) => {
     if (Array.isArray(obj[el])) {
       return [...res, prefix + el];
     }
