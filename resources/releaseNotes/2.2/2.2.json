@@ -1,0 +1,13 @@
+{
+  "title": "Welcome to Monokle 2.2",
+  "learnMoreUrl": "https://monokle.io/blog/monokle-2-2-release",
+  "about": {
+    "when": "June 2023",
+    "title": "2.2 focused on:",
+    "features": [
+      "AI-Assisted YAML Resource Creation",
+      "Helm Chart Explorer",
+      "Enhanced Kubernetes management experience"
+    ]
+  }
+}
