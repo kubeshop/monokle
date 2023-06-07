@@ -15,7 +15,7 @@ import {dashboardSlice} from './dashboard';
 import {formSlice} from './forms';
 import {gitSlice} from './git';
 import {combineListeners, listenerMiddleware} from './listeners/base';
-import {alertSlice} from './reducers/alert';
+import {alertSlice, testAsyncListener} from './reducers/alert';
 import {extensionSlice} from './reducers/extension';
 import {mainSlice} from './reducers/main';
 import {imageListParserListener} from './reducers/main/mainListeners';
@@ -48,6 +48,7 @@ combineListeners([
   ...appConfigListeners,
   ...clusterListeners,
   imageListParserListener,
+  testAsyncListener,
 ]);
 
 const appReducer = combineReducers({

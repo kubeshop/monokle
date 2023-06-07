@@ -65,7 +65,7 @@ type NewResourceWizardInput = {
 };
 
 export const ExplorerCollapsibleSections = ['files', 'kustomize', 'helm', 'preview-configuration', 'images'] as const;
-export type ExplorerCollapsibleSectionsType = typeof ExplorerCollapsibleSections[number];
+export type ExplorerCollapsibleSectionsType = (typeof ExplorerCollapsibleSections)[number];
 
 export const LeftMenuSelectionOptions = [
   'explorer',
@@ -76,7 +76,7 @@ export const LeftMenuSelectionOptions = [
   'settings',
   'dashboard',
 ] as const;
-type LeftMenuSelectionType = typeof LeftMenuSelectionOptions[number];
+type LeftMenuSelectionType = (typeof LeftMenuSelectionOptions)[number];
 
 type PaneConfiguration = {
   leftPane: number;

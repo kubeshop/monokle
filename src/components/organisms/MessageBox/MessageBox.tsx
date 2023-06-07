@@ -1,9 +1,11 @@
 import {useEffect, useMemo} from 'react';
+import {Provider} from 'react-redux';
 
 import {notification} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {clearAlert} from '@redux/reducers/alert';
+import store from '@redux/store';
 
 import {NotificationMarkdown} from '@molecules';
 
@@ -40,10 +42,12 @@ const MessageBox: React.FC = () => {
         key: alert.id,
         message: alert.title,
         description: (
-          <NotificationMarkdown
-            notification={{...alert, message: enhanceErrorMessage(alert.message)}}
-            type={notificationType}
-          />
+          <Provider store={store}>
+            <NotificationMarkdown
+              notification={{...alert, message: enhanceErrorMessage(alert.message)}}
+              type={notificationType}
+            />
+          </Provider>
         ),
         duration: alert.duration || 4,
         style: {zIndex: '10000'},

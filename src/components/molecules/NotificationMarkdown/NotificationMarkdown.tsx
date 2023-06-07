@@ -2,10 +2,12 @@ import {useMemo} from 'react';
 import ReactMarkdown from 'react-markdown';
 import {Provider} from 'react-redux';
 
-import {Modal} from 'antd';
+import {Button, Modal} from 'antd';
 
 import _ from 'lodash';
 
+import {useAppDispatch} from '@redux/hooks';
+import {clearAlert} from '@redux/reducers/alert';
 import store from '@redux/store';
 
 import {TelemetryButtons} from '@molecules/NotificationMarkdown/TelemetryButtons';
@@ -30,7 +32,8 @@ const getExtraContent = (extraContentType: ExtraContentType, notificationId?: st
 
 const NotificationMarkdown: React.FC<NotificationProps> = props => {
   const {notification, type} = props;
-  const {extraContentType, id, message, title} = notification;
+  const dispatch = useAppDispatch();
+  const {extraContentType, id, message, title, buttons} = notification;
 
   const truncatedMessage = useMemo(() => {
     if (message.length <= 200) {
@@ -66,6 +69,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
         </Provider>
       ),
       width: 600,
+      cancelText: 'Cancel',
       okText: 'Done',
     });
   };
@@ -93,6 +97,19 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
         </S.SeeAllButton>
       )}
       {extraContentType && getExtraContent(extraContentType, id)}
+      <div>
+        {buttons?.map(button => (
+          <Button
+            key={button.text}
+            style={button.style}
+            onClick={() => {
+              button.type !== 'cancel' ? dispatch(button.action) : dispatch(clearAlert());
+            }}
+          >
+            {button.text}
+          </Button>
+        ))}
+      </div>
     </S.NotificationMarkdownContainer>
   );
 };
