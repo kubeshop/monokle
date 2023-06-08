@@ -11,6 +11,7 @@ import {createRejectionWithAlert} from '@redux/thunks/utils';
 import {buildHelmCommand} from '@utils/helm';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AlertButton} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {CommandOptions} from '@shared/models/commands';
 import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
@@ -20,6 +21,9 @@ import {RootState} from '@shared/models/rootState';
 import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {runCommandInMainThread} from '@shared/utils/commands';
 import {trackEvent} from '@shared/utils/telemetry';
+
+// import { testSyncAction } from '@redux/reducers/alert';
+import {runHelmCommand} from './runHelmCommand';
 
 /**
  * Thunk to preview a Helm Chart
@@ -39,6 +43,7 @@ export const runPreviewConfiguration = createAsyncThunk<
   const startTime = new Date().getTime();
   const configState = thunkAPI.getState().config;
   const mainState = thunkAPI.getState().main;
+  const helmChartMap = thunkAPI.getState().main.helmChartMap;
   const previewConfigurationMap = configState.projectConfig?.helm?.previewConfigurationMap;
   const kubeconfig = selectKubeconfig(thunkAPI.getState());
 
@@ -153,10 +158,23 @@ export const runPreviewConfiguration = createAsyncThunk<
   }
 
   trackEvent('preview/helm_config/end', {executionTime: endTime - startTime});
+  // const buttons: AlertButton[] = [
+  //   {
+  //     text: 'Cancel',
+  //     action: () => {}
+  //   },
+  //   {
+  //     text: 'Ok',
+  //     action: async () => {
+  //       await runHelmCommand({ chart: helmChartMap.id.id, command: ['dependency', 'update'] });
+  //     }
+  //   }
+  // ];
 
   return createRejectionWithAlert(
     thunkAPI,
     'Helm Error',
     `Unable to run Helm with Preview Configuration: ${previewConfiguration.name} - [${result.stderr}]`
+    // buttons
   );
 });

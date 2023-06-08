@@ -9,7 +9,7 @@ import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {AlertEnum} from '@shared/models/alert';
+import {AlertButton, AlertEnum} from '@shared/models/alert';
 import {K8sObject} from '@shared/models/k8s';
 import {ResourceMeta} from '@shared/models/k8sResource';
 
@@ -67,12 +67,13 @@ export function getK8sObjectsAsYaml(items: any[], kind?: string, apiVersion?: st
  * Creates a thunk rejection that displays an error alert
  */
 
-export function createRejectionWithAlert(thunkAPI: any, title: string, message: string) {
+export function createRejectionWithAlert(thunkAPI: any, title: string, message: string, buttons: AlertButton[] = []) {
   return thunkAPI.rejectWithValue({
     alert: {
       title,
       message,
       type: AlertEnum.Error,
+      buttons,
     },
   });
 }

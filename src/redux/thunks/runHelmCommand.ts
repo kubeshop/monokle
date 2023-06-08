@@ -3,6 +3,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import log from 'loglevel';
 import path, {dirname} from 'path';
 
+import {useAppDispatch} from '@redux/hooks';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {errorMsg} from '@utils/error';
@@ -29,6 +30,8 @@ export const runHelmCommand = createAsyncThunk<
   const rootFolderPath = thunkAPI.getState().main.fileMap[ROOT_FILE_ENTRY]?.filePath;
   const helmChartMap = thunkAPI.getState().main.helmChartMap;
   const {chart, command} = payload;
+
+  const dispatch = useAppDispatch();
 
   trackEvent('helm/command/start', {command});
   try {
@@ -72,6 +75,7 @@ export const runHelmCommand = createAsyncThunk<
   } catch (err) {
     let reason = errorMsg(err);
     trackEvent('helm/command/fail', {reason});
+
     return createRejectionWithAlert(thunkAPI, `helm ${command.join(' ')} failed`, reason);
   }
 });

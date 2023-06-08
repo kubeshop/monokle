@@ -2,6 +2,8 @@ import {Button as RawButton} from 'antd';
 
 import styled from 'styled-components';
 
+import {Colors} from '@shared/styles/colors';
+
 export const Button = styled(RawButton)`
   padding: 0 20px;
 `;
@@ -30,4 +32,26 @@ export const SeeAllButton = styled(RawButton)`
   font-size: 12px;
   margin-left: 6px;
   height: auto;
+`;
+
+export const CancelButton = styled.button`
+  border: 1px solid ${Colors.blue6};
+  color: ${Colors.grey100};
+  padding: 0 20px;
+  height: 32px;
+`;
+
+export const DefaultActionButton = styled.button`
+  border: none;
+  background-color: ${Colors.blue6};
+  padding: 0 20px;
+  height: 32px;
+  margin-left: 10px;
+`;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  align-items: center;
 `;

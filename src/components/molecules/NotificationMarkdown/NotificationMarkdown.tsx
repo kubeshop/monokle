@@ -7,7 +7,6 @@ import {Button, Modal} from 'antd';
 import _ from 'lodash';
 
 import {useAppDispatch} from '@redux/hooks';
-import {clearAlert} from '@redux/reducers/alert';
 import store from '@redux/store';
 
 import {TelemetryButtons} from '@molecules/NotificationMarkdown/TelemetryButtons';
@@ -61,6 +60,15 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
           >
             {message}
           </ReactMarkdown>
+          {/* <S.ButtonContainer>
+            {
+              buttons?.map(button => (
+                button.text === 'Cancel' ?
+                  <S.CancelButton onClick={() => Modal.destroyAll()}>{button.text}</S.CancelButton> :
+                  <S.DefaultActionButton onClick={() => dispatch(button.action)}>{button.text}</S.DefaultActionButton>
+              ))
+            }
+          </S.ButtonContainer> */}
         </S.NotificationModalContent>
       ),
       title: (
@@ -69,7 +77,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
         </Provider>
       ),
       width: 600,
-      cancelText: 'Cancel',
+      cancel: 'Cancel',
       okText: 'Done',
     });
   };
@@ -103,7 +111,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
             key={button.text}
             style={button.style}
             onClick={() => {
-              button.type !== 'cancel' ? dispatch(button.action) : dispatch(clearAlert());
+              dispatch(button.action);
             }}
           >
             {button.text}

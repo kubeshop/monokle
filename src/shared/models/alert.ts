@@ -20,7 +20,6 @@ type AlertState = {
 };
 
 type AlertButton = {
-  type: 'cancel' | 'action';
   text: string;
   action: AnyAction;
   style?: React.CSSProperties;
@@ -40,4 +39,4 @@ type AlertType = {
   buttons?: AlertButton[];
 };
 
-export type {AlertState, AlertType};
+export type {AlertState, AlertType, AlertButton};

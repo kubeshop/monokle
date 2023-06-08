@@ -16,7 +16,7 @@ import {activeProjectSelector, updateProjectsGitRepo} from '@redux/appConfig';
 import {setCurrentBranch, setRepo} from '@redux/git';
 import {getRepoInfo, initGitRepo} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setAlert, testSyncAction, triggerTestAsyncAction} from '@redux/reducers/alert';
+// import {setAlert, testSyncAction, triggerTestAsyncAction} from '@redux/reducers/alert';
 import {setAutosavingError} from '@redux/reducers/main';
 import {
   setIsFromBackToStart,
@@ -40,7 +40,7 @@ import {showGitErrorModal} from '@utils/terminal';
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {Icon} from '@monokle/components';
-import {AlertEnum} from '@shared/models/alert';
+// import {AlertEnum} from '@shared/models/alert';
 import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
@@ -285,28 +285,26 @@ const PageHeader = () => {
           <button
             type="button"
             style={{color: 'black'}}
-            onClick={() =>
-              dispatch(
-                setAlert({
-                  type: AlertEnum.Info,
-                  title: 'test',
-                  message:
-                    'gvefodiuvnbritnuvbirtbvnirtubhirtubvrtibvrtibnrtibirtbhibrtiurtibuvrtibvuivbivbertivberivberivbeirvbierbhfierhrefierufheirucvndfivuhero9fiuheriuhgvefodiuvnbritnuvbirtbvnirtubhirtubvrtibvrtibnrtibirtbhibrtiurtibuvrtibvuivbivbertivberivberivbeirvbierbhfierhrefierufheirucvndfivuhero9fiuheriuh',
-                  buttons: [
-                    {
-                      text: 'Cannel',
-                      action: testSyncAction(),
-                      type: 'cancel',
-                    },
-                    {
-                      text: 'Async action',
-                      action: triggerTestAsyncAction(),
-                      type: 'action',
-                    },
-                  ],
-                })
-              )
-            }
+            // onClick={() =>
+            //   dispatch(
+            //     setAlert({
+            //       type: AlertEnum.Info,
+            //       title: 'test',
+            //       message:
+            //         'gvefodiuvnbritnuvbirtbvnirtubhirtubvrtibvrtibnrtibirtbhibrtiurtibuvrtibvuivbivbertivberivberivbeirvbierbhfierhrefierufheirucvndfivuhero9fiuheriuhgvefodiuvnbritnuvbirtbvnirtubhirtubvrtibvrtibnrtibirtbhibrtiurtibuvrtibvuivbivbertivberivberivbeirvbierbhfierhrefierufheirucvndfivuhero9fiuheriuh',
+            //       buttons: [
+            //         {
+            //           text: 'Cannel',
+            //           action: testSyncAction(),
+            //         },
+            //         {
+            //           text: 'Async action',
+            //           action: triggerTestAsyncAction(),
+            //         },
+            //       ],
+            //     })
+            //   )
+            // }
           >
             Test notification
           </button>

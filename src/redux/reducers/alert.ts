@@ -17,6 +17,7 @@ export const alertSlice = createSlice({
     },
     testSyncAction: () => {
       console.log('Some sync action');
+      console.log('%cSome sync action', 'color: red');
     },
     triggerTestAsyncAction: () => {
       console.log('Dispatching a sync action to trigger an async listener');
