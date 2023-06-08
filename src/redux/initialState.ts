@@ -128,6 +128,7 @@ let paneConfiguration: PaneConfiguration = electronStore.get('ui.paneConfigurati
 if (
   !paneConfiguration ||
   paneConfiguration.leftPane === undefined ||
+  paneConfiguration.bottomPaneHeight === undefined ||
   paneConfiguration.leftPane === 0 ||
   paneConfiguration.navPane === 0
 ) {
@@ -218,12 +219,6 @@ const initialUiState: UiState = {
   layoutSize: {header: 0},
   resetLayout: false,
   isActionsPaneFooterExpanded: false,
-  highlightedItems: {
-    clusterPaneIcon: false,
-    createResource: false,
-    browseTemplates: false,
-    connectToCluster: false,
-  },
   startPage: {
     selectedMenuOption: 'new-project',
     learn: {
@@ -245,6 +240,13 @@ const initialUiState: UiState = {
   explorerSelectedSection: 'files',
   fileExplorerExpandedFolders: [],
   showOpenProjectAlert: electronStore.get('ui.showOpenProjectAlert', true),
+  helmPane: {
+    selectedMenuItem: 'browse-charts',
+    chartSearchToken: '',
+    selectedChart: null,
+    chartDetailsTab: 'info',
+    isSearchHubIncluded: false,
+  },
 };
 
 const initialExtensionState: ExtensionState = {

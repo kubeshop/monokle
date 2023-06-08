@@ -24,6 +24,7 @@ export const ClusterDiffDisabledTooltip = 'Browse for a folder to enable the Clu
 export const ClusterDiffSaveTooltip = 'Replace local resource with cluster version';
 export const ClusterDiffTooltip = 'Compare your local resources with resources in your configured cluster';
 export const ClusterNamespaceTooltip = 'Selected cluster namespace';
+export const CollapseResourcesTooltip = 'Collapse all resources';
 export const CollapseTreeTooltip = 'Collapse all folders';
 export const CommitTooltip = 'Commit to the main branch';
 export const DeletePreviewConfigurationTooltip = 'Are you sure you want to delete this Preview Configuration?';
@@ -32,6 +33,7 @@ export const EditPreviewConfigurationTooltip = 'Edit this Preview Configuration'
 export const EnableHelmWithKustomizeTooltip = 'Enable helm-related functionality when invoking Kustomize';
 export const ExitHelmPreviewTooltip = 'Exit Helm Chart preview (Escape)';
 export const ExitKustomizationPreviewTooltip = 'Exit Kustomize preview (Escape)';
+export const ExpandResourcesTooltip = 'Expand all resources';
 export const ExpandTreeTooltip = 'Expand all folders';
 export const FeedbackTooltip =
   'Monokle is open source and free of charge. Would you help us to improve it by dedicating 2 minutes to answer our questions?';

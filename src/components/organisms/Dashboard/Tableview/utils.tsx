@@ -2,17 +2,17 @@ import {Modal} from 'antd';
 
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 
+import {connectCluster} from '@redux/cluster/thunks/connect';
 import {setDashboardSelectedResourceId} from '@redux/dashboard';
 import {setAlert} from '@redux/reducers/alert';
 import {editorHasReloadedSelectedPath} from '@redux/reducers/main';
+import restartDeployment from '@redux/services/restartDeployment';
 import {removeResources} from '@redux/thunks/removeResources';
 
 import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {K8sResource} from '@shared/models/k8sResource';
 import {trackEvent} from '@shared/utils/telemetry';
-import restartDeployment from '@redux/services/restartDeployment';
-import {connectCluster} from '@redux/cluster/thunks/connect';
 
 export const deleteResourceHandler = (dispatch: AppDispatch, resource?: K8sResource<'cluster'>) => {
   if (!resource) {
@@ -22,15 +22,23 @@ export const deleteResourceHandler = (dispatch: AppDispatch, resource?: K8sResou
   Modal.confirm({
     title: `This action will delete the resource from the Cluster.\n Are you sure you want to delete ${resource.name}?`,
     icon: <ExclamationCircleOutlined />,
-    onOk() {
-      return new Promise(resolve => {
-        trackEvent('cluster/actions/delete', {kind: resource.kind});
-        dispatch(removeResources([resource]));
+    async onOk() {
+      trackEvent('cluster/actions/delete', {kind: resource.kind});
+
+      const result = await dispatch(removeResources([resource])).unwrap();
+      if (result.error) {
+        dispatch(
+          setAlert({
+            title: 'Failed to delete resource from the cluster',
+            message: result.error.message,
+            type: AlertEnum.Error,
+          })
+        );
+      } else {
         dispatch(editorHasReloadedSelectedPath(true));
         dispatch(setDashboardSelectedResourceId());
         dispatch(setAlert({title: 'Resource deleted from the cluster', message: '', type: AlertEnum.Success}));
-        resolve({});
-      });
+      }
     },
     onCancel() {},
   });

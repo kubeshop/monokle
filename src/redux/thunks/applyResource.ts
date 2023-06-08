@@ -2,6 +2,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import _, {cloneDeep} from 'lodash';
 import log from 'loglevel';
+import {stringify} from 'yaml';
 
 import {currentConfigSelector, kubeConfigContextSelector} from '@redux/appConfig';
 import {setAlert} from '@redux/reducers/alert';
@@ -21,8 +22,8 @@ import {AlertEnum, AlertType} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {FileMapType} from '@shared/models/appState';
 import {ProjectConfig} from '@shared/models/config';
+import {K8sObject} from '@shared/models/k8s';
 import {
-  ResourceContent,
   ResourceContentMapByStorage,
   ResourceIdentifier,
   ResourceMeta,
@@ -37,12 +38,12 @@ import {trackEvent} from '@shared/utils/telemetry';
  */
 
 function applyK8sResource(
-  resourceContent: ResourceContent,
+  resource: K8sObject,
   context: string,
   kubeconfig?: string,
   namespace?: {name: string; new: boolean}
 ) {
-  const resourceObject = _.cloneDeep(resourceContent.object);
+  const resourceObject = _.cloneDeep(resource);
   if (namespace && namespace.name !== resourceObject.metadata?.namespace) {
     delete resourceObject.metadata.namespace;
   }
@@ -81,7 +82,6 @@ function applyKustomization(
  *
  * this isn't actually a Thunk - but should be in the future!
  */
-
 export async function applyResource(
   resourceIdentifeir: ResourceIdentifier,
   resourceMetaMapByStorage: ResourceMetaMapByStorage,
@@ -95,12 +95,16 @@ export async function applyResource(
     isInClusterMode?: boolean;
     shouldPerformDiff?: boolean;
     quiet?: boolean;
+    providedResourceObject?: K8sObject;
   }
 ) {
+  const providedResourceObject = options?.providedResourceObject;
   const showAlert = options?.quiet !== true;
   const resourceMeta = resourceMetaMapByStorage[resourceIdentifeir.storage][resourceIdentifeir.id];
 
-  const resourceContent = cloneDeep(resourceContentMapByStorage[resourceIdentifeir.storage][resourceIdentifeir.id]);
+  const resourceContent = providedResourceObject
+    ? {text: stringify(providedResourceObject), object: providedResourceObject}
+    : cloneDeep(resourceContentMapByStorage[resourceIdentifeir.storage][resourceIdentifeir.id]);
 
   // Related to this https://stackoverflow.com/questions/51297136/kubectl-error-the-object-has-been-modified-please-apply-your-changes-to-the-la
   // We need to remove certain properties before updating the resource in cluster mode
@@ -119,7 +123,7 @@ export async function applyResource(
         const result =
           isKustomization && isLocalResourceMeta(resourceMeta)
             ? await applyKustomization(resourceMeta, fileMap, context, projectConfig, namespace)
-            : await applyK8sResource(resourceContent, context, kubeconfigPath, namespace);
+            : await applyK8sResource(resourceContent.object, context, kubeconfigPath, namespace);
 
         if (isKustomization) {
           trackEvent('cluster/deploy_kustomization');
@@ -202,6 +206,7 @@ export const applyResourceToCluster = createAsyncThunk<
       isInClusterMode?: boolean;
       shouldPerformDiff?: boolean;
       quiet?: boolean;
+      providedResourceObject?: K8sObject;
     };
   },
   ThunkApi

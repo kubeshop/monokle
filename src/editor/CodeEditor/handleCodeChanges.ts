@@ -7,7 +7,7 @@ import store from '@redux/store';
 import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateResource} from '@redux/thunks/updateResource';
 
-import {getEditor, resetEditor, subscribeToEditorModelContentChanges} from '@editor/editor.instance';
+import {getEditor, getEditorType, resetEditor, subscribeToEditorModelContentChanges} from '@editor/editor.instance';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {ResourceIdentifier} from '@shared/models/k8sResource';
 
@@ -48,9 +48,11 @@ const debouncedCodeSave = debounce(
 
 const onCodeChange = () => {
   const editor = getEditor();
-  if (!editor) {
+  const editorType = getEditorType();
+  if (!editor || editorType === 'cluster') {
     return;
   }
+
   const state = store.getState();
   const selectedPath = selectedFilePathSelector(state);
   const selectedHelmValuesFile = selectedHelmValuesSelector(state);
