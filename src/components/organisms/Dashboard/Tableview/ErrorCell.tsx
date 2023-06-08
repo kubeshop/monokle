@@ -46,7 +46,7 @@ const ErrorCell: React.FC<IProps> = props => {
         dispatch(setMonacoEditor({selection: {type: 'resource', resourceId, range: targetOutgoingRefRange}}));
       });
     },
-    [dispatch, resourceId]
+    [dispatch, resourceId, resourceKind]
   );
 
   if (isEmpty(errors) && isEmpty(warnings)) {

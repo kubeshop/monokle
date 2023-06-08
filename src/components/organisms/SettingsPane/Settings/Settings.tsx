@@ -49,13 +49,11 @@ type SettingsProps = {
   projectName?: string;
   onProjectNameChange?: Function;
   onConfigChange?: Function;
-  isClusterPaneIconHighlighted?: boolean | null;
 };
 
 export const Settings = ({
   config,
   onConfigChange,
-  isClusterPaneIconHighlighted,
   projectName,
   onProjectNameChange,
   showProjectName,
@@ -289,11 +287,7 @@ export const Settings = ({
           <S.Heading>
             KUBECONFIG
             {isClusterActionDisabled && wasRehydrated && (
-              <S.WarningOutlined
-                className={isClusterPaneIconHighlighted ? 'animated-highlight' : ''}
-                isKubeconfigPathValid={Boolean(kubeConfig?.isValid)}
-                highlighted={Boolean(isClusterPaneIconHighlighted)}
-              />
+              <S.WarningOutlined $isKubeconfigPathValid={Boolean(kubeConfig?.isValid)} />
             )}
           </S.Heading>
 

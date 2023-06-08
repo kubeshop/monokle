@@ -10,7 +10,7 @@ import {YAML_DOCUMENT_DELIMITER_NEW_LINE} from '@constants/constants';
 import {currentConfigSelector, kubeConfigPathSelector} from '@redux/appConfig';
 import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {getCommitResources} from '@redux/git/git.ipc';
-import {runKustomize} from '@redux/thunks/previewKustomization';
+import {runKustomize} from '@redux/thunks/preview';
 
 import {buildHelmCommand} from '@utils/helm';
 

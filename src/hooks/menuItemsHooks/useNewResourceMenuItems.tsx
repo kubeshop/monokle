@@ -2,16 +2,17 @@ import {useMemo} from 'react';
 
 import {MenuProps} from 'antd';
 
-import {FileAddOutlined as RawFileAddOutlined} from '@ant-design/icons';
+import {FileAddOutlined as RawFileAddOutlined, RobotOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
 import {useAppDispatch} from '@redux/hooks';
-import {openNewResourceWizard, openTemplateExplorer} from '@redux/reducers/ui';
+import {openNewAiResourceWizard, openNewResourceWizard, openTemplateExplorer} from '@redux/reducers/ui';
 
 import TemplateSmallWhiteSvg from '@assets/TemplateSmallWhite.svg';
 
 import {Colors} from '@shared/styles/colors';
+import {trackEvent} from '@shared/utils/telemetry';
 
 export function useNewResourceMenuItems() {
   const dispatch = useAppDispatch();
@@ -23,21 +24,39 @@ export function useNewResourceMenuItems() {
         label: (
           <MenuItem>
             <FileAddOutlined />
-            New from model
+            Create manually
           </MenuItem>
         ),
-
-        onClick: () => dispatch(openNewResourceWizard()),
+        onClick: () => {
+          trackEvent('new_resource/create', {type: 'wizard', from: 'navigator_header'});
+          dispatch(openNewResourceWizard());
+        },
       },
       {
         key: 'from-template',
         label: (
           <MenuItem>
             <img src={TemplateSmallWhiteSvg} />
-            New from advanced template
+            Use Advanced Template
           </MenuItem>
         ),
-        onClick: () => dispatch(openTemplateExplorer()),
+        onClick: () => {
+          trackEvent('new_resource/create', {type: 'advanced_template', from: 'navigator_header'});
+          dispatch(openTemplateExplorer());
+        },
+      },
+      {
+        key: 'from-ai',
+        label: (
+          <MenuItem>
+            <RobotOutlined />
+            AI Assisted
+          </MenuItem>
+        ),
+        onClick: () => {
+          trackEvent('new_resource/create', {type: 'AI', from: 'navigator_header'});
+          dispatch(openNewAiResourceWizard());
+        },
       },
     ],
     [dispatch]

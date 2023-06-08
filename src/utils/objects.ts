@@ -1,5 +1,5 @@
 import fastJsonStableStringify from 'fast-json-stable-stringify';
-import _ from 'lodash';
+import _, {isNil, isObject, omit} from 'lodash';
 
 export function removeNestedEmptyObjects(obj: any): any {
   if (_.isArray(obj)) {
@@ -16,6 +16,29 @@ export function removeNestedEmptyObjects(obj: any): any {
     .omitBy(_.isEmpty)
     .assign(_.omitBy(obj, _.isObject))
     .value();
+}
+
+export function omitDeep(input: any, keysToOmit: string[]): any {
+  function omitDeepOnOwnProps(obj: any): any {
+    if (typeof input === 'undefined') {
+      return input;
+    }
+    if (!Array.isArray(obj) && !isObject(obj)) {
+      return obj;
+    }
+    if (Array.isArray(obj)) {
+      return omitDeep(obj, keysToOmit);
+    }
+    const o: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      o[key] = !isNil(value) ? omitDeep(value, keysToOmit) : value;
+    }
+    return omit(o, ...keysToOmit);
+  }
+  if (Array.isArray(input)) {
+    return input.map(omitDeepOnOwnProps);
+  }
+  return omitDeepOnOwnProps(input);
 }
 
 /**

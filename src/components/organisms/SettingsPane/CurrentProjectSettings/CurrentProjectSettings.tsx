@@ -16,7 +16,6 @@ export const CurrentProjectSettings = () => {
   const dispatch = useAppDispatch();
   const mergedConfig: ProjectConfig = useAppSelector(currentConfigSelector);
   const activeProject: Project | undefined = useAppSelector(activeProjectSelector);
-  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
 
   const changeProjectConfig = useCallback(
     (config: ProjectConfig) => {
@@ -38,7 +37,6 @@ export const CurrentProjectSettings = () => {
       showProjectName
       projectName={activeProject?.name}
       onProjectNameChange={onProjectNameChange}
-      isClusterPaneIconHighlighted={highlightedItems.clusterPaneIcon}
     />
   );
 };

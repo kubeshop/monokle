@@ -2,27 +2,27 @@ import {webFrame} from 'electron';
 
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import path from 'path';
+import path, {sep} from 'path';
 import {Entries} from 'type-fest';
 
 import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import initialState from '@redux/initialState';
-import {previewSavedCommand} from '@redux/services/previewCommand';
 import {stopClusterConnection} from '@redux/thunks/cluster';
-import {previewHelmValuesFile} from '@redux/thunks/previewHelmValuesFile';
-import {previewKustomization} from '@redux/thunks/previewKustomization';
+import {previewHelmValuesFile, previewKustomization, previewSavedCommand} from '@redux/thunks/preview';
 import {setOpenProject} from '@redux/thunks/project';
 import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Project, SavedCommand, SettingsPanel} from '@shared/models/config';
-import {ResourceIdentifier} from '@shared/models/k8sResource';
+import {K8sResource, ResourceIdentifier} from '@shared/models/k8sResource';
 import {
+  ChartInfo,
   ExplorerCollapsibleSectionsType,
-  HighlightItems,
+  HelmChartDetailsTab,
+  HelmRepoMenu,
   LayoutSizeType,
   LearnTopicType,
   LeftMenuBottomSelectionType,
@@ -34,7 +34,11 @@ import {
   StartPageMenuOptions,
   UiState,
 } from '@shared/models/ui';
+import {trackEvent} from '@shared/utils';
 import electronStore from '@shared/utils/electronStore';
+import {generateExpandedPaths} from '@shared/utils/file';
+
+import {selectFile} from './main';
 
 export const uiSlice = createSlice({
   name: 'ui',
@@ -120,6 +124,13 @@ export const uiSlice = createSlice({
       if (action.payload && action.payload.defaultInput) {
         state.newResourceWizard.defaultInput = action.payload.defaultInput;
       }
+    },
+    openNewAiResourceWizard: (state: Draft<UiState>) => {
+      trackEvent('ai/generation/open');
+      state.newAiResourceWizard.isOpen = true;
+    },
+    closeNewAiResourceWizard: (state: Draft<UiState>) => {
+      state.newAiResourceWizard.isOpen = false;
     },
     closeNewResourceWizard: (state: Draft<UiState>) => {
       state.newResourceWizard.isOpen = false;
@@ -342,12 +353,6 @@ export const uiSlice = createSlice({
       state.paneConfiguration = DEFAULT_PANE_CONFIGURATION;
       electronStore.set('ui.paneConfiguration', DEFAULT_PANE_CONFIGURATION);
     },
-    highlightItem: (state: Draft<UiState>, action: PayloadAction<string | null>) => {
-      state.highlightedItems.clusterPaneIcon = action.payload === HighlightItems.CLUSTER_PANE_ICON;
-      state.highlightedItems.createResource = action.payload === HighlightItems.CREATE_RESOURCE;
-      state.highlightedItems.browseTemplates = action.payload === HighlightItems.BROWSE_TEMPLATES;
-      state.highlightedItems.connectToCluster = action.payload === HighlightItems.CONNECT_TO_CLUSTER;
-    },
     openReleaseNotesDrawer: (state: Draft<UiState>) => {
       state.isReleaseNotesDrawerOpen = true;
     },
@@ -379,11 +384,14 @@ export const uiSlice = createSlice({
       state.showOpenProjectAlert = action.payload;
       electronStore.set('ui.showOpenProjectAlert', action.payload);
     },
-    openScaleModal: (state: Draft<UiState>) => {
-      state.isScaleModalOpen = true;
+    openScaleModal: (state: Draft<UiState>, action: PayloadAction<K8sResource>) => {
+      state.scaleModal = {
+        isOpen: true,
+        resource: action.payload,
+      };
     },
     closeScaleModal: (state: Draft<UiState>) => {
-      state.isScaleModalOpen = false;
+      state.scaleModal.isOpen = false;
     },
     closeReleaseNotesDrawer: (state: Draft<UiState>) => {
       state.isReleaseNotesDrawerOpen = false;
@@ -412,6 +420,21 @@ export const uiSlice = createSlice({
     setFileExplorerExpandedFolders: (state: Draft<UiState>, action: PayloadAction<string[]>) => {
       state.fileExplorerExpandedFolders = action.payload;
     },
+    setHelmPaneMenuItem: (state: Draft<UiState>, action: PayloadAction<HelmRepoMenu>) => {
+      state.helmPane.selectedMenuItem = action.payload;
+    },
+    setHelmPaneChartSearch: (state: Draft<UiState>, action: PayloadAction<string>) => {
+      state.helmPane.chartSearchToken = action.payload;
+    },
+    setHelmPaneSelectedChart: (state: Draft<UiState>, action: PayloadAction<ChartInfo | null>) => {
+      state.helmPane.selectedChart = action.payload;
+    },
+    setHelmPaneChartDetailsTab: (state: Draft<UiState>, action: PayloadAction<HelmChartDetailsTab>) => {
+      state.helmPane.chartDetailsTab = action.payload;
+    },
+    toggleHelmPanSearchHub: (state: Draft<UiState>) => {
+      state.helmPane.isSearchHubIncluded = !state.helmPane.isSearchHubIncluded;
+    },
   },
   extraReducers: builder => {
     builder
@@ -432,11 +455,25 @@ export const uiSlice = createSlice({
       .addCase(setRootFolder.rejected, state => {
         state.isFolderLoading = false;
       })
-      .addCase(connectCluster.fulfilled, state => {
+      .addCase(selectFile, (state, action) => {
+        if (!action.payload.filePath) {
+          return;
+        }
+
+        const items = action.payload.filePath.split(sep).filter(item => item);
+        state.fileExplorerExpandedFolders = [
+          ...state.fileExplorerExpandedFolders,
+          ...generateExpandedPaths(items, state.fileExplorerExpandedFolders),
+        ];
+      })
+      .addCase(connectCluster.fulfilled, (state, action) => {
         state.leftMenu.activityBeforeClusterConnect = state.leftMenu.selection;
-        state.leftMenu.selection = 'dashboard';
         state.leftMenu.isActive = true;
         state.navigator.collapsedResourceKinds = [];
+
+        if (!action.payload.reload) {
+          state.leftMenu.selection = 'dashboard';
+        }
       })
       .addCase(stopClusterConnection.fulfilled, state => {
         state.leftMenu.selection = state.leftMenu.activityBeforeClusterConnect ?? 'explorer';
@@ -473,6 +510,7 @@ export const {
   closeFiltersPresetModal,
   closeFolderExplorer,
   closeKeyboardShortcutsModal,
+  closeNewAiResourceWizard,
   closeNewResourceWizard,
   closeQuickSearchActionsPopup,
   closeReleaseNotesDrawer,
@@ -490,7 +528,6 @@ export const {
   expandKustomizeKinds,
   expandResourceKinds,
   hideNewVersionNotice,
-  highlightItem,
   openAboutModal,
   openCreateFileFolderModal,
   openCreateProjectModal,
@@ -498,6 +535,7 @@ export const {
   openFiltersPresetModal,
   openFolderExplorer,
   openKeyboardShortcutsModal,
+  openNewAiResourceWizard,
   openNewResourceWizard,
   openQuickSearchActionsPopup,
   openReleaseNotesDrawer,
@@ -546,5 +584,10 @@ export const {
   openScaleModal,
   closeScaleModal,
   setIsInQuickClusterMode,
+  setHelmPaneMenuItem,
+  setHelmPaneChartSearch,
+  setHelmPaneSelectedChart,
+  setHelmPaneChartDetailsTab,
+  toggleHelmPanSearchHub,
 } = uiSlice.actions;
 export default uiSlice.reducer;

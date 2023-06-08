@@ -20,7 +20,6 @@ import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 export function ConnectButton() {
   const dispatch = useAppDispatch();
   const kubeConfig = useAppSelector(selectKubeconfig);
-  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isStartProjectPaneVisible = useAppSelector(state => state.ui.isStartProjectPaneVisible);
   const clusterConnection = useAppSelector(state => state.main.clusterConnection);
   const clusterConnectionOptions = useAppSelector(state => state.main.clusterConnectionOptions);
@@ -62,11 +61,7 @@ export function ConnectButton() {
 
   return (
     <Tooltip title="Connect to cluster">
-      <ConnectBtn
-        disabled={!kubeConfig?.isValid}
-        className={highlightedItems.connectToCluster ? 'animated-highlight' : ''}
-        onClick={loadOrReload}
-      >
+      <ConnectBtn disabled={!kubeConfig?.isValid} onClick={loadOrReload}>
         <ApiOutlined />
       </ConnectBtn>
     </Tooltip>

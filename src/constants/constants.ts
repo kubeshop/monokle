@@ -53,7 +53,7 @@ export const PANE_CONSTRAINT_VALUES = {
 };
 
 export const HELM_CHART_ENTRY_FILE = 'Chart.yaml';
-export const HELM_CHART_SECTION_NAME = 'Helm Charts';
+export const HELM_CHART_SECTION_NAME = 'Local Helm Charts';
 export const HELM_TEMPLATE_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_template/#options';
 export const HELM_INSTALL_OPTIONS_DOCS_URL = 'https://helm.sh/docs/helm/helm_install/#options';
 
@@ -62,6 +62,7 @@ export const VALID_URL_REGEX =
   /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi;
 export const VALID_IMAGE_NAME_REGEX =
   /^(?:(?=[^:\/]{1,253})(?!-)[a-zA-Z0-9-]{1,63}(?<!-)(?:\\.(?!-)[a-zA-Z0-9-]{1,63}(?<!-))*(?::[0-9]{1,5})?\/)?((?![._-])(?:[a-z0-9._-]*)(?<![._-])(?:\/(?![._-])[a-z0-9._-]*(?<![._-]))*)(?::(?![.-])[a-zA-Z0-9_.-]{1,128})?$/;
+export const VALID_RESOURCE_NAME_REGEX = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
 export const ADDITIONAL_SUPPORTED_FILES = [
   '.monokle',
   '.gitignore',

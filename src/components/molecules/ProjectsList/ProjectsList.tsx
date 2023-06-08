@@ -9,38 +9,28 @@ import {orderBy, size} from 'lodash';
 import {activeProjectSelector, sortProjects} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 
+import thunderIcon from '@assets/figures/thunderIcon.svg';
+
 import ProjectCard from '../ProjectCard';
 import * as S from './ProjectsList.styled';
-
-type IProps = {
-  type: 'all' | 'recent';
-};
 
 type FiltersType = 'all' | 'local' | 'git';
 type CreationFiltersType = 'last-created' | 'first-created' | 'name-asc' | 'name-desc' | 'last-opened';
 
-const ProjectsList: React.FC<IProps> = props => {
-  const {type} = props;
-
+const ProjectsList: React.FC = () => {
   const activeProject = useAppSelector(activeProjectSelector);
-  const currentProjects = useAppSelector(state => {
-    let projects = sortProjects(state.config.projects, Boolean(activeProject));
+  const allProjects = useAppSelector(state => state.config.projects);
 
-    if (type === 'recent') {
-      projects = projects.slice(0, 5);
-    }
-
-    return projects;
-  });
+  const currentProjects = useMemo(
+    () => sortProjects(allProjects, Boolean(activeProject)),
+    [activeProject, allProjects]
+  );
 
   const [typeFilter, setTypeFilter] = useState<FiltersType>('all');
-  const [creationFilter, setCreationFilter] = useState<CreationFiltersType>('last-created');
+  const [creationFilter, setCreationFilter] = useState<CreationFiltersType>('last-opened');
+  const [searchInput, setSearchInput] = useState<string>('');
 
   const filteredAndSortedProjects = useMemo(() => {
-    if (type === 'recent') {
-      return currentProjects;
-    }
-
     let projects = orderBy(
       currentProjects,
       creationFilter === 'last-created' || creationFilter === 'first-created'
@@ -55,17 +45,22 @@ const ProjectsList: React.FC<IProps> = props => {
     );
 
     if (typeFilter === 'all') {
-      return projects;
+      return searchInput.trim() === ''
+        ? projects
+        : projects.filter(p => p.name?.toLowerCase().includes(searchInput.toLowerCase()));
     }
 
     if (typeFilter === 'git') {
-      return projects.filter(p => p.isGitRepo);
+      return searchInput.trim() === ''
+        ? projects.filter(p => p.isGitRepo)
+        : projects.filter(p => p.name?.toLowerCase().includes(searchInput.toLowerCase()) && p.isGitRepo);
     }
+    return searchInput.trim() === ''
+      ? projects.filter(p => !p.isGitRepo)
+      : projects.filter(p => p.name?.toLowerCase().includes(searchInput.toLowerCase()) && !p.isGitRepo);
+  }, [creationFilter, currentProjects, typeFilter, searchInput]);
 
-    return projects.filter(p => !p.isGitRepo);
-  }, [creationFilter, currentProjects, type, typeFilter]);
-
-  if (size(filteredAndSortedProjects) === 0) {
+  if (size(filteredAndSortedProjects) === 0 && searchInput.trim() === '') {
     return (
       <S.EmptyList>
         Click on
@@ -82,7 +77,7 @@ const ProjectsList: React.FC<IProps> = props => {
 
   return (
     <>
-      {type === 'all' && (
+      <S.SortFilterAndSearchContainer>
         <S.SortAndFiltersContainer>
           <S.Select
             dropdownMatchSelectWidth={false}
@@ -126,7 +121,19 @@ const ProjectsList: React.FC<IProps> = props => {
             </Select.Option>
           </S.Select>
         </S.SortAndFiltersContainer>
-      )}
+
+        <S.SearchInputBar>
+          {/* <ThunderboltFilled style={{color: `${Colors.grey7}`}} /> */}
+          <S.ThunderIcon src={thunderIcon} />
+          <S.SearchInput
+            placeholder="Quick project search"
+            value={searchInput}
+            onChange={e => {
+              setSearchInput(e.target.value);
+            }}
+          />
+        </S.SearchInputBar>
+      </S.SortFilterAndSearchContainer>
 
       <S.ProjectsListContainer>
         {filteredAndSortedProjects.map(project => (
@@ -134,8 +141,12 @@ const ProjectsList: React.FC<IProps> = props => {
             key={project.rootFolder}
             isActive={project.rootFolder === activeProject?.rootFolder}
             project={project}
+            query={searchInput}
           />
         ))}
+        {size(filteredAndSortedProjects) === 0 && searchInput.trim() !== '' && (
+          <S.NoProjectsFoundContainer>No matching projects found</S.NoProjectsFoundContainer>
+        )}
       </S.ProjectsListContainer>
     </>
   );

@@ -27,7 +27,8 @@ export function createTransientResource(
   input: {name: string; kind: string; apiVersion: string; namespace?: string},
   dispatch: AppDispatch,
   createdIn: 'local' | 'cluster',
-  jsonTemplate?: Partial<K8sObject>
+  jsonTemplate?: Partial<K8sObject>,
+  saveToFileOrFolder?: boolean
 ) {
   const newResourceId = uuidv4();
   let newResourceText: string;
@@ -76,7 +77,10 @@ export function createTransientResource(
     object: newResourceObject,
     isClusterScoped: getResourceKindHandler(input.kind)?.isNamespaced || false,
   };
-  dispatch(addResource(newResource));
+
+  if (!saveToFileOrFolder) {
+    dispatch(addResource(newResource));
+  }
 
   return newResource;
 }

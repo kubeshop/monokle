@@ -40,6 +40,12 @@ const StartPage: React.FC = () => {
     dispatch(toggleStartProjectPane());
   };
 
+  const onClickBrowseHelmCharts = () => {
+    dispatch(setIsInQuickClusterMode(true));
+    dispatch(setLeftMenuSelection('helm'));
+    dispatch(toggleStartProjectPane());
+  };
+
   useEffect(() => {
     if (!isStartPageLearnVisible || selectedOption === 'learn') {
       return;
@@ -49,8 +55,8 @@ const StartPage: React.FC = () => {
   }, [dispatch, isStartPageLearnVisible, selectedOption]);
 
   useEffect(() => {
-    if (projects.length && selectedOption !== 'recent-projects' && !isFromBackToStart) {
-      dispatch(setStartPageMenuOption('recent-projects'));
+    if (projects.length && selectedOption !== 'projects' && !isFromBackToStart) {
+      dispatch(setStartPageMenuOption('projects'));
     }
 
     if (isFromBackToStart) {
@@ -75,6 +81,10 @@ const StartPage: React.FC = () => {
 
                 if (key === 'quick-cluster-mode') {
                   onClickQuickClusterLoad();
+                  return;
+                }
+                if (key === 'helm-pane') {
+                  onClickBrowseHelmCharts();
                   return;
                 }
 

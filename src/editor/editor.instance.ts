@@ -18,6 +18,9 @@ let nextSelection: monaco.IRange | undefined;
 let isRecreatingModel = false;
 let editorType: 'local' | 'cluster' | undefined;
 let hasTypedInEditor = false;
+let hasModelContentChanged = false;
+
+export const didEditorContentChange = () => hasModelContentChanged;
 
 const modelContentChangeListeners: ((e: monaco.editor.IModelContentChangedEvent) => any)[] = [];
 
@@ -38,6 +41,7 @@ export const mountEditor = (props: {element: HTMLElement; type: 'local' | 'clust
   });
   EDITOR.onDidChangeModelContent(e => {
     modelContentChangeListeners.forEach(listener => listener(e));
+    hasModelContentChanged = true;
   });
   EDITOR.onDidChangeCursorPosition(() => {
     if (!isRecreatingModel) {
@@ -52,6 +56,7 @@ export const unmountEditor = () => {
   EDITOR?.dispose();
   EDITOR = undefined;
   hasTypedInEditor = false;
+  hasModelContentChanged = false;
 };
 
 export const resetEditor = () => {
@@ -59,6 +64,7 @@ export const resetEditor = () => {
   clearEditorLinks();
   clearEditorCommands();
   clearEditorDecorations();
+  hasModelContentChanged = false;
 };
 
 const consumeNextSelection = () => {

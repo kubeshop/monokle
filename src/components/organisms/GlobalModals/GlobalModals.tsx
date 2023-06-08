@@ -40,8 +40,10 @@ const RenameResourceModal = React.lazy(() => import('@organisms/RenameResourceMo
 const ReplaceImageModal = React.lazy(() => import('@organisms/ReplaceImageModal'));
 const SaveEditCommandModal = React.lazy(() => import('@organisms/SaveEditCommandModal'));
 const SaveResourcesToFileFolderModal = React.lazy(() => import('@molecules/SaveResourcesToFileFolderModal'));
+const ScaleModal = React.lazy(() => import('@organisms/ScaleModal'));
 const TemplateExplorer = React.lazy(() => import('@organisms/TemplateExplorer'));
 const WelcomeModal = React.lazy(() => import('@organisms/WelcomeModal'));
+const AIGenerationModal = React.lazy(() => import('@molecules/AIGenerationModal'));
 
 const GlobalModals = () => {
   const dispatch = useAppDispatch();
@@ -71,7 +73,9 @@ const GlobalModals = () => {
   const isTemplateExplorerVisible = useAppSelector(state => state.ui.templateExplorer.isVisible);
   const projects: Project[] = useAppSelector(state => state.config.projects);
   const targetResourceId = useAppSelector(state => state.main.resourceDiff.targetResourceId);
+  const isScaleModalVisible = useAppSelector(state => state.ui.scaleModal.isOpen);
   const isWelcomeModalVisible = useAppSelector(state => state.ui.welcomeModal.isVisible);
+  const isNewAiResourceWizardVisible = useAppSelector(state => state.ui.newAiResourceWizard.isOpen);
 
   const isClusterResourceDiffModalVisible = useMemo(
     () => Boolean(targetResourceId) && isInClusterMode,
@@ -187,6 +191,8 @@ const GlobalModals = () => {
         {isRenameResourceModalVisible && <RenameResourceModal />}
         {isReplaceImageModalVisible && <ReplaceImageModal />}
         {isSaveEditCommandModalVisible && <SaveEditCommandModal />}
+        {isNewAiResourceWizardVisible && <AIGenerationModal />}
+        {isScaleModalVisible && <ScaleModal />}
         {isSaveResourcesToFileFolderModalVisible && <SaveResourcesToFileFolderModal />}
         {showReleaseNotes && (
           <Modal

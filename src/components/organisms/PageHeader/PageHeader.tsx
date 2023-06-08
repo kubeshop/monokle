@@ -26,8 +26,8 @@ import {
   toggleStartProjectPane,
 } from '@redux/reducers/ui';
 import {monitorGitFolder} from '@redux/services/gitFolderMonitor';
-import {stopPreview} from '@redux/services/preview';
 import store from '@redux/store';
+import {stopPreview} from '@redux/thunks/preview';
 
 import {BranchSelect, NewVersionNotice} from '@molecules';
 
@@ -93,7 +93,7 @@ const PageHeader = () => {
     }
 
     if (isInClusterModeRef.current) {
-      stopPreview(dispatch);
+      dispatch(stopPreview());
     }
 
     dispatch(setStartPageMenuOption(startPageSelectedMenuOption.current));
@@ -157,7 +157,7 @@ const PageHeader = () => {
     }
 
     if (isInClusterModeRef.current) {
-      stopPreview(dispatch);
+      dispatch(stopPreview());
     }
   };
 

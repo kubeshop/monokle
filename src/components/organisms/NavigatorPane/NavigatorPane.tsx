@@ -2,26 +2,32 @@ import {useCallback, useMemo} from 'react';
 
 import {Dropdown, Tooltip} from 'antd';
 
-import {PlusOutlined} from '@ant-design/icons';
+import AntdIcon from '@ant-design/icons';
 
 import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
-import {DisabledAddResourceTooltip, NewResourceTooltip} from '@constants/tooltips';
+import {
+  CollapseResourcesTooltip,
+  DisabledAddResourceTooltip,
+  ExpandResourcesTooltip,
+  NewResourceTooltip,
+} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
-import {navigatorResourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
+import {activeResourceCountSelector, navigatorResourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
 
 import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
+import {CollapseIcon, ExpandIcon} from '@components/atoms/Icons';
 import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
 
 import {useNewResourceMenuItems} from '@hooks/menuItemsHooks';
 
-import {useRefSelector} from '@utils/hooks';
+import {useSelectorWithRef} from '@utils/hooks';
 
-import {Icon, TitleBar} from '@monokle/components';
+import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils';
@@ -36,7 +42,6 @@ const NavPane: React.FC = () => {
 
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
   const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
-  const highlightedItems = useAppSelector(state => state.ui.highlightedItems);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
@@ -52,11 +57,6 @@ const NavPane: React.FC = () => {
   const resourceFilterButtonHandler = useCallback(() => {
     dispatch(toggleResourceFilters());
   }, [dispatch]);
-
-  const isHighlighted = useMemo(
-    () => Boolean(highlightedItems.createResource || highlightedItems.browseTemplates),
-    [highlightedItems.browseTemplates, highlightedItems.createResource]
-  );
 
   return (
     <S.NavigatorPaneContainer>
@@ -91,16 +91,14 @@ const NavPane: React.FC = () => {
                         : NewResourceTooltip
                     }
                   >
-                    <S.PlusButton
+                    <S.NewButton
                       id="create-resource-button"
-                      $disabled={isAddResourceDisabled}
-                      $highlighted={isHighlighted}
-                      className={isHighlighted ? 'animated-highlight' : ''}
                       disabled={isAddResourceDisabled}
-                      icon={<PlusOutlined />}
                       size="small"
-                      type="link"
-                    />
+                      type="primary"
+                    >
+                      New
+                    </S.NewButton>
                   </Tooltip>
                 </Dropdown>
               </S.TitleBarRightButtons>
@@ -122,28 +120,58 @@ export default NavPane;
 
 function CollapseAction() {
   const dispatch = useAppDispatch();
-  const navigatorKinds = useRefSelector(navigatorResourceKindsSelector);
-  const collapsedKinds = useRefSelector(s => s.ui.navigator.collapsedResourceKinds);
+  const [hasAnyActiveResources, hasAnyActiveResourcesRef] = useSelectorWithRef(
+    state => activeResourceCountSelector(state) > 0
+  );
+
+  const [collapsedKinds, collapsedKindsRef] = useSelectorWithRef(s => s.ui.navigator.collapsedResourceKinds);
+  const [navigatorKinds, navigatorKindsRef] = useSelectorWithRef(navigatorResourceKindsSelector);
+
+  const isCollapsed = useMemo(
+    () => collapsedKinds.length === navigatorKinds.length,
+    [collapsedKinds.length, navigatorKinds.length]
+  );
 
   const onClick = useCallback(() => {
-    if (collapsedKinds.current.length === navigatorKinds.current.length) {
-      dispatch(expandResourceKinds(navigatorKinds.current));
+    if (!hasAnyActiveResourcesRef.current) {
+      return;
+    }
+
+    if (collapsedKindsRef.current.length === navigatorKindsRef.current.length) {
+      dispatch(expandResourceKinds(navigatorKindsRef.current));
       trackEvent('navigator/expand_all');
       return;
     }
-    dispatch(collapseResourceKinds(navigatorKinds.current));
+
+    dispatch(collapseResourceKinds(navigatorKindsRef.current));
     trackEvent('navigator/collapse_all');
-  }, [dispatch, collapsedKinds, navigatorKinds]);
+  }, [hasAnyActiveResourcesRef, collapsedKindsRef, navigatorKindsRef, dispatch]);
 
   return (
-    <CollapseIconWrapper onClick={onClick}>
-      <Icon name="collapse" />
-    </CollapseIconWrapper>
+    <>
+      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandResourcesTooltip : CollapseResourcesTooltip}>
+        {isCollapsed ? (
+          <StyledFullscreenOutlined component={ExpandIcon} onClick={onClick} $disabled={!hasAnyActiveResources} />
+        ) : (
+          <StyledFullscreenExitOutlined component={CollapseIcon} onClick={onClick} $disabled={!hasAnyActiveResources} />
+        )}
+      </Tooltip>
+    </>
   );
 }
 
-const CollapseIconWrapper = styled.div`
-  color: ${Colors.blue6};
-  cursor: pointer;
-  padding-right: 8px;
+// Styled Components
+
+const StyledFullscreenOutlined = styled(AntdIcon)<{$disabled: boolean}>`
+  color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.blue6)};
+  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
+  padding-right: 10px;
+  font-size: 16px;
+`;
+
+const StyledFullscreenExitOutlined = styled(AntdIcon)<{$disabled: boolean}>`
+  color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.blue6)};
+  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
+  padding-right: 10px;
+  font-size: 16px;
 `;

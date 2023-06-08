@@ -8,6 +8,7 @@ import {setDashboardSelectedResourceId} from '@redux/dashboard';
 import {AppListenerFn} from '@redux/listeners/base';
 import {selectFile, selectHelmValuesFile, selectResource} from '@redux/reducers/main';
 import {selectedFilePathSelector} from '@redux/selectors';
+import {getSelectedHelmValuesFilePath} from '@redux/selectors/helmGetters';
 import {getResourceContentFromState, getResourceMetaFromState} from '@redux/selectors/resourceGetters';
 import {editorResourceIdentifierSelector} from '@redux/selectors/resourceSelectors';
 import {isKustomizationPatch} from '@redux/services/kustomize';
@@ -17,13 +18,12 @@ import {getResourceSchema, getSchemaForPath} from '@redux/services/schema';
 import {MONACO_YAML_BASE_DIAGNOSTICS_OPTIONS} from '@editor/editor.constants';
 import {getEditor, getEditorType, recreateEditorModel} from '@editor/editor.instance';
 import {editorMounted} from '@editor/editor.slice';
-import {editorEnhancers} from '@editor/enhancers';
+import {applyResourceEnhancers} from '@editor/enhancers';
 import {helmTemplateFileEnhancer} from '@editor/enhancers/helm/templates';
 import {helmValuesFileEnhancer} from '@editor/enhancers/helm/valuesFile';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {ResourceIdentifier, ResourceMeta} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
-import {isHelmValuesFileSelection} from '@shared/models/selection';
 
 export const editorSelectionListener: AppListenerFn = listen => {
   listen({
@@ -34,6 +34,8 @@ export const editorSelectionListener: AppListenerFn = listen => {
       const rootFolderPath = getState().main.fileMap[ROOT_FILE_ENTRY]?.filePath;
       const editor = getEditor();
       const editorType = getEditorType();
+      const selectedHelmValuesFilePath = getSelectedHelmValuesFilePath(getState());
+      const selectedFilePath = selectedFilePathSelector(getState()) ?? selectedHelmValuesFilePath;
 
       if (!editor || (editorType === 'local' && !rootFolderPath)) {
         return;
@@ -69,10 +71,13 @@ export const editorSelectionListener: AppListenerFn = listen => {
           });
         }
 
-        const promises = editorEnhancers.map(enhancer =>
-          Promise.resolve(enhancer({state: getState(), editor, resourceIdentifier, dispatch}))
-        );
-        await Promise.all(promises);
+        await applyResourceEnhancers({
+          state: getState(),
+          dispatch,
+          editor,
+          resourceIdentifier,
+        });
+
         return;
       }
 
@@ -80,8 +85,6 @@ export const editorSelectionListener: AppListenerFn = listen => {
         return;
       }
 
-      const selectedHelmValuesFilePath = getSelectedHelmValuesFilePath(getState());
-      const selectedFilePath = selectedFilePathSelector(getState()) ?? selectedHelmValuesFilePath;
       if (!resourceIdentifier && selectedFilePath) {
         const fileText = await readFile(join(rootFolderPath, selectedFilePath), 'utf8');
         recreateEditorModel(editor, fileText);
@@ -95,18 +98,6 @@ export const editorSelectionListener: AppListenerFn = listen => {
       }
     },
   });
-};
-
-const getSelectedHelmValuesFilePath = (state: RootState) => {
-  const selection = state.main.selection;
-  if (!isHelmValuesFileSelection(selection)) {
-    return undefined;
-  }
-  const helmValuesFile = state.main.helmValuesMap[selection.valuesFileId];
-  if (!helmValuesFile) {
-    return undefined;
-  }
-  return helmValuesFile.filePath;
 };
 
 const enableResourceSchemaValidation = (resourceMeta: ResourceMeta, state: RootState) => {

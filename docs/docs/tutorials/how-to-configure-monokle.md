@@ -1,70 +1,83 @@
 # How to Configure Monokle
 
-In this tutorial, we will show the steps to configure the Monokle Environment. 
+Getting started with Monokle is easy.
 
-<em>**Note:** All settings are initialised with default values - there is no immediate need to change them. </em>
+Configure your Monokle Environment in a few minutes by following this step-by-step configuration guide.
+
+<em>**Note:** All settings are initialized with default values - there is no immediate need to change them. </em>
 
 Let’s get started! 
 
 ## **1. Open Settings**
 
-Launch Monokle and click on the **Settings** button to access the Settings widget:
+Launch Monokle. Then. click on the **Settings** button to access the Settings widget:
 
-![Settings](img/settings-1.9.png)
+![Settings](img/settings-2.0.jpeg)
 
 ## **2. Set kubeconfig**
 
 Enter the kubeconfig file path in the KUBECONFIG text field. The kubeconfig parameter is used when viewing cluster
-resources and deploying/diffing local resources to a cluster.
+resources, deploying, and/or diffing local resources with cluster resources.
 
-![Kubeconfig](img/kubeconfig-1.9.png)
+![Kubeconfig](img/kubeconfig-2.0.jpeg)
 
-Alternatively, you can click on the **Browse** button to fetch the kubeconfig file for configuring cluster access. 
+Alternatively, you can click on the Browse button to fetch the kubeconfig file for configuring cluster access.
 
-![Browse](img/browse-1.9.png)
+![Browse](img/browse-2.0.jpeg)
 
-Select the required folder to configure the cluster. 
+To configure your cluster, select the required folder.
 
-![Folders](img/folders-4.png)
+![Folders](img/folders-2.0.png)
 
 <em>**Note:** The kubectl command-line tool uses kubeconfig files to find the information for choosing a cluster and communicating with the API server.</em>
 
 ## **3. Files: Include**
 
-Monokle will look for Kubernetes manifests in files matching this filter, by default this is set to *.yaml/*.yml files.
+Monokle will look for Kubernetes manifests in files matching the chosen filter, by default this is set to *.yaml/*.yml files.
 Click on the **Add Pattern** button to include the files having the corresponding extension.
 
-![Add pattern](img/add-pattern-1.9.png)
+![Add pattern](img/add-pattern-2.0.jpeg)
 
-Enter the extension pattern in the Files Include textbox and click **OK**. 
+Enter the extension pattern in the Files Include textbox. When finished, click **OK**. 
 
-![Ok](img/ok-1.9.png)
+![Ok](img/ok-2.0.jpeg)
+
+To reflect all changes, click on Apply. For deleting any extension pattern, hover over the extension, and click on the Delete icon. Then, click on Apply to ensure the change is made.
+
 
 ## **4. Files: Exclude**
 
-Monokle will ignore files/folders matching any of the specified paths, even if they match an above inclusion pattern.
-Click on the **Add Pattern** button to exclude the files having the corresponding extension. For example, node_modules.
+To ignore specified files, folders or paths, click on the **Add Pattern** button and configure the pattern, files, or folders you want to exclude by including the corresponding extension. For example, node_modules.
 
-![Add pattern](img/add-pattern-7-1.9.png)
+![Add pattern](img/add-pattern-2.0.jpeg)
 
-Enter the extension pattern in the Files Exclude textbox and hit the OK button. 
+Enter the extension pattern in the Files Exclude textbox and then, click the OK button. 
 
-![Ok](img/ok-8-1.9.png)
+![Ok](img/ok-2.0.jpeg)
+
+Select Apply changes to ensure the changes have been saved and are reflected in your configuration.
+
+For deleting any extension pattern at a later time, hover over the extension, click on the delete icon, and then, click Apply to save the changes made.
+
 
 ## **5. Helm Preview Mode**
 
-Click on the Helm Preview Mode dropdown to select any of the viewing states. The options for preview:
+Click on the Helm Preview Mode dropdown to select viewing states. The options for previews are:
 
-- **Template** - To use the [Helm Template command](https://helm.sh/docs/helm/helm_template/)
-- **Install** - To use the [Helm Install command](https://helm.sh/docs/helm/helm_install/)
+- **Template** - [Helm Template command](https://helm.sh/docs/helm/helm_template/)
+- **Install** - [Helm Install command](https://helm.sh/docs/helm/helm_install/)
 
-![Helm](img/helm-9.png)
+![Helm](img/helm-2.0.jpeg)
 
-## **6. On Startup**
+## **6. Kustomize Command**
 
-Tick the **Automatically Load Last Folder** checkbox to reload the last reviewed folder when launching Monokle. 
+Click on the Kustomize Command dropdown to select the necessary command for kustomizations. The options for the command are:
 
-![Startup](img/startup-1.9.png)
+- Use [kubectl](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/)
+- Use [kustomize](https://kubectl.docs.kubernetes.io/references/kustomize/cmd/)
+
+Review these 6 configuration settings as needed to keep Monokle customized to your needs.
+
 
 ## **Questions or Comments?**
 

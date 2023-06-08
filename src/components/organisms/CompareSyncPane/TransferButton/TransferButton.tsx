@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
 
-import {Button} from 'antd';
+import {Button, Modal} from 'antd';
 
 import {ArrowLeftOutlined, ArrowRightOutlined} from '@ant-design/icons';
 
@@ -43,8 +43,14 @@ const TransferButton: React.FC<Props> = ({side}) => {
   });
 
   const handleTransfer = useCallback(() => {
-    dispatch(transferResource({ids, direction}));
-  }, [direction, dispatch, ids]);
+    Modal.confirm({
+      title: `Are you sure you want to ${buttonLabel.toLowerCase()}?`,
+      onOk() {
+        dispatch(transferResource({ids, direction}));
+      },
+      onCancel() {},
+    });
+  }, [buttonLabel, direction, dispatch, ids]);
 
   if (status === 'selecting') {
     return null;

@@ -23,16 +23,16 @@ export const selectPreviewDisplayContent = (state: RootState): PreviewDisplayCon
     case 'helm': {
       const helmId = preview.chartId;
       const helmChart = state.main.helmChartMap[helmId];
-      if (!helmChart) return {name: 'Helm Chart', description: 'You are previewing a Helm Chart.'};
+      if (!helmChart) return {name: 'Helm Chart', description: 'You are dry-running a Helm Chart.'};
       return {
         name: helmChart.name,
-        description: `You are previewing ${helmChart.name} located at ${helmChart.filePath}.`,
+        description: `You are dry-running ${helmChart.name} located at ${helmChart.filePath}.`,
       };
     }
     case 'helm-config': {
       const helmId = preview.configId;
       const helmConfig = state.config.projectConfig?.helm?.previewConfigurationMap?.[helmId];
-      if (!helmConfig) return {name: 'Helm Chart', description: 'You are previewing a Helm Chart.'};
+      if (!helmConfig) return {name: 'Helm Chart', description: 'You are dry-running a Helm Chart.'};
       const helmChart = state.main.helmChartMap[helmId];
       return {
         name: helmConfig.name,
@@ -47,12 +47,12 @@ export const selectPreviewDisplayContent = (state: RootState): PreviewDisplayCon
       if (!isLocalResourceMeta(kustomization)) {
         return {
           name: 'Kustomize overlay',
-          description: `You are previewing a Kustomize overlay.`,
+          description: `You are dry-running a Kustomize overlay.`,
         };
       }
       return {
         name: 'Kustomize overlay',
-        description: `You are previewing a Kustomize overlay located at ${kustomization.origin.filePath}.`,
+        description: `You are dry-running a Kustomize overlay located at ${kustomization.origin.filePath}.`,
       };
     }
     default:

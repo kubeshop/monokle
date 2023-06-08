@@ -12,8 +12,8 @@ import {
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 import {useResource} from '@redux/selectors/resourceSelectors';
-import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
 import {isKustomizationPreviewed, isResourceSelected} from '@redux/services/resource';
+import {restartPreview, startPreview, stopPreview} from '@redux/thunks/preview';
 
 import {QuickActionCompare, QuickActionPreview} from '@components/molecules';
 
@@ -52,9 +52,9 @@ const KustomizeQuickAction: React.FC<IProps> = props => {
       dispatch(selectResource({resourceIdentifier: {id: thisKustomization.id, storage: 'local'}}));
     }
     if (!isThisPreviewed) {
-      startPreview({type: 'kustomize', kustomizationId: id}, dispatch);
+      dispatch(startPreview({type: 'kustomize', kustomizationId: id}));
     } else {
-      stopPreview(dispatch);
+      dispatch(stopPreview());
     }
   }, [thisKustomization, selectionRef, isThisPreviewed, dispatch, id]);
 
@@ -63,7 +63,7 @@ const KustomizeQuickAction: React.FC<IProps> = props => {
       dispatch(selectResource({resourceIdentifier: {id: thisKustomization.id, storage: 'local'}}));
     }
 
-    restartPreview({type: 'kustomize', kustomizationId: id}, dispatch);
+    dispatch(restartPreview({type: 'kustomize', kustomizationId: id}));
   }, [thisKustomization, selectionRef, id, dispatch]);
 
   useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {

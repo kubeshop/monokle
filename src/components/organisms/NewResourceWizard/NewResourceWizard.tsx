@@ -12,13 +12,14 @@ import {first} from 'lodash';
 import path from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {closeNewResourceWizard} from '@redux/reducers/ui';
 import {registeredKindHandlersSelector} from '@redux/selectors/resourceKindSelectors';
 import {useResourceContentMapRef, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {joinK8sResource} from '@redux/services/resource';
 import {getResourceKindSchema} from '@redux/services/schema';
 import {createTransientResource} from '@redux/services/transientResource';
-import {saveTransientResources} from '@redux/thunks/saveTransientResources';
+import {saveResourceToFileFolder} from '@redux/thunks/saveResourceToFileFolder';
 
 import {useFileSelectOptions} from '@hooks/useFileSelectOptions';
 import {useFileFolderTreeSelectData} from '@hooks/useFolderTreeSelectData';
@@ -30,12 +31,15 @@ import {getResourceKindHandler} from '@src/kindhandlers';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {hotkeys} from '@shared/constants/hotkeys';
+import {AlertEnum} from '@shared/models/alert';
 import {FileMapType} from '@shared/models/appState';
 import {FileEntry} from '@shared/models/fileEntry';
 import {K8sResource, ResourceMeta} from '@shared/models/k8sResource';
+import {ResourceSavingDestination} from '@shared/models/resourceCreate';
 import {ResourceKindHandler} from '@shared/models/resourceKindHandler';
 import {NewResourceWizardInput} from '@shared/models/ui';
 import {openNamespaceTopic, openUniqueObjectNameTopic} from '@shared/utils/shell';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {FileCategoryLabel, FileNameLabel, SaveDestinationWrapper, StyledSelect} from './NewResourceWizard.styled';
 
@@ -93,7 +97,8 @@ const NewResourceWizard = () => {
   const [isResourceKindNamespaced, setIsResourceKindNamespaced] = useState<boolean>(true);
   const [isSubmitDisabled, setSubmitDisabled] = useState(true);
   const [exportFileName, setExportFileName] = useState<string | undefined>('');
-  const [savingDestination, setSavingDestination, savingDestinationRef] = useStateWithRef<string>('doNotSave');
+  const [savingDestination, setSavingDestination, savingDestinationRef] =
+    useStateWithRef<ResourceSavingDestination>('doNotSave');
   const [selectedFile, setSelectedFile, selectedFileRef] = useStateWithRef<string | undefined>(undefined);
   const [selectedFolder, setSelectedFolder, selectedFolderRef] = useStateWithRef(ROOT_FILE_ENTRY);
   const [generateRandom, setGenerateRandom, generateRandomRef] = useStateWithRef<boolean>(false);
@@ -227,7 +232,7 @@ const NewResourceWizard = () => {
       setSavingDestination('saveToFolder');
       setSelectedFolder(defaultInput.targetFolder);
     } else if (defaultInput?.targetFile && isFolderOpen) {
-      setSavingDestination('saveToFile');
+      setSavingDestination('appendToFile');
       setSelectedFile(defaultInput.targetFile);
     } else {
       setSavingDestination('doNotSave');
@@ -420,8 +425,11 @@ const NewResourceWizard = () => {
       },
       dispatch,
       'local',
-      jsonTemplate
+      jsonTemplate,
+      savingDestinationRef.current !== 'doNotSave' ? true : undefined
     );
+
+    trackEvent('create/resource', {resourceKind: newResource.kind});
 
     if (savingDestinationRef.current !== 'doNotSave') {
       let absolutePath;
@@ -432,19 +440,22 @@ const NewResourceWizard = () => {
           selectedFolderRef.current === ROOT_FILE_ENTRY
             ? path.join(rootFolderEntryRef.current.filePath, path.sep, fullFileName)
             : path.join(rootFolderEntryRef.current.filePath, selectedFolderRef.current, path.sep, fullFileName);
-      } else if (savingDestinationRef.current === 'saveToFile' && selectedFileRef.current) {
+      } else if (savingDestinationRef.current === 'appendToFile' && selectedFileRef.current) {
         absolutePath = path.join(rootFolderEntryRef.current.filePath, selectedFileRef.current);
       } else {
         absolutePath = path.join(rootFolderEntryRef.current.filePath, path.sep, fullFileName);
       }
 
-      dispatch(
-        saveTransientResources({
-          resourcePayloads: [{resource: newResource, absolutePath}],
-          saveMode: savingDestinationRef.current === 'saveToFolder' ? savingDestinationRef.current : 'appendToFile',
-        })
-      );
+      dispatch(saveResourceToFileFolder({resource: newResource, absolutePath, saveMode: savingDestinationRef.current}));
     }
+
+    dispatch(
+      setAlert({
+        title: 'Resource created',
+        message: `Successfully created ${newResource.name}`,
+        type: AlertEnum.Success,
+      })
+    );
 
     setSavingDestination('doNotSave');
     closeWizard();
@@ -649,7 +660,7 @@ const NewResourceWizard = () => {
         <SaveDestinationWrapper compact>
           <StyledSelect value={savingDestination} onChange={handleSavingDestinationChange}>
             <Option value="saveToFolder">Save to folder</Option>
-            <Option value="saveToFile">Add to file</Option>
+            <Option value="appendToFile">Add to file</Option>
             <Option value="doNotSave">Don't save</Option>
           </StyledSelect>
           {savingDestination === 'saveToFolder' && (
@@ -665,7 +676,7 @@ const NewResourceWizard = () => {
               treeNodeLabelProp="label"
             />
           )}
-          {savingDestination === 'saveToFile' && (
+          {savingDestination === 'appendToFile' && (
             <StyledSelect
               showSearch
               onChange={(value: any) => setSelectedFile(value)}

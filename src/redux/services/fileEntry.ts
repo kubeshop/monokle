@@ -207,7 +207,8 @@ export function readFiles(
           helmValuesMap,
           helmTemplatesMap,
         },
-        depth
+        depth,
+        helmChart
       )
     );
   } else {
@@ -215,13 +216,9 @@ export function readFiles(
     filterGitFolder(files).forEach(file => {
       const filePath = path.join(folder, file);
       const fileEntryPath = filePath.substring(rootFolder.length);
-
       const isDir = getFileStats(filePath)?.isDirectory();
-
       const isExcluded = fileIsExcluded(fileEntryPath, projectConfig);
-
       let extension = isDir ? '' : path.extname(fileEntryPath);
-
       const fileEntry = createFileEntry({fileEntryPath, fileMap, helmChartId: helmChart?.id, extension, projectConfig});
 
       if (helmChart && isHelmTemplateFile(fileEntry.filePath) && !isExcluded) {

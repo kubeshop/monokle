@@ -11,6 +11,7 @@ import {K8sResource} from '@shared/models/k8sResource';
 import {isDefined} from '@shared/utils/filter';
 
 import ErrorCell from './ErrorCell';
+import ResourceActionsDropdown from './ResourceActionsDropdown';
 import * as S from './TableCells.styled';
 
 const UNSORTED_VALUE = -9999999;
@@ -62,6 +63,14 @@ export const CellAge = {
   sorter: (a: K8sResource, b: K8sResource) =>
     DateTime.fromISO(a.object.metadata?.creationTimestamp).toMillis() -
     DateTime.fromISO(b.object.metadata?.creationTimestamp).toMillis(),
+};
+
+export const CellContextMenu = {
+  title: '',
+  dataIndex: '',
+  key: 'contextMenu',
+  width: '20px',
+  render: (resource: K8sResource<'cluster'>) => <ResourceActionsDropdown resource={resource} />,
 };
 
 export const CellName = {

@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
 
-import {Button, Checkbox, Col} from 'antd';
+import {Button, Checkbox, Col, Modal} from 'antd';
 
 import {
   comparisonInspecting,
@@ -10,6 +10,8 @@ import {
   transferResource,
 } from '@redux/compare';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+
+import {useRefSelector} from '@utils/hooks';
 
 import {CompareSide, ComparisonItemProps, HeaderItemProps} from '@shared/models/compare';
 
@@ -68,13 +70,23 @@ function ComparisonItem({
   const dispatch = useAppDispatch();
   const handleSelect = useCallback(() => dispatch(comparisonToggled({id})), [dispatch, id]);
   const selected = useAppSelector(state => selectIsComparisonSelected(state.compare, id));
+  const leftTypeRef = useRefSelector(state => state.compare.current.view.leftSet?.type);
+  const rightTypeRef = useRefSelector(state => state.compare.current.view.rightSet?.type);
 
   const handleTransfer = useCallback(
     (side: CompareSide) => {
       const direction = side === 'left' ? 'left-to-right' : 'right-to-left';
-      dispatch(transferResource({ids: [id], direction}));
+      const transferTo = side === 'left' ? rightTypeRef.current : leftTypeRef.current;
+
+      Modal.confirm({
+        title: `Are you sure you want to ${transferTo === 'cluster' ? 'deploy to cluster' : 'extract to local'}?`,
+        onOk() {
+          dispatch(transferResource({ids: [id], direction}));
+        },
+        onCancel() {},
+      });
     },
-    [dispatch, id]
+    [dispatch, id, leftTypeRef, rightTypeRef]
   );
 
   const handleInspect = useCallback(

@@ -57,17 +57,9 @@ export const OptionDownloadedText = styled.div`
   color: ${Colors.greenOkayCompliment};
 `;
 
-export const WarningOutlined = styled(
-  (props: {isKubeconfigPathValid: boolean; highlighted?: boolean; className: string}) => (
-    <RawWarningOutlined className={props.className} />
-  )
-)`
+export const WarningOutlined = styled(RawWarningOutlined)<{$isKubeconfigPathValid: boolean}>`
   ${props =>
-    `color: ${
-      props.highlighted ? Colors.whitePure : !props.isKubeconfigPathValid ? Colors.redError : Colors.yellowWarning
-    };
-    margin-left: ${props.highlighted ? '10px' : '5px'};
-    padding-top: ${props.highlighted ? '5px' : '0px'};
+    `color: ${!props.$isKubeconfigPathValid ? Colors.redError : Colors.yellowWarning};
     `};
 `;
 

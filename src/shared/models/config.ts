@@ -36,6 +36,9 @@ export enum Themes {
   Light = 'light',
 }
 
+// String union type for the supported API key vendors, currently only OpenAI
+export type ApiKeyVendor = 'OpenAI';
+
 interface AppConfig {
   /** a list of patterns to exclude when scanning the file system for resources */
   scanExcludes: string[];
@@ -77,6 +80,9 @@ interface AppConfig {
   };
   fileExplorerSortOrder: FileExplorerSortOrder;
   isNewVersionAvailable: boolean;
+  userApiKeys: {
+    [vendor in ApiKeyVendor]: string;
+  };
 }
 
 type FileExplorerSortOrder = 'folders' | 'files' | 'mixed';

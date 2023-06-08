@@ -360,6 +360,7 @@ div.monokleEditorErrorRefGlyphClass.monokleEditorUnsatisfiedRefGlyphClass::after
 
 .dropdown-secondary .ant-dropdown-menu-item {
   background-color: #177ddc;
+  border-radius: 2px;
 }
 
 .dropdown-secondary .ant-dropdown-menu-item:not(:last-child) {

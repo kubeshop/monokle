@@ -1,52 +1,50 @@
+import {useLayoutEffect, useRef, useState} from 'react';
+import {useClickAway} from 'react-use';
+
+import {v4 as uuidv4} from 'uuid';
+
 import {setActiveTab, setDashboardSelectedResourceId} from '@redux/dashboard/slice';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {useResource} from '@redux/selectors/resourceSelectors';
-import {applyResourceToCluster} from '@redux/thunks/applyResource';
 
 import {Logs, ResourceRefsIconPopover} from '@components/molecules';
 
 import PodHandler from '@src/kindhandlers/Pod.handler';
 
 import CodeEditor from '@editor/CodeEditor';
+import {useWarnUnsavedChanges} from '@editor/editor.cluster';
 
 import * as S from './Drawer.styled';
+import GraphTab from './GraphTab';
 import {InfoTab} from './InfoTab';
+import ResourceActions from './ResourceActions';
 import {TerminalTab} from './TerminalTab';
 
 export const Drawer = () => {
   const dispatch = useAppDispatch();
-  const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
-  const clusterResourceMetaMap = useResourceMetaMap('cluster');
   const activeTab = useAppSelector(state => state.dashboard.ui.activeTab);
-  const isApplyingResource = useAppSelector(state => state.main.isApplyingResource);
-
+  const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
   const selectedResource = useResource(selectedResourceId ? {id: selectedResourceId, storage: 'cluster'} : undefined);
+  const [isConfirmingUpdate, setIsConfirmingUpdate] = useState(false);
 
-  const handleApplyResource = () => {
-    if (
-      selectedResource &&
-      selectedResource.namespace &&
-      selectedResourceId &&
-      clusterResourceMetaMap[selectedResourceId]
-    ) {
-      dispatch(
-        applyResourceToCluster({
-          resourceIdentifier: {
-            id: selectedResourceId,
-            storage: 'cluster',
-          },
-          namespace: selectedResource.namespace ? {name: selectedResource.namespace, new: false} : undefined,
-          options: {
-            isInClusterMode: true,
-          },
-        })
-      );
+  const [warnUnsavedCodeChanges, UnsavedCodeChangesModal] = useWarnUnsavedChanges();
+
+  const drawerClassName = useRef(uuidv4());
+  const drawerRef = useRef<HTMLDivElement | null>(null);
+  useClickAway(drawerRef, () => {
+    if (!selectedResourceId || isConfirmingUpdate) return;
+    warnUnsavedCodeChanges();
+  });
+  useLayoutEffect(() => {
+    const elements = document.getElementsByClassName(drawerClassName.current);
+    if (elements[0] instanceof HTMLDivElement) {
+      drawerRef.current = elements[0];
     }
-  };
+  }, [selectedResourceId]);
 
   return (
     <S.Drawer
+      className={drawerClassName.current}
       placement="right"
       size="large"
       open={Boolean(selectedResourceId)}
@@ -76,12 +74,22 @@ export const Drawer = () => {
         dispatch(setDashboardSelectedResourceId());
       }}
     >
+      <UnsavedCodeChangesModal />
       <S.TabsContainer>
         <S.Tabs
+          tabBarExtraContent={
+            <ResourceActions
+              resource={selectedResource}
+              isConfirmingUpdate={isConfirmingUpdate}
+              setIsConfirmingUpdate={setIsConfirmingUpdate}
+            />
+          }
           defaultActiveKey={activeTab}
           activeKey={activeTab}
           onChange={(key: string) => {
-            dispatch(setActiveTab({tab: key as any, kind: selectedResource?.kind}));
+            if (!warnUnsavedCodeChanges()) {
+              dispatch(setActiveTab({tab: key as any, kind: selectedResource?.kind}));
+            }
           }}
           items={[
             {
@@ -112,21 +120,13 @@ export const Drawer = () => {
                     : []),
                 ]
               : []),
+            {
+              label: 'Graph',
+              key: 'Graph',
+              children: <GraphTab resource={selectedResource} />,
+            },
           ]}
         />
-        <S.TabsFooter>
-          <S.ActionButtons>
-            {activeTab === 'Manifest' && (
-              <S.ActionButton
-                loading={isApplyingResource}
-                disabled={!selectedResource}
-                onClick={() => handleApplyResource()}
-              >
-                Update
-              </S.ActionButton>
-            )}
-          </S.ActionButtons>
-        </S.TabsFooter>
       </S.TabsContainer>
     </S.Drawer>
   );

@@ -63,9 +63,13 @@ const HelmValueRenderer: React.FC<IProps> = props => {
           <HelmValueQuickAction id={helmValue.id} isSelected={isSelected} />
         </S.QuickActionContainer>
 
-        <S.ContextMenuContainer>
-          <HelmContextMenu id={id} isSelected={isSelected} />
-        </S.ContextMenuContainer>
+        {isHovered ? (
+          <S.ContextMenuContainer>
+            <HelmContextMenu id={id} isSelected={isSelected} />
+          </S.ContextMenuContainer>
+        ) : (
+          <S.ContextMenuPlaceholder />
+        )}
       </div>
     </S.ItemContainer>
   );

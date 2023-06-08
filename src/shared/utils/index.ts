@@ -1,5 +1,6 @@
 export {default as electronStore} from './electronStore';
 export * from './env';
+export * from './file';
 export * from './fileSystem';
 export * from './helm';
 export * from './hotkey';

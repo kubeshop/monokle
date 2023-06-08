@@ -16,7 +16,6 @@ import {Spinner} from '@monokle/components';
 import {FileEntry} from '@shared/models/fileEntry';
 import {Colors} from '@shared/styles';
 import {isEqual} from '@shared/utils/isEqual';
-import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
 
 import * as S from './TreeNode.styled';
 import {useCanPreview, useDelete, useFileMenuItems, useIsDisabled, usePreview} from './hooks';
@@ -28,9 +27,9 @@ type Props = {
 const TreeNodeFile: React.FC<Props> = props => {
   const {filePath} = props;
   const fileEntry: FileEntry | undefined = useAppSelector(state => state.main.fileMap[filePath]);
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
+
   const selectedFilePath = useAppSelector(selectionFilePathSelector);
+
   const isSelected = selectedFilePath === filePath;
   const isDisabled = useIsDisabled(fileEntry);
   const canBePreviewed = useCanPreview(fileEntry, isDisabled);
@@ -87,27 +86,28 @@ const TreeNodeFile: React.FC<Props> = props => {
         </S.SpinnerContainer>
       )}
 
-      {isHovered && (
-        <S.ActionButtonsContainer ref={actionButtonsRef} onClick={e => e.stopPropagation()}>
-          {canBePreviewed && (
-            <S.PreviewButton
-              type="text"
-              size="small"
-              disabled={isInPreviewMode || isInClusterMode}
-              $isItemSelected={isSelected}
-              onClick={() => preview(fileEntry.filePath)}
-            >
-              Preview
-            </S.PreviewButton>
-          )}
+      <S.ActionButtonsContainer ref={actionButtonsRef} onClick={e => e.stopPropagation()}>
+        {canBePreviewed && (
+          <S.PreviewButton
+            type="text"
+            size="small"
+            $isItemSelected={isSelected}
+            onClick={() => preview(fileEntry.filePath)}
+          >
+            Dry-run
+          </S.PreviewButton>
+        )}
 
+        {isHovered ? (
           <ContextMenu items={menuItems}>
             <div ref={contextMenuButtonRef}>
               <Dots color={isSelected ? Colors.blackPure : undefined} />
             </div>
           </ContextMenu>
-        </S.ActionButtonsContainer>
-      )}
+        ) : (
+          <S.ContextMenuPlaceholder />
+        )}
+      </S.ActionButtonsContainer>
     </S.NodeContainer>
   );
 };

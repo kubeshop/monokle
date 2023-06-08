@@ -2,7 +2,7 @@ import {useMemo} from 'react';
 
 import {Button, MenuProps, Tooltip} from 'antd';
 
-import {CommentOutlined, QuestionCircleOutlined} from '@ant-design/icons';
+import {CommentOutlined, GlobalOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 
 import semver from 'semver';
 import styled from 'styled-components';
@@ -15,7 +15,16 @@ import {openAboutModal, openKeyboardShortcutsModal, openReleaseNotesDrawer} from
 
 import {AnimationDurations} from '@shared/styles';
 import {Colors} from '@shared/styles/colors';
-import {openDiscord, openDocumentation, openFeedback, openGitHub} from '@shared/utils/shell';
+import {
+  openDiscord,
+  openDocumentation,
+  openFeedback,
+  openGitHub,
+  openGitHubAction,
+  openMonokleChromeExtension,
+  openMonokleCli,
+  openMonokleCloud,
+} from '@shared/utils/shell';
 
 import {useAppVersion} from '../useAppVersion';
 
@@ -64,6 +73,29 @@ export function useHelpMenuItems() {
             </MenuItemLinks>
           </>
         ),
+      },
+      {
+        label: (
+          <>
+            {renderMenuItem('Discover More', <GlobalOutlined />, false, false)}
+
+            <MenuItemLinks>
+              <HelpLink type="link" size="small" onClick={() => openMonokleCloud()}>
+                Monokle Cloud
+              </HelpLink>
+              <HelpLink type="link" size="small" onClick={() => openGitHubAction()}>
+                Monokle GitHub Action
+              </HelpLink>
+              <HelpLink type="link" size="small" onClick={() => openMonokleCli()}>
+                Monokle CLI
+              </HelpLink>
+              <HelpLink type="link" size="small" onClick={() => openMonokleChromeExtension()}>
+                Monokle Chrome Extension
+              </HelpLink>
+            </MenuItemLinks>
+          </>
+        ),
+        key: 'discover',
       },
       {
         label: (

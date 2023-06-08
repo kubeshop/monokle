@@ -15,6 +15,13 @@ type ProcessArgs = {
   files?: string[];
 };
 
+let abortController = new AbortController();
+
+export const abortAllRunningRefsProcessing = () => {
+  abortController.abort();
+  abortController = new AbortController();
+};
+
 export const processResourceRefs = createAsyncThunk<ValidationResource[], ProcessArgs, ThunkApi>(
   'references/process',
   async (payload, {signal, getState, rejectWithValue}) => {
@@ -22,18 +29,26 @@ export const processResourceRefs = createAsyncThunk<ValidationResource[], Proces
     let resources: ValidationResource[] = [];
 
     try {
-      const {validationResources} = await RESOURCE_PARSER.processRefs({
-        resources: payload.resources,
-        incremental: payload.incremental,
-        files: payload.files,
-      });
-      resources = validationResources;
+      resources = (
+        await RESOURCE_PARSER.processRefs({
+          resources: payload.resources,
+          incremental: payload.incremental,
+          files: payload.files,
+        })
+      ).validationResources;
     } catch (e) {
       return rejectWithValue(e);
     }
 
-    if (signal.aborted) return [];
+    signal.addEventListener('abort', () => {
+      RESOURCE_PARSER.clear();
+    });
+    abortController.signal.addEventListener('abort', () => {
+      RESOURCE_PARSER.clear();
+    });
+
     signal.throwIfAborted();
+    abortController.signal.throwIfAborted();
 
     const osPlatform = getState().config.osPlatform;
 

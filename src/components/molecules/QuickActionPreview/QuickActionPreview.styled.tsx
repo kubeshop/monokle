@@ -20,6 +20,7 @@ export const PreviewSpan = styled.span<{isItemSelected: boolean}>`
   color: ${props => (props.isItemSelected ? Colors.blackPure : Colors.blue6)};
   margin-left: 5px;
   margin-right: 15px;
+  white-space: nowrap;
 `;
 
 export const ReloadSpan = styled.span<{isItemSelected: boolean}>`

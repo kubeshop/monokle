@@ -48,9 +48,9 @@ const ValidationPane: React.FC = () => {
             <S.DescriptionContainer>
               <Image src={ValidationFigure} width={95} />
               <div>
-                Fix your resources according to your validation setup. Manage your validation policy, turn rules on or
-                off, and more in the <Link onClick={() => dispatch(setLeftMenuSelection('settings'))}>settings</Link>{' '}
-                section, located in the left menu.
+                Manage your validation policy and rules in the{' '}
+                <Link onClick={() => dispatch(setLeftMenuSelection('settings'))}>settings</Link> section in the left
+                menu.
                 {isInClusterMode && (
                   <S.BackToDashboardButton
                     icon={<Icon name="cluster-dashboard" />}

@@ -5,7 +5,7 @@ import {Button, Dropdown} from 'antd';
 import {DownOutlined} from '@ant-design/icons';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {startPreview} from '@redux/services/preview';
+import {startPreview} from '@redux/thunks/preview';
 
 import {SavedCommand} from '@shared/models/config';
 import {Colors} from '@shared/styles/colors';
@@ -19,7 +19,7 @@ const PreviewSavedCommand = () => {
 
   const onPreviewCommand = useCallback(
     (command: SavedCommand) => {
-      startPreview({type: 'command', commandId: command.id}, dispatch);
+      dispatch(startPreview({type: 'command', commandId: command.id}));
     },
     [dispatch]
   );

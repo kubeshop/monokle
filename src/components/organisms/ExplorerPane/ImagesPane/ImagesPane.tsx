@@ -54,8 +54,7 @@ const ImageTopContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
-
-  padding: 16px 14px 16px 16px;
+  padding: 2px 14px 16px 16px;
   font-size: 12px;
   color: ${Colors.grey9};
 `;

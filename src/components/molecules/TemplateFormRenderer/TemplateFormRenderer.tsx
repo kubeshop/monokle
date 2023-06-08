@@ -1,6 +1,10 @@
+import {shell} from 'electron';
+
 import React, {useEffect, useState} from 'react';
 
 import {Button, Skeleton} from 'antd';
+
+import {ExportOutlined} from '@ant-design/icons';
 
 // @ts-ignore
 import {Theme as AntDTheme} from '@rjsf/antd';
@@ -11,13 +15,14 @@ import fs from 'fs';
 import log from 'loglevel';
 import {Primitive} from 'type-fest';
 
-import {VALID_IMAGE_NAME_REGEX} from '@constants/constants';
+import {VALID_IMAGE_NAME_REGEX, VALID_RESOURCE_NAME_REGEX} from '@constants/constants';
 
 import {getCustomFormWidgets} from '@molecules/FormEditor/FormWidgets';
 
 import {TemplateForm} from '@shared/models/template';
 
 import TemplateFormErrorBoundary from './TemplateFormErrorBoundary';
+import * as S from './TemplateFormRenderer.styled';
 
 const Form = withTheme(AntDTheme);
 
@@ -44,25 +49,40 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [schema, setSchema] = useState<any>();
   const [uiSchema, setUiSchema] = useState<any>();
+  const [displayLink, setDisplayLink] = useState<boolean>(false);
 
   const customValidate = (fData: Record<string, Primitive>, errors: any) => {
     if (!fData) {
       return errors;
     }
 
-    Object.entries(fData).forEach(([key, value]) => {
-      if (!key.toLowerCase().includes('image') || !value || typeof value !== 'string') {
-        return;
-      }
+    if (fData.name && !VALID_RESOURCE_NAME_REGEX.test(fData.name.toString())) {
+      errors.name.addError(
+        "must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character"
+      );
+    }
 
-      if (VALID_IMAGE_NAME_REGEX.test(value)) {
-        return;
-      }
+    if (fData.image && !VALID_IMAGE_NAME_REGEX.test(fData.image.toString())) {
+      errors.image.addError(`name must be in the format <registry>/<image>:<tag> and should not start with a \':\'`);
+    }
 
-      errors[key].addError(' name is not valid.');
-    });
+    if (fData.namespace && !VALID_RESOURCE_NAME_REGEX.test(fData.namespace.toString())) {
+      errors.namespace.addError(
+        "must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character"
+      );
+    }
 
     return errors;
+  };
+
+  const handleErrorLink = () => {
+    if (
+      (formData.name && !VALID_RESOURCE_NAME_REGEX.test(formData.name.toString())) ||
+      (formData.image && !VALID_IMAGE_NAME_REGEX.test(formData.image.toString())) ||
+      (formData.namespace && !VALID_RESOURCE_NAME_REGEX.test(formData.namespace.toString()))
+    ) {
+      setDisplayLink(true);
+    }
   };
 
   useEffect(() => {
@@ -93,6 +113,21 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
 
   return (
     <TemplateFormErrorBoundary>
+      {displayLink && (
+        <S.ErrorContainer>
+          <S.ErrorText>
+            <S.ReadMoreLink
+              onClick={() => {
+                shell.openExternal('https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names');
+              }}
+            >
+              Read more{` `}
+              <ExportOutlined />
+            </S.ReadMoreLink>
+            {` about the naming conventions for Kubernetes resources.`}
+          </S.ErrorText>
+        </S.ErrorContainer>
+      )}
       <Form
         onSubmit={e => onSubmit(e.formData)}
         schema={schema}
@@ -110,7 +145,7 @@ const TemplateFormRenderer: React.FC<IProps> = props => {
           </Button>
         )}
 
-        <Button htmlType="submit" type="primary" style={{marginTop: '16px'}}>
+        <Button htmlType="submit" onClick={handleErrorLink} type="primary" style={{marginTop: '16px'}}>
           {isLastForm ? 'Submit' : 'Next'}
         </Button>
       </Form>

@@ -32,7 +32,7 @@ class ResourceParserWorker {
 
   clear(resourceIds?: string[]) {
     this.#parser.clear(resourceIds);
-    createWorkerEventPromise<ClearCacheMessage['output']>({
+    return createWorkerEventPromise<ClearCacheMessage['output']>({
       type: ClearCacheMessageType,
       worker: this.#worker,
       input: {

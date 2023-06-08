@@ -12,9 +12,14 @@ export const ActionButtonsContainer = styled.div`
   justify-content: flex-end;
   flex-direction: row;
   height: 100%;
+  z-index: 1;
   position: absolute;
   right: 0;
   cursor: pointer;
+`;
+
+export const ContextMenuPlaceholder = styled.div`
+  width: 15px;
 `;
 
 export const PreviewButton = styled(Button)<{$isItemSelected: boolean}>`

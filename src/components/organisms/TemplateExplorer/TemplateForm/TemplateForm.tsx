@@ -116,7 +116,6 @@ const TemplateForm: React.FC<IProps> = props => {
       newFormDataList.splice(formIndex, 1, formatFormData(formData));
       setCurrentFormDataList(newFormDataList);
       setActiveFormIndex(formIndex + 1);
-
       if (formIndex === template.forms.length - 1) {
         onClickSubmit(newFormDataList);
       }

@@ -29,17 +29,22 @@ const NavigatorDescription: React.FC = () => {
 
   return (
     <S.NavigatorDescriptionContainer>
-      <S.ResourcesCount>{navigatorResourcesCount} objects</S.ResourcesCount>
+      {navigatorResourcesCount ? (
+        <>
+          <S.ResourcesCount>{navigatorResourcesCount} objects</S.ResourcesCount>
+          <S.WarningsErrorsContainer>
+            <S.ProblemCountContainer onClick={() => handleSetFilters('error')}>
+              <ProblemIcon level="error" /> <S.Count $type="error">{errorsCount}</S.Count>
+            </S.ProblemCountContainer>
 
-      <S.WarningsErrorsContainer>
-        <S.ProblemCountContainer onClick={() => handleSetFilters('error')}>
-          <ProblemIcon level="error" /> <S.Count $type="error">{errorsCount}</S.Count>
-        </S.ProblemCountContainer>
-
-        <S.ProblemCountContainer onClick={() => handleSetFilters('warning')}>
-          <ProblemIcon level="warning" /> <S.Count $type="warning">{warningsCount}</S.Count>
-        </S.ProblemCountContainer>
-      </S.WarningsErrorsContainer>
+            <S.ProblemCountContainer onClick={() => handleSetFilters('warning')}>
+              <ProblemIcon level="warning" /> <S.Count $type="warning">{warningsCount}</S.Count>
+            </S.ProblemCountContainer>
+          </S.WarningsErrorsContainer>
+        </>
+      ) : (
+        <S.ResourcesCount>No objects found</S.ResourcesCount>
+      )}
     </S.NavigatorDescriptionContainer>
   );
 };

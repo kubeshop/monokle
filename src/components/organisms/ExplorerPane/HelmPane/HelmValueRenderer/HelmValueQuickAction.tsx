@@ -14,7 +14,7 @@ import {
   selectHelmValues,
   selectedHelmValuesSelector,
 } from '@redux/selectors';
-import {restartPreview, startPreview, stopPreview} from '@redux/services/preview';
+import {restartPreview, startPreview, stopPreview} from '@redux/thunks/preview';
 
 import {QuickActionCompare, QuickActionPreview} from '@molecules';
 
@@ -71,9 +71,9 @@ const HelmValueQuickAction: React.FC<IProps> = props => {
       dispatch(selectHelmValuesFile({valuesFileId: id}));
     }
     if (!isThisPreviewing) {
-      startPreview({type: 'helm', valuesFileId: id, chartId: thisValuesFile.helmChartId}, dispatch);
+      dispatch(startPreview({type: 'helm', valuesFileId: id, chartId: thisValuesFile.helmChartId}));
     } else {
-      stopPreview(dispatch);
+      dispatch(stopPreview());
     }
   }, [isThisSelected, isThisPreviewing, dispatch, id, thisValuesFile.helmChartId]);
 
@@ -82,7 +82,7 @@ const HelmValueQuickAction: React.FC<IProps> = props => {
       dispatch(selectHelmValuesFile({valuesFileId: id}));
     }
 
-    restartPreview({type: 'helm', valuesFileId: id, chartId: thisValuesFile.helmChartId}, dispatch);
+    dispatch(restartPreview({type: 'helm', valuesFileId: id, chartId: thisValuesFile.helmChartId}));
   }, [isThisSelected, id, thisValuesFile.helmChartId, dispatch]);
 
   useHotkeys(defineHotkey(hotkeys.RELOAD_PREVIEW.key), () => {

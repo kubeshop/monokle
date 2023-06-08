@@ -7,9 +7,9 @@ import {Colors} from '@shared/styles/colors';
 
 export const SecondaryButton = styled(Button)<{$disableHover?: boolean}>`
   border-radius: 4px;
-  color: ${Colors.blue6};
-  padding: 0px 14px;
-  background-color: ${Colors.grey3b};
+  color: ${Colors.blue7};
+  padding: 0px 16px;
+  background-color: ${Colors.grey3};
   border: none;
   font-weight: 600;
 

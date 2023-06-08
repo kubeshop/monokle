@@ -6,6 +6,7 @@ import {getSegmentClient} from '@shared/utils/segment';
 import {isRendererThread} from '@shared/utils/thread';
 
 import {PreviewType} from './preview';
+import {NewResourceTelemtryFrom, NewResourceTelemtryType} from './resourceCreate';
 import {LeftMenuBottomSelectionType, LeftMenuSelectionType} from './ui';
 
 const machineId: string = machineIdSync();
@@ -45,6 +46,7 @@ export type EventMap = {
   };
   'app_start/create_project': {from: 'scratch' | 'git' | 'template' | 'folder'; templateID?: string};
   'app_start/select_page': {page: string};
+  'app_start/select_project': undefined;
   'project_list/open_project': undefined;
   'project_list/pin_project': undefined;
   'project_list/unpin_project': undefined;
@@ -101,11 +103,18 @@ export type EventMap = {
   'preview/command/fail': {reason: string};
   'preview/command/end': {resourcesCount: number; executionTime: number};
   'preview/restart': {type: PreviewType};
+  'helm/command/start': {command: string[]};
+  'helm/command/fail': {reason: string};
+  'helm/command/end': undefined;
   'cluster/diff_resource': undefined;
   'cluster/deploy_resource': {kind: string};
   'cluster/deploy_file': undefined;
   'cluster/deploy_helm_chart': undefined;
   'cluster/deploy_kustomization': undefined;
+  'cluster/actions/update_manifest': {kind: string};
+  'cluster/actions/scale': {replicasNumber: number};
+  'cluster/actions/restart': undefined;
+  'cluster/actions/delete': {kind: string};
   'compare/opened': {from?: string};
   'compare/compared': {left?: string; right?: string; operation: string};
   'compare/inspected': {type?: string};
@@ -131,7 +140,22 @@ export type EventMap = {
   'left-menu/activity-changed': {activity: LeftMenuSelectionType; section?: string};
   'bottom-left-menu/select-option': {option: LeftMenuBottomSelectionType};
   'notifications/toggle': undefined;
+  'new_resource/create': {type: NewResourceTelemtryType; from: NewResourceTelemtryFrom};
+  'helm_repo/search': {query: string};
+  'helm_repo/select': undefined;
+  'helm_repo/add': undefined;
+  'helm_repo/remove': undefined;
+  'helm_repo/update': undefined;
+  'helm_repo/download': undefined;
+  'helm_repo/install': undefined;
+  'ai/generation/open': undefined;
+  'ai/generation/success': {
+    enabledValidation: boolean;
+    executionTime: number;
+  };
+  'ai/generation/created-resources': {resourceKinds: string[]; resourcesCount: number};
 };
+
 export const APP_INSTALLED = 'APP_INSTALLED';
 export const APP_SESSION = 'APP_SESSION';
 export const APP_UPDATED = 'APP_UPDATED';
