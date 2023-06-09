@@ -66,7 +66,7 @@ export const ResourceName = styled.span<{$isActive?: boolean}>`
   font-size: 14px;
   font-weight: 400;
   line-height: 25px;
-  color: ${({$isActive = true}) => ($isActive ? Colors.whitePure : Colors.grey5b)};
+  color: ${({$isActive = true}) => ($isActive ? Colors.whitePure : Colors.grey5)};
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
