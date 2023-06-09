@@ -2,7 +2,7 @@ import {useMemo, useState} from 'react';
 
 import {AutoComplete, Badge, Dropdown, Tooltip, Typography} from 'antd';
 
-import {BellOutlined, EllipsisOutlined} from '@ant-design/icons';
+import {BellOutlined, EllipsisOutlined, LeftOutlined} from '@ant-design/icons';
 
 import _ from 'lodash';
 
@@ -10,7 +10,12 @@ import {TOOLTIP_DELAY} from '@constants/constants';
 import {NotificationsTooltip} from '@constants/tooltips';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setShowStartPageLearn, setStartPageMenuOption, toggleNotifications} from '@redux/reducers/ui';
+import {
+  setShowStartPageLearn,
+  setStartPageMenuOption,
+  toggleNotifications,
+  toggleStartProjectPane,
+} from '@redux/reducers/ui';
 import {setOpenProject} from '@redux/thunks/project';
 
 import {NewVersionNotice} from '@molecules';
@@ -24,12 +29,13 @@ import {useRefSelector} from '@utils/hooks';
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {SearchInput} from '@monokle/components';
-import {trackEvent} from '@shared/utils';
+import {activeProjectSelector, trackEvent} from '@shared/utils';
 
 import * as S from './StartPageHeader.styled';
 
 const StartPageHeader: React.FC = () => {
   const dispatch = useAppDispatch();
+  const activeProject = useAppSelector(activeProjectSelector);
   const isNewVersionAvailable = useAppSelector(state => state.config.isNewVersionAvailable);
   const isNewVersionNoticeVisible = useAppSelector(state => state.ui.newVersionNotice.isVisible);
   const isStartPageLearnVisible = useAppSelector(state => state.ui.startPage.learn.isVisible);
@@ -88,6 +94,17 @@ const StartPageHeader: React.FC = () => {
         </S.NewVersionBadge>
       </S.LogoContainer>
 
+      {activeProject && (
+        <S.BackToProjectButton
+          icon={<LeftOutlined />}
+          onClick={() => {
+            dispatch(toggleStartProjectPane());
+          }}
+        >
+          Back to project
+        </S.BackToProjectButton>
+      )}
+
       <S.SearchContainer>
         <AutoComplete
           style={{width: '340px'}}
@@ -104,6 +121,7 @@ const StartPageHeader: React.FC = () => {
         </AutoComplete>
         <div id="projectsList" />
       </S.SearchContainer>
+
       <S.ActionsContainer>
         <S.LearnButton
           $isActive={isStartPageLearnVisible}
