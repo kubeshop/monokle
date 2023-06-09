@@ -6,11 +6,13 @@ import {Button, Modal} from 'antd';
 
 import _ from 'lodash';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import store from '@redux/store';
+import {updateHelmDependencies} from '@redux/thunks/updateHelmDependencies';
 
 import {TelemetryButtons} from '@molecules/NotificationMarkdown/TelemetryButtons';
 
+import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AlertType, ExtraContentType} from '@shared/models/alert';
 import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
@@ -33,6 +35,14 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
   const {notification, type} = props;
   const dispatch = useAppDispatch();
   const {extraContentType, id, message, title, buttons} = notification;
+  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
+  const rootFolderPath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY].filePath);
+  const helmChartIds = useMemo(() => {
+    return Object.keys(helmChartMap);
+  }, [helmChartMap]);
+  const helmChartFilePaths = useMemo(() => {
+    return helmChartIds.map(ID => helmChartMap[ID].filePath);
+  }, [helmChartIds, helmChartMap]);
 
   const truncatedMessage = useMemo(() => {
     if (message.length <= 200) {
@@ -41,6 +51,12 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
 
     return _.truncate(message, {length: 240});
   }, [message]);
+
+  const handleDefaultAction = (action: string) => {
+    if (action === 'update_dependencies') {
+      dispatch(updateHelmDependencies({rootFolderPath, filePaths: helmChartFilePaths}));
+    }
+  };
 
   const handleSeeMore = () => {
     // @ts-ignore
@@ -60,15 +76,17 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
           >
             {message}
           </ReactMarkdown>
-          {/* <S.ButtonContainer>
-            {
-              buttons?.map(button => (
-                button.text === 'Cancel' ?
-                  <S.CancelButton onClick={() => Modal.destroyAll()}>{button.text}</S.CancelButton> :
-                  <S.DefaultActionButton onClick={() => dispatch(button.action)}>{button.text}</S.DefaultActionButton>
-              ))
-            }
-          </S.ButtonContainer> */}
+          <S.ButtonContainer>
+            {buttons?.map(button =>
+              button.text === 'Cancel' ? (
+                <S.CancelButton onClick={() => Modal.destroyAll()}>{button.text}</S.CancelButton>
+              ) : (
+                <S.DefaultActionButton onClick={() => handleDefaultAction(button.action)}>
+                  {button.text}
+                </S.DefaultActionButton>
+              )
+            )}
+          </S.ButtonContainer>
         </S.NotificationModalContent>
       ),
       title: (
@@ -107,13 +125,7 @@ const NotificationMarkdown: React.FC<NotificationProps> = props => {
       {extraContentType && getExtraContent(extraContentType, id)}
       <div>
         {buttons?.map(button => (
-          <Button
-            key={button.text}
-            style={button.style}
-            onClick={() => {
-              dispatch(button.action);
-            }}
-          >
+          <Button key={button.text} style={button.style} onClick={() => handleDefaultAction(button.action)}>
             {button.text}
           </Button>
         ))}
