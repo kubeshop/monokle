@@ -485,6 +485,7 @@ export const uiSlice = createSlice({
       })
       .addCase(setOpenProject.fulfilled, state => {
         state.leftMenu.selection = 'explorer';
+        state.explorerSelectedSection = 'files';
         state.navigator.collapsedResourceKinds = [];
       })
       .addCase(previewKustomization.fulfilled, state => {
