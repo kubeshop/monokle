@@ -28,8 +28,7 @@ export const BackToProjectButton = styled(Button)`
   }
 
   & .anticon-left {
-    font-size: 12px !important;
-    padding-top: 2px;
+    font-size: 10px !important;
   }
 `;
 
