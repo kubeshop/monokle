@@ -70,7 +70,7 @@ export const Modal = styled(RawModal)`
 export const PlaceholderContainer = styled.div`
   position: relative;
   color: ${Colors.grey6};
-  border: 2px dashed ${Colors.grey6};
+  border: 1px dashed ${Colors.grey5};
   border-radius: 4px;
   height: calc(100% - 32px);
 `;
