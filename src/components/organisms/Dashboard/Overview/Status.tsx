@@ -39,22 +39,25 @@ export const Status = () => {
   return (
     <S.Container>
       <S.KindRow $type="resource">
-        <S.Count>{clusterResourceCount}</S.Count>
-        <span>resources</span>
+        <S.Count>
+          <b>{clusterResourceCount}</b> resources
+        </S.Count>
       </S.KindRow>
 
       <S.InnerContainer>
         <Tooltip title={<ClusterDashboardErrorsWarningTooltip type="errors" />} mouseEnterDelay={TOOLTIP_DELAY}>
           <S.KindRow $type="error" style={{width: '48.5%'}} onClick={() => handleSetFilters('error')}>
-            <S.Count>{errorsCount}</S.Count>
-            <span>errors</span>
+            <S.Count $small>
+              <b>{errorsCount}</b> errors
+            </S.Count>
           </S.KindRow>
         </Tooltip>
 
         <Tooltip title={<ClusterDashboardErrorsWarningTooltip type="warnings" />} mouseEnterDelay={TOOLTIP_DELAY}>
           <S.KindRow $type="warning" style={{width: '48.5%'}} onClick={() => handleSetFilters('warning')}>
-            <S.Count>{warningsCount}</S.Count>
-            <span>warnings</span>
+            <S.Count $small>
+              <b>{warningsCount}</b> warnings
+            </S.Count>
           </S.KindRow>
         </Tooltip>
       </S.InnerContainer>
