@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/kubeshop/monokle/compare/v2.1.2-nightly-2023-06-07.0...v2.2.0) (2023-06-07)
+
+
+### Features
+
+* actions in WarnUnsavedChangesModal ([79f57c6](https://github.com/kubeshop/monokle/commit/79f57c683970fb0315de3b403817f15af99a2fce))
+* added the logic and alert for resource names regex ([d3b27b9](https://github.com/kubeshop/monokle/commit/d3b27b9a57b3f5e586dcd0adf98a44afb7894b9a))
+* adding k8s docs link and restyling ([4672044](https://github.com/kubeshop/monokle/commit/467204469193af03a9792d42defef534615c3aef))
+* adding name and image validation ([c52696c](https://github.com/kubeshop/monokle/commit/c52696c6a70e9da86df72a8542243fdc34d657ad))
+* cluster unsaved changes confirmation modal ([6630c21](https://github.com/kubeshop/monokle/commit/6630c21cc5b4a16c3015ab94acf9d49e89a5b1df))
+
+
+### Bug Fixes
+
+* catch errors for deleting cluster resource ([ca55282](https://github.com/kubeshop/monokle/commit/ca552824f4114fdfe80f35da8c6169a7a176c8d8))
+* cluster resource update action ([f43554e](https://github.com/kubeshop/monokle/commit/f43554e96bab815d1aec8012c42c938ed528f72f))
+* create resource and save to folder / append to file duplicate ([ba7945c](https://github.com/kubeshop/monokle/commit/ba7945c5c11f59e0ae68bcdf6eb7c53038a5c2ce))
+* editor sync external changes ([4dabc71](https://github.com/kubeshop/monokle/commit/4dabc713850e038a6f9be954f8cec0d55ea6a62b))
+
 ### [2.1.1](https://github.com/kubeshop/monokle/compare/v2.1.1-nightly-2023-05-17.0...v2.1.1) (2023-05-17)
 
 ## [2.1.0](https://github.com/kubeshop/monokle/compare/v2.0.11-nightly-2023-05-10.0...v2.1.0) (2023-05-11)

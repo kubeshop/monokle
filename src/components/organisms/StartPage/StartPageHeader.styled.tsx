@@ -16,6 +16,22 @@ export const ActionsContainer = styled.div`
   }
 `;
 
+export const BackToProjectButton = styled(Button)`
+  color: ${Colors.grey9};
+  border-color: ${Colors.grey9};
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    color: ${Colors.grey8};
+    border-color: ${Colors.grey8};
+  }
+
+  & .anticon-left {
+    font-size: 10px !important;
+  }
+`;
+
 export const LearnButton = styled(Button)<{$isActive: boolean}>`
   font-size: 16px;
   padding: 0px 10px;
@@ -31,14 +47,13 @@ export const LearnButton = styled(Button)<{$isActive: boolean}>`
 `;
 
 export const Logo = styled.img`
-  height: 31px;
+  height: 32px;
   cursor: pointer;
 `;
 
 export const LogoContainer = styled.div<{$isNewVersionNoticeVisible: boolean}>`
-  border-right: ${AppBorders.sectionDivider};
-  width: 50px;
-  padding-right: ${({$isNewVersionNoticeVisible}) => ($isNewVersionNoticeVisible ? '356px' : '0px')};
+  width: 32px;
+  padding-right: ${({$isNewVersionNoticeVisible}) => ($isNewVersionNoticeVisible ? '332px' : '0px')};
 `;
 
 export const NewVersionBadge = styled(Badge)`
@@ -51,7 +66,7 @@ export const StartPageHeaderContainer = styled.div`
   height: 32px;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
 `;
 
 export const SearchItemLabel = styled.div.attrs({className: 'search-item-label'})`
@@ -63,6 +78,9 @@ export const SearchItemLabel = styled.div.attrs({className: 'search-item-label'}
 `;
 
 export const SearchContainer = styled.div`
+  padding-left: 16px;
+  border-left: ${AppBorders.sectionDivider};
+
   .selected-menu-item {
     background-color: ${Colors.blue7};
   }
