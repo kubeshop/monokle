@@ -16,10 +16,11 @@ export const ContentContainer = styled.div`
   height: 100%;
   overflow-y: auto;
   padding-right: 10px;
+  width: 70%;
 
-  @media ${Device.laptopM} {
+  /* @media ${Device.laptopM} {
     padding-right: 250px;
-  }
+  } */
 `;
 
 export const ContentTitle = styled.div`
@@ -29,11 +30,11 @@ export const ContentTitle = styled.div`
 `;
 
 export const MainContainer = styled.div`
-  display: grid;
-  grid-template-columns: 228px 1fr;
-  grid-column-gap: 60px;
+  display: flex;
+  width: 100%;
   overflow: hidden;
   height: 100%;
+  justify-content: space-between;
 `;
 
 export const Menu = styled.div`
@@ -41,6 +42,7 @@ export const Menu = styled.div`
   flex-direction: column;
   gap: 20px;
   margin-top: 10px;
+  width: 310px;
 
   & div:last-child {
     display: none;
@@ -85,9 +87,86 @@ export const SettingsOutlined = styled(RawSettingsOutlined)`
 export const StartPageContainer = styled.div<{$height: number}>`
   width: 100%;
   height: ${({$height}) => $height}px;
-  padding: 50px;
+  padding: 50px 20px 50px 50px;
   background: ${Colors.black100};
   display: flex;
   flex-direction: column;
   gap: 50px;
+`;
+
+export const NewsFeedContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 310px;
+`;
+
+export const NewsFeed = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  border-radius: 5px;
+  border: 1px solid ${Colors.grey10};
+  height: 320px;
+`;
+
+export const NewsFeedHeader = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  color: ${Colors.geekblue9};
+  font-weight: 900;
+  margin: 10px 0 10px 0;
+`;
+
+export const NewsFeedIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: ${Colors.grey10};
+  margin-left: 10px;
+  margin-right: 15px;
+  border-radius: 30px;
+`;
+
+export const NewsFeedContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px 20px 20px;
+  color: ${Colors.grey1000};
+  overflow-y: scroll;
+`;
+
+export const NewsFeedItemTime = styled.div`
+  font-weight: 400;
+  color: ${Colors.grey6};
+  font-size: 12px;
+  line-height: 20px;
+`;
+
+export const NewsFeedItemTitle = styled.div`
+  font-weight: 400;
+  font-size: 13px;
+  color: ${Colors.grey7};
+  line-height: 20px;
+`;
+
+export const NewsFeeditem = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 10px 0 10px 0;
+  padding: 5px;
+  border-radius: 5px;
+
+  &:hover {
+    cursor: pointer;
+    ${NewsFeedItemTime} {
+      color: ${Colors.grey7};
+    }
+    ${NewsFeedItemTitle} {
+      color: ${Colors.grey9};
+    }
+  }
 `;

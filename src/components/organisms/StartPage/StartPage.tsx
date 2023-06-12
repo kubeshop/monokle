@@ -1,4 +1,6 @@
-import {useEffect} from 'react';
+import {shell} from 'electron';
+
+import {useEffect, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -16,11 +18,23 @@ import {useStartPageOptions} from '@hooks/useStartPageOptions';
 
 import {useWindowSize} from '@utils/hooks';
 
+import AnnotationHeart from '@assets/AnnotationHeart.svg';
+
 import {StartPageMenuOptions} from '@shared/models/ui';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import * as S from './StartPage.styled';
 import StartPageHeader from './StartPageHeader';
+
+export interface NewsFeedItem {
+  title: string;
+  type: string;
+  url: string;
+  description: string;
+  date: string;
+  tags: string[];
+  imageUrl: string;
+}
 
 const StartPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -28,6 +42,7 @@ const StartPage: React.FC = () => {
   const projects = useAppSelector(state => state.config.projects);
   const selectedOption = useAppSelector(state => state.ui.startPage.selectedMenuOption);
   const isFromBackToStart = useAppSelector(state => state.ui.startPage.fromBackToStart);
+  const [newsFeed, setNewsFeed] = useState<NewsFeedItem[]>([]);
 
   const {height} = useWindowSize();
 
@@ -65,6 +80,18 @@ const StartPage: React.FC = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    fetch('https://monokle-news-api.kubeshop.workers.dev/')
+      .then(response => response.json())
+      .then(data => {
+        setNewsFeed(data);
+      });
+  }, []);
+
+  const openNewsFeedItem = (url: string) => {
+    shell.openExternal(url);
+  };
 
   return (
     <S.StartPageContainer $height={height}>
@@ -104,6 +131,32 @@ const StartPage: React.FC = () => {
           <S.ContentTitle>{options[selectedOption].title}</S.ContentTitle>
           {options[selectedOption].content}
         </S.ContentContainer>
+
+        <S.NewsFeedContainer>
+          <S.NewsFeed>
+            <S.NewsFeedHeader>
+              <S.NewsFeedIcon>
+                <img src={AnnotationHeart} alt="news feed icon" />
+              </S.NewsFeedIcon>
+              What&lsquo;s New?
+            </S.NewsFeedHeader>
+            <S.NewsFeedContent>
+              {newsFeed.map(item => (
+                <S.NewsFeeditem
+                  onClick={() => {
+                    openNewsFeedItem(item.url);
+                  }}
+                >
+                  <S.NewsFeedItemTime>
+                    {Math.floor((new Date().getTime() - new Date(item.date).getTime()) / (1000 * 60 * 60 * 24))}
+                    {' days'}
+                  </S.NewsFeedItemTime>
+                  <S.NewsFeedItemTitle>{item.title}</S.NewsFeedItemTitle>
+                </S.NewsFeeditem>
+              ))}
+            </S.NewsFeedContent>
+          </S.NewsFeed>
+        </S.NewsFeedContainer>
       </S.MainContainer>
     </S.StartPageContainer>
   );
