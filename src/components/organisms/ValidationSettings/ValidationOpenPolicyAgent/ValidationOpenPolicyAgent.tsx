@@ -5,7 +5,7 @@ import {toggleRule} from '@redux/validation/validation.slice';
 
 import {Button} from '@src/App.styled';
 
-import {OPA_INTEGRATION} from '@shared/models/integrations';
+import {OPA_INTEGRATION} from '@shared/models/validationPlugins';
 import {trackEvent} from '@shared/utils';
 
 import ValidationPaneHeading from '../ValidationPaneHeading';
@@ -25,7 +25,7 @@ const ValidationOpenPolicyAgent: React.FC = () => {
 
   return (
     <>
-      <ValidationPaneHeading integration={OPA_INTEGRATION} />
+      <ValidationPaneHeading plugin={OPA_INTEGRATION} />
 
       <S.DescriptionContainer>
         <S.Description>Validate your resources with policies. Enable or disable OPA rules in this list.</S.Description>

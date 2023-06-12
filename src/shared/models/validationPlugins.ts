@@ -1,14 +1,9 @@
 import {IconNames} from '@monokle/components';
 
-type ValidationIntegrationId =
-  | 'kubernetes-schema'
-  | 'open-policy-agent'
-  | 'resource-links'
-  | 'yaml-syntax'
-  | 'crd-schema';
+type ValidationPluginId = 'kubernetes-schema' | 'open-policy-agent' | 'resource-links' | 'yaml-syntax' | 'crd-schema';
 
-type ValidationIntegration = {
-  id: ValidationIntegrationId;
+type ValidationPlugin = {
+  id: ValidationPluginId;
   icon: IconNames;
   name: string;
   description: string;
@@ -17,7 +12,7 @@ type ValidationIntegration = {
   isConfigurable?: boolean;
 };
 
-export const K8S_SCHEMA_INTEGRATION: ValidationIntegration = {
+export const K8S_SCHEMA_INTEGRATION: ValidationPlugin = {
   id: 'kubernetes-schema',
   icon: 'k8s-schema',
   name: 'Kubernetes Schema',
@@ -26,7 +21,7 @@ export const K8S_SCHEMA_INTEGRATION: ValidationIntegration = {
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-validation/',
 };
 
-export const OPA_INTEGRATION: ValidationIntegration = {
+export const OPA_INTEGRATION: ValidationPlugin = {
   id: 'open-policy-agent',
   icon: 'open-policy-agent',
   name: 'Open Policy Agent',
@@ -36,7 +31,7 @@ export const OPA_INTEGRATION: ValidationIntegration = {
   isConfigurable: true,
 };
 
-export const RESOURCE_LINKS_INTEGRATION: ValidationIntegration = {
+export const RESOURCE_LINKS_INTEGRATION: ValidationPlugin = {
   id: 'resource-links',
   icon: 'resource-links',
   name: 'Resource Links',
@@ -45,7 +40,7 @@ export const RESOURCE_LINKS_INTEGRATION: ValidationIntegration = {
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-validation/',
 };
 
-export const YAML_SYNTAX_INTEGRATION: ValidationIntegration = {
+export const YAML_SYNTAX_INTEGRATION: ValidationPlugin = {
   id: 'yaml-syntax',
   icon: 'yaml-syntax',
   name: 'YAML Syntax',
@@ -53,7 +48,7 @@ export const YAML_SYNTAX_INTEGRATION: ValidationIntegration = {
   learnMoreUrl: 'https://kubeshop.github.io/monokle/resource-validation/',
 };
 
-export const CRD_SCHEMA_INTEGRATION: ValidationIntegration = {
+export const CRD_SCHEMA_INTEGRATION: ValidationPlugin = {
   id: 'crd-schema',
   icon: 'crds',
   name: 'CRDs Schema',
@@ -63,4 +58,4 @@ export const CRD_SCHEMA_INTEGRATION: ValidationIntegration = {
   isConfigurable: true,
 };
 
-export type {ValidationIntegration, ValidationIntegrationId};
+export type {ValidationPlugin, ValidationPluginId};

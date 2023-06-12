@@ -8,8 +8,8 @@ import type {
   ValidationResult,
 } from '@monokle/validation';
 
-import {ValidationIntegration} from './integrations';
 import {K8sResource, ResourceIdentifier, ResourceStorage} from './k8sResource';
+import {ValidationPlugin} from './validationPlugins';
 
 type Initialization = 'uninitialized' | 'loading' | 'error' | 'loaded';
 export type NewProblemsIntroducedType = 'initial' | 'k8s-schema' | 'rule';
@@ -39,7 +39,7 @@ export type ValidationState = {
     newProblemsIntroducedType: NewProblemsIntroducedType;
   };
   configure: {
-    integration: ValidationIntegration | undefined;
+    plugin: ValidationPlugin | undefined;
   };
 };
 

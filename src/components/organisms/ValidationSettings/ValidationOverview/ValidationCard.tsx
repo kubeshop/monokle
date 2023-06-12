@@ -4,19 +4,19 @@ import {useCallback} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
-import {toggleValidation, updateIntegration} from '@redux/validation/validation.slice';
+import {toggleValidation, updateSelectedPluginConfiguration} from '@redux/validation/validation.slice';
 
-import {ValidationIntegration} from '@shared/models/integrations';
+import {ValidationPlugin} from '@shared/models/validationPlugins';
 import {trackEvent} from '@shared/utils';
 
 import * as S from './ValidationCard.styled';
 
 type Props = {
-  integration: ValidationIntegration;
+  plugin: ValidationPlugin;
 };
 
-const ValidationCard: React.FC<Props> = ({integration}) => {
-  const {id, icon, name, description, learnMoreUrl} = integration;
+const ValidationCard: React.FC<Props> = ({plugin}) => {
+  const {id, icon, name, description, learnMoreUrl} = plugin;
 
   const dispatch = useAppDispatch();
   // TODO: fix this pluginEnabledSelector
@@ -25,7 +25,7 @@ const ValidationCard: React.FC<Props> = ({integration}) => {
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
   const onConfigureHandler = () => {
-    dispatch(updateIntegration(integration));
+    dispatch(updateSelectedPluginConfiguration(plugin));
   };
 
   const toggleEnabled = useCallback(() => {
@@ -46,13 +46,13 @@ const ValidationCard: React.FC<Props> = ({integration}) => {
         </span>
       </S.InfoContainer>
 
-      {integration.isConfigurable && (
+      {plugin.isConfigurable && (
         <S.ConfigureButton type="primary" onClick={onConfigureHandler}>
           Configure
         </S.ConfigureButton>
       )}
 
-      {!integration.disableToggle && <S.Switch checked={isEnabled} size="small" onChange={toggleEnabled} />}
+      {!plugin.disableToggle && <S.Switch checked={isEnabled} size="small" onChange={toggleEnabled} />}
     </S.ValidationCardContainer>
   );
 };

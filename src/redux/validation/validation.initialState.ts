@@ -28,6 +28,6 @@ export const validationInitialState: ValidationState = {
     newProblemsIntroducedType: 'initial',
   },
   configure: {
-    integration: undefined,
+    plugin: undefined,
   },
 };

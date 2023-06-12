@@ -12,7 +12,7 @@ import ValidationOverview from './ValidationOverview';
 import * as S from './ValidationSettings.styled';
 
 const ValidationSettings: React.FC = () => {
-  const integration = useValidationSelector(state => state.configure.integration);
+  const plugin = useValidationSelector(state => state.configure.plugin);
 
   const dispatch = useAppDispatch();
 
@@ -21,7 +21,7 @@ const ValidationSettings: React.FC = () => {
   };
 
   const Panel = useMemo(() => {
-    switch (integration?.id) {
+    switch (plugin?.id) {
       case 'open-policy-agent':
         return ValidationOpenPolicyAgent;
       case 'crd-schema':
@@ -29,7 +29,7 @@ const ValidationSettings: React.FC = () => {
       default:
         return ValidationOverview;
     }
-  }, [integration]);
+  }, [plugin]);
 
   return (
     <S.ValidationSettingsContainer>
