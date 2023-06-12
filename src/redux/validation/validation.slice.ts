@@ -7,7 +7,7 @@ import {stopClusterConnection} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ValidationFiltersValueType} from '@monokle/components';
-import {ValidationIntegrationId} from '@shared/models/integrations';
+import {ValidationIntegration, ValidationIntegrationId} from '@shared/models/integrations';
 import {SelectedProblem, ValidationState} from '@shared/models/validation';
 import electronStore from '@shared/utils/electronStore';
 
@@ -81,6 +81,10 @@ export const validationSlice = createSlice({
       set(state, ['config', 'settings', 'kubernetes-schema', 'schemaVersion'], action.payload);
       electronStore.set('validation.config.settings.kubernetes-schema.schemaVersion', action.payload);
       state.validationOverview.newProblemsIntroducedType = 'k8s-schema';
+    },
+
+    updateIntegration: (state: Draft<ValidationState>, action: PayloadAction<ValidationIntegration | undefined>) => {
+      state.configure.integration = action.payload;
     },
 
     toggleRule: (
@@ -214,5 +218,6 @@ export const {
   setSelectedProblem,
   toggleRule,
   toggleValidation,
+  updateIntegration,
 } = validationSlice.actions;
 export default validationSlice.reducer;

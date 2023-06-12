@@ -3,9 +3,8 @@ import {shell} from 'electron';
 import {useCallback} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {updateValidationIntegration} from '@redux/reducers/main';
 import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
-import {toggleValidation} from '@redux/validation/validation.slice';
+import {toggleValidation, updateIntegration} from '@redux/validation/validation.slice';
 
 import {ValidationIntegration} from '@shared/models/integrations';
 import {trackEvent} from '@shared/utils';
@@ -26,7 +25,7 @@ const ValidationCard: React.FC<Props> = ({integration}) => {
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
   const onConfigureHandler = () => {
-    dispatch(updateValidationIntegration(integration));
+    dispatch(updateIntegration(integration));
   };
 
   const toggleEnabled = useCallback(() => {

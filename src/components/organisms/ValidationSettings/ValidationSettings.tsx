@@ -2,8 +2,9 @@ import {useMemo} from 'react';
 
 import {CheckCircleOutlined} from '@ant-design/icons';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {useAppDispatch} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
+import {useValidationSelector} from '@redux/validation/validation.selectors';
 
 import CRDsSchemaValidation from './CRDsSchemaValidation';
 import ValidationOpenPolicyAgent from './ValidationOpenPolicyAgent';
@@ -11,7 +12,7 @@ import ValidationOverview from './ValidationOverview';
 import * as S from './ValidationSettings.styled';
 
 const ValidationSettings: React.FC = () => {
-  const integration = useAppSelector(state => state.main.validationIntegration);
+  const integration = useValidationSelector(state => state.configure.integration);
 
   const dispatch = useAppDispatch();
 

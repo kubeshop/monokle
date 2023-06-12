@@ -3,7 +3,7 @@ import {shell} from 'electron';
 import React, {useCallback} from 'react';
 
 import {useAppDispatch} from '@redux/hooks';
-import {updateValidationIntegration} from '@redux/reducers/main';
+import {updateIntegration} from '@redux/validation/validation.slice';
 
 import {ValidationIntegration} from '@shared/models/integrations';
 
@@ -16,7 +16,7 @@ const ValidationPaneHeading: React.FC<{integration: ValidationIntegration}> = pr
   const dispatch = useAppDispatch();
 
   const onBackHandler = () => {
-    dispatch(updateValidationIntegration(undefined));
+    dispatch(updateIntegration(undefined));
   };
 
   return (
