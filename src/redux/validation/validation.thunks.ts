@@ -29,7 +29,13 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
       plugins: Object.fromEntries(CORE_PLUGINS.map(p => [p, false])),
     };
 
+    console.log('Config:', config);
+    console.log("State's config:", state.config);
+
     merge(config, state.config);
+
+    console.log('Config after merge:', config);
+
     electronStore.set('validation.config', config);
 
     // @ts-ignore
@@ -38,7 +44,11 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
       config.rules['resource-links/no-missing-optional-links'] = 'warn';
     }
 
+    console.log('Latest config:', config);
+
     await VALIDATOR.loadValidation({config});
+
+    console.log('Validatior metadata:', VALIDATOR.metadata);
 
     return {
       metadata: VALIDATOR.metadata,

@@ -39,7 +39,7 @@ export type ValidationState = {
     newProblemsIntroducedType: NewProblemsIntroducedType;
   };
   configure: {
-    plugin: ValidationPlugin | undefined;
+    plugin: ValidationPlugin | PluginMetadataWithConfig | undefined;
   };
 };
 

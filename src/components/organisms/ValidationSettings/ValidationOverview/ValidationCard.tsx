@@ -1,58 +1,71 @@
 import {shell} from 'electron';
 
-import {useCallback} from 'react';
+import {useCallback, useState} from 'react';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
+import {useAppDispatch} from '@redux/hooks';
+import {pluginRulesSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 import {toggleValidation, updateSelectedPluginConfiguration} from '@redux/validation/validation.slice';
 
-import {ValidationPlugin} from '@shared/models/validationPlugins';
+import {IconNames} from '@monokle/components';
+import {PluginMetadataWithConfig} from '@monokle/validation';
 import {trackEvent} from '@shared/utils';
 
 import * as S from './ValidationCard.styled';
 
 type Props = {
-  plugin: ValidationPlugin;
+  plugin: PluginMetadataWithConfig;
+  configurable?: boolean;
 };
 
-const ValidationCard: React.FC<Props> = ({plugin}) => {
-  const {id, icon, name, description, learnMoreUrl} = plugin;
+const ValidationCard: React.FC<Props> = ({configurable, plugin}) => {
+  const {
+    id,
+    icon,
+    displayName,
+    description,
+    learnMoreUrl,
+    name,
+    configuration: {enabled},
+  } = plugin;
 
   const dispatch = useAppDispatch();
-  // TODO: fix this pluginEnabledSelector
-  const isEnabled = useAppSelector(state => pluginEnabledSelector(state, id));
+  const hasRules = useValidationSelector(s => pluginRulesSelector(s, name).length > 0);
 
-  const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
+  const [isChecked, setIsChecked] = useState(enabled);
+
+  const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl || ''), [learnMoreUrl]);
 
   const onConfigureHandler = () => {
     dispatch(updateSelectedPluginConfiguration(plugin));
   };
 
   const toggleEnabled = useCallback(() => {
-    dispatch(toggleValidation(id));
-    trackEvent('configure/toggle_validation', {id});
-  }, [dispatch, id]);
+    setIsChecked(currentIsChecked => !currentIsChecked);
+    dispatch(toggleValidation(name));
+    trackEvent('configure/toggle_validation', {id: name});
+  }, [dispatch, name]);
 
   return (
     <S.ValidationCardContainer key={id}>
-      <S.Icon name={icon} key={icon} />
+      <S.Icon name={(icon ?? 'plugin-default') as IconNames} key={icon} />
 
       <S.InfoContainer>
-        <S.Name>{name}</S.Name>
+        <S.Name>{displayName}</S.Name>
 
         <span>
           <S.Description>{description}</S.Description>
-          <S.Link onClick={openLearnMore}>Learn more</S.Link>
+
+          {learnMoreUrl && <S.Link onClick={openLearnMore}>Learn more</S.Link>}
         </span>
       </S.InfoContainer>
 
-      {plugin.isConfigurable && (
+      {hasRules && configurable && (
         <S.ConfigureButton type="primary" onClick={onConfigureHandler}>
           Configure
         </S.ConfigureButton>
       )}
 
-      {!plugin.disableToggle && <S.Switch checked={isEnabled} size="small" onChange={toggleEnabled} />}
+      <S.Switch checked={isChecked} size="small" onChange={toggleEnabled} />
     </S.ValidationCardContainer>
   );
 };

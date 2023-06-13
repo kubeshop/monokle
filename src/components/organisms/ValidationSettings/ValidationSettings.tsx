@@ -4,15 +4,18 @@ import {CheckCircleOutlined} from '@ant-design/icons';
 
 import {useAppDispatch} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
-import {useValidationSelector} from '@redux/validation/validation.selectors';
+import {pluginMetadataSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
-import CRDsSchemaValidation from './CRDsSchemaValidation';
-import ValidationOpenPolicyAgent from './ValidationOpenPolicyAgent';
+import CRDsSchemaValidation from './CRDsSchemaValidation/CRDsSchemaValidation';
+import ValidationCustom from './ValidationCustom';
 import ValidationOverview from './ValidationOverview';
+import {VALIDATION_CONFIGURATION_COMPONENTS} from './ValidationOverview/ConfigurationComponents';
 import * as S from './ValidationSettings.styled';
 
 const ValidationSettings: React.FC = () => {
   const plugin = useValidationSelector(state => state.configure.plugin);
+  const pluginMetadata = useValidationSelector(s => pluginMetadataSelector(s, plugin?.name));
+  const status = useValidationSelector(s => s.status);
 
   const dispatch = useAppDispatch();
 
@@ -20,16 +23,13 @@ const ValidationSettings: React.FC = () => {
     dispatch(setLeftMenuSelection('validation'));
   };
 
-  const Panel = useMemo(() => {
-    switch (plugin?.id) {
-      case 'open-policy-agent':
-        return ValidationOpenPolicyAgent;
-      case 'crd-schema':
-        return CRDsSchemaValidation;
-      default:
-        return ValidationOverview;
-    }
+  const ConfigPane = useMemo(() => {
+    return plugin?.name ? VALIDATION_CONFIGURATION_COMPONENTS[plugin.name] ?? ValidationCustom : undefined;
   }, [plugin]);
+
+  if (status === 'error') {
+    return <div>Failed to load plugins.</div>;
+  }
 
   return (
     <S.ValidationSettingsContainer>
@@ -46,7 +46,13 @@ const ValidationSettings: React.FC = () => {
         </S.CheckoutErrorsButton>
       </S.ValidationSettingsDescriptionAndButtonContainer>
 
-      <Panel />
+      {plugin?.id === 'crd-schema' ? (
+        <CRDsSchemaValidation />
+      ) : pluginMetadata && ConfigPane ? (
+        <ConfigPane {...pluginMetadata} />
+      ) : (
+        <ValidationOverview />
+      )}
     </S.ValidationSettingsContainer>
   );
 };
