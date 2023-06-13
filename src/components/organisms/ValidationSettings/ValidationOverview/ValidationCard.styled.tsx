@@ -64,8 +64,8 @@ export const ValidationCardContainer = styled.div`
   height: 145px;
   width: 100%;
 
-  @media ${Device.laptopS} {
+  /* @media ${Device.laptopS} {
     width: 50%;
     margin-left: 25%;
-  }
+  } */
 `;

@@ -11,7 +11,7 @@ import {Rule} from './ValidationCustomTable';
 export const Container = styled.div``;
 
 export const InputContainer = styled.div`
-  padding: 0px 16px;
+  padding: 16px 0px;
 `;
 
 export const RuleId = styled.span`
@@ -44,8 +44,7 @@ export const Table = styled((props: TableProps<Rule>) => <AntdTable<Rule> {...pr
   }
 `;
 
-export const TableContainer = styled.div<{$height: number}>`
-  height: ${({$height}) => `calc(${$height}px)`};
+export const TableContainer = styled.div`
   overflow-y: auto;
   padding-top: 10px;
 `;

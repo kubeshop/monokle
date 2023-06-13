@@ -13,7 +13,7 @@ export const DescriptionContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: 5px;
-  padding: 16px;
+  padding: 16px 0px;
 `;
 
 export const DescriptionActions = styled.div`

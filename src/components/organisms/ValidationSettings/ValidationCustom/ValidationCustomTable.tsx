@@ -24,11 +24,10 @@ export type Rule = {
 
 type IProps = {
   plugin: PluginMetadataWithConfig;
-  height: number;
 };
 
 const ValidationCustomTable: React.FC<IProps> = props => {
-  const {plugin, height} = props;
+  const {plugin} = props;
 
   const [containerRef, {width}] = useMeasure<HTMLDivElement>();
 
@@ -89,7 +88,7 @@ const ValidationCustomTable: React.FC<IProps> = props => {
         />
       </S.InputContainer>
 
-      <S.TableContainer $height={height}>
+      <S.TableContainer>
         <S.Table
           columns={columns}
           dataSource={filteredRules}

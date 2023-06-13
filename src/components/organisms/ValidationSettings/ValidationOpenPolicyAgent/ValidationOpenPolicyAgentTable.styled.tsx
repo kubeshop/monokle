@@ -45,5 +45,5 @@ export const Table = styled((props: TableProps<Rule>) => <AntdTable<Rule> {...pr
 
 export const TableContainer = styled.div`
   overflow-y: auto;
-  margin-top: 10px;
+  padding-top: 10px;
 `;

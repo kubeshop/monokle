@@ -13,11 +13,10 @@ import {VALIDATION_CONFIGURATION_COMPONENTS} from './ValidationOverview/Configur
 import * as S from './ValidationSettings.styled';
 
 const ValidationSettings: React.FC = () => {
+  const dispatch = useAppDispatch();
   const plugin = useValidationSelector(state => state.configure.plugin);
   const pluginMetadata = useValidationSelector(s => pluginMetadataSelector(s, plugin?.name));
   const status = useValidationSelector(s => s.status);
-
-  const dispatch = useAppDispatch();
 
   const handleValidation = () => {
     dispatch(setLeftMenuSelection('validation'));
