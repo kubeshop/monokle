@@ -8,6 +8,5 @@ export const VALIDATION_CONFIGURATION_COMPONENTS: Record<
 > = {
   'CRDs Schema': () => <CRDsSchemaValidation />,
   'kubernetes-schema': false,
-  'resource-links': false,
   'yaml-syntax': false,
 };
