@@ -19,7 +19,6 @@ const ValidationCard: React.FC<Props> = ({plugin}) => {
   const {id, icon, name, description, learnMoreUrl} = plugin;
 
   const dispatch = useAppDispatch();
-  // TODO: fix this pluginEnabledSelector
   const isEnabled = useAppSelector(state => pluginEnabledSelector(state, id));
 
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
