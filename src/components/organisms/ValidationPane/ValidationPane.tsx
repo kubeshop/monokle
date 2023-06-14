@@ -8,7 +8,7 @@ import {ReloadOutlined} from '@ant-design/icons';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
-import {useValidationSelector} from '@redux/validation/validation.selectors';
+import {activePluginsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 import {setSelectedProblem, setValidationFilters} from '@redux/validation/validation.slice';
 import {validateResources} from '@redux/validation/validation.thunks';
 
@@ -26,6 +26,7 @@ import * as S from './ValidationPane.styled';
 
 const ValidationPane: React.FC = () => {
   const dispatch = useAppDispatch();
+  const activePlugins = useValidationSelector(activePluginsSelector);
   const activeStorageRef = useRefSelector(activeResourceStorageSelector);
   const lastResponse = useValidationSelector(state => state.lastResponse);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
@@ -82,6 +83,7 @@ const ValidationPane: React.FC = () => {
         </S.ErrorEmptyMessageContainer>
       ) : lastResponse ? (
         <ValidationOverview
+          activePlugins={activePlugins}
           containerStyle={{marginTop: '20px'}}
           showOnlyByResource={isInClusterMode || isInPreviewMode}
           filters={validationFilters}
