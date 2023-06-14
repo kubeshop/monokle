@@ -38,7 +38,13 @@ export type ValidationState = {
     selectedProblem?: SelectedProblem;
     newProblemsIntroducedType: NewProblemsIntroducedType;
   };
+  /**
+   * The 'configure' property is related to the UI of the Validation Settings
+   */
   configure: {
+    /**
+     * This property determines which plugin is currently being configured in the Validation Settings panel
+     */
     plugin: CustomValidationPlugin | PluginMetadataWithConfig | undefined;
   };
 };
