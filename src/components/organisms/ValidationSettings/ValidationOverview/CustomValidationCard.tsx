@@ -6,13 +6,13 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {pluginEnabledSelector} from '@redux/validation/validation.selectors';
 import {toggleValidation, updateSelectedPluginConfiguration} from '@redux/validation/validation.slice';
 
-import {ValidationPlugin} from '@shared/models/validationPlugins';
+import {CustomValidationPlugin} from '@shared/models/validationPlugins';
 import {trackEvent} from '@shared/utils';
 
 import * as S from './ValidationCard.styled';
 
 type Props = {
-  plugin: ValidationPlugin;
+  plugin: CustomValidationPlugin;
 };
 
 const ValidationCard: React.FC<Props> = ({plugin}) => {

@@ -31,7 +31,7 @@ const ValidationHeading: React.FC<IProps> = props => {
   return (
     <S.Heading>
       <Space>
-        <Icon name={(icon ?? 'kubernetes') as IconNames} />
+        <Icon name={(icon ?? 'kubernetes') as IconNames} style={{fontSize: '36px'}} />
 
         <S.HeadingTextContainer>
           <S.Name>{displayName}</S.Name>

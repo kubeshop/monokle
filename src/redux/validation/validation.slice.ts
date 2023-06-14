@@ -9,7 +9,7 @@ import {setRootFolder} from '@redux/thunks/setRootFolder';
 import {ValidationFiltersValueType} from '@monokle/components';
 import {PluginMetadataWithConfig} from '@monokle/validation';
 import {SelectedProblem, ValidationState} from '@shared/models/validation';
-import {ValidationPlugin} from '@shared/models/validationPlugins';
+import {CustomValidationPlugin} from '@shared/models/validationPlugins';
 import electronStore from '@shared/utils/electronStore';
 
 import {validationInitialState} from './validation.initialState';
@@ -86,7 +86,7 @@ export const validationSlice = createSlice({
 
     updateSelectedPluginConfiguration: (
       state: Draft<ValidationState>,
-      action: PayloadAction<ValidationPlugin | PluginMetadataWithConfig | undefined>
+      action: PayloadAction<CustomValidationPlugin | PluginMetadataWithConfig | undefined>
     ) => {
       state.configure.plugin = action.payload;
     },

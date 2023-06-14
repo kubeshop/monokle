@@ -5,11 +5,11 @@ import React, {useCallback} from 'react';
 import {useAppDispatch} from '@redux/hooks';
 import {updateSelectedPluginConfiguration} from '@redux/validation/validation.slice';
 
-import {ValidationPlugin} from '@shared/models/validationPlugins';
+import {CustomValidationPlugin} from '@shared/models/validationPlugins';
 
-import * as S from './ValidationPaneHeading.styled';
+import * as S from './CustomValidationPaneHeading.styled';
 
-const ValidationPaneHeading: React.FC<{plugin: ValidationPlugin}> = ({plugin}) => {
+const CustomValidationPaneHeading: React.FC<{plugin: CustomValidationPlugin}> = ({plugin}) => {
   const {icon, name, learnMoreUrl} = plugin;
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
@@ -35,4 +35,4 @@ const ValidationPaneHeading: React.FC<{plugin: ValidationPlugin}> = ({plugin}) =
   );
 };
 
-export default ValidationPaneHeading;
+export default CustomValidationPaneHeading;
