@@ -149,6 +149,8 @@ export type EventMap = {
   'helm_repo/download': undefined;
   'helm_repo/install': undefined;
   'ai/generation/open': undefined;
+  'ai/generation/no-api-key-set': undefined;
+  'ai/generation/error': {message: string};
   'ai/generation/success': {
     enabledValidation: boolean;
     executionTime: number;

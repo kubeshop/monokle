@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 import MonacoEditor from 'react-monaco-editor/lib/editor';
 import {useMeasure} from 'react-use';
 
@@ -41,10 +41,20 @@ const AIGenerationModal: React.FC = () => {
 
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>();
+  const [errorMessage, _setErrorMessage] = useState<string>();
   const [editorCode, setEditorCode] = useState<string>();
   const [isValidationEnabled, setIsValidationEnabled] = useState(true);
   const [areSettingsVisible, setAreSettingsVisible] = useState(false);
+
+  const setErrorMessage = useCallback(
+    (msg?: string) => {
+      _setErrorMessage(msg);
+      if (msg) {
+        trackEvent('ai/generation/error', {message: msg});
+      }
+    },
+    [_setErrorMessage]
+  );
 
   const apiKey = useAppSelector(state => state.config.userApiKeys.OpenAI);
   const [isApiKeyModalVisible, setIsApiKeyModalVisible] = useState(false);
@@ -64,6 +74,7 @@ const AIGenerationModal: React.FC = () => {
 
     if (!apiKey) {
       setIsApiKeyModalVisible(true);
+      trackEvent('ai/generation/no-api-key-set');
       return;
     }
 
