@@ -9,8 +9,7 @@ import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelecto
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ResourceRefType, ValidationResponse} from '@monokle/validation';
-import {CORE_PLUGINS} from '@shared/constants/validation';
+import {CORE_PLUGINS, ResourceRefType, ValidationResponse} from '@monokle/validation';
 import {K8sResource, ResourceMeta} from '@shared/models/k8sResource';
 import type {ThunkApi} from '@shared/models/thunk';
 import type {LoadValidationResult, ValidationArgs, ValidationResource} from '@shared/models/validation';
