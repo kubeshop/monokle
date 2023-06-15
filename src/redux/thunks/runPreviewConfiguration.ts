@@ -45,7 +45,7 @@ export const runPreviewConfiguration = createAsyncThunk<
   if (!kubeconfig?.isValid) {
     return createRejectionWithAlert(
       thunkAPI,
-      'Preview Configuration Error',
+      'Dry-run Configuration Error',
       `Could not preview due to invalid kubeconfig`
     );
   }
@@ -60,8 +60,8 @@ export const runPreviewConfiguration = createAsyncThunk<
   if (!previewConfiguration) {
     return createRejectionWithAlert(
       thunkAPI,
-      'Preview Configuration Error',
-      `Could not find the Preview Configuration with id ${previewConfigurationId}`
+      'Dry-run Configuration Error',
+      `Could not find the Dry-run Configuration with id ${previewConfigurationId}`
     );
   }
 
@@ -157,6 +157,6 @@ export const runPreviewConfiguration = createAsyncThunk<
   return createRejectionWithAlert(
     thunkAPI,
     'Helm Error',
-    `Unable to run Helm with Preview Configuration: ${previewConfiguration.name} - [${result.stderr}]`
+    `Unable to run Helm with Dry-run Configuration: ${previewConfiguration.name} - [${result.stderr}]`
   );
 });
