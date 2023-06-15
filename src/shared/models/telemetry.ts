@@ -42,6 +42,7 @@ export type EventMap = {
     numberOfResources: number;
     numberOfOverlays: number;
     numberOfHelmCharts: number;
+    numberOfValuesFiles: number;
     executionTime: number;
   };
   'app_start/create_project': {from: 'scratch' | 'git' | 'template' | 'folder'; templateID?: string};
