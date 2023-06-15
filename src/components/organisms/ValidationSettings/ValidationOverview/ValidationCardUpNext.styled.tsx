@@ -5,7 +5,6 @@ import {QuestionCircleFilled} from '@ant-design/icons';
 import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
-import {Device} from '@shared/styles/device';
 
 export const Card = styled(AntdCard)`
   border: 2px dashed #31393c;
@@ -17,11 +16,6 @@ export const Card = styled(AntdCard)`
   .ant-card-body {
     background-color: #191f21;
     height: 100%;
-  }
-
-  @media ${Device.laptopS} {
-    width: 50%;
-    margin-left: 25%;
   }
 `;
 

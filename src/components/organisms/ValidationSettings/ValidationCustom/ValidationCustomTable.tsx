@@ -1,26 +1,39 @@
-import React, {useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useMeasure} from 'react-use';
 
 import {Input, Skeleton} from 'antd';
 
-import {
-  pluginMetadataSelector,
-  pluginRulesSelector,
-  useValidationSelector,
-} from '@redux/validation/validation.selectors';
+import {pluginRulesSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 
-import type {Rule} from '@shared/models/validation';
+import {PluginMetadataWithConfig} from '@monokle/validation';
 
-import * as S from './ValidationOpenPolicyAgentTable.styled';
-import {useOpenPolicyAgentTable} from './useOpenPolicyAgentTable';
+import * as S from './ValidationCustomTable.styled';
+import {useValidationTable} from './useValidationTable';
 
-export const ValidationOpenPolicyAgentTable: React.FC = () => {
-  const plugin = useValidationSelector(s => pluginMetadataSelector(s, 'open-policy-agent')!);
-  const pluginRules = useValidationSelector(state => pluginRulesSelector(state, 'open-policy-agent'));
+export type Rule = {
+  id: string;
+  name: string;
+  shortDescription: string;
+  fullDescription: string;
+  learnMoreUrl?: string;
+  severity: 'low' | 'medium' | 'high';
+  enabled: boolean;
+  level: 'warning' | 'error';
+  defaultLevel: 'warning' | 'error';
+};
+
+type IProps = {
+  plugin: PluginMetadataWithConfig;
+};
+
+const ValidationCustomTable: React.FC<IProps> = props => {
+  const {plugin} = props;
 
   const [containerRef, {width}] = useMeasure<HTMLDivElement>();
 
-  const columns = useOpenPolicyAgentTable(plugin, width);
+  const columns = useValidationTable(plugin, width);
+
+  const pluginRules = useValidationSelector(s => pluginRulesSelector(s, plugin.name));
 
   const rules: Rule[] = useMemo(() => {
     return pluginRules.map(rule => {
@@ -49,7 +62,16 @@ export const ValidationOpenPolicyAgentTable: React.FC = () => {
   const [filter, setFilter] = useState<string>('');
 
   const filteredRules: Rule[] = useMemo(() => {
-    return rules.filter(rule => (filter.length === 0 ? true : rule.fullDescription.toLowerCase().includes(filter)));
+    return rules
+      .filter(rule => (filter.length === 0 ? true : rule.fullDescription.toLowerCase().includes(filter)))
+      .sort((a, b) => {
+        const aPrefix = a.id.slice(0, a.id.length - 3);
+        const aNumber = Number(a.id.slice(-3));
+        const bPrefix = b.id.slice(0, b.id.length - 3);
+        const bNumber = Number(b.id.slice(-3));
+
+        return aPrefix < bPrefix ? -1 : bPrefix < aPrefix ? 1 : aNumber === bNumber ? 0 : aNumber > bNumber ? 1 : -1;
+      });
   }, [rules, filter]);
 
   if (rules.length === 0) {
@@ -57,7 +79,7 @@ export const ValidationOpenPolicyAgentTable: React.FC = () => {
   }
 
   return (
-    <S.Container ref={containerRef}>
+    <div ref={containerRef}>
       <S.InputContainer>
         <Input
           prefix={<S.SearchIcon />}
@@ -75,6 +97,8 @@ export const ValidationOpenPolicyAgentTable: React.FC = () => {
           locale={{emptyText: 'No rules found'}}
         />
       </S.TableContainer>
-    </S.Container>
+    </div>
   );
 };
+
+export default ValidationCustomTable;

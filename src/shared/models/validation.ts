@@ -9,6 +9,7 @@ import type {
 } from '@monokle/validation';
 
 import {K8sResource, ResourceIdentifier, ResourceStorage} from './k8sResource';
+import {CustomValidationPlugin} from './validationPlugins';
 
 type Initialization = 'uninitialized' | 'loading' | 'error' | 'loaded';
 export type NewProblemsIntroducedType = 'initial' | 'k8s-schema' | 'rule';
@@ -36,6 +37,15 @@ export type ValidationState = {
     filters: ValidationFiltersValueType;
     selectedProblem?: SelectedProblem;
     newProblemsIntroducedType: NewProblemsIntroducedType;
+  };
+  /**
+   * The 'configure' property is related to the UI of the Validation Settings
+   */
+  configure: {
+    /**
+     * This property determines which plugin is currently being configured in the Validation Settings panel
+     */
+    plugin: CustomValidationPlugin | PluginMetadataWithConfig | undefined;
   };
 };
 

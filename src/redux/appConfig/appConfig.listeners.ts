@@ -1,13 +1,6 @@
-import {isAnyOf} from '@reduxjs/toolkit';
-
 import {AppListenerFn} from '@redux/listeners/base';
-import {getResourceKindSchema} from '@redux/services/schema';
-import {setOpenProject} from '@redux/thunks/project';
-import {VALIDATOR} from '@redux/validation/validator';
 
-import {ResourceKindHandlers, readSavedCrdKindHandlers} from '@src/kindhandlers';
-
-import {CustomSchema} from '@monokle/validation';
+import {readSavedCrdKindHandlers} from '@src/kindhandlers';
 
 import {setUserDirs} from './appConfig.slice';
 
@@ -26,29 +19,4 @@ const crdsPathChangedListener: AppListenerFn = listen => {
   });
 };
 
-const k8sVersionSchemaListener: AppListenerFn = listen => {
-  listen({
-    matcher: isAnyOf(setOpenProject.fulfilled),
-    effect: async (action, {getState}) => {
-      const state = getState().config;
-      const k8sVersion = state.projectConfig?.k8sVersion || state.k8sVersion;
-      const userDataDir = state.userDataDir;
-      if (!userDataDir) {
-        return;
-      }
-
-      const schemas: CustomSchema[] = ResourceKindHandlers.filter(h => !h.isCustom).map(kindHandler => {
-        const schema = getResourceKindSchema(kindHandler.kind, k8sVersion, userDataDir);
-        return {
-          apiVersion: kindHandler.clusterApiVersion,
-          kind: kindHandler.kind,
-          schema,
-        };
-      });
-
-      await VALIDATOR.bulkRegisterCustomSchemas(schemas);
-    },
-  });
-};
-
-export const appConfigListeners = [crdsPathChangedListener, k8sVersionSchemaListener];
+export const appConfigListeners = [crdsPathChangedListener];

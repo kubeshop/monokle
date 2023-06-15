@@ -30,13 +30,8 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
     };
 
     merge(config, state.config);
-    electronStore.set('validation.config', config);
 
-    // @ts-ignore
-    if (config && config['rules']) {
-      // @ts-ignore
-      config.rules['resource-links/no-missing-optional-links'] = 'warn';
-    }
+    electronStore.set('validation.config', config);
 
     await VALIDATOR.loadValidation({config});
 

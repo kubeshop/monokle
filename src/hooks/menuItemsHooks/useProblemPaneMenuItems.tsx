@@ -16,7 +16,7 @@ import {Monaco} from '@components/molecules';
 
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
-import {getRuleForResult} from '@monokle/validation';
+import {getRuleForResultV2} from '@monokle/validation';
 import {ResourceStorage} from '@shared/models/k8sResource';
 import {ResourceSelection} from '@shared/models/selection';
 import {isEqual} from '@shared/utils/isEqual';
@@ -65,7 +65,7 @@ export function useProblemPaneMenuItems(width: number, height: number) {
       return null;
     }
 
-    return getRuleForResult(lastResponse, selectedProblem);
+    return getRuleForResultV2(lastResponse.runs[0], selectedProblem);
   }, [lastResponse, selectedProblem]);
 
   const sarifValue = useMemo(() => {
