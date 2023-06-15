@@ -44,7 +44,7 @@ const PreviewConfigurationPane: React.FC<InjectedPanelProps> = props => {
       collapsible={isInClusterMode ? 'disabled' : undefined}
       header={
         <TitleBar
-          title="Helm Preview Configurations"
+          title="Helm Dry-run Configurations"
           expandable
           isOpen={Boolean(isActive)}
           actions={<TitleBarCount count={count} isActive={Boolean(isActive)} />}

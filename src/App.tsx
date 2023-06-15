@@ -250,7 +250,7 @@ const App = () => {
 
         <LazyDrawer
           onClose={previewConfigurationDrawerOnClose}
-          title="Preview Configuration"
+          title="Dry-run Configuration"
           visible={previewConfigurationEditorState.isOpen}
         >
           <PreviewConfigurationEditor key={previewConfigurationEditorState.helmChartId} />
