@@ -46,7 +46,7 @@ const SaveToFolderModal: React.FC<Props> = props => {
         resourcePayloads: resourcesRef.current.map(resource => {
           return {
             resource,
-            absolutePath: path.join(folder, `${resource.name}-${resource.kind}.yaml`),
+            absolutePath: path.join(folder, `${resource.name}-${resource.kind.toLowerCase()}.yaml`),
           };
         }),
         saveMode: 'saveToFolder',
