@@ -23,7 +23,7 @@ const PreviewConfigurationAdd: React.FC = () => {
           dispatch(openPreviewConfigurationEditor({}));
         }}
       >
-        Create preview configuration
+        Create dry-run configuration
       </AddButton>
     </Tooltip>
   );

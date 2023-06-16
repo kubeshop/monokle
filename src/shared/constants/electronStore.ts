@@ -17,6 +17,9 @@ export const electronStoreSchema = {
       deviceID: {
         type: 'string',
       },
+      firstTimeRunTimestamp: {
+        type: 'number',
+      },
       filtersPresets: {
         type: 'object',
       },

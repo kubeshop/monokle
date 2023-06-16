@@ -85,7 +85,7 @@ const PreviewConfigurationQuickAction: React.FC<IProps> = props => {
           }
         }}
       >
-        {isCurrentPreviewing ? 'Exit' : 'Preview'}
+        {isCurrentPreviewing ? 'Exit' : 'Dry-run'}
       </Button>
 
       <Button isItemSelected={isSelected} onClick={() => onClickEdit()}>

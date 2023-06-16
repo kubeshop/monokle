@@ -58,7 +58,7 @@ const PreviewConfigurationEditor = () => {
   const [showNameError, setShowNameError] = useState(false);
 
   const [valuesFileItemMap, setValuesFileItemMap] = useState<Record<string, PreviewConfigValuesFileItem>>(() => {
-    // get the existing items saved in the preview configuration
+    // get the existing items saved in the dry-run configuration
     let items = previewConfiguration
       ? Object.values(previewConfiguration.valuesFileItemMap).filter(
           (value): value is PreviewConfigValuesFileItem => value !== null
@@ -208,7 +208,7 @@ const PreviewConfigurationEditor = () => {
           <S.Field>
             <S.Label>Name your configuration:</S.Label>
             <Input value={name} onChange={e => setName(e.target.value)} placeholder="Enter the configuration name" />
-            {showNameError && <S.Error>You must enter a name for this Preview Configuration.</S.Error>}
+            {showNameError && <S.Error>You must enter a name for this Dry-run Configuration.</S.Error>}
           </S.Field>
           <S.Field>
             <S.Label style={{marginBottom: 0}}>Select which values files to use:</S.Label>
@@ -216,7 +216,7 @@ const PreviewConfigurationEditor = () => {
             <ValuesFilesList itemMap={valuesFileItemMap} onChange={itemMap => setValuesFileItemMap(itemMap)} />
           </S.Field>
           <S.Field>
-            <S.Label>Select which helm command to use for this Preview:</S.Label>
+            <S.Label>Select which helm command to use for this Dry-run:</S.Label>
             <Select value={helmCommand} onChange={setHelmCommand} style={{width: 150}}>
               <Select.Option value="template">Template</Select.Option>
               <Select.Option value="install">Install</Select.Option>
@@ -240,7 +240,7 @@ const PreviewConfigurationEditor = () => {
               Save
             </Button>
             <Button onClick={() => onSave(true)} type="primary">
-              Save and Preview
+              Save and Dry-run
             </Button>
           </S.ActionsContainer>
         </>
