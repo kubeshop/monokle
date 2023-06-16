@@ -1,14 +1,18 @@
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 
 import {trackEvent} from '@shared/utils/telemetry';
 
-let sessionStartTimestamp: number = Date.now();
-
 export function useSessionTime() {
+  const sessionStartTimeRef = useRef(Date.now());
   useEffect(() => {
-    window.addEventListener('beforeunload', () => {
+    const beforeUnload = () => {
       // will calculate time spent on this session in seconds
-      trackEvent('APP_SESSION_END', {timeSpent: Math.floor((Date.now() - sessionStartTimestamp) / (1000 * 60 * 60))});
-    });
+      const timeSpent = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
+      trackEvent('APP_SESSION_END', {timeSpent});
+    };
+    window.addEventListener('beforeunload', beforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', beforeUnload);
+    };
   }, []);
 }
