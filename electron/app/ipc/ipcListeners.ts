@@ -32,6 +32,7 @@ import type {FileExplorerOptions, FileOptions} from '@shared/models/fileExplorer
 import {AnyPlugin} from '@shared/models/plugin';
 import {DISABLED_TELEMETRY} from '@shared/models/telemetry';
 import {AnyTemplate, InterpolateTemplateOptions, TemplatePack} from '@shared/models/template';
+import electronStore from '@shared/utils/electronStore';
 import {disableSegment, enableSegment, getSegmentClient} from '@shared/utils/segment';
 
 import autoUpdater from '../autoUpdater';
@@ -103,12 +104,16 @@ const killTerminal = (id: string) => {
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   const segmentClient = getSegmentClient();
   if (segmentClient) {
-    const minutesPassedSinceCreation = calculateMinutesPassed();
+    const minutesPassedSinceFirstTimeRun = calculateMinutesPassed(electronStore.get('main.firstTimeRunTimestamp'));
 
     const properties: any = {appVersion: app.getVersion(), ...payload};
 
-    if (minutesPassedSinceCreation >= 0 && minutesPassedSinceCreation <= 10) {
+    if (minutesPassedSinceFirstTimeRun >= 0 && minutesPassedSinceFirstTimeRun <= 10) {
       properties['ftu10m'] = 1;
+    } else if (minutesPassedSinceFirstTimeRun > 10 && minutesPassedSinceFirstTimeRun <= 30) {
+      properties['ftu30m'] = 1;
+    } else if (minutesPassedSinceFirstTimeRun > 30 && minutesPassedSinceFirstTimeRun <= 60) {
+      properties['ftu60m'] = 1;
     }
 
     segmentClient.track({
