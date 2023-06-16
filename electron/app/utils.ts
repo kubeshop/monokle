@@ -248,3 +248,17 @@ export const checkMissingDependencies = (dependencies: Array<string>): Array<str
     }
   });
 };
+
+// will calculate the minutes that passed from the creation time of the current session
+
+export function calculateMinutesPassed(): number {
+  const creationTime = process.getCreationTime();
+
+  if (!creationTime) {
+    return -1;
+  }
+
+  const currentTimeInMillis = Date.now();
+  const minutesPassed = Math.floor((currentTimeInMillis - creationTime) / (1000 * 60));
+  return minutesPassed;
+}

@@ -55,7 +55,7 @@ import {
   updateTemplate,
   updateTemplatePack,
 } from '../services/templateService';
-import {askActionConfirmation} from '../utils';
+import {askActionConfirmation, calculateMinutesPassed} from '../utils';
 import {dispatchToAllWindows} from './ipcMainRedux';
 
 const userDataDir = app.getPath('userData');
@@ -103,7 +103,14 @@ const killTerminal = (id: string) => {
 ipcMain.on('track-event', async (event: any, {eventName, payload}: any) => {
   const segmentClient = getSegmentClient();
   if (segmentClient) {
+    const minutesPassedSinceCreation = calculateMinutesPassed();
+
     const properties: any = {appVersion: app.getVersion(), ...payload};
+
+    if (minutesPassedSinceCreation >= 0 && minutesPassedSinceCreation <= 10) {
+      properties['ftu10m'] = 1;
+    }
+
     segmentClient.track({
       event: eventName,
       userId: machineId,
