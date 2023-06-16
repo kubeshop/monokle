@@ -4,7 +4,7 @@ import {RESOURCE_PARSER} from '@redux/parsing/resourceParser';
 
 import {createWorkerEventPromise} from '@utils/worker';
 
-import {CustomSchema, MonokleValidator, SchemaLoader, createDefaultMonokleValidator} from '@monokle/validation';
+import {CustomSchema, MonokleValidator, SchemaLoader, createExtensibleMonokleValidator} from '@monokle/validation';
 
 import {
   LoadValidationMessage,
@@ -23,7 +23,7 @@ class ValidationWorker {
 
   constructor() {
     this.#worker = new Worker(new URL('./validation.worker', import.meta.url));
-    this.#validator = createDefaultMonokleValidator(RESOURCE_PARSER.getParser(), SCHEMA_LOADER);
+    this.#validator = createExtensibleMonokleValidator(RESOURCE_PARSER.getParser(), SCHEMA_LOADER);
   }
 
   get metadata() {

@@ -1,7 +1,8 @@
 /// <reference lib="webworker" />
 import {WorkerMessage, matchWorkerEvent} from '@utils/worker';
 
-import {ResourceParser, SchemaLoader, createDefaultMonokleValidator} from '@monokle/validation';
+import {ResourceParser, SchemaLoader} from '@monokle/validation';
+import {createExtensibleMonokleValidator} from '@monokle/validation/lib/createExtensibleMonokleValidator.browser';
 
 import {
   LoadValidationMessage,
@@ -14,7 +15,7 @@ import {
 
 const RESOURCE_PARSER = new ResourceParser();
 const SCHEMA_LOADER = new SchemaLoader();
-const VALIDATOR = createDefaultMonokleValidator(RESOURCE_PARSER, SCHEMA_LOADER);
+const VALIDATOR = createExtensibleMonokleValidator(RESOURCE_PARSER, SCHEMA_LOADER);
 
 const handleEvent = <Message extends WorkerMessage>(
   event: MessageEvent,
