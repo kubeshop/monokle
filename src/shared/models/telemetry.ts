@@ -37,7 +37,7 @@ export type EventMap = {
   APP_UPDATED: {oldVersion: string; newVersion: string};
   APP_DOWNGRADED: {oldVersion: string; newVersion: string};
   APP_QUIT: {exitCode: number};
-  SESSION_END: {timeSpent: number};
+  APP_SESSION_END: {timeSpent: number};
   'app_start/open_project': {
     numberOfFiles: number;
     numberOfResources: number;
