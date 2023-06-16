@@ -24,7 +24,7 @@ type Props = {
 const SaveToFolderModal: React.FC<Props> = props => {
   const {isVisible, onClose, resources} = props;
   const dispatch = useAppDispatch();
-  const [selectedFolder, setSelectedFolder, selectedFolderRef] = useStateWithRef<string | undefined>(undefined);
+  const [selectedFolder, setSelectedFolder, selectedFolderRef] = useStateWithRef<string | undefined>(ROOT_FILE_ENTRY);
   const [isLoading, setIsLoading] = useState(false);
   const folderTreeData = useFileFolderTreeSelectData('folder');
   const rootFolderPathRef = useRefSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]?.filePath);
@@ -46,7 +46,7 @@ const SaveToFolderModal: React.FC<Props> = props => {
         resourcePayloads: resourcesRef.current.map(resource => {
           return {
             resource,
-            absolutePath: path.join(folder, `${resource.name}.yaml`),
+            absolutePath: path.join(folder, `${resource.name}-${resource.kind.toLowerCase()}.yaml`),
           };
         }),
         saveMode: 'saveToFolder',
