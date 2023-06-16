@@ -1,6 +1,6 @@
 import React, {Suspense, useCallback, useLayoutEffect, useMemo, useState} from 'react';
 
-import {Image, Modal} from 'antd';
+import {Modal} from 'antd';
 
 import fs from 'fs';
 import semver from 'semver';
@@ -12,8 +12,6 @@ import {openWelcomeModal} from '@redux/reducers/ui';
 import {setDeleteProject} from '@redux/thunks/project';
 
 import {fetchAppVersion} from '@utils/appVersion';
-
-import PerformanceIcon from '@assets/PerformanceIcon.svg';
 
 import {AlertEnum} from '@shared/models/alert';
 import {Project} from '@shared/models/config';
@@ -99,27 +97,6 @@ const GlobalModals = () => {
       const lastSeenReleaseNotesVersion = electronStore.get('appConfig.lastSeenReleaseNotesVersion');
 
       const nextMajorReleaseVersion = semver.inc(lastSeenReleaseNotesVersion, 'minor');
-
-      if (
-        semver.valid(lastSeenReleaseNotesVersion) &&
-        semver.satisfies(version, `>=2.0.0 <=${nextMajorReleaseVersion}`)
-      ) {
-        const seenPerformanceNotification = electronStore.get('appConfig.seenPerformanceNotification');
-
-        if (!seenPerformanceNotification) {
-          dispatch(
-            setAlert({
-              id: 'monokle_performance_alert',
-              title: 'Improving performance',
-              message: `In version 2.0.0 of Monokle, we have updated the interface and underlying data model to enhance your experience. Despite our best efforts, you may have encountered performance and stability issues that impacted your user experience. We apologize for any inconvenience and appreciate your patience as we are working to resolve these concerns.\n\n We are working hard to address identified issues and improve your experience with Monokle. However, there may still be room for improvement. Your feedback is crucial to us, and we invite you to share any concerns or suggestions you may have. Please [connect with us on Discord](https://discord.com/invite/6zupCZFQbe) or use the feedback form included in this version. Your input helps us continually refine and improve our product for all users.`,
-              type: AlertEnum.Info,
-              icon: <Image src={PerformanceIcon} />,
-            })
-          );
-
-          electronStore.set('appConfig.seenPerformanceNotification', true);
-        }
-      }
 
       // new user
       if (!semver.valid(lastSeenReleaseNotesVersion)) {
