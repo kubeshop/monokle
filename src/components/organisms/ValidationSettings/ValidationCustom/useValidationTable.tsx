@@ -1,5 +1,3 @@
-import {shell} from 'electron';
-
 import {useCallback, useMemo} from 'react';
 
 import {Switch, Tooltip} from 'antd';
@@ -7,42 +5,44 @@ import {ColumnsType} from 'antd/lib/table';
 
 import styled from 'styled-components';
 
-import {TOOLTIP_DELAY, VALIDATION_HIDING_LABELS_WIDTH} from '@constants/constants';
+import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppDispatch} from '@redux/hooks';
 import {changeRuleLevel, toggleRule} from '@redux/validation/validation.slice';
 
 import {Icon, IconNames} from '@monokle/components';
 import {PluginMetadataWithConfig} from '@monokle/validation';
-import type {Rule} from '@shared/models/validation';
 import {Colors} from '@shared/styles/colors';
-import {trackEvent} from '@shared/utils';
+import {trackEvent} from '@shared/utils/telemetry';
 
+import type {Rule} from './ValidationCustomTable';
+import * as S from './ValidationCustomTable.styled';
 import ValidationLevelSelect from './ValidationLevelSelect';
-import * as S from './ValidationOpenPolicyAgentTable.styled';
 
-export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width: number) {
+const VALIDATION_HIDING_LABELS_WIDTH = 450;
+
+export function useValidationTable(plugin: PluginMetadataWithConfig, width: number) {
   const dispatch = useAppDispatch();
 
   const handleToggle = useCallback(
     (rule: Rule) => {
-      dispatch(toggleRule({plugin: 'open-policy-agent', rule: rule.name}));
+      dispatch(toggleRule({plugin: plugin.name, rule: rule.name}));
       trackEvent('configure/toggle_rule', {id: rule.id});
     },
-    [dispatch]
+    [dispatch, plugin.name]
   );
 
-  const changeLevelHandler = useCallback(
+  const changeLevel = useCallback(
     (rule: Rule, level: 'error' | 'warning' | 'default') => {
       dispatch(
         changeRuleLevel({
-          plugin: 'open-policy-agent',
+          plugin: plugin.name,
           rule: rule.name,
           level,
         })
       );
     },
-    [dispatch]
+    [dispatch, plugin.name]
   );
 
   const columns: ColumnsType<Rule> = useMemo(() => {
@@ -52,20 +52,20 @@ export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width:
         title: 'Description',
         dataIndex: 'name',
         render: (_value, rule) => {
-          const {fullDescription, id, learnMoreUrl, shortDescription} = rule;
-
+          const {fullDescription, learnMoreUrl} = rule;
           return (
             <Tooltip
               mouseEnterDelay={TOOLTIP_DELAY}
               title={
                 <p>
-                  {fullDescription} {learnMoreUrl && <a onClick={() => shell.openExternal(learnMoreUrl)}>Learn more</a>}
+                  {fullDescription}{' '}
+                  {learnMoreUrl && <a onClick={() => window.open(learnMoreUrl, '_newtab')}>Learn more</a>}
                 </p>
               }
               placement="bottomLeft"
               overlayStyle={{maxWidth: '500px'}}
             >
-              {shortDescription} <S.RuleId>{id}</S.RuleId>
+              {rule.shortDescription} <S.RuleId>{rule.id}</S.RuleId>
             </Tooltip>
           );
         },
@@ -91,15 +91,15 @@ export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width:
           return (
             <Box>
               <Switch
+                disabled={!plugin.configuration.enabled}
                 checked={rule.enabled}
-                disabled={!plugin?.configuration.enabled ?? true}
                 onChange={() => handleToggle(rule)}
               />
 
               <ValidationLevelSelect
                 rule={rule}
                 disabled={!plugin.configuration.enabled || !rule.enabled}
-                handleChange={changeLevelHandler}
+                handleChange={changeLevel}
               />
             </Box>
           );
@@ -109,7 +109,7 @@ export function useOpenPolicyAgentTable(plugin: PluginMetadataWithConfig, width:
         }),
       },
     ];
-  }, [changeLevelHandler, handleToggle, plugin.configuration.enabled, width]);
+  }, [width, plugin.configuration.enabled, changeLevel, handleToggle]);
 
   return columns;
 }

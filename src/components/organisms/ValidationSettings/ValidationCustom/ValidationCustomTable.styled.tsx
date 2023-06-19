@@ -4,13 +4,14 @@ import {SearchOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
-import type {Rule} from '@shared/models/validation';
 import {Colors} from '@shared/styles/colors';
+
+import {Rule} from './ValidationCustomTable';
 
 export const Container = styled.div``;
 
 export const InputContainer = styled.div`
-  padding: 0px 16px;
+  padding: 16px 0px;
 `;
 
 export const RuleId = styled.span`
@@ -45,5 +46,5 @@ export const Table = styled((props: TableProps<Rule>) => <AntdTable<Rule> {...pr
 
 export const TableContainer = styled.div`
   overflow-y: auto;
-  margin-top: 10px;
+  padding-top: 10px;
 `;

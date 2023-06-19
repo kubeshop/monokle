@@ -9,8 +9,7 @@ import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelecto
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {ResourceRefType, ValidationResponse} from '@monokle/validation';
-import {CORE_PLUGINS} from '@shared/constants/validation';
+import {CORE_PLUGINS, ResourceRefType, ValidationResponse} from '@monokle/validation';
 import {K8sResource, ResourceMeta} from '@shared/models/k8sResource';
 import type {ThunkApi} from '@shared/models/thunk';
 import type {LoadValidationResult, ValidationArgs, ValidationResource} from '@shared/models/validation';
@@ -30,13 +29,8 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
     };
 
     merge(config, state.config);
-    electronStore.set('validation.config', config);
 
-    // @ts-ignore
-    if (config && config['rules']) {
-      // @ts-ignore
-      config.rules['resource-links/no-missing-optional-links'] = 'warn';
-    }
+    electronStore.set('validation.config', config);
 
     await VALIDATOR.loadValidation({config});
 

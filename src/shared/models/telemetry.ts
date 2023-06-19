@@ -37,11 +37,13 @@ export type EventMap = {
   APP_UPDATED: {oldVersion: string; newVersion: string};
   APP_DOWNGRADED: {oldVersion: string; newVersion: string};
   APP_QUIT: {exitCode: number};
+  APP_SESSION_END: {timeSpent: number};
   'app_start/open_project': {
     numberOfFiles: number;
     numberOfResources: number;
     numberOfOverlays: number;
     numberOfHelmCharts: number;
+    numberOfValuesFiles: number;
     executionTime: number;
   };
   'app_start/create_project': {from: 'scratch' | 'git' | 'template' | 'folder'; templateID?: string};
@@ -149,11 +151,14 @@ export type EventMap = {
   'helm_repo/download': undefined;
   'helm_repo/install': undefined;
   'ai/generation/open': undefined;
+  'ai/generation/no-api-key-set': undefined;
+  'ai/generation/error': {message: string};
   'ai/generation/success': {
     enabledValidation: boolean;
     executionTime: number;
   };
   'ai/generation/created-resources': {resourceKinds: string[]; resourcesCount: number};
+  'logs/search': {resourceKind: string};
 };
 
 export const APP_INSTALLED = 'APP_INSTALLED';
