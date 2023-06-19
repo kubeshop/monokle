@@ -123,6 +123,18 @@ export const NewsFeed = styled.div`
   height: 320px;
 `;
 
+export const NewsFeedBottom = styled.div`
+  display: none;
+
+  @media (max-width: 944px) {
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+    border: 1px solid ${Colors.grey10};
+    height: 150px;
+  }
+`;
+
 export const NewsFeedHeader = styled.div`
   display: flex;
   align-items: center;
@@ -175,6 +187,14 @@ export const NewsFeedItemTime = styled.div`
   line-height: 20px;
 `;
 
+export const NewsFeedItemTimeBottom = styled.div`
+  font-weight: 400;
+  color: ${Colors.grey6};
+  font-size: 12px;
+  line-height: 20px;
+  width: 80px;
+`;
+
 export const NewsFeedItemTitle = styled.div`
   font-weight: 400;
   font-size: 13px;
@@ -187,6 +207,22 @@ export const NewsFeeditem = styled.div`
   flex-direction: column;
   margin: 10px 0 10px 0;
   padding: 5px;
+  border-radius: 5px;
+
+  &:hover {
+    cursor: pointer;
+    ${NewsFeedItemTime} {
+      color: ${Colors.grey7};
+    }
+    ${NewsFeedItemTitle} {
+      color: ${Colors.grey9};
+    }
+  }
+`;
+
+export const NewsFeeditemBottom = styled.div`
+  display: flex;
+  margin: 2px 0 2px 0;
   border-radius: 5px;
 
   &:hover {

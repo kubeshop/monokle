@@ -7,6 +7,7 @@ import {AlertState} from '@shared/models/alert';
 import {AppState} from '@shared/models/appState';
 import {AppConfig, NewVersionCode, SettingsPanel} from '@shared/models/config';
 import {ExtensionState} from '@shared/models/extension';
+import {NewsFeedState} from '@shared/models/newsfeed';
 import {TerminalState} from '@shared/models/terminal';
 import {LeftMenuSelectionOptions, PaneConfiguration, UiState} from '@shared/models/ui';
 import electronStore from '@shared/utils/electronStore';
@@ -266,6 +267,10 @@ const initialTerminalState: TerminalState = {
   terminalsMap: {},
 };
 
+const initialNewsFeedState: NewsFeedState = {
+  items: [],
+};
+
 export default {
   alert: initialAlertState,
   config: initialAppConfigState,
@@ -273,4 +278,5 @@ export default {
   main: initialAppState,
   terminal: initialTerminalState,
   ui: initialUiState,
+  newsfeed: initialNewsFeedState,
 };

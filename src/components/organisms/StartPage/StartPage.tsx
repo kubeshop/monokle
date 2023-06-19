@@ -3,6 +3,7 @@ import {shell} from 'electron';
 import {useEffect, useState} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setNewsFeed} from '@redux/reducers/newsfeed';
 import {
   setIsFromBackToStart,
   setIsInQuickClusterMode,
@@ -42,7 +43,8 @@ const StartPage: React.FC = () => {
   const projects = useAppSelector(state => state.config.projects);
   const selectedOption = useAppSelector(state => state.ui.startPage.selectedMenuOption);
   const isFromBackToStart = useAppSelector(state => state.ui.startPage.fromBackToStart);
-  const [newsFeed, setNewsFeed] = useState<NewsFeedItem[]>([]);
+  const newsFeedfromStore = useAppSelector(state => state.newsfeed.items);
+  const [newsFeed, setStartNewsFeed] = useState<NewsFeedItem[]>([]);
 
   const {height, width} = useWindowSize();
 
@@ -82,15 +84,21 @@ const StartPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (isFromBackToStart) {
+    if (newsFeed.length === 0) {
       fetch('https://monokle-news-api.kubeshop.workers.dev/')
         .then(response => response.json())
         .then(data => {
-          setNewsFeed(data);
+          setStartNewsFeed(data);
         });
-      console.log('%cNews Feed data is set', 'color: green; font-size: 16px; font-weight: bold;');
+      console.log('%c calling of API', 'color: #bada55');
     }
-  }, [isFromBackToStart]);
+  }, []);
+
+  useEffect(() => {
+    if (newsFeed.length > 0) {
+      dispatch(setNewsFeed(newsFeed));
+    }
+  }, [newsFeed]);
 
   const openNewsFeedItem = (url: string) => {
     shell.openExternal(url);
@@ -133,6 +141,29 @@ const StartPage: React.FC = () => {
         <S.ContentContainer>
           <S.ContentTitle>{options[selectedOption].title}</S.ContentTitle>
           {options[selectedOption].content}
+          <S.NewsFeedBottom>
+            <S.NewsFeedHeader>
+              <S.NewsFeedIcon>
+                <img src={AnnotationHeart} alt="news feed icon" />
+              </S.NewsFeedIcon>
+              What&lsquo;s New?
+            </S.NewsFeedHeader>
+            <S.NewsFeedContent>
+              {newsFeedfromStore.map(item => (
+                <S.NewsFeeditemBottom
+                  onClick={() => {
+                    openNewsFeedItem(item.url);
+                  }}
+                >
+                  <S.NewsFeedItemTimeBottom>
+                    {Math.floor((new Date().getTime() - new Date(item.date).getTime()) / (1000 * 60 * 60 * 24))}
+                    {' days'}
+                  </S.NewsFeedItemTimeBottom>
+                  <S.NewsFeedItemTitle>{item.title}</S.NewsFeedItemTitle>
+                </S.NewsFeeditemBottom>
+              ))}
+            </S.NewsFeedContent>
+          </S.NewsFeedBottom>
         </S.ContentContainer>
 
         <S.NewsFeedContainer>
@@ -144,7 +175,7 @@ const StartPage: React.FC = () => {
               What&lsquo;s New?
             </S.NewsFeedHeader>
             <S.NewsFeedContent>
-              {newsFeed.map(item => (
+              {newsFeedfromStore.map(item => (
                 <S.NewsFeeditem
                   onClick={() => {
                     openNewsFeedItem(item.url);
