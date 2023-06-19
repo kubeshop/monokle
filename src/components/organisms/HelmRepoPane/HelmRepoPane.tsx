@@ -6,6 +6,7 @@ import {setHelmPaneMenuItem} from '@redux/reducers/ui';
 import {Colors} from '@shared/styles';
 
 import HelmChartsView from './HelmChartsView';
+import HelmReleases from './HelmReleases';
 import HelmReposView from './HelmReposView';
 
 import * as S from './styled';
@@ -13,6 +14,7 @@ import * as S from './styled';
 const menuItems = [
   {label: 'Browse Charts', key: 'browse-charts'},
   {label: 'Manage Repositories', key: 'manage-repositories'},
+  {label: 'Manage Releases', key: 'manage-releases'},
 ];
 
 const TooltipDescription = () => {
@@ -68,6 +70,7 @@ const HelmRepoView = () => {
       <div style={{display: 'flex', flexDirection: 'column', gap: 16}}>
         {selectedMenuItem === 'browse-charts' && <HelmChartsView />}
         {selectedMenuItem === 'manage-repositories' && <HelmReposView />}
+        {selectedMenuItem === 'manage-releases' && <HelmReleases />}
       </div>
     </S.Container>
   );

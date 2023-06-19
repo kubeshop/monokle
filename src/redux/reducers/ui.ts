@@ -22,6 +22,7 @@ import {
   ChartInfo,
   ExplorerCollapsibleSectionsType,
   HelmChartDetailsTab,
+  HelmRelease,
   HelmRepoMenu,
   LayoutSizeType,
   LearnTopicType,
@@ -435,6 +436,9 @@ export const uiSlice = createSlice({
     toggleHelmPanSearchHub: (state: Draft<UiState>) => {
       state.helmPane.isSearchHubIncluded = !state.helmPane.isSearchHubIncluded;
     },
+    setSelectedHelmRelease: (state: Draft<UiState>, action: PayloadAction<HelmRelease | null>) => {
+      state.helmPane.selectedHelmRelease = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -590,5 +594,6 @@ export const {
   setHelmPaneSelectedChart,
   setHelmPaneChartDetailsTab,
   toggleHelmPanSearchHub,
+  setSelectedHelmRelease,
 } = uiSlice.actions;
 export default uiSlice.reducer;
