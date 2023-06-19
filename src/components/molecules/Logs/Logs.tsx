@@ -4,6 +4,7 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 
 import {Skeleton} from 'antd';
 
+import {debounce} from 'lodash';
 import log from 'loglevel';
 import stream from 'stream';
 import {v4 as uuidv4} from 'uuid';
@@ -15,6 +16,7 @@ import {SearchInput} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
 import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {createKubeClient} from '@shared/utils/kubeclient';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import * as S from './Logs.styled';
 
@@ -57,6 +59,7 @@ const Logs: React.FC = () => {
   const kubeconfig = useAppSelector(selectKubeconfig);
   const selectedResource = useSelectedResource();
 
+  const [inputFocused, setInputFocused] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [logs, setLogs] = useState<LogLineType[]>([]);
@@ -72,6 +75,29 @@ const Logs: React.FC = () => {
       label: <span>{matchingCharactersLabel(logLine.text, searchValue)}</span>,
     }));
   }, [logs, searchValue]);
+
+  const debouncedSetSearchValue = useMemo(() => {
+    return debounce(e => {
+      setSearchValue(e.target.value);
+    }, 500);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      debouncedSetSearchValue.cancel();
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!inputFocused || !searchValue || !selectedResource) {
+      return;
+    }
+
+    trackEvent('logs/search', {resourceKind: selectedResource.kind});
+    setInputFocused(false);
+  }, [searchValue, inputFocused, selectedResource]);
 
   useEffect(() => {
     if (containerRef && containerRef.current) {
@@ -131,10 +157,11 @@ const Logs: React.FC = () => {
   return (
     <S.LogContainer ref={containerRef}>
       <SearchInput
+        onFocus={() => setInputFocused(true)}
+        onBlur={() => setInputFocused(false)}
         style={{marginBottom: '16px'}}
         placeholder="Search through logs..."
-        value={searchValue}
-        onChange={(e: any) => setSearchValue(e.target.value)}
+        onChange={debouncedSetSearchValue}
       />
 
       <S.LogsContainer>
