@@ -15,6 +15,7 @@ import {SearchInput} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
 import {selectKubeconfig} from '@shared/utils/cluster/selectors';
 import {createKubeClient} from '@shared/utils/kubeclient';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import * as S from './Logs.styled';
 
@@ -57,6 +58,7 @@ const Logs: React.FC = () => {
   const kubeconfig = useAppSelector(selectKubeconfig);
   const selectedResource = useSelectedResource();
 
+  const [inputFocused, setInputFocused] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [logs, setLogs] = useState<LogLineType[]>([]);
@@ -72,6 +74,15 @@ const Logs: React.FC = () => {
       label: <span>{matchingCharactersLabel(logLine.text, searchValue)}</span>,
     }));
   }, [logs, searchValue]);
+
+  useEffect(() => {
+    if (!inputFocused || !searchValue) {
+      return;
+    }
+
+    trackEvent('logs/search');
+    setInputFocused(false);
+  }, [searchValue, inputFocused]);
 
   useEffect(() => {
     if (containerRef && containerRef.current) {
@@ -131,6 +142,8 @@ const Logs: React.FC = () => {
   return (
     <S.LogContainer ref={containerRef}>
       <SearchInput
+        onFocus={() => setInputFocused(true)}
+        onBlur={() => setInputFocused(false)}
         style={{marginBottom: '16px'}}
         placeholder="Search through logs..."
         value={searchValue}
