@@ -4,6 +4,7 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 
 import {Skeleton} from 'antd';
 
+import {debounce} from 'lodash';
 import log from 'loglevel';
 import stream from 'stream';
 import {v4 as uuidv4} from 'uuid';
@@ -75,14 +76,28 @@ const Logs: React.FC = () => {
     }));
   }, [logs, searchValue]);
 
+  const debouncedSetSearchValue = useMemo(() => {
+    return debounce(e => {
+      setSearchValue(e.target.value);
+    }, 500);
+  }, []);
+
   useEffect(() => {
-    if (!inputFocused || !searchValue) {
+    return () => {
+      debouncedSetSearchValue.cancel();
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!inputFocused || !searchValue || !selectedResource) {
       return;
     }
 
-    trackEvent('logs/search');
+    trackEvent('logs/search', {resourceKind: selectedResource.kind});
     setInputFocused(false);
-  }, [searchValue, inputFocused]);
+  }, [searchValue, inputFocused, selectedResource]);
 
   useEffect(() => {
     if (containerRef && containerRef.current) {
@@ -146,8 +161,7 @@ const Logs: React.FC = () => {
         onBlur={() => setInputFocused(false)}
         style={{marginBottom: '16px'}}
         placeholder="Search through logs..."
-        value={searchValue}
-        onChange={(e: any) => setSearchValue(e.target.value)}
+        onChange={debouncedSetSearchValue}
       />
 
       <S.LogsContainer>

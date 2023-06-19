@@ -158,7 +158,7 @@ export type EventMap = {
     executionTime: number;
   };
   'ai/generation/created-resources': {resourceKinds: string[]; resourcesCount: number};
-  'logs/search': undefined;
+  'logs/search': {resourceKind: string};
 };
 
 export const APP_INSTALLED = 'APP_INSTALLED';
