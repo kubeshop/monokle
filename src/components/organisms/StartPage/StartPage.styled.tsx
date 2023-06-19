@@ -7,7 +7,7 @@ import {
 import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
-import {Device} from '@shared/styles/device';
+import {Device, size} from '@shared/styles/device';
 
 export const ContentContainer = styled.div`
   display: flex;
@@ -18,9 +18,9 @@ export const ContentContainer = styled.div`
   padding-right: 10px;
   width: 70%;
 
-  /* @media ${Device.laptopM} {
-    padding-right: 250px;
-  } */
+  @media (max-width: 944px) {
+    width: 100%;
+  }
 `;
 
 export const ContentTitle = styled.div`
@@ -42,7 +42,12 @@ export const Menu = styled.div`
   flex-direction: column;
   gap: 20px;
   margin-top: 10px;
-  width: 310px;
+  width: auto;
+  margin-right: 20px;
+
+  @media ${Device.laptopM} {
+    width: 290px;
+  }
 
   & div:last-child {
     display: none;
@@ -92,6 +97,10 @@ export const StartPageContainer = styled.div<{$height: number}>`
   display: flex;
   flex-direction: column;
   gap: 50px;
+
+  @media (max-width: ${size.laptopM}) {
+    padding: 20px 20px 20px 20px;
+  }
 `;
 
 export const NewsFeedContainer = styled.div`
@@ -99,6 +108,10 @@ export const NewsFeedContainer = styled.div`
   flex-direction: column;
   height: 100%;
   width: 310px;
+
+  @media (max-width: 944px) {
+    display: none;
+  }
 `;
 
 export const NewsFeed = styled.div`
@@ -137,6 +150,22 @@ export const NewsFeedContent = styled.div`
   padding: 0 20px 20px 20px;
   color: ${Colors.grey1000};
   overflow-y: scroll;
+  /* Make the scrollbar appear only on hover */
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+
+  &:hover {
+    ::-webkit-scrollbar {
+      width: 8px;
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: ${Colors.grey10};
+      border-radius: 5px;
+    }
+  }
 `;
 
 export const NewsFeedItemTime = styled.div`

@@ -44,7 +44,7 @@ const StartPage: React.FC = () => {
   const isFromBackToStart = useAppSelector(state => state.ui.startPage.fromBackToStart);
   const [newsFeed, setNewsFeed] = useState<NewsFeedItem[]>([]);
 
-  const {height} = useWindowSize();
+  const {height, width} = useWindowSize();
 
   const options = useStartPageOptions();
 
@@ -82,12 +82,15 @@ const StartPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetch('https://monokle-news-api.kubeshop.workers.dev/')
-      .then(response => response.json())
-      .then(data => {
-        setNewsFeed(data);
-      });
-  }, []);
+    if (isFromBackToStart) {
+      fetch('https://monokle-news-api.kubeshop.workers.dev/')
+        .then(response => response.json())
+        .then(data => {
+          setNewsFeed(data);
+        });
+      console.log('%cNews Feed data is set', 'color: green; font-size: 16px; font-weight: bold;');
+    }
+  }, [isFromBackToStart]);
 
   const openNewsFeedItem = (url: string) => {
     shell.openExternal(url);
@@ -122,7 +125,7 @@ const StartPage: React.FC = () => {
               }}
             >
               <IconButton>{value.icon}</IconButton>
-              {value.label}
+              {width > 1070 && value.label}
             </S.MenuOption>
           ))}
         </S.Menu>
