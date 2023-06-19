@@ -435,6 +435,12 @@ export const uiSlice = createSlice({
     toggleHelmPanSearchHub: (state: Draft<UiState>) => {
       state.helmPane.isSearchHubIncluded = !state.helmPane.isSearchHubIncluded;
     },
+    openHelmRepoModal: (state: Draft<UiState>) => {
+      state.helmRepoModal.isOpen = true;
+    },
+    closeHelmRepoModal: (state: Draft<UiState>) => {
+      state.helmRepoModal.isOpen = false;
+    },
   },
   extraReducers: builder => {
     builder
@@ -590,5 +596,7 @@ export const {
   setHelmPaneSelectedChart,
   setHelmPaneChartDetailsTab,
   toggleHelmPanSearchHub,
+  openHelmRepoModal,
+  closeHelmRepoModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;
