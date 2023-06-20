@@ -246,6 +246,9 @@ const initialUiState: UiState = {
     chartDetailsTab: 'info',
     isSearchHubIncluded: false,
   },
+  helmRepoModal: {
+    isOpen: false,
+  },
 };
 
 const initialExtensionState: ExtensionState = {

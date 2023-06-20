@@ -205,6 +205,9 @@ type UiState = {
     chartDetailsTab: HelmChartDetailsTab;
     isSearchHubIncluded: boolean;
   };
+  helmRepoModal: {
+    isOpen: boolean;
+  };
 };
 
 type HelmRepoMenu = 'browse-charts' | 'manage-repositories';
