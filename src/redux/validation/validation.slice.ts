@@ -7,8 +7,9 @@ import {stopClusterConnection} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ValidationFiltersValueType} from '@monokle/components';
-import {ValidationIntegrationId} from '@shared/models/integrations';
+import {PluginMetadataWithConfig} from '@monokle/validation';
 import {SelectedProblem, ValidationState} from '@shared/models/validation';
+import {CustomValidationPlugin} from '@shared/models/validationPlugins';
 import electronStore from '@shared/utils/electronStore';
 
 import {validationInitialState} from './validation.initialState';
@@ -83,6 +84,13 @@ export const validationSlice = createSlice({
       state.validationOverview.newProblemsIntroducedType = 'k8s-schema';
     },
 
+    updateSelectedPluginConfiguration: (
+      state: Draft<ValidationState>,
+      action: PayloadAction<CustomValidationPlugin | PluginMetadataWithConfig | undefined>
+    ) => {
+      state.configure.plugin = action.payload;
+    },
+
     toggleRule: (
       state: Draft<ValidationState>,
       action: PayloadAction<{plugin: string; rule?: string; enable?: boolean}>
@@ -140,7 +148,7 @@ export const validationSlice = createSlice({
       electronStore.set('validation.config.rules', config.rules);
     },
 
-    toggleValidation: (state: Draft<ValidationState>, action: PayloadAction<ValidationIntegrationId>) => {
+    toggleValidation: (state: Draft<ValidationState>, action: PayloadAction<string>) => {
       const id = action.payload;
 
       if (!state.config.plugins) {
@@ -214,5 +222,6 @@ export const {
   setSelectedProblem,
   toggleRule,
   toggleValidation,
+  updateSelectedPluginConfiguration,
 } = validationSlice.actions;
 export default validationSlice.reducer;

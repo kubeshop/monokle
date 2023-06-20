@@ -24,7 +24,7 @@ export function useNewResourceMenuItems() {
         label: (
           <MenuItem>
             <FileAddOutlined />
-            Create manually
+            use Basic Form
           </MenuItem>
         ),
         onClick: () => {
@@ -37,7 +37,7 @@ export function useNewResourceMenuItems() {
         label: (
           <MenuItem>
             <img src={TemplateSmallWhiteSvg} />
-            Use Advanced Template
+            use Advanced Template
           </MenuItem>
         ),
         onClick: () => {
@@ -50,7 +50,7 @@ export function useNewResourceMenuItems() {
         label: (
           <MenuItem>
             <RobotOutlined />
-            AI Assisted
+            use AI Assistant
           </MenuItem>
         ),
         onClick: () => {

@@ -46,7 +46,6 @@ import {
 import {ProjectConfig} from '@shared/models/config';
 import {FileEntry} from '@shared/models/fileEntry';
 import {HelmChart} from '@shared/models/helm';
-import {ValidationIntegration} from '@shared/models/integrations';
 import {
   K8sResource,
   ResourceContent,
@@ -286,9 +285,6 @@ export const mainSlice = createSlice({
       state.lastChangedLine = action.payload;
     },
 
-    updateValidationIntegration: (state: Draft<AppState>, action: PayloadAction<ValidationIntegration | undefined>) => {
-      state.validationIntegration = action.payload;
-    },
     updateMultipleClusterResources: (state: Draft<AppState>, action: PayloadAction<K8sResource[]>) => {
       action.payload.forEach((r: K8sResource) => {
         if (!isClusterResource(r)) {
@@ -678,7 +674,6 @@ export const {
   uncheckMultipleResourceIds,
   uncheckResourceId,
   updateResourceFilter,
-  updateValidationIntegration,
   setLastChangedLine,
   updateMultipleClusterResources,
   deleteMultipleClusterResources,

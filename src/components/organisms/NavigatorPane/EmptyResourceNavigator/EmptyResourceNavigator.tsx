@@ -32,30 +32,32 @@ const EmptyResourceNavigator: React.FC = () => {
   const newResourceActionsList: NewResourceAction[] = useMemo(
     () => [
       {
-        image: FromAI,
-        hoverImage: FromAIHovered,
-        fromTypeLabel: 'AI',
+        image: FromModel,
+        hoverImage: FromModelHovered,
+        typeLabel: 'Basic Form',
         onClick: () => {
-          trackEvent('new_resource/create', {type: 'AI', from: 'empty_navigator'});
-          dispatch(openNewAiResourceWizard());
+          trackEvent('new_resource/create', {type: 'wizard', from: 'empty_navigator'});
+          dispatch(openNewResourceWizard());
         },
       },
+
       {
         image: FromAdvancedTemplate,
         hoverImage: FromAdvancedTemplateHovered,
-        fromTypeLabel: 'advanced template',
+        typeLabel: 'Advanced Template',
         onClick: () => {
           trackEvent('new_resource/create', {type: 'advanced_template', from: 'empty_navigator'});
           dispatch(openTemplateExplorer());
         },
       },
+
       {
-        image: FromModel,
-        hoverImage: FromModelHovered,
-        fromTypeLabel: 'model',
+        image: FromAI,
+        hoverImage: FromAIHovered,
+        typeLabel: 'AI Assistant',
         onClick: () => {
-          trackEvent('new_resource/create', {type: 'wizard', from: 'empty_navigator'});
-          dispatch(openNewResourceWizard());
+          trackEvent('new_resource/create', {type: 'AI', from: 'empty_navigator'});
+          dispatch(openNewAiResourceWizard());
         },
       },
     ],
@@ -71,7 +73,7 @@ const EmptyResourceNavigator: React.FC = () => {
       ) : (
         <NewResourceCardsContainer>
           {newResourceActionsList.map(action => (
-            <NewResourceCard key={action.fromTypeLabel} action={action} />
+            <NewResourceCard key={action.typeLabel} action={action} />
           ))}
         </NewResourceCardsContainer>
       )}

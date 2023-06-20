@@ -27,4 +27,7 @@ export const validationInitialState: ValidationState = {
     },
     newProblemsIntroducedType: 'initial',
   },
+  configure: {
+    plugin: undefined,
+  },
 };

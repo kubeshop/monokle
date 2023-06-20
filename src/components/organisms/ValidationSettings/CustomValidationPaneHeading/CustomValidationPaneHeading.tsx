@@ -3,20 +3,20 @@ import {shell} from 'electron';
 import React, {useCallback} from 'react';
 
 import {useAppDispatch} from '@redux/hooks';
-import {updateValidationIntegration} from '@redux/reducers/main';
+import {updateSelectedPluginConfiguration} from '@redux/validation/validation.slice';
 
-import {ValidationIntegration} from '@shared/models/integrations';
+import {CustomValidationPlugin} from '@shared/models/validationPlugins';
 
-import * as S from './ValidationPaneHeading.styled';
+import * as S from './CustomValidationPaneHeading.styled';
 
-const ValidationPaneHeading: React.FC<{integration: ValidationIntegration}> = props => {
-  const {icon, name, learnMoreUrl} = props.integration;
+const CustomValidationPaneHeading: React.FC<{plugin: CustomValidationPlugin}> = ({plugin}) => {
+  const {icon, name, learnMoreUrl} = plugin;
   const openLearnMore = useCallback(() => shell.openExternal(learnMoreUrl), [learnMoreUrl]);
 
   const dispatch = useAppDispatch();
 
   const onBackHandler = () => {
-    dispatch(updateValidationIntegration(undefined));
+    dispatch(updateSelectedPluginConfiguration(undefined));
   };
 
   return (
@@ -35,4 +35,4 @@ const ValidationPaneHeading: React.FC<{integration: ValidationIntegration}> = pr
   );
 };
 
-export default ValidationPaneHeading;
+export default CustomValidationPaneHeading;

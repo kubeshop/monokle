@@ -101,7 +101,7 @@ function useEditorKeybindings(
         },
       });
     },
-    [dispatch, fileMapRef, hiddenInputRef, isQuickSearchActionsOpen]
+    [dispatch, fileMapRef, hiddenInputRef, isInClusterMode, isInPreviewMode, isQuickSearchActionsOpen]
   );
 
   return {registerStaticActions};

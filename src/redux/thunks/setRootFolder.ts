@@ -102,6 +102,7 @@ export const setRootFolder = createAsyncThunk<
   const filesNumber = Object.values(fileMap).filter(f => !f.children).length;
   const resourcesNumber = Object.values(resourceMetaMap).length;
   const helmChartsNumber = Object.values(helmChartMap).length;
+  const valuesFilesNumber = Object.values(helmValuesMap).length;
   const overlaysNumber = Object.values(resourceMetaMap).filter(r => isKustomizationResource(r)).length;
 
   const generatedAlert = {
@@ -157,6 +158,7 @@ export const setRootFolder = createAsyncThunk<
     numberOfResources: resourcesNumber,
     numberOfOverlays: overlaysNumber,
     numberOfHelmCharts: helmChartsNumber,
+    numberOfValuesFiles: valuesFilesNumber,
     executionTime: endTime - startTime,
   });
 

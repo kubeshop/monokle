@@ -158,6 +158,7 @@ export const initTelemetry = (deviceID: string, disableEventTracking: boolean, a
       },
     });
     electronStore.set('main.deviceID', deviceID);
+    electronStore.set('main.firstTimeRunTimestamp', Date.now());
   }
 };
 
@@ -248,3 +249,15 @@ export const checkMissingDependencies = (dependencies: Array<string>): Array<str
     }
   });
 };
+
+// will calculate the minutes that passed from the first time the app was run
+
+export function calculateMinutesPassed(firstTimeRunTimestamp: number): number {
+  if (!firstTimeRunTimestamp) {
+    return -1;
+  }
+
+  const currentTimeInMillis = Date.now();
+  const minutesPassed = Math.floor((currentTimeInMillis - firstTimeRunTimestamp) / (1000 * 60));
+  return minutesPassed;
+}
