@@ -106,6 +106,7 @@ const NewProject: React.FC = () => {
       itemDescription: 'Create a new project from a Helm Chart in a Helm repository, and save it locally.',
       itemAction: () => {
         dispatch(openHelmRepoModal());
+        trackEvent('app_start/create_project', {from: 'helm'});
       },
     },
   ];

@@ -46,7 +46,10 @@ export type EventMap = {
     numberOfValuesFiles: number;
     executionTime: number;
   };
-  'app_start/create_project': {from: 'sample' | 'scratch' | 'git' | 'template' | 'folder'; templateID?: string};
+  'app_start/create_project': {
+    from: 'sample' | 'scratch' | 'git' | 'template' | 'folder' | 'helm';
+    templateID?: string;
+  };
   'app_start/select_page': {page: string};
   'app_start/select_project': undefined;
   'project_list/open_project': undefined;
