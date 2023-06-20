@@ -18,6 +18,8 @@ import {Project} from '@shared/models/config';
 import electronStore from '@shared/utils/electronStore';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
+import HelmRepoModal from '../HelmRepoModal/HelmRepoModal';
+
 const GitCloneModal = React.lazy(() => import('@organisms/GitCloneModal'));
 
 const AboutModal = React.lazy(() => import('@organisms/AboutModal'));
@@ -74,6 +76,7 @@ const GlobalModals = () => {
   const isScaleModalVisible = useAppSelector(state => state.ui.scaleModal.isOpen);
   const isWelcomeModalVisible = useAppSelector(state => state.ui.welcomeModal.isVisible);
   const isNewAiResourceWizardVisible = useAppSelector(state => state.ui.newAiResourceWizard.isOpen);
+  const isHelmRepoModalVisible = useAppSelector(state => state.ui.helmRepoModal.isOpen);
 
   const isClusterResourceDiffModalVisible = useMemo(
     () => Boolean(targetResourceId) && isInClusterMode,
@@ -185,6 +188,7 @@ const GlobalModals = () => {
         )}
         {isTemplateExplorerVisible && <TemplateExplorer />}
         {isWelcomeModalVisible && <WelcomeModal />}
+        {isHelmRepoModalVisible && <HelmRepoModal />}
       </Suspense>
     </>
   );
