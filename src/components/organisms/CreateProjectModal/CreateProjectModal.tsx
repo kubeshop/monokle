@@ -49,6 +49,7 @@ const CreateProjectModal: React.FC = () => {
         dispatch(setCreateProject({name, rootFolder}));
         onCloseModalHandler();
       } else {
+        trackEvent('app_start/create_project', {from: 'folder'});
         dispatch(setTemplateProjectCreate({name, rootFolder}));
         dispatch(openTemplateExplorer());
         onCloseModalHandler();

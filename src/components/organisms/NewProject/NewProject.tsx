@@ -51,6 +51,7 @@ const NewProject: React.FC = () => {
         'Not sure where to start? Explore a sample project containing everything you need to get started with just one click.',
       itemAction: () => {
         dispatch(openGitCloneModal({fromSampleProject: true}));
+        trackEvent('app_start/create_project', {from: 'sample'});
       },
     },
     {
