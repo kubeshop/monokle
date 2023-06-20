@@ -1,11 +1,10 @@
 import {useCallback, useEffect, useRef} from 'react';
 
-import {Table as AntTable, Button, Form, Input, Modal, TableColumnProps, Typography} from 'antd';
+import {Button, Form, Modal, TableColumnProps, Typography} from 'antd';
 
-import {SearchOutlined} from '@ant-design/icons';
+import {RightOutlined, SearchOutlined} from '@ant-design/icons';
 
 import {debounce} from 'lodash';
-import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
@@ -20,8 +19,9 @@ import {
 import {sortChartsByName, useSearchHelmCharts} from '@hooks/useSearchHelmCharts';
 
 import {ChartInfo} from '@shared/models/ui';
-import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils';
+
+import * as S from './styled';
 
 const columns: TableColumnProps<ChartInfo>[] = [
   {
@@ -50,6 +50,19 @@ const columns: TableColumnProps<ChartInfo>[] = [
     dataIndex: 'app_version',
     key: 'app_version',
   },
+  {
+    title: '',
+    dataIndex: '',
+    key: 'x',
+    responsive: ['sm'],
+    width: 40,
+
+    render: () => (
+      <S.HoverArea>
+        <RightOutlined style={{fontSize: 14}} />
+      </S.HoverArea>
+    ),
+  },
 ];
 
 const CHART_NAME_REGEX = /^[a-z]([-a-z0-9]*[a-z0-9])?(\/[a-z]([-a-z0-9]*[a-z0-9])?)*$/gi;
@@ -76,7 +89,7 @@ const SearchForm = ({onChangeSearchInputHandler}: {onChangeSearchInputHandler: (
         ]}
         initialValue={initialValue}
       >
-        <Input placeholder="Search for a Helm Chart" prefix={<SearchOutlined />} size="large" />
+        <S.Input placeholder="Refine your Chart search" prefix={<SearchOutlined />} />
       </Form.Item>
     </Form>
   );
@@ -121,13 +134,13 @@ const HelmRepoModal = () => {
       okText="Cancel"
       okType="default"
       footer={<Button onClick={onCancelClickHandler}>Cancel</Button>}
-      width="60vw"
+      width="75vw"
     >
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24}}>
         <Typography.Text>{searchResultCount} Helm Charts available. Select desired one to proceed.</Typography.Text>
         <SearchForm onChangeSearchInputHandler={onChangeSearchInputHandler} />
       </div>
-      <Table
+      <S.Table
         columns={columns}
         dataSource={result}
         loading={loading}
@@ -143,56 +156,3 @@ const HelmRepoModal = () => {
 };
 
 export default HelmRepoModal;
-
-const Table = styled(props => <AntTable {...props} />)`
-  .ant-table {
-    border: 1px solid ${Colors.grey4};
-    border-radius: 2px;
-  }
-
-  .ant-table-header {
-    background-color: #1f2628;
-    color: ${Colors.grey9};
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    border-bottom: 1px solid ${Colors.grey4};
-    margin-bottom: 0;
-    scrollbar-gutter: stable both-edges;
-  }
-
-  & .ant-table-header .ant-table-cell {
-    font-size: 14px;
-    font-weight: 700;
-    color: ${Colors.grey9};
-  }
-
-  .ant-table-thead .ant-table-cell::before {
-    display: none;
-  }
-
-  .ant-table-body .ant-table-row {
-    background-color: #191f21;
-    border-bottom: 1px solid ${Colors.grey4};
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 18px;
-    color: ${Colors.grey9};
-  }
-
-  .ant-table-body .ant-table-row:hover {
-    background-color: #2a3437;
-  }
-
-  .ant-table-body .ant-table-row:hover .hover-area {
-    visibility: visible;
-  }
-
-  .row-selected {
-    background-color: ${Colors.cyan8} !important;
-    color: ${Colors.grey2} !important;
-  }
-
-  .hub-search {
-    color: ${Colors.geekblue8} !important;
-  }
-`;
