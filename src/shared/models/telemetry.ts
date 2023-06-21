@@ -123,6 +123,7 @@ export type EventMap = {
   'cluster/actions/scale': {replicasNumber: number};
   'cluster/actions/restart': undefined;
   'cluster/actions/delete': {kind: string};
+  'cluster/metrics': {providers: string[]};
   'compare/opened': {from?: string};
   'compare/compared': {left?: string; right?: string; operation: string};
   'compare/inspected': {type?: string};

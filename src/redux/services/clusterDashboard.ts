@@ -1,8 +1,15 @@
 import * as k8s from '@kubernetes/client-node';
 
+import {uniq} from 'lodash';
+
 import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 
 import {cpuParser, memoryParser} from '@utils/unit-converter';
+
+import {isDefined} from '@shared/utils/filter';
+import {trackEvent} from '@shared/utils/telemetry';
+
+let lastContext: string | undefined;
 
 export const getClusterUtilization = async (kubeconfig: string, context: string): Promise<NodeMetric[]> => {
   const kc = await createKubeClientWithSetup({context, kubeconfig, skipHealthCheck: true});
@@ -13,6 +20,23 @@ export const getClusterUtilization = async (kubeconfig: string, context: string)
 
   const nodeMetrics: k8s.NodeMetric[] = (await metricClient.getNodeMetrics()).items;
   const nodes = await k8s.topNodes(k8sApiClient);
+
+  if (lastContext !== context) {
+    const providers = uniq(
+      nodes
+        .map(node => {
+          const providerId = node.Node?.spec?.providerID;
+          // ID of the node assigned by the cloud provider in the format: <ProviderName>://<ProviderSpecificNodeID>
+          const providerParts = providerId?.split('://');
+          if (providerParts?.length === 2) {
+            return providerParts[0];
+          }
+          return undefined;
+        })
+        .filter(isDefined)
+    );
+    trackEvent('cluster/metrics', {providers});
+  }
 
   return nodeMetrics.map(m => ({
     nodeName: m.metadata.name,
