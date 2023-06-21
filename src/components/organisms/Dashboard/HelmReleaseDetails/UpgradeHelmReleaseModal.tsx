@@ -4,14 +4,13 @@ import {useAppSelector} from '@redux/hooks';
 
 import {useSearchHelmCharts} from '@hooks/useSearchHelmCharts';
 
-import {runCommandInMainThread, upgradeHelmReleaseCommand} from '@shared/utils/commands';
-
 interface IProps {
   onClose: () => void;
   onOk?: (repo: string) => void;
+  isDryRun?: boolean;
 }
 
-const UpgradeHelmReleaseModal = ({onClose, onOk}: IProps) => {
+const UpgradeHelmReleaseModal = ({onClose, onOk, isDryRun}: IProps) => {
   const [form] = Form.useForm();
   const release = useAppSelector(state => state.ui.helmPane.selectedHelmRelease!);
   const {result: repos, loading} = useSearchHelmCharts(release.chart.slice(0, release.chart.lastIndexOf('-')), false);
@@ -20,17 +19,17 @@ const UpgradeHelmReleaseModal = ({onClose, onOk}: IProps) => {
     form.submit();
     const values = await form.validateFields();
     onOk && onOk(values.repo);
-    const result = await runCommandInMainThread(
-      upgradeHelmReleaseCommand({release: release.name, chart: values.repo, namespace: release.namespace})
-    );
-    if (result.stderr) {
-      return;
-    }
     onClose();
   };
 
   return loading ? null : (
-    <Modal open onCancel={onClose} getContainer="helmDiffModalContainer" okText="Upgrade" onOk={onUpgradeClickHandler}>
+    <Modal
+      open
+      onCancel={onClose}
+      getContainer="helmDiffModalContainer"
+      okText={isDryRun ? 'Dry-run upgrade' : 'Upgrade'}
+      onOk={onUpgradeClickHandler}
+    >
       <Form layout="vertical" form={form}>
         <Form.Item name="chart" label="Chart" initialValue={release.chart}>
           <Input disabled />

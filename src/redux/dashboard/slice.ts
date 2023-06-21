@@ -3,7 +3,7 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {setCurrentContext} from '@redux/appConfig';
 import {connectCluster} from '@redux/cluster/thunks/connect';
 
-import {DashboardMenu, DashboardState} from '@shared/models/dashboard';
+import {DashboardAccordionType, DashboardMenu, DashboardState} from '@shared/models/dashboard';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {initialState} from './state';
@@ -30,6 +30,9 @@ export const dashboardSlice = createSlice({
       state.ui.activeTab = action.payload.tab;
       trackEvent('dashboard/selectTab', {tab: action.payload.tab, kind: action.payload.kind});
     },
+    setDashboardActiveAccordion: (state: Draft<DashboardState>, action: PayloadAction<DashboardAccordionType>) => {
+      state.ui.activeAccordion = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(connectCluster.fulfilled, state => {
@@ -41,7 +44,12 @@ export const dashboardSlice = createSlice({
   },
 });
 
-export const {setActiveDashboardMenu, setDashboardMenuList, setDashboardSelectedResourceId, setActiveTab} =
-  dashboardSlice.actions;
+export const {
+  setActiveDashboardMenu,
+  setDashboardMenuList,
+  setDashboardSelectedResourceId,
+  setActiveTab,
+  setDashboardActiveAccordion,
+} = dashboardSlice.actions;
 
 export default dashboardSlice.reducer;

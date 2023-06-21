@@ -15,6 +15,8 @@ interface IProps {
   leftSideCommand: CommandOptions;
   rightSideCommand: CommandOptions;
   onClose: () => void;
+  onOk: () => void;
+  okText: string;
 }
 
 const monacoEditorOptions = {
@@ -25,7 +27,7 @@ const monacoEditorOptions = {
   },
 };
 
-const HelmDryRunDiffModal = ({leftSideCommand, rightSideCommand, onClose}: IProps) => {
+const HelmDryRunDiffModal = ({leftSideCommand, rightSideCommand, onClose, onOk, okText}: IProps) => {
   const [containerRef, {height: containerHeight, width: containerWidth}] = useMeasure<HTMLDivElement>();
 
   const {value: leftSideSource = '', loading: isLeftSideLoading} = useAsync(async () => {
@@ -45,7 +47,7 @@ const HelmDryRunDiffModal = ({leftSideCommand, rightSideCommand, onClose}: IProp
   });
 
   return isLeftSideLoading || isRightSideLoading ? null : (
-    <Modal open onCancel={onClose} width="100%">
+    <Modal open onCancel={onClose} onOk={onOk} okText={okText} width="100%">
       <MonacoDiffContainer width="100%" height="calc(70vh - 80px)" ref={containerRef}>
         <MonacoDiffEditor
           width={containerWidth}

@@ -1,9 +1,11 @@
 import {useAsync} from 'react-use';
 
-import {Table as AntTable} from 'antd';
+import {Table as AntTable, Tag, Typography} from 'antd';
 
 import {DateTime} from 'luxon';
 import styled from 'styled-components';
+
+import {useAppSelector} from '@redux/hooks';
 
 import {Colors} from '@shared/styles';
 import {helmReleaseRevisionsCommand, runCommandInMainThread} from '@shared/utils/commands';
@@ -23,6 +25,9 @@ const columns = [
   {
     title: 'Status',
     dataIndex: 'status',
+    render: (value: string) => {
+      return <Tag color={value === 'deployed' ? 'green' : undefined}>{value}</Tag>;
+    },
   },
   {
     title: 'Chart',
@@ -39,16 +44,27 @@ const columns = [
 ];
 
 const HelmRevisionsTable = () => {
+  const release = useAppSelector(state => state.ui.helmPane.selectedHelmRelease!);
+
   const {value, loading} = useAsync(async () => {
     const result = await runCommandInMainThread(
-      helmReleaseRevisionsCommand({release: 'ingress-nginx', namespace: 'n1'})
+      helmReleaseRevisionsCommand({release: release.name, namespace: release.namespace!})
     );
     if (result.stderr) {
       throw new Error(result.stderr);
     }
-    return JSON.parse(result.stdout || '[]');
-  });
-  return <Table rowKey="revision" dataSource={value} columns={columns} pagination={false} loading={loading} />;
+    return JSON.parse(result.stdout || '[]').reverse();
+  }, [release]);
+
+  return (
+    <>
+      <Typography.Text>
+        Review this Chart updates history below. You can also <Typography.Link>update </Typography.Link> to latest
+        version.
+      </Typography.Text>
+      <Table rowKey="revision" dataSource={value} columns={columns} pagination={false} loading={loading} />
+    </>
+  );
 };
 
 export default HelmRevisionsTable;
@@ -57,6 +73,7 @@ export const Table = styled(props => <AntTable {...props} />)`
   .ant-table {
     border: 1px solid ${Colors.grey4};
     border-radius: 2px;
+    margin-top: 30px;
   }
 
   .ant-table-header {

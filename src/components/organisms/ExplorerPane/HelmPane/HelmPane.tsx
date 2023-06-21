@@ -6,11 +6,12 @@ import {size} from 'lodash';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {AccordionPanel} from '@components/atoms';
+
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {InjectedPanelProps} from '@shared/models/explorer';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
-import AccordionPanel from '../AccordionPanel';
 import HelmList from './HelmList';
 
 const HelmPane: React.FC<InjectedPanelProps> = props => {

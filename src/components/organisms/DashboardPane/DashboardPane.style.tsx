@@ -1,4 +1,4 @@
-import {Button as RawButton, Input as RawInput} from 'antd';
+import {Button as RawButton, Collapse as RawCollapse, Input as RawInput} from 'antd';
 
 import {
   CheckCircleFilled as RawCheckCircleFilled,
@@ -14,11 +14,13 @@ import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
   padding: 16px 0px 16px 0;
+
+  .ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
+    overflow-y: auto;
+  }
 `;
 
-export const HeaderContainer = styled.div`
-  padding: 0px 16px 16px 16px;
-`;
+export const HeaderContainer = styled.div``;
 
 export const MainSection = styled.div<{$active: boolean; $clickable: boolean; $isHovered: boolean}>`
   padding: 0 0 0 16px;
@@ -139,4 +141,29 @@ export const FilterAction = styled(RawButton)`
 
 export const FilterOutlined = styled(RawFilterOutlined)`
   color: ${Colors.blue7};
+`;
+
+export const Collapse = styled(RawCollapse)`
+  padding-top: 18px;
+  box-sizing: border-box;
+  height: 100%;
+  padding-bottom: 14px !important;
+  overflow: hidden;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 0;
+
+  .ant-collapse-header {
+    padding: 2px 20px 0px 20px !important;
+  }
+  .ant-collapse-item .ant-collapse-header-collapsible-only .ant-collapse-header-text {
+    width: 100%;
+  }
+`;
+
+export const CollapseContainer = styled.div`
+  width: 100%;
+  height: 100%;
 `;
