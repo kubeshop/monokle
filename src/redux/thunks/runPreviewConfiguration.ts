@@ -130,8 +130,8 @@ export const runPreviewConfiguration = createAsyncThunk<
 
   const result = await runCommandInMainThread(commandOptions);
 
-  if (result.error) {
-    trackEvent('preview/helm_config/fail', {reason: result.error});
+  if (result.error || result.stderr) {
+    trackEvent('preview/helm_config/fail', {reason: result.error || result.stderr || 'unknown'});
     return createRejectionWithAlert(thunkAPI, 'Helm Error', `${result.error} - ${result.stderr}`);
   }
 
