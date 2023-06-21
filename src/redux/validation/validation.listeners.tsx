@@ -47,6 +47,7 @@ import {doesSchemaExist} from '@utils/index';
 import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
 import {isDefined} from '@shared/utils/filter';
 import {isEqual} from '@shared/utils/isEqual';
+import {trackEvent} from '@shared/utils/telemetry';
 
 import {changeRuleLevel, setConfigK8sSchemaVersion, toggleRule, toggleValidation} from './validation.slice';
 import {loadValidation, validateResources} from './validation.thunks';
@@ -73,6 +74,7 @@ const loadListener: AppListenerFn = listen => {
       changeRuleLevel
     ),
     async effect(_action, {dispatch, delay, signal, cancelActiveListeners}) {
+      trackEvent('validation/load_config', {actionType: _action.type});
       if (isAnyOf(setIsInQuickClusterMode)(_action)) {
         if (!_action.payload) {
           return;
@@ -114,6 +116,7 @@ const validateListener: AppListenerFn = listen => {
     ),
     async effect(_action, {dispatch, getState, cancelActiveListeners, signal, delay}) {
       cancelActiveListeners();
+      trackEvent('validation/validate_all', {actionType: _action.type});
 
       if (incrementalValidationStatus.isRunning) {
         incrementalValidationStatus.abortController?.abort();
@@ -178,6 +181,7 @@ const incrementalValidationListener: AppListenerFn = listen => {
       multiplePathsChanged.fulfilled
     ),
     async effect(_action, {dispatch, delay, signal}) {
+      trackEvent('validation/validate_incremental', {actionType: _action.type});
       let resourceIdentifiers: ResourceIdentifier[] = [];
 
       if (

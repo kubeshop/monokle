@@ -162,6 +162,9 @@ export type EventMap = {
   };
   'ai/generation/created-resources': {resourceKinds: string[]; resourcesCount: number};
   'logs/search': {resourceKind: string};
+  'validation/load_config': {actionType: string};
+  'validation/validate_all': {actionType: string};
+  'validation/validate_incremental': {actionType: string};
 };
 
 export const APP_INSTALLED = 'APP_INSTALLED';
