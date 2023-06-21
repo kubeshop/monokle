@@ -85,6 +85,8 @@ export function recreateEditorModel(editor: monaco.editor.ICodeEditor, text: str
   const kindMatch = text.match(/kind:\s*(\w+)/);
   if (kindMatch?.length === 1) {
     currentResourceKind = kindMatch[1];
+  } else {
+    currentResourceKind = undefined;
   }
 
   isRecreatingModel = true;
@@ -178,7 +180,6 @@ export const clearEditorDecorations = () => {
 
 monaco.languages.registerHoverProvider('yaml', {
   provideHover: (model, position) => {
-    // We're sending this event on any hover because this method might be triggered by a hover created by Monaco itself
     const positionHovers = editorHovers.filter(hover => isPositionInRange(position, hover.range));
     if (positionHovers.length === 0) {
       trackEvent('editor/hover', {resourceKind: currentResourceKind});
