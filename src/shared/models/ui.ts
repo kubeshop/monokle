@@ -206,6 +206,9 @@ type UiState = {
     isSearchHubIncluded: boolean;
     selectedHelmRelease: null | HelmRelease;
   };
+  helmRepoModal: {
+    isOpen: boolean;
+  };
 };
 
 type HelmRepoMenu = 'browse-charts' | 'manage-repositories' | 'manage-releases';

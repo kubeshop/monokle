@@ -60,6 +60,7 @@ export const helmTemplateFileEnhancer = createEditorEnhancer(({state, resourceId
           typeof keyPathInFile.value === 'object' ? JSON.stringify(keyPathInFile.value, null, 4) : keyPathInFile.value;
 
         const newCommand = addEditorCommand({
+          type: 'go_to_helm_values_file',
           text: `${keyPathInFile.filePath}`,
           altText: 'Select file',
           handler: () => {
@@ -87,6 +88,7 @@ export const helmTemplateFileEnhancer = createEditorEnhancer(({state, resourceId
       const text = hasMultipleLinks ? `Found this value in ${keyPathsInFile.length} helm value files` : ``;
       if (!hasMultipleLinks) {
         addEditorLink({
+          type: 'go_to_file',
           range: helmFileValue.range,
           tooltip: 'Open file',
           handler: () => {
@@ -108,6 +110,7 @@ export const helmTemplateFileEnhancer = createEditorEnhancer(({state, resourceId
 
       if (commands.length) {
         addEditorHover({
+          type: 'helm_template_values_found',
           range: helmFileValue.range,
           contents: [createMarkdownString(text), ...commands.map(c => c.markdownLink)],
         });
@@ -117,6 +120,7 @@ export const helmTemplateFileEnhancer = createEditorEnhancer(({state, resourceId
     }
 
     addEditorHover({
+      type: 'helm_template_values_not_found',
       range: helmFileValue.range,
       contents: [createMarkdownString('This value was not found in any helm values file.')],
     });

@@ -3,6 +3,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {
   openCreateProjectModal,
   openFolderExplorer,
+  openHelmRepoModal,
   setIsInQuickClusterMode,
   setLeftMenuSelection,
   toggleStartProjectPane,
@@ -11,6 +12,7 @@ import {
 import ClusterLive from '@assets/newProject/ClusterLive.svg';
 import SelectFolder from '@assets/newProject/FromFolder.svg';
 import CreateFromGit from '@assets/newProject/FromGit.svg';
+import CreateFromHelm from '@assets/newProject/FromHelm.svg';
 import SampleProject from '@assets/newProject/FromSampleProject.svg';
 import CreateFromScratch from '@assets/newProject/FromScratch.svg';
 import CreateFromTemplate from '@assets/newProject/FromTemplate.svg';
@@ -49,6 +51,7 @@ const NewProject: React.FC = () => {
         'Not sure where to start? Explore a sample project containing everything you need to get started with just one click.',
       itemAction: () => {
         dispatch(openGitCloneModal({fromSampleProject: true}));
+        trackEvent('app_start/create_project', {from: 'sample'});
       },
     },
     {
@@ -93,6 +96,17 @@ const NewProject: React.FC = () => {
         if (isGitInstalled) {
           dispatch(openGitCloneModal({}));
         }
+      },
+    },
+    {
+      disabled: false,
+      itemId: 'start-from-helm',
+      itemLogo: CreateFromHelm,
+      itemTitle: 'Start from a Helm Chart',
+      itemDescription: 'Create a new project from a Helm Chart in a Helm repository, and save it locally.',
+      itemAction: () => {
+        dispatch(openHelmRepoModal());
+        trackEvent('app_start/create_project', {from: 'helm'});
       },
     },
   ];

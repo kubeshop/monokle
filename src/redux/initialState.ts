@@ -247,6 +247,9 @@ const initialUiState: UiState = {
     isSearchHubIncluded: false,
     selectedHelmRelease: null,
   },
+  helmRepoModal: {
+    isOpen: false,
+  },
 };
 
 const initialExtensionState: ExtensionState = {

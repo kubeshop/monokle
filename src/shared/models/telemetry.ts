@@ -46,7 +46,10 @@ export type EventMap = {
     numberOfValuesFiles: number;
     executionTime: number;
   };
-  'app_start/create_project': {from: 'scratch' | 'git' | 'template' | 'folder'; templateID?: string};
+  'app_start/create_project': {
+    from: 'sample' | 'scratch' | 'git' | 'template' | 'folder' | 'helm';
+    templateID?: string;
+  };
   'app_start/select_page': {page: string};
   'app_start/select_project': undefined;
   'project_list/open_project': undefined;
@@ -76,13 +79,16 @@ export type EventMap = {
   'explore/quick_search': undefined;
   'graph/select_resource': {kind: string};
   'graph/select_image': undefined;
-  'edit/code_changes': {from?: 'local' | 'cluster'};
+  'edit/code_changes': {from?: 'local' | 'cluster'; resourceKind?: string};
   'edit/template_use': {templateID: string};
   'edit/form_editor': {resourceKind?: string};
   'edit/source': {resourceKind?: string};
   'edit/side_by_side_editor': {resourceKind: string};
   'edit/select_hover_link': {type: 'resource' | 'image' | 'file'};
   'edit/graphview': {resourceKind?: string};
+  'editor/hover': {types?: string[]; resourceKind?: string};
+  'editor/follow_link': {types?: string[]; resourceKind?: string};
+  'editor/run_command': {type: string; resourceKind?: string};
   'create/file': undefined;
   'create/folder': undefined;
   'create/resource': {resourceKind: string};
@@ -117,6 +123,7 @@ export type EventMap = {
   'cluster/actions/scale': {replicasNumber: number};
   'cluster/actions/restart': undefined;
   'cluster/actions/delete': {kind: string};
+  'cluster/info': {kubeletVersion?: string; providers: string[]};
   'compare/opened': {from?: string};
   'compare/compared': {left?: string; right?: string; operation: string};
   'compare/inspected': {type?: string};
@@ -159,6 +166,9 @@ export type EventMap = {
   };
   'ai/generation/created-resources': {resourceKinds: string[]; resourcesCount: number};
   'logs/search': {resourceKind: string};
+  'validation/load_config': {actionType: string};
+  'validation/validate_all': {actionType: string};
+  'validation/validate_incremental': {actionType: string};
 };
 
 export const APP_INSTALLED = 'APP_INSTALLED';
