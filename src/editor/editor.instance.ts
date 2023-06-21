@@ -180,9 +180,15 @@ export const clearEditorDecorations = () => {
 
 monaco.languages.registerHoverProvider('yaml', {
   provideHover: (model, position) => {
+    let foundErrorOrWarning = false;
+    monaco.editor.getModelMarkers({resource: model.uri}).forEach(marker => {
+      if (!foundErrorOrWarning && isPositionInRange(position, marker)) {
+        trackEvent('editor/hover', {resourceKind: currentResourceKind, types: ['error_or_warning']});
+        foundErrorOrWarning = true;
+      }
+    });
     const positionHovers = editorHovers.filter(hover => isPositionInRange(position, hover.range));
     if (positionHovers.length === 0) {
-      trackEvent('editor/hover', {resourceKind: currentResourceKind});
       return null;
     }
     if (positionHovers.length === 1) {
