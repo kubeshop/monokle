@@ -58,6 +58,7 @@ function addNamespaceFilterLink(
 `);
 
     addEditorHover({
+      type: 'list_namespace_filters',
       range: symbol.range,
       contents: [filterMarkdown],
     });
@@ -104,6 +105,7 @@ function addKindFilterLink(
 `);
 
     addEditorHover({
+      type: 'list_kind_filters',
       range: symbol.range,
       contents: [filterMarkdown],
     });
@@ -140,6 +142,7 @@ function addLabelFilterLink(
 `);
 
     addEditorHover({
+      type: 'list_label_filters',
       range: symbol.range,
       contents: [filterMarkdown],
     });
@@ -176,6 +179,7 @@ function addAnnotationFilterLink(
     `);
 
     addEditorHover({
+      type: 'list_annotation_filters',
       range: symbol.range,
       contents: [filterMarkdown],
     });
@@ -209,6 +213,7 @@ function addDecodeSecretHover(
 `);
 
     addEditorHover({
+      type: 'decoded_secret',
       range: symbol.range,
       contents: [secretMarkdown],
     });

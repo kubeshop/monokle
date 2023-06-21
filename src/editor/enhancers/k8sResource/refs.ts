@@ -168,6 +168,7 @@ ${outgoingRefsMarkdownTableRows.join('\n')}
       );
     }
     addEditorHover({
+      type: 'list_outgoing_links',
       range,
       contents: hoverContents,
     });
@@ -175,11 +176,12 @@ ${outgoingRefsMarkdownTableRows.join('\n')}
     if (matchedRefs.length === 1 && getEditorType() !== 'cluster') {
       const ref = matchedRefs[0];
       addEditorLink({
+        type: 'go_to_outgoing_link',
         range,
         handler: () => onClickRefLink({resourceMeta, ref, dispatch}),
       });
     } else {
-      addEditorLink({range, handler: () => {}});
+      addEditorLink({type: 'go_to_outgoing_link', range, handler: () => {}});
     }
   });
 });

@@ -179,14 +179,16 @@ export const clearEditorDecorations = () => {
 monaco.languages.registerHoverProvider('yaml', {
   provideHover: (model, position) => {
     // We're sending this event on any hover because this method might be triggered by a hover created by Monaco itself
-    trackEvent('editor/hover', {resourceKind: currentResourceKind});
     const positionHovers = editorHovers.filter(hover => isPositionInRange(position, hover.range));
     if (positionHovers.length === 0) {
+      trackEvent('editor/hover', {resourceKind: currentResourceKind});
       return null;
     }
     if (positionHovers.length === 1) {
+      trackEvent('editor/hover', {resourceKind: currentResourceKind, types: [positionHovers[0].type]});
       return positionHovers[0];
     }
+    trackEvent('editor/hover', {resourceKind: currentResourceKind, types: positionHovers.map(hover => hover.type)});
     return {
       contents: positionHovers.map(hover => hover.contents).flat(),
     };
@@ -203,8 +205,13 @@ monaco.languages.registerLinkProvider('yaml', {
     };
   },
   resolveLink: async link => {
-    trackEvent('editor/follow_link', {resourceKind: currentResourceKind});
     const linksToResolve = editorLinks.filter(({range}) => isRangeInRange(range, link.range));
+    if (linksToResolve.length > 0) {
+      trackEvent('editor/follow_link', {
+        resourceKind: currentResourceKind,
+        types: linksToResolve.map(l => l.type),
+      });
+    }
     const promises = linksToResolve.map(({handler}) => Promise.resolve(handler()));
     await Promise.all(promises);
     return {range: link.range};

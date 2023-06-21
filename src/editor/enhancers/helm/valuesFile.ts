@@ -64,6 +64,7 @@ export const helmValuesFileEnhancer = createEditorEnhancer(({state, resourceIden
 
     if (commands.length) {
       addEditorHover({
+        type: 'helm_values_used_in_template',
         range: placeUsed.locationInValueFile,
         contents: commands.map(c => c.markdownLink),
       });
