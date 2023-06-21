@@ -196,6 +196,7 @@ const addEditorCommandForRef = (args: {resourceMeta: ResourceMeta; ref: Resource
   if (ref.target.type === 'resource' && ref.target.resourceId) {
     command = addEditorCommand(
       {
+        type: 'go_to_resource',
         text: 'Open resource',
         altText: 'Open resource',
         handler: () => {
@@ -215,6 +216,7 @@ const addEditorCommandForRef = (args: {resourceMeta: ResourceMeta; ref: Resource
   } else if (ref.target.type === 'file') {
     command = addEditorCommand(
       {
+        type: 'go_to_file',
         text: `Open file`,
         altText: 'Open file',
         handler: () => {
@@ -229,6 +231,7 @@ const addEditorCommandForRef = (args: {resourceMeta: ResourceMeta; ref: Resource
   } else if (ref.target.type === 'image') {
     command = addEditorCommand(
       {
+        type: 'go_to_image',
         text: `Open image`,
         altText: 'Open image',
         handler: () => {

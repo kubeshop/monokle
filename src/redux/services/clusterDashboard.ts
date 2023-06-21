@@ -20,11 +20,16 @@ export const getClusterUtilization = async (kubeconfig: string, context: string)
 
   const nodeMetrics: k8s.NodeMetric[] = (await metricClient.getNodeMetrics()).items;
   const nodes = await k8s.topNodes(k8sApiClient);
+  let kubeletVersion: string | undefined;
 
   if (lastContext !== context) {
     const providers = uniq(
       nodes
         .map(node => {
+          if (!kubeletVersion) {
+            kubeletVersion = node.Node.status?.nodeInfo?.kubeletVersion;
+          }
+
           const providerId = node.Node?.spec?.providerID;
           // ID of the node assigned by the cloud provider in the format: <ProviderName>://<ProviderSpecificNodeID>
           const providerParts = providerId?.split('://');
@@ -35,7 +40,7 @@ export const getClusterUtilization = async (kubeconfig: string, context: string)
         })
         .filter(isDefined)
     );
-    trackEvent('cluster/metrics', {providers});
+    trackEvent('cluster/info', {providers, kubeletVersion});
   }
 
   return nodeMetrics.map(m => ({

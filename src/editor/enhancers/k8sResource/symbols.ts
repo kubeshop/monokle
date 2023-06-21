@@ -43,6 +43,7 @@ function addNamespaceFilterLink(
   const namespace = getSymbolValue(lines, symbol);
   if (namespace) {
     const newCommand = addEditorCommand({
+      type: 'filter_namespace',
       text: `Apply or remove`,
       altText: 'Add/remove namespace to/from current filter',
       handler: () => {
@@ -88,6 +89,7 @@ function addKindFilterLink(
   const kind = getSymbolValue(lines, symbol);
   if (kind) {
     const newCommand = addEditorCommand({
+      type: 'filter_kind',
       text: `Apply or remove`,
       altText: 'Add/remove kind to/from current filter',
       handler: () => {
@@ -121,6 +123,7 @@ function addLabelFilterLink(
     const value = label.substring(symbol.name.length + 1).trim();
 
     const newCommand = addEditorCommand({
+      type: 'filter_label',
       text: `Apply or remove`,
       altText: 'Add/remove label to/from current filter',
       handler: () => {
@@ -156,6 +159,7 @@ function addAnnotationFilterLink(
     const value = annotation.substring(symbol.name.length + 1).trim();
 
     const newCommand = addEditorCommand({
+      type: 'filter_annotation',
       text: `${annotation}`,
       altText: 'Add/remove annotation to/from current filter',
       handler: () => {
@@ -190,6 +194,7 @@ function addDecodeSecretHover(
     const decoded = Buffer.from(value, 'base64').toString('utf-8');
 
     const newCommand = addEditorCommand({
+      type: 'secret_copy_to_clipboard',
       text: 'Copy to clipboard',
       altText: 'Copy decoded secret to clipboard',
       handler: () => {

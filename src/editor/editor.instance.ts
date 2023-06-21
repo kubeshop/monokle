@@ -19,6 +19,7 @@ let isRecreatingModel = false;
 let editorType: 'local' | 'cluster' | undefined;
 let hasTypedInEditor = false;
 let hasModelContentChanged = false;
+let currentResourceKind: string | undefined;
 
 export const didEditorContentChange = () => hasModelContentChanged;
 
@@ -36,7 +37,7 @@ export const mountEditor = (props: {element: HTMLElement; type: 'local' | 'clust
     if (hasTypedInEditor) {
       return;
     }
-    trackEvent('edit/code_changes', {from: getEditorType()});
+    trackEvent('edit/code_changes', {from: getEditorType(), resourceKind: currentResourceKind});
     hasTypedInEditor = true;
   });
   EDITOR.onDidChangeModelContent(e => {
@@ -81,6 +82,11 @@ export const setEditorNextSelection = (range: monaco.IRange) => {
 };
 
 export function recreateEditorModel(editor: monaco.editor.ICodeEditor, text: string, language: string = 'yaml') {
+  const kindMatch = text.match(/kind:\s*(\w+)/);
+  if (kindMatch?.length === 1) {
+    currentResourceKind = kindMatch[1];
+  }
+
   isRecreatingModel = true;
   resetEditor();
   editor.getModel()?.dispose();
@@ -113,11 +119,11 @@ export const clearEditorLinks = () => {
 };
 
 export const addEditorCommand = (payload: EditorCommand['payload'], supportHtml?: boolean) => {
-  const {text, altText, handler, beforeText, afterText} = payload;
+  const {text, altText, handler, beforeText, afterText, type} = payload;
 
   const id = `cmd_${uuidv4()}`;
   const wrappedHandler = () => {
-    trackEvent('editor/run_command');
+    trackEvent('editor/run_command', {type, resourceKind: currentResourceKind});
     handler();
   };
   const disposable: monaco.IDisposable = monaco.editor.registerCommand(id, wrappedHandler);
@@ -172,7 +178,8 @@ export const clearEditorDecorations = () => {
 
 monaco.languages.registerHoverProvider('yaml', {
   provideHover: (model, position) => {
-    trackEvent('editor/hover');
+    // We're sending this event on any hover because this method might be triggered by a hover created by Monaco itself
+    trackEvent('editor/hover', {resourceKind: currentResourceKind});
     const positionHovers = editorHovers.filter(hover => isPositionInRange(position, hover.range));
     if (positionHovers.length === 0) {
       return null;
@@ -196,7 +203,7 @@ monaco.languages.registerLinkProvider('yaml', {
     };
   },
   resolveLink: async link => {
-    trackEvent('editor/follow_link');
+    trackEvent('editor/follow_link', {resourceKind: currentResourceKind});
     const linksToResolve = editorLinks.filter(({range}) => isRangeInRange(range, link.range));
     const promises = linksToResolve.map(({handler}) => Promise.resolve(handler()));
     await Promise.all(promises);

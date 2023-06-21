@@ -40,6 +40,7 @@ export const helmValuesFileEnhancer = createEditorEnhancer(({state, resourceIden
     decorations.push(createInlineDecoration(placeUsed.locationInValueFile, InlineDecorationTypes.SatisfiedRef));
     placeUsed.uses.forEach(use => {
       const newCommand = addEditorCommand({
+        type: 'go_to_helm_template_file',
         text: `${use.filePath}`,
         altText: 'Select file',
         beforeText: 'Found in: ',

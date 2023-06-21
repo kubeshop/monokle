@@ -60,6 +60,7 @@ export const helmTemplateFileEnhancer = createEditorEnhancer(({state, resourceId
           typeof keyPathInFile.value === 'object' ? JSON.stringify(keyPathInFile.value, null, 4) : keyPathInFile.value;
 
         const newCommand = addEditorCommand({
+          type: 'go_to_helm_values_file',
           text: `${keyPathInFile.filePath}`,
           altText: 'Select file',
           handler: () => {

@@ -13,6 +13,10 @@ export type EditorLink = {
 
 export type EditorCommand = {
   payload: {
+    /**
+     * The type of the command is only used for telemetry.
+     */
+    type: string;
     text: string;
     altText: string;
     handler: monaco.editor.ICommandHandler;
