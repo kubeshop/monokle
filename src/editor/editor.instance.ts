@@ -19,6 +19,7 @@ let isRecreatingModel = false;
 let editorType: 'local' | 'cluster' | undefined;
 let hasTypedInEditor = false;
 let hasModelContentChanged = false;
+let currentResourceKind: string | undefined;
 
 export const didEditorContentChange = () => hasModelContentChanged;
 
@@ -36,7 +37,7 @@ export const mountEditor = (props: {element: HTMLElement; type: 'local' | 'clust
     if (hasTypedInEditor) {
       return;
     }
-    trackEvent('edit/code_changes', {from: getEditorType()});
+    trackEvent('edit/code_changes', {from: getEditorType(), resourceKind: currentResourceKind});
     hasTypedInEditor = true;
   });
   EDITOR.onDidChangeModelContent(e => {
@@ -81,6 +82,13 @@ export const setEditorNextSelection = (range: monaco.IRange) => {
 };
 
 export function recreateEditorModel(editor: monaco.editor.ICodeEditor, text: string, language: string = 'yaml') {
+  const kindMatch = text.match(/kind:\s*(\w+)/);
+  if (kindMatch?.length === 1) {
+    currentResourceKind = kindMatch[1];
+  } else {
+    currentResourceKind = undefined;
+  }
+
   isRecreatingModel = true;
   resetEditor();
   editor.getModel()?.dispose();
@@ -113,10 +121,14 @@ export const clearEditorLinks = () => {
 };
 
 export const addEditorCommand = (payload: EditorCommand['payload'], supportHtml?: boolean) => {
-  const {text, altText, handler, beforeText, afterText} = payload;
+  const {text, altText, handler, beforeText, afterText, type} = payload;
 
   const id = `cmd_${uuidv4()}`;
-  const disposable: monaco.IDisposable = monaco.editor.registerCommand(id, handler);
+  const wrappedHandler = () => {
+    trackEvent('editor/run_command', {type, resourceKind: currentResourceKind});
+    handler();
+  };
+  const disposable: monaco.IDisposable = monaco.editor.registerCommand(id, wrappedHandler);
 
   let markdownLink: monaco.IMarkdownString;
 
@@ -170,11 +182,14 @@ monaco.languages.registerHoverProvider('yaml', {
   provideHover: (model, position) => {
     const positionHovers = editorHovers.filter(hover => isPositionInRange(position, hover.range));
     if (positionHovers.length === 0) {
+      trackEvent('editor/hover', {resourceKind: currentResourceKind});
       return null;
     }
     if (positionHovers.length === 1) {
+      trackEvent('editor/hover', {resourceKind: currentResourceKind, types: [positionHovers[0].type]});
       return positionHovers[0];
     }
+    trackEvent('editor/hover', {resourceKind: currentResourceKind, types: positionHovers.map(hover => hover.type)});
     return {
       contents: positionHovers.map(hover => hover.contents).flat(),
     };
@@ -192,6 +207,12 @@ monaco.languages.registerLinkProvider('yaml', {
   },
   resolveLink: async link => {
     const linksToResolve = editorLinks.filter(({range}) => isRangeInRange(range, link.range));
+    if (linksToResolve.length > 0) {
+      trackEvent('editor/follow_link', {
+        resourceKind: currentResourceKind,
+        types: linksToResolve.map(l => l.type),
+      });
+    }
     const promises = linksToResolve.map(({handler}) => Promise.resolve(handler()));
     await Promise.all(promises);
     return {range: link.range};
