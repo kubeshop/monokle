@@ -116,7 +116,11 @@ export const addEditorCommand = (payload: EditorCommand['payload'], supportHtml?
   const {text, altText, handler, beforeText, afterText} = payload;
 
   const id = `cmd_${uuidv4()}`;
-  const disposable: monaco.IDisposable = monaco.editor.registerCommand(id, handler);
+  const wrappedHandler = () => {
+    trackEvent('editor/run_command');
+    handler();
+  };
+  const disposable: monaco.IDisposable = monaco.editor.registerCommand(id, wrappedHandler);
 
   let markdownLink: monaco.IMarkdownString;
 
@@ -168,6 +172,7 @@ export const clearEditorDecorations = () => {
 
 monaco.languages.registerHoverProvider('yaml', {
   provideHover: (model, position) => {
+    trackEvent('editor/hover');
     const positionHovers = editorHovers.filter(hover => isPositionInRange(position, hover.range));
     if (positionHovers.length === 0) {
       return null;
@@ -191,6 +196,7 @@ monaco.languages.registerLinkProvider('yaml', {
     };
   },
   resolveLink: async link => {
+    trackEvent('editor/follow_link');
     const linksToResolve = editorLinks.filter(({range}) => isRangeInRange(range, link.range));
     const promises = linksToResolve.map(({handler}) => Promise.resolve(handler()));
     await Promise.all(promises);

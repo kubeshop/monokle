@@ -86,6 +86,9 @@ export type EventMap = {
   'edit/side_by_side_editor': {resourceKind: string};
   'edit/select_hover_link': {type: 'resource' | 'image' | 'file'};
   'edit/graphview': {resourceKind?: string};
+  'editor/hover': undefined;
+  'editor/follow_link': undefined;
+  'editor/run_command': undefined;
   'create/file': undefined;
   'create/folder': undefined;
   'create/resource': {resourceKind: string};
