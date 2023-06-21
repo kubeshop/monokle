@@ -35,7 +35,7 @@ const HelmReleasesList = ({list}: {list: HelmRelease[]}) => {
       <Typography.Text type="secondary">No Helm releases found</Typography.Text>
     </div>
   ) : (
-    <div style={{marginTop: 16}}>
+    <ListContainer style={{marginTop: 16}} ref={ref}>
       <div
         style={{
           height: `${rowVirtualizer.getTotalSize()}px`,
@@ -65,7 +65,7 @@ const HelmReleasesList = ({list}: {list: HelmRelease[]}) => {
           );
         })}
       </div>
-    </div>
+    </ListContainer>
   );
 };
 
@@ -105,4 +105,10 @@ const VirtualItem = styled.div<{$active: boolean}>`
       `;
     }
   }};
+`;
+
+const ListContainer = styled.ul`
+  height: 100%;
+  overflow-y: auto;
+  padding: 0px 0px;
 `;
