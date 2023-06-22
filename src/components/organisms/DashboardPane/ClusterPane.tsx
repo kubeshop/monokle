@@ -136,14 +136,6 @@ const ClusterPane: React.FC<InjectedPanelProps> = props => {
     clusterResourceMeta,
   ]);
 
-  if (clusterConnectionOptions.current.isLoading) {
-    return (
-      <S.Container style={{padding: '16px'}}>
-        <Skeleton />
-      </S.Container>
-    );
-  }
-
   return (
     <AccordionPanel
       {...props}
@@ -154,7 +146,7 @@ const ClusterPane: React.FC<InjectedPanelProps> = props => {
           expandable
           isOpen={Boolean(isActive)}
           title="Resources"
-          actions={<TitleBarCount count={registeredKindHandlers.length} isActive={Boolean(isActive)} />}
+          actions={<TitleBarCount count={size(clusterResourceMeta)} isActive={Boolean(isActive)} />}
           description={
             <div style={{display: 'flex', flexDirection: 'column', paddingTop: 16, paddingBottom: 16}}>
               <Typography.Text type="secondary">{currentContext}</Typography.Text>
@@ -168,14 +160,20 @@ const ClusterPane: React.FC<InjectedPanelProps> = props => {
       }
     >
       <div style={{padding: '0px 16px 16px 16px'}}>
-        <S.Input
-          style={{marginBottom: 8}}
-          placeholder=""
-          prefix={<S.SearchOutlined />}
-          onChange={(event: any) => setFilterText(event.target.value)}
-          allowClear
-        />
-        <DashboardFilteredMenu filterText={filterText} />
+        {clusterConnectionOptions.current.isLoading ? (
+          <Skeleton />
+        ) : (
+          <>
+            <S.Input
+              style={{marginBottom: 8}}
+              placeholder=""
+              prefix={<S.SearchOutlined />}
+              onChange={(event: any) => setFilterText(event.target.value)}
+              allowClear
+            />
+            <DashboardFilteredMenu filterText={filterText} />
+          </>
+        )}
       </div>
     </AccordionPanel>
   );
