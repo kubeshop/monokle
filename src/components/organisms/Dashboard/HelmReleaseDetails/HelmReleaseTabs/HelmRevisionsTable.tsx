@@ -10,6 +10,21 @@ import {useAppSelector} from '@redux/hooks';
 import {Colors} from '@shared/styles';
 import {helmReleaseRevisionsCommand, runCommandInMainThread} from '@shared/utils/commands';
 
+const getTagColor = (status: string) => {
+  switch (status) {
+    case 'deployed':
+      return 'green';
+    case 'superseded':
+      return undefined;
+    case 'failed':
+      return 'red';
+    case 'uninstalled':
+      return 'grey';
+    default:
+      return undefined;
+  }
+};
+
 const columns = [
   {
     title: 'Revision',
@@ -26,7 +41,7 @@ const columns = [
     title: 'Status',
     dataIndex: 'status',
     render: (value: string) => {
-      return <Tag color={value === 'deployed' ? 'green' : undefined}>{value}</Tag>;
+      return <Tag color={getTagColor(value)}>{value}</Tag>;
     },
   },
   {
