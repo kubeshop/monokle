@@ -1,3 +1,5 @@
+import {HelmRelease} from './ui';
+
 export type DashboardMenu = {
   key: string;
   label: string;
@@ -22,5 +24,8 @@ export type DashboardState = {
   };
   tableDrawer: {
     selectedResourceId?: string;
+  };
+  helm: {
+    selectedHelmRelease: HelmRelease | null;
   };
 };

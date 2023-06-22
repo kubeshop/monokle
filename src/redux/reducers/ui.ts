@@ -22,7 +22,6 @@ import {
   ChartInfo,
   ExplorerCollapsibleSectionsType,
   HelmChartDetailsTab,
-  HelmRelease,
   HelmRepoMenu,
   LayoutSizeType,
   LearnTopicType,
@@ -436,10 +435,6 @@ export const uiSlice = createSlice({
     toggleHelmPanSearchHub: (state: Draft<UiState>) => {
       state.helmPane.isSearchHubIncluded = !state.helmPane.isSearchHubIncluded;
     },
-
-    setSelectedHelmRelease: (state: Draft<UiState>, action: PayloadAction<HelmRelease | null>) => {
-      state.helmPane.selectedHelmRelease = action.payload;
-    },
     openHelmRepoModal: (state: Draft<UiState>) => {
       state.helmRepoModal.isOpen = true;
     },
@@ -601,7 +596,6 @@ export const {
   setHelmPaneSelectedChart,
   setHelmPaneChartDetailsTab,
   toggleHelmPanSearchHub,
-  setSelectedHelmRelease,
   openHelmRepoModal,
   closeHelmRepoModal,
 } = uiSlice.actions;

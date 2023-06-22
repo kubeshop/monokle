@@ -9,4 +9,7 @@ export const initialState: DashboardState = {
     menuList: [],
   },
   tableDrawer: {},
+  helm: {
+    selectedHelmRelease: null,
+  },
 };

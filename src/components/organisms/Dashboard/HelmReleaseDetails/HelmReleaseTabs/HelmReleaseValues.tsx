@@ -19,7 +19,7 @@ const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
 };
 
 const HelmReleaseValues = () => {
-  const selectedHelmRelease = useAppSelector(state => state.ui.helmPane.selectedHelmRelease);
+  const selectedHelmRelease = useAppSelector(state => state.dashboard.helm.selectedHelmRelease);
   const {value = '', loading} = useAsync(async () => {
     if (selectedHelmRelease === null) {
       return '';

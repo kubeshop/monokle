@@ -12,7 +12,7 @@ interface IProps {
 
 const UpgradeHelmReleaseModal = ({onClose, onOk, isDryRun}: IProps) => {
   const [form] = Form.useForm();
-  const release = useAppSelector(state => state.ui.helmPane.selectedHelmRelease!);
+  const release = useAppSelector(state => state.dashboard.helm.selectedHelmRelease!);
   const {result: repos, loading} = useSearchHelmCharts(release.chart.slice(0, release.chart.lastIndexOf('-')), false);
 
   const onUpgradeClickHandler = async () => {

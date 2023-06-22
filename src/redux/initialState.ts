@@ -245,7 +245,6 @@ const initialUiState: UiState = {
     selectedChart: null,
     chartDetailsTab: 'info',
     isSearchHubIncluded: false,
-    selectedHelmRelease: null,
   },
   helmRepoModal: {
     isOpen: false,

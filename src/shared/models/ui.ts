@@ -204,7 +204,6 @@ type UiState = {
     selectedChart: null | ChartInfo;
     chartDetailsTab: HelmChartDetailsTab;
     isSearchHubIncluded: boolean;
-    selectedHelmRelease: null | HelmRelease;
   };
   helmRepoModal: {
     isOpen: boolean;

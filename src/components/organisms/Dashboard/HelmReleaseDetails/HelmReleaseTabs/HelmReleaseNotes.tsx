@@ -12,7 +12,7 @@ import {openUrlInExternalBrowser} from '@shared/utils';
 import {getHelmReleaseNotesCommand, runCommandInMainThread} from '@shared/utils/commands';
 
 const HelmReleaseNotes = () => {
-  const selectedHelmRelease = useAppSelector(state => state.ui.helmPane.selectedHelmRelease);
+  const selectedHelmRelease = useAppSelector(state => state.dashboard.helm.selectedHelmRelease);
 
   const {value = '', loading} = useAsync(async () => {
     if (selectedHelmRelease === null) {

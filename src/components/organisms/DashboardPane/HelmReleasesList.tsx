@@ -4,8 +4,9 @@ import {Typography} from 'antd';
 
 import styled, {css} from 'styled-components';
 
+import {setSelectedHelmRelease} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setLeftMenuSelection, setSelectedHelmRelease} from '@redux/reducers/ui';
+import {setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {HelmRelease} from '@shared/models/ui';
 import {Colors} from '@shared/styles';
@@ -15,7 +16,7 @@ const ROW_HEIGHT = 40;
 
 const HelmReleasesList = ({list}: {list: HelmRelease[]}) => {
   const dispatch = useAppDispatch();
-  const selectedHelmRelease = useAppSelector(state => state.ui.helmPane.selectedHelmRelease);
+  const selectedHelmRelease = useAppSelector(state => state.dashboard.helm.selectedHelmRelease);
 
   const ref = useRef<HTMLUListElement>(null);
 

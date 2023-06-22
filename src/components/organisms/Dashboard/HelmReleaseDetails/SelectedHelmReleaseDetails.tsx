@@ -4,8 +4,8 @@ import {Tabs as AntTabs, Dropdown, Typography} from 'antd';
 
 import styled from 'styled-components';
 
+import {setSelectedHelmRelease} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setSelectedHelmRelease} from '@redux/reducers/ui';
 
 import {
   getHelmReleaseManifestCommand,
@@ -47,7 +47,7 @@ const tabsItems = [
 
 const SelectedHelmRelease = () => {
   const dispatch = useAppDispatch();
-  const release = useAppSelector(state => state.ui.helmPane.selectedHelmRelease!);
+  const release = useAppSelector(state => state.dashboard.helm.selectedHelmRelease!);
   const [commandDryRun, setCommandDryRun] = useState<'upgrade-dry-run' | 'uninstall-dry-run' | undefined>();
   const [isHelmDiffModalOpen, setIsHelmDiffModalOpen] = useState(false);
   const [isSelectHelmReleaseOpen, setIsSelectHelmReleaseOpen] = useState(false);

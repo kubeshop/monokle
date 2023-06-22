@@ -59,7 +59,7 @@ const columns = [
 ];
 
 const HelmRevisionsTable = () => {
-  const release = useAppSelector(state => state.ui.helmPane.selectedHelmRelease!);
+  const release = useAppSelector(state => state.dashboard.helm.selectedHelmRelease!);
 
   const {value, loading} = useAsync(async () => {
     const result = await runCommandInMainThread(
