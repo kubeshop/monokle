@@ -98,7 +98,8 @@ const VirtualItem = styled.div<{$active: boolean}>`
   color: ${Colors.grey9};
 
   :hover {
-    background: ${Colors.blackPearl};
+    background: #252a2c;
+
     .ant-typography {
       font-weight: 700;
       color: ${$active => ($active ? Colors.whitePure : 'currentColor')};

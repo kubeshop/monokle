@@ -91,7 +91,12 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
             </Button>
           </Tooltip>
         </div>
-        <Input placeholder="" prefix={<SearchOutlined />} allowClear onChange={onChangeSearchInputHandler} />
+        <Input
+          placeholder="Search & filter installed"
+          prefix={<SearchOutlined />}
+          allowClear
+          onChange={onChangeSearchInputHandler}
+        />
         {loading ? <Skeleton style={{marginTop: 16}} active /> : <HelmReleasesList list={list} />}
       </div>
     </AccordionPanel>
