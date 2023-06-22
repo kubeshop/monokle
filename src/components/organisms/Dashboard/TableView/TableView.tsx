@@ -65,4 +65,4 @@ const TableView = ({dataSource, columns}: {dataSource: ResourceMeta[]; columns: 
   );
 };
 
-export default TableView;
+export {TableView};
