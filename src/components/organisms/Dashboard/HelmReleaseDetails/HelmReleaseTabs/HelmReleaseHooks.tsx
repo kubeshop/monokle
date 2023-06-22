@@ -21,7 +21,7 @@ const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
 const HelmReleaseHooks = () => {
   const selectedHelmRelease = useAppSelector(state => state.dashboard.helm.selectedHelmRelease);
 
-  const {value = '', loading} = useAsync(async () => {
+  const {value = 'No hooks found.', loading} = useAsync(async () => {
     if (selectedHelmRelease === null) {
       return '';
     }
