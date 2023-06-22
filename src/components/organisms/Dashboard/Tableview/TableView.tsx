@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import {ColumnsType} from 'antd/lib/table';
 
@@ -13,25 +13,18 @@ import {RootState} from '@shared/models/rootState';
 
 import {Drawer} from './Drawer';
 import NoResourcesFound from './NoResourcesFound';
-import * as S from './Tableview.styled';
+import * as S from './TableView.styled';
 
-export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; columns: ColumnsType<any>}) => {
+const TableView = ({dataSource, columns}: {dataSource: ResourceMeta[]; columns: ColumnsType<any>}) => {
   const dispatch = useAppDispatch();
   const {height} = useMainPaneDimensions();
-  const [filteredDataSource, setFilteredDataSource] = useState(dataSource);
   const [filterText, setFilterText] = useState<string>('');
   const selectedResourceId = useAppSelector((state: RootState) => state.dashboard.tableDrawer.selectedResourceId);
   const terminalHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
   const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
 
-  useEffect(() => {
-    if (!filterText) {
-      setFilteredDataSource(dataSource);
-      return;
-    }
-    setFilteredDataSource(
-      dataSource.filter(s => s.name.toLowerCase().trim().includes(filterText.toLocaleLowerCase().trim()))
-    );
+  const filteredDataSource = useMemo(() => {
+    return dataSource.filter(s => s.name.toLowerCase().trim().includes(filterText.toLocaleLowerCase().trim()));
   }, [dataSource, filterText]);
 
   return (
@@ -71,3 +64,5 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
     </S.Container>
   );
 };
+
+export default TableView;
