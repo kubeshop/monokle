@@ -70,7 +70,9 @@ const HelmReleasesList = ({list}: {list: HelmRelease[]}) => {
               }}
               onClick={() => onItemClick(node)}
             >
-              <Typography.Text>{node.name}</Typography.Text>
+              <Typography.Text>
+                {node.name}/{node.chart}
+              </Typography.Text>
             </VirtualItem>
           );
         })}
