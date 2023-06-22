@@ -1,5 +1,4 @@
-import {monaco} from 'react-monaco-editor';
-import MonacoEditor from 'react-monaco-editor/lib/editor';
+import MonacoEditor, {monaco} from 'react-monaco-editor';
 import {useAsync} from 'react-use';
 
 import {Skeleton} from 'antd';
@@ -19,11 +18,8 @@ const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
 };
 
 const HelmReleaseValues = () => {
-  const selectedHelmRelease = useAppSelector(state => state.dashboard.helm.selectedHelmRelease);
+  const selectedHelmRelease = useAppSelector(state => state.dashboard.helm.selectedHelmRelease!);
   const {value = '', loading} = useAsync(async () => {
-    if (selectedHelmRelease === null) {
-      return '';
-    }
     const result = await runCommandInMainThread(
       getHelmReleaseValuesCommand({release: selectedHelmRelease.name, namespace: selectedHelmRelease.namespace})
     );
@@ -31,7 +27,7 @@ const HelmReleaseValues = () => {
       throw new Error(result.stderr);
     }
     return result.stdout;
-  }, [selectedHelmRelease]);
+  }, [selectedHelmRelease?.name, selectedHelmRelease?.namespace]);
 
   return loading ? (
     <Skeleton active={loading} />

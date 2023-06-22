@@ -25,7 +25,7 @@ const HelmReleaseNotes = () => {
       throw new Error(result.stderr);
     }
     return result.stdout;
-  }, [selectedHelmRelease]);
+  }, [selectedHelmRelease?.name, selectedHelmRelease?.namespace]);
 
   return loading ? (
     <Skeleton active={loading} />

@@ -5,8 +5,12 @@ import NonSelectedHelmRelease from './NonSelectedHelmRelease';
 import SelectedHelmRelease from './SelectedHelmReleaseDetails';
 
 const HelmReleaseDetails = () => {
-  const release = useAppSelector(state => state.dashboard.helm.selectedHelmRelease!);
-  return <HelmReleaseProvider>{release ? <SelectedHelmRelease /> : <NonSelectedHelmRelease />}</HelmReleaseProvider>;
+  const release = useAppSelector(state => state.dashboard.helm.selectedHelmRelease);
+  return (
+    <HelmReleaseProvider>
+      {release ? <SelectedHelmRelease key={`${release.name}-${release.chart}`} /> : <NonSelectedHelmRelease />}
+    </HelmReleaseProvider>
+  );
 };
 
 export default HelmReleaseDetails;

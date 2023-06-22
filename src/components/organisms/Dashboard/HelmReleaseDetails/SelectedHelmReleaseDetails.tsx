@@ -57,6 +57,7 @@ const SelectedHelmRelease = () => {
   const [commandDryRun, setCommandDryRun] = useHelmReleaseDiffContext();
   const [isSelectHelmReleaseOpen, setIsSelectHelmReleaseOpen] = useState(false);
   const [selectedHelmReleaseRepo, setSelectedHelmReleaseRepo] = useState<string>('');
+
   const onUpgradeDryRunClickHandler = () => {
     setIsSelectHelmReleaseOpen(true);
     setCommandDryRun({
