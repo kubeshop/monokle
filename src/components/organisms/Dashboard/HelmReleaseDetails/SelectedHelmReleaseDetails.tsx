@@ -16,6 +16,7 @@ import {
 
 import HelmDryRunDiffModal from './HelmDryRunDiffModal';
 import {HelmReleaseProvider} from './HelmReleaseContext';
+import HelmReleaseHooks from './HelmReleaseTabs/HelmReleaseHooks';
 import HelmReleaseManifest from './HelmReleaseTabs/HelmReleaseManifest';
 import HelmReleaseNotes from './HelmReleaseTabs/HelmReleaseNotes';
 import HelmReleaseValues from './HelmReleaseTabs/HelmReleaseValues';
@@ -37,6 +38,11 @@ const tabsItems = [
     key: 'release-manifest',
     label: 'Release Manifest',
     children: <HelmReleaseManifest />,
+  },
+  {
+    key: 'release-hooks',
+    label: 'Release Hooks',
+    children: <HelmReleaseHooks />,
   },
   {
     key: 'release-notes',

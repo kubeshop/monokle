@@ -250,3 +250,12 @@ export function getHelmReleaseNotesCommand({release, namespace}: {release: strin
     env,
   };
 }
+
+export function getHelmReleaseHooksCommand({release, namespace}: {release: string; namespace: string}, env?: HelmEnv) {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['get', 'hooks', release, '-n', namespace],
+    env,
+  };
+}
