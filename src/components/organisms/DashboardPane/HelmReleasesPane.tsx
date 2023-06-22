@@ -1,16 +1,17 @@
 import {ChangeEvent, useCallback, useRef} from 'react';
 import {useAsync} from 'react-use';
 
-import {Input as RawInput, Skeleton, Typography} from 'antd';
+import {Button, Input as RawInput, Skeleton, Tooltip, Typography} from 'antd';
 
-import {SearchOutlined as RawSearchOutlined} from '@ant-design/icons';
+import {PlusCircleFilled, SearchOutlined as RawSearchOutlined} from '@ant-design/icons';
 
 import {debounce} from 'lodash';
 import styled from 'styled-components';
 
 import {currentKubeContextSelector} from '@redux/appConfig';
+import {setSelectedHelmRelease} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setHelmPaneChartSearch} from '@redux/reducers/ui';
+import {setHelmPaneChartSearch, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import AccordionPanel, {InjectedPanelProps} from '@components/atoms/AccordionPanel/AccordionPanel';
 
@@ -49,6 +50,11 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
     debouncedSearchRef.current(e.target.value);
   }, []);
 
+  const onBrowseHelmClickHandler = () => {
+    dispatch(setSelectedHelmRelease(null));
+    dispatch(setLeftMenuSelection('helm'));
+  };
+
   return (
     <AccordionPanel
       {...props}
@@ -61,21 +67,30 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
           isOpen={Boolean(isActive)}
           actions={<TitleBarCount count={list.length} isActive={Boolean(isActive)} />}
           description={
-            <div style={{display: 'flex', flexDirection: 'column', paddingTop: 8, paddingBottom: 16, gap: 12}}>
-              <Description type="secondary">Manage Helm releases installed in your cluster </Description>
-              <div style={{display: 'flex', flexDirection: 'column'}}>
-                <Typography.Text type="secondary">{currentContext}</Typography.Text>
-                <div>
-                  <S.CheckCircleFilled />
-                  <S.ConnectedText>Connected</S.ConnectedText>
-                </div>
-              </div>
-            </div>
+            <S.ConnectedContainer>
+              <Tooltip title="Successfully connected!" placement="bottomRight">
+                <S.CheckCircleFilled />
+              </Tooltip>
+              <S.ConnectedText>{currentContext}</S.ConnectedText>
+            </S.ConnectedContainer>
           }
         />
       }
     >
       <div style={{padding: '0px 16px 16px 16px'}}>
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+          <Typography.Text>Installed Charts</Typography.Text>
+          <Tooltip title="Find and install new Helm Charts." placement="rightBottom">
+            <Button
+              style={{paddingRight: 0}}
+              type="link"
+              icon={<PlusCircleFilled />}
+              onClick={onBrowseHelmClickHandler}
+            >
+              New
+            </Button>
+          </Tooltip>
+        </div>
         <Input placeholder="" prefix={<SearchOutlined />} allowClear onChange={onChangeSearchInputHandler} />
         {loading ? <Skeleton style={{marginTop: 16}} active /> : <HelmReleasesList list={list} />}
       </div>

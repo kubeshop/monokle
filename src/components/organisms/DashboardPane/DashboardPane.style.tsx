@@ -109,12 +109,21 @@ export const ClusterName = styled(TitleBar)`
 export const CheckCircleFilled = styled(RawCheckCircleFilled)`
   color: ${Colors.polarGreen};
   margin-right: 4px;
+  font-size: 12px;
+`;
+
+export const ConnectedContainer = styled.div`
+  display: flex;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  gap: 4px;
+  align-items: center;
 `;
 
 export const ConnectedText = styled.span`
   color: ${Colors.polarGreen};
   font-weight: 600;
-  font-size: 10px;
+  font-size: 12px;
 `;
 
 export const FilterContainer = styled.div`

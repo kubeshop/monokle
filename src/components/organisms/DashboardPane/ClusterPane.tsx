@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {Skeleton, Typography} from 'antd';
+import {Skeleton, Tooltip} from 'antd';
 
 import {groupBy, size, uniq} from 'lodash';
 
@@ -148,13 +148,12 @@ const ClusterPane: React.FC<InjectedPanelProps> = props => {
           title="Resources"
           actions={<TitleBarCount count={size(clusterResourceMeta)} isActive={Boolean(isActive)} />}
           description={
-            <div style={{display: 'flex', flexDirection: 'column', paddingTop: 16, paddingBottom: 16}}>
-              <Typography.Text type="secondary">{currentContext}</Typography.Text>
-              <div>
+            <S.ConnectedContainer>
+              <Tooltip title="Successfully connected!" placement="bottomRight">
                 <S.CheckCircleFilled />
-                <S.ConnectedText>Connected</S.ConnectedText>
-              </div>
-            </div>
+              </Tooltip>
+              <S.ConnectedText>{currentContext}</S.ConnectedText>
+            </S.ConnectedContainer>
           }
         />
       }
