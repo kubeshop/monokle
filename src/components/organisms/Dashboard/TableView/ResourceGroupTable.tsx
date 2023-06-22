@@ -14,7 +14,7 @@ import {RootState} from '@shared/models/rootState';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import {Drawer} from './Drawer';
-import * as S from './Tableview.styled';
+import * as S from './TableView.styled';
 
 const UNSORTED_VALUE = -9999999;
 

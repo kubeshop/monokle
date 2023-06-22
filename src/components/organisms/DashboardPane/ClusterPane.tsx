@@ -2,7 +2,7 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {Skeleton, Tooltip} from 'antd';
 
-import {forEach, groupBy, size, uniq} from 'lodash';
+import {groupBy, size, uniq} from 'lodash';
 
 import navSectionNames from '@constants/navSectionNames';
 
@@ -70,7 +70,7 @@ const ClusterPane: React.FC<InjectedPanelProps> = props => {
     ];
 
     navSectionNames.representation[navSectionNames.K8S_RESOURCES]
-      .filter(r => ![navSectionNames.CUSTOM, navSectionNames.HELM].includes(r))
+      .filter(r => ![navSectionNames.CUSTOM].includes(r))
       .forEach((path: string) => {
         tempMenu.push({
           key: path,
@@ -124,35 +124,6 @@ const ClusterPane: React.FC<InjectedPanelProps> = props => {
         });
       });
       tempMenu.push(customResources);
-    }
-
-    const helmResources: Array<ResourceMeta> = [];
-
-    forEach(clusterResourceMeta, (resource: ResourceMeta) => {
-      if ('helm.sh/chart' in (resource.labels || {})) {
-        helmResources.push(resource);
-      }
-    });
-
-    const groupHelmResources = groupBy(helmResources, 'kind');
-
-    const helmReleaseMenu: DashboardMenu = {
-      key: navSectionNames.HELM,
-      label: navSectionNames.HELM,
-      children: [],
-    };
-
-    forEach(groupHelmResources, (resources: Array<ResourceMeta>, kind: string) => {
-      helmReleaseMenu.children?.push({
-        key: `${kind}`,
-        label: kind,
-        children: [],
-        resourceCount: size(resources) ?? 0,
-      });
-    });
-
-    if (helmResources.length) {
-      tempMenu.push(helmReleaseMenu);
     }
 
     dispatch(setDashboardMenuList(tempMenu));

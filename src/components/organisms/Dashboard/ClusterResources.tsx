@@ -26,7 +26,8 @@ import StatefulSetHandler from '@src/kindhandlers/StatefulSet.handler';
 import {CLICKAKBLE_RESOURCE_GROUPS} from '.';
 import * as S from './Dashboard.styled';
 import {Overview} from './Overview/Overview';
-import {ResourceGroupTable} from './Tableview/ResourceGroupTable';
+import {TableView} from './TableView';
+import {ResourceGroupTable} from './TableView/ResourceGroupTable';
 import {
   CellAddresses,
   CellAge,
@@ -54,8 +55,7 @@ import {
   CellType,
   CellVersion,
   LoadBalancerIPs,
-} from './Tableview/TableCells';
-import {Tableview} from './Tableview/Tableview';
+} from './TableView/TableCells';
 
 const ClusterResources: React.FC = () => {
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
@@ -119,7 +119,7 @@ const ClusterResources: React.FC = () => {
     }
     if (activeMenu.key !== 'Overview') {
       return (
-        <Tableview
+        <TableView
           dataSource={filteredResources}
           columns={resourceKindColumns[activeMenu.label] || resourceKindColumns['ANY']}
         />

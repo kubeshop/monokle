@@ -9,7 +9,7 @@ import {DashboardMenu} from '@shared/models/dashboard';
 import {trackEvent} from '@shared/utils';
 
 import {CLICKAKBLE_RESOURCE_GROUPS} from '../Dashboard';
-import {ErrorCell, Resource, Warning} from '../Dashboard/Tableview/TableCells.styled';
+import {ErrorCell, Resource, Warning} from '../Dashboard/TableView/TableCells.styled';
 import * as S from './DashboardPane.style';
 
 export const MenuItem = ({

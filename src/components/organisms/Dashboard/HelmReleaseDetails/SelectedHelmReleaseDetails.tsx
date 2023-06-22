@@ -16,6 +16,7 @@ import {
 
 import HelmDryRunDiffModal from './HelmDryRunDiffModal';
 import {useHelmReleaseDiffContext} from './HelmReleaseContext';
+import HelmClusterResources from './HelmReleaseTabs/HelmClusterResources';
 import HelmReleaseHooks from './HelmReleaseTabs/HelmReleaseHooks';
 import HelmReleaseManifest from './HelmReleaseTabs/HelmReleaseManifest';
 import HelmReleaseNotes from './HelmReleaseTabs/HelmReleaseNotes';
@@ -48,6 +49,11 @@ const tabsItems = [
     key: 'release-notes',
     label: 'Release Notes',
     children: <HelmReleaseNotes />,
+  },
+  {
+    key: 'cluster-resources',
+    label: 'Cluster Resources',
+    children: <HelmClusterResources />,
   },
 ];
 
