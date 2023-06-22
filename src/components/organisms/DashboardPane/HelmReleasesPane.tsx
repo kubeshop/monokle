@@ -8,6 +8,7 @@ import {SearchOutlined as RawSearchOutlined} from '@ant-design/icons';
 import {debounce} from 'lodash';
 import styled from 'styled-components';
 
+import {currentKubeContextSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setHelmPaneChartSearch} from '@redux/reducers/ui';
 
@@ -18,6 +19,7 @@ import {HelmRelease} from '@shared/models/ui';
 import {Colors} from '@shared/styles';
 import {listHelmReleasesCommand, runCommandInMainThread} from '@shared/utils/commands';
 
+import * as S from './DashboardPane.style';
 import HelmReleasesList from './HelmReleasesList';
 
 const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
@@ -25,6 +27,7 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
   const dispatch = useAppDispatch();
   const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
   const helmRepoSearch = useAppSelector(state => state.ui.helmPane.chartSearchToken);
+  const currentContext = useAppSelector(currentKubeContextSelector);
 
   const {value: list = [], loading} = useAsync(async () => {
     const output = await runCommandInMainThread(
@@ -57,7 +60,18 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
           expandable
           isOpen={Boolean(isActive)}
           actions={<TitleBarCount count={list.length} isActive={Boolean(isActive)} />}
-          description={<Description type="secondary">Manage Helm releases installed in your cluster </Description>}
+          description={
+            <div style={{display: 'flex', flexDirection: 'column', paddingTop: 8, paddingBottom: 16, gap: 12}}>
+              <Description type="secondary">Manage Helm releases installed in your cluster </Description>
+              <div style={{display: 'flex', flexDirection: 'column'}}>
+                <Typography.Text type="secondary">{currentContext}</Typography.Text>
+                <div>
+                  <S.CheckCircleFilled />
+                  <S.ConnectedText>Connected</S.ConnectedText>
+                </div>
+              </div>
+            </div>
+          }
         />
       }
     >
