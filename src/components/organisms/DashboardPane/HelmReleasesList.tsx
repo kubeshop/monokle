@@ -62,7 +62,7 @@ const HelmReleasesList = ({list}: {list: HelmRelease[]}) => {
 
           return (
             <VirtualItem
-              $active={node.name === selectedHelmRelease?.name}
+              $active={node.chart === selectedHelmRelease?.chart}
               key={virtualItem.key}
               style={{
                 height: `${virtualItem.size}px`,
