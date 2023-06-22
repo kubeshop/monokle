@@ -28,7 +28,7 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
 
   const {value: list = [], loading} = useAsync(async () => {
     const output = await runCommandInMainThread(
-      listHelmReleasesCommand({filter: helmRepoSearch, namespace: selectedNamespace})
+      listHelmReleasesCommand({filter: helmRepoSearch, namespace: selectedNamespace?.replace('<all>', '')})
     );
     if (output.stderr) {
       throw new Error(output.stderr);

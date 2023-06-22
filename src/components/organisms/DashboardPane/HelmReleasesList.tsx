@@ -5,7 +5,7 @@ import {Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setSelectedHelmRelease} from '@redux/reducers/ui';
+import {setLeftMenuSelection, setSelectedHelmRelease} from '@redux/reducers/ui';
 
 import {HelmRelease} from '@shared/models/ui';
 import {Colors} from '@shared/styles';
@@ -30,9 +30,18 @@ const HelmReleasesList = ({list}: {list: HelmRelease[]}) => {
     dispatch(setSelectedHelmRelease(chart));
   };
 
+  const onBrowseHelmClickHandler = () => {
+    dispatch(setSelectedHelmRelease(null));
+    dispatch(setLeftMenuSelection('helm'));
+  };
+
   return list.length === 0 ? (
     <div style={{marginTop: 16}}>
-      <Typography.Text type="secondary">No Helm releases found</Typography.Text>
+      <Typography.Text type="secondary">
+        No Helm releases found - try the{' '}
+        <Typography.Link onClick={onBrowseHelmClickHandler}>[Helm Repository Browser]</Typography.Link> to find a chart
+        to install
+      </Typography.Text>
     </div>
   ) : (
     <ListContainer style={{marginTop: 16}} ref={ref}>
