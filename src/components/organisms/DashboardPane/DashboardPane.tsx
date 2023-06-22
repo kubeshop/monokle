@@ -3,9 +3,12 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {DashboardAccordionType} from '@shared/models/dashboard';
 
+import ImagesPane from '../ExplorerPane/ImagesPane/ImagesPane';
 import ClusterPane from './ClusterPane';
 import * as S from './DashboardPane.style';
 import HelmReleasesPane from './HelmReleasesPane';
+
+const accordionsKeys = ['cluster-resources', 'helm-releases', 'images'] as DashboardAccordionType[];
 
 const DashboardPane = () => {
   const dispatch = useAppDispatch();
@@ -19,7 +22,7 @@ const DashboardPane = () => {
           ghost
           collapsible="header"
           activeKey={activeKey}
-          onChange={(key: any = activeKey === 'cluster-resources' ? 'helm-releases' : 'cluster-resources') =>
+          onChange={(key: any = accordionsKeys.find(k => k !== activeKey)) =>
             dispatch(
               setDashboardActiveAccordion(
                 Array.isArray(key) ? (key[0] as DashboardAccordionType) : (key as DashboardAccordionType)
@@ -29,6 +32,7 @@ const DashboardPane = () => {
         >
           <ClusterPane key="cluster-resources" />
           <HelmReleasesPane key="helm-releases" />
+          <ImagesPane key="images" />
         </S.Collapse>
       </S.CollapseContainer>
     </S.Container>

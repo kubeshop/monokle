@@ -11,13 +11,13 @@ export type DashboardMenu = {
   children?: DashboardMenu[];
 };
 
-export type DashboardAccordionType = 'cluster-resources' | 'helm-releases';
+export type DashboardAccordionType = 'cluster-resources' | 'helm-releases' | 'images';
 export type DashboardActiveTab = 'Info' | 'Manifest' | 'Logs' | 'Shell' | 'Graph';
 
 export type DashboardState = {
   isOpen: boolean;
   ui: {
-    activeAccordion: 'cluster-resources' | 'helm-releases';
+    activeAccordion: DashboardAccordionType;
     activeMenu: DashboardMenu;
     activeTab: DashboardActiveTab;
     menuList: Array<DashboardMenu>;
