@@ -15,7 +15,7 @@ import {
 } from '@shared/utils/commands';
 
 import HelmDryRunDiffModal from './HelmDryRunDiffModal';
-import {HelmReleaseProvider} from './HelmReleaseContext';
+import {useHelmReleaseDiffContext} from './HelmReleaseContext';
 import HelmReleaseHooks from './HelmReleaseTabs/HelmReleaseHooks';
 import HelmReleaseManifest from './HelmReleaseTabs/HelmReleaseManifest';
 import HelmReleaseNotes from './HelmReleaseTabs/HelmReleaseNotes';
@@ -54,18 +54,47 @@ const tabsItems = [
 const SelectedHelmRelease = () => {
   const dispatch = useAppDispatch();
   const release = useAppSelector(state => state.dashboard.helm.selectedHelmRelease!);
-  const [commandDryRun, setCommandDryRun] = useState<'upgrade-dry-run' | 'uninstall-dry-run' | undefined>();
-  const [isHelmDiffModalOpen, setIsHelmDiffModalOpen] = useState(false);
+  const [commandDryRun, setCommandDryRun] = useHelmReleaseDiffContext();
   const [isSelectHelmReleaseOpen, setIsSelectHelmReleaseOpen] = useState(false);
   const [selectedHelmReleaseRepo, setSelectedHelmReleaseRepo] = useState<string>('');
   const onUpgradeDryRunClickHandler = () => {
     setIsSelectHelmReleaseOpen(true);
-    setCommandDryRun('upgrade-dry-run');
+    setCommandDryRun({
+      open: false,
+      leftCommand: getHelmReleaseManifestCommand({release: release.name, namespace: release.namespace}),
+      rightCommand: upgradeHelmReleaseCommand({
+        release: release.name,
+        chart: '',
+        namespace: release.namespace,
+        dryRun: true,
+      }),
+      okText: 'Upgrade',
+      okHandler: async () => {
+        await runCommandInMainThread(
+          upgradeHelmReleaseCommand({
+            release: release.name,
+            chart: selectedHelmReleaseRepo,
+            namespace: release.namespace,
+          })
+        );
+        dispatch(setSelectedHelmRelease({...release}));
+      },
+    });
   };
 
   const onUninstallDryRunClickHandler = () => {
-    setIsHelmDiffModalOpen(true);
-    setCommandDryRun('uninstall-dry-run');
+    setCommandDryRun({
+      open: true,
+      leftCommand: getHelmReleaseManifestCommand({release: release.name, namespace: release.namespace}),
+      rightCommand: uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace, dryRun: true}),
+      okText: 'Uninstall',
+      okHandler: async () => {
+        await runCommandInMainThread(
+          uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace})
+        );
+        dispatch(setSelectedHelmRelease(null));
+      },
+    });
   };
 
   const onUpgradeClickHandler = () => {
@@ -75,8 +104,17 @@ const SelectedHelmRelease = () => {
 
   const onSelectHelmRepoOkHandler = async (repo: string) => {
     setSelectedHelmReleaseRepo(repo);
-    if (commandDryRun === 'upgrade-dry-run') {
-      setIsHelmDiffModalOpen(true);
+    if (commandDryRun) {
+      setCommandDryRun({
+        ...commandDryRun,
+        open: true,
+        rightCommand: upgradeHelmReleaseCommand({
+          release: release?.name,
+          chart: repo,
+          namespace: release?.namespace,
+          dryRun: true,
+        }),
+      });
     } else {
       await runCommandInMainThread(
         upgradeHelmReleaseCommand({release: release.name, chart: repo, namespace: release.namespace})
@@ -85,71 +123,57 @@ const SelectedHelmRelease = () => {
     }
   };
 
-  const onDryRunDiffOkHandler = () => {
-    setIsHelmDiffModalOpen(false);
+  const onDiffDismissHandler = () => {
     setIsSelectHelmReleaseOpen(false);
+    setCommandDryRun(undefined);
   };
 
-  const leftSideCommand = getHelmReleaseManifestCommand({release: release.name, namespace: release.namespace});
-
-  const rightSideCommand =
-    commandDryRun === 'upgrade-dry-run'
-      ? upgradeHelmReleaseCommand({
-          release: release?.name,
-          chart: selectedHelmReleaseRepo,
-          namespace: release?.namespace,
-          dryRun: true,
-        })
-      : uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace, dryRun: true});
-
   return (
-    <HelmReleaseProvider>
-      <Container>
-        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24}}>
-          <Typography.Title style={{marginBottom: 0}} level={4}>
-            {release.name}
-          </Typography.Title>
-          <div style={{display: 'flex', gap: 16}}>
-            <Dropdown.Button
-              type="primary"
-              menu={{items: [{key: 'upgrade', label: 'Upgrade', onClick: onUpgradeClickHandler}]}}
-              onClick={onUpgradeDryRunClickHandler}
-            >
-              Dry-run Upgrade
-            </Dropdown.Button>
+    <Container>
+      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24}}>
+        <Typography.Title style={{marginBottom: 0}} level={4}>
+          {release.name}
+        </Typography.Title>
+        <div style={{display: 'flex', gap: 16}}>
+          <Dropdown.Button
+            type="primary"
+            menu={{items: [{key: 'upgrade', label: 'Upgrade', onClick: onUpgradeClickHandler}]}}
+            onClick={onUpgradeDryRunClickHandler}
+          >
+            Dry-run Upgrade
+          </Dropdown.Button>
 
-            <Dropdown.Button
-              type="primary"
-              menu={{items: [{key: 'uninstall', label: 'Uninstall', onClick: onUninstallDryRunClickHandler}]}}
-              onClick={onUninstallDryRunClickHandler}
-            >
-              Dry-run Uninstall
-            </Dropdown.Button>
-          </div>
+          <Dropdown.Button
+            type="primary"
+            menu={{items: [{key: 'uninstall', label: 'Uninstall', onClick: onUninstallDryRunClickHandler}]}}
+            onClick={onUninstallDryRunClickHandler}
+          >
+            Dry-run Uninstall
+          </Dropdown.Button>
         </div>
+      </div>
 
-        <div style={{display: 'flex', flexDirection: 'column'}}>
-          <Tabs items={tabsItems} />
-        </div>
-        <div id="helmDiffModalContainer" />
-        {isHelmDiffModalOpen && (
-          <HelmDryRunDiffModal
-            leftSideCommand={leftSideCommand}
-            rightSideCommand={rightSideCommand}
-            onClose={() => setIsHelmDiffModalOpen(false)}
-            onOk={onDryRunDiffOkHandler}
-            okText={commandDryRun === 'upgrade-dry-run' ? 'Upgrade' : 'Uninstall'}
-          />
-        )}
-        {isSelectHelmReleaseOpen && (
-          <UpgradeHelmReleaseModal
-            onOk={onSelectHelmRepoOkHandler}
-            onClose={() => setIsSelectHelmReleaseOpen(false)}
-            isDryRun={commandDryRun === 'upgrade-dry-run'}
-          />
-        )}
-      </Container>
-    </HelmReleaseProvider>
+      <div style={{display: 'flex', flexDirection: 'column'}}>
+        <Tabs items={tabsItems} />
+      </div>
+      <div id="helmDiffModalContainer" />
+      {commandDryRun && commandDryRun.open && (
+        <HelmDryRunDiffModal
+          leftSideCommand={commandDryRun?.leftCommand}
+          rightSideCommand={commandDryRun?.rightCommand}
+          onClose={onDiffDismissHandler}
+          onOk={commandDryRun?.okHandler}
+          okText={commandDryRun?.okText}
+        />
+      )}
+      {isSelectHelmReleaseOpen && (
+        <UpgradeHelmReleaseModal
+          onOk={onSelectHelmRepoOkHandler}
+          onClose={() => setIsSelectHelmReleaseOpen(false)}
+          isDryRun={Boolean(commandDryRun)}
+        />
+      )}
+    </Container>
   );
 };
 

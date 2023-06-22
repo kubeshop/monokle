@@ -46,8 +46,20 @@ const HelmDryRunDiffModal = ({leftSideCommand, rightSideCommand, onClose, onOk, 
     return result.stdout;
   });
 
+  const onOkClickHandler = () => {
+    onOk();
+    onClose();
+  };
+
   return isLeftSideLoading || isRightSideLoading ? null : (
-    <Modal open onCancel={onClose} onOk={onOk} okText={okText} width="100%">
+    <Modal
+      open
+      onCancel={onClose}
+      onOk={onOkClickHandler}
+      okText={okText}
+      width="100%"
+      getContainer="helmDiffModalContainer"
+    >
       <MonacoDiffContainer width="100%" height="calc(70vh - 80px)" ref={containerRef}>
         <MonacoDiffEditor
           width={containerWidth}

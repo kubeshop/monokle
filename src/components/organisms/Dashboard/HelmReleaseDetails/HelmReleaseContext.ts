@@ -1,7 +1,15 @@
 import {createStateContext} from 'react-use';
 
-interface HelmReleaseContext {}
+import {CommandOptions} from '@shared/models/commands';
 
-const [useHelmReleaseContext, HelmReleaseProvider] = createStateContext<HelmReleaseContext | undefined>(undefined);
+interface HelmReleaseDiff {
+  leftCommand: CommandOptions;
+  rightCommand: CommandOptions;
+  okText: string;
+  okHandler: () => void;
+  open: boolean;
+}
 
-export {useHelmReleaseContext, HelmReleaseProvider};
+const [useHelmReleaseDiffContext, HelmReleaseProvider] = createStateContext<HelmReleaseDiff | undefined>(undefined);
+
+export {useHelmReleaseDiffContext, HelmReleaseProvider};

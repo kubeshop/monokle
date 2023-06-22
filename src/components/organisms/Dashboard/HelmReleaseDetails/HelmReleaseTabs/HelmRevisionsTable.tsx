@@ -1,6 +1,7 @@
+import {useCallback, useMemo} from 'react';
 import {useAsync} from 'react-use';
 
-import {Table as AntTable, Tag, Typography} from 'antd';
+import {Table as AntTable, Button, Tag, Typography} from 'antd';
 
 import {DateTime} from 'luxon';
 import styled from 'styled-components';
@@ -8,7 +9,22 @@ import styled from 'styled-components';
 import {useAppSelector} from '@redux/hooks';
 
 import {Colors} from '@shared/styles';
-import {helmReleaseRevisionsCommand, runCommandInMainThread} from '@shared/utils/commands';
+import {
+  getHelmReleaseManifestCommand,
+  helmReleaseRevisionsCommand,
+  runCommandInMainThread,
+} from '@shared/utils/commands';
+
+import {useHelmReleaseDiffContext} from '../HelmReleaseContext';
+
+interface HelmRevision {
+  revision: number;
+  updated: string;
+  status: string;
+  chart: string;
+  app_version: string;
+  description: string;
+}
 
 const getTagColor = (status: string) => {
   switch (status) {
@@ -25,7 +41,7 @@ const getTagColor = (status: string) => {
   }
 };
 
-const columns = [
+const createTableColumns = (onDiffClickHandler: (release: HelmRevision) => void) => [
   {
     title: 'Revision',
     dataIndex: 'revision',
@@ -56,11 +72,43 @@ const columns = [
     title: 'Description',
     dataIndex: 'description',
   },
+  {
+    title: '',
+    dataIndex: '',
+    key: 'x',
+    responsive: ['sm'],
+    render: (value: any, record: HelmRevision) => (
+      <HoverArea>
+        <Button type="primary" onClick={() => onDiffClickHandler(record)}>
+          Diff
+        </Button>
+      </HoverArea>
+    ),
+  },
 ];
 
 const HelmRevisionsTable = () => {
   const release = useAppSelector(state => state.dashboard.helm.selectedHelmRelease!);
+  const setHelmReleaseDiff = useHelmReleaseDiffContext()[1];
 
+  const onDiffClickHandler = useCallback(
+    async (revision: HelmRevision) => {
+      setHelmReleaseDiff({
+        open: true,
+        leftCommand: getHelmReleaseManifestCommand({release: release.name, namespace: release.namespace}),
+        rightCommand: getHelmReleaseManifestCommand({
+          release: release.name,
+          namespace: release.namespace,
+          revision: revision.revision,
+        }),
+        okText: 'Ok',
+        okHandler: () => {},
+      });
+    },
+    [release, setHelmReleaseDiff]
+  );
+
+  const columns = useMemo(() => createTableColumns(onDiffClickHandler), [onDiffClickHandler]);
   const {value, loading} = useAsync(async () => {
     const result = await runCommandInMainThread(
       helmReleaseRevisionsCommand({release: release.name, namespace: release.namespace!})
@@ -77,7 +125,7 @@ const HelmRevisionsTable = () => {
         Review this Chart updates history below. You can also <Typography.Link>update </Typography.Link> to latest
         version.
       </Typography.Text>
-      <Table rowKey="revision" dataSource={value} columns={columns} pagination={false} loading={loading} />
+      <Table sticky rowKey="revision" dataSource={value} columns={columns} pagination={false} loading={loading} />
     </>
   );
 };
@@ -131,8 +179,12 @@ export const Table = styled(props => <AntTable {...props} />)`
     background-color: ${Colors.cyan8} !important;
     color: ${Colors.grey2} !important;
   }
+`;
 
-  .hub-search {
-    color: ${Colors.geekblue8} !important;
-  }
+const HoverArea = styled.div.attrs({
+  className: 'hover-area',
+})`
+  display: flex;
+  align-items: center;
+  visibility: hidden;
 `;
