@@ -17,10 +17,14 @@ export const Container = styled.div`
   height: 100%;
 
   .ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
-    overflow-y: auto;
+    overflow-y: hidden;
     padding-top: 0;
     margin-top: 12px;
     scrollbar-gutter: stable both-edges;
+  }
+
+  .ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box:hover {
+    overflow-y: auto;
   }
 `;
 
