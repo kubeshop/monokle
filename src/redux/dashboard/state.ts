@@ -11,6 +11,7 @@ export const initialState: DashboardState = {
   tableDrawer: {},
   helm: {
     selectedHelmRelease: null,
+    activeHelmReleaseTab: 'revision-history',
   },
   selectedImage: null,
 };

@@ -4,7 +4,7 @@ import {setCurrentContext} from '@redux/appConfig';
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 
-import {DashboardAccordionType, DashboardMenu, DashboardState} from '@shared/models/dashboard';
+import {DashboardAccordionType, DashboardMenu, DashboardState, HelmReleaseTab} from '@shared/models/dashboard';
 import {ImageType} from '@shared/models/image';
 import {HelmRelease} from '@shared/models/ui';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -38,6 +38,9 @@ export const dashboardSlice = createSlice({
     },
     setSelectedHelmRelease: (state: Draft<DashboardState>, action: PayloadAction<HelmRelease | null>) => {
       state.helm.selectedHelmRelease = action.payload;
+    },
+    setSelectedHelmReleaseTab: (state: Draft<DashboardState>, action: PayloadAction<HelmReleaseTab>) => {
+      state.helm.activeHelmReleaseTab = action.payload;
     },
     setSelectedImage: (state: Draft<DashboardState>, action: PayloadAction<ImageType | null>) => {
       state.selectedImage = action.payload;
@@ -76,6 +79,7 @@ export const {
   setDashboardActiveAccordion,
   setSelectedHelmRelease,
   setSelectedImage,
+  setSelectedHelmReleaseTab,
 } = dashboardSlice.actions;
 
 export default dashboardSlice.reducer;

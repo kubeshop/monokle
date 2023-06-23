@@ -4,9 +4,10 @@ import {Tabs as AntTabs, Dropdown, Typography} from 'antd';
 
 import styled from 'styled-components';
 
-import {setSelectedHelmRelease} from '@redux/dashboard';
+import {setSelectedHelmRelease, setSelectedHelmReleaseTab} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
+import {HelmReleaseTab} from '@shared/models/dashboard';
 import {
   getHelmReleaseManifestCommand,
   runCommandInMainThread,
@@ -60,6 +61,7 @@ const tabsItems = [
 const SelectedHelmRelease = () => {
   const dispatch = useAppDispatch();
   const release = useAppSelector(state => state.dashboard.helm.selectedHelmRelease!);
+  const activeTab = useAppSelector(state => state.dashboard.helm.activeHelmReleaseTab);
   const [commandDryRun, setCommandDryRun] = useHelmReleaseDiffContext();
   const [isSelectHelmReleaseOpen, setIsSelectHelmReleaseOpen] = useState(false);
   const [selectedHelmReleaseRepo, setSelectedHelmReleaseRepo] = useState<string>('');
@@ -161,7 +163,11 @@ const SelectedHelmRelease = () => {
       </div>
 
       <div style={{display: 'flex', flexDirection: 'column'}}>
-        <Tabs items={tabsItems} />
+        <Tabs
+          items={tabsItems}
+          activeKey={activeTab}
+          onChange={(tab: HelmReleaseTab) => dispatch(setSelectedHelmReleaseTab(tab))}
+        />
       </div>
       <div id="helmDiffModalContainer" />
       {commandDryRun && commandDryRun.open && (

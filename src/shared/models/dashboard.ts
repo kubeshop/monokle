@@ -14,7 +14,13 @@ export type DashboardMenu = {
 
 export type DashboardAccordionType = 'cluster-resources' | 'helm-releases' | 'images';
 export type DashboardActiveTab = 'Info' | 'Manifest' | 'Logs' | 'Shell' | 'Graph';
-
+export type HelmReleaseTab =
+  | 'revision-history'
+  | 'release-values'
+  | 'release-manifest'
+  | 'release-hooks'
+  | 'release-notes'
+  | 'cluster-resources';
 export type DashboardState = {
   isOpen: boolean;
   ui: {
@@ -28,6 +34,7 @@ export type DashboardState = {
   };
   helm: {
     selectedHelmRelease: HelmRelease | null;
+    activeHelmReleaseTab: HelmReleaseTab;
   };
   selectedImage: ImageType | null;
 };
