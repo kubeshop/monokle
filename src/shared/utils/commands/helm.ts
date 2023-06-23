@@ -136,12 +136,11 @@ export function helmPullChartCommand(
 
 export function installHelmRepoChartCommand(
   {
-    name,
     chart,
     namespace,
     version,
     shouldCreateNamespace,
-  }: {name: string; chart: string; namespace?: string; version?: string; shouldCreateNamespace?: boolean},
+  }: {chart: string; namespace?: string; version?: string; shouldCreateNamespace?: boolean},
   env?: HelmEnv
 ) {
   return {
@@ -149,8 +148,8 @@ export function installHelmRepoChartCommand(
     cmd: 'helm',
     args: [
       'install',
-      name,
       chart,
+      '-g',
       namespace ? `--namespace ${namespace}` : '',
       version ? `--version ${version}` : '',
       shouldCreateNamespace ? '--create-namespace' : '',
