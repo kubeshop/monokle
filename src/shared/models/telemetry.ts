@@ -171,11 +171,15 @@ export type EventMap = {
   'validation/validate_incremental': {actionType: string};
   'helm_release/search': undefined;
   'helm_release/select': undefined;
+  'helm_release/release_select_tab': {tab: string};
+  'helm_release/select_resource': {kind: string};
   'helm_release/revision_diff': undefined;
   'helm_release/upgrade': {dryRun: boolean; status?: 'failed' | 'succeeded'};
   'helm_release/uninstall': {dryRun: boolean; status?: 'failed' | 'succeeded'};
+  'helm_release/navigate_to_helm_repo': undefined;
   'image_resources/select': undefined;
   'image_resources/search': undefined;
+  'image_resources/select_resource': {kind: string};
 };
 
 export const APP_INSTALLED = 'APP_INSTALLED';

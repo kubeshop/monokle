@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 
 import {forEach} from 'lodash';
 
@@ -6,6 +6,7 @@ import {useAppSelector} from '@redux/hooks';
 import {useResourceContentMap, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 
 import {ResourceMeta} from '@shared/models/k8sResource';
+import {trackEvent} from '@shared/utils';
 
 import {Header} from '../Header/Header';
 import {TableView} from '../TableView';
@@ -33,12 +34,17 @@ const ImageResources = () => {
     return data;
   }, [selectedImage, clusterResourceMeta, clusterResourceContent]);
 
+  const onRowClickHandler = useCallback((resource: ResourceMeta) => {
+    trackEvent('image_resources/select_resource', {kind: resource.kind});
+  }, []);
+
   return selectedImage ? (
     <>
       <Header title="Image Resources" />
       <TableView
         dataSource={resources}
         columns={[CellKind, CellName, CellError, CellNamespace, CellAge, CellContextMenu]}
+        onRowClick={onRowClickHandler}
       />
     </>
   ) : (

@@ -15,7 +15,15 @@ import {Drawer} from './Drawer';
 import NoResourcesFound from './NoResourcesFound';
 import * as S from './TableView.styled';
 
-const TableView = ({dataSource, columns}: {dataSource: ResourceMeta[]; columns: ColumnsType<any>}) => {
+const TableView = ({
+  dataSource,
+  columns,
+  onRowClick,
+}: {
+  dataSource: ResourceMeta[];
+  columns: ColumnsType<any>;
+  onRowClick?: (resource: ResourceMeta) => void;
+}) => {
   const dispatch = useAppDispatch();
   const {height} = useMainPaneDimensions();
   const [filterText, setFilterText] = useState<string>('');
@@ -55,6 +63,7 @@ const TableView = ({dataSource, columns}: {dataSource: ResourceMeta[]; columns: 
                 dispatch(setDashboardSelectedResourceId(record.id));
                 dispatch(setActiveTab({tab: 'Info', kind: record.kind}));
                 dispatch(selectResource({resourceIdentifier: {id: record.id, storage: 'cluster'}}));
+                onRowClick && onRowClick(record);
               },
             };
           }}

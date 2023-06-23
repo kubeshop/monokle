@@ -193,7 +193,10 @@ const SelectedHelmRelease = () => {
         <Tabs
           items={tabsItems}
           activeKey={activeTab}
-          onChange={(tab: HelmReleaseTab) => dispatch(setSelectedHelmReleaseTab(tab))}
+          onChange={(tab: HelmReleaseTab) => {
+            dispatch(setSelectedHelmReleaseTab(tab));
+            trackEvent('helm_release/release_select_tab', {tab});
+          }}
         />
       </div>
       <div id="helmDiffModalContainer" />

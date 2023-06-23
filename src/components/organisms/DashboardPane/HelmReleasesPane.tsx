@@ -55,6 +55,7 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
   const onBrowseHelmClickHandler = () => {
     dispatch(setSelectedHelmRelease(null));
     dispatch(setLeftMenuSelection('helm'));
+    trackEvent('helm_release/navigate_to_helm_repo');
   };
 
   return (
