@@ -16,7 +16,7 @@ export const Container = styled.div`
   column-gap: 8px;
   row-gap: 8px;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 20% 80%;
+  grid-template-rows: max-content 1fr;
   grid-template-areas:
     'status utilization utilization'
     'inventory-info activity activity';

@@ -4,7 +4,7 @@ import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
   display: grid;
-  grid-template-rows: repeat(2, 56px);
+  grid-template-rows: repeat(3, 56px);
   width: 100%;
   padding: 0 16px;
 `;
@@ -30,7 +30,7 @@ export const KindRow = styled.div<{$type: 'error' | 'warning' | 'resource'}>`
   width: 100%;
   margin-bottom: 10px;
   padding: 8px 10px;
-  cursor: ${({$type}) => ($type === 'warning' || $type === 'error' ? 'pointer' : 'default')};
+  cursor: ${({onClick}) => (onClick ? 'pointer' : 'default')};
 
   ${props =>
     `border-left: 4px solid ${

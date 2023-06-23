@@ -7,11 +7,14 @@ import {size} from 'lodash';
 import {TOOLTIP_DELAY} from '@constants/constants';
 import {ClusterDashboardErrorsWarningTooltip} from '@constants/tooltips';
 
-import {useAppDispatch} from '@redux/hooks';
+import {setDashboardActiveAccordion} from '@redux/dashboard';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 import {setValidationFilters} from '@redux/validation/validation.slice';
+
+import useGetHelmReleases from '@hooks/useGetHelmReleases';
 
 import {useRefSelector} from '@utils/hooks';
 
@@ -24,8 +27,10 @@ export const Status = () => {
 
   const currentFilters = useRefSelector(state => state.validation.validationOverview.filters);
   const problems = useValidationSelector(problemsSelector);
+  const imagesCount = useAppSelector(state => size(state.main.imageMap));
 
   const clusterResourceCount = size(useResourceMetaMap('cluster'));
+  const {list: helmList} = useGetHelmReleases();
 
   const errorsCount = useMemo(() => size(problems.filter(p => p.level === 'error')), [problems]);
   const warningsCount = useMemo(() => size(problems.filter(p => p.level === 'warning')), [problems]);
@@ -43,6 +48,38 @@ export const Status = () => {
           <b>{clusterResourceCount}</b> resources
         </S.Count>
       </S.KindRow>
+
+      <S.InnerContainer>
+        <Tooltip title="Helm releases count" mouseEnterDelay={TOOLTIP_DELAY}>
+          <S.KindRow
+            $type="resource"
+            style={{width: '48.5%'}}
+            onClick={() => {
+              dispatch(setDashboardActiveAccordion('helm-releases'));
+              trackEvent('dashboard/select_helm');
+            }}
+          >
+            <S.Count $small>
+              <b>{helmList.length}</b> Helm Charts
+            </S.Count>
+          </S.KindRow>
+        </Tooltip>
+
+        <Tooltip title="Images count" mouseEnterDelay={TOOLTIP_DELAY}>
+          <S.KindRow
+            $type="resource"
+            style={{width: '48.5%'}}
+            onClick={() => {
+              dispatch(setDashboardActiveAccordion('images'));
+              trackEvent('dashboard/select_images');
+            }}
+          >
+            <S.Count $small>
+              <b>{imagesCount}</b> images
+            </S.Count>
+          </S.KindRow>
+        </Tooltip>
+      </S.InnerContainer>
 
       <S.InnerContainer>
         <Tooltip title={<ClusterDashboardErrorsWarningTooltip type="errors" />} mouseEnterDelay={TOOLTIP_DELAY}>

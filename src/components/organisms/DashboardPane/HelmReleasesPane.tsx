@@ -1,5 +1,4 @@
 import {ChangeEvent, useCallback, useRef} from 'react';
-import {useAsync} from 'react-use';
 
 import {Button, Input as RawInput, Skeleton, Tooltip, Typography} from 'antd';
 
@@ -15,11 +14,11 @@ import {setHelmPaneChartSearch, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import AccordionPanel, {InjectedPanelProps} from '@components/atoms/AccordionPanel/AccordionPanel';
 
+import useGetHelmReleases from '@hooks/useGetHelmReleases';
+
 import {TitleBar, TitleBarCount} from '@monokle/components';
-import {HelmRelease} from '@shared/models/ui';
 import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils';
-import {listHelmReleasesCommand, runCommandInMainThread} from '@shared/utils/commands';
 
 import * as S from './DashboardPane.style';
 import HelmReleasesList from './HelmReleasesList';
@@ -27,19 +26,9 @@ import HelmReleasesList from './HelmReleasesList';
 const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
   const {isActive} = props;
   const dispatch = useAppDispatch();
-  const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
-  const helmRepoSearch = useAppSelector(state => state.ui.helmPane.chartSearchToken);
   const currentContext = useAppSelector(currentKubeContextSelector);
 
-  const {value: list = [], loading} = useAsync(async () => {
-    const output = await runCommandInMainThread(
-      listHelmReleasesCommand({filter: helmRepoSearch, namespace: selectedNamespace?.replace('<all>', '')})
-    );
-    if (output.stderr) {
-      throw new Error(output.stderr);
-    }
-    return JSON.parse(output.stdout || '[]') as HelmRelease[];
-  }, [helmRepoSearch, selectedNamespace]);
+  const {list, loading} = useGetHelmReleases();
 
   const debouncedSearchRef = useRef(
     debounce((search: string) => {
