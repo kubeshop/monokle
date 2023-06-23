@@ -164,13 +164,15 @@ const ClusterPane: React.FC<InjectedPanelProps> = props => {
           <Skeleton />
         ) : (
           <>
-            <S.Input
-              style={{marginBottom: 8}}
-              placeholder=""
-              prefix={<S.SearchOutlined />}
-              onChange={(event: any) => setFilterText(event.target.value)}
-              allowClear
-            />
+            <S.StickyContainer>
+              <S.Input
+                style={{marginBottom: 8}}
+                placeholder=""
+                prefix={<S.SearchOutlined />}
+                onChange={(event: any) => setFilterText(event.target.value)}
+                allowClear
+              />
+            </S.StickyContainer>
             <DashboardFilteredMenu filterText={filterText} />
           </>
         )}

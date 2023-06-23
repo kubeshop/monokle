@@ -70,25 +70,27 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
       }
     >
       <div style={{padding: '0px 16px 16px 16px'}}>
-        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-          <Typography.Text>Installed Charts</Typography.Text>
-          <Tooltip title="Find and install new Helm Charts." placement="rightBottom">
-            <Button
-              style={{paddingRight: 0}}
-              type="link"
-              icon={<PlusCircleFilled />}
-              onClick={onBrowseHelmClickHandler}
-            >
-              New
-            </Button>
-          </Tooltip>
-        </div>
-        <Input
-          placeholder="Search & filter installed"
-          prefix={<SearchOutlined />}
-          allowClear
-          onChange={onChangeSearchInputHandler}
-        />
+        <S.StickyContainer>
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <Typography.Text>Installed Charts</Typography.Text>
+            <Tooltip title="Find and install new Helm Charts." placement="rightBottom">
+              <Button
+                style={{paddingRight: 0}}
+                type="link"
+                icon={<PlusCircleFilled />}
+                onClick={onBrowseHelmClickHandler}
+              >
+                New
+              </Button>
+            </Tooltip>
+          </div>
+          <Input
+            placeholder="Search & filter installed"
+            prefix={<SearchOutlined />}
+            allowClear
+            onChange={onChangeSearchInputHandler}
+          />
+        </S.StickyContainer>
         {loading ? <Skeleton style={{marginTop: 16}} active /> : <HelmReleasesList list={list} />}
       </div>
     </AccordionPanel>

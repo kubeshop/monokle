@@ -60,12 +60,14 @@ const ImagesPane: React.FC<InjectedPanelProps> = props => {
       }
     >
       <div style={{padding: '0px 16px 16px 16px'}}>
-        <Input
-          placeholder="Search & filter images"
-          prefix={<SearchOutlined />}
-          allowClear
-          onChange={onChangeSearchInputHandler}
-        />
+        <S.StickyContainer>
+          <Input
+            placeholder="Search & filter images"
+            prefix={<SearchOutlined />}
+            allowClear
+            onChange={onChangeSearchInputHandler}
+          />
+        </S.StickyContainer>
         <ImagesList />
       </div>
     </AccordionPanel>

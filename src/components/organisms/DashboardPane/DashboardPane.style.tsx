@@ -14,9 +14,13 @@ import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
   padding: 16px 0px 16px 0;
+  height: 100%;
 
   .ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
     overflow-y: auto;
+    padding-top: 0;
+    margin-top: 12px;
+    scrollbar-gutter: stable both-edges;
   }
 `;
 
@@ -130,6 +134,14 @@ export const FilterContainer = styled.div`
   grid-area: filter;
 `;
 
+export const StickyContainer = styled.div`
+  position: sticky;
+  top: 0;
+  background-color: ${Colors.grey10};
+  z-index: 5;
+  margin-bottom: 4px;
+`;
+
 export const Input = styled(RawInput)`
   background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
@@ -150,6 +162,7 @@ export const FilterOutlined = styled(RawFilterOutlined)`
 `;
 
 export const Collapse = styled(RawCollapse)`
+  position: relative;
   padding-top: 18px;
   box-sizing: border-box;
   height: 100%;
