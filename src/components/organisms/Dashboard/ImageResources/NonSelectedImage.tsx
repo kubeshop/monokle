@@ -7,7 +7,9 @@ import {Colors} from '@shared/styles';
 const NonSelectedImage = () => {
   return (
     <Container>
-      <Title>Working with Images in your cluster</Title>
+      <Title>
+        Working with <b>Images</b> in your cluster
+      </Title>
       <Text>← Click on any of found Images on the left to check out:</Text>
 
       <UL>

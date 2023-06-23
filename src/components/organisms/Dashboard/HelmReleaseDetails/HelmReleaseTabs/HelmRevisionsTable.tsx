@@ -10,6 +10,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
 import {errorAlert, successAlert} from '@utils/alert';
+import {useMainPaneDimensions} from '@utils/hooks';
 
 import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils';
@@ -76,6 +77,8 @@ const createTableColumns = (onDiffClickHandler: (release: HelmRevision) => void)
   {
     title: 'Description',
     dataIndex: 'description',
+
+    ellipsis: true,
   },
   {
     title: '',
@@ -94,9 +97,13 @@ const createTableColumns = (onDiffClickHandler: (release: HelmRevision) => void)
 ];
 
 const HelmRevisionsTable = () => {
+  const {height} = useMainPaneDimensions();
+
   const dispatch = useAppDispatch();
   const release = useAppSelector(state => state.dashboard.helm.selectedHelmRelease!);
   const setHelmReleaseDiff = useHelmReleaseDiffContext()[1];
+  const terminalHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
 
   const onDiffClickHandler = useCallback(
     async (revision: HelmRevision) => {
@@ -159,10 +166,18 @@ const HelmRevisionsTable = () => {
   }, [release]);
 
   return (
-    <>
+    <div style={{marginTop: 30, height: '100%'}}>
       <Typography.Text>Review this Chart updates history below.</Typography.Text>
-      <Table sticky rowKey="revision" dataSource={value} columns={columns} pagination={false} loading={loading} />
-    </>
+      <Table
+        sticky
+        rowKey="revision"
+        dataSource={value}
+        columns={columns}
+        pagination={false}
+        loading={loading}
+        scroll={{y: height - 300 - (bottomSelection === 'terminal' ? terminalHeight : 0)}}
+      />
+    </div>
   );
 };
 

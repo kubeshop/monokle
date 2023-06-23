@@ -11,6 +11,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {errorAlert, successAlert} from '@utils/alert';
 
 import {HelmReleaseTab} from '@shared/models/dashboard';
+import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils';
 import {
   getHelmReleaseManifestCommand,
@@ -224,9 +225,8 @@ const SelectedHelmRelease = () => {
   return (
     <Container>
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24}}>
-        <Typography.Title style={{marginBottom: 0}} level={4}>
-          {release.name}
-        </Typography.Title>
+        <Title>{release.name} </Title>
+
         <div style={{display: 'flex', gap: 16}}>
           <Dropdown.Button
             type="primary"
@@ -281,6 +281,7 @@ export default SelectedHelmRelease;
 
 const Container = styled.div`
   padding: 28px;
+  height: 100%;
 `;
 
 const Tabs = styled(props => <AntTabs {...props} />)`
@@ -307,4 +308,26 @@ const Tabs = styled(props => <AntTabs {...props} />)`
   & .ant-tabs-tabpane-active {
     height: 100%;
   }
+
+  & .ant-tabs-tab.ant-tabs-tab .ant-tabs-tab-btn {
+    color: ${Colors.grey7};
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+
+  & .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: ${Colors.grey9};
+  }
+
+  & .ant-tabs-ink-bar {
+    background-color: ${Colors.grey9};
+  }
+`;
+
+const Title = styled(Typography.Text)`
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 22px;
+  color: ${Colors.grey9};
 `;

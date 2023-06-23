@@ -7,7 +7,9 @@ import {Colors} from '@shared/styles';
 const NonSelectedHelmRelease = () => {
   return (
     <Container>
-      <Title>Working with Helm in your cluster</Title>
+      <Title>
+        Working with <b>Helm</b> in your cluster
+      </Title>
       <Text>
         ← Manage here everyting related to Helm Charts in your cluster. Click on any of found Chart releases on the left
         to:
