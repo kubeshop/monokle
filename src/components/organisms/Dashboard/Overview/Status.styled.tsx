@@ -20,10 +20,16 @@ export const InnerContainer = styled.div`
 export const Count = styled.div<{$small?: boolean}>`
   display: flex;
   gap: 4px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+
   ${({$small}) => ($small ? 'font-size: 12px' : 'font-size: 16px')};
 `;
 
-export const KindRow = styled.div<{$type: 'error' | 'warning' | 'resource'}>`
+export const KindRow = styled.span<{$type: 'error' | 'warning' | 'resource'}>`
   display: flex;
   align-items: center;
   border-radius: 4px;
@@ -32,6 +38,10 @@ export const KindRow = styled.div<{$type: 'error' | 'warning' | 'resource'}>`
   padding: 8px 10px;
   cursor: ${({onClick}) => (onClick ? 'pointer' : 'default')};
 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
   ${props =>
     `border-left: 4px solid ${
       (props.$type === 'warning' && Colors.yellow12) ||
