@@ -7,6 +7,7 @@ import {useResourceContentMap, useResourceMetaMap} from '@redux/selectors/resour
 
 import {ResourceMeta} from '@shared/models/k8sResource';
 
+import {Header} from '../Header/Header';
 import {TableView} from '../TableView';
 import {CellAge, CellContextMenu, CellError, CellKind, CellName, CellNamespace} from '../TableView/TableCells';
 import NonSelectedImage from './NonSelectedImage';
@@ -33,10 +34,13 @@ const ImageResources = () => {
   }, [selectedImage, clusterResourceMeta, clusterResourceContent]);
 
   return selectedImage ? (
-    <TableView
-      dataSource={resources}
-      columns={[CellKind, CellName, CellError, CellNamespace, CellAge, CellContextMenu]}
-    />
+    <>
+      <Header title="Image Resources" />
+      <TableView
+        dataSource={resources}
+        columns={[CellKind, CellName, CellError, CellNamespace, CellAge, CellContextMenu]}
+      />
+    </>
   ) : (
     <NonSelectedImage />
   );
