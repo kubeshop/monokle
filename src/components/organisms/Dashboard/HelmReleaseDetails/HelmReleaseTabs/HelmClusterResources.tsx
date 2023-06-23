@@ -1,6 +1,7 @@
 import {useCallback, useMemo} from 'react';
 
 import {forEach} from 'lodash';
+import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 import {useResourceContentMap, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
@@ -42,13 +43,21 @@ const HelmClusterResources = () => {
   }, []);
 
   return (
-    <TableView
-      dataSource={clusterResources}
-      columns={[CellKind, CellName, CellError, CellNamespace, CellAge, CellContextMenu]}
-      onRowClick={onRowClickHandler}
-      tableScrollHeight={height - 300 - (bottomSelection === 'terminal' ? terminalHeight : 0)}
-    />
+    <Container>
+      <TableView
+        dataSource={clusterResources}
+        columns={[CellKind, CellName, CellError, CellNamespace, CellAge, CellContextMenu]}
+        onRowClick={onRowClickHandler}
+        tableScrollHeight={height - 300 - (bottomSelection === 'terminal' ? terminalHeight : 0)}
+      />
+    </Container>
   );
 };
 
 export default HelmClusterResources;
+
+const Container = styled.div`
+  .table-view-container {
+    padding: 0;
+  }
+`;

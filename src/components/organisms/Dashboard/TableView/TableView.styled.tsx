@@ -6,7 +6,9 @@ import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
 
-export const Container = styled.div`
+export const Container = styled.div.attrs({
+  className: 'table-view-container',
+})`
   padding: 8px 16px 0px 16px;
   display: flex;
   flex-direction: column;
