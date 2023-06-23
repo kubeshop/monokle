@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-import {Tabs as AntTabs, Dropdown, Typography} from 'antd';
+import {Tabs as AntTabs, Dropdown, Tooltip, Typography} from 'antd';
 
 import styled from 'styled-components';
 
@@ -28,34 +28,34 @@ import UpgradeHelmReleaseModal from './UpgradeHelmReleaseModal';
 
 const tabsItems = [
   {
+    key: 'cluster-resources',
+    label: <Tooltip title="Cluster Resources">Cluster Resources</Tooltip>,
+    children: <HelmClusterResources />,
+  },
+  {
     key: 'revision-history',
-    label: 'Revision History',
+    label: <Tooltip title="Revision History">Revision History</Tooltip>,
     children: <HelmRevisionsTable />,
   },
   {
     key: 'release-values',
-    label: 'Release Values',
+    label: <Tooltip title="Release Values">Release Values</Tooltip>,
     children: <HelmReleaseValues />,
   },
   {
     key: 'release-manifest',
-    label: 'Release Manifests',
+    label: <Tooltip title="Release Manifests">Release Manifests</Tooltip>,
     children: <HelmReleaseManifest />,
   },
   {
     key: 'release-hooks',
-    label: 'Release Hooks',
+    label: <Tooltip title="Release Hooks">Release Hooks</Tooltip>,
     children: <HelmReleaseHooks />,
   },
   {
     key: 'release-notes',
-    label: 'Release Notes',
+    label: <Tooltip title="Release Notes">Release Notes</Tooltip>,
     children: <HelmReleaseNotes />,
-  },
-  {
-    key: 'cluster-resources',
-    label: 'Cluster Resources',
-    children: <HelmClusterResources />,
   },
 ];
 

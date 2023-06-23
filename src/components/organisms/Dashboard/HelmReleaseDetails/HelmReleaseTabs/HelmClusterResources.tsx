@@ -57,7 +57,10 @@ const HelmClusterResources = () => {
 export default HelmClusterResources;
 
 const Container = styled.div`
+  height: 100%;
+
   .table-view-container {
     padding: 0;
+    height: 100%;
   }
 `;

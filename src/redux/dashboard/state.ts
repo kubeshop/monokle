@@ -11,7 +11,7 @@ export const initialState: DashboardState = {
   tableDrawer: {},
   helm: {
     selectedHelmRelease: null,
-    activeHelmReleaseTab: 'revision-history',
+    activeHelmReleaseTab: 'cluster-resources',
   },
   selectedImage: null,
 };
