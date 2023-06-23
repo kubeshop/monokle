@@ -11,25 +11,21 @@ import {installHelmRepoChartCommand, runCommandInMainThread} from '@shared/utils
 
 export const installHelmRepoChart = createAsyncThunk<
   void,
-  {name: string; chart: string; namespace?: string; version?: string; shouldCreateNamespace?: boolean},
+  {chart: string; namespace?: string; version?: string; shouldCreateNamespace?: boolean},
   {dispatch: AppDispatch; state: RootState}
->(
-  'main/installHelmRepoChart',
-  async ({name, chart, namespace, version, shouldCreateNamespace}, {dispatch, getState}) => {
-    const kubeconfig = kubeConfigPathSelector(getState());
-    const result = await runCommandInMainThread(
-      installHelmRepoChartCommand(
-        {name, chart, namespace, version, shouldCreateNamespace},
-        {
-          KUBECONFIG: kubeconfig,
-        }
-      )
-    );
-    if (result.stderr) {
-      dispatch(setAlert(errorAlert('Install Helm Chart', result.stderr)));
-      throw new Error(result.stderr);
-    }
-
-    dispatch(setAlert(successAlert('Install Helm Chart', `${name} Chart installed successfully`)));
+>('main/installHelmRepoChart', async ({chart, namespace, version, shouldCreateNamespace}, {dispatch, getState}) => {
+  const kubeconfig = kubeConfigPathSelector(getState());
+  const result = await runCommandInMainThread(
+    installHelmRepoChartCommand(
+      {chart, namespace, version, shouldCreateNamespace},
+      {
+        KUBECONFIG: kubeconfig,
+      }
+    )
+  );
+  if (result.stderr) {
+    dispatch(setAlert(errorAlert('Install Helm Chart', result.stderr)));
   }
-);
+
+  dispatch(setAlert(successAlert('Install Helm Chart', `${chart} Chart installed successfully`)));
+});
