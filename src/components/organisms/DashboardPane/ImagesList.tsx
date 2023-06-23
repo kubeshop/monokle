@@ -2,20 +2,26 @@ import {useRef} from 'react';
 
 import {Typography} from 'antd';
 
-import {setSelectedHelmRelease} from '@redux/dashboard';
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setLeftMenuSelection} from '@redux/reducers/ui';
+import {size} from 'lodash';
+import styled from 'styled-components';
 
-import {HelmRelease} from '@shared/models/ui';
+import {setSelectedImage} from '@redux/dashboard';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {imageListSelector} from '@redux/selectors/imageSelectors';
+
+import {ImageType} from '@shared/models/image';
+import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import * as S from './DashboardPane.style';
 
 const ROW_HEIGHT = 40;
 
-const HelmReleasesList = ({list}: {list: HelmRelease[]}) => {
+const ImagesList: React.FC = () => {
   const dispatch = useAppDispatch();
-  const selectedHelmRelease = useAppSelector(state => state.dashboard.helm.selectedHelmRelease);
+  const list = useAppSelector(imageListSelector);
+  const imagesMap = useAppSelector(state => state.main.imageMap);
+  const selectedImage = useAppSelector(state => state.dashboard.selectedImage);
 
   const ref = useRef<HTMLUListElement>(null);
 
@@ -26,25 +32,16 @@ const HelmReleasesList = ({list}: {list: HelmRelease[]}) => {
     scrollToFn: elementScroll,
   });
 
-  const onItemClick = (chart: HelmRelease) => {
-    dispatch(setSelectedHelmRelease(chart));
+  const onItemClick = (image: ImageType) => {
+    dispatch(setSelectedImage(image));
   };
 
-  const onBrowseHelmClickHandler = () => {
-    dispatch(setSelectedHelmRelease(null));
-    dispatch(setLeftMenuSelection('helm'));
-  };
+  if (!size(list)) {
+    return <EmptyText>No images were found in the current project.</EmptyText>;
+  }
 
-  return list.length === 0 ? (
-    <div style={{marginTop: 16}}>
-      <Typography.Text type="secondary">
-        No Helm releases found - try the{' '}
-        <Typography.Link onClick={onBrowseHelmClickHandler}>[Helm Repository Browser]</Typography.Link> to find a chart
-        to install
-      </Typography.Text>
-    </div>
-  ) : (
-    <S.ListContainer style={{marginTop: 16}} ref={ref}>
+  return (
+    <S.ListContainer ref={ref}>
       <div
         style={{
           height: `${rowVirtualizer.getTotalSize()}px`,
@@ -58,20 +55,19 @@ const HelmReleasesList = ({list}: {list: HelmRelease[]}) => {
           if (!node) {
             return null;
           }
+          const image = imagesMap[node.id];
 
           return (
             <S.VirtualItem
-              $active={node.chart === selectedHelmRelease?.chart}
+              $active={selectedImage?.id === image.id}
               key={virtualItem.key}
               style={{
                 height: `${virtualItem.size}px`,
                 transform: `translateY(${virtualItem.start}px)`,
               }}
-              onClick={() => onItemClick(node)}
+              onClick={() => onItemClick(image)}
             >
-              <Typography.Text>
-                {node.name}/{node.chart}
-              </Typography.Text>
+              <Typography.Text>{image.name}</Typography.Text>
             </S.VirtualItem>
           );
         })}
@@ -80,4 +76,11 @@ const HelmReleasesList = ({list}: {list: HelmRelease[]}) => {
   );
 };
 
-export default HelmReleasesList;
+export default ImagesList;
+
+// Styled Components
+
+const EmptyText = styled.div`
+  padding: 16px;
+  color: ${Colors.grey8};
+`;

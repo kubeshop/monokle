@@ -1,3 +1,4 @@
+import {ImageType} from './image';
 import {HelmRelease} from './ui';
 
 export type DashboardMenu = {
@@ -28,4 +29,5 @@ export type DashboardState = {
   helm: {
     selectedHelmRelease: HelmRelease | null;
   };
+  selectedImage: ImageType | null;
 };

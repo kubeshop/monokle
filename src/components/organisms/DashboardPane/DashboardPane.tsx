@@ -3,10 +3,10 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {DashboardAccordionType} from '@shared/models/dashboard';
 
-import ImagesPane from '../ExplorerPane/ImagesPane/ImagesPane';
 import ClusterPane from './ClusterPane';
 import * as S from './DashboardPane.style';
 import HelmReleasesPane from './HelmReleasesPane';
+import ImagesPane from './ImagesPane';
 
 const accordionsKeys = ['cluster-resources', 'helm-releases', 'images'] as DashboardAccordionType[];
 

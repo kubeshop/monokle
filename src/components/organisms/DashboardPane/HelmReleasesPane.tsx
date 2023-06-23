@@ -111,12 +111,6 @@ const Input = styled(RawInput)`
   width: 100%;
 `;
 
-const Description = styled(Typography.Text)`
-  font-weight: 600;
-  font-size: 10px;
-  line-height: 16px;
-`;
-
 export const SearchOutlined = styled(RawSearchOutlined)`
   color: ${Colors.grey6};
 `;

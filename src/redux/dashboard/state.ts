@@ -12,4 +12,5 @@ export const initialState: DashboardState = {
   helm: {
     selectedHelmRelease: null,
   },
+  selectedImage: null,
 };
