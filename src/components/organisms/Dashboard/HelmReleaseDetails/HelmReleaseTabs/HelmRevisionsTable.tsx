@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import {useAppSelector} from '@redux/hooks';
 
 import {Colors} from '@shared/styles';
+import {trackEvent} from '@shared/utils';
 import {
   getHelmReleaseManifestCommand,
   helmReleaseRevisionsCommand,
@@ -104,6 +105,7 @@ const HelmRevisionsTable = () => {
         okText: 'Ok',
         okHandler: () => {},
       });
+      trackEvent('helm_release/revision_diff');
     },
     [release, setHelmReleaseDiff]
   );
