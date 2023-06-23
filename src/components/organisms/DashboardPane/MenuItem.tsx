@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 
 import {FundProjectionScreenOutlined} from '@ant-design/icons';
 
@@ -24,7 +24,6 @@ export const MenuItem = ({
   const activeMenu = useAppSelector(state => state.dashboard.ui.activeMenu);
   const dispatch = useAppDispatch();
   const menuItemRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   useEffect(() => {
     if (onActiveMenuItem && activeMenu.key === menuItem.key && menuItemRef && menuItemRef.current) {
@@ -45,10 +44,6 @@ export const MenuItem = ({
     return (
       <S.MainSection
         ref={menuItemRef}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        $isHovered={isHovered}
-        $clickable={['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === menuItem.key) > -1}
         $active={activeMenu.key === menuItem.key}
         onClick={() =>
           ['Overview', ...CLICKAKBLE_RESOURCE_GROUPS].findIndex(m => m === menuItem.key) > -1
@@ -64,14 +59,7 @@ export const MenuItem = ({
 
   if (type === 'child') {
     return (
-      <S.SubSection
-        ref={menuItemRef}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        $isHovered={isHovered}
-        $active={activeMenu.key === menuItem.key}
-        onClick={() => setActiveMenu(menuItem)}
-      >
+      <S.SubSection ref={menuItemRef} $active={activeMenu.key === menuItem.key} onClick={() => setActiveMenu(menuItem)}>
         <span style={{marginRight: '4px'}}>{menuItem.label}</span>
         <Resource>{menuItem.resourceCount}</Resource>
         {menuItem.errorCount ? <ErrorCell>{menuItem.errorCount}</ErrorCell> : null}

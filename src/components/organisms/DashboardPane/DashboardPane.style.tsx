@@ -22,35 +22,30 @@ export const Container = styled.div`
 
 export const HeaderContainer = styled.div``;
 
-export const MainSection = styled.div<{$active: boolean; $clickable: boolean; $isHovered: boolean}>`
+export const MainSection = styled.div<{$active: boolean}>`
   padding: 0 0 0 16px;
   font-size: 16px;
   line-height: 36px;
   font-weight: 600;
 
-  /* ${props =>
-    props.$clickable &&
-    `
-    :hover {
-      background-color: rgba(255, 255, 255, 0.08);
-      color: ${Colors.grey9};
-    }
-  `} */
-
   ${props => `
     color: ${props.$active ? Colors.grey2 : Colors.whitePure};
     background-color: ${props.$active ? Colors.blue9 : 'transparent'};
-    cursor:${props.$clickable ? 'pointer' : 'inherit'};`}
+    cursor:${props.onClick ? 'pointer' : 'inherit'};`}
 
   ${props => {
     if (props.$active) {
-      if (props.$isHovered && props.$clickable) {
-        return `background: ${Colors.selectionColorHover};`;
+      return `background: ${Colors.selectionColor};font-weight: 700;
+      :hover {
+        background: ${Colors.selectionColorHover};
       }
-      return `background: ${Colors.selectionColor};font-weight: 700;`;
+      `;
     }
-    if (props.$isHovered && props.$clickable) {
-      return `background: ${Colors.blackPearl};`;
+    if (props.onClick) {
+      return `
+      :hover{
+        background: #252a2c;
+      }`;
     }
   }};
 
@@ -66,7 +61,7 @@ export const MainSection = styled.div<{$active: boolean; $clickable: boolean; $i
     return `color: ${Colors.whitePure};`;
   }};
 `;
-export const SubSection = styled.div<{$active: boolean; $isHovered: boolean}>`
+export const SubSection = styled.div<{$active: boolean}>`
   padding: 0 0 0 16px;
   font-size: 14px;
   line-height: 36px;
@@ -74,15 +69,17 @@ export const SubSection = styled.div<{$active: boolean; $isHovered: boolean}>`
   display: flex;
   align-items: center;
 
+  :hover {
+    background: #252a2c;
+  }
+
   ${props => {
     if (props.$active) {
-      if (props.$isHovered) {
-        return `background: ${Colors.selectionColorHover};`;
+      return `background: ${Colors.selectionColor};font-weight: 700;
+      :hover {
+        background: ${Colors.selectionColorHover};
       }
-      return `background: ${Colors.selectionColor};font-weight: 700;`;
-    }
-    if (props.$isHovered) {
-      return `background: ${Colors.blackPearl};`;
+      `;
     }
   }};
 
