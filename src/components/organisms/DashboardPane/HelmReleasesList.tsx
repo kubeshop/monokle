@@ -7,6 +7,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {HelmRelease} from '@shared/models/ui';
+import {trackEvent} from '@shared/utils';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import * as S from './DashboardPane.style';
@@ -28,6 +29,7 @@ const HelmReleasesList = ({list}: {list: HelmRelease[]}) => {
 
   const onItemClick = (chart: HelmRelease) => {
     dispatch(setSelectedHelmRelease(chart));
+    trackEvent('helm_release/select');
   };
 
   const onBrowseHelmClickHandler = () => {

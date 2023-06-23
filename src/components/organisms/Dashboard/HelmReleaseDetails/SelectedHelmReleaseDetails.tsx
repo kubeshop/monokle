@@ -8,6 +8,7 @@ import {setSelectedHelmRelease, setSelectedHelmReleaseTab} from '@redux/dashboar
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {HelmReleaseTab} from '@shared/models/dashboard';
+import {trackEvent} from '@shared/utils';
 import {
   getHelmReleaseManifestCommand,
   runCommandInMainThread,
@@ -79,16 +80,22 @@ const SelectedHelmRelease = () => {
       }),
       okText: 'Upgrade',
       okHandler: async () => {
-        await runCommandInMainThread(
-          upgradeHelmReleaseCommand({
-            release: release.name,
-            chart: selectedHelmReleaseRepo,
-            namespace: release.namespace,
-          })
-        );
-        dispatch(setSelectedHelmRelease({...release}));
+        try {
+          await runCommandInMainThread(
+            upgradeHelmReleaseCommand({
+              release: release.name,
+              chart: selectedHelmReleaseRepo,
+              namespace: release.namespace,
+            })
+          );
+          dispatch(setSelectedHelmRelease({...release}));
+          trackEvent('helm_release/upgrade', {dryRun: true, status: 'succeeded'});
+        } catch (err) {
+          trackEvent('helm_release/upgrade', {dryRun: true, status: 'failed'});
+        }
       },
     });
+    trackEvent('helm_release/upgrade', {dryRun: true});
   };
 
   const onUninstallDryRunClickHandler = () => {
@@ -98,12 +105,27 @@ const SelectedHelmRelease = () => {
       rightCommand: uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace, dryRun: true}),
       okText: 'Uninstall',
       okHandler: async () => {
-        await runCommandInMainThread(
-          uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace})
-        );
-        dispatch(setSelectedHelmRelease(null));
+        try {
+          await runCommandInMainThread(
+            uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace})
+          );
+          dispatch(setSelectedHelmRelease(null));
+          trackEvent('helm_release/uninstall', {dryRun: true, status: 'succeeded'});
+        } catch (err) {
+          trackEvent('helm_release/uninstall', {dryRun: true, status: 'failed'});
+        }
       },
     });
+    trackEvent('helm_release/uninstall', {dryRun: true});
+  };
+
+  const onUninstallReleaseClickHandler = async () => {
+    try {
+      await uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace, dryRun: true});
+      trackEvent('helm_release/uninstall', {dryRun: false, status: 'succeeded'});
+    } catch (err) {
+      trackEvent('helm_release/uninstall', {dryRun: false, status: 'failed'});
+    }
   };
 
   const onUpgradeClickHandler = () => {
@@ -125,10 +147,15 @@ const SelectedHelmRelease = () => {
         }),
       });
     } else {
-      await runCommandInMainThread(
-        upgradeHelmReleaseCommand({release: release.name, chart: repo, namespace: release.namespace})
-      );
-      dispatch(setSelectedHelmRelease({...release}));
+      try {
+        await runCommandInMainThread(
+          upgradeHelmReleaseCommand({release: release.name, chart: repo, namespace: release.namespace})
+        );
+        dispatch(setSelectedHelmRelease({...release}));
+        trackEvent('helm_release/upgrade', {dryRun: false, status: 'succeeded'});
+      } catch (err) {
+        trackEvent('helm_release/upgrade', {dryRun: false, status: 'failed'});
+      }
     }
   };
 
@@ -154,7 +181,7 @@ const SelectedHelmRelease = () => {
 
           <Dropdown.Button
             type="primary"
-            menu={{items: [{key: 'uninstall', label: 'Uninstall', onClick: onUninstallDryRunClickHandler}]}}
+            menu={{items: [{key: 'uninstall', label: 'Uninstall', onClick: onUninstallReleaseClickHandler}]}}
             onClick={onUninstallDryRunClickHandler}
           >
             Dry-run Uninstall

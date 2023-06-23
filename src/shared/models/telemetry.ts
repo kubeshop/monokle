@@ -169,6 +169,12 @@ export type EventMap = {
   'validation/load_config': {actionType: string};
   'validation/validate_all': {actionType: string};
   'validation/validate_incremental': {actionType: string};
+  'helm_release/search': undefined;
+  'helm_release/select': undefined;
+  'helm_release/upgrade': {dryRun: boolean; status?: 'failed' | 'succeeded'};
+  'helm_release/uninstall': {dryRun: boolean; status?: 'failed' | 'succeeded'};
+  'image_resources/select': undefined;
+  'image_resources/search': undefined;
 };
 
 export const APP_INSTALLED = 'APP_INSTALLED';

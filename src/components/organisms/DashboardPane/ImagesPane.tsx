@@ -15,6 +15,7 @@ import AccordionPanel, {InjectedPanelProps} from '@components/atoms/AccordionPan
 
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {Colors} from '@shared/styles';
+import {trackEvent} from '@shared/utils';
 
 import * as S from './DashboardPane.style';
 import ImagesList from './ImagesList';
@@ -28,6 +29,7 @@ const ImagesPane: React.FC<InjectedPanelProps> = props => {
   const debouncedSearchRef = useRef(
     debounce((search: string) => {
       dispatch(setImagesSearchedValue(search));
+      trackEvent('image_resources/search');
     }, 400)
   );
 

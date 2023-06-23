@@ -18,6 +18,7 @@ import AccordionPanel, {InjectedPanelProps} from '@components/atoms/AccordionPan
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {HelmRelease} from '@shared/models/ui';
 import {Colors} from '@shared/styles';
+import {trackEvent} from '@shared/utils';
 import {listHelmReleasesCommand, runCommandInMainThread} from '@shared/utils/commands';
 
 import * as S from './DashboardPane.style';
@@ -43,6 +44,7 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
   const debouncedSearchRef = useRef(
     debounce((search: string) => {
       dispatch(setHelmPaneChartSearch(search));
+      trackEvent('helm_release/search');
     }, 400)
   );
 

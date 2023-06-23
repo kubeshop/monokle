@@ -11,6 +11,7 @@ import {imageListSelector} from '@redux/selectors/imageSelectors';
 
 import {ImageType} from '@shared/models/image';
 import {Colors} from '@shared/styles/colors';
+import {trackEvent} from '@shared/utils';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import * as S from './DashboardPane.style';
@@ -34,6 +35,7 @@ const ImagesList: React.FC = () => {
 
   const onItemClick = (image: ImageType) => {
     dispatch(setSelectedImage(image));
+    trackEvent('image_resources/select');
   };
 
   if (!size(list)) {
