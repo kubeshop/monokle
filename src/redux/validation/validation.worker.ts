@@ -3,6 +3,7 @@ import {WorkerMessage, matchWorkerEvent} from '@utils/worker';
 
 import {ResourceParser, SchemaLoader, createExtensibleMonokleValidator} from '@monokle/validation';
 
+import {validationCustomPluginLoader} from './validation.loader';
 import {
   LoadValidationMessage,
   LoadValidationMessageType,
@@ -14,7 +15,7 @@ import {
 
 const RESOURCE_PARSER = new ResourceParser();
 const SCHEMA_LOADER = new SchemaLoader();
-const VALIDATOR = createExtensibleMonokleValidator(RESOURCE_PARSER, SCHEMA_LOADER);
+const VALIDATOR = createExtensibleMonokleValidator(RESOURCE_PARSER, SCHEMA_LOADER, validationCustomPluginLoader);
 
 const handleEvent = <Message extends WorkerMessage>(
   event: MessageEvent,

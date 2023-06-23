@@ -6,6 +6,7 @@ import {createWorkerEventPromise} from '@utils/worker';
 
 import {CustomSchema, MonokleValidator, SchemaLoader, createExtensibleMonokleValidator} from '@monokle/validation';
 
+import {validationCustomPluginLoader} from './validation.loader';
 import {
   LoadValidationMessage,
   LoadValidationMessageType,
@@ -23,7 +24,11 @@ class ValidationWorker {
 
   constructor() {
     this.#worker = new Worker(new URL('./validation.worker', import.meta.url));
-    this.#validator = createExtensibleMonokleValidator(RESOURCE_PARSER.getParser(), SCHEMA_LOADER);
+    this.#validator = createExtensibleMonokleValidator(
+      RESOURCE_PARSER.getParser(),
+      SCHEMA_LOADER,
+      validationCustomPluginLoader
+    );
   }
 
   get metadata() {
