@@ -1,11 +1,14 @@
 import {useState} from 'react';
 
-import {Tabs as AntTabs, Dropdown, Tooltip, Typography} from 'antd';
+import {Tabs as AntTabs, Dropdown, Modal, Tooltip, Typography} from 'antd';
 
 import styled from 'styled-components';
 
 import {setSelectedHelmRelease, setSelectedHelmReleaseTab} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
+
+import {errorAlert, successAlert} from '@utils/alert';
 
 import {HelmReleaseTab} from '@shared/models/dashboard';
 import {trackEvent} from '@shared/utils';
@@ -65,7 +68,6 @@ const SelectedHelmRelease = () => {
   const activeTab = useAppSelector(state => state.dashboard.helm.activeHelmReleaseTab);
   const [commandDryRun, setCommandDryRun] = useHelmReleaseDiffContext();
   const [isSelectHelmReleaseOpen, setIsSelectHelmReleaseOpen] = useState(false);
-  const [selectedHelmReleaseRepo, setSelectedHelmReleaseRepo] = useState<string>('');
 
   const onUpgradeDryRunClickHandler = () => {
     setIsSelectHelmReleaseOpen(true);
@@ -79,21 +81,7 @@ const SelectedHelmRelease = () => {
         dryRun: true,
       }),
       okText: 'Upgrade',
-      okHandler: async () => {
-        try {
-          await runCommandInMainThread(
-            upgradeHelmReleaseCommand({
-              release: release.name,
-              chart: selectedHelmReleaseRepo,
-              namespace: release.namespace,
-            })
-          );
-          dispatch(setSelectedHelmRelease({...release}));
-          trackEvent('helm_release/upgrade', {dryRun: true, status: 'succeeded'});
-        } catch (err) {
-          trackEvent('helm_release/upgrade', {dryRun: true, status: 'failed'});
-        }
-      },
+      okHandler: () => {},
     });
     trackEvent('helm_release/upgrade', {dryRun: true});
   };
@@ -105,27 +93,58 @@ const SelectedHelmRelease = () => {
       rightCommand: uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace, dryRun: true}),
       okText: 'Uninstall',
       okHandler: async () => {
-        try {
-          await runCommandInMainThread(
-            uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace})
-          );
-          dispatch(setSelectedHelmRelease(null));
-          trackEvent('helm_release/uninstall', {dryRun: true, status: 'succeeded'});
-        } catch (err) {
-          trackEvent('helm_release/uninstall', {dryRun: true, status: 'failed'});
-        }
+        Modal.confirm({
+          title: 'Are you sure you want to uninstall this release?',
+          content: 'This action cannot be undone.',
+          okText: 'Uninstall',
+          onOk: async () => {
+            try {
+              const result = await runCommandInMainThread(
+                uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace})
+              );
+              if (result.stderr) {
+                dispatch(setAlert(errorAlert('Uninstall failed', result.stderr)));
+                trackEvent('helm_release/uninstall', {dryRun: true, status: 'failed'});
+              } else {
+                dispatch(setAlert(successAlert("Release's un-installation has been scheduled")));
+                dispatch(setSelectedHelmRelease(null));
+                trackEvent('helm_release/uninstall', {dryRun: true, status: 'succeeded'});
+              }
+            } catch (err: any) {
+              dispatch(setAlert(errorAlert('Uninstall failed', err.message)));
+              trackEvent('helm_release/uninstall', {dryRun: true, status: 'failed'});
+            }
+          },
+        });
       },
     });
     trackEvent('helm_release/uninstall', {dryRun: true});
   };
 
   const onUninstallReleaseClickHandler = async () => {
-    try {
-      await uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace, dryRun: true});
-      trackEvent('helm_release/uninstall', {dryRun: false, status: 'succeeded'});
-    } catch (err) {
-      trackEvent('helm_release/uninstall', {dryRun: false, status: 'failed'});
-    }
+    Modal.confirm({
+      title: 'Are you sure you want to uninstall this release?',
+      content: 'This action cannot be undone.',
+      okText: 'Uninstall',
+      onOk: async () => {
+        try {
+          const result = await runCommandInMainThread(
+            uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace})
+          );
+          if (result.stderr) {
+            dispatch(setAlert(errorAlert('Uninstall failed', result.stderr)));
+            trackEvent('helm_release/uninstall', {dryRun: false, status: 'failed'});
+          } else {
+            dispatch(setAlert(successAlert("Release's un-installation has been scheduled")));
+            dispatch(setSelectedHelmRelease(null));
+            trackEvent('helm_release/uninstall', {dryRun: false, status: 'succeeded'});
+          }
+        } catch (err: any) {
+          dispatch(setAlert(errorAlert('Uninstall failed', err.message)));
+          trackEvent('helm_release/uninstall', {dryRun: false, status: 'failed'});
+        }
+      },
+    });
   };
 
   const onUpgradeClickHandler = () => {
@@ -134,7 +153,6 @@ const SelectedHelmRelease = () => {
   };
 
   const onSelectHelmRepoOkHandler = async (repo: string) => {
-    setSelectedHelmReleaseRepo(repo);
     if (commandDryRun) {
       setCommandDryRun({
         ...commandDryRun,
@@ -145,17 +163,56 @@ const SelectedHelmRelease = () => {
           namespace: release?.namespace,
           dryRun: true,
         }),
+        okHandler: async () => {
+          Modal.confirm({
+            title: 'Are you sure you want to upgrade this release?',
+            content: 'This action cannot be undone.',
+            okText: 'Upgrade',
+            onOk: async () => {
+              try {
+                const result = await runCommandInMainThread(
+                  upgradeHelmReleaseCommand({release: release.name, chart: repo, namespace: release.namespace})
+                );
+                if (result.stderr) {
+                  dispatch(setAlert(errorAlert('Upgrade failed', result.stderr)));
+                  trackEvent('helm_release/upgrade', {dryRun: true, status: 'failed'});
+                } else {
+                  dispatch(setAlert(successAlert("Release's upgrade has been scheduled")));
+                  dispatch(setSelectedHelmRelease({...release}));
+                  trackEvent('helm_release/upgrade', {dryRun: true, status: 'succeeded'});
+                }
+              } catch (err: any) {
+                dispatch(setAlert(errorAlert('Upgrade failed', err.message)));
+                trackEvent('helm_release/upgrade', {dryRun: true, status: 'failed'});
+              }
+            },
+          });
+        },
       });
     } else {
-      try {
-        await runCommandInMainThread(
-          upgradeHelmReleaseCommand({release: release.name, chart: repo, namespace: release.namespace})
-        );
-        dispatch(setSelectedHelmRelease({...release}));
-        trackEvent('helm_release/upgrade', {dryRun: false, status: 'succeeded'});
-      } catch (err) {
-        trackEvent('helm_release/upgrade', {dryRun: false, status: 'failed'});
-      }
+      Modal.confirm({
+        title: 'Are you sure you want to upgrade this release?',
+        content: 'This action cannot be undone.',
+        okText: 'Upgrade',
+        onOk: async () => {
+          try {
+            const result = await runCommandInMainThread(
+              upgradeHelmReleaseCommand({release: release.name, chart: repo, namespace: release.namespace})
+            );
+            if (result.stderr) {
+              dispatch(setAlert(errorAlert('Upgrade failed', result.stderr)));
+              trackEvent('helm_release/upgrade', {dryRun: false, status: 'failed'});
+            } else {
+              dispatch(setAlert(successAlert("Release's upgrade has been scheduled")));
+              dispatch(setSelectedHelmRelease({...release}));
+              trackEvent('helm_release/upgrade', {dryRun: false, status: 'succeeded'});
+            }
+          } catch (err: any) {
+            dispatch(setAlert(errorAlert('Upgrade failed', err.message)));
+            trackEvent('helm_release/upgrade', {dryRun: false, status: 'failed'});
+          }
+        },
+      });
     }
   };
 
