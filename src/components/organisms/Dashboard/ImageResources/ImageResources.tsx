@@ -1,9 +1,12 @@
 import {useCallback, useMemo} from 'react';
 
 import {forEach} from 'lodash';
+import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 import {useResourceContentMap, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
+
+import {useMainPaneDimensions} from '@utils/hooks';
 
 import {ResourceMeta} from '@shared/models/k8sResource';
 import {trackEvent} from '@shared/utils';
@@ -14,9 +17,13 @@ import {CellAge, CellContextMenu, CellError, CellKind, CellName, CellNamespace} 
 import NonSelectedImage from './NonSelectedImage';
 
 const ImageResources = () => {
+  const {height} = useMainPaneDimensions();
+
   const selectedImage = useAppSelector(state => state.dashboard.selectedImage);
   const clusterResourceMeta = useResourceMetaMap('cluster');
   const clusterResourceContent = useResourceContentMap('cluster');
+  const terminalHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
 
   const resources = useMemo(() => {
     if (!selectedImage) {
@@ -39,17 +46,22 @@ const ImageResources = () => {
   }, []);
 
   return selectedImage ? (
-    <>
+    <Container>
       <Header title="Image Resources" />
       <TableView
         dataSource={resources}
         columns={[CellKind, CellName, CellError, CellNamespace, CellAge, CellContextMenu]}
         onRowClick={onRowClickHandler}
+        tableScrollHeight={height - 300 - (bottomSelection === 'terminal' ? terminalHeight : 0)}
       />
-    </>
+    </Container>
   ) : (
     <NonSelectedImage />
   );
 };
 
 export default ImageResources;
+
+const Container = styled.div`
+  height: calc(100vh - 110px);
+`;

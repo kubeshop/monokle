@@ -227,7 +227,7 @@ const Container = styled.div`
 `;
 
 const Tabs = styled(props => <AntTabs {...props} />)`
-  height: calc(100vh - 200px);
+  height: calc(100vh - 160px);
 
   .ant-tabs-nav::before {
     display: none;
@@ -244,5 +244,10 @@ const Tabs = styled(props => <AntTabs {...props} />)`
 
   .ant-tabs-content {
     position: unset;
+    height: 100%;
+  }
+
+  & .ant-tabs-tabpane-active {
+    height: 100%;
   }
 `;

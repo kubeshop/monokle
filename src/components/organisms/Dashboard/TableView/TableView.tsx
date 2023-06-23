@@ -19,10 +19,12 @@ const TableView = ({
   dataSource,
   columns,
   onRowClick,
+  tableScrollHeight = 0,
 }: {
   dataSource: ResourceMeta[];
   columns: ColumnsType<any>;
   onRowClick?: (resource: ResourceMeta) => void;
+  tableScrollHeight?: number;
 }) => {
   const dispatch = useAppDispatch();
   const {height} = useMainPaneDimensions();
@@ -53,7 +55,9 @@ const TableView = ({
           dataSource={filteredDataSource}
           columns={columns}
           rowKey="id"
-          scroll={{y: height - 212 - (bottomSelection === 'terminal' ? terminalHeight : 0)}}
+          scroll={{
+            y: tableScrollHeight || height - 212 - (bottomSelection === 'terminal' ? terminalHeight : 0),
+          }}
           rowClassName={(record: ResourceMeta | any) => (record.id === selectedResourceId ? 'selected' : '')}
           pagination={false}
           sticky

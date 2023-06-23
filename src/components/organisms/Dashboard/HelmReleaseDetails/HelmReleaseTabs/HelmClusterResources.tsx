@@ -5,6 +5,8 @@ import {forEach} from 'lodash';
 import {useAppSelector} from '@redux/hooks';
 import {useResourceContentMap, useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 
+import {useMainPaneDimensions} from '@utils/hooks';
+
 import {ResourceMeta} from '@shared/models/k8sResource';
 import {trackEvent} from '@shared/utils';
 
@@ -12,9 +14,13 @@ import {TableView} from '../../TableView';
 import {CellAge, CellContextMenu, CellError, CellKind, CellName, CellNamespace} from '../../TableView/TableCells';
 
 const HelmClusterResources = () => {
+  const {height} = useMainPaneDimensions();
+
   const release = useAppSelector(state => state.dashboard.helm.selectedHelmRelease!);
   const clusterResourceMeta = useResourceMetaMap('cluster');
   const clusterResourceContent = useResourceContentMap('cluster');
+  const terminalHeight = useAppSelector(state => state.ui.paneConfiguration.bottomPaneHeight);
+  const bottomSelection = useAppSelector(state => state.ui.leftMenu.bottomSelection);
 
   const clusterResources = useMemo(() => {
     const helmResources: Array<ResourceMeta> = [];
@@ -40,6 +46,7 @@ const HelmClusterResources = () => {
       dataSource={clusterResources}
       columns={[CellKind, CellName, CellError, CellNamespace, CellAge, CellContextMenu]}
       onRowClick={onRowClickHandler}
+      tableScrollHeight={height - 300 - (bottomSelection === 'terminal' ? terminalHeight : 0)}
     />
   );
 };
