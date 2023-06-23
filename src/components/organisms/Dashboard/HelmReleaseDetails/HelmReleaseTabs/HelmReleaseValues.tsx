@@ -26,6 +26,9 @@ const HelmReleaseValues = () => {
     if (result.stderr) {
       throw new Error(result.stderr);
     }
+    if (result.stdout?.trim().includes('USER-SUPPLIED VALUES:\nnull')) {
+      return 'No Provided Values Found';
+    }
     return result.stdout;
   }, [selectedHelmRelease?.name, selectedHelmRelease?.namespace]);
 
