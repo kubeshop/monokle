@@ -1,6 +1,6 @@
 import {ChangeEvent, useCallback, useRef} from 'react';
 
-import {Button, Input as RawInput, Skeleton, Tooltip, Typography} from 'antd';
+import {Button, Input as RawInput, Skeleton, Tooltip} from 'antd';
 
 import {PlusCircleFilled, SearchOutlined as RawSearchOutlined} from '@ant-design/icons';
 
@@ -72,9 +72,10 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
       <S.CollapseContent>
         <S.StickyContainer>
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-            <Typography.Text>Installed Charts</Typography.Text>
+            <S.Heading>Installed Charts</S.Heading>
             <Tooltip title="Find and install new Helm Charts." placement="rightBottom">
               <Button
+                size="large"
                 style={{paddingRight: 0}}
                 type="link"
                 icon={<PlusCircleFilled />}

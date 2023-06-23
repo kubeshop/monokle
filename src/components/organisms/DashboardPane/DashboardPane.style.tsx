@@ -1,4 +1,4 @@
-import {Button as RawButton, Collapse as RawCollapse, Input as RawInput} from 'antd';
+import {Button as RawButton, Collapse as RawCollapse, Input as RawInput, Typography} from 'antd';
 
 import {
   CheckCircleFilled as RawCheckCircleFilled,
@@ -122,8 +122,6 @@ export const CheckCircleFilled = styled(RawCheckCircleFilled)`
 
 export const ConnectedContainer = styled.div`
   display: flex;
-  padding-top: 16px;
-  padding-bottom: 16px;
   gap: 4px;
   align-items: center;
 `;
@@ -147,6 +145,7 @@ export const StickyContainer = styled.div`
   background-color: ${Colors.grey10};
   z-index: 5;
   padding: 0px 14px;
+  margin-bottom: 4px;
 `;
 
 export const Input = styled(RawInput)`
@@ -239,6 +238,13 @@ export const VirtualItem = styled.div<{$active: boolean}>`
       `;
     }
   }};
+`;
+
+export const Heading = styled(Typography.Text)`
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 32px;
+  color: ${Colors.grey9};
 `;
 
 export const CollapseContent = styled.div``;
