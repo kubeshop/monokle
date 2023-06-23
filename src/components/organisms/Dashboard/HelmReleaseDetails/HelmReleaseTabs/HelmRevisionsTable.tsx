@@ -121,10 +121,7 @@ const HelmRevisionsTable = () => {
 
   return (
     <>
-      <Typography.Text>
-        Review this Chart updates history below. You can also <Typography.Link>update </Typography.Link> to latest
-        version.
-      </Typography.Text>
+      <Typography.Text>Review this Chart updates history below.</Typography.Text>
       <Table sticky rowKey="revision" dataSource={value} columns={columns} pagination={false} loading={loading} />
     </>
   );
