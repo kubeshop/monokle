@@ -1,18 +1,22 @@
 import {useCallback, useMemo} from 'react';
 import {useAsync} from 'react-use';
 
-import {Table as AntTable, Button, Tag, Typography} from 'antd';
+import {Table as AntTable, Button, Modal, Tag, Typography} from 'antd';
 
 import {DateTime} from 'luxon';
 import styled from 'styled-components';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
+
+import {errorAlert, successAlert} from '@utils/alert';
 
 import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils';
 import {
   getHelmReleaseManifestCommand,
   helmReleaseRevisionsCommand,
+  rollbackHelmReleaseCommand,
   runCommandInMainThread,
 } from '@shared/utils/commands';
 
@@ -81,7 +85,7 @@ const createTableColumns = (onDiffClickHandler: (release: HelmRevision) => void)
     render: (value: any, record: HelmRevision) => (
       <HoverArea>
         <Button type="primary" onClick={() => onDiffClickHandler(record)}>
-          Diff
+          Diff && Rollback
         </Button>
       </HoverArea>
     ),
@@ -89,6 +93,7 @@ const createTableColumns = (onDiffClickHandler: (release: HelmRevision) => void)
 ];
 
 const HelmRevisionsTable = () => {
+  const dispatch = useAppDispatch();
   const release = useAppSelector(state => state.dashboard.helm.selectedHelmRelease!);
   const setHelmReleaseDiff = useHelmReleaseDiffContext()[1];
 
@@ -102,12 +107,43 @@ const HelmRevisionsTable = () => {
           namespace: release.namespace,
           revision: revision.revision,
         }),
-        okText: 'Ok',
-        okHandler: () => {},
+        okText: 'Rollback',
+        okHandler: () => {
+          Modal.confirm({
+            title: 'Are you sure you want to rollback to this revision?',
+            content: 'This will trigger a new deployment.',
+            okText: 'Rollback',
+            onOk: async () => {
+              try {
+                const result = await runCommandInMainThread(
+                  rollbackHelmReleaseCommand({
+                    release: release.name,
+                    namespace: release.namespace,
+                    revision: revision.revision,
+                  })
+                );
+                if (result.stderr) {
+                  dispatch(setAlert(errorAlert("Couldn't rollback Helm release", result.stderr)));
+                  trackEvent('helm_release/rollback', {status: 'failed'});
+                } else {
+                  dispatch(setAlert(successAlert("Helm release rollbacked successfully. Check it's status")));
+                  trackEvent('helm_release/rollback', {status: 'succeeded'});
+                }
+              } catch (e: any) {
+                setAlert;
+                dispatch(setAlert(errorAlert("Couldn't rollback Helm release", e.message)));
+                trackEvent('helm_release/rollback', {status: 'failed'});
+              }
+            },
+            onCancel: () => {
+              trackEvent('helm_release/rollback', {status: 'canceled'});
+            },
+          });
+        },
       });
       trackEvent('helm_release/revision_diff');
     },
-    [release, setHelmReleaseDiff]
+    [release, setHelmReleaseDiff, dispatch]
   );
 
   const columns = useMemo(() => createTableColumns(onDiffClickHandler), [onDiffClickHandler]);

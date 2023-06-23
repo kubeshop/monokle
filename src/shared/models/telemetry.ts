@@ -176,6 +176,7 @@ export type EventMap = {
   'helm_release/revision_diff': undefined;
   'helm_release/upgrade': {dryRun: boolean; status?: 'failed' | 'succeeded'};
   'helm_release/uninstall': {dryRun: boolean; status?: 'failed' | 'succeeded'};
+  'helm_release/rollback': {status?: 'failed' | 'succeeded' | 'canceled'};
   'helm_release/navigate_to_helm_repo': undefined;
   'image_resources/select': undefined;
   'image_resources/search': undefined;

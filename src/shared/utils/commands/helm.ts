@@ -274,3 +274,14 @@ export function getHelmReleaseHooksCommand(
     env,
   };
 }
+export function rollbackHelmReleaseCommand(
+  {release, namespace, revision}: {release: string; namespace: string; revision: number},
+  env?: HelmEnv
+): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['rollback', release, revision.toString(), '-n', namespace],
+    env,
+  };
+}
