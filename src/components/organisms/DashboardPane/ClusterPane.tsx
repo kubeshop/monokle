@@ -159,7 +159,7 @@ const ClusterPane: React.FC<InjectedPanelProps> = props => {
         />
       }
     >
-      <div style={{padding: '0px 16px 16px 16px'}}>
+      <S.CollapseContent>
         {clusterConnectionOptions.current.isLoading ? (
           <Skeleton />
         ) : (
@@ -176,7 +176,7 @@ const ClusterPane: React.FC<InjectedPanelProps> = props => {
             <DashboardFilteredMenu filterText={filterText} />
           </>
         )}
-      </div>
+      </S.CollapseContent>
     </AccordionPanel>
   );
 };

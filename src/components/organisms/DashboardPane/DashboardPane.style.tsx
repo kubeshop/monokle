@@ -13,25 +13,28 @@ import {TitleBar} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
 
 export const Container = styled.div`
-  padding: 16px 0px 16px 0;
   height: 100%;
 
   .ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
     overflow-y: hidden;
     padding-top: 0;
-    margin-top: 12px;
+    margin-top: 4px;
     scrollbar-gutter: stable both-edges;
   }
 
   .ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box:hover {
     overflow-y: auto;
   }
+
+  .ant-collapse-item-active {
+    justify-content: unset !important;
+  }
 `;
 
 export const HeaderContainer = styled.div``;
 
 export const MainSection = styled.div<{$active: boolean}>`
-  padding: 0 0 0 16px;
+  padding-left: 14px;
   font-size: 16px;
   line-height: 36px;
   font-weight: 600;
@@ -70,7 +73,7 @@ export const MainSection = styled.div<{$active: boolean}>`
   }};
 `;
 export const SubSection = styled.div<{$active: boolean}>`
-  padding: 0 0 0 16px;
+  padding-left: 14px;
   font-size: 14px;
   line-height: 36px;
   cursor: pointer;
@@ -143,7 +146,7 @@ export const StickyContainer = styled.div`
   top: 0;
   background-color: ${Colors.grey10};
   z-index: 5;
-  margin-bottom: 4px;
+  padding: 0px 14px;
 `;
 
 export const Input = styled(RawInput)`
@@ -195,6 +198,7 @@ export const ListContainer = styled.ul`
   height: 100%;
   overflow-y: auto;
   padding: 0px 0px;
+  margin-top: 0px;
 `;
 
 export const VirtualItem = styled.div<{$active: boolean}>`
@@ -204,8 +208,7 @@ export const VirtualItem = styled.div<{$active: boolean}>`
   width: 100%;
   overflow: hidden;
   cursor: pointer;
-  padding: 0 0 0 16px;
-
+  padding-left: 14px;
   font-size: 14px;
   line-height: 36px;
 
@@ -237,3 +240,5 @@ export const VirtualItem = styled.div<{$active: boolean}>`
     }
   }};
 `;
+
+export const CollapseContent = styled.div``;

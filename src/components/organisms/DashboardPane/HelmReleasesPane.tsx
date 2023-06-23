@@ -69,7 +69,7 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
         />
       }
     >
-      <div style={{padding: '0px 16px 16px 16px'}}>
+      <S.CollapseContent>
         <S.StickyContainer>
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
             <Typography.Text>Installed Charts</Typography.Text>
@@ -92,7 +92,7 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
           />
         </S.StickyContainer>
         {loading ? <Skeleton style={{marginTop: 16}} active /> : <HelmReleasesList list={list} />}
-      </div>
+      </S.CollapseContent>
     </AccordionPanel>
   );
 };

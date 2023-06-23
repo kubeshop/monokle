@@ -16,7 +16,7 @@ import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import * as S from './DashboardPane.style';
 
-const ROW_HEIGHT = 40;
+const ROW_HEIGHT = 32;
 
 const ImagesList: React.FC = () => {
   const dispatch = useAppDispatch();
