@@ -35,6 +35,7 @@ const HelmReleasesList = ({list}: {list: HelmRelease[]}) => {
   const onBrowseHelmClickHandler = () => {
     dispatch(setSelectedHelmRelease(null));
     dispatch(setLeftMenuSelection('helm'));
+    trackEvent('helm_release/navigate_to_helm_repo');
   };
 
   return list.length === 0 ? (
