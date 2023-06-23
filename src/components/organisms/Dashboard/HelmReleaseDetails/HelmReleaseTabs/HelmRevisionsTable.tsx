@@ -81,11 +81,12 @@ const createTableColumns = (onDiffClickHandler: (release: HelmRevision) => void)
     title: '',
     dataIndex: '',
     key: 'x',
-    responsive: ['sm'],
+    fixed: 'right',
+    width: 150,
     render: (value: any, record: HelmRevision) => (
       <HoverArea>
         <Button type="primary" onClick={() => onDiffClickHandler(record)}>
-          Diff && Rollback
+          Rollback
         </Button>
       </HoverArea>
     ),
