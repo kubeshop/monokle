@@ -38,7 +38,7 @@ const tabsItems = [
   },
   {
     key: 'release-manifest',
-    label: 'Release Manifest',
+    label: 'Release Manifests',
     children: <HelmReleaseManifest />,
   },
   {

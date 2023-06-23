@@ -62,7 +62,7 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
       showArrow={false}
       header={
         <TitleBar
-          title="Helm"
+          title="Helm Charts"
           expandable
           isOpen={Boolean(isActive)}
           actions={<TitleBarCount count={list.length} isActive={Boolean(isActive)} />}
