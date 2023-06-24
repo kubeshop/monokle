@@ -232,7 +232,7 @@ export const CellScope = {
 };
 
 export const CellKind = {
-  title: 'Resource',
+  title: 'Kind',
   dataIndex: 'object',
   key: 'kind',
   width: '150px',

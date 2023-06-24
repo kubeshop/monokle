@@ -47,7 +47,7 @@ const ImageResources = () => {
 
   return selectedImage ? (
     <Container>
-      <Header title="Image Resources" />
+      <Header title={selectedImage.name} />
       <TableView
         dataSource={resources}
         columns={[CellKind, CellName, CellError, CellNamespace, CellAge, CellContextMenu]}

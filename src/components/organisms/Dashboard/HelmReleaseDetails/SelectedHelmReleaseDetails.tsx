@@ -225,7 +225,9 @@ const SelectedHelmRelease = () => {
   return (
     <Container>
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24}}>
-        <Title>{release.name} </Title>
+        <Title>
+          {release.name}/{release.chart}
+        </Title>
 
         <div style={{display: 'flex', gap: 16}}>
           <Dropdown.Button
