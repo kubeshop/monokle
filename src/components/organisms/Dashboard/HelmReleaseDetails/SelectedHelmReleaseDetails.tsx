@@ -199,14 +199,15 @@ const SelectedHelmRelease = () => {
         </Tooltip>
 
         <S.ActionsContainer>
-          <Dropdown.Button
-            type="primary"
-            menu={{items: [{key: 'upgrade', label: 'Update', onClick: onUpgradeClickHandler}]}}
-            onClick={onUpgradeDryRunClickHandler}
-          >
-            Dry-run Update
-          </Dropdown.Button>
-
+          <Tooltip title="Shows a diff of the current release manifests and those generated for another version of the chart">
+            <Dropdown.Button
+              type="primary"
+              menu={{items: [{key: 'upgrade', label: 'Update', onClick: onUpgradeClickHandler}]}}
+              onClick={onUpgradeDryRunClickHandler}
+            >
+              Dry-run Update
+            </Dropdown.Button>
+          </Tooltip>
           <Button type="primary" danger onClick={onUninstallReleaseClickHandler}>
             Uninstall
           </Button>
