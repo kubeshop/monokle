@@ -1,9 +1,10 @@
-import {Tooltip} from 'antd';
+import {Tooltip, Typography} from 'antd';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setHelmPaneMenuItem} from '@redux/reducers/ui';
+import {openFolderExplorer, setHelmPaneMenuItem, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {Colors} from '@shared/styles';
+import {activeProjectSelector} from '@shared/utils';
 
 import HelmChartsView from './HelmChartsView';
 import HelmReposView from './HelmReposView';
@@ -16,6 +17,21 @@ const menuItems = [
 ];
 
 const TooltipDescription = () => {
+  const dispatch = useAppDispatch();
+  const activeProject = useAppSelector(activeProjectSelector);
+
+  const onInClusterClickHandler = () => {
+    dispatch(setLeftMenuSelection('dashboard'));
+  };
+
+  const onFileClickHandler = () => {
+    if (activeProject) {
+      dispatch(setLeftMenuSelection('explorer'));
+    } else {
+      dispatch(openFolderExplorer());
+    }
+  };
+
   return (
     <S.DescriptionContainer>
       <S.HighlightedIcon name="helm" />
@@ -27,14 +43,18 @@ const TooltipDescription = () => {
         <li>Add & manage Helm Carts repositories</li>
       </ul>
       <S.HighlightedIcon name="document" />
-      <S.DescriptionTitle>In Files section</S.DescriptionTitle>
+      <S.DescriptionTitle>
+        In <Typography.Link onClick={onFileClickHandler}>Files section</Typography.Link>
+      </S.DescriptionTitle>
       <ul>
         <li>View Helm Charts contained in your project</li>
         <li>Preview the output of a Helm Chart</li>
       </ul>
 
       <S.HighlightedIcon name="cluster-dashboard" />
-      <S.DescriptionTitle>In cluster</S.DescriptionTitle>
+      <S.DescriptionTitle>
+        <Typography.Link onClick={onInClusterClickHandler}>In cluster</Typography.Link>
+      </S.DescriptionTitle>
       <ul>
         <li>Check out chart releases update history and update to latest versions</li>
         <li>Find and install new Helm Charts</li>

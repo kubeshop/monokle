@@ -170,6 +170,8 @@ export const HighlightedIcon = styled(Icon)`
 `;
 
 export const DescriptionContainer = styled.div`
+  padding: 16px;
+
   ul > li {
     font-size: 14px;
     line-height: 24px;
