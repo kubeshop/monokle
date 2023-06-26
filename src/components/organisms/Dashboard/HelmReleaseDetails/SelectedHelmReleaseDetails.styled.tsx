@@ -39,6 +39,10 @@ export const Tabs = styled(props => <AntTabs {...props} />)`
     font-size: 16px;
     font-weight: 600;
     line-height: 24px;
+
+    :hover {
+      color: ${Colors.grey9};
+    }
   }
 
   & .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
