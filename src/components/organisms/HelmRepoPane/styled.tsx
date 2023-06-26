@@ -163,8 +163,8 @@ export const HighlightedIcon = styled(Icon)`
   margin-bottom: 8px;
   background: ${Colors.geekblue7};
   svg {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
     color: ${Colors.cyan9};
   }
 `;

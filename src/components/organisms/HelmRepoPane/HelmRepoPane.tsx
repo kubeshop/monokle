@@ -32,6 +32,16 @@ const TooltipDescription = () => {
         <li>View Helm Charts contained in your project</li>
         <li>Preview the output of a Helm Chart</li>
       </ul>
+
+      <S.HighlightedIcon name="cluster-dashboard" />
+      <S.DescriptionTitle>In cluster</S.DescriptionTitle>
+      <ul>
+        <li>Check out chart releases update history and update to latest versions</li>
+        <li>Find and install new Helm Charts</li>
+        <li>Dry-run an update</li>
+        <li>Uninstalling helm release</li>
+        <li>Check out release manifest and further notes</li>
+      </ul>
     </S.DescriptionContainer>
   );
 };

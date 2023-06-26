@@ -80,7 +80,7 @@ const SelectedHelmRelease = () => {
         namespace: release.namespace,
         dryRun: true,
       }),
-      okText: 'Upgrade',
+      okText: 'Update',
       okHandler: () => {},
     });
     trackEvent('helm_release/upgrade', {dryRun: true});
@@ -133,24 +133,24 @@ const SelectedHelmRelease = () => {
         }),
         okHandler: async () => {
           Modal.confirm({
-            title: `Are you sure you want to upgrade ${release.name} to ${version}`,
+            title: `Are you sure you want to update ${release.name} to ${version}`,
             content: 'This action cannot be undone.',
-            okText: 'Upgrade',
+            okText: 'update',
             onOk: async () => {
               try {
                 const result = await runCommandInMainThread(
                   upgradeHelmReleaseCommand({release: release.name, chart: repo, namespace: release.namespace, version})
                 );
                 if (result.stderr) {
-                  dispatch(setAlert(errorAlert('Upgrade failed', result.stderr)));
+                  dispatch(setAlert(errorAlert('Update failed', result.stderr)));
                   trackEvent('helm_release/upgrade', {dryRun: true, status: 'failed'});
                 } else {
-                  dispatch(setAlert(successAlert("Release's upgrade has been scheduled")));
+                  dispatch(setAlert(successAlert("Release's update has been scheduled")));
                   dispatch(setSelectedHelmRelease({...release}));
                   trackEvent('helm_release/upgrade', {dryRun: true, status: 'succeeded'});
                 }
               } catch (err: any) {
-                dispatch(setAlert(errorAlert('Upgrade failed', err.message)));
+                dispatch(setAlert(errorAlert('Update failed', err.message)));
                 trackEvent('helm_release/upgrade', {dryRun: true, status: 'failed'});
               }
             },
@@ -159,19 +159,19 @@ const SelectedHelmRelease = () => {
       });
     } else {
       Modal.confirm({
-        title: `Are you sure you want to upgrade ${release.name} to ${version}`,
+        title: `Are you sure you want to update ${release.name} to ${version}`,
         content: 'This action cannot be undone.',
-        okText: 'Upgrade',
+        okText: 'Update',
         onOk: async () => {
           try {
             const result = await runCommandInMainThread(
               upgradeHelmReleaseCommand({release: release.name, chart: repo, namespace: release.namespace, version})
             );
             if (result.stderr) {
-              dispatch(setAlert(errorAlert('Upgrade failed', result.stderr)));
+              dispatch(setAlert(errorAlert('update failed', result.stderr)));
               trackEvent('helm_release/upgrade', {dryRun: false, status: 'failed'});
             } else {
-              dispatch(setAlert(successAlert("Release's upgrade has been scheduled")));
+              dispatch(setAlert(successAlert("Release's update has been scheduled")));
               dispatch(setSelectedHelmRelease({...release}));
               trackEvent('helm_release/upgrade', {dryRun: false, status: 'succeeded'});
             }
@@ -201,10 +201,10 @@ const SelectedHelmRelease = () => {
         <S.ActionsContainer>
           <Dropdown.Button
             type="primary"
-            menu={{items: [{key: 'upgrade', label: 'Upgrade', onClick: onUpgradeClickHandler}]}}
+            menu={{items: [{key: 'upgrade', label: 'Update', onClick: onUpgradeClickHandler}]}}
             onClick={onUpgradeDryRunClickHandler}
           >
-            Dry-run Upgrade
+            Dry-run Update
           </Dropdown.Button>
 
           <Button type="primary" danger onClick={onUninstallReleaseClickHandler}>

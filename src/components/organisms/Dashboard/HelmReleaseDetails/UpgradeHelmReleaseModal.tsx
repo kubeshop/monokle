@@ -45,7 +45,7 @@ const UpgradeHelmReleaseModal = ({onClose, onOk, isDryRun}: IProps) => {
       open
       onCancel={onClose}
       getContainer="helmDiffModalContainer"
-      okText={isDryRun ? 'Dry-run upgrade' : 'Upgrade'}
+      okText={isDryRun ? 'Dry-run Update' : 'Update'}
       onOk={onUpgradeClickHandler}
     >
       <Form layout="vertical" form={form}>
