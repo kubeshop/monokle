@@ -270,10 +270,6 @@ const initialTerminalState: TerminalState = {
   terminalsMap: {},
 };
 
-const initialNewsFeedState: NewsFeedState = {
-  items: [],
-};
-
 export default {
   alert: initialAlertState,
   config: initialAppConfigState,
@@ -281,5 +277,4 @@ export default {
   main: initialAppState,
   terminal: initialTerminalState,
   ui: initialUiState,
-  newsfeed: initialNewsFeedState,
 };
