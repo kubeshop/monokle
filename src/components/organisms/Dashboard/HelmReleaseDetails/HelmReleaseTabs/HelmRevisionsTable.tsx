@@ -172,7 +172,7 @@ const HelmRevisionsTable = () => {
   }, [release]);
 
   return (
-    <div style={{marginTop: 30, height: '100%'}}>
+    <div style={{height: '100%'}}>
       <Typography.Text>Review this Chart updates history below.</Typography.Text>
       <Table
         sticky
