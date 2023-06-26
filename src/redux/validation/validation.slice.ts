@@ -1,13 +1,13 @@
 import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
-import {set} from 'lodash';
+import {pick, set} from 'lodash';
 
 import {connectCluster} from '@redux/cluster/thunks/connect';
 import {stopClusterConnection} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ValidationFiltersValueType} from '@monokle/components';
-import {PluginMetadataWithConfig} from '@monokle/validation';
+import {CORE_PLUGINS, PluginMetadataWithConfig} from '@monokle/validation';
 import {SelectedProblem, ValidationState} from '@shared/models/validation';
 import {CustomValidationPlugin} from '@shared/models/validationPlugins';
 import electronStore from '@shared/utils/electronStore';
@@ -161,6 +161,23 @@ export const validationSlice = createSlice({
       state.validationOverview.newProblemsIntroducedType = 'rule';
       electronStore.set('validation.config.plugins', state.config.plugins);
     },
+
+    addValidationPlugin(state, {payload}: PayloadAction<{plugin: string; enable?: boolean}>) {
+      if (!state.config.plugins) state.config.plugins = {};
+      state.config.plugins[payload.plugin] = payload.enable ?? false;
+    },
+
+    removeValidationPlugin(state, {payload}: PayloadAction<{plugin: string} | undefined>) {
+      if (!state.config.plugins) return;
+
+      if (payload) {
+        // Remove given plugin
+        delete state.config.plugins[payload.plugin];
+      } else {
+        // Remove all custom plugins
+        state.config.plugins = pick(state.config.plugins, CORE_PLUGINS);
+      }
+    },
   },
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, state => {
@@ -223,5 +240,7 @@ export const {
   toggleRule,
   toggleValidation,
   updateSelectedPluginConfiguration,
+  addValidationPlugin,
+  removeValidationPlugin,
 } = validationSlice.actions;
 export default validationSlice.reducer;

@@ -49,7 +49,14 @@ import {isDefined} from '@shared/utils/filter';
 import {isEqual} from '@shared/utils/isEqual';
 import {trackEvent} from '@shared/utils/telemetry';
 
-import {changeRuleLevel, setConfigK8sSchemaVersion, toggleRule, toggleValidation} from './validation.slice';
+import {
+  addValidationPlugin,
+  changeRuleLevel,
+  removeValidationPlugin,
+  setConfigK8sSchemaVersion,
+  toggleRule,
+  toggleValidation,
+} from './validation.slice';
 import {loadValidation, validateResources} from './validation.thunks';
 
 type IncrementalValidationStatus = {
@@ -71,7 +78,9 @@ const loadListener: AppListenerFn = listen => {
       updateProjectK8sVersion,
       toggleRule,
       toggleValidation,
-      changeRuleLevel
+      changeRuleLevel,
+      addValidationPlugin,
+      removeValidationPlugin
     ),
     async effect(_action, {dispatch, delay, signal, cancelActiveListeners}) {
       trackEvent('validation/load_config', {actionType: _action.type});
