@@ -7,6 +7,7 @@ import {CRD_SCHEMA_INTEGRATION} from '@shared/models/validationPlugins';
 import {VALIDATION_CONFIGURATION_COMPONENTS} from './ConfigurationComponents';
 import CustomValidationCard from './CustomValidationCard';
 import ValidationCard from './ValidationCard';
+import {ValidationCardPlugins} from './ValidationCardPlugins';
 import ValidationCardUpNext from './ValidationCardUpNext';
 import * as S from './ValidationOverview.styled';
 
@@ -25,6 +26,7 @@ const ValidationOverview: React.FC = () => {
 
       <CustomValidationCard plugin={CRD_SCHEMA_INTEGRATION} />
 
+      <ValidationCardPlugins />
       <ValidationCardUpNext />
     </S.ValidationOverviewContainer>
   );
