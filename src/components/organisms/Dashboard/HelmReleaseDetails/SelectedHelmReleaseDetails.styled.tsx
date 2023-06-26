@@ -64,6 +64,9 @@ export const Title = styled(Typography.Text)`
   color: ${Colors.grey9};
   white-space: nowrap;
   text-overflow: ellipsis;
+  overflow: hidden;
+  min-width: 0;
+  max-width: 50%;
 `;
 
 export const ActionsContainer = styled.div`
