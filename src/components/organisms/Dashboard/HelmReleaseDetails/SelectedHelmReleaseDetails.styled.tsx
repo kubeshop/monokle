@@ -28,7 +28,7 @@ export const Tabs = styled(props => <AntTabs {...props} />)`
   .ant-tabs-content {
     position: unset;
     height: 100%;
-    padding-top: 24px;
+    padding-top: 38px;
   }
 
   & .ant-tabs-tabpane-active {
