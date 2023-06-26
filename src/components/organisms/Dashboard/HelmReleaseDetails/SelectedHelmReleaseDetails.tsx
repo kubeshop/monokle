@@ -1,8 +1,6 @@
 import {useState} from 'react';
 
-import {Tabs as AntTabs, Dropdown, Modal, Tooltip, Typography} from 'antd';
-
-import styled from 'styled-components';
+import {Dropdown, Modal, Tooltip} from 'antd';
 
 import {setSelectedHelmRelease, setSelectedHelmReleaseTab} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -12,7 +10,6 @@ import {loadClusterHelmReleases} from '@redux/thunks/cluster/loadClusterHelmRele
 import {errorAlert, successAlert} from '@utils/alert';
 
 import {HelmReleaseTab} from '@shared/models/dashboard';
-import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils';
 import {
   getHelmReleaseManifestCommand,
@@ -29,6 +26,7 @@ import HelmReleaseManifest from './HelmReleaseTabs/HelmReleaseManifest';
 import HelmReleaseNotes from './HelmReleaseTabs/HelmReleaseNotes';
 import HelmReleaseValues from './HelmReleaseTabs/HelmReleaseValues';
 import HelmRevisionsTable from './HelmReleaseTabs/HelmRevisionsTable';
+import * as S from './SelectedHelmReleaseDetails.styled';
 import UpgradeHelmReleaseModal from './UpgradeHelmReleaseModal';
 
 const tabsItems = [
@@ -227,13 +225,15 @@ const SelectedHelmRelease = () => {
   };
 
   return (
-    <Container>
-      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24}}>
-        <Title>
-          {release.name}/{release.chart}
-        </Title>
+    <S.Container>
+      <S.Header>
+        <Tooltip title={`${release.name}/${release.chart}`}>
+          <S.Title>
+            {release.name}/{release.chart}
+          </S.Title>
+        </Tooltip>
 
-        <div style={{display: 'flex', gap: 16}}>
+        <S.ActionsContainer>
           <Dropdown.Button
             type="primary"
             menu={{items: [{key: 'upgrade', label: 'Upgrade', onClick: onUpgradeClickHandler}]}}
@@ -244,16 +244,18 @@ const SelectedHelmRelease = () => {
 
           <Dropdown.Button
             type="primary"
-            menu={{items: [{key: 'uninstall', label: 'Uninstall', onClick: onUninstallReleaseClickHandler}]}}
+            menu={{
+              items: [{key: 'uninstall', label: 'Uninstall', danger: true, onClick: onUninstallReleaseClickHandler}],
+            }}
             onClick={onUninstallDryRunClickHandler}
           >
             Dry-run Uninstall
           </Dropdown.Button>
-        </div>
-      </div>
+        </S.ActionsContainer>
+      </S.Header>
 
       <div style={{display: 'flex', flexDirection: 'column'}}>
-        <Tabs
+        <S.Tabs
           items={tabsItems}
           activeKey={activeTab}
           onChange={(tab: HelmReleaseTab) => {
@@ -279,61 +281,8 @@ const SelectedHelmRelease = () => {
           isDryRun={Boolean(commandDryRun)}
         />
       )}
-    </Container>
+    </S.Container>
   );
 };
 
 export default SelectedHelmRelease;
-
-const Container = styled.div`
-  padding: 28px;
-  height: 100%;
-`;
-
-const Tabs = styled(props => <AntTabs {...props} />)`
-  height: calc(100vh - 160px);
-
-  .ant-tabs-nav::before {
-    display: none;
-  }
-
-  .ant-tabs-content-holder {
-    overflow-y: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  &.ant-tabs > .ant-tabs-nav > .ant-tabs-nav-wrap {
-  }
-
-  .ant-tabs-content {
-    position: unset;
-    height: 100%;
-  }
-
-  & .ant-tabs-tabpane-active {
-    height: 100%;
-  }
-
-  & .ant-tabs-tab.ant-tabs-tab .ant-tabs-tab-btn {
-    color: ${Colors.grey7};
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 24px;
-  }
-
-  & .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-    color: ${Colors.grey9};
-  }
-
-  & .ant-tabs-ink-bar {
-    background-color: ${Colors.grey9};
-  }
-`;
-
-const Title = styled(Typography.Text)`
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 22px;
-  color: ${Colors.grey9};
-`;
