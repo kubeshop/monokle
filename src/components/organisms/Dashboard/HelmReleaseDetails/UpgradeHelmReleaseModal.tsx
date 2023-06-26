@@ -38,7 +38,7 @@ const UpgradeHelmReleaseModal = ({onClose, onOk, isDryRun}: IProps) => {
   }, [form, selectedRepo]);
 
   const suggestedRepoName =
-    release.name.slice(0, release.name.lastIndexOf('/')) || release.chart.slice(0, release.chart.lastIndexOf('/'));
+    release.name.slice(0, release.name.indexOf('-')) || release.chart.slice(0, release.chart.indexOf('-'));
 
   return loading ? null : (
     <Modal
