@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import {setSelectedHelmRelease, setSelectedHelmReleaseTab} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
+import {loadClusterHelmReleases} from '@redux/thunks/cluster/loadClusterHelmReleases';
 
 import {errorAlert, successAlert} from '@utils/alert';
 
@@ -109,6 +110,7 @@ const SelectedHelmRelease = () => {
               } else {
                 dispatch(setAlert(successAlert("Release's un-installation has been scheduled")));
                 dispatch(setSelectedHelmRelease(null));
+                dispatch(loadClusterHelmReleases());
                 trackEvent('helm_release/uninstall', {dryRun: true, status: 'succeeded'});
               }
             } catch (err: any) {
@@ -138,6 +140,7 @@ const SelectedHelmRelease = () => {
           } else {
             dispatch(setAlert(successAlert("Release's un-installation has been scheduled")));
             dispatch(setSelectedHelmRelease(null));
+            dispatch(loadClusterHelmReleases());
             trackEvent('helm_release/uninstall', {dryRun: false, status: 'succeeded'});
           }
         } catch (err: any) {

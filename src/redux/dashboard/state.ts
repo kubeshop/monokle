@@ -10,6 +10,7 @@ export const initialState: DashboardState = {
   },
   tableDrawer: {},
   helm: {
+    helmReleases: null,
     selectedHelmRelease: null,
     activeHelmReleaseTab: 'cluster-resources',
   },

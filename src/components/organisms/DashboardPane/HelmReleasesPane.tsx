@@ -1,4 +1,4 @@
-import {ChangeEvent, useCallback, useRef} from 'react';
+import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
 
 import {Button, Input as RawInput, Skeleton, Tooltip} from 'antd';
 
@@ -11,10 +11,9 @@ import {currentKubeContextSelector} from '@redux/appConfig';
 import {setSelectedHelmRelease} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setHelmPaneChartSearch, setLeftMenuSelection} from '@redux/reducers/ui';
+import {loadClusterHelmReleases} from '@redux/thunks/cluster/loadClusterHelmReleases';
 
 import AccordionPanel, {InjectedPanelProps} from '@components/atoms/AccordionPanel/AccordionPanel';
-
-import useGetHelmReleases from '@hooks/useGetHelmReleases';
 
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {Colors} from '@shared/styles';
@@ -27,13 +26,34 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
   const {isActive} = props;
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(currentKubeContextSelector);
+  const helmReleases = useAppSelector(state => state.dashboard.helm.helmReleases || []);
+  const [loadingHelmReleases, setLoadingHelmReleases] = useState<boolean>(false);
 
-  const {list, loading} = useGetHelmReleases();
+  useEffect(() => {
+    const clusterHelmReleases = async () => {
+      try {
+        setLoadingHelmReleases(true);
+        await dispatch(loadClusterHelmReleases()).unwrap();
+        setLoadingHelmReleases(false);
+      } catch (e) {
+        setLoadingHelmReleases(false);
+      }
+    };
+    clusterHelmReleases();
+  }, [dispatch]);
 
   const debouncedSearchRef = useRef(
-    debounce((search: string) => {
+    debounce(async (search: string) => {
       dispatch(setHelmPaneChartSearch(search));
       trackEvent('helm_release/search');
+
+      try {
+        setLoadingHelmReleases(true);
+        await dispatch(loadClusterHelmReleases()).unwrap();
+        setLoadingHelmReleases(false);
+      } catch (e) {
+        setLoadingHelmReleases(false);
+      }
     }, 400)
   );
 
@@ -57,7 +77,7 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
           title="Helm Charts"
           expandable
           isOpen={Boolean(isActive)}
-          actions={<TitleBarCount count={list.length} isActive={Boolean(isActive)} />}
+          actions={<TitleBarCount count={helmReleases.length} isActive={Boolean(isActive)} />}
           description={
             <S.ConnectedContainer>
               <Tooltip title="Successfully connected!" placement="bottomRight">
@@ -92,7 +112,7 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
             onChange={onChangeSearchInputHandler}
           />
         </S.StickyContainer>
-        {loading ? <Skeleton style={{marginTop: 16}} active /> : <HelmReleasesList list={list} />}
+        {loadingHelmReleases ? <Skeleton style={{marginTop: 16}} active /> : <HelmReleasesList list={helmReleases} />}
       </S.CollapseContent>
     </AccordionPanel>
   );

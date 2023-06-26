@@ -14,8 +14,6 @@ import {useResourceMetaMap} from '@redux/selectors/resourceMapSelectors';
 import {problemsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 import {setValidationFilters} from '@redux/validation/validation.slice';
 
-import useGetHelmReleases from '@hooks/useGetHelmReleases';
-
 import {useRefSelector} from '@utils/hooks';
 
 import {trackEvent} from '@shared/utils';
@@ -28,9 +26,9 @@ export const Status = () => {
   const currentFilters = useRefSelector(state => state.validation.validationOverview.filters);
   const problems = useValidationSelector(problemsSelector);
   const imagesCount = useAppSelector(state => size(state.main.imageMap));
+  const helmReleases = useAppSelector(state => state.dashboard.helm.helmReleases || []);
 
   const clusterResourceCount = size(useResourceMetaMap('cluster'));
-  const {list: helmList} = useGetHelmReleases();
 
   const errorsCount = useMemo(() => size(problems.filter(p => p.level === 'error')), [problems]);
   const warningsCount = useMemo(() => size(problems.filter(p => p.level === 'warning')), [problems]);
@@ -60,7 +58,7 @@ export const Status = () => {
             }}
           >
             <S.Count $small>
-              <b>{helmList.length}</b> Helm Charts
+              <b>{helmReleases.length}</b> Helm Charts
             </S.Count>
           </S.KindRow>
         </Tooltip>

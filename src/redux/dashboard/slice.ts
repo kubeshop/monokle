@@ -45,6 +45,9 @@ export const dashboardSlice = createSlice({
     setSelectedImage: (state: Draft<DashboardState>, action: PayloadAction<ImageType | null>) => {
       state.selectedImage = action.payload;
     },
+    setHelmReleases: (state: Draft<DashboardState>, action: PayloadAction<HelmRelease[] | null>) => {
+      state.helm.helmReleases = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(connectCluster.fulfilled, state => {
@@ -80,6 +83,7 @@ export const {
   setSelectedHelmRelease,
   setSelectedImage,
   setSelectedHelmReleaseTab,
+  setHelmReleases,
 } = dashboardSlice.actions;
 
 export default dashboardSlice.reducer;

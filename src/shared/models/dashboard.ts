@@ -33,6 +33,7 @@ export type DashboardState = {
     selectedResourceId?: string;
   };
   helm: {
+    helmReleases: HelmRelease[] | null;
     selectedHelmRelease: HelmRelease | null;
     activeHelmReleaseTab: HelmReleaseTab;
   };
