@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-import {Dropdown, Modal, Tooltip} from 'antd';
+import {Button, Dropdown, Modal, Tooltip} from 'antd';
 
 import {setSelectedHelmRelease, setSelectedHelmReleaseTab} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -86,47 +86,12 @@ const SelectedHelmRelease = () => {
     trackEvent('helm_release/upgrade', {dryRun: true});
   };
 
-  const onUninstallDryRunClickHandler = () => {
-    setCommandDryRun({
-      open: true,
-      leftCommand: getHelmReleaseManifestCommand({release: release.name, namespace: release.namespace}),
-      rightCommand: uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace, dryRun: true}),
-      okText: 'Uninstall',
-      okHandler: async () => {
-        Modal.confirm({
-          title: 'Are you sure you want to uninstall this release?',
-          content: 'This action cannot be undone.',
-          okText: 'Uninstall',
-          onOk: async () => {
-            try {
-              const result = await runCommandInMainThread(
-                uninstallHelmReleaseCommand({release: release.name, namespace: release.namespace})
-              );
-              if (result.stderr) {
-                dispatch(setAlert(errorAlert('Uninstall failed', result.stderr)));
-                trackEvent('helm_release/uninstall', {dryRun: true, status: 'failed'});
-              } else {
-                dispatch(setAlert(successAlert("Release's un-installation has been scheduled")));
-                dispatch(setSelectedHelmRelease(null));
-                dispatch(loadClusterHelmReleases());
-                trackEvent('helm_release/uninstall', {dryRun: true, status: 'succeeded'});
-              }
-            } catch (err: any) {
-              dispatch(setAlert(errorAlert('Uninstall failed', err.message)));
-              trackEvent('helm_release/uninstall', {dryRun: true, status: 'failed'});
-            }
-          },
-        });
-      },
-    });
-    trackEvent('helm_release/uninstall', {dryRun: true});
-  };
-
   const onUninstallReleaseClickHandler = async () => {
     Modal.confirm({
-      title: 'Are you sure you want to uninstall this release?',
+      title: `Are you sure you want to uninstall ${release.name}?`,
       content: 'This action cannot be undone.',
       okText: 'Uninstall',
+      okType: 'danger',
       onOk: async () => {
         try {
           const result = await runCommandInMainThread(
@@ -168,7 +133,7 @@ const SelectedHelmRelease = () => {
         }),
         okHandler: async () => {
           Modal.confirm({
-            title: 'Are you sure you want to upgrade this release?',
+            title: `Are you sure you want to upgrade ${release.name} to ${version}`,
             content: 'This action cannot be undone.',
             okText: 'Upgrade',
             onOk: async () => {
@@ -194,7 +159,7 @@ const SelectedHelmRelease = () => {
       });
     } else {
       Modal.confirm({
-        title: 'Are you sure you want to upgrade this release?',
+        title: `Are you sure you want to upgrade ${release.name} to ${version}`,
         content: 'This action cannot be undone.',
         okText: 'Upgrade',
         onOk: async () => {
@@ -242,15 +207,9 @@ const SelectedHelmRelease = () => {
             Dry-run Upgrade
           </Dropdown.Button>
 
-          <Dropdown.Button
-            type="primary"
-            menu={{
-              items: [{key: 'uninstall', label: 'Uninstall', danger: true, onClick: onUninstallReleaseClickHandler}],
-            }}
-            onClick={onUninstallDryRunClickHandler}
-          >
-            Dry-run Uninstall
-          </Dropdown.Button>
+          <Button type="primary" danger onClick={onUninstallReleaseClickHandler}>
+            Uninstall
+          </Button>
         </S.ActionsContainer>
       </S.Header>
 
