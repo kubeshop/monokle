@@ -22,5 +22,6 @@ export const Header = styled(RawHeader)`
 `;
 
 export const Content = styled.div`
+  margin-top: -130px;
   grid-area: content;
 `;

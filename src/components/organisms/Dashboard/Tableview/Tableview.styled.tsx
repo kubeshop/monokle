@@ -12,6 +12,7 @@ export const Container = styled.div`
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  margin-top: 65px;
 `;
 
 export const FilterContainer = styled.div`
@@ -19,6 +20,12 @@ export const FilterContainer = styled.div`
   justify-content: space-between;
   margin-bottom: 16px;
   grid-area: filter;
+`;
+
+export const HeightAdjuster = styled.div`
+  height: 65px;
+  width: 100%;
+  background-color: transparent;
 `;
 
 export const Input = styled(RawInput)`
@@ -29,10 +36,13 @@ export const Input = styled(RawInput)`
 export const TableContainer = styled.div`
   position: relative;
   height: 100%;
+  margin-top: -65px;
+  z-index: 2000;
 `;
 
 export const Table = styled(RawTable)`
   grid-area: table;
+  margin-top: 65px;
 
   & .ant-table-container {
     border-top-left-radius: 4px;

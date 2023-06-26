@@ -36,6 +36,7 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
 
   return (
     <S.Container>
+      <S.HeightAdjuster />
       <S.FilterContainer>
         <S.Input
           size="large"
