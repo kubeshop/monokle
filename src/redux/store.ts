@@ -19,7 +19,6 @@ import {alertSlice} from './reducers/alert';
 import {extensionSlice} from './reducers/extension';
 import {mainSlice} from './reducers/main';
 import {imageListParserListener} from './reducers/main/mainListeners';
-import {newsfeedSlice} from './reducers/newsfeed';
 import {killTerminalProcessesListener, removeTerminalListener, terminalSlice} from './reducers/terminal';
 import {uiSlice} from './reducers/ui';
 import {validationListeners} from './validation/validation.listeners';
@@ -65,7 +64,6 @@ const appReducer = combineReducers({
   dashboard: dashboardSlice.reducer,
   cluster: clusterSlice.reducer,
   editor: editorSlice.reducer,
-  newsfeed: newsfeedSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {

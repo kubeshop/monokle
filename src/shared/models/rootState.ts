@@ -7,7 +7,6 @@ import {DashboardState} from './dashboard';
 import {ExtensionState} from './extension';
 import {FormsState} from './form';
 import {GitSliceState} from './git';
-import {NewsFeedState} from './newsfeed';
 import {TerminalState} from './terminal';
 import {UiState} from './ui';
 import {ValidationState} from './validation';
@@ -29,7 +28,6 @@ type RootState = {
   validation: ValidationState;
   dashboard: DashboardState;
   cluster: ClusterState;
-  newsfeed: NewsFeedState;
 };
 
 type ElectronMenuDataType = {
