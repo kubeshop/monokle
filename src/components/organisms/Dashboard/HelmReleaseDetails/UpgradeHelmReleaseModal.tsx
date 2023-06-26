@@ -37,6 +37,9 @@ const UpgradeHelmReleaseModal = ({onClose, onOk, isDryRun}: IProps) => {
     form.setFieldValue('version', '');
   }, [form, selectedRepo]);
 
+  const suggestedRepoName =
+    release.name.slice(0, release.name.lastIndexOf('/')) || release.chart.slice(0, release.chart.lastIndexOf('/'));
+
   return loading ? null : (
     <Modal
       open
@@ -53,7 +56,7 @@ const UpgradeHelmReleaseModal = ({onClose, onOk, isDryRun}: IProps) => {
           name="repo"
           label="Repo"
           rules={[{required: true}]}
-          initialValue={repos.length === 1 ? repos[0].name : undefined}
+          initialValue={repos.find(ch => ch.name.startsWith(suggestedRepoName))?.name || ''}
         >
           <Select>
             {repos.map(ch => (

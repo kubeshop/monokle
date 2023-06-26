@@ -26,6 +26,8 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
   const {isActive} = props;
   const dispatch = useAppDispatch();
   const currentContext = useAppSelector(currentKubeContextSelector);
+  const selectedNamespace = useAppSelector(state => state.main.clusterConnection?.namespace);
+
   const helmReleases = useAppSelector(state => state.dashboard.helm.helmReleases || []);
   const [loadingHelmReleases, setLoadingHelmReleases] = useState<boolean>(false);
 
@@ -40,7 +42,7 @@ const HelmReleasesPane: React.FC<InjectedPanelProps> = props => {
       }
     };
     clusterHelmReleases();
-  }, [dispatch]);
+  }, [dispatch, currentContext, selectedNamespace]);
 
   const debouncedSearchRef = useRef(
     debounce(async (search: string) => {
