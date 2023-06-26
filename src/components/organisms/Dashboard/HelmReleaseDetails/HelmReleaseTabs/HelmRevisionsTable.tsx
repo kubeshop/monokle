@@ -1,7 +1,7 @@
 import {useCallback, useMemo} from 'react';
 import {useAsync} from 'react-use';
 
-import {Table as AntTable, Button, Modal, Tag, Typography} from 'antd';
+import {Table as AntTable, Button, Modal, Tag, Tooltip, Typography} from 'antd';
 
 import {DateTime} from 'luxon';
 import styled from 'styled-components';
@@ -12,6 +12,7 @@ import {setAlert} from '@redux/reducers/alert';
 import {errorAlert, successAlert} from '@utils/alert';
 import {useMainPaneDimensions} from '@utils/hooks';
 
+import {HelmRelease} from '@shared/models/ui';
 import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils';
 import {
@@ -47,7 +48,7 @@ const getTagColor = (status: string) => {
   }
 };
 
-const createTableColumns = (onDiffClickHandler: (release: HelmRevision) => void) => [
+const createTableColumns = (release: HelmRelease, onDiffClickHandler: (release: HelmRevision) => void) => [
   {
     title: 'Revision',
     dataIndex: 'revision',
@@ -86,13 +87,18 @@ const createTableColumns = (onDiffClickHandler: (release: HelmRevision) => void)
     key: 'x',
     fixed: 'right',
     width: 150,
-    render: (value: any, record: HelmRevision) => (
-      <HoverArea>
-        <Button type="primary" onClick={() => onDiffClickHandler(record)}>
-          Rollback
-        </Button>
-      </HoverArea>
-    ),
+    render: (value: any, record: HelmRevision) => {
+      const isSameRevision = Number(record.revision) === Number(release.revision);
+      return (
+        <HoverArea>
+          <Tooltip title={isSameRevision ? 'Cannot Rollback to the same version' : 'Rollback'}>
+            <Button disabled={isSameRevision} type="primary" onClick={() => onDiffClickHandler(record)}>
+              Rollback
+            </Button>
+          </Tooltip>
+        </HoverArea>
+      );
+    },
   },
 ];
 
@@ -154,7 +160,7 @@ const HelmRevisionsTable = () => {
     [release, setHelmReleaseDiff, dispatch]
   );
 
-  const columns = useMemo(() => createTableColumns(onDiffClickHandler), [onDiffClickHandler]);
+  const columns = useMemo(() => createTableColumns(release, onDiffClickHandler), [release, onDiffClickHandler]);
   const {value, loading} = useAsync(async () => {
     const result = await runCommandInMainThread(
       helmReleaseRevisionsCommand({release: release.name, namespace: release.namespace!})
