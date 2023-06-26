@@ -156,7 +156,7 @@ const SelectedHelmRelease = () => {
     setCommandDryRun(undefined);
   };
 
-  const onSelectHelmRepoOkHandler = async (repo: string) => {
+  const onSelectHelmRepoOkHandler = async (repo: string, version: string) => {
     if (commandDryRun) {
       setCommandDryRun({
         ...commandDryRun,
@@ -166,6 +166,7 @@ const SelectedHelmRelease = () => {
           chart: repo,
           namespace: release?.namespace,
           dryRun: true,
+          version,
         }),
         okHandler: async () => {
           Modal.confirm({
@@ -175,7 +176,7 @@ const SelectedHelmRelease = () => {
             onOk: async () => {
               try {
                 const result = await runCommandInMainThread(
-                  upgradeHelmReleaseCommand({release: release.name, chart: repo, namespace: release.namespace})
+                  upgradeHelmReleaseCommand({release: release.name, chart: repo, namespace: release.namespace, version})
                 );
                 if (result.stderr) {
                   dispatch(setAlert(errorAlert('Upgrade failed', result.stderr)));
@@ -201,7 +202,7 @@ const SelectedHelmRelease = () => {
         onOk: async () => {
           try {
             const result = await runCommandInMainThread(
-              upgradeHelmReleaseCommand({release: release.name, chart: repo, namespace: release.namespace})
+              upgradeHelmReleaseCommand({release: release.name, chart: repo, namespace: release.namespace, version})
             );
             if (result.stderr) {
               dispatch(setAlert(errorAlert('Upgrade failed', result.stderr)));
