@@ -4,7 +4,7 @@ import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import {isAnyOf} from '@reduxjs/toolkit';
 
-import {isEmpty, uniqWith} from 'lodash';
+import {isEmpty, size, uniqWith} from 'lodash';
 import log from 'loglevel';
 
 import {
@@ -42,6 +42,7 @@ import {updateFileEntry} from '@redux/thunks/updateFileEntry';
 import {updateMultipleResources} from '@redux/thunks/updateMultipleResources';
 import {updateResource} from '@redux/thunks/updateResource';
 
+import {startExecutionTimer} from '@utils/executionTime';
 import {doesSchemaExist} from '@utils/index';
 
 import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
@@ -124,8 +125,8 @@ const validateListener: AppListenerFn = listen => {
       restartPreview.rejected
     ),
     async effect(_action, {dispatch, getState, cancelActiveListeners, signal, delay}) {
+      const stopExecutionTimer = startExecutionTimer();
       cancelActiveListeners();
-      trackEvent('validation/validate_all', {actionType: _action.type});
 
       if (incrementalValidationStatus.isRunning) {
         incrementalValidationStatus.abortController?.abort();
@@ -173,6 +174,12 @@ const validateListener: AppListenerFn = listen => {
       const response = dispatch(validateResources({type: 'full', resourceStorage}));
       signal.addEventListener('abort', () => response.abort());
       await response;
+
+      trackEvent('validation/validate_all', {
+        actionType: _action.type,
+        resourcesCount: resourceStorage ? size(getState().main.resourceMetaMapByStorage[resourceStorage]) : 0,
+        executionTime: stopExecutionTimer(),
+      });
     },
   });
 };
@@ -190,7 +197,7 @@ const incrementalValidationListener: AppListenerFn = listen => {
       multiplePathsChanged.fulfilled
     ),
     async effect(_action, {dispatch, delay, signal}) {
-      trackEvent('validation/validate_incremental', {actionType: _action.type});
+      const stopExecutionTimer = startExecutionTimer();
       let resourceIdentifiers: ResourceIdentifier[] = [];
 
       if (
@@ -235,6 +242,12 @@ const incrementalValidationListener: AppListenerFn = listen => {
       signal.addEventListener('abort', () => response.abort());
       incrementalValidationStatus.abortController?.signal.addEventListener('abort', () => response.abort());
       await response;
+
+      trackEvent('validation/validate_incremental', {
+        actionType: _action.type,
+        resourcesCount: resourceIdentifiers.length,
+        executionTime: stopExecutionTimer(),
+      });
 
       incrementalValidationStatus.isRunning = false;
       incrementalValidationStatus.abortController = undefined;
