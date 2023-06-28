@@ -1,3 +1,5 @@
+import textExtensions from 'text-extensions';
+
 import {PaneConfiguration} from '@shared/models/ui';
 import {Colors} from '@shared/styles/colors';
 
@@ -75,7 +77,10 @@ export const ADDITIONAL_SUPPORTED_FILES = [
   '.env.local',
   '.env.production',
   '.env.development',
+  '.github',
+  '.vscode',
 ];
 
 export const CLUSTER_DASHBOARD_HELP_URL: string = 'https://kubeshop.github.io/monokle/cluster-mode';
 export const SUPPORTED_TEXT_EXTENSIONS = ['.md', '.yaml', '.yml'];
+export const ALL_TEXT_EXTENSIONS = [...textExtensions, ...SUPPORTED_TEXT_EXTENSIONS, ...ADDITIONAL_SUPPORTED_FILES];

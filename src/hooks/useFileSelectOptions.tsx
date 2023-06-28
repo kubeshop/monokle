@@ -13,7 +13,7 @@ export function useFileSelectOptions() {
     const files: string[] = [];
 
     Object.entries(fileMap).forEach(([key, value]) => {
-      if (value.children || !value.isSupported || value.isExcluded) {
+      if (value.children || !value.containsK8sResources || value.isExcluded) {
         return;
       }
       files.push(key.replace(sep, ''));
