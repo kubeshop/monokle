@@ -79,7 +79,7 @@ const HelmContextMenu: React.FC<IProps> = props => {
         key: 'update_dependencies',
         label: <Tooltip title="Run 'helm dependency update' on this Helm Chart">Update Dependencies</Tooltip>,
         disabled: isInPreviewMode || isInClusterMode,
-        onClick: () => {
+        onClick: (): void => {
           dispatch(runHelmCommand({chart: id, command: ['dependency', 'update']}));
         },
       },
