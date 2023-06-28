@@ -65,7 +65,6 @@ export const TitleText = styled.span<{
   $isSelected?: boolean;
   $isHighlighted?: boolean;
   $isExcluded: boolean;
-  $isSupported: boolean;
 }>(props => ({
   overflow: 'hidden',
   position: 'relative',
@@ -76,7 +75,7 @@ export const TitleText = styled.span<{
     ? Colors.blackPure
     : props.$isHighlighted
     ? Colors.cyan7
-    : props.$isExcluded || !props.$isSupported
+    : props.$isExcluded
     ? Colors.grey7
     : Colors.blue10,
 }));

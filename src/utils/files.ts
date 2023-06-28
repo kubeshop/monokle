@@ -3,6 +3,8 @@ import {lstat, rm} from 'fs/promises';
 import log from 'loglevel';
 import path from 'path';
 
+import {ALL_TEXT_EXTENSIONS} from '@constants/constants';
+
 import {setAlert} from '@redux/reducers/alert';
 
 import {AlertEnum} from '@shared/models/alert';
@@ -205,13 +207,13 @@ export const isFileEntryDisabled = (fileEntry?: FileEntry) => {
     return true;
   }
   const isFolder = isDefined(fileEntry.children);
-  const isSupported = fileEntry.isSupported;
+  const isTextFile = ALL_TEXT_EXTENSIONS.some(extension => fileEntry.name.endsWith(extension));
 
   if (isFolder) {
     return false;
   }
 
-  return !isSupported || fileEntry.isExcluded;
+  return !isTextFile || fileEntry.isExcluded;
 };
 
 const getParentFolderPath = (relativePath: string): string | undefined => {

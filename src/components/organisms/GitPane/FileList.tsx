@@ -141,7 +141,6 @@ const FileList: React.FC<IProps> = props => {
     if (
       item.modifiedContent &&
       fileMap[item.path] &&
-      fileMap[item.path].isSupported &&
       !fileMap[item.path].isExcluded &&
       fileMap[item.path].filePath.startsWith(fileOrFolderContainedInFilter || '')
     ) {

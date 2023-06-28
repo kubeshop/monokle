@@ -71,7 +71,7 @@ export function createFileEntry({fileEntryPath, fileMap, helmChartId, extension,
     filePath: fileEntryPath,
     rootFolderPath: fileMap[ROOT_FILE_ENTRY].filePath,
     isExcluded: Boolean(fileIsExcluded(fileEntryPath, projectConfig)),
-    isSupported:
+    containsK8sResources:
       SUPPORTED_TEXT_EXTENSIONS.some(supportedExtension => supportedExtension === extension) ||
       ADDITIONAL_SUPPORTED_FILES.some(supportedExtension => supportedExtension === path.basename(fileEntryPath)),
     helmChartId,
@@ -97,7 +97,6 @@ export function createRootFileEntry(rootFolder: string, fileMap: FileMapType) {
     filePath: rootFolder,
     rootFolderPath: rootFolder,
     isExcluded: false,
-    isSupported: false,
     extension: path.extname(rootFolder),
   };
   fileMap[ROOT_FILE_ENTRY] = rootEntry;
@@ -139,19 +138,20 @@ export function extractResourcesForFileEntry(fileEntry: FileEntry, rootFolderPat
   const result: K8sResource<'local'>[] = [];
 
   try {
-    fileEntry.isSupported = true;
     extractK8sResourcesFromFile(fileEntry.filePath, rootFolderPath).forEach(resource => {
       // TODO: shouldn't we filter out resources that are not supported?
       if (!isSupportedResource(resource)) {
-        fileEntry.isSupported = false;
         return;
       }
 
       result.push(resource);
     });
   } catch (e) {
-    fileEntry.isSupported = false;
     log.warn(`Failed to parse yaml in file ${fileEntry.name}; ${e}`);
+  }
+
+  if (result.length > 0) {
+    fileEntry.containsK8sResources = true;
   }
 
   return result;
