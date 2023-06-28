@@ -31,7 +31,10 @@ export const Drawer = () => {
   const [isHalfScreen, setIsHalfScreen] = useState(true);
   const [isResizing, setIsResizing] = useState(false);
   const [width, setWidth] = useState(736);
-  const [height, setHeight] = useState(900);
+  const layoutSize = useAppSelector(state => state.ui.layoutSize);
+  const leftPaneSize = useAppSelector(state => state.ui.paneConfiguration.leftPane);
+  const [height, setHeight] = useState<number>(window.innerHeight - layoutSize.header);
+  const [maxWidth, setMaxWidth] = useState<number>(window.innerWidth - leftPaneSize);
 
   const onMouseDown = (e: any) => {
     setIsResizing(true);
@@ -41,11 +44,15 @@ export const Drawer = () => {
     setIsResizing(false);
   };
 
+  useEffect(() => {
+    setHeight(window.innerHeight - layoutSize.header);
+    setMaxWidth(window.innerWidth - leftPaneSize);
+  }, [layoutSize, leftPaneSize]);
+
   const onMouseMove = (e: {clientX: number}) => {
     if (isResizing) {
       let offsetRight = document.body.offsetWidth - (e.clientX - document.body.offsetLeft);
       const minWidth = 600;
-      const maxWidth = 3000;
       if (offsetRight > minWidth && offsetRight < maxWidth) {
         setWidth(offsetRight);
       }
@@ -89,6 +96,7 @@ export const Drawer = () => {
       open={Boolean(selectedResourceId)}
       getContainer={false}
       width={width}
+      height={height}
       title={
         selectedResource ? (
           <S.ArrowAndTitleContainer>

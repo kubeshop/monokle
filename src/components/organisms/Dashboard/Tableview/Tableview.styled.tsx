@@ -10,7 +10,6 @@ export const Container = styled.div`
   padding: 8px 16px 0px 16px;
   display: flex;
   flex-direction: column;
-  height: 100%;
   overflow: hidden;
   margin-top: 65px;
 `;
@@ -35,7 +34,6 @@ export const Input = styled(RawInput)`
 
 export const TableContainer = styled.div`
   position: relative;
-  height: 100%;
   margin-top: -65px;
   z-index: 2000;
 `;

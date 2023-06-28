@@ -47,7 +47,7 @@ export const Tableview = ({dataSource, columns}: {dataSource: ResourceMeta[]; co
         />
       </S.FilterContainer>
 
-      <S.TableContainer>
+      <S.TableContainer style={{height: `${height - 85}px`}}>
         <S.Table
           locale={{emptyText: <NoResourcesFound />}}
           dataSource={filteredDataSource}

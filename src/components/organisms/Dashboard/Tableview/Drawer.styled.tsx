@@ -9,9 +9,9 @@ import {Colors} from '@shared/styles/colors';
 export const Drawer = styled(RawDrawer)`
   & .ant-drawer-content {
     background: ${Colors.grey1};
-    height: 100% !important;
   }
   z-index: 2000 !important;
+  margin-top: -65px;
 
   & .ant-drawer-close {
     position: absolute;
