@@ -14,6 +14,7 @@ import {validateResources} from '@redux/validation/validation.thunks';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
+import {downloadJson} from '@utils/downloadJson';
 import {useRefSelector} from '@utils/hooks';
 
 import ValidationFigure from '@assets/NewValidationFigure.svg';
@@ -85,7 +86,7 @@ const ValidationPane: React.FC = () => {
         <ValidationOverview
           activePlugins={activePlugins}
           containerStyle={{marginTop: '20px'}}
-          showOnlyByResource={isInClusterMode || isInPreviewMode}
+          groupOnlyByResource={isInClusterMode || isInPreviewMode}
           filters={validationFilters}
           height={height - titleBarHeight - 60}
           newProblemsIntroducedType={newProblemsIntroducedType}
@@ -101,6 +102,10 @@ const ValidationPane: React.FC = () => {
           status={isInClusterMode ? 'loaded' : status}
           skeletonStyle={{marginTop: '20px'}}
           onFiltersChange={filters => dispatch(setValidationFilters(filters))}
+          triggerValidationSettingsRedirectCallback={() => dispatch(setLeftMenuSelection('settings'))}
+          downloadSarifResponseCallback={() => {
+            downloadJson(lastResponse);
+          }}
         />
       ) : (
         <S.ErrorEmptyMessageContainer>There are no errors or warnings found.</S.ErrorEmptyMessageContainer>
