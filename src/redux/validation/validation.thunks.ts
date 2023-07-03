@@ -85,7 +85,6 @@ export const validateResources = createAsyncThunk<ValidationResponse | undefined
       resources = resources.concat(
         Object.values(getResourceMapFromState(getState(), 'transient'))
           .filter(isDefined)
-          // @ts-ignore
           .filter(r => r.origin.createdIn === resourceStorage)
       );
 
