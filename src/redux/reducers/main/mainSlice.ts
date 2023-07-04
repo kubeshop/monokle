@@ -477,7 +477,7 @@ export const mainSlice = createSlice({
           const newFileEntry: FileEntry = {
             ...createFileEntry({fileEntryPath: relativeFilePath, fileMap: state.fileMap, extension, projectConfig: {}}),
             isExcluded: resourcePayload.isExcluded,
-            isSupported: isSupportedResource(resourceMeta),
+            containsK8sResources: isSupportedResource(resourceMeta),
             timestamp: resourcePayload.fileTimestamp,
           };
           state.fileMap[relativeFilePath] = newFileEntry;

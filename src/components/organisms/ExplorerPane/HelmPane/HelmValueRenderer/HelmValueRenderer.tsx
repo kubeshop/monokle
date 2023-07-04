@@ -4,7 +4,6 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectHelmValuesFile} from '@redux/reducers/main';
 
 import {trackEvent} from '@shared/utils';
-import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import HelmContextMenu from '../HelmContextMenu';
 import HelmValueQuickAction from './HelmValueQuickAction';
@@ -18,17 +17,7 @@ const HelmValueRenderer: React.FC<IProps> = props => {
   const {id} = props;
 
   const dispatch = useAppDispatch();
-  const fileOrFolderContainedIn = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn || '');
   const helmValue = useAppSelector(state => state.main.helmValuesMap[id]);
-  const isDisabled = useAppSelector(state =>
-    Boolean(
-      (state.main.preview?.type === 'helm' &&
-        state.main.preview.valuesFileId &&
-        state.main.preview.valuesFileId !== helmValue.id) ||
-        isInClusterModeSelector(state) ||
-        !helmValue.filePath.startsWith(fileOrFolderContainedIn)
-    )
-  );
   const isSelected = useAppSelector(
     state => state.main.selection?.type === 'helm.values.file' && state.main.selection.valuesFileId === helmValue.id
   );
@@ -39,7 +28,6 @@ const HelmValueRenderer: React.FC<IProps> = props => {
 
   return (
     <S.ItemContainer
-      isDisabled={isDisabled}
       isHovered={isHovered}
       isSelected={isSelected}
       onMouseEnter={() => setIsHovered(true)}
@@ -49,9 +37,7 @@ const HelmValueRenderer: React.FC<IProps> = props => {
         trackEvent('explore/select_values_file');
       }}
     >
-      <S.ItemName isDisabled={isDisabled} isSelected={isSelected}>
-        {helmValue.name}
-      </S.ItemName>
+      <S.ItemName isSelected={isSelected}>{helmValue.name}</S.ItemName>
 
       <div
         style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}

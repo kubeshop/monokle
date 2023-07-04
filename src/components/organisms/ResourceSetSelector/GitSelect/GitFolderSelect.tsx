@@ -96,7 +96,6 @@ const generateGitFileMap = (resources: K8sResource<'local'>[]) => {
       filePath: folderPath,
       name: basename(folderPath),
       isExcluded: false,
-      isSupported: true,
       extension: '',
     };
   });

@@ -11,8 +11,8 @@ type FileEntry = {
   extension: string;
   /** if the file/folder is excluded from the navigator */
   isExcluded: boolean;
-  /** if the file is found in global inclusion config ( config.fileIncludes ) */
-  isSupported: boolean;
+  /** if the file is found in global inclusion config ( config.fileIncludes ) which means this file might contain k8s resources */
+  containsK8sResources?: boolean;
   /** child file names (for folders) */
   children?: string[];
   /** the timestamp of the last write - for discarding change notifications */

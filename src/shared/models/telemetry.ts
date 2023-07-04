@@ -168,9 +168,6 @@ export type EventMap = {
   };
   'ai/generation/created-resources': {resourceKinds: string[]; resourcesCount: number};
   'logs/search': {resourceKind: string};
-  'validation/load_config': {actionType: string};
-  'validation/validate_all': {actionType: string};
-  'validation/validate_incremental': {actionType: string};
   'helm_release/search': undefined;
   'helm_release/select': undefined;
   'helm_release/release_select_tab': {tab: string};
@@ -183,6 +180,9 @@ export type EventMap = {
   'image_resources/select': undefined;
   'image_resources/search': undefined;
   'image_resources/select_resource': {kind: string};
+  'validation/load_config': {actionType: string};
+  'validation/validate_all': {actionType: string; resourcesCount: number; executionTime: number};
+  'validation/validate_incremental': {actionType: string; resourcesCount: number; executionTime: number};
 };
 
 export const APP_INSTALLED = 'APP_INSTALLED';
