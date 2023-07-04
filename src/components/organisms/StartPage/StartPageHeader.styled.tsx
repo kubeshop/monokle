@@ -67,6 +67,7 @@ export const StartPageHeaderContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
+  padding-right: 30px;
 `;
 
 export const SearchItemLabel = styled.div.attrs({className: 'search-item-label'})`

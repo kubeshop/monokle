@@ -7,6 +7,5 @@ export const VALIDATION_CONFIGURATION_COMPONENTS: Record<
   ((props: PluginMetadataWithConfig) => JSX.Element) | false | undefined
 > = {
   'CRDs Schema': () => <CRDsSchemaValidation />,
-  'kubernetes-schema': false,
   'yaml-syntax': false,
 };
