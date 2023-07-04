@@ -14,8 +14,8 @@ export const useSearchHelmCharts = (helmRepoSearch: string, includeHubSearch: bo
     if (result.stderr) {
       throw new Error(result.stderr);
     }
-
-    return JSON.parse(result.stdout || '[]');
+    const data = JSON.parse(result.stdout || '[]') as ChartInfo[];
+    return data.filter(f => f.name.includes(helmRepoSearch));
   }, [helmRepoSearch]);
 
   const {value: hubResult = []} = useAsync(async (): Promise<ChartInfo[]> => {

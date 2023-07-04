@@ -1,3 +1,4 @@
+import {isEmpty} from 'lodash';
 import {v4 as uuid} from 'uuid';
 
 import {CommandOptions, HelmEnv, HelmInstallArgs, HelmTemplateArgs} from '@shared/models/commands';
@@ -142,7 +143,7 @@ export function installHelmRepoChartCommand(
     shouldCreateNamespace,
   }: {chart: string; namespace?: string; version?: string; shouldCreateNamespace?: boolean},
   env?: HelmEnv
-) {
+): CommandOptions {
   return {
     commandId: uuid(),
     cmd: 'helm',
@@ -154,6 +155,132 @@ export function installHelmRepoChartCommand(
       version ? `--version ${version}` : '',
       shouldCreateNamespace ? '--create-namespace' : '',
     ],
+    env,
+  };
+}
+
+export function listHelmReleasesCommand(
+  {namespace, filter}: {namespace?: string; filter?: string},
+  env?: HelmEnv
+): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: [
+      'list',
+      !isEmpty(namespace) ? `--namespace ${namespace}` : '--all-namespaces',
+      !isEmpty(filter) ? `--filter ${filter}` : '',
+      '-o json',
+    ],
+    env,
+  };
+}
+
+export function helmReleaseRevisionsCommand(
+  {release, namespace}: {release: string; namespace: string},
+  env?: HelmEnv
+): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['history', release, '-n', namespace, '-o json'],
+    env,
+  };
+}
+
+export function upgradeHelmReleaseCommand(
+  {
+    release,
+    chart,
+    namespace,
+    version,
+    dryRun,
+  }: {release: string; chart: string; namespace: string; version?: string; dryRun?: boolean},
+  env?: HelmEnv
+): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: [
+      'upgrade',
+      release,
+      chart,
+      dryRun ? '--dry-run' : '',
+      '-n',
+      namespace,
+      version ? `--version ${version}` : '',
+    ],
+    env,
+  };
+}
+
+export function uninstallHelmReleaseCommand(
+  {release, namespace, dryRun}: {release: string; namespace: string; dryRun?: boolean},
+  env?: HelmEnv
+): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['uninstall', release, dryRun ? '--dry-run' : '', '-n', namespace],
+    env,
+  };
+}
+
+export function getHelmReleaseManifestCommand(
+  {release, namespace, revision = -1}: {release: string; namespace: string; revision?: number},
+  env?: HelmEnv
+): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['get', 'manifest', release, revision > -1 ? `--revision ${revision}` : '', '-n', namespace],
+    env,
+  };
+}
+
+export function getHelmReleaseValuesCommand(
+  {release, namespace}: {release: string; namespace: string},
+  env?: HelmEnv
+): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['get', 'values', release, '-n', namespace],
+    env,
+  };
+}
+
+export function getHelmReleaseNotesCommand(
+  {release, namespace}: {release: string; namespace: string},
+  env?: HelmEnv
+): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['get', 'notes', release, '-n', namespace],
+    env,
+  };
+}
+
+export function getHelmReleaseHooksCommand(
+  {release, namespace}: {release: string; namespace: string},
+  env?: HelmEnv
+): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['get', 'hooks', release, '-n', namespace],
+    env,
+  };
+}
+export function rollbackHelmReleaseCommand(
+  {release, namespace, revision}: {release: string; namespace: string; revision: number},
+  env?: HelmEnv
+): CommandOptions {
+  return {
+    commandId: uuid(),
+    cmd: 'helm',
+    args: ['rollback', release, revision.toString(), '-n', namespace],
     env,
   };
 }

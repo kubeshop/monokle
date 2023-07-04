@@ -22,10 +22,10 @@ const AccordionPanel: React.FC<CollapsePanelProps & InjectedPanelProps> = props 
 
   return (
     <Panel
+      {...props}
       collapsible={props.disabled ? 'disabled' : undefined}
       id={id}
       $contentHeight={id !== 'accordion-panel-files' ? height + 12 : height}
-      {...props}
     />
   );
 };

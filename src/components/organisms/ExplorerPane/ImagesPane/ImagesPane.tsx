@@ -7,11 +7,12 @@ import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {AccordionPanel} from '@components/atoms';
+
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {InjectedPanelProps} from '@shared/models/explorer';
 import {Colors} from '@shared/styles/colors';
 
-import AccordionPanel from '../AccordionPanel';
 import ImageFilteredTag from './ImageFilteredTag';
 import ImageSearch from './ImageSearch';
 import ImagesList from './ImagesList';

@@ -163,13 +163,15 @@ export const HighlightedIcon = styled(Icon)`
   margin-bottom: 8px;
   background: ${Colors.geekblue7};
   svg {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
     color: ${Colors.cyan9};
   }
 `;
 
 export const DescriptionContainer = styled.div`
+  padding: 16px;
+
   ul > li {
     font-size: 14px;
     line-height: 24px;

@@ -232,16 +232,14 @@ export const CellScope = {
 };
 
 export const CellKind = {
-  title: 'Resource',
+  title: 'Kind',
   dataIndex: 'object',
   key: 'kind',
   width: '150px',
-  render: (object: any) =>
-    object?.spec?.names?.kind ? (
-      <span style={{padding: '2px 4px'}}>{object?.spec?.names?.kind}</span>
-    ) : (
-      <span style={{padding: '2px 4px'}}>-</span>
-    ),
+  render: (object: any) => {
+    const kind = object?.spec?.names?.kind || object?.spec?.kind || object?.kind || '-';
+    return <span style={{padding: '2px 4px'}}>{kind}</span>;
+  },
   sorter: (a: K8sResource, b: K8sResource) =>
     a?.object?.spec?.names?.kind?.localeCompare(b?.object?.spec?.names?.kind || '') || UNSORTED_VALUE,
 };

@@ -5,11 +5,12 @@ import {CollapsePanelProps} from 'antd';
 import {useAppSelector} from '@redux/hooks';
 import {helmChartsCountSelector} from '@redux/selectors';
 
+import {AccordionPanel} from '@components/atoms';
+
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {InjectedPanelProps} from '@shared/models/explorer';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
-import AccordionPanel from '../AccordionPanel';
 import HelmList from './HelmList';
 
 const HelmPane: React.FC<InjectedPanelProps> = props => {
