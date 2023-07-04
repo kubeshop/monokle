@@ -199,7 +199,11 @@ const SelectedHelmRelease = () => {
         </Tooltip>
 
         <S.ActionsContainer>
-          <Tooltip title="Shows a diff of the current release manifests and those generated for another version of the chart">
+          <Tooltip
+            title="Shows a diff of the current release manifests and those generated for another version of the chart"
+            placement="bottomLeft"
+            zIndex={1}
+          >
             <Dropdown.Button
               type="primary"
               menu={{items: [{key: 'upgrade', label: 'Update', onClick: onUpgradeClickHandler}]}}

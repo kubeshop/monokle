@@ -56,7 +56,9 @@ const UpgradeHelmReleaseModal = ({onClose, onOk, isDryRun}: IProps) => {
           name="repo"
           label="Repo"
           rules={[{required: true}]}
-          initialValue={repos.find(ch => ch.name.startsWith(suggestedRepoName))?.name || ''}
+          initialValue={
+            repos.length === 1 ? repos[0].name : repos.find(ch => ch.name.startsWith(suggestedRepoName))?.name || ''
+          }
         >
           <Select>
             {repos.map(ch => (
