@@ -10,7 +10,8 @@ export const Drawer = styled(RawDrawer)`
   & .ant-drawer-content {
     background: ${Colors.grey1};
   }
-  z-index: 1000;
+  z-index: 2000 !important;
+  margin-top: -65px;
 
   & .ant-drawer-close {
     position: absolute;
@@ -151,4 +152,42 @@ export const ErrorCount = styled.div`
 export const TitleContainer = styled.div`
   display: flex;
   align-items: center;
+`;
+
+export const ArrowIconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  width: 16px;
+  height: 16px;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+export const ArrowAndTitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export const DrawerSlider = styled.div`
+  position: absolute;
+  width: 5px;
+  padding: 4px 0 0;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 10001;
+  cursor: ew-resize;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: ${Colors.blue7};
+  }
+
+  &:active {
+    background-color: ${Colors.blue7};
+  }
 `;

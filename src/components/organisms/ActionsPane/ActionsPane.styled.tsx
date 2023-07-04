@@ -108,3 +108,10 @@ export const Tabs = styled(RawTabs)<{$height: number}>`
     background: transparent;
   }
 `;
+
+export const FullViewIconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: -30px;
+  margin-bottom: 30px;
+`;

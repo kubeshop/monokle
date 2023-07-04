@@ -1,5 +1,7 @@
-import {useLayoutEffect, useRef, useState} from 'react';
+import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {useClickAway} from 'react-use';
+
+import {LeftCircleFilled, RightCircleFilled} from '@ant-design/icons';
 
 import {v4 as uuidv4} from 'uuid';
 
@@ -26,6 +28,46 @@ export const Drawer = () => {
   const selectedResourceId = useAppSelector(state => state.dashboard.tableDrawer.selectedResourceId);
   const selectedResource = useResource(selectedResourceId ? {id: selectedResourceId, storage: 'cluster'} : undefined);
   const [isConfirmingUpdate, setIsConfirmingUpdate] = useState(false);
+  const [isHalfScreen, setIsHalfScreen] = useState(true);
+  const [isResizing, setIsResizing] = useState(false);
+  const [width, setWidth] = useState(736);
+  const layoutSize = useAppSelector(state => state.ui.layoutSize);
+  const leftPaneSize = useAppSelector(state => state.ui.paneConfiguration.leftPane);
+  const [height, setHeight] = useState<number>(window.innerHeight - layoutSize.header);
+  const [maxWidth, setMaxWidth] = useState<number>(window.innerWidth - leftPaneSize);
+
+  const onMouseDown = (e: any) => {
+    setIsResizing(true);
+  };
+
+  const onMouseUp = (e: any) => {
+    setIsResizing(false);
+  };
+
+  useEffect(() => {
+    setHeight(window.innerHeight - layoutSize.header);
+    setMaxWidth(window.innerWidth - leftPaneSize);
+  }, [layoutSize, leftPaneSize]);
+
+  const onMouseMove = (e: {clientX: number}) => {
+    if (isResizing) {
+      let offsetRight = document.body.offsetWidth - (e.clientX - document.body.offsetLeft);
+      const minWidth = 600;
+      if (offsetRight > minWidth && offsetRight < maxWidth) {
+        setWidth(offsetRight);
+      }
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+  });
 
   const [warnUnsavedCodeChanges, UnsavedCodeChangesModal] = useWarnUnsavedChanges();
 
@@ -42,30 +84,42 @@ export const Drawer = () => {
     }
   }, [selectedResourceId]);
 
+  const changeDrawerSize = () => {
+    setIsHalfScreen(!isHalfScreen);
+  };
+
   return (
     <S.Drawer
       className={drawerClassName.current}
-      placement="right"
+      placement={isHalfScreen ? 'right' : 'top'}
       size="large"
       open={Boolean(selectedResourceId)}
       getContainer={false}
+      width={width}
+      height={height}
       title={
         selectedResource ? (
-          <S.TitleContainer>
-            <ResourceRefsIconPopover
-              isSelected={false}
-              isDisabled={false}
-              resourceMeta={selectedResource}
-              type="incoming"
-            />
-            <S.DrawerTitle>{selectedResource.name}</S.DrawerTitle>
-            <ResourceRefsIconPopover
-              isSelected={false}
-              isDisabled={false}
-              resourceMeta={selectedResource}
-              type="outgoing"
-            />
-          </S.TitleContainer>
+          <S.ArrowAndTitleContainer>
+            <S.ArrowIconContainer onClick={changeDrawerSize}>
+              {isHalfScreen && <LeftCircleFilled />}
+              {!isHalfScreen && <RightCircleFilled />}
+            </S.ArrowIconContainer>
+            <S.TitleContainer>
+              <ResourceRefsIconPopover
+                isSelected={false}
+                isDisabled={false}
+                resourceMeta={selectedResource}
+                type="incoming"
+              />
+              <S.DrawerTitle>{selectedResource.name}</S.DrawerTitle>
+              <ResourceRefsIconPopover
+                isSelected={false}
+                isDisabled={false}
+                resourceMeta={selectedResource}
+                type="outgoing"
+              />
+            </S.TitleContainer>
+          </S.ArrowAndTitleContainer>
         ) : (
           <S.TitleContainer> - </S.TitleContainer>
         )
@@ -74,6 +128,7 @@ export const Drawer = () => {
         dispatch(setDashboardSelectedResourceId());
       }}
     >
+      <S.DrawerSlider onMouseDown={onMouseDown} />
       <UnsavedCodeChangesModal />
       <S.TabsContainer>
         <S.Tabs

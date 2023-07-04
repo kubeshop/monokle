@@ -5,7 +5,7 @@ import {useMeasure} from 'react-use';
 
 import {Tooltip} from 'antd';
 
-import {BookOutlined} from '@ant-design/icons';
+import {BookOutlined, LeftCircleFilled} from '@ant-design/icons';
 
 import {DEFAULT_PANE_TITLE_HEIGHT, HELM_CHART_HELP_URL, KUSTOMIZE_HELP_URL, TOOLTIP_DELAY} from '@constants/constants';
 import {makeApplyKustomizationText, makeApplyResourceText} from '@constants/makeApplyText';
@@ -407,6 +407,10 @@ const ActionsPane: React.FC = () => {
         applySelection={applySelection}
         selectedResourceMeta={selectedResource}
       />
+
+      <S.FullViewIconContainer>
+        <LeftCircleFilled style={{cursor: 'pointer'}} />
+      </S.FullViewIconContainer>
 
       {selection?.type === 'preview.configuration' ? (
         <PreviewConfigurationDetails />
