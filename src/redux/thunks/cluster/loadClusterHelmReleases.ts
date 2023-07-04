@@ -7,9 +7,10 @@ import {errorAlert} from '@utils/alert';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
+import {HelmRelease} from '@shared/models/ui';
 import {listHelmReleasesCommand, runCommandInMainThread} from '@shared/utils/commands';
 
-export const loadClusterHelmReleases = createAsyncThunk<void, void, {dispatch: AppDispatch; state: RootState}>(
+export const loadClusterHelmReleases = createAsyncThunk<HelmRelease[], void, {dispatch: AppDispatch; state: RootState}>(
   'dashboard/getHelmReleases',
   async (_, {dispatch, getState}) => {
     const selectedNamespace = getState().main.clusterConnection?.namespace;
@@ -23,5 +24,6 @@ export const loadClusterHelmReleases = createAsyncThunk<void, void, {dispatch: A
     }
     const helmReleases = JSON.parse(result.stdout || '[]');
     dispatch(setHelmReleases(helmReleases));
+    return helmReleases;
   }
 );

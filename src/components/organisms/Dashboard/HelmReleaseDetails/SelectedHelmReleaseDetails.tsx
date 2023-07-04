@@ -146,7 +146,8 @@ const SelectedHelmRelease = () => {
                   trackEvent('helm_release/upgrade', {dryRun: true, status: 'failed'});
                 } else {
                   dispatch(setAlert(successAlert("Release's update has been scheduled")));
-                  dispatch(setSelectedHelmRelease({...release}));
+                  const latestReleases = await dispatch(loadClusterHelmReleases()).unwrap();
+                  dispatch(setSelectedHelmRelease(latestReleases.find(r => r.name === release.name) || null));
                   trackEvent('helm_release/upgrade', {dryRun: true, status: 'succeeded'});
                 }
               } catch (err: any) {
@@ -172,7 +173,8 @@ const SelectedHelmRelease = () => {
               trackEvent('helm_release/upgrade', {dryRun: false, status: 'failed'});
             } else {
               dispatch(setAlert(successAlert("Release's update has been scheduled")));
-              dispatch(setSelectedHelmRelease({...release}));
+              const latestReleases = await dispatch(loadClusterHelmReleases()).unwrap();
+              dispatch(setSelectedHelmRelease(latestReleases.find(r => r.name === release.name) || null));
               trackEvent('helm_release/upgrade', {dryRun: false, status: 'succeeded'});
             }
           } catch (err: any) {
