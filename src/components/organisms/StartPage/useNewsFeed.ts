@@ -23,7 +23,9 @@ export function useNewsFeed() {
     try {
       const response = await fetch(newsFeedUrl);
       const data: NewsFeedItem[] = await response.json();
-      const sortedFeed = data.sort((item1, item2) => Date.parse(item2.date) - Date.parse(item1.date));
+      const sortedFeed = data
+        .filter(item => Date.parse(item.date) - Date.now() < 0)
+        .sort((item1, item2) => Date.parse(item2.date) - Date.parse(item1.date));
       setNewsFeed(sortedFeed);
       cachedNewsFeed = sortedFeed;
     } catch (e: any) {
