@@ -1,6 +1,8 @@
 import {useState} from 'react';
 import {useAsync} from 'react-use';
 
+import log from 'loglevel';
+
 import {NewsFeedItem} from '@shared/models/newsfeed';
 
 let cachedNewsFeed: NewsFeedItem[] | undefined;
@@ -17,10 +19,16 @@ export function useNewsFeed() {
     if (!newsFeedUrl) {
       return;
     }
-    const response = await fetch(newsFeedUrl);
-    const data = await response.json();
-    setNewsFeed(data);
-    cachedNewsFeed = data;
+
+    try {
+      const response = await fetch(newsFeedUrl);
+      const data: NewsFeedItem[] = await response.json();
+      const sortedFeed = data.sort((item1, item2) => Date.parse(item2.date) - Date.parse(item1.date));
+      setNewsFeed(sortedFeed);
+      cachedNewsFeed = sortedFeed;
+    } catch (e: any) {
+      log.warn('Error retrieving news feed', e.toString());
+    }
   });
 
   return newsFeed;
