@@ -196,7 +196,7 @@ export function extractSchema(crd: any, versionName: string) {
 export function removeSchemaDefaults(schema: any, removeObjectDefaults: boolean, removePrimitiveDefaults: boolean) {
   const schemaClone = cloneDeep(schema);
   removeDefaults(schemaClone, removeObjectDefaults, removePrimitiveDefaults);
-  return schemaClone;
+  return replaceUndefinedAdditionalProperties(schemaClone);
 }
 
 function removeDefaults(schemaItem: any, removeObjectDefaults: boolean, removePrimitiveDefaults: boolean) {
@@ -219,4 +219,28 @@ function removeDefaults(schemaItem: any, removeObjectDefaults: boolean, removePr
       }
     });
   }
+}
+
+function replaceUndefinedAdditionalProperties(schema: any): any {
+  if (typeof schema !== 'object' || schema === null) {
+    return schema;
+  }
+
+  if (Array.isArray(schema)) {
+    return schema.map(item => replaceUndefinedAdditionalProperties(item));
+  }
+
+  const updatedSchema: any = {};
+
+  for (const key in schema) {
+    if (schema[key]) {
+      if (key === 'additionalProperties' && schema[key] === undefined) {
+        updatedSchema[key] = {};
+      } else {
+        updatedSchema[key] = replaceUndefinedAdditionalProperties(schema[key]);
+      }
+    }
+  }
+
+  return updatedSchema;
 }

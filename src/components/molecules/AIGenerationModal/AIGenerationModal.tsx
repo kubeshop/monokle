@@ -1,8 +1,8 @@
-import {useState} from 'react';
+import {useCallback, useState} from 'react';
 import MonacoEditor from 'react-monaco-editor/lib/editor';
 import {useMeasure} from 'react-use';
 
-import {Button, Input, Spin, Switch} from 'antd';
+import {Button, Spin, Switch} from 'antd';
 
 import {SettingOutlined} from '@ant-design/icons';
 
@@ -41,10 +41,20 @@ const AIGenerationModal: React.FC = () => {
 
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>();
+  const [errorMessage, _setErrorMessage] = useState<string>();
   const [editorCode, setEditorCode] = useState<string>();
   const [isValidationEnabled, setIsValidationEnabled] = useState(true);
   const [areSettingsVisible, setAreSettingsVisible] = useState(false);
+
+  const setErrorMessage = useCallback(
+    (msg?: string) => {
+      _setErrorMessage(msg);
+      if (msg) {
+        trackEvent('ai/generation/error', {message: msg});
+      }
+    },
+    [_setErrorMessage]
+  );
 
   const apiKey = useAppSelector(state => state.config.userApiKeys.OpenAI);
   const [isApiKeyModalVisible, setIsApiKeyModalVisible] = useState(false);
@@ -64,6 +74,7 @@ const AIGenerationModal: React.FC = () => {
 
     if (!apiKey) {
       setIsApiKeyModalVisible(true);
+      trackEvent('ai/generation/no-api-key-set');
       return;
     }
 
@@ -146,7 +157,7 @@ const AIGenerationModal: React.FC = () => {
 
   return (
     <S.Modal
-      title="Create Resources using AI"
+      title={null}
       open={newAiResourceWizardState.isOpen}
       onCancel={onCancel}
       width="80%"
@@ -187,12 +198,14 @@ const AIGenerationModal: React.FC = () => {
             <S.LeftColumn>
               <img src={AIRobot} />
 
+              <S.Title>Create resources using AI</S.Title>
+
               <S.Note>
                 Please provide <strong>precise and specific details</strong> for creating your desired Kubernetes
                 resources. Accurate details will help us meet your specific needs effectively.
               </S.Note>
 
-              <Input.TextArea
+              <S.TextArea
                 autoSize={{minRows: 8, maxRows: 16}}
                 value={inputValue}
                 onChange={e => {
@@ -225,7 +238,7 @@ const AIGenerationModal: React.FC = () => {
                 <S.PlaceholderContainer>
                   <S.PlaceholderBody>
                     <img src={AIRobotColored} alt="AI Robot" />
-                    <S.NoContentTitle>Nothing to preview.</S.NoContentTitle>
+                    <S.NoContentTitle>Nothing to preview</S.NoContentTitle>
                     <p>
                       Ask the AI to generate resources using the top left input, then preview the output and create the
                       resources if everything looks fine.
@@ -233,7 +246,7 @@ const AIGenerationModal: React.FC = () => {
                   </S.PlaceholderBody>
                 </S.PlaceholderContainer>
               ) : (
-                <div ref={monacoContainerRef} style={{height: '100%', width: '100%'}}>
+                <div ref={monacoContainerRef} style={{height: '100%', width: '100%', paddingBottom: '16px'}}>
                   <MonacoEditor
                     width={containerWidth}
                     height={containerHeight}

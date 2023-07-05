@@ -143,21 +143,6 @@ export function getDefaultNamespaceForApply(
   return {defaultNamespace: namespace};
 }
 
-// TODO: refactor countResourceWarnings and countResourceErrors using @monokle/validation
-// export function countResourceWarnings(resources: K8sResource[]): number {
-//   return resources.reduce<number>((acc, resource) => {
-//     return acc + (resource.refs ? resource.refs.filter(ref => ref.type === ResourceRefType.Unsatisfied).length : 0);
-//   }, 0);
-// }
-
-// export function countResourceErrors(resources: K8sResource[]): number {
-//   return resources.reduce<number>((acc, resource) => {
-//     const validationErrorCount = resource.validation ? resource.validation.errors.length : 0;
-//     const policyErrorCount = resource.issues ? resource.issues.errors.length : 0;
-//     return acc + validationErrorCount + policyErrorCount;
-//   }, 0);
-// }
-
 export function getApiVersionGroup(resource: K8sResource) {
   return resource.apiVersion.includes('/') ? resource.apiVersion.split('/')[0] : 'kubernetes';
 }

@@ -9,6 +9,11 @@ export const ValidationSettingsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 25px;
+
+  @media ${Device.laptopS} {
+    width: 56%;
+    margin-left: 22%;
+  }
 `;
 
 export const ValidationSettingsDescription = styled.div`
@@ -31,11 +36,6 @@ export const ValidationSettingsDescriptionAndButtonContainer = styled.div`
   align-items: center;
   width: 100%;
   margin-bottom: 10px;
-
-  @media ${Device.laptopS} {
-    width: 50%;
-    margin-left: 25%;
-  }
 `;
 
 export const Link = styled.a`

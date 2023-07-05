@@ -7,12 +7,13 @@ import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {AccordionPanel} from '@components/atoms';
+
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {InjectedPanelProps} from '@shared/models/explorer';
 import {isDefined} from '@shared/utils/filter';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
-import AccordionPanel from '../AccordionPanel';
 import PreviewConfigurationAdd from './PreviewConfigurationAdd';
 import PreviewConfigurationList from './PreviewConfigurationList';
 
@@ -44,7 +45,7 @@ const PreviewConfigurationPane: React.FC<InjectedPanelProps> = props => {
       collapsible={isInClusterMode ? 'disabled' : undefined}
       header={
         <TitleBar
-          title="Helm Preview Configurations"
+          title="Helm Dry-run Configurations"
           expandable
           isOpen={Boolean(isActive)}
           actions={<TitleBarCount count={count} isActive={Boolean(isActive)} />}

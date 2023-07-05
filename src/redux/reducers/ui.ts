@@ -435,6 +435,12 @@ export const uiSlice = createSlice({
     toggleHelmPanSearchHub: (state: Draft<UiState>) => {
       state.helmPane.isSearchHubIncluded = !state.helmPane.isSearchHubIncluded;
     },
+    openHelmRepoModal: (state: Draft<UiState>) => {
+      state.helmRepoModal.isOpen = true;
+    },
+    closeHelmRepoModal: (state: Draft<UiState>) => {
+      state.helmRepoModal.isOpen = false;
+    },
   },
   extraReducers: builder => {
     builder
@@ -485,6 +491,7 @@ export const uiSlice = createSlice({
       })
       .addCase(setOpenProject.fulfilled, state => {
         state.leftMenu.selection = 'explorer';
+        state.explorerSelectedSection = 'files';
         state.navigator.collapsedResourceKinds = [];
       })
       .addCase(previewKustomization.fulfilled, state => {
@@ -589,5 +596,7 @@ export const {
   setHelmPaneSelectedChart,
   setHelmPaneChartDetailsTab,
   toggleHelmPanSearchHub,
+  openHelmRepoModal,
+  closeHelmRepoModal,
 } = uiSlice.actions;
 export default uiSlice.reducer;

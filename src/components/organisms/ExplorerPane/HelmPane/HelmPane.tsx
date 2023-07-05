@@ -1,28 +1,23 @@
-import {memo, useMemo} from 'react';
+import {memo} from 'react';
 
 import {CollapsePanelProps} from 'antd';
 
-import {size} from 'lodash';
-
 import {useAppSelector} from '@redux/hooks';
+import {helmChartsCountSelector} from '@redux/selectors';
+
+import {AccordionPanel} from '@components/atoms';
 
 import {TitleBar, TitleBarCount} from '@monokle/components';
 import {InjectedPanelProps} from '@shared/models/explorer';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
-import AccordionPanel from '../AccordionPanel';
 import HelmList from './HelmList';
 
 const HelmPane: React.FC<InjectedPanelProps> = props => {
   const {isActive, panelKey} = props;
 
-  const helmChartMap = useAppSelector(state => state.main.helmChartMap);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
-
-  const count = useMemo(
-    () => size(Object.values(helmChartMap).filter(chart => !chart.name.includes('Unnamed Chart:'))),
-    [helmChartMap]
-  );
+  const helmChartsCount = useAppSelector(helmChartsCountSelector);
 
   return (
     <AccordionPanel
@@ -33,7 +28,7 @@ const HelmPane: React.FC<InjectedPanelProps> = props => {
           title="Helm Charts"
           expandable
           isOpen={Boolean(isActive)}
-          actions={<TitleBarCount count={count} isActive={Boolean(isActive)} />}
+          actions={<TitleBarCount count={helmChartsCount} isActive={Boolean(isActive)} />}
         />
       }
       showArrow={false}

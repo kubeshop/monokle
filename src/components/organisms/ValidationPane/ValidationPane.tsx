@@ -8,12 +8,13 @@ import {ReloadOutlined} from '@ant-design/icons';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelectors';
-import {useValidationSelector} from '@redux/validation/validation.selectors';
+import {activePluginsSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 import {setSelectedProblem, setValidationFilters} from '@redux/validation/validation.slice';
 import {validateResources} from '@redux/validation/validation.thunks';
 
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
+import {downloadJson} from '@utils/downloadJson';
 import {useRefSelector} from '@utils/hooks';
 
 import ValidationFigure from '@assets/NewValidationFigure.svg';
@@ -26,6 +27,7 @@ import * as S from './ValidationPane.styled';
 
 const ValidationPane: React.FC = () => {
   const dispatch = useAppDispatch();
+  const activePlugins = useValidationSelector(activePluginsSelector);
   const activeStorageRef = useRefSelector(activeResourceStorageSelector);
   const lastResponse = useValidationSelector(state => state.lastResponse);
   const isInClusterMode = useAppSelector(isInClusterModeSelector);
@@ -82,8 +84,9 @@ const ValidationPane: React.FC = () => {
         </S.ErrorEmptyMessageContainer>
       ) : lastResponse ? (
         <ValidationOverview
+          activePlugins={activePlugins}
           containerStyle={{marginTop: '20px'}}
-          showOnlyByResource={isInClusterMode || isInPreviewMode}
+          groupOnlyByResource={isInClusterMode || isInPreviewMode}
           filters={validationFilters}
           height={height - titleBarHeight - 60}
           newProblemsIntroducedType={newProblemsIntroducedType}
@@ -99,6 +102,10 @@ const ValidationPane: React.FC = () => {
           status={isInClusterMode ? 'loaded' : status}
           skeletonStyle={{marginTop: '20px'}}
           onFiltersChange={filters => dispatch(setValidationFilters(filters))}
+          triggerValidationSettingsRedirectCallback={() => dispatch(setLeftMenuSelection('settings'))}
+          downloadSarifResponseCallback={() => {
+            downloadJson(lastResponse);
+          }}
         />
       ) : (
         <S.ErrorEmptyMessageContainer>There are no errors or warnings found.</S.ErrorEmptyMessageContainer>

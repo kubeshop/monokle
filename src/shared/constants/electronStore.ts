@@ -1,5 +1,3 @@
-import {sep} from 'path';
-
 import {PREDEFINED_K8S_VERSION} from './k8s';
 
 export const electronStoreSchema = {
@@ -16,6 +14,9 @@ export const electronStoreSchema = {
       },
       deviceID: {
         type: 'string',
+      },
+      firstTimeRunTimestamp: {
+        type: 'number',
       },
       filtersPresets: {
         type: 'object',
@@ -294,7 +295,7 @@ export const electronStoreDefaults = {
     useKubectlProxy: false,
     loadLastProjectOnStartup: false,
     fileExplorerSortOrder: 'folders',
-    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp', `${sep}.github`],
+    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp'],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {
       theme: 'dark',

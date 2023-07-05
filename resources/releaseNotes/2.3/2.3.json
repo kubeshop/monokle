@@ -1,0 +1,9 @@
+{
+  "title": "Introducing Monokle 2.3",
+  "learnMoreUrl": "https://monokle.io/blog/monokle-2-3-release",
+  "about": {
+    "when": "July 2023",
+    "title": "2.3 focused on:",
+    "features": ["Helm Releases in Cluster Mode", "Validation Plugins"]
+  }
+}

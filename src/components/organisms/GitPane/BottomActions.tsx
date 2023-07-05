@@ -105,6 +105,7 @@ const BottomActions: React.FC = () => {
     }
 
     dispatch(addGitBranch(`origin/${currentBranch}`));
+    await fetchRepo({path: selectedProjectRootFolder});
     dispatch(setGitLoading(false));
   }, [currentBranch, dispatch, gitRepo, selectedProjectRootFolder]);
 

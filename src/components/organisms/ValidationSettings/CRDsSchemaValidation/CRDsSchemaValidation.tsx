@@ -23,11 +23,11 @@ import {registerKindHandler} from '@src/kindhandlers';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
 import {AlertEnum} from '@shared/models/alert';
-import {CRD_SCHEMA_INTEGRATION} from '@shared/models/integrations';
+import {CRD_SCHEMA_INTEGRATION} from '@shared/models/validationPlugins';
 import {trackEvent} from '@shared/utils';
 import {readFile} from '@shared/utils/fileSystem';
 
-import ValidationPaneHeading from '../ValidationPaneHeading';
+import CustomValidationPaneHeading from '../CustomValidationPaneHeading';
 import CRDItem from './CRDItem';
 import * as S from './CRDsSchemaValidation.styled';
 
@@ -167,7 +167,8 @@ const CRDsSchemaValidation: React.FC = () => {
 
   return (
     <>
-      <ValidationPaneHeading integration={CRD_SCHEMA_INTEGRATION} />
+      <CustomValidationPaneHeading plugin={CRD_SCHEMA_INTEGRATION} />
+
       <S.Container>
         {isRegistering ? (
           <S.RegisterContainer>

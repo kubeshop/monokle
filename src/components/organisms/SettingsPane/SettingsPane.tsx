@@ -36,7 +36,7 @@ const SettingsPane = () => {
               key: 'validation',
               label: <S.TabOption>Validation</S.TabOption>,
               children: (
-                <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
+                <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage} id="validation-settings-tab">
                   <ValidationSettings />
                 </S.TabItemContainer>
               ),

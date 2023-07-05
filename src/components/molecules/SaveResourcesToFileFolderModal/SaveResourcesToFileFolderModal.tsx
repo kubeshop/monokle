@@ -144,7 +144,7 @@ const SaveResourcesToFileFolderModal: React.FC = () => {
       if (value.children) {
         folders.push(key.replace(path.sep, ''));
       } else {
-        if (!value.isSupported || value.isExcluded) {
+        if (!value.containsK8sResources || value.isExcluded) {
           return;
         }
         files.push(key.replace(path.sep, ''));

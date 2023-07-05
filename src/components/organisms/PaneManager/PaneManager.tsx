@@ -40,7 +40,7 @@ const PaneManager: React.FC = () => {
   const currentActivity = useMemo(() => activities.find(a => a.name === leftMenuSelection), [leftMenuSelection]);
 
   const showClosedPanePlaceholder = useMemo(
-    () => !leftMenuActive && currentActivity?.name === 'explorer',
+    () => !leftMenuActive && ['explorer', 'dashboard'].includes(currentActivity?.name || ''),
     [currentActivity?.name, leftMenuActive]
   );
 
@@ -151,7 +151,8 @@ const PaneManager: React.FC = () => {
                   isLeftActive={leftMenuActive}
                   paneCloseIconStyle={{top: '20px', right: '-8px'}}
                   left={
-                    currentActivity?.name !== 'explorer' || (leftMenuActive && currentActivity.name === 'explorer')
+                    !['explorer', 'dashboard'].includes(currentActivity?.name || '') ||
+                    (leftMenuActive && ['explorer', 'dashboard'].includes(currentActivity?.name || ''))
                       ? currentActivity?.component
                       : undefined
                   }
@@ -167,7 +168,7 @@ const PaneManager: React.FC = () => {
                       <ActionsPane />
                     )
                   }
-                  leftClosable={currentActivity?.name === 'explorer'}
+                  leftClosable={['explorer', 'dashboard'].includes(currentActivity?.name || '')}
                   onCloseLeftPane={() => dispatch(toggleLeftMenu())}
                   defaultSizes={columnsSizes}
                   onDragEnd={handleColumnResize}

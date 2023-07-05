@@ -210,6 +210,14 @@ export const opaRuleCountSelector = (state: ValidationState) => {
   }, 0);
 };
 
+export const activePluginsSelector = createDeepEqualSelector(
+  (state: ValidationState) => state.metadata,
+  metadata =>
+    Object.values(metadata ?? {})
+      .filter(plugin => plugin.configuration.enabled)
+      .map(plugin => plugin.name)
+);
+
 export const pluginEnabledSelector = createDeepEqualSelector(
   (state: RootState, id: string) => state.validation.config?.plugins?.[id],
   (_: RootState, id: string) => id,

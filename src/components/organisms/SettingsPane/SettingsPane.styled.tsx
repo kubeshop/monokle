@@ -104,6 +104,6 @@ export const Tabs = styled(RawTabs)<{$isOnStartProjectPage: boolean}>`
 export const TabItemContainer = styled.div<{$isOnStartProjectPage: boolean}>`
   padding: ${({$isOnStartProjectPage}) => ($isOnStartProjectPage ? '16px 0px' : '16px')};
   height: ${({$isOnStartProjectPage}) =>
-    !$isOnStartProjectPage ? 'calc(100% - 50px)' : '100%'}; // TODO: No hardcoded height: ;
+    !$isOnStartProjectPage ? 'calc(100% - 70px)' : '100%'}; // TODO: No hardcoded height: ;
   overflow-y: auto;
 `;

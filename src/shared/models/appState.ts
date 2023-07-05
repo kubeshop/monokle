@@ -2,7 +2,6 @@ import {AlertType} from './alert';
 import {FileEntry} from './fileEntry';
 import {HelmChart, HelmTemplate, HelmValuesFile} from './helm';
 import {ImageType} from './image';
-import {ValidationIntegration} from './integrations';
 import {ResourceContentMapByStorage, ResourceIdentifier, ResourceMetaMapByStorage} from './k8sResource';
 import {AnyPreview} from './preview';
 import {AppSelection} from './selection';
@@ -74,7 +73,6 @@ type AppState = {
   imagesSearchedValue?: string;
   filtersPresets: FiltersPresetsType;
   imageMap: ImageMapType;
-  validationIntegration: ValidationIntegration | undefined;
   autosaving: {
     status?: boolean;
     error?: {

@@ -60,21 +60,18 @@ const HelmChartDetails = () => {
   const [installModalOpen, setInstallModalOpen] = useState(false);
   const [chartVersion, setChartVersion] = useState('');
   const chart = selectedChart?.name || '';
-  const chartName = chart.split('/')[1];
 
   const tabItems = useMemo(() => createTabItems(chart), [chart]);
 
   const {value: versions = [], loading: isLoadingVersions} = useAsync(async (): Promise<{version: string}[]> => {
-    const result = await runCommandInMainThread(searchHelmRepoCommand({q: chartName}, true));
+    const result = await runCommandInMainThread(searchHelmRepoCommand({q: chart}, true));
     return JSON.parse(result.stdout || '[]');
   });
 
   const onClickApplyHelmChart = useCallback(
     async (namespace?: string, shouldCreateNamespace?: boolean) => {
-      const repoName = chart.split('/')[0];
       await dispatch(
         installHelmRepoChart({
-          name: repoName,
           chart,
           namespace,
           version: chartVersion,

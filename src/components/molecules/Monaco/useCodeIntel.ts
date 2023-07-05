@@ -62,14 +62,12 @@ function useCodeIntel(props: CodeIntelProps) {
     helmChartMap,
     helmValuesMap,
     helmTemplatesMap,
-    isDirty,
     activeResourceStorage,
     selection,
   } = props;
 
   const idsOfDecorationsRef = useRef<string[]>([]);
   const disposablesRef = useRef<monaco.IDisposable[]>([]);
-  const completionDisposableRef = useRef<monaco.IDisposable | null>(null);
   const currentFile = Object.values(fileMap).find(file => selectedPath === file.filePath);
   const dispatch = useAppDispatch();
   const lastChangedLine = useAppSelector(state => state.main.lastChangedLine);

@@ -23,6 +23,7 @@ import {GlobalModals, HotKeysHandler, LazyDrawer, MessageBox, PageHeader, PaneMa
 import {FileExplorer} from '@atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
+import {useSessionTime} from '@hooks/useSessionTime';
 
 import {getFileStats} from '@utils/files';
 import {globalElectronStoreChanges} from '@utils/global-electron-store';
@@ -57,6 +58,7 @@ const App = () => {
   const projects: Project[] = useAppSelector(state => state.config.projects);
 
   const size: Size = useWindowSize();
+  useSessionTime();
 
   const onExecutedFrom = useCallback(
     (_: any, data: any) => {
@@ -250,7 +252,7 @@ const App = () => {
 
         <LazyDrawer
           onClose={previewConfigurationDrawerOnClose}
-          title="Preview Configuration"
+          title="Dry-run Configuration"
           visible={previewConfigurationEditorState.isOpen}
         >
           <PreviewConfigurationEditor key={previewConfigurationEditorState.helmChartId} />

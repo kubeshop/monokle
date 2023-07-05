@@ -18,7 +18,7 @@ const createNode = (fileEntry: FileEntry, fileMap: FileMapType, rootFolderName: 
   const node: any = {
     value: filePath,
     title: name,
-    label: filePath,
+    label: filePath === ROOT_FILE_ENTRY ? name : filePath,
     children: [],
   };
 

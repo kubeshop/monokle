@@ -37,7 +37,7 @@ const PreviewConfigurationList: React.FC = () => {
   }
 
   if (!size(list)) {
-    return <EmptyText>No Preview Configurations found in the current project.</EmptyText>;
+    return <EmptyText>No Dry-run Configurations found in the current project.</EmptyText>;
   }
 
   return (

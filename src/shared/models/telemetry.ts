@@ -37,14 +37,19 @@ export type EventMap = {
   APP_UPDATED: {oldVersion: string; newVersion: string};
   APP_DOWNGRADED: {oldVersion: string; newVersion: string};
   APP_QUIT: {exitCode: number};
+  APP_SESSION_END: {timeSpent: number};
   'app_start/open_project': {
     numberOfFiles: number;
     numberOfResources: number;
     numberOfOverlays: number;
     numberOfHelmCharts: number;
+    numberOfValuesFiles: number;
     executionTime: number;
   };
-  'app_start/create_project': {from: 'scratch' | 'git' | 'template' | 'folder'; templateID?: string};
+  'app_start/create_project': {
+    from: 'sample' | 'scratch' | 'git' | 'template' | 'folder' | 'helm';
+    templateID?: string;
+  };
   'app_start/select_page': {page: string};
   'app_start/select_project': undefined;
   'project_list/open_project': undefined;
@@ -74,13 +79,16 @@ export type EventMap = {
   'explore/quick_search': undefined;
   'graph/select_resource': {kind: string};
   'graph/select_image': undefined;
-  'edit/code_changes': {from?: 'local' | 'cluster'};
+  'edit/code_changes': {from?: 'local' | 'cluster'; resourceKind?: string};
   'edit/template_use': {templateID: string};
   'edit/form_editor': {resourceKind?: string};
   'edit/source': {resourceKind?: string};
   'edit/side_by_side_editor': {resourceKind: string};
   'edit/select_hover_link': {type: 'resource' | 'image' | 'file'};
   'edit/graphview': {resourceKind?: string};
+  'editor/hover': {types?: string[]; resourceKind?: string};
+  'editor/follow_link': {types?: string[]; resourceKind?: string};
+  'editor/run_command': {type: string; resourceKind?: string};
   'create/file': undefined;
   'create/folder': undefined;
   'create/resource': {resourceKind: string};
@@ -115,6 +123,7 @@ export type EventMap = {
   'cluster/actions/scale': {replicasNumber: number};
   'cluster/actions/restart': undefined;
   'cluster/actions/delete': {kind: string};
+  'cluster/info': {kubeletVersion?: string; providers: string[]};
   'compare/opened': {from?: string};
   'compare/compared': {left?: string; right?: string; operation: string};
   'compare/inspected': {type?: string};
@@ -134,6 +143,8 @@ export type EventMap = {
   'dashboard/select_warnings': undefined;
   'dashboard/start_activity': undefined;
   'dashboard/pause_activity': undefined;
+  'dashboard/select_helm': undefined;
+  'dashboard/select_images': undefined;
   'terminal/open': undefined;
   'terminal/add': undefined;
   'terminal/kill': undefined;
@@ -149,11 +160,29 @@ export type EventMap = {
   'helm_repo/download': undefined;
   'helm_repo/install': undefined;
   'ai/generation/open': undefined;
+  'ai/generation/no-api-key-set': undefined;
+  'ai/generation/error': {message: string};
   'ai/generation/success': {
     enabledValidation: boolean;
     executionTime: number;
   };
   'ai/generation/created-resources': {resourceKinds: string[]; resourcesCount: number};
+  'logs/search': {resourceKind: string};
+  'helm_release/search': undefined;
+  'helm_release/select': undefined;
+  'helm_release/release_select_tab': {tab: string};
+  'helm_release/select_resource': {kind: string};
+  'helm_release/revision_diff': undefined;
+  'helm_release/upgrade': {dryRun: boolean; status?: 'failed' | 'succeeded'};
+  'helm_release/uninstall': {dryRun: boolean; status?: 'failed' | 'succeeded'};
+  'helm_release/rollback': {status?: 'failed' | 'succeeded' | 'canceled'};
+  'helm_release/navigate_to_helm_repo': undefined;
+  'image_resources/select': undefined;
+  'image_resources/search': undefined;
+  'image_resources/select_resource': {kind: string};
+  'validation/load_config': {actionType: string};
+  'validation/validate_all': {actionType: string; resourcesCount: number; executionTime: number};
+  'validation/validate_incremental': {actionType: string; resourcesCount: number; executionTime: number};
 };
 
 export const APP_INSTALLED = 'APP_INSTALLED';

@@ -399,7 +399,7 @@ export const useFileMenuItems = (
       isHelmChartFile(fileEntry.filePath) ||
       isHelmValuesFile(fileEntry.filePath) ||
       isHelmTemplateFile(fileEntry.filePath) ||
-      !fileEntry.isSupported ||
+      !fileEntry.containsK8sResources ||
       fileEntry.isExcluded;
 
     const newMenuItems: AntdMenuItem[] = [];
@@ -447,7 +447,7 @@ export const useFileMenuItems = (
     });
 
     newMenuItems.push({
-      disabled: isRoot || (!fileEntry.children && !fileEntry.isSupported),
+      disabled: isRoot || (!fileEntry.children && !fileEntry.containsK8sResources),
       key: 'update_scanning',
       label: `${
         fileEntry.isExcluded && projectConfig?.scanExcludes?.some(e => micromatch.isMatch(filePath, e))
@@ -573,7 +573,7 @@ export const useFolderMenuItems = (
     });
 
     newMenuItems.push({
-      disabled: isRoot || (!fileEntry.children && !fileEntry.isSupported),
+      disabled: isRoot || (!fileEntry.children && !fileEntry.containsK8sResources),
       key: 'update_scanning',
       label: `${
         fileEntry.isExcluded && projectConfig?.scanExcludes?.some(e => micromatch.isMatch(filePath, e))

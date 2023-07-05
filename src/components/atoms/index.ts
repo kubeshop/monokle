@@ -15,3 +15,4 @@ export {IconButton, PrimaryButton, SecondaryButton, TitleBarWrapper} from './Sty
 export {default as SelectItemImage} from './SelectItemImage';
 export {default as TabHeader} from './TabHeader';
 export {default as TableSelect} from './TableSelect';
+export {default as AccordionPanel} from './AccordionPanel';

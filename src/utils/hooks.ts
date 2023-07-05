@@ -10,8 +10,8 @@ export function useFocus<T>(): [React.RefObject<T>, () => void] {
   const htmlElRef = useRef<T>(null);
   const focus = () => {
     const current = htmlElRef.current;
-    // @ts-ignore
-    if (current && current.focus) current.focus();
+    if (current && typeof current === 'object' && 'focus' in current && typeof current.focus === 'function')
+      current.focus();
   };
 
   return [htmlElRef, focus];

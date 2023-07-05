@@ -11,7 +11,7 @@ import {useProblemPaneMenuItems} from '@hooks/menuItemsHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {ProblemInfo, TitleBar} from '@monokle/components';
-import {getRuleForResult} from '@monokle/validation';
+import {getRuleForResultV2} from '@monokle/validation';
 import {openUrlInExternalBrowser} from '@shared/utils';
 
 import * as S from './ProblemPane.styled';
@@ -35,7 +35,7 @@ const ProblemPane: React.FC = () => {
       return null;
     }
 
-    return getRuleForResult(lastResponse, selectedProblem);
+    return getRuleForResultV2(lastResponse.runs[0], selectedProblem);
   }, [lastResponse, selectedProblem]);
 
   const sarifValue = useMemo(() => {

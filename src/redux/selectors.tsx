@@ -1,5 +1,6 @@
 import {FolderOpenFilled} from '@ant-design/icons';
 
+import {size} from 'lodash';
 import path from 'path';
 import {createSelector} from 'reselect';
 
@@ -187,3 +188,7 @@ export const projectFileTreeSelector = createSelector(
     return [rootEntryNode, ...sortNodes(rootFolderNodes, rootFileNodes, fileExplorerSortOrder)];
   }
 );
+
+export const helmChartsCountSelector = createSelector([(state: RootState) => state.main.helmChartMap], helmChartMap => {
+  return size(helmChartMap);
+});

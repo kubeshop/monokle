@@ -148,7 +148,7 @@ const MenuItem = styled.div<{$border?: boolean; $disabled?: boolean}>`
 
   ${({$border}) => {
     if ($border) {
-      return `border-bottom: 1px solid ${Colors.grey5b}`;
+      return `border-bottom: 1px solid ${Colors.grey5}`;
     }
   }}
 `;
@@ -167,5 +167,5 @@ const MenuItemLinks = styled.div`
   flex-direction: column;
   padding: 0px 10px 0.5rem 37px;
   margin-top: -0.5rem;
-  border-bottom: 1px solid ${Colors.grey5b};
+  border-bottom: 1px solid ${Colors.grey5};
 `;

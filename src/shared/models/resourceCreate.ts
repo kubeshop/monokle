@@ -4,7 +4,7 @@ export type NewResourceTelemtryFrom = 'empty_navigator' | 'navigator_header';
 export type NewResourceAction = {
   image: string;
   hoverImage: string;
-  fromTypeLabel: 'AI' | 'advanced template' | 'model';
+  typeLabel: string;
   onClick: () => void;
 };
 

@@ -101,7 +101,6 @@ export function createHelmValuesFile({fileEntry, helmChart, helmValuesMap, fileM
 
   helmValuesMap[helmValues.id] = helmValues;
   helmChart.valueFileIds.push(helmValues.id);
-  fileEntry.isSupported = true;
 }
 
 export function createHelmTemplate(
@@ -124,7 +123,6 @@ export function createHelmTemplate(
 
   helmTemplatesMap[helmTemplate.id] = helmTemplate;
   helmChart.templateIds.push(helmTemplate.id);
-  fileEntry.isSupported = true;
 }
 
 /**
@@ -299,8 +297,6 @@ export function createHelmChart(
     valueFileIds: [],
     templateIds: [],
   };
-
-  fileEntry.isSupported = true;
 
   helmChartMap[helmChart.id] = helmChart;
   setImmediate(() => HelmChartEventEmitter.emit('create', helmChart));

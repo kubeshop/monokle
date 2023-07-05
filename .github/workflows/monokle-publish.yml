@@ -87,6 +87,7 @@ jobs:
           MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
           SEGMENT_API_KEY: ${{ secrets.SEGMENT_API_KEY }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          REACT_APP_NEWS_FEED_URL: ${{ secrets.REACT_APP_NEWS_FEED_URL }}
 
       - name: Package
         id: build
@@ -206,6 +207,7 @@ jobs:
           MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
           SEGMENT_API_KEY: ${{ secrets.SEGMENT_API_KEY }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          REACT_APP_NEWS_FEED_URL: ${{ secrets.REACT_APP_NEWS_FEED_URL }}
 
       - name: Package
         id: package
@@ -298,6 +300,7 @@ jobs:
           MONOKLE_INSTALLS_URL: ${{ secrets.MONOKLE_INSTALLS_URL }}
           SEGMENT_API_KEY: ${{ secrets.SEGMENT_API_KEY }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          REACT_APP_NEWS_FEED_URL: ${{ secrets.REACT_APP_NEWS_FEED_URL }}
 
       - name: Package
         id: package

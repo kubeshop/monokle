@@ -205,9 +205,12 @@ type UiState = {
     chartDetailsTab: HelmChartDetailsTab;
     isSearchHubIncluded: boolean;
   };
+  helmRepoModal: {
+    isOpen: boolean;
+  };
 };
 
-type HelmRepoMenu = 'browse-charts' | 'manage-repositories';
+type HelmRepoMenu = 'browse-charts' | 'manage-repositories' | 'manage-releases';
 
 type HelmChartDetailsTab = 'info' | 'templates' | 'defaultValues' | 'changelog';
 interface ChartInfo {
@@ -218,6 +221,16 @@ interface ChartInfo {
   app_version: string;
   repository?: {name: string; url: string};
   isHubSearch?: boolean;
+}
+
+interface HelmRelease {
+  name: string;
+  namespace: string;
+  revision: number;
+  updated: string;
+  status: string;
+  chart: string;
+  app_version: string;
 }
 type LearnTopicType = 'explore' | 'edit' | 'validate' | 'publish' | (string & {});
 
@@ -238,4 +251,5 @@ export type {
   HelmRepoMenu,
   HelmChartDetailsTab,
   ChartInfo,
+  HelmRelease,
 };

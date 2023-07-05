@@ -11,6 +11,7 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setFileExplorerExpandedFolders} from '@redux/reducers/ui';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
+import {AccordionPanel} from '@components/atoms';
 import {CollapseIcon, ExpandIcon} from '@components/atoms/Icons';
 
 import {useRefSelector} from '@utils/hooks';
@@ -22,7 +23,6 @@ import {trackEvent} from '@shared/utils';
 import {isEqual} from '@shared/utils/isEqual';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
-import AccordionPanel from '../AccordionPanel';
 import * as S from './FilePane.styled';
 import FileSystemTree from './FileSystemTree';
 import {useSetFolderFromMainThread} from './useSetFolderFromMainThread';

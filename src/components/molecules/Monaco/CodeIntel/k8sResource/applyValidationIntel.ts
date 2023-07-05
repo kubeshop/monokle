@@ -3,7 +3,7 @@ import * as monaco from 'monaco-editor';
 import store from '@redux/store';
 import {problemsByResourceSelector} from '@redux/validation/validation.selectors';
 
-import {RuleMetadata, ValidationResult, getResourceLocation, getRuleForResult} from '@monokle/validation';
+import {RuleMetadata, ValidationResult, getResourceLocation, getRuleForResultV2} from '@monokle/validation';
 import {K8sResource} from '@shared/models/k8sResource';
 
 const applyValidationIntel = (
@@ -26,7 +26,7 @@ const applyValidationIntel = (
   }
 
   problems.forEach(problem => {
-    const rule = getRuleForResult(response, problem);
+    const rule = getRuleForResultV2(response.runs[0], problem);
     const region = getResourceLocation(problem).physicalLocation?.region;
 
     if (!region) {

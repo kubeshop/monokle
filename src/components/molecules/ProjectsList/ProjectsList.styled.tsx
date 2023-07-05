@@ -32,6 +32,7 @@ export const ProjectsListContainer = styled.div`
   gap: 15px;
   padding-right: 10px;
   overflow-y: auto;
+  width: 100%;
 `;
 
 export const Select = styled(RawSelect)`

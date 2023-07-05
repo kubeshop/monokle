@@ -3,13 +3,11 @@ import styled from 'styled-components';
 import {Colors} from '@shared/styles/colors';
 
 type ItemContainerProps = {
-  isDisabled: boolean;
   isSelected: boolean;
   isHovered: boolean;
 };
 
 type ItemNameProps = {
-  isDisabled: boolean;
   isSelected: boolean;
 };
 
@@ -31,10 +29,6 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   cursor: pointer;
 
   ${props => {
-    if (props.isDisabled) {
-      return;
-    }
-
     if (props.isSelected) {
       if (props.isHovered) {
         return `background: ${Colors.selectionColorHover};`;
@@ -61,10 +55,6 @@ export const ItemName = styled.div<ItemNameProps>`
     }
   }};
   ${props => {
-    if (props.isDisabled) {
-      return `color: ${Colors.grey7};`;
-    }
-
     if (props.isSelected) {
       return `color: ${Colors.blackPure};`;
     }
