@@ -1,4 +1,5 @@
 import {readFileSync} from 'fs';
+import log from 'loglevel';
 import path from 'path';
 import {SimpleGit} from 'simple-git';
 
@@ -46,7 +47,11 @@ export function formatGitChangedFiles(
     let modifiedContent = '';
 
     if (fileType !== 'deleted') {
-      modifiedContent = readFileSync(path.join(gitFolderPath, gitFile.path), 'utf8');
+      try {
+        modifiedContent = readFileSync(path.join(gitFolderPath, gitFile.path), 'utf8');
+      } catch (e) {
+        log.error(`Error reading file ${path.join(gitFolderPath, gitFile.path)}`, e);
+      }
     }
 
     const fullGitPath = path.join(gitFolderPath, gitFile.path);
