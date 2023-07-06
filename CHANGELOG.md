@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/kubeshop/monokle/compare/v2.3.1-nightly-2023-07-06.0...v2.3.0) (2023-07-06)
+
+
+### Bug Fixes
+
+* ordering of news feed and click telemetry ([d652188](https://github.com/kubeshop/monokle/commit/d65218818acc1d75889350142c4a77e3d7421bac))
+* remove news items in the future ([c91c0a7](https://github.com/kubeshop/monokle/commit/c91c0a7de64490b9bea3510d7af79dc8b3331139))
+* validate incremental telemetry ([760dbd4](https://github.com/kubeshop/monokle/commit/760dbd459ac5013453113396eb893906831e8fb1))
+
 ## [2.3.0](https://github.com/kubeshop/monokle/compare/v2.2.1-nightly-2023-07-05.0...v2.3.0) (2023-07-05)
 
 ## [2.2.0](https://github.com/kubeshop/monokle/compare/v2.1.2-nightly-2023-06-07.0...v2.2.0) (2023-06-07)
