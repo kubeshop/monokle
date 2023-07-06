@@ -84,6 +84,7 @@ const StartPage: React.FC = () => {
   }, []);
 
   const openNewsFeedItem = (url: string) => {
+    trackEvent('app_start/select_news_item', {itemUrl: url});
     shell.openExternal(url);
   };
 
