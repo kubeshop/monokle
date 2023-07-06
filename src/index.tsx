@@ -6,6 +6,7 @@ import 'antd/dist/antd.less';
 
 import 'allotment/dist/style.css';
 import log from 'loglevel';
+import {machineIdSync} from 'node-machine-id';
 
 import '@redux/ipcRendererRedux';
 import store from '@redux/store';
@@ -21,7 +22,8 @@ import reportWebVitals from './reportWebVitals';
 
 declare global {
   interface Window {
-    debug_logs: Function;
+    debug_logs: (value: boolean) => void;
+    get_machine_id: () => string;
   }
 }
 
@@ -38,6 +40,11 @@ window.debug_logs = (value: boolean) => {
     log.disableAll();
     log.debug('Disabled all log levels');
   }
+};
+
+window.get_machine_id = () => {
+  const machineId = machineIdSync();
+  return machineId;
 };
 
 ignoreKnownErrors();
