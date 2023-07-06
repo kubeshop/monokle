@@ -243,11 +243,13 @@ const incrementalValidationListener: AppListenerFn = listen => {
       incrementalValidationStatus.abortController?.signal.addEventListener('abort', () => response.abort());
       await response;
 
-      trackEvent('validation/validate_incremental', {
-        actionType: _action.type,
-        resourcesCount: resourceIdentifiers.length,
-        executionTime: stopExecutionTimer(),
-      });
+      if (!isAnyOf(updateMultipleClusterResources)(_action)) {
+        trackEvent('validation/validate_incremental', {
+          actionType: _action.type,
+          resourcesCount: resourceIdentifiers.length,
+          executionTime: stopExecutionTimer(),
+        });
+      }
 
       incrementalValidationStatus.isRunning = false;
       incrementalValidationStatus.abortController = undefined;
