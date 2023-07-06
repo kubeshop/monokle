@@ -13,7 +13,7 @@ export const getSegmentClient = () => client;
 export const enableSegment = () => {
   if (process.env.SEGMENT_API_KEY && !client) {
     log.info('Enabled Segment');
-    client = new Analytics(process.env.SEGMENT_API_KEY, {flushAt: 1});
+    client = new Analytics(process.env.SEGMENT_API_KEY, {flushAt: 1, errorHandler: log.error});
   }
 };
 

@@ -18,6 +18,10 @@ export const dispatchToAllWindows = (action: AnyAction) => {
 };
 
 export const dispatchToWindow = (window: BrowserWindow, action: AnyAction) => {
+  if (!window || window.isDestroyed()) {
+    return;
+  }
+
   window.webContents.send('redux-dispatch', action);
 };
 

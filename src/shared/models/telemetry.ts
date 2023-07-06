@@ -52,6 +52,7 @@ export type EventMap = {
   };
   'app_start/select_page': {page: string};
   'app_start/select_project': undefined;
+  'app_start/select_news_item': {itemUrl: string};
   'project_list/open_project': undefined;
   'project_list/pin_project': undefined;
   'project_list/unpin_project': undefined;
