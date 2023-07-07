@@ -8,7 +8,7 @@ export const startKubectlProxyProcess = async (event: IpcMainEvent) => {
   killKubectlProxyProcess();
 
   try {
-    kubectlProxyProcess = spawn('kubectl', ['proxy', '--port=0'], {
+    kubectlProxyProcess = spawn('kubectl', ['proxy', '--port=0', '--append-server-path'], {
       env: {
         ...process.env,
       },
