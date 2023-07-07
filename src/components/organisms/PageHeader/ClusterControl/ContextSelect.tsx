@@ -18,6 +18,7 @@ import {ClusterSelectionTable} from '../ClusterSelectionTable';
 
 export function ContextSelect() {
   const kubeconfig = useAppSelector(selectKubeconfig);
+  const isInClusterMode = useAppSelector(isInClusterModeSelector);
 
   if (!kubeconfig?.isValid) {
     return <InvalidKubeconfigButton />;
@@ -40,7 +41,12 @@ export function ContextSelect() {
     >
       <div>
         <Trigger
-          icon={<Icon name="cluster-dashboard" style={{fontSize: '14px', marginTop: 4}} />}
+          icon={
+            <Icon
+              name={isInClusterMode ? 'cluster-connected' : 'cluster-dashboard'}
+              style={{fontSize: isInClusterMode ? '16px' : '14px', marginTop: isInClusterMode ? 0 : 4}}
+            />
+          }
           value={kubeconfig.currentContext}
         />
       </div>
