@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import {SettingOutlined} from '@ant-design/icons';
+import {CloseOutlined, SettingOutlined} from '@ant-design/icons';
 
 import {size} from 'lodash';
 
@@ -50,7 +50,7 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
       const problemsCount = useValidationSelector(state => size(problemsSelector(state)));
       return {count: problemsCount, size: 'small'};
     },
-    isVisible: () => Boolean(useAppSelector(activeProjectSelector)) || Boolean(useAppSelector(isInClusterModeSelector)),
+    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
   },
   {
     type: 'fullscreen',
@@ -59,6 +59,7 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     icon: () => <Icon name="helm" style={{fontSize: '18px', marginTop: 4}} />,
     component: <HelmRepoPane />,
     useBadge: () => undefined,
+    isVisible: () => Boolean(useAppSelector(isInClusterModeSelector)) === false,
   },
   {
     type: 'panel',
@@ -86,12 +87,50 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     useBadge: () => undefined,
   },
   {
+    type: 'panel',
+    name: 'cluster-validation',
+    tooltip: 'View validation errors',
+    icon: () => <Icon name="cluster-validation" style={{fontSize: '18px'}} />,
+    component: <ValidationPane />,
+    useBadge: () => {
+      const problemsCount = useValidationSelector(state => size(problemsSelector(state)));
+      return {count: problemsCount, size: 'small'};
+    },
+    isVisible: () => Boolean(useAppSelector(isInClusterModeSelector)),
+  },
+  {
+    type: 'panel',
+    name: 'helm-releases',
+    tooltip: 'View helm releases',
+    icon: () => <Icon name="cluster-helm" style={{fontSize: '18px', marginTop: 4}} />,
+    component: <DashboardPane />,
+    useBadge: () => undefined,
+    isVisible: () => Boolean(useAppSelector(isInClusterModeSelector)),
+  },
+  {
     type: 'fullscreen',
     name: 'settings',
     tooltip: <SettingsTooltip />,
-    icon: () => <SettingOutlined style={{fontSize: '16px', marginTop: 4}} />,
+    icon: () => {
+      const isClusterConnected = useAppSelector(isInClusterModeSelector);
+
+      return isClusterConnected ? (
+        <Icon name="cluster-settings" style={{fontSize: '18px', marginTop: 4}} />
+      ) : (
+        <SettingOutlined style={{fontSize: '16px', marginTop: 4}} />
+      );
+    },
     component: <SettingsPane />,
     useBadge: () => undefined,
+  },
+  {
+    type: 'fullscreen',
+    name: 'close',
+    tooltip: 'Close',
+    icon: () => <CloseOutlined style={{fontSize: '16px', marginTop: 4}} />,
+    component: <></>,
+    useBadge: () => undefined,
+    isVisible: () => useAppSelector(isInClusterModeSelector),
   },
 ];
 

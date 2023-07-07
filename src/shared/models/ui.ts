@@ -70,6 +70,9 @@ export const LeftMenuSelectionOptions = [
   'settings',
   'dashboard',
   'helm',
+  'helm-releases',
+  'cluster-validation',
+  'close',
 ] as const;
 type LeftMenuSelectionType = (typeof LeftMenuSelectionOptions)[number];
 
