@@ -40,7 +40,7 @@ export function ContextSelect() {
     >
       <div>
         <Trigger
-          icon={<Icon name="cluster-validation" style={{fontSize: '14px', marginTop: 4}} />}
+          icon={<Icon name="cluster-dashboard" style={{fontSize: '14px', marginTop: 4}} />}
           value={kubeconfig.currentContext}
         />
       </div>
