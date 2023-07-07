@@ -5,7 +5,6 @@ import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
-import {closeKubectlProxy} from '@shared/utils/commands/kubectl';
 
 export const stopClusterConnection = createAsyncThunk<void, undefined, {dispatch: AppDispatch; state: RootState}>(
   'main/stopClusterConnection',
@@ -13,6 +12,5 @@ export const stopClusterConnection = createAsyncThunk<void, undefined, {dispatch
     // Close connection
     dispatch(setClusterProxyPort(undefined));
     disconnectFromCluster();
-    closeKubectlProxy();
   }
 );

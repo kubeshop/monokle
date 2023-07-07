@@ -10,6 +10,7 @@ import {isDefined} from '@shared/utils/filter';
 import {trackEvent} from '@shared/utils/telemetry';
 
 let lastContext: string | undefined;
+let lastKubeletVersion: string | undefined;
 
 export const getClusterUtilization = async (kubeconfig: string, context: string): Promise<NodeMetric[]> => {
   const kc = await createKubeClientWithSetup({context, kubeconfig, skipHealthCheck: true});
@@ -20,9 +21,10 @@ export const getClusterUtilization = async (kubeconfig: string, context: string)
 
   const nodeMetrics: k8s.NodeMetric[] = (await metricClient.getNodeMetrics()).items;
   const nodes = await k8s.topNodes(k8sApiClient);
-  let kubeletVersion: string | undefined;
 
   if (lastContext !== context) {
+    lastContext = context;
+    let kubeletVersion: string | undefined;
     const providers = uniq(
       nodes
         .map(node => {
@@ -40,7 +42,10 @@ export const getClusterUtilization = async (kubeconfig: string, context: string)
         })
         .filter(isDefined)
     );
-    trackEvent('cluster/info', {providers, kubeletVersion});
+    if (lastKubeletVersion !== kubeletVersion) {
+      lastKubeletVersion = kubeletVersion;
+      trackEvent('cluster/info', {providers, kubeletVersion});
+    }
   }
 
   return nodeMetrics.map(m => ({

@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useDebounce} from 'react-use';
 
 import {Button, Checkbox, Form, Input, Select, Tooltip} from 'antd';
@@ -23,6 +23,7 @@ import {FileExplorer} from '@components/atoms';
 
 import {useFileExplorer} from '@hooks/useFileExplorer';
 
+import electronStore from '@shared/utils/electronStore';
 import {openUrlInExternalBrowser} from '@shared/utils/shell';
 
 import * as S from './GlobalSettings.styled';
@@ -34,6 +35,18 @@ export const GlobalSettings = () => {
   const fileExplorerSortOrder = useAppSelector(state => state.config.fileExplorerSortOrder);
   const loadLastProjectOnStartup = useAppSelector(state => state.config.loadLastProjectOnStartup);
   const projectsRootPath = useAppSelector(state => state.config.projectsRootPath);
+
+  const [shouldAppendServerPath, _setShouldAppendServerPath] = useState<boolean>(
+    electronStore.get('kubeConfig.proxyOptions.appendServerPath') ?? true
+  );
+
+  const setShouldAppendServerPath = useCallback(
+    (value: boolean) => {
+      _setShouldAppendServerPath(value);
+      electronStore.set('kubeConfig.proxyOptions.appendServerPath', value);
+    },
+    [_setShouldAppendServerPath]
+  );
 
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
@@ -131,12 +144,21 @@ export const GlobalSettings = () => {
           </Select>
         </S.Div>
 
-        <S.Span>On Startup</S.Span>
-        <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
-          <Checkbox checked={loadLastProjectOnStartup} onChange={handleChangeLoadLastFolderOnStartup}>
-            Automatically load last project
+        <S.Div>
+          <S.Span>On Startup</S.Span>
+          <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={AutoLoadLastProjectTooltip}>
+            <Checkbox checked={loadLastProjectOnStartup} onChange={handleChangeLoadLastFolderOnStartup}>
+              Automatically load last project
+            </Checkbox>
+          </Tooltip>
+        </S.Div>
+
+        <S.Div>
+          <S.Span>Cluster</S.Span>
+          <Checkbox checked={shouldAppendServerPath} onChange={e => setShouldAppendServerPath(e.target.checked)}>
+            Append Server Path to Kubectl Proxy
           </Checkbox>
-        </Tooltip>
+        </S.Div>
       </div>
 
       <div style={{width: '45%'}}>

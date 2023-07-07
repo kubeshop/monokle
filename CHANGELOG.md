@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.1](https://github.com/kubeshop/monokle/compare/v2.3.1-nightly-2023-07-07.0...v2.3.1) (2023-07-07)
+
+
+### Features
+
+* setting: kubectl proxy --append-server-path ([afda309](https://github.com/kubeshop/monokle/commit/afda309edb42392aef9fa6c507d73e2ddc97271f))
+
+
+### Bug Fixes
+
+* kubelet version telemetry ([542d862](https://github.com/kubeshop/monokle/commit/542d862782ced02ace937ccbca1997826ee411ae))
+* skip noisy errors from sentry ([7ee5e98](https://github.com/kubeshop/monokle/commit/7ee5e98f652047adb0aaa69aee03544d27160451))
+
 ## [2.3.0](https://github.com/kubeshop/monokle/compare/v2.3.1-nightly-2023-07-06.0...v2.3.0) (2023-07-06)
 
 

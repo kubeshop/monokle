@@ -264,6 +264,15 @@ export const electronStoreSchema = {
           type: 'string',
         },
       },
+      proxyOptions: {
+        type: 'object',
+        properties: {
+          appendServerPath: {
+            type: 'boolean',
+            default: true,
+          },
+        },
+      },
     },
   },
   terminal: {

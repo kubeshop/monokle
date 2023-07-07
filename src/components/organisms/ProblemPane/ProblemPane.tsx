@@ -3,7 +3,8 @@ import {useMeasure} from 'react-use';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {SelectItemImage} from '@atoms';
 
@@ -17,6 +18,7 @@ import {openUrlInExternalBrowser} from '@shared/utils';
 import * as S from './ProblemPane.styled';
 
 const ProblemPane: React.FC = () => {
+  const dispatch = useAppDispatch();
   const lastResponse = useAppSelector(state => state.validation.lastResponse);
   const selectedProblem = useAppSelector(state => state.validation.validationOverview.selectedProblem?.problem ?? null);
 
@@ -56,7 +58,12 @@ const ProblemPane: React.FC = () => {
 
       {selectedProblem && (
         <div ref={problemInfoRef}>
-          <ProblemInfo problem={selectedProblem} rule={rule} onHelpURLClick={url => openUrlInExternalBrowser(url)} />
+          <ProblemInfo
+            problem={selectedProblem}
+            rule={rule}
+            onHelpURLClick={url => openUrlInExternalBrowser(url)}
+            onSettingsClick={() => dispatch(setLeftMenuSelection('settings'))}
+          />
         </div>
       )}
     </S.ProblemPaneContainer>
