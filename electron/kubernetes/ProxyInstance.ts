@@ -3,6 +3,7 @@ import log from 'electron-log';
 import {ChildProcessWithoutNullStreams, spawn} from 'child_process';
 
 import type {ProxyLog} from '@shared/ipc';
+import electronStore from '@shared/utils/electronStore';
 
 import {Signal} from './signal';
 
@@ -55,6 +56,12 @@ export class ProxyInstance {
     if (this.verbosity) globalOptions.push(`-v=${this.verbosity}`);
 
     const proxyOptions = [`--port=${this.port}`];
+
+    const shouldAppendServerPath = electronStore.get('kubeConfig.proxyOptions.appendServerPath');
+    if (shouldAppendServerPath === undefined || shouldAppendServerPath === true) {
+      log.info('[kubectl-proxy]: Append Server Path enabled.');
+      proxyOptions.push('--append-server-path=true');
+    }
 
     const proxySignal = new Signal();
     this._cmd = ['kubectl', ...globalOptions, 'proxy', ...proxyOptions].join(' ');

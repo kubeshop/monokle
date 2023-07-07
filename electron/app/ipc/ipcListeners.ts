@@ -44,7 +44,6 @@ import {
   saveFileDialog,
   selectFileDialog,
 } from '../commands';
-import {killKubectlProxyProcess, startKubectlProxyProcess} from '../kubectl';
 import {ProjectNameChange, StorePropagation} from '../models';
 import '../services/cluster/ipc';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
@@ -274,14 +273,6 @@ ipcMain.handle('save-file', async (event: any, options: FileOptions) => {
 
 ipcMain.on('run-command', (event, args: CommandOptions) => {
   runCommand(args, event);
-});
-
-ipcMain.on('kubectl-proxy-open', event => {
-  startKubectlProxyProcess(event);
-});
-
-ipcMain.on('kubectl-proxy-close', () => {
-  killKubectlProxyProcess();
 });
 
 ipcMain.on('app-version', event => {
