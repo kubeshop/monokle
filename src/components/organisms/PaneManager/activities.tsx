@@ -29,7 +29,8 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     icon: () => <Icon name="document" style={{fontSize: '18px', marginTop: 4}} />,
     component: <ExplorerPane />,
     useBadge: () => undefined,
-    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
+    isVisible: () =>
+      Boolean(useAppSelector(activeProjectSelector)) && Boolean(useAppSelector(isInClusterModeSelector)) === false,
   },
   {
     type: 'fullscreen',
@@ -38,7 +39,8 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     icon: () => <Icon name="compare" style={{fontSize: '16px', marginTop: 4}} />,
     component: <CompareSyncPane />,
     useBadge: () => undefined,
-    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
+    isVisible: () =>
+      Boolean(useAppSelector(activeProjectSelector)) && Boolean(useAppSelector(isInClusterModeSelector)) === false,
   },
   {
     type: 'panel',
@@ -50,7 +52,8 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
       const problemsCount = useValidationSelector(state => size(problemsSelector(state)));
       return {count: problemsCount, size: 'small'};
     },
-    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
+    isVisible: () =>
+      Boolean(useAppSelector(activeProjectSelector)) && Boolean(useAppSelector(isInClusterModeSelector)) === false,
   },
   {
     type: 'fullscreen',
