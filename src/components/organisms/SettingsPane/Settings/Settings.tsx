@@ -422,18 +422,6 @@ export const Settings = ({
             }}
           />
         </S.Div>
-        {/* <S.Div>
-          <S.Span>Resource links processing</S.Span> */}
-
-        {/*
-            // TODO: revisit this after @monokle/validation is integrated
-          <Checkbox
-            checked={resourceRefsProcessingOptions.shouldIgnoreOptionalUnsatisfiedRefs}
-            onChange={setShouldIgnoreOptionalUnsatisfiedRefs}
-          >
-            Ignore optional unsatisfied links
-          </Checkbox> */}
-        {/* </S.Div> */}
         <S.Div>
           <S.Span>Form Editor</S.Span>
           <S.Div>
