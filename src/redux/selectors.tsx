@@ -192,3 +192,10 @@ export const projectFileTreeSelector = createSelector(
 export const helmChartsCountSelector = createSelector([(state: RootState) => state.main.helmChartMap], helmChartMap => {
   return size(helmChartMap);
 });
+
+export const kustomizationResourcesCountSelector = createSelector(
+  [kustomizationResourcesSelectors],
+  kustomizationResources => {
+    return size(kustomizationResources);
+  }
+);

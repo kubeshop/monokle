@@ -47,8 +47,6 @@ import {
 
 import {TabHeader} from '@atoms';
 
-import {MonacoPlaceholder} from '@components/molecules/MonacoPlaceholder/MonacoPlaceholder';
-
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
 import {useRefSelector, useSelectorWithRef} from '@utils/hooks';
@@ -67,6 +65,7 @@ import {openExternalResourceKindDocumentation} from '@shared/utils/shell';
 
 import * as S from './ActionsPane.styled';
 import ActionsPaneHeader from './ActionsPaneHeader';
+import {ProjectOverview} from './ProjectOverview';
 
 // TODO: we should also check if the selectedFile entry has only one resource and if so, to set the selectedResource to be that for this component
 const ActionsPane: React.FC = () => {
@@ -400,6 +399,14 @@ const ActionsPane: React.FC = () => {
     ]
   );
 
+  if (isFolderLoading) {
+    return <S.Skeleton active />;
+  }
+
+  if (!selection) {
+    return <ProjectOverview />;
+  }
+
   return (
     <S.ActionsPaneMainContainer ref={actionsPaneRef} id="EditorPane" $height={height - 21}>
       <ActionsPaneHeader
@@ -477,7 +484,7 @@ const ActionsPane: React.FC = () => {
           }
         />
       ) : (
-        !settings.hideEditorPlaceholder && (isFolderLoading ? <S.Skeleton active /> : <MonacoPlaceholder />)
+        !settings.hideEditorPlaceholder && (isFolderLoading ? <S.Skeleton active /> : <ProjectOverview />)
       )}
 
       {isApplyModalVisible && (
