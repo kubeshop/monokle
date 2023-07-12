@@ -143,7 +143,7 @@ const ProjectOverview = () => {
               <S.GreyText>
                 <S.Text onClick={() => dispatch(setExplorerSelectedSection('helm'))}>Check out Helm Charts </S.Text>
                 found on your files. You can dry-run them and
-                <S.Text> add new Helm Charts.</S.Text>
+                <S.Text onClick={() => dispatch(setLeftMenuSelection('helm'))}> add new Helm Charts.</S.Text>
               </S.GreyText>
             )}
           </S.CardContent>
