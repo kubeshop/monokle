@@ -21,7 +21,6 @@ export type HelmEnv = {
 };
 
 export type HelmInstallArgs = {
-  kubeContext: string;
   values: string;
   name: string;
   chart: string;
