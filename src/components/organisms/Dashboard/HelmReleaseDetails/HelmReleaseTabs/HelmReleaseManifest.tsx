@@ -5,9 +5,10 @@ import {Skeleton} from 'antd';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {getHelmReleaseManifestCommand} from '@utils/helm';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
-import {getHelmReleaseManifestCommand, runCommandInMainThread} from '@shared/utils/commands';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 const monacoOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   readOnly: true,

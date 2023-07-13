@@ -3,7 +3,9 @@ import {useAsyncFn} from 'react-use';
 
 import YAML from 'yaml';
 
-import {helmChartInfoCommand, runCommandInMainThread} from '@shared/utils/commands';
+import {helmChartInfoCommand} from '@utils/helm';
+
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 export const useGetHelmChartInfo = (helmChartName: string) => {
   const [state, fetchChart] = useAsyncFn(async (): Promise<HelmChartInfo> => {

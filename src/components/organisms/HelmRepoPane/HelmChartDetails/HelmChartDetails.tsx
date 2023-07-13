@@ -15,10 +15,12 @@ import {installHelmRepoChart} from '@redux/thunks/InstallHelmRepoChart';
 
 import {HelmChartModalConfirmWithNamespaceSelect} from '@components/molecules';
 
+import {searchHelmRepoCommand} from '@utils/helm';
+
 import {Icon} from '@monokle/components';
 import {HelmChartDetailsTab} from '@shared/models/ui';
 import {trackEvent} from '@shared/utils';
-import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 import HelmInfo from './HelmChartTabs/HelmInfo';
 import HelmTemplate from './HelmChartTabs/HelmTemplate';

@@ -3,11 +3,12 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {setAlert} from '@redux/reducers/alert';
 
 import {errorAlert, successAlert} from '@utils/alert';
+import {installHelmRepoChartCommand} from '@utils/helm';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
 import {kubeConfigPathSelector} from '@shared/utils';
-import {installHelmRepoChartCommand, runCommandInMainThread} from '@shared/utils/commands';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 export const installHelmRepoChart = createAsyncThunk<
   void,
