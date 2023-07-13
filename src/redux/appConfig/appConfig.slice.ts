@@ -388,9 +388,6 @@ export const configSlice = createSlice({
         log.warn("Couldn't initialize Sentry.");
       }
     },
-    setClusterProxyPort: (state: Draft<AppConfig>, action: PayloadAction<number | undefined>) => {
-      state.clusterProxyPort = action.payload;
-    },
     setUserApiKey: (state: Draft<AppConfig>, action: PayloadAction<{vendor: ApiKeyVendor; apiKey: string}>) => {
       state.userApiKeys[action.payload.vendor] = action.payload.apiKey;
       electronStore.set('appConfig.userApiKeys', state.userApiKeys);
@@ -455,7 +452,6 @@ export const {
   updateTelemetry,
   updateTextSize,
   updateTheme,
-  setClusterProxyPort,
   setUserApiKey,
 } = configSlice.actions;
 export default configSlice.reducer;
