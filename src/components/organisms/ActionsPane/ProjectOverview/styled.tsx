@@ -11,17 +11,23 @@ export const Container = styled.div`
   gap: 16px;
 `;
 
-export const Title = styled(Typography.Title)`
-  background-color: ${Colors.grey3b};
+export const Title = styled.div`
+  display: flex;
+  flex-direction: column;
   padding: 16px;
+  border-radius: 4px;
 
-  &.ant-typography {
-    font-size: 16px;
+  & .ant-typography {
+    font-size: 14px;
     font-style: normal;
-    font-weight: 700;
-    line-height: 22px;
-    color: ${Colors.whitePure};
+    font-weight: 400;
+    line-height: 22px !important;
     margin-bottom: 0;
+    text-align: center;
+  }
+
+  .weight-700 {
+    font-weight: 700 !important;
   }
 `;
 
@@ -42,6 +48,8 @@ export const Card = styled.div`
 export const CardTitle = styled(Typography.Title)`
   background-color: ${Colors.grey10};
   padding: 4px 12px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
 
   &.ant-typography {
     font-size: 14px;
@@ -59,6 +67,8 @@ export const CardContent = styled.div`
   padding: 24px;
   padding-bottom: 16px;
   height: 100%;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
 `;
 
 export const Text = styled(Typography.Text)`
@@ -70,6 +80,21 @@ export const Text = styled(Typography.Text)`
     font-weight: 400;
     line-height: 20px;
     color: ${Colors.grey9};
+  }
+
+  &.ant-typography:hover {
+    color: ${({onClick}) => (onClick ? Colors.whitePure : 'currentColor')};
+  }
+`;
+
+export const Link = styled(Typography.Link)`
+  cursor: ${({onClick}) => (onClick ? 'pointer' : 'default')};
+
+  &.ant-typography {
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
   }
 `;
 
@@ -97,8 +122,8 @@ export const CountChip = styled.span<{$type: 'error' | 'warning' | 'resource'}>`
   margin-bottom: 8px;
   justify-content: space-between;
   width: 100%;
-  height: ${props => (props.$type === 'resource' ? '90px' : '67px')};
-  padding: 8px 10px;
+  height: ${props => (props.$type === 'resource' ? '90px' : '56px')};
+  padding: 8px 20px;
   cursor: ${({onClick}) => (onClick ? 'pointer' : 'default')};
 
   white-space: nowrap;
@@ -146,6 +171,7 @@ export const Count = styled(Typography.Text)`
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+  cursor: ${({onClick}) => (onClick ? 'pointer' : 'default')};
 
   &.ant-typography {
     display: flex;

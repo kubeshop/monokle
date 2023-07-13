@@ -7,6 +7,7 @@ import {
   openNewAiResourceWizard,
   openNewResourceWizard,
   openTemplateExplorer,
+  setActiveSettingsPanel,
   setExplorerSelectedSection,
   setLeftMenuSelection,
 } from '@redux/reducers/ui';
@@ -20,6 +21,7 @@ import {setValidationFilters} from '@redux/validation/validation.slice';
 
 import {useRefSelector} from '@utils/hooks';
 
+import {SettingsPanel} from '@shared/models/config';
 import {openDocumentation} from '@shared/utils';
 
 import * as S from './styled';
@@ -38,6 +40,7 @@ const ProjectOverview = () => {
 
   const onClickValidationSettingsHandler = (e: MouseEvent<HTMLSpanElement>) => {
     e.stopPropagation();
+    dispatch(setActiveSettingsPanel(SettingsPanel.ValidationSettings));
     dispatch(setLeftMenuSelection('settings'));
   };
 
@@ -69,8 +72,42 @@ const ProjectOverview = () => {
 
   return (
     <S.Container>
-      <S.Title>Overview</S.Title>
+      <S.Title>
+        <S.Text>
+          ← Select a resource to the left to <S.Text className="weight-700">edit and fix</S.Text>
+        </S.Text>
+        <S.GreyText>
+          In the meantime, check out your <S.GreyText className="weight-700">project summary ↓</S.GreyText>
+        </S.GreyText>
+      </S.Title>
       <S.CardContainer>
+        <S.Card>
+          <S.CardTitle>Misconfigurations</S.CardTitle>
+          <S.CardContent>
+            <S.CountChip $type="error" onClick={onClickErrorsCountHandler}>
+              <div style={{display: 'flex'}}>
+                <S.Count>{errorsCount}</S.Count>
+                <S.SmallText style={{alignSelf: 'flex-end', marginLeft: 4}}>errors</S.SmallText>
+              </div>
+              <SettingOutlined onClick={onClickValidationSettingsHandler} />
+            </S.CountChip>
+
+            <S.CountChip $type="warning" onClick={onClickWarningsCountHandler}>
+              <div style={{display: 'flex'}}>
+                <S.Count>{warningsCount}</S.Count>
+                <S.SmallText style={{alignSelf: 'end', marginLeft: 4}}>warnings</S.SmallText>
+              </div>
+              <SettingOutlined onClick={onClickValidationSettingsHandler} />
+            </S.CountChip>
+
+            <S.GreyText>
+              Analyze and fix errors in the{' '}
+              <S.Text onClick={() => dispatch(setLeftMenuSelection('validation'))}>Validation Pane</S.Text>, configure
+              your policy in the <S.Text onClick={onClickValidationSettingsHandler}>Policy Configuration</S.Text>
+            </S.GreyText>
+          </S.CardContent>
+        </S.Card>
+
         <S.Card>
           <S.CardTitle>Files & Resources</S.CardTitle>
           <S.CardContent>
@@ -101,27 +138,6 @@ const ProjectOverview = () => {
             )}
           </S.CardContent>
         </S.Card>
-
-        <S.Card>
-          <S.CardTitle>Misconfigurations</S.CardTitle>
-          <S.CardContent>
-            <S.CountChip $type="error" onClick={onClickErrorsCountHandler}>
-              <div style={{display: 'flex'}}>
-                <S.Count>{errorsCount}</S.Count>
-                <S.SmallText style={{alignSelf: 'flex-end', marginLeft: 4}}>errors</S.SmallText>
-              </div>
-              <SettingOutlined onClick={onClickValidationSettingsHandler} />
-            </S.CountChip>
-
-            <S.CountChip $type="warning" onClick={onClickWarningsCountHandler}>
-              <div style={{display: 'flex'}}>
-                <S.Count>{warningsCount}</S.Count>
-                <S.SmallText style={{alignSelf: 'end', marginLeft: 4}}>warnings</S.SmallText>
-              </div>
-              <SettingOutlined onClick={onClickValidationSettingsHandler} />
-            </S.CountChip>
-          </S.CardContent>
-        </S.Card>
       </S.CardContainer>
 
       <S.CardContainer>
@@ -130,7 +146,7 @@ const ProjectOverview = () => {
           <S.CardContent>
             <S.CountChip $type="resource">
               <div>
-                <S.Count>{helmChartsCount}</S.Count>
+                <S.Count onClick={() => dispatch(setExplorerSelectedSection('helm'))}>{helmChartsCount}</S.Count>
                 <S.SmallText>Helm Charts</S.SmallText>
               </div>
             </S.CountChip>
@@ -153,10 +169,18 @@ const ProjectOverview = () => {
           <S.CardTitle>Kustomize</S.CardTitle>
           <S.CardContent>
             <S.CountChip $type="resource">
-              <div>
-                <S.Count>{kustomizationsResourcesCount}</S.Count>
-                <S.SmallText>Kustomize overlays</S.SmallText>
-              </div>
+              {kustomizationsResourcesCount === 0 ? (
+                <div>
+                  <S.SmallText>No Kustomize Overlays found</S.SmallText>
+                </div>
+              ) : (
+                <div>
+                  <S.Count onClick={() => dispatch(setExplorerSelectedSection('kustomize'))}>
+                    {kustomizationsResourcesCount}
+                  </S.Count>
+                  <S.SmallText>Kustomize overlays</S.SmallText>
+                </div>
+              )}
             </S.CountChip>
 
             <S.GreyText>
@@ -172,16 +196,16 @@ const ProjectOverview = () => {
       <S.CardContainer>
         <S.Card>
           <S.CardTitle>More actions</S.CardTitle>
-          <S.CardContent>
-            <S.Text onClick={onClickCompareHandler}>Compare to cluster</S.Text>
+          <S.CardContent style={{gap: 8}}>
+            <S.Link onClick={onClickCompareHandler}>Compare to cluster</S.Link>
 
-            <S.Text onClick={onClickNewAIResourceHandler}> New resource from AI</S.Text>
+            <S.Link onClick={onClickNewAIResourceHandler}> New resource from AI</S.Link>
 
-            <S.Text onClick={onClickNewResourcesTemplateHandler}> New resource from advanced template</S.Text>
+            <S.Link onClick={onClickNewResourcesTemplateHandler}> New resource from advanced template</S.Link>
 
-            <S.Text onClick={onClickNewResourceHandler}> New resource manually</S.Text>
+            <S.Link onClick={onClickNewResourceHandler}> New resource manually</S.Link>
 
-            <S.Text onClick={() => openDocumentation()}>Documentation</S.Text>
+            <S.Link onClick={() => openDocumentation()}>Documentation</S.Link>
           </S.CardContent>
         </S.Card>
       </S.CardContainer>
