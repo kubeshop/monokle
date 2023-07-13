@@ -1,16 +1,4 @@
-import store from '@redux/store';
-
-export function getKubeContext(): string | undefined {
-  return store.getState().main.clusterConnection?.context;
-}
-
-export function getClusterNamespace(): string | undefined {
-  return store.getState().main.clusterConnection?.namespace;
-}
-
-export function getClusterProxyPort(): number | undefined {
-  return store.getState().cluster.proxyPort;
-}
+import {getClusterProxyPort, getKubeContext} from '@redux/cluster/getters';
 
 export function getHelmClusterArgs(): string[] {
   const context = getKubeContext();
@@ -18,5 +6,5 @@ export function getHelmClusterArgs(): string[] {
 
   if (!context || !proxyPort) return [];
 
-  return ['--kube-context', context, '--kube-api-server', `http://127.0.0.1:${proxyPort}`];
+  return ['--kube-context', context, '--kube-apiserver', `http://127.0.0.1:${proxyPort}`];
 }
