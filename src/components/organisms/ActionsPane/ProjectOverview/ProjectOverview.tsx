@@ -22,7 +22,8 @@ import {setValidationFilters} from '@redux/validation/validation.slice';
 import {useRefSelector} from '@utils/hooks';
 
 import {SettingsPanel} from '@shared/models/config';
-import {openDocumentation} from '@shared/utils';
+import {ExplorerCollapsibleSectionsType} from '@shared/models/ui';
+import {openDocumentation, trackEvent} from '@shared/utils';
 
 import * as S from './styled';
 
@@ -42,32 +43,44 @@ const ProjectOverview = () => {
     e.stopPropagation();
     dispatch(setActiveSettingsPanel(SettingsPanel.ValidationSettings));
     dispatch(setLeftMenuSelection('settings'));
+    trackEvent('project_summary/select_validation_settings');
   };
 
-  const onClickErrorsCountHandler = () => {
-    dispatch(setValidationFilters({...currentFilters.current, type: 'error'}));
+  const onClickValidationHandler = (type?: 'warning' | 'error') => {
+    dispatch(setValidationFilters({...currentFilters.current, type}));
+
     dispatch(setLeftMenuSelection('validation'));
+    trackEvent('project_summary/select_validation', {type});
   };
 
-  const onClickWarningsCountHandler = () => {
-    dispatch(setValidationFilters({...currentFilters.current, type: 'warning'}));
-    dispatch(setLeftMenuSelection('validation'));
+  const onClickHelmRepoHandler = () => {
+    dispatch(setLeftMenuSelection('helm'));
+    trackEvent('project_summary/select_helm_repo');
   };
 
   const onClickCompareHandler = () => {
     dispatch(setLeftMenuSelection('compare'));
+    trackEvent('project_summary/select_compare');
   };
 
   const onClickNewAIResourceHandler = () => {
     dispatch(openNewAiResourceWizard());
+    trackEvent('project_summary/new_ai_resource');
   };
 
   const onClickNewResourcesTemplateHandler = () => {
     dispatch(openTemplateExplorer());
+    trackEvent('project_summary/new_template_resource');
   };
 
   const onClickNewResourceHandler = () => {
     dispatch(openNewResourceWizard());
+    trackEvent('project_summary/new_empty_resource');
+  };
+
+  const onChangeExplorerSelectionHandler = (key: ExplorerCollapsibleSectionsType) => {
+    dispatch(setExplorerSelectedSection(key));
+    trackEvent('project_summary/select_explorer_section', {section: key});
   };
 
   return (
@@ -84,16 +97,16 @@ const ProjectOverview = () => {
         <S.Card>
           <S.CardTitle>Misconfigurations</S.CardTitle>
           <S.CardContent>
-            <S.CountChip $type="error" onClick={onClickErrorsCountHandler}>
-              <div style={{display: 'flex'}}>
+            <S.CountChip $type="error" onClick={() => onClickValidationHandler('error')}>
+              <div style={{display: 'flex'}} className="clickable-text">
                 <S.Count>{errorsCount}</S.Count>
                 <S.SmallText style={{alignSelf: 'flex-end', marginLeft: 4}}>errors</S.SmallText>
               </div>
               <SettingOutlined onClick={onClickValidationSettingsHandler} />
             </S.CountChip>
 
-            <S.CountChip $type="warning" onClick={onClickWarningsCountHandler}>
-              <div style={{display: 'flex'}}>
+            <S.CountChip $type="warning" onClick={() => onClickValidationHandler('warning')}>
+              <div style={{display: 'flex'}} className="clickable-text">
                 <S.Count>{warningsCount}</S.Count>
                 <S.SmallText style={{alignSelf: 'end', marginLeft: 4}}>warnings</S.SmallText>
               </div>
@@ -101,9 +114,9 @@ const ProjectOverview = () => {
             </S.CountChip>
 
             <S.GreyText>
-              Analyze and fix errors in the{' '}
-              <S.Text onClick={() => dispatch(setLeftMenuSelection('validation'))}>Validation Pane</S.Text>, configure
-              your policy in the <S.Text onClick={onClickValidationSettingsHandler}>Policy Configuration</S.Text>
+              Analyze and fix errors in the <S.Text onClick={() => onClickValidationHandler()}>Validation Pane</S.Text>,
+              configure your policy in the{' '}
+              <S.Text onClick={onClickValidationSettingsHandler}>Policy Configuration</S.Text>
             </S.GreyText>
           </S.CardContent>
         </S.Card>
@@ -113,8 +126,8 @@ const ProjectOverview = () => {
           <S.CardContent>
             <S.CountChip $type="resource">
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', width: '100%'}}>
-                <div>
-                  <S.Count>{filesCount}</S.Count>
+                <div className="clickable-text">
+                  <S.Count onClick={() => onChangeExplorerSelectionHandler('files')}>{filesCount}</S.Count>
                   <S.SmallText style={{marginLeft: 4}}>Files</S.SmallText>
                 </div>
                 <S.ResourcesContainer $hasResources={Boolean(resourcesCount)}>
@@ -132,8 +145,8 @@ const ProjectOverview = () => {
               </S.GreyText>
             ) : (
               <S.GreyText>
-                <S.Text onClick={() => dispatch(setExplorerSelectedSection('files'))}>Check out files</S.Text> and
-                resources in the left to see relations, edit and fix errors.
+                <S.Text onClick={() => onChangeExplorerSelectionHandler('files')}>Check out files</S.Text> and resources
+                in the left to see relations, edit and fix errors.
               </S.GreyText>
             )}
           </S.CardContent>
@@ -145,21 +158,21 @@ const ProjectOverview = () => {
           <S.CardTitle>Helm</S.CardTitle>
           <S.CardContent>
             <S.CountChip $type="resource">
-              <div>
-                <S.Count onClick={() => dispatch(setExplorerSelectedSection('helm'))}>{helmChartsCount}</S.Count>
+              <div className="clickable-text">
+                <S.Count onClick={() => onChangeExplorerSelectionHandler('helm')}>{helmChartsCount}</S.Count>
                 <S.SmallText>Helm Charts</S.SmallText>
               </div>
             </S.CountChip>
 
             {helmChartsCount === 0 ? (
-              <S.Text onClick={() => dispatch(setLeftMenuSelection('helm'))}>
+              <S.Text onClick={() => onClickHelmRepoHandler()}>
                 Browse Helm Charts to download / install Add Helm repository
               </S.Text>
             ) : (
               <S.GreyText>
-                <S.Text onClick={() => dispatch(setExplorerSelectedSection('helm'))}>Check out Helm Charts </S.Text>
+                <S.Text onClick={() => onChangeExplorerSelectionHandler('helm')}>Check out Helm Charts </S.Text>
                 found on your files. You can dry-run them and
-                <S.Text onClick={() => dispatch(setLeftMenuSelection('helm'))}> add new Helm Charts.</S.Text>
+                <S.Text onClick={() => onClickHelmRepoHandler()}> add new Helm Charts.</S.Text>
               </S.GreyText>
             )}
           </S.CardContent>
@@ -174,8 +187,8 @@ const ProjectOverview = () => {
                   <S.SmallText>No Kustomize Overlays found</S.SmallText>
                 </div>
               ) : (
-                <div>
-                  <S.Count onClick={() => dispatch(setExplorerSelectedSection('kustomize'))}>
+                <div className="clickable-text">
+                  <S.Count onClick={() => onChangeExplorerSelectionHandler('kustomize')}>
                     {kustomizationsResourcesCount}
                   </S.Count>
                   <S.SmallText>Kustomize overlays</S.SmallText>
@@ -184,7 +197,7 @@ const ProjectOverview = () => {
             </S.CountChip>
 
             <S.GreyText>
-              <S.Text onClick={() => dispatch(setExplorerSelectedSection('kustomize'))}>
+              <S.Text onClick={() => onChangeExplorerSelectionHandler('kustomize')}>
                 Check out Kustimize overlays{' '}
               </S.Text>
               found on your files. You can dry-run them.

@@ -155,6 +155,15 @@ export const CountChip = styled.span<{$type: 'error' | 'warning' | 'resource'}>`
       (props.$type === 'error' && Colors.red7) ||
       (props.$type === 'resource' && Colors.geekblue7)};
   }
+
+  .clickable-text:hover {
+    & .ant-typography {
+      color: ${props =>
+        (props.$type === 'warning' && Colors.yellow10) ||
+        (props.$type === 'error' && Colors.volcano8) ||
+        (props.$type === 'resource' && Colors.geekblue9)};
+    }
+  }
 `;
 
 export const ResourcesContainer = styled.div<{$hasResources: boolean}>`
