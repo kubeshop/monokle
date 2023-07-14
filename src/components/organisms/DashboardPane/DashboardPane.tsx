@@ -1,5 +1,3 @@
-import {useEffect} from 'react';
-
 import {setDashboardActiveAccordion} from '@redux/dashboard';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
@@ -15,13 +13,6 @@ const accordionsKeys = ['cluster-resources', 'helm-releases', 'images'] as Dashb
 const DashboardPane = () => {
   const dispatch = useAppDispatch();
   const activeKey = useAppSelector(state => state.dashboard.ui.activeAccordion);
-  const leftMenuSelection = useAppSelector(state => state.ui.leftMenu.selection);
-
-  useEffect(() => {
-    if (leftMenuSelection === 'helm-releases') {
-      dispatch(setDashboardActiveAccordion('helm-releases'));
-    }
-  }, [dispatch, leftMenuSelection]);
 
   return (
     <S.Container>

@@ -70,7 +70,7 @@ export const LeftMenuSelectionOptions = [
   'settings',
   'dashboard',
   'helm',
-  'helm-releases',
+  'helm-in-cluster',
   'cluster-validation',
   'close',
 ] as const;
