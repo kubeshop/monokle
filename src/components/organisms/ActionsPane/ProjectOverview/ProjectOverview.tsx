@@ -126,10 +126,10 @@ const ProjectOverview = () => {
           <S.CardContent>
             <S.CountChip $type="resource">
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', width: '100%'}}>
-                <div className="clickable-text">
-                  <S.Count onClick={() => onChangeExplorerSelectionHandler('files')}>{filesCount}</S.Count>
+                <S.CountContainer className="clickable-text" onClick={() => onChangeExplorerSelectionHandler('files')}>
+                  <S.Count>{filesCount}</S.Count>
                   <S.SmallText style={{marginLeft: 4}}>Files</S.SmallText>
-                </div>
+                </S.CountContainer>
                 <S.ResourcesContainer $hasResources={Boolean(resourcesCount)}>
                   <S.Count>{resourcesCount}</S.Count>
                   <S.SmallText style={{marginLeft: 4}}>Resources</S.SmallText>
@@ -158,10 +158,10 @@ const ProjectOverview = () => {
           <S.CardTitle>Helm</S.CardTitle>
           <S.CardContent>
             <S.CountChip $type="resource">
-              <div className="clickable-text">
-                <S.Count onClick={() => onChangeExplorerSelectionHandler('helm')}>{helmChartsCount}</S.Count>
+              <S.CountContainer className="clickable-text" onClick={() => onChangeExplorerSelectionHandler('helm')}>
+                <S.Count>{helmChartsCount}</S.Count>
                 <S.SmallText>Helm Charts</S.SmallText>
-              </div>
+              </S.CountContainer>
             </S.CountChip>
 
             {helmChartsCount === 0 ? (
@@ -187,12 +187,13 @@ const ProjectOverview = () => {
                   <S.SmallText>No Kustomize Overlays found</S.SmallText>
                 </div>
               ) : (
-                <div className="clickable-text">
-                  <S.Count onClick={() => onChangeExplorerSelectionHandler('kustomize')}>
-                    {kustomizationsResourcesCount}
-                  </S.Count>
+                <S.CountContainer
+                  className="clickable-text"
+                  onClick={() => onChangeExplorerSelectionHandler('kustomize')}
+                >
+                  <S.Count>{kustomizationsResourcesCount}</S.Count>
                   <S.SmallText>Kustomize overlays</S.SmallText>
-                </div>
+                </S.CountContainer>
               )}
             </S.CountChip>
 

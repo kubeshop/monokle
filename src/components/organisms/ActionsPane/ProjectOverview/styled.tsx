@@ -172,6 +172,10 @@ export const ResourcesContainer = styled.div<{$hasResources: boolean}>`
   }
 `;
 
+export const CountContainer = styled.div`
+  cursor: ${onClick => (onClick ? 'pointer' : 'default')};
+`;
+
 export const Count = styled(Typography.Text)`
   display: flex;
   gap: 4px;
@@ -180,7 +184,6 @@ export const Count = styled(Typography.Text)`
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
-  cursor: ${({onClick}) => (onClick ? 'pointer' : 'default')};
 
   &.ant-typography {
     display: flex;
