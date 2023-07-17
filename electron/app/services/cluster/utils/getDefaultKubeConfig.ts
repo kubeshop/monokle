@@ -15,3 +15,8 @@ export function getDefaultKubeConfig() {
   const kubeConfigPath = path.join(home, `${path.sep}.kube${path.sep}config`);
   return kubeConfigPath;
 }
+
+export function getEnvKubeconfigs(): string[] {
+  const kubeconfig = getDefaultKubeConfig();
+  return kubeconfig.split(':');
+}

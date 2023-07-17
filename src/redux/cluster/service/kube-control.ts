@@ -13,6 +13,7 @@ import {runCommandInMainThread} from '@shared/utils/commands';
 export const setup = invokeIpc<SetupParams, SetupResult>('cluster:setup');
 export const debugProxy = invokeIpc<DebugProxyArgs, DebugProxyResponse>('cluster:debug-proxy');
 export const getKubeconfig = invokeIpc<{path: string | undefined}, ModernKubeConfig>('kubeconfig:get');
+export const getEnvKubeconfigs = invokeIpc<undefined, string[]>('kubeconfig:get:env');
 export const watchKubeconfig = invokeIpc<{kubeconfigs: string[]}, void>('kubeconfig:watch');
 export const stopWatchKubeconfig = invokeIpc<undefined, void>('kubeconfig:watch:stop');
 
