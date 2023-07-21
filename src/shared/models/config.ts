@@ -58,8 +58,6 @@ interface AppConfig {
     data: any;
   };
   kubeConfig: KubeConfig;
-  // TODO: clusterProxyPort should move to AppState.clusterConnectionOptions or clusterConnection
-  clusterProxyPort?: number;
   osPlatform: NodeJS.Platform;
   projects: Project[];
   selectedProjectRootFolder: string | null;

@@ -8,15 +8,11 @@ import {setAlert} from '@redux/reducers/alert';
 import {loadClusterHelmReleases} from '@redux/thunks/cluster/loadClusterHelmReleases';
 
 import {errorAlert, successAlert} from '@utils/alert';
+import {getHelmReleaseManifestCommand, uninstallHelmReleaseCommand, upgradeHelmReleaseCommand} from '@utils/helm';
 
 import {HelmReleaseTab} from '@shared/models/dashboard';
 import {trackEvent} from '@shared/utils';
-import {
-  getHelmReleaseManifestCommand,
-  runCommandInMainThread,
-  uninstallHelmReleaseCommand,
-  upgradeHelmReleaseCommand,
-} from '@shared/utils/commands';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 import HelmDryRunDiffModal from './HelmDryRunDiffModal';
 import {useHelmReleaseDiffContext} from './HelmReleaseContext';

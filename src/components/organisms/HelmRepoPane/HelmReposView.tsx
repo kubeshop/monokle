@@ -9,16 +9,11 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
 import {errorAlert, successAlert} from '@utils/alert';
+import {addHelmRepoCommand, listHelmRepoCommand, removeHelmRepoCommand, updateHelmRepoCommand} from '@utils/helm';
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {trackEvent} from '@shared/utils';
-import {
-  addHelmRepoCommand,
-  listHelmRepoCommand,
-  removeHelmRepoCommand,
-  runCommandInMainThread,
-  updateHelmRepoCommand,
-} from '@shared/utils/commands';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 import * as S from './styled';
 

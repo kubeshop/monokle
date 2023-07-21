@@ -7,10 +7,11 @@ import {selectFile} from '@redux/reducers/main';
 import {setExplorerSelectedSection, setIsInQuickClusterMode, setLeftMenuSelection} from '@redux/reducers/ui';
 
 import {errorAlert, successAlert} from '@utils/alert';
+import {helmPullChartCommand} from '@utils/helm';
 
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
-import {helmPullChartCommand, runCommandInMainThread} from '@shared/utils/commands';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 import {setCreateProject, setOpenProject} from './project';
 
