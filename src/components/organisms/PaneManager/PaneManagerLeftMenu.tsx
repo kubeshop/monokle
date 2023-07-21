@@ -3,6 +3,7 @@ import {useMemo} from 'react';
 import {activeProjectSelector} from '@redux/appConfig';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftBottomMenuSelection, setLeftMenuIsActive, setLeftMenuSelection} from '@redux/reducers/ui';
+import {stopClusterConnection} from '@redux/thunks/cluster';
 
 import {ActivityBar} from '@monokle/components';
 import {Colors} from '@shared/styles';
@@ -38,6 +39,11 @@ const PaneManagerLeftMenu: React.FC = () => {
 
         if (activityName === leftMenuSelection) {
           return;
+        }
+
+        if (activityName === 'close') {
+          dispatch(stopClusterConnection());
+          dispatch(setLeftMenuSelection('dashboard'));
         }
 
         dispatch(setLeftMenuSelection(activityName));

@@ -184,6 +184,14 @@ export type EventMap = {
   'validation/load_config': {actionType: string};
   'validation/validate_all': {actionType: string; resourcesCount: number; executionTime: number};
   'validation/validate_incremental': {actionType: string; resourcesCount: number; executionTime: number};
+  'project_summary/select_validation_settings': undefined;
+  'project_summary/select_validation': {type?: 'warning' | 'error'};
+  'project_summary/select_compare': undefined;
+  'project_summary/select_helm_repo': undefined;
+  'project_summary/new_template_resource': undefined;
+  'project_summary/new_empty_resource': undefined;
+  'project_summary/new_ai_resource': undefined;
+  'project_summary/select_explorer_section': {section: string};
 };
 
 export const APP_INSTALLED = 'APP_INSTALLED';
