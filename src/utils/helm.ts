@@ -1,4 +1,5 @@
 import {isEmpty} from 'lodash';
+import log from 'loglevel';
 import {dirname, join, sep} from 'path';
 import {v4 as uuid} from 'uuid';
 
@@ -53,132 +54,160 @@ export function buildHelmCommand(
 export function createHelmInstallCommand({values, name, chart}: HelmInstallArgs, env?: HelmEnv): CommandOptions {
   const clusterArgs = getHelmClusterArgs();
 
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['install', ...clusterArgs, '-f', `"${values}"`, chart, `"${name}"`, '--dry-run'],
     env,
   };
+  log.debug('createHelmInstallCommand', command);
+  return command;
 }
 
 export function createHelmTemplateCommand({values, name, chart}: HelmTemplateArgs, env?: HelmEnv): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['template', '-f', `"${values}"`, chart, `"${name}"`],
     env,
   };
+  log.debug('createHelmTemplateCommand', command);
+  return command;
 }
 
 export function listHelmRepoCommand(env?: HelmEnv): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['repo', 'list', '-o json'],
     env,
   };
+  log.debug('listHelmRepoCommand', command);
+  return command;
 }
 
 export function addHelmRepoCommand({name, url}: {name: string; url: string}, env?: HelmEnv): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['repo', 'add', name, url],
     env,
   };
+  log.debug('addHelmRepoCommand', command);
+  return command;
 }
 
 export function updateHelmRepoCommand({repos = []}: {repos?: string[]}, env?: HelmEnv): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['repo', 'update', ...repos],
     env,
   };
+  log.debug('updateHelmRepoCommand', command);
+  return command;
 }
 
 export function removeHelmRepoCommand({repos}: {repos: string[]}, env?: HelmEnv): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['repo', 'remove', ...repos],
     env,
   };
+  log.debug('removeHelmRepoCommand', command);
+  return command;
 }
 
 export function indexHelmRepoCommand({dir}: {dir: string}, env?: HelmEnv): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['repo', 'index', dir],
     env,
   };
+  log.debug('indexHelmRepoCommand', command);
+  return command;
 }
 
 export function searchHelmRepoCommand({q}: {q: string}, versions?: boolean, env?: HelmEnv): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['search', 'repo', q, versions ? '--versions' : '', '-o json'],
     env,
   };
+  log.debug('searchHelmRepoCommand', command);
+  return command;
 }
 
 export function searchHelmHubCommand({q}: {q: string}, env?: HelmEnv): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['search', 'hub', q, '-o json'],
     env,
   };
+  log.debug('searchHelmHubCommand', command);
+  return command;
 }
 
 export function helmChartInfoCommand({name}: {name: string}, env?: HelmEnv): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['show', 'chart', name],
     env,
   };
+  log.debug('helmChartInfoCommand', command);
+  return command;
 }
 
 export function helmChartReadmeCommand({name}: {name: string}, env?: HelmEnv): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['show', 'readme', name],
     env,
   };
+  log.debug('helmChartReadmeCommand', command);
+  return command;
 }
 
 export function helmChartTemplateCommand({name}: {name: string}, env?: HelmEnv): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['template', name],
     env,
   };
+  log.debug('helmChartTemplateCommand', command);
+  return command;
 }
 
 export function helmChartValuesCommand({name}: {name: string}, env?: HelmEnv): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['show', 'values', name],
     env,
   };
+  log.debug('helmChartValuesCommand', command);
+  return command;
 }
 
 export function helmPullChartCommand(
   {name, path, version}: {name: string; path: string; version?: string},
   env?: HelmEnv
 ): CommandOptions {
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['pull', name, '--untar', '--untardir', path, version ? `--version ${version}` : ''],
     env,
   };
+  log.debug('helmPullChartCommand', command);
+  return command;
 }
 
 export function installHelmRepoChartCommand(
@@ -191,7 +220,7 @@ export function installHelmRepoChartCommand(
   env?: HelmEnv
 ): CommandOptions {
   const clusterArgs = getHelmClusterArgs();
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: [
@@ -205,6 +234,8 @@ export function installHelmRepoChartCommand(
     ],
     env,
   };
+  log.debug('installHelmRepoChartCommand', command);
+  return command;
 }
 
 export function listHelmReleasesCommand(
@@ -212,7 +243,7 @@ export function listHelmReleasesCommand(
   env?: HelmEnv
 ): CommandOptions {
   const clusterArgs = getHelmClusterArgs();
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: [
@@ -224,6 +255,8 @@ export function listHelmReleasesCommand(
     ],
     env,
   };
+  log.debug('listHelmReleasesCommand', command);
+  return command;
 }
 
 export function helmReleaseRevisionsCommand(
@@ -231,12 +264,14 @@ export function helmReleaseRevisionsCommand(
   env?: HelmEnv
 ): CommandOptions {
   const clusterArgs = getHelmClusterArgs();
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['history', release, ...clusterArgs, '-n', namespace, '-o json'],
     env,
   };
+  log.debug('helmReleaseRevisionsCommand', command);
+  return command;
 }
 
 export function upgradeHelmReleaseCommand(
@@ -250,7 +285,7 @@ export function upgradeHelmReleaseCommand(
   env?: HelmEnv
 ): CommandOptions {
   const clusterArgs = getHelmClusterArgs();
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: [
@@ -265,6 +300,8 @@ export function upgradeHelmReleaseCommand(
     ],
     env,
   };
+  log.debug('upgradeHelmReleaseCommand', command);
+  return command;
 }
 
 export function uninstallHelmReleaseCommand(
@@ -272,12 +309,14 @@ export function uninstallHelmReleaseCommand(
   env?: HelmEnv
 ): CommandOptions {
   const clusterArgs = getHelmClusterArgs();
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['uninstall', release, dryRun ? '--dry-run' : '', ...clusterArgs, '-n', namespace],
     env,
   };
+  log.debug('uninstallHelmReleaseCommand', command);
+  return command;
 }
 
 export function getHelmReleaseManifestCommand(
@@ -285,12 +324,14 @@ export function getHelmReleaseManifestCommand(
   env?: HelmEnv
 ): CommandOptions {
   const clusterArgs = getHelmClusterArgs();
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['get', 'manifest', release, revision > -1 ? `--revision ${revision}` : '', ...clusterArgs, '-n', namespace],
     env,
   };
+  log.debug('getHelmReleaseManifestCommand', command);
+  return command;
 }
 
 export function getHelmReleaseValuesCommand(
@@ -298,12 +339,14 @@ export function getHelmReleaseValuesCommand(
   env?: HelmEnv
 ): CommandOptions {
   const clusterArgs = getHelmClusterArgs();
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['get', 'values', release, ...clusterArgs, '-n', namespace],
     env,
   };
+  log.debug('getHelmReleaseValuesCommand', command);
+  return command;
 }
 
 export function getHelmReleaseNotesCommand(
@@ -311,12 +354,14 @@ export function getHelmReleaseNotesCommand(
   env?: HelmEnv
 ): CommandOptions {
   const clusterArgs = getHelmClusterArgs();
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['get', 'notes', release, ...clusterArgs, '-n', namespace],
     env,
   };
+  log.debug('getHelmReleaseNotesCommand', command);
+  return command;
 }
 
 export function getHelmReleaseHooksCommand(
@@ -324,22 +369,26 @@ export function getHelmReleaseHooksCommand(
   env?: HelmEnv
 ): CommandOptions {
   const clusterArgs = getHelmClusterArgs();
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['get', 'hooks', release, ...clusterArgs, '-n', namespace],
     env,
   };
+  log.debug('getHelmReleaseHooksCommand', command);
+  return command;
 }
 export function rollbackHelmReleaseCommand(
   {release, namespace, revision}: {release: string; namespace: string; revision: number},
   env?: HelmEnv
 ): CommandOptions {
   const clusterArgs = getHelmClusterArgs();
-  return {
+  const command = {
     commandId: uuid(),
     cmd: 'helm',
     args: ['rollback', release, revision.toString(), ...clusterArgs, '-n', namespace],
     env,
   };
+  log.debug('rollbackHelmReleaseCommand', command);
+  return command;
 }
