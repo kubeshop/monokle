@@ -199,7 +199,7 @@ const HelmChartsTable = () => {
           })}
         />
       </div>
-      {leftMenuSelection === 'helm' && selectedChart && <HelmChartDetails />}
+      {['helm', 'helm-in-cluster'].includes(leftMenuSelection) && selectedChart && <HelmChartDetails />}
     </>
   );
 };

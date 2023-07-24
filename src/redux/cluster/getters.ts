@@ -2,8 +2,17 @@
 // Due to circular dependencies, we can't import the store into the utils/helm file to get the context and proxy port.
 // Thus, we rely on the clusterArgsChanged listener to update these getters when the cluster args change.
 
+let kubeconfigPath: string | undefined;
 let context: string | undefined;
 let proxyPort: number | undefined;
+
+export function getKubeConfigPath(): string | undefined {
+  return kubeconfigPath;
+}
+
+export function setKubeConfigPath(newKubeconfigPath: string | undefined) {
+  kubeconfigPath = newKubeconfigPath;
+}
 
 export function getKubeContext(): string | undefined {
   return context;
