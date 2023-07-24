@@ -3,6 +3,7 @@ import {Select, Tooltip} from 'antd';
 import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
+import {ValidationLevelSelectTooltip} from '@constants/tooltips';
 
 import {ProblemIcon} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
@@ -19,10 +20,7 @@ const ValidationLevelSelect: React.FC<IProps> = props => {
   const {rule, disabled, handleChange} = props;
 
   return (
-    <Tooltip
-      mouseEnterDelay={TOOLTIP_DELAY}
-      title="Select how you want the violation of this rule to be highlighted in your code."
-    >
+    <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ValidationLevelSelectTooltip}>
       <Select
         size="small"
         disabled={disabled}

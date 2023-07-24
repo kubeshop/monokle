@@ -1,6 +1,8 @@
 import {useAsync} from 'react-use';
 
-import {helmChartReadmeCommand, runCommandInMainThread} from '@shared/utils/commands';
+import {helmChartReadmeCommand} from '@utils/helm';
+
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 export const useGetHelmChartChangelog = (chartName: string) => {
   const state = useAsync(async () => {

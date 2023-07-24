@@ -3,9 +3,10 @@ import {useAsync} from 'react-use';
 
 import {Skeleton} from 'antd';
 
+import {helmChartTemplateCommand} from '@utils/helm';
 import {KUBESHOP_MONACO_THEME} from '@utils/monaco';
 
-import {helmChartTemplateCommand, runCommandInMainThread} from '@shared/utils/commands';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 interface IProps {
   chartName: string;

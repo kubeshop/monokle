@@ -28,3 +28,5 @@ export async function debugProxy({context, kubeconfig}: DebugProxyArgs): Promise
     };
   }
 }
+
+export const getProxyPort = (context: string) => PROXY_SERVICE.find(context)?.port;

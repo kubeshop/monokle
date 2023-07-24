@@ -8,8 +8,10 @@ import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
 
+import {getHelmReleaseNotesCommand} from '@utils/helm';
+
 import {openUrlInExternalBrowser} from '@shared/utils';
-import {getHelmReleaseNotesCommand, runCommandInMainThread} from '@shared/utils/commands';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 const HelmReleaseNotes = () => {
   const selectedHelmRelease = useAppSelector(state => state.dashboard.helm.selectedHelmRelease);

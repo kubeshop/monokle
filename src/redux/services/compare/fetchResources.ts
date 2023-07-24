@@ -12,7 +12,7 @@ import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {getCommitResources} from '@redux/git/git.ipc';
 import {runKustomize} from '@redux/thunks/preview';
 
-import {buildHelmCommand} from '@utils/helm';
+import {buildHelmCommand, createHelmInstallCommand, createHelmTemplateCommand} from '@utils/helm';
 
 import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -31,12 +31,7 @@ import {
 import {K8sResource} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {selectKubeconfig} from '@shared/utils/cluster/selectors';
-import {
-  createHelmInstallCommand,
-  createHelmTemplateCommand,
-  hasCommandFailed,
-  runCommandInMainThread,
-} from '@shared/utils/commands';
+import {hasCommandFailed, runCommandInMainThread} from '@shared/utils/commands';
 import {isDefined} from '@shared/utils/filter';
 
 import getClusterObjects from '../getClusterObjects';
@@ -191,7 +186,6 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
 
       command = createHelmInstallCommand(
         {
-          kubeContext: currentContext,
           values: path.join(folder, valuesFile.name),
           name: folder,
           chart: chart.name,

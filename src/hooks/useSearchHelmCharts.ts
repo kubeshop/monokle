@@ -1,8 +1,10 @@
 import {useMemo} from 'react';
 import {useAsync} from 'react-use';
 
+import {searchHelmHubCommand, searchHelmRepoCommand} from '@utils/helm';
+
 import {ChartInfo} from '@shared/models/ui';
-import {runCommandInMainThread, searchHelmHubCommand, searchHelmRepoCommand} from '@shared/utils/commands';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 export const useSearchHelmCharts = (helmRepoSearch: string, includeHubSearch: boolean) => {
   const {

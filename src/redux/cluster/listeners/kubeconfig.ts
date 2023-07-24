@@ -20,7 +20,7 @@ import {setOpenProject} from '@redux/thunks/project';
 import {KubeConfig, ModernKubeConfig} from '@shared/models/config';
 
 import {selectKubeconfigPaths} from '../selectors';
-import {stopWatchKubeconfig, watchKubeconfig} from '../service/kube-control';
+import {getEnvKubeconfigs, stopWatchKubeconfig, watchKubeconfig} from '../service/kube-control';
 import {kubeconfigPathsUpdated, kubeconfigUpdated} from '../slice';
 
 export const startWatchingKubeconfig = createAction('cluster/startKubeConfigWatch');
@@ -32,7 +32,8 @@ export const kubeConfigListener: AppListenerFn = listen => {
     effect: async (_, {getState, dispatch, condition, unsubscribe, subscribe}) => {
       unsubscribe();
 
-      const kubeconfigs = selectKubeconfigPaths(getState());
+      const ENV_KUBECONFIGS = await getEnvKubeconfigs();
+      const kubeconfigs = [...ENV_KUBECONFIGS, ...selectKubeconfigPaths(getState())];
 
       const listener = (_event: any, config: ModernKubeConfig | undefined) => {
         const oldConfig = config ? getState().cluster.kubeconfigs[config.path] : undefined;
@@ -123,7 +124,8 @@ export const kubeconfigPathUpdateListener: AppListenerFn = listen => {
         return;
       }
 
-      const kubeconfigs = selectKubeconfigPaths(getState());
+      const ENV_KUBECONFIG = await getEnvKubeconfigs();
+      const kubeconfigs = [...ENV_KUBECONFIG, ...selectKubeconfigPaths(getState())];
       dispatch(kubeconfigPathsUpdated({kubeconfigs}));
       await watchKubeconfig({kubeconfigs});
     },

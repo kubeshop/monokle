@@ -29,7 +29,6 @@ export const validationSlice = createSlice({
       const config = state.config;
       const pluginName = payload.plugin;
 
-      // @ts-ignore
       const pluginMetadata = pluginMetadataSelector(state, pluginName);
       const pluginRules = pluginRulesSelector(state, payload.plugin);
 
@@ -100,7 +99,6 @@ export const validationSlice = createSlice({
       const config = state.config;
       const pluginName = payload.plugin;
 
-      // @ts-ignore
       const pluginMetadata = pluginMetadataSelector(state, pluginName);
       const pluginRules = pluginRulesSelector(state, payload.plugin);
 
@@ -119,14 +117,12 @@ export const validationSlice = createSlice({
         if (enable) {
           pluginRules.forEach(rule => {
             const ruleName = `${pluginMetadata.name}/${rule.name}`;
-            // @ts-ignore
-            config.rules[ruleName] = true;
+            if (config.rules) config.rules[ruleName] = true;
           });
         } else {
           pluginRules.forEach(rule => {
             const ruleName = `${pluginMetadata.name}/${rule.name}`;
-            // @ts-ignore
-            config.rules[ruleName] = false;
+            if (config.rules) config.rules[ruleName] = false;
           });
         }
       } else {
@@ -215,7 +211,6 @@ export const validationSlice = createSlice({
 
     builder.addCase(validateResources.fulfilled, (state, action) => {
       if (action.payload) {
-        // @ts-ignore
         state.lastResponse = action.payload;
       }
       state.status = 'loaded';

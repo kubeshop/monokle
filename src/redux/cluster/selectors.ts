@@ -26,8 +26,19 @@ export const selectKubeconfigPaths = (state: RootState): string[] => {
   const configsFromClusterSlice = state.cluster.configPaths;
   const globalConfig = state.config.kubeConfig.path;
   const projectConfig = state.config.projectConfig?.kubeConfig?.path;
-  const allConfigs = [...configsFromClusterSlice, globalConfig, projectConfig].filter(isDefined);
-  return uniq(allConfigs);
+  let allConfigs = [...configsFromClusterSlice, globalConfig, projectConfig].filter(isDefined);
+  allConfigs = uniq(
+    allConfigs
+      .map(config => {
+        // KUBECONFIG ENV VAR can contain multiple paths separated by ':'
+        if (config.includes(':')) {
+          return config.split(':');
+        }
+        return config;
+      })
+      .flat()
+  );
+  return allConfigs;
 };
 
 export const selectCurrentContextId = createSelector(

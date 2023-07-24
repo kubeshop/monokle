@@ -21,6 +21,10 @@ export class ProxyService {
     return this.start(context, kubeconfig);
   }
 
+  find(context: string) {
+    return this.proxies.find(p => p.context === context);
+  }
+
   private async start(context: string, kubeconfig?: string): Promise<ProxyInstance> {
     let attempt = 0;
     // eslint-disable-next-line no-constant-condition

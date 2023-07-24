@@ -17,12 +17,13 @@ import {
 
 import {sortChartsByName, useSearchHelmCharts} from '@hooks/useSearchHelmCharts';
 
+import {addHelmRepoCommand} from '@utils/helm';
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {Icon} from '@monokle/components';
 import {ChartInfo} from '@shared/models/ui';
 import {openUrlInExternalBrowser, trackEvent} from '@shared/utils';
-import {addHelmRepoCommand, runCommandInMainThread} from '@shared/utils/commands';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 import HelmChartDetails from './HelmChartDetails';
 
@@ -198,7 +199,7 @@ const HelmChartsTable = () => {
           })}
         />
       </div>
-      {leftMenuSelection === 'helm' && selectedChart && <HelmChartDetails />}
+      {['helm', 'helm-in-cluster'].includes(leftMenuSelection) && selectedChart && <HelmChartDetails />}
     </>
   );
 };

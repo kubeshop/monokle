@@ -24,6 +24,12 @@ import {uiSlice} from './reducers/ui';
 import {validationListeners} from './validation/validation.listeners';
 import {validationSlice} from './validation/validation.slice';
 
+declare global {
+  interface Window {
+    debug_state: Function;
+  }
+}
+
 const middlewares: Middleware[] = [];
 
 if (process.env.NODE_ENV === `development`) {
@@ -86,5 +92,10 @@ const store = configureStore({
       .prepend(listenerMiddleware.middleware)
       .concat(middlewares),
 });
+
+window.debug_state = () => {
+  // eslint-disable-next-line no-console
+  console.log(store.getState());
+};
 
 export default store;

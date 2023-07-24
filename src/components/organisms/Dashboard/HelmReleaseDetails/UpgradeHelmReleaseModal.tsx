@@ -7,7 +7,9 @@ import {useAppSelector} from '@redux/hooks';
 
 import {useSearchHelmCharts} from '@hooks/useSearchHelmCharts';
 
-import {runCommandInMainThread, searchHelmRepoCommand} from '@shared/utils/commands';
+import {searchHelmRepoCommand} from '@utils/helm';
+
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 interface IProps {
   onClose: () => void;

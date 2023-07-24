@@ -10,17 +10,13 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setAlert} from '@redux/reducers/alert';
 
 import {errorAlert, successAlert} from '@utils/alert';
+import {getHelmReleaseManifestCommand, helmReleaseRevisionsCommand, rollbackHelmReleaseCommand} from '@utils/helm';
 import {useMainPaneDimensions} from '@utils/hooks';
 
 import {HelmRelease} from '@shared/models/ui';
 import {Colors} from '@shared/styles';
 import {trackEvent} from '@shared/utils';
-import {
-  getHelmReleaseManifestCommand,
-  helmReleaseRevisionsCommand,
-  rollbackHelmReleaseCommand,
-  runCommandInMainThread,
-} from '@shared/utils/commands';
+import {runCommandInMainThread} from '@shared/utils/commands';
 
 import {useHelmReleaseDiffContext} from '../HelmReleaseContext';
 

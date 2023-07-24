@@ -4,8 +4,7 @@ name: monokle-sign-notarize-publish-test
 on:
   push:
     branches:
-      # Add your branch name here
-      - erdikose/test/test
+      - build/test
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -32,6 +31,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
       - name: Checkout Project
         uses: actions/checkout@v2
+        with:
+          ref: build/test
 
       # Check memory and cpu
       - name: Verify Runner Resources

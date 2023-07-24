@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.2](https://github.com/kubeshop/monokle/compare/v2.3.2-nightly-2023-07-24.0...v2.3.2) (2023-07-24)
+
+
+### Bug Fixes
+
+* helm details drawer in cluster mode ([52fa48a](https://github.com/kubeshop/monokle/commit/52fa48ab3117038a2514e1d99f15539c6d0fa339))
+* set kubeconfig arg on all helm commands ([fbbcfeb](https://github.com/kubeshop/monokle/commit/fbbcfeb5e06eeb801db73c620033a2844f9fd3e9))
+
 ### [2.3.1](https://github.com/kubeshop/monokle/compare/v2.3.1-nightly-2023-07-07.0...v2.3.1) (2023-07-07)
 
 

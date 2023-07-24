@@ -125,7 +125,7 @@ export const runPreviewConfiguration = createAsyncThunk<
     commandId: uuid(),
     cmd: 'helm',
     args: args.splice(1),
-    env: {KUBECONFIG: kubeconfig},
+    env: {KUBECONFIG: kubeconfig.path},
   };
 
   const result = await runCommandInMainThread(commandOptions);
