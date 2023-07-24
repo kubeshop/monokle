@@ -7,7 +7,7 @@ export function getHelmClusterArgs(): string[] {
 
   if (!kubeconfigPath || !context || !proxyPort) return [];
 
-  return [
+  const args = [
     '--kubeconfig',
     kubeconfigPath,
     '--kube-context',
@@ -15,4 +15,5 @@ export function getHelmClusterArgs(): string[] {
     '--kube-apiserver',
     `http://127.0.0.1:${proxyPort}`,
   ];
+  return args;
 }
