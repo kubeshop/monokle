@@ -94,7 +94,10 @@ export const compareSlice = createSlice({
       state.current[side] = undefined;
     },
     comparisonInspecting: (state: Draft<CompareState>, action: PayloadAction<ComparisonInspection>) => {
-      trackEvent('compare/inspected', {type: state.current.inspect?.type});
+      const currentComparison = state.current.comparison?.comparisons.find(c => c.id === action.payload.comparison);
+      const resourceApiVersion = currentComparison?.left?.apiVersion ?? currentComparison?.right?.apiVersion;
+      const resourceKind = currentComparison?.left?.kind ?? currentComparison?.right?.kind;
+      trackEvent('compare/inspected', {type: action.payload.type, resourceApiVersion, resourceKind});
       state.current.inspect = action.payload;
     },
     comparisonInspected: state => {
