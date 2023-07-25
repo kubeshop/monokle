@@ -127,7 +127,7 @@ export type EventMap = {
   'cluster/info': {kubeletVersion?: string; providers: string[]};
   'compare/opened': {from?: string};
   'compare/compared': {left?: string; right?: string; operation: string};
-  'compare/inspected': {type?: string};
+  'compare/inspected': {type?: string; resourceApiVersion?: string; resourceKind?: string};
   'compare/transfered': {from?: string; to?: string; count: number};
   'git/branch_checkout': undefined;
   'git/commit': undefined;
