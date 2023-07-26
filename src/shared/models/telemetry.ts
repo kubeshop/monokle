@@ -99,7 +99,7 @@ export type EventMap = {
   'preview/helm/start': undefined;
   'preview/helm/fail': {reason: string};
   'preview/helm/end': {resourcesCount?: number; executionTime: number};
-  'preview/helm_config/start': undefined;
+  'preview/helm_config/start': {isInstall: boolean};
   'preview/helm_config/fail': {reason: string};
   'preview/helm_config/end': {resourcesCount?: number; executionTime: number};
   'preview/kustomize/start': undefined;
@@ -115,6 +115,9 @@ export type EventMap = {
   'helm/command/start': {command: string[]};
   'helm/command/fail': {reason: string};
   'helm/command/end': undefined;
+  'helm/config/install/start': undefined;
+  'helm/config/install/end': undefined;
+  'helm/config/install/fail': {reason: string};
   'cluster/diff_resource': undefined;
   'cluster/deploy_resource': {kind: string};
   'cluster/deploy_file': undefined;

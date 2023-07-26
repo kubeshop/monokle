@@ -5,12 +5,14 @@ import {sortBy} from 'lodash';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
+import {setAlert} from '@redux/reducers/alert';
 import {extractK8sResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {buildHelmCommand} from '@utils/helm';
+import {buildHelmConfigCommand} from '@utils/helm';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {CommandOptions} from '@shared/models/commands';
 import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
@@ -26,16 +28,20 @@ import {trackEvent} from '@shared/utils/telemetry';
  */
 
 export const runPreviewConfiguration = createAsyncThunk<
+  | {
+      resources: K8sResource<'preview'>[];
+      preview: HelmConfigPreview;
+    }
+  | undefined,
   {
-    resources: K8sResource<'preview'>[];
-    preview: HelmConfigPreview;
+    helmConfigId: string;
+    performDeploy?: boolean;
   },
-  string,
   {
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/runPreviewConfiguration', async (previewConfigurationId, thunkAPI) => {
+>('main/runPreviewConfiguration', async ({helmConfigId, performDeploy}, thunkAPI) => {
   const startTime = new Date().getTime();
   const configState = thunkAPI.getState().config;
   const mainState = thunkAPI.getState().main;
@@ -45,23 +51,22 @@ export const runPreviewConfiguration = createAsyncThunk<
   if (!kubeconfig?.isValid) {
     return createRejectionWithAlert(
       thunkAPI,
-      'Dry-run Configuration Error',
+      'Helm Configuration Error',
       `Could not preview due to invalid kubeconfig`
     );
   }
 
-  const currentContext = kubeconfig.currentContext;
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
 
   let previewConfiguration: HelmPreviewConfiguration | null | undefined;
   if (previewConfigurationMap) {
-    previewConfiguration = previewConfigurationMap[previewConfigurationId];
+    previewConfiguration = previewConfigurationMap[helmConfigId];
   }
   if (!previewConfiguration) {
     return createRejectionWithAlert(
       thunkAPI,
-      'Dry-run Configuration Error',
-      `Could not find the Dry-run Configuration with id ${previewConfigurationId}`
+      'Helm Configuration Error',
+      `Could not find the Helm Configuration with id ${helmConfigId}`
     );
   }
 
@@ -110,15 +115,15 @@ export const runPreviewConfiguration = createAsyncThunk<
     );
   }
 
-  trackEvent('preview/helm_config/start');
+  trackEvent('preview/helm_config/start', {isInstall: Boolean(performDeploy)});
 
-  const args = buildHelmCommand(
+  const args = buildHelmConfigCommand(
     chart,
     orderedValuesFilePaths,
     previewConfiguration.command,
     previewConfiguration.options,
     rootFolderPath,
-    currentContext
+    performDeploy
   );
 
   const commandOptions: CommandOptions = {
@@ -136,6 +141,19 @@ export const runPreviewConfiguration = createAsyncThunk<
   }
 
   const endTime = new Date().getTime();
+  trackEvent('preview/helm_config/end', {executionTime: endTime - startTime});
+
+  if (performDeploy) {
+    thunkAPI.dispatch(
+      setAlert({
+        type: AlertEnum.Success,
+        title: 'Installed Helm Chart',
+        message: `Successfully installed the ${chart.name} Helm Chart using the ${previewConfiguration.name} configuration!`,
+      })
+    );
+    // If we are performing a deploy, we don't want to return any resources or preview
+    return;
+  }
 
   if (result.stdout) {
     const preview: HelmConfigPreview = {type: 'helm-config', configId: previewConfiguration.id};
@@ -151,8 +169,6 @@ export const runPreviewConfiguration = createAsyncThunk<
       preview,
     };
   }
-
-  trackEvent('preview/helm_config/end', {executionTime: endTime - startTime});
 
   return createRejectionWithAlert(
     thunkAPI,

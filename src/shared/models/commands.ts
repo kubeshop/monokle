@@ -24,6 +24,7 @@ export type HelmInstallArgs = {
   values: string;
   name: string;
   chart: string;
+  dryRun?: boolean;
 };
 
 export type HelmTemplateArgs = {
