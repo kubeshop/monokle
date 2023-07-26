@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.3](https://github.com/kubeshop/monokle/compare/v2.3.3-nightly-2023-07-26.0...v2.3.3) (2023-07-26)
+
+
+### Features
+
+* install action for helm configurations ([c4e081a](https://github.com/kubeshop/monokle/commit/c4e081aaa738d2300190b4a81f694ab5c14c3354))
+
+
+### Bug Fixes
+
+* clear selection when closing cluster mode ([8c45eb8](https://github.com/kubeshop/monokle/commit/8c45eb8d1c59315f083a0f6e13cd46d52330c140))
+* helm dry-run configs styling ([dbdb1cc](https://github.com/kubeshop/monokle/commit/dbdb1cca0f652288e4db0089fce319d878e83f28))
+* left menu in cluster mode ([c82c6ca](https://github.com/kubeshop/monokle/commit/c82c6ca31a44d8773efbdf382d4a9419754bc6a9))
+* news feed date label ([9a2415a](https://github.com/kubeshop/monokle/commit/9a2415a8bfeb55a806ec90e18d71d721ff56970b))
+
 ### [2.3.2](https://github.com/kubeshop/monokle/compare/v2.3.2-nightly-2023-07-24.0...v2.3.2) (2023-07-24)
 
 

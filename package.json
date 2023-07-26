@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "author": "Kubeshop",
   "description": "UI for managing k8s manifests",
   "homepage": "./",
