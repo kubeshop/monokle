@@ -8,7 +8,7 @@ import {v4 as uuid} from 'uuid';
 import {extractK8sResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
-import {buildHelmCommand} from '@utils/helm';
+import {buildHelmConfigCommand} from '@utils/helm';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppDispatch} from '@shared/models/appDispatch';
@@ -50,7 +50,6 @@ export const runPreviewConfiguration = createAsyncThunk<
     );
   }
 
-  const currentContext = kubeconfig.currentContext;
   const rootFolderPath = mainState.fileMap[ROOT_FILE_ENTRY].filePath;
 
   let previewConfiguration: HelmPreviewConfiguration | null | undefined;
@@ -112,13 +111,12 @@ export const runPreviewConfiguration = createAsyncThunk<
 
   trackEvent('preview/helm_config/start');
 
-  const args = buildHelmCommand(
+  const args = buildHelmConfigCommand(
     chart,
     orderedValuesFilePaths,
     previewConfiguration.command,
     previewConfiguration.options,
-    rootFolderPath,
-    currentContext
+    rootFolderPath
   );
 
   const commandOptions: CommandOptions = {
