@@ -114,7 +114,12 @@ export const previewExtraReducers = createSliceExtraReducers('main', builder => 
     .addCase(previewHelmValuesFile.rejected, onPreviewRejected);
 
   builder
-    .addCase(runPreviewConfiguration.pending, onPreviewPending)
+    .addCase(runPreviewConfiguration.pending, (state, action) => {
+      if (action.meta.arg.performDeploy) {
+        return;
+      }
+      onPreviewPending(state);
+    })
     .addCase(runPreviewConfiguration.fulfilled, (state, action) => {
       if (!action.payload) {
         return;

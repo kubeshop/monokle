@@ -5,12 +5,14 @@ import {sortBy} from 'lodash';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 
+import {setAlert} from '@redux/reducers/alert';
 import {extractK8sResources} from '@redux/services/resource';
 import {createRejectionWithAlert} from '@redux/thunks/utils';
 
 import {buildHelmConfigCommand} from '@utils/helm';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {CommandOptions} from '@shared/models/commands';
 import {HelmPreviewConfiguration, PreviewConfigValuesFileItem} from '@shared/models/config';
@@ -49,7 +51,7 @@ export const runPreviewConfiguration = createAsyncThunk<
   if (!kubeconfig?.isValid) {
     return createRejectionWithAlert(
       thunkAPI,
-      'Dry-run Configuration Error',
+      'Helm Configuration Error',
       `Could not preview due to invalid kubeconfig`
     );
   }
@@ -63,8 +65,8 @@ export const runPreviewConfiguration = createAsyncThunk<
   if (!previewConfiguration) {
     return createRejectionWithAlert(
       thunkAPI,
-      'Dry-run Configuration Error',
-      `Could not find the Dry-run Configuration with id ${helmConfigId}`
+      'Helm Configuration Error',
+      `Could not find the Helm Configuration with id ${helmConfigId}`
     );
   }
 
@@ -113,7 +115,7 @@ export const runPreviewConfiguration = createAsyncThunk<
     );
   }
 
-  trackEvent('preview/helm_config/start');
+  trackEvent('preview/helm_config/start', {isInstall: Boolean(performDeploy)});
 
   const args = buildHelmConfigCommand(
     chart,
@@ -142,6 +144,13 @@ export const runPreviewConfiguration = createAsyncThunk<
   trackEvent('preview/helm_config/end', {executionTime: endTime - startTime});
 
   if (performDeploy) {
+    thunkAPI.dispatch(
+      setAlert({
+        type: AlertEnum.Success,
+        title: 'Installed Helm Chart',
+        message: `Successfully installed the ${chart.name} Helm Chart using the ${previewConfiguration.name} configuration!`,
+      })
+    );
     // If we are performing a deploy, we don't want to return any resources or preview
     return;
   }

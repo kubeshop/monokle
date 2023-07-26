@@ -99,7 +99,7 @@ export type EventMap = {
   'preview/helm/start': undefined;
   'preview/helm/fail': {reason: string};
   'preview/helm/end': {resourcesCount?: number; executionTime: number};
-  'preview/helm_config/start': undefined;
+  'preview/helm_config/start': {isInstall: boolean};
   'preview/helm_config/fail': {reason: string};
   'preview/helm_config/end': {resourcesCount?: number; executionTime: number};
   'preview/kustomize/start': undefined;

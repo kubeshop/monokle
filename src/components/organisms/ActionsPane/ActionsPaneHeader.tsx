@@ -77,7 +77,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   const onClickInstallPreviewConfiguration = useCallback(() => {
     Modal.confirm({
       title: 'Install Helm Chart',
-      content: `Are you sure you want to install the **${selectedHelmConfig?.name}** configuration to the cluster?`,
+      content: `Are you sure you want to install the ${selectedHelmConfig?.name} configuration to the cluster?`,
       onOk: () => {
         if (!selectedHelmConfig) {
           return;
