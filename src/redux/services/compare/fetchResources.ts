@@ -12,7 +12,7 @@ import {createKubeClientWithSetup} from '@redux/cluster/service/kube-client';
 import {getCommitResources} from '@redux/git/git.ipc';
 import {runKustomize} from '@redux/thunks/preview';
 
-import {buildHelmCommand, createHelmInstallCommand, createHelmTemplateCommand} from '@utils/helm';
+import {buildHelmConfigCommand, createHelmInstallCommand, createHelmTemplateCommand} from '@utils/helm';
 
 import {ERROR_MSG_FALLBACK} from '@shared/constants/constants';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -189,6 +189,7 @@ async function previewHelmResources(state: RootState, options: HelmResourceSet):
           values: path.join(folder, valuesFile.name),
           name: folder,
           chart: chart.name,
+          dryRun: true,
         },
         {
           KUBECONFIG: kubeconfig.path,
@@ -255,13 +256,12 @@ async function previewCustomHelmResources(
 
     checkAllFilesExist(orderedValuesFilePaths, rootFolder);
 
-    const args = buildHelmCommand(
+    const args = buildHelmConfigCommand(
       chart,
       orderedValuesFilePaths,
       helmConfig.command,
       helmConfig.options,
-      rootFolder,
-      currentContext
+      rootFolder
     );
 
     const command: CommandOptions = {

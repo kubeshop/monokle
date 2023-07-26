@@ -8,15 +8,16 @@ import {getHelmClusterArgs} from '@utils/cluster';
 import {CommandOptions, HelmEnv, HelmInstallArgs, HelmTemplateArgs} from '@shared/models/commands';
 import {HelmChart} from '@shared/models/helm';
 
-export function buildHelmCommand(
+export function buildHelmConfigCommand(
   helmChart: HelmChart,
   valuesFilePaths: string[],
-  command: 'template' | 'install',
+  helmCommand: 'template' | 'install',
   options: Record<string, string | null>,
   rootFolderPath: string,
-  clusterContext?: string
+  performDeploy?: boolean
 ): string[] {
   let chartFolderPath = join(rootFolderPath, dirname(helmChart.filePath));
+  let command = performDeploy ? 'install' : helmCommand;
 
   if (chartFolderPath.endsWith(sep)) {
     chartFolderPath = chartFolderPath.slice(0, -1);
@@ -38,10 +39,7 @@ export function buildHelmCommand(
     );
   }
 
-  if (command === 'install') {
-    if (clusterContext) {
-      args.splice(1, 0, ...['--kube-context', clusterContext]);
-    }
+  if (!performDeploy && command === 'install') {
     args.push('--dry-run');
   }
 
@@ -51,15 +49,21 @@ export function buildHelmCommand(
   return args;
 }
 
-export function createHelmInstallCommand({values, name, chart}: HelmInstallArgs, env?: HelmEnv): CommandOptions {
+export function createHelmInstallCommand(
+  {values, name, chart, dryRun}: HelmInstallArgs,
+  env?: HelmEnv
+): CommandOptions {
   const clusterArgs = getHelmClusterArgs();
 
   const command = {
     commandId: uuid(),
     cmd: 'helm',
-    args: ['install', ...clusterArgs, '-f', `"${values}"`, chart, `"${name}"`, '--dry-run'],
+    args: ['install', ...clusterArgs, '-f', `"${values}"`, chart, `"${name}"`],
     env,
   };
+  if (dryRun) {
+    command.args.push('--dry-run');
+  }
   log.debug('createHelmInstallCommand', command);
   return command;
 }

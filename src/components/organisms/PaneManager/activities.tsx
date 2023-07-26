@@ -29,8 +29,7 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     icon: () => <Icon name="document" style={{fontSize: '18px', marginTop: 4}} />,
     component: <ExplorerPane />,
     useBadge: () => undefined,
-    isVisible: () =>
-      Boolean(useAppSelector(activeProjectSelector)) && Boolean(useAppSelector(isInClusterModeSelector)) === false,
+    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
   },
   {
     type: 'fullscreen',
@@ -39,30 +38,39 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     icon: () => <Icon name="compare" style={{fontSize: '16px', marginTop: 4}} />,
     component: <CompareSyncPane />,
     useBadge: () => undefined,
-    isVisible: () =>
-      Boolean(useAppSelector(activeProjectSelector)) && Boolean(useAppSelector(isInClusterModeSelector)) === false,
+    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
   },
   {
     type: 'panel',
     name: 'validation',
     tooltip: 'View validation errors',
-    icon: () => <Icon name="validation" style={{fontSize: '18px'}} />,
+    icon: () =>
+      useAppSelector(isInClusterModeSelector) ? (
+        <Icon name="cluster-validation" style={{fontSize: '18px'}} />
+      ) : (
+        <Icon name="validation" style={{fontSize: '18px'}} />
+      ),
     component: <ValidationPane />,
     useBadge: () => {
       const problemsCount = useValidationSelector(state => size(problemsSelector(state)));
       return {count: problemsCount, size: 'small'};
     },
-    isVisible: () =>
-      Boolean(useAppSelector(activeProjectSelector)) && Boolean(useAppSelector(isInClusterModeSelector)) === false,
+    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
   },
   {
     type: 'fullscreen',
     name: 'helm',
     tooltip: 'Helm',
-    icon: () => <Icon name="helm" style={{fontSize: '18px', marginTop: 4}} />,
+    icon: () => {
+      const isInClusterMode = useAppSelector(isInClusterModeSelector);
+      const activeProject = useAppSelector(activeProjectSelector);
+      if (isInClusterMode || !activeProject) {
+        return <Icon name="cluster-helm" style={{fontSize: '18px', marginTop: 4}} />;
+      }
+      return <Icon name="helm" style={{fontSize: '18px', marginTop: 4}} />;
+    },
     component: <HelmRepoPane />,
     useBadge: () => undefined,
-    isVisible: () => Boolean(useAppSelector(isInClusterModeSelector)) === false,
   },
   {
     type: 'panel',
@@ -88,27 +96,6 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     icon: () => <Icon name="cluster-dashboard" style={{fontSize: '18px', marginTop: 4}} />,
     component: <DashboardPane />,
     useBadge: () => undefined,
-  },
-  {
-    type: 'panel',
-    name: 'cluster-validation',
-    tooltip: 'View validation errors',
-    icon: () => <Icon name="cluster-validation" style={{fontSize: '18px'}} />,
-    component: <ValidationPane />,
-    useBadge: () => {
-      const problemsCount = useValidationSelector(state => size(problemsSelector(state)));
-      return {count: problemsCount, size: 'small'};
-    },
-    isVisible: () => Boolean(useAppSelector(isInClusterModeSelector)),
-  },
-  {
-    type: 'fullscreen',
-    name: 'helm-in-cluster',
-    tooltip: 'View helm browser',
-    icon: () => <Icon name="cluster-helm" style={{fontSize: '18px', marginTop: 4}} />,
-    component: <HelmRepoPane />,
-    useBadge: () => undefined,
-    isVisible: () => Boolean(useAppSelector(isInClusterModeSelector)),
   },
   {
     type: 'fullscreen',

@@ -140,6 +140,14 @@ const validateListener: AppListenerFn = listen => {
       await delay(1);
       if (signal.aborted) return;
 
+      if (isAnyOf(runPreviewConfiguration.fulfilled, runPreviewConfiguration.rejected)(_action)) {
+        // if runPreviewConfiguration was used to perform a deploy and not a preview
+        // then, we don't have to revalidate
+        if (_action.meta.arg.performDeploy) {
+          return;
+        }
+      }
+
       let resourceStorage: ResourceStorage | undefined;
 
       if (isAnyOf(loadClusterResources.fulfilled, reloadClusterResources.fulfilled)(_action)) {

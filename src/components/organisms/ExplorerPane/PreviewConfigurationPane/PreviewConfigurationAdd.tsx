@@ -16,7 +16,8 @@ const PreviewConfigurationAdd: React.FC = () => {
   return (
     <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NewPreviewConfigurationTooltip}>
       <AddButton
-        type="link"
+        type="primary"
+        ghost
         size="small"
         icon={<PlusOutlined />}
         onClick={() => {

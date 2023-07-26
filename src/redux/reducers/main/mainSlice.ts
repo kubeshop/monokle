@@ -418,6 +418,7 @@ export const mainSlice = createSlice({
 
     builder.addCase(stopClusterConnection.fulfilled, state => {
       resetSelectionHistory(state);
+      clearSelectionReducer(state);
       state.clusterConnectionOptions.isLoading = false;
       state.clusterConnection = undefined;
     });

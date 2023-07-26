@@ -69,5 +69,8 @@ export default memo(PreviewConfigurationPane);
 
 const PreviewConfigurationTopContainer = styled.div`
   width: 100%;
-  padding: 2px 14px 16px 16px;
+  /* padding: 4px 14px 16px 16px; */
+  margin-top: -6px;
+  padding-left: 20px;
+  padding-bottom: 12px;
 `;

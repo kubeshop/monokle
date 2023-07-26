@@ -156,7 +156,7 @@ const PaneManager: React.FC = () => {
                       ? currentActivity?.component
                       : undefined
                   }
-                  center={currentActivity?.name === 'explorer' ? <NavigatorPane /> : undefined}
+                  middle={currentActivity?.name === 'explorer' ? <NavigatorPane /> : undefined}
                   right={
                     currentActivity?.name === 'git' ? (
                       <GitOpsView />

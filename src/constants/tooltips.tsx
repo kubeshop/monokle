@@ -63,6 +63,7 @@ export const ProjectManagementTooltip = 'Select and manage your projects';
 export const ReloadHelmPreviewTooltip = 'Reload the Helm Chart preview with this values file';
 export const ReloadKustomizationPreviewTooltip = 'Reload the preview of this Kustomization';
 export const RunPreviewConfigurationTooltip = 'Run this Dry-run Configuration';
+export const InstallPreviewConfigurationTooltip = 'Install this Dry-run Configuration to the cluster.';
 export const SaveTransientResourceTooltip = 'Save resource to file/folder';
 export const SearchProjectTooltip = 'Search for project by name or path';
 export const TelemetryDocumentationUrl = 'https://kubeshop.github.io/monokle/telemetry';

@@ -503,7 +503,10 @@ export const uiSlice = createSlice({
       .addCase(previewSavedCommand.fulfilled, state => {
         state.navigator.collapsedResourceKinds = [];
       })
-      .addCase(runPreviewConfiguration.fulfilled, state => {
+      .addCase(runPreviewConfiguration.fulfilled, (state, action) => {
+        if (action.meta.arg.performDeploy) {
+          return;
+        }
         state.navigator.collapsedResourceKinds = [];
       });
   },

@@ -167,7 +167,7 @@ const StartPage: React.FC = () => {
                 >
                   <S.NewsFeedItemTime>
                     {Math.floor((new Date().getTime() - new Date(item.date).getTime()) / (1000 * 60 * 60 * 24))}
-                    {' days'}
+                    {' days ago'}
                   </S.NewsFeedItemTime>
                   <S.NewsFeedItemTitle>{item.title}</S.NewsFeedItemTitle>
                 </S.NewsFeeditem>

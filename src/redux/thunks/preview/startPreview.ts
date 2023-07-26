@@ -22,7 +22,7 @@ export const startPreview = createAsyncThunk<void, AnyPreview, {dispatch: AppDis
       thunkAPI.dispatch(previewHelmValuesFile(preview.valuesFileId));
     }
     if (preview.type === 'helm-config') {
-      thunkAPI.dispatch(runPreviewConfiguration(preview.configId));
+      thunkAPI.dispatch(runPreviewConfiguration({helmConfigId: preview.configId}));
     }
     if (preview.type === 'command') {
       thunkAPI.dispatch(previewSavedCommand(preview.commandId));

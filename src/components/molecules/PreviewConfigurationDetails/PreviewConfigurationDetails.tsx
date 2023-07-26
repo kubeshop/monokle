@@ -4,10 +4,9 @@ import {Breadcrumb, Typography} from 'antd';
 
 import {sortBy} from 'lodash';
 
-import {kubeConfigContextSelector} from '@redux/appConfig';
 import {useAppSelector} from '@redux/hooks';
 
-import {buildHelmCommand} from '@utils/helm';
+import {buildHelmConfigCommand} from '@utils/helm';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {PreviewConfigValuesFileItem} from '@shared/models/config';
@@ -17,7 +16,6 @@ import * as S from './PreviewConfigurationDetails.styled';
 const {Text} = Typography;
 
 const PreviwConfigurationDetails: React.FC = () => {
-  const currentContext = useAppSelector(kubeConfigContextSelector);
   const previewConfigurationMap = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap);
   const rootFolderPath = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY].filePath);
   const selectedPreviewConfigurationId = useAppSelector(state =>
@@ -59,15 +57,14 @@ const PreviwConfigurationDetails: React.FC = () => {
       return [''];
     }
 
-    return buildHelmCommand(
+    return buildHelmConfigCommand(
       helmChart,
       orderedValuesFilePaths,
       previewConfiguration.command,
       previewConfiguration.options,
-      rootFolderPath,
-      currentContext
+      rootFolderPath
     );
-  }, [previewConfiguration, helmChart, currentContext, rootFolderPath, orderedValuesFilePaths]);
+  }, [previewConfiguration, helmChart, rootFolderPath, orderedValuesFilePaths]);
 
   if (!previewConfiguration || !helmChart) {
     return (
