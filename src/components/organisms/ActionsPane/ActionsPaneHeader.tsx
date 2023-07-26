@@ -1,12 +1,13 @@
 import {useCallback, useMemo} from 'react';
 
-import {Button, Dropdown, Tooltip} from 'antd';
+import {Button, Dropdown, Modal, Tooltip} from 'antd';
 
 import {LeftOutlined, RightOutlined} from '@ant-design/icons';
 
 import {PANE_CONSTRAINT_VALUES, TOOLTIP_DELAY} from '@constants/constants';
 import {
   EditPreviewConfigurationTooltip,
+  InstallPreviewConfigurationTooltip,
   RunPreviewConfigurationTooltip,
   SaveTransientResourceTooltip,
 } from '@constants/tooltips';
@@ -16,6 +17,7 @@ import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 import {openSaveResourcesToFileFolderModal} from '@redux/reducers/ui';
 import {selectedHelmConfigSelector, selectedImageSelector} from '@redux/selectors';
 import {startPreview} from '@redux/thunks/preview';
+import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {selectFromHistory} from '@redux/thunks/selectFromHistory';
 
 import {TitleBarWrapper} from '@components/atoms';
@@ -72,6 +74,19 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
     dispatch(startPreview({type: 'helm-config', configId: selectedHelmConfig.id}));
   }, [dispatch, selectedHelmConfig]);
 
+  const onClickInstallPreviewConfiguration = useCallback(() => {
+    Modal.confirm({
+      title: 'Install Helm Chart',
+      content: `Are you sure you want to install the **${selectedHelmConfig?.name}** configuration to the cluster?`,
+      onOk: () => {
+        if (!selectedHelmConfig) {
+          return;
+        }
+        dispatch(runPreviewConfiguration({helmConfigId: selectedHelmConfig.id, performDeploy: true}));
+      },
+    });
+  }, [dispatch, selectedHelmConfig]);
+
   const onClickLeftArrow = useCallback(() => {
     dispatch(selectFromHistory('left'));
   }, [dispatch]);
@@ -125,9 +140,18 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
           type="secondary"
           actions={
             <div style={{display: 'flex', justifyContent: 'flex-end', gap: '10px'}}>
+              <Tooltip
+                mouseEnterDelay={TOOLTIP_DELAY}
+                title={InstallPreviewConfigurationTooltip}
+                placement="bottomLeft"
+              >
+                <Button type="primary" size="small" ghost onClick={onClickInstallPreviewConfiguration}>
+                  Install
+                </Button>
+              </Tooltip>
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={RunPreviewConfigurationTooltip} placement="bottomLeft">
                 <Button type="primary" size="small" ghost onClick={onClickRunPreviewConfiguration}>
-                  Preview
+                  Dry-run
                 </Button>
               </Tooltip>
               <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={EditPreviewConfigurationTooltip} placement="bottomLeft">

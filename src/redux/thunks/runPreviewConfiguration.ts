@@ -26,16 +26,20 @@ import {trackEvent} from '@shared/utils/telemetry';
  */
 
 export const runPreviewConfiguration = createAsyncThunk<
+  | {
+      resources: K8sResource<'preview'>[];
+      preview: HelmConfigPreview;
+    }
+  | undefined,
   {
-    resources: K8sResource<'preview'>[];
-    preview: HelmConfigPreview;
+    helmConfigId: string;
+    performDeploy?: boolean;
   },
-  string,
   {
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/runPreviewConfiguration', async (previewConfigurationId, thunkAPI) => {
+>('main/runPreviewConfiguration', async ({helmConfigId, performDeploy}, thunkAPI) => {
   const startTime = new Date().getTime();
   const configState = thunkAPI.getState().config;
   const mainState = thunkAPI.getState().main;
@@ -54,13 +58,13 @@ export const runPreviewConfiguration = createAsyncThunk<
 
   let previewConfiguration: HelmPreviewConfiguration | null | undefined;
   if (previewConfigurationMap) {
-    previewConfiguration = previewConfigurationMap[previewConfigurationId];
+    previewConfiguration = previewConfigurationMap[helmConfigId];
   }
   if (!previewConfiguration) {
     return createRejectionWithAlert(
       thunkAPI,
       'Dry-run Configuration Error',
-      `Could not find the Dry-run Configuration with id ${previewConfigurationId}`
+      `Could not find the Dry-run Configuration with id ${helmConfigId}`
     );
   }
 
@@ -116,7 +120,8 @@ export const runPreviewConfiguration = createAsyncThunk<
     orderedValuesFilePaths,
     previewConfiguration.command,
     previewConfiguration.options,
-    rootFolderPath
+    rootFolderPath,
+    performDeploy
   );
 
   const commandOptions: CommandOptions = {
@@ -134,6 +139,12 @@ export const runPreviewConfiguration = createAsyncThunk<
   }
 
   const endTime = new Date().getTime();
+  trackEvent('preview/helm_config/end', {executionTime: endTime - startTime});
+
+  if (performDeploy) {
+    // If we are performing a deploy, we don't want to return any resources or preview
+    return;
+  }
 
   if (result.stdout) {
     const preview: HelmConfigPreview = {type: 'helm-config', configId: previewConfiguration.id};
@@ -149,8 +160,6 @@ export const runPreviewConfiguration = createAsyncThunk<
       preview,
     };
   }
-
-  trackEvent('preview/helm_config/end', {executionTime: endTime - startTime});
 
   return createRejectionWithAlert(
     thunkAPI,

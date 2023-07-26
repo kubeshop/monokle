@@ -116,6 +116,9 @@ export const previewExtraReducers = createSliceExtraReducers('main', builder => 
   builder
     .addCase(runPreviewConfiguration.pending, onPreviewPending)
     .addCase(runPreviewConfiguration.fulfilled, (state, action) => {
+      if (!action.payload) {
+        return;
+      }
       const initialSelection: PreviewConfigurationSelection = {
         type: 'preview.configuration',
         previewConfigurationId: action.payload.preview.configId,

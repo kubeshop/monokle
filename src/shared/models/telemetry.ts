@@ -115,6 +115,9 @@ export type EventMap = {
   'helm/command/start': {command: string[]};
   'helm/command/fail': {reason: string};
   'helm/command/end': undefined;
+  'helm/config/install/start': undefined;
+  'helm/config/install/end': undefined;
+  'helm/config/install/fail': {reason: string};
   'cluster/diff_resource': undefined;
   'cluster/deploy_resource': {kind: string};
   'cluster/deploy_file': undefined;
