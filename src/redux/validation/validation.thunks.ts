@@ -18,10 +18,15 @@ import {isDefined} from '@shared/utils/filter';
 
 import {VALIDATOR} from './validator';
 
-export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, ThunkApi>(
+export const loadValidation = createAsyncThunk<LoadValidationResult | undefined, undefined, ThunkApi>(
   'validation/load',
   async (_action, {getState}) => {
     const state = getState().validation;
+
+    if (state.cloudPolicy?.policy && state.cloudPolicy.valid) {
+      await VALIDATOR.loadValidation({config: state.cloudPolicy.policy});
+      return;
+    }
 
     // Ensure that these plugins are always get loaded.
     let config = {
