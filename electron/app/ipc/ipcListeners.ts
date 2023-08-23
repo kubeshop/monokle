@@ -45,6 +45,7 @@ import {
   selectFileDialog,
 } from '../commands';
 import {ProjectNameChange, StorePropagation} from '../models';
+import '../services/cloud/ipc';
 import '../services/cluster/ipc';
 import {downloadPlugin, updatePlugin} from '../services/pluginService';
 import {
