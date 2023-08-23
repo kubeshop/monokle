@@ -13,3 +13,10 @@ export type DeepPartial<T> = T extends object
       [P in keyof T]?: DeepPartial<T[P]>;
     }
   : T;
+
+export type ExtractProperties<ObjectType> = Pick<
+  ObjectType,
+  {
+    [Property in keyof ObjectType]: ObjectType[Property] extends (...params: unknown[]) => unknown ? never : Property;
+  }[keyof ObjectType]
+>;
