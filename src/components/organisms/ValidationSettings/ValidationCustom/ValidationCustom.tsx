@@ -1,10 +1,11 @@
 import {useCallback, useLayoutEffect} from 'react';
 
-import {Space, Switch, Tooltip} from 'antd';
+import {Button, Space, Switch, Tooltip} from 'antd';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {isUsingCloudPolicySelector} from '@redux/validation/validation.selectors';
 import {toggleRule, toggleValidation} from '@redux/validation/validation.slice';
 
 import {PluginMetadataWithConfig} from '@monokle/validation';
@@ -22,6 +23,8 @@ const ValidationCustom: React.FC<PluginMetadataWithConfig> = props => {
   } = props;
 
   const dispatch = useAppDispatch();
+
+  const isUsingCloudPolicy = useAppSelector(isUsingCloudPolicySelector);
 
   const toggleEnabled = useCallback(() => {
     dispatch(toggleValidation(name));
@@ -57,13 +60,17 @@ const ValidationCustom: React.FC<PluginMetadataWithConfig> = props => {
             <Space size="small">
               <span>Enable plugin</span>
 
-              <Switch size="small" checked={enabled} onChange={toggleEnabled} />
+              <Switch disabled={isUsingCloudPolicy} size="small" checked={enabled} onChange={toggleEnabled} />
             </Space>
           </Tooltip>
 
           <Space size="large">
-            <a onClick={enableAllRules}>Enable all</a>
-            <a onClick={disableAllRules}>Disable all</a>
+            <Button type="link" disabled={isUsingCloudPolicy} onClick={enableAllRules}>
+              Enable all
+            </Button>
+            <Button type="link" disabled={isUsingCloudPolicy} onClick={disableAllRules}>
+              Disable all
+            </Button>
           </Space>
         </S.DescriptionActions>
       </S.DescriptionContainer>

@@ -200,9 +200,6 @@ export const validationSlice = createSlice({
 
     builder.addCase(loadValidation.fulfilled, (state, {payload}) => {
       state.status = 'loaded';
-      if (!payload) {
-        return;
-      }
       state.metadata = payload.metadata;
       state.rules = payload.rules as any; // See NOTE_TS
     });

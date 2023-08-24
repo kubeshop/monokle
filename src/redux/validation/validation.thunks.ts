@@ -9,7 +9,7 @@ import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelecto
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {CORE_PLUGINS, ResourceRefType, ValidationResponse} from '@monokle/validation';
+import {CORE_PLUGINS, Config, ResourceRefType, ValidationResponse} from '@monokle/validation';
 import {K8sResource, ResourceMeta} from '@shared/models/k8sResource';
 import type {ThunkApi} from '@shared/models/thunk';
 import type {LoadValidationResult, ValidationArgs, ValidationResource} from '@shared/models/validation';
@@ -18,26 +18,24 @@ import {isDefined} from '@shared/utils/filter';
 
 import {VALIDATOR} from './validator';
 
-export const loadValidation = createAsyncThunk<LoadValidationResult | undefined, undefined, ThunkApi>(
+export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, ThunkApi>(
   'validation/load',
   async (_action, {getState}) => {
     const state = getState().validation;
 
-    if (state.cloudPolicy?.policy && state.cloudPolicy.valid) {
-      await VALIDATOR.loadValidation({config: state.cloudPolicy.policy});
-      return;
-    }
-
     // Ensure that these plugins are always get loaded.
-    let config = {
+    let localConfig = {
       plugins: Object.fromEntries(CORE_PLUGINS.map(p => [p, false])),
     };
+    merge(localConfig, state.config);
+    electronStore.set('validation.config', localConfig);
 
-    merge(config, state.config);
+    let cloudConfig: Config | undefined;
+    if (state.cloudPolicy?.policy && state.cloudPolicy.valid) {
+      cloudConfig = state.cloudPolicy.policy;
+    }
 
-    electronStore.set('validation.config', config);
-
-    await VALIDATOR.loadValidation({config});
+    await VALIDATOR.loadValidation({config: cloudConfig ?? localConfig});
 
     return {
       metadata: VALIDATOR.metadata,

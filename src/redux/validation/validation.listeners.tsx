@@ -50,6 +50,7 @@ import {isDefined} from '@shared/utils/filter';
 import {isEqual} from '@shared/utils/isEqual';
 import {trackEvent} from '@shared/utils/telemetry';
 
+import {pollCloudPolicy} from './validation.hooks';
 import {
   addValidationPlugin,
   changeRuleLevel,
@@ -69,6 +70,15 @@ type IncrementalValidationStatus = {
 let incrementalValidationStatus: IncrementalValidationStatus = {
   isRunning: false,
   nextBatch: [],
+};
+
+const pullCloudPolicyListener: AppListenerFn = listen => {
+  listen({
+    matcher: isAnyOf(setRootFolder.fulfilled),
+    async effect(_action, {getState, dispatch}) {
+      pollCloudPolicy(getState(), dispatch);
+    },
+  });
 };
 
 const loadListener: AppListenerFn = listen => {
@@ -344,4 +354,5 @@ export const validationListeners = [
   loadListener,
   validateListener,
   incrementalValidationListener,
+  pullCloudPolicyListener,
 ];

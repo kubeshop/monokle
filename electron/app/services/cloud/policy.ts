@@ -14,13 +14,13 @@ export const getPolicy = async (repoPath: string) => {
   }
 
   try {
-    const policy = await synchronizer.synchronize(repoPath, user.token);
+    const policy = await synchronizer.getPolicy(repoPath, true, user.token);
     return policy;
   } catch (e: any) {
     if (e instanceof Error) {
-      console.log(e.message);
+      log.warn(e.message);
     }
-    log.error('Failed to synchronize policy');
+    log.warn('Failed to synchronize policy');
   }
   return undefined;
 };
