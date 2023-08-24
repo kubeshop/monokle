@@ -5,6 +5,7 @@ import {useAsync, useInterval, useMount} from 'react-use';
 import {isEqual} from 'lodash';
 
 import {getCloudPolicy, getCloudUser, startCloudLogin} from '@redux/cloud/ipc';
+import {useAppSelector} from '@redux/hooks';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppDispatch} from '@shared/models/appDispatch';
@@ -32,13 +33,14 @@ export const pollCloudPolicy = async (state: RootState, dispatch: AppDispatch) =
 
 export const useCloudPolicy = () => {
   const store = useStore<RootState>();
-  const foundPolicy = store.getState().validation.cloudPolicy !== undefined;
+  const foundPolicy = useAppSelector(state => state.validation.cloudPolicy !== undefined);
+
   useMount(() => {
     pollCloudPolicy(store.getState(), store.dispatch);
   });
   useInterval(() => {
     pollCloudPolicy(store.getState(), store.dispatch);
-  }, 10 * 1000);
+  }, 30 * 1000);
   return {foundPolicy};
 };
 

@@ -1,6 +1,8 @@
 import {useCallback} from 'react';
 
-import {Button, Dropdown} from 'antd';
+import {Button, Dropdown, Spin} from 'antd';
+
+import {LoadingOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -10,11 +12,22 @@ import CloudIcon from '@assets/CloudIcon.svg';
 
 import {Colors} from '@monokle/components';
 
+const LoadingIcon = <LoadingOutlined style={{fontSize: 24}} spin />;
+
 const CloudSync = () => {
-  const {connect, cloudUser, isConnecting} = useCloudUser();
+  const {connect, cloudUser, isConnecting, isInitializing} = useCloudUser();
   const {foundPolicy} = useCloudPolicy();
 
   const dropdownRender = useCallback(() => {
+    if (isInitializing) {
+      return (
+        <DropdownContent>
+          <Spin indicator={LoadingIcon} />
+          Initializing...
+        </DropdownContent>
+      );
+    }
+
     if (cloudUser) {
       return (
         <DropdownContent>
@@ -38,7 +51,7 @@ const CloudSync = () => {
         </Button>
       </DropdownContent>
     );
-  }, [connect, cloudUser, isConnecting, foundPolicy]);
+  }, [connect, cloudUser, isConnecting, foundPolicy, isInitializing]);
 
   return (
     <Container>
