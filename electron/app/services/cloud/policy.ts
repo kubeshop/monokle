@@ -10,7 +10,7 @@ export const getPolicy = async (repoPath: string) => {
   const user = await authenticator?.getUser();
 
   if (!user?.token || !synchronizer) {
-    return undefined;
+    return null;
   }
 
   try {
@@ -22,5 +22,5 @@ export const getPolicy = async (repoPath: string) => {
     }
     log.warn('Failed to synchronize policy');
   }
-  return undefined;
+  return null;
 };

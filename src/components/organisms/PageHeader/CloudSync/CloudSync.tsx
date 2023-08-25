@@ -16,7 +16,7 @@ const LoadingIcon = <LoadingOutlined style={{fontSize: 24}} spin />;
 
 const CloudSync = () => {
   const {connect, cloudUser, isConnecting, isInitializing} = useCloudUser();
-  const {foundPolicy} = useCloudPolicy();
+  const {cloudPolicy, projectInfo} = useCloudPolicy();
 
   const dropdownRender = useCallback(() => {
     if (isInitializing) {
@@ -32,12 +32,19 @@ const CloudSync = () => {
       return (
         <DropdownContent>
           <p>Connected to Monokle Cloud</p>
-          <span>
-            E-mail: <b>{cloudUser.email}</b>
-          </span>
           <p>
-            {foundPolicy
-              ? 'Monokle Desktop is now using the Policy that was set for this repository in Monokle Cloud.'
+            E-mail: <b>{cloudUser.email}</b>
+          </p>
+          {cloudPolicy && projectInfo ? (
+            <p>
+              Project: <b>{projectInfo.name}</b>
+            </p>
+          ) : (
+            <p>Project: Not found</p>
+          )}
+          <p>
+            {cloudPolicy
+              ? 'Monokle Desktop is using the Policy from the Monokle Cloud project.'
               : 'No Policy was found in Monokle Cloud for the current repository.'}
           </p>
         </DropdownContent>
@@ -51,17 +58,20 @@ const CloudSync = () => {
         </Button>
       </DropdownContent>
     );
-  }, [connect, cloudUser, isConnecting, foundPolicy, isInitializing]);
+  }, [connect, cloudUser, isConnecting, cloudPolicy, isInitializing, projectInfo]);
 
   return (
-    <Container>
+    <Container $hasText={Boolean(projectInfo)}>
       <Dropdown
         trigger={['click']}
         placement="bottom"
         dropdownRender={dropdownRender}
         getPopupContainer={() => document.getElementById('monokleCloudSync')!}
       >
-        <Image src={CloudIcon} />
+        <div>
+          <Image src={CloudIcon} />
+          {projectInfo && <ProjectName>{projectInfo.name}</ProjectName>}
+        </div>
       </Dropdown>
       <div id="monokleCloudSync" />
     </Container>
@@ -70,11 +80,11 @@ const CloudSync = () => {
 
 export default CloudSync;
 
-const Container = styled.div`
+const Container = styled.div<{$hasText: boolean}>`
   display: flex;
   align-items: center;
   border-radius: 4px;
-  padding: 0.3rem 0.5rem;
+  padding: 0 0.5rem;
   background: ${Colors.grey3b};
   border: none;
   min-width: fit-content;
@@ -90,4 +100,9 @@ const DropdownContent = styled.div`
   padding: 20px;
   margin-top: 10px;
   background-color: ${Colors.grey1};
+`;
+
+const ProjectName = styled.span`
+  margin-left: 4px;
+  cursor: pointer;
 `;

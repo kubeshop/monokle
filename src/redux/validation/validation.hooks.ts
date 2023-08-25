@@ -1,12 +1,14 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useStore} from 'react-redux';
 import {useAsync, useInterval, useMount} from 'react-use';
 
 import {isEqual} from 'lodash';
 
-import {getCloudPolicy, getCloudUser, logoutFromCloud, startCloudLogin} from '@redux/cloud/ipc';
+import {getCloudPolicy, getCloudProjectInfo, getCloudUser, logoutFromCloud, startCloudLogin} from '@redux/cloud/ipc';
 import {useAppSelector} from '@redux/hooks';
+import {rootFolderSelector} from '@redux/selectors';
 
+import {ProjectInfo} from '@monokle/synchronizer';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {CloudUser} from '@shared/models/cloud';
@@ -19,6 +21,8 @@ export const pollCloudPolicy = async (state: RootState, dispatch: AppDispatch) =
   const rootFolderPath = rootFileEntry?.filePath;
   const cloudPolicy = rootFolderPath ? await getCloudPolicy(rootFolderPath) : undefined;
   const previousCloudPolicy = state.validation.cloudPolicy;
+
+  console.log('POLL CLOUD POLICY');
 
   if (!cloudPolicy) {
     return;
@@ -33,15 +37,31 @@ export const pollCloudPolicy = async (state: RootState, dispatch: AppDispatch) =
 
 export const useCloudPolicy = () => {
   const store = useStore<RootState>();
-  const foundPolicy = useAppSelector(state => state.validation.cloudPolicy !== undefined);
+  const cloudPolicy = useAppSelector(state => state.validation.cloudPolicy);
+  const rootFolderPath = useAppSelector(rootFolderSelector);
+  const [projectInfo, setProjectInfo] = useState<ProjectInfo | null>();
+
+  const updateProjectInfo = useCallback(async () => {
+    const info = await getCloudProjectInfo(rootFolderPath);
+    setProjectInfo(info);
+  }, [rootFolderPath]);
 
   useMount(() => {
     pollCloudPolicy(store.getState(), store.dispatch);
+    updateProjectInfo();
   });
+
+  useEffect(() => {
+    pollCloudPolicy(store.getState(), store.dispatch);
+    updateProjectInfo();
+  }, [store, rootFolderPath, updateProjectInfo]);
+
   useInterval(() => {
     pollCloudPolicy(store.getState(), store.dispatch);
-  }, 30 * 1000);
-  return {foundPolicy};
+    updateProjectInfo();
+  }, 10 * 1000);
+
+  return {cloudPolicy, projectInfo};
 };
 
 export const useCloudUser = () => {

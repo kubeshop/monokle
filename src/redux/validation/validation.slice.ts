@@ -184,6 +184,7 @@ export const validationSlice = createSlice({
     builder.addCase(setRootFolder.fulfilled, state => {
       state.validationOverview.selectedProblem = undefined;
       state.lastResponse = undefined;
+      state.cloudPolicy = undefined;
       state.validationOverview.newProblemsIntroducedType = 'initial';
     });
 
