@@ -21,3 +21,8 @@ export const cloudLogin = async (): Promise<CloudLoginResponse> => {
   }
   return {user: serializeUser(user)};
 };
+
+export const cloudLogout = async (): Promise<void> => {
+  const authenticator = await getAuthenticator();
+  await authenticator?.logout();
+};

@@ -4,7 +4,7 @@ import {useAsync, useInterval, useMount} from 'react-use';
 
 import {isEqual} from 'lodash';
 
-import {getCloudPolicy, getCloudUser, startCloudLogin} from '@redux/cloud/ipc';
+import {getCloudPolicy, getCloudUser, logoutFromCloud, startCloudLogin} from '@redux/cloud/ipc';
 import {useAppSelector} from '@redux/hooks';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
@@ -47,6 +47,7 @@ export const useCloudPolicy = () => {
 export const useCloudUser = () => {
   const [isInitializing, setIsInitializing] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [cloudUser, setCloudUser] = useState<CloudUser>();
 
   useAsync(async () => {
@@ -63,10 +64,19 @@ export const useCloudUser = () => {
     setIsConnecting(false);
   }, []);
 
+  const disconnect = useCallback(async () => {
+    setIsDisconnecting(true);
+    await logoutFromCloud(undefined);
+    setCloudUser(undefined);
+    setIsDisconnecting(false);
+  }, []);
+
   return {
     connect,
+    disconnect,
     cloudUser,
     isInitializing,
     isConnecting,
+    isDisconnecting,
   };
 };

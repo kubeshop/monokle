@@ -1,4 +1,4 @@
-import {Button, Col} from 'antd';
+import {Button, Col, Popconfirm} from 'antd';
 
 import {useCloudUser} from '@redux/validation/validation.hooks';
 
@@ -9,7 +9,7 @@ import {Spinner} from '@monokle/components';
 import * as S from './CloudConnect.styled';
 
 export default function CloudConnect() {
-  const {connect, cloudUser, isInitializing, isConnecting} = useCloudUser();
+  const {connect, disconnect, cloudUser, isInitializing, isConnecting, isDisconnecting} = useCloudUser();
 
   if (isInitializing) {
     return (
@@ -32,6 +32,15 @@ export default function CloudConnect() {
               Thank you for syncing Monokle Desktop with Monokle Cloud. <br />
               Your validation policies are now unified and synchronized across platforms.
             </S.Paragraph>
+            <Popconfirm
+              title="Are you sure you want to disconnect from Monokle Cloud?"
+              onConfirm={disconnect}
+              cancelText="No"
+              okText="Yes"
+              okType="default"
+            >
+              <Button loading={isDisconnecting}>Disconnect</Button>
+            </Popconfirm>
           </>
         ) : (
           <>
