@@ -13,16 +13,20 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {CloudUser} from '@shared/models/cloud';
 import {RootState} from '@shared/models/rootState';
+import {trackEvent} from '@shared/utils';
 
 import {setCloudPolicy} from './validation.slice';
+
+/**
+ * Used as a telemetry cache to avoid sending multiple events for the same project
+ */
+const cloudProjectsThisSession = new Set<string>();
 
 export const pollCloudPolicy = async (state: RootState, dispatch: AppDispatch) => {
   const rootFileEntry = state.main.fileMap[ROOT_FILE_ENTRY];
   const rootFolderPath = rootFileEntry?.filePath;
   const cloudPolicy = rootFolderPath ? await getCloudPolicy(rootFolderPath) : undefined;
   const previousCloudPolicy = state.validation.cloudPolicy;
-
-  console.log('POLL CLOUD POLICY');
 
   if (!cloudPolicy) {
     return;
@@ -44,7 +48,12 @@ export const useCloudPolicy = () => {
   const updateProjectInfo = useCallback(async () => {
     const info = await getCloudProjectInfo(rootFolderPath);
     setProjectInfo(info);
-  }, [rootFolderPath]);
+
+    if (cloudPolicy && info && !cloudProjectsThisSession.has(info.slug)) {
+      trackEvent('cloud_sync/policy', {projectSlug: info.slug});
+      cloudProjectsThisSession.add(info.slug);
+    }
+  }, [rootFolderPath, cloudPolicy]);
 
   useMount(() => {
     pollCloudPolicy(store.getState(), store.dispatch);
@@ -80,6 +89,7 @@ export const useCloudUser = () => {
   const connect = useCallback(async () => {
     setIsConnecting(true);
     const {user} = await startCloudLogin(undefined);
+    trackEvent('cloud_sync/login');
     setCloudUser(user);
     setIsConnecting(false);
   }, []);
@@ -87,6 +97,7 @@ export const useCloudUser = () => {
   const disconnect = useCallback(async () => {
     setIsDisconnecting(true);
     await logoutFromCloud(undefined);
+    trackEvent('cloud_sync/logout');
     setCloudUser(undefined);
     setIsDisconnecting(false);
   }, []);
