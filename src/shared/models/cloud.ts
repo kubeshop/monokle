@@ -8,3 +8,7 @@ export type CloudUser = {
 export type CloudLoginResponse = {
   user: CloudUser;
 };
+
+export type CloudState = {
+  user?: CloudUser;
+};

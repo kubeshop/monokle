@@ -5,13 +5,13 @@ import {useAsync, useInterval, useMount} from 'react-use';
 import {isEqual} from 'lodash';
 
 import {getCloudPolicy, getCloudProjectInfo, getCloudUser, logoutFromCloud, startCloudLogin} from '@redux/cloud/ipc';
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setCloudUser} from '@redux/reducers/cloud';
 import {rootFolderSelector} from '@redux/selectors';
 
 import {ProjectInfo} from '@monokle/synchronizer';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppDispatch} from '@shared/models/appDispatch';
-import {CloudUser} from '@shared/models/cloud';
 import {RootState} from '@shared/models/rootState';
 import {trackEvent} from '@shared/utils';
 
@@ -75,15 +75,16 @@ export const useCloudPolicy = () => {
 };
 
 export const useCloudUser = () => {
+  const dispatch = useAppDispatch();
   const [isInitializing, setIsInitializing] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
-  const [cloudUser, setCloudUser] = useState<CloudUser | undefined>();
+  const cloudUser = useAppSelector(state => state.cloud.user);
 
   useAsync(async () => {
     setIsInitializing(true);
     const user = await getCloudUser(undefined);
-    setCloudUser(user);
+    dispatch(setCloudUser(user));
     setIsInitializing(false);
   }, []);
 
@@ -91,7 +92,7 @@ export const useCloudUser = () => {
     setIsConnecting(true);
     const {user} = await startCloudLogin(undefined);
     trackEvent('cloud_sync/login');
-    setCloudUser(user);
+    dispatch(setCloudUser(user));
     setIsConnecting(false);
   };
 
@@ -99,7 +100,7 @@ export const useCloudUser = () => {
     setIsDisconnecting(true);
     await logoutFromCloud(undefined);
     trackEvent('cloud_sync/logout');
-    setCloudUser(undefined);
+    dispatch(setCloudUser(undefined));
     setIsDisconnecting(false);
   };
 
