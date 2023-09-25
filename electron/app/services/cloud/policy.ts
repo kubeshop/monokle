@@ -1,14 +1,11 @@
 import log from 'loglevel';
 
-import {getAuthenticator} from './authenticator';
 import {getSynchronizer} from './synchronizer';
+import {getUser} from './user';
 
 export const getPolicy = async (repoPath: string) => {
-  const authenticator = await getAuthenticator();
   const synchronizer = await getSynchronizer();
-
-  const user = await authenticator?.getUser();
-
+  const user = await getUser();
   if (!user?.token || !synchronizer) {
     return null;
   }

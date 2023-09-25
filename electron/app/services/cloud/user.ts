@@ -1,15 +1,30 @@
+import log from 'loglevel';
+
 import {User} from '@monokle/synchronizer';
 import {CloudUser} from '@shared/models/cloud';
 
 import {getAuthenticator} from './authenticator';
 
-export const getUser = async (): Promise<CloudUser | undefined> => {
+export const getUser = async (): Promise<User | undefined> => {
   const authenticator = await getAuthenticator();
   if (!authenticator) {
     return undefined;
   }
-  const user = await authenticator.getUser();
-  if (!user.isAuthenticated) {
+  try {
+    const user = await authenticator.getUser();
+    if (!user.isAuthenticated) {
+      return undefined;
+    }
+    return user;
+  } catch (e: any) {
+    log.warn(e.message);
+    return undefined;
+  }
+};
+
+export const getSerializedUser = async (): Promise<CloudUser | undefined> => {
+  const user = await getUser();
+  if (!user) {
     return undefined;
   }
   try {
