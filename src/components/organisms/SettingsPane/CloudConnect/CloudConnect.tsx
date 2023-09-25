@@ -76,7 +76,7 @@ export default function CloudConnect(props: {wide: boolean}) {
             )}
           </Col>
           <Col offset={2} span={10}>
-            <img style={{width: '100%'}} src={CloudSync} />
+            <img style={{marginTop: '12px', width: '100%'}} src={CloudSync} />
           </Col>
         </S.Row>
       </Col>

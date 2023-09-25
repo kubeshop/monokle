@@ -79,6 +79,7 @@ export const useCloudPolicy = () => {
 };
 
 export const useCloudUser = () => {
+  const store = useStore<RootState>();
   const dispatch = useAppDispatch();
   const [isInitializing, setIsInitializing] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -97,6 +98,7 @@ export const useCloudUser = () => {
     const {user} = await startCloudLogin(undefined);
     trackEvent('cloud_sync/login');
     dispatch(setCloudUser(user));
+    pollCloudPolicy(store.getState(), dispatch);
     setIsConnecting(false);
   };
 
@@ -105,6 +107,9 @@ export const useCloudUser = () => {
     await logoutFromCloud(undefined);
     trackEvent('cloud_sync/logout');
     dispatch(setCloudUser(undefined));
+    dispatch(setCloudPolicy(undefined));
+    dispatch(setCloudProjectInfo(undefined));
+    dispatch(setCloudPolicyInfo(undefined));
     setIsDisconnecting(false);
   };
 

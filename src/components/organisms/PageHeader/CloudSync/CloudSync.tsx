@@ -2,13 +2,7 @@ import {useCallback} from 'react';
 
 import {Button, Dropdown, Spin, Tooltip} from 'antd';
 
-import {
-  ArrowRightOutlined,
-  CheckCircleFilled,
-  CloseCircleFilled,
-  InfoCircleFilled,
-  LoadingOutlined,
-} from '@ant-design/icons';
+import {CheckCircleFilled, CloseCircleFilled, InfoCircleFilled, LoadingOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -80,7 +74,7 @@ const CloudSync = () => {
                     onClick={() => openUrlInExternalBrowser(policyInfo?.link)}
                     style={{cursor: 'pointer', color: Colors.blue7}}
                   >
-                    View project policy <ArrowRightOutlined />
+                    View project policy
                   </span>
                   <Info description="A Policy is configured for this repository in Monokle Cloud. Your local Policy is in-sync and cannot be changed." />
                 </>
@@ -111,7 +105,7 @@ const CloudSync = () => {
   }, [connect, cloudUser, isConnecting, cloudPolicy, isInitializing, projectInfo, policyInfo]);
 
   return (
-    <Container $hasText={Boolean(projectInfo)} style={{backgroundColor: cloudUser ? Colors.blue7 : ''}}>
+    <Container $hasText={Boolean(projectInfo)} style={{cursor: 'pointer'}}>
       <Dropdown
         trigger={['click']}
         placement="bottom"
@@ -125,6 +119,7 @@ const CloudSync = () => {
             placement="bottom"
           >
             <Icon src={cloudUser ? CloudIconWhite : CloudIcon} />
+            {projectInfo?.name}
           </Tooltip>
         </div>
       </Dropdown>
@@ -158,6 +153,7 @@ const Icon = styled.img`
   cursor: pointer;
   height: 20px;
   width: 20px;
+  margin-right: 4px;
 `;
 
 const Image = styled.img`
@@ -166,7 +162,7 @@ const Image = styled.img`
 `;
 
 const DropdownContent = styled.div`
-  padding: 20px;
+  padding: 28px;
   margin-top: 10px;
   background-color: ${Colors.grey2};
 `;
@@ -184,11 +180,15 @@ const GraySpan = styled.span`
 `;
 
 const GreenCircle = styled(CheckCircleFilled)`
+  font-size: 12px;
   color: ${Colors.polarGreen};
+  margin-right: 4px;
 `;
 
 const RedCircle = styled(CloseCircleFilled)`
+  font-size: 12px;
   color: ${Colors.red7};
+  margin-right: 4px;
 `;
 
 const Item = styled.div`
@@ -199,7 +199,7 @@ const Item = styled.div`
 `;
 
 const Title = styled.div`
-  width: 110px;
+  width: 120px;
   margin-right: 8px;
   color: ${Colors.grey7};
 `;
