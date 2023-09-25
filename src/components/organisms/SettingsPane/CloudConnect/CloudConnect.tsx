@@ -27,7 +27,7 @@ export default function CloudConnect(props: {wide: boolean}) {
           <Col span={12} style={{padding: '8px'}}>
             {cloudUser ? (
               <>
-                <S.Heading>Connected to Monokle Cloud 🟢</S.Heading>
+                <S.Heading>Connected to Monokle Cloud</S.Heading>
                 <S.Paragraph>
                   E-mail: <b>{cloudUser.email}</b>
                 </S.Paragraph>
