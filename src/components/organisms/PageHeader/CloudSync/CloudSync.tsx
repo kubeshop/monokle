@@ -22,7 +22,7 @@ const LoadingIcon = <LoadingOutlined style={{fontSize: 24}} spin />;
 
 const CloudSync = () => {
   const {connect, cloudUser, isConnecting, isInitializing} = useCloudUser();
-  const {cloudPolicy, projectInfo, policyLink} = useCloudPolicy();
+  const {cloudPolicy, projectInfo, policyInfo} = useCloudPolicy();
 
   const dropdownRender = useCallback(() => {
     if (isInitializing) {
@@ -58,7 +58,7 @@ const CloudSync = () => {
             <Value>
               {cloudPolicy ? (
                 <span
-                  onClick={() => openUrlInExternalBrowser(policyLink)}
+                  onClick={() => openUrlInExternalBrowser(policyInfo?.link)}
                   style={{cursor: 'pointer', color: Colors.blue7}}
                 >
                   View project policy <ArrowRightOutlined />
@@ -84,7 +84,7 @@ const CloudSync = () => {
         </Button>
       </DropdownContent>
     );
-  }, [connect, cloudUser, isConnecting, cloudPolicy, isInitializing, projectInfo, policyLink]);
+  }, [connect, cloudUser, isConnecting, cloudPolicy, isInitializing, projectInfo, policyInfo]);
 
   return (
     <Container $hasText={Boolean(projectInfo)} style={{backgroundColor: cloudUser ? Colors.blue7 : ''}}>

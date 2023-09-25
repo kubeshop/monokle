@@ -4,12 +4,11 @@ import {useAsync, useInterval, useMount} from 'react-use';
 
 import {isEqual} from 'lodash';
 
-import {getCloudPolicy, getCloudProjectInfo, getCloudUser, logoutFromCloud, startCloudLogin} from '@redux/cloud/ipc';
+import {getCloudInfo, getCloudPolicy, getCloudUser, logoutFromCloud, startCloudLogin} from '@redux/cloud/ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setCloudUser} from '@redux/reducers/cloud';
+import {setCloudPolicyInfo, setCloudProjectInfo, setCloudUser} from '@redux/reducers/cloud';
 import {rootFolderSelector} from '@redux/selectors';
 
-import {ProjectInfo} from '@monokle/synchronizer';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
@@ -41,39 +40,42 @@ export const pollCloudPolicy = async (state: RootState, dispatch: AppDispatch) =
 };
 
 export const useCloudPolicy = () => {
+  const dispatch = useAppDispatch();
   const store = useStore<RootState>();
   const cloudPolicy = useAppSelector(state => state.validation.cloudPolicy);
   const rootFolderPath = useAppSelector(rootFolderSelector);
-  const [projectInfo, setProjectInfo] = useState<ProjectInfo | null>();
-  const [policyLink, setPolicyLink] = useState<string>();
+
+  const projectInfo = useAppSelector(state => state.cloud.projectInfo);
+  const policyInfo = useAppSelector(state => state.cloud.policyInfo);
 
   const updateProjectInfo = useCallback(async () => {
-    const {info, link} = (await getCloudProjectInfo(rootFolderPath)) || {};
-    setProjectInfo(info);
-    setPolicyLink(link);
+    const cloudInfo = await getCloudInfo(rootFolderPath);
+    dispatch(setCloudProjectInfo(cloudInfo?.projectInfo));
+    dispatch(setCloudPolicyInfo(cloudInfo?.policyInfo));
 
-    if (cloudPolicy && info && !cloudProjectsThisSession.has(info.slug)) {
-      trackEvent('cloud_sync/policy', {projectSlug: info.slug});
-      cloudProjectsThisSession.add(info.slug);
+    if (cloudPolicy && cloudInfo?.projectInfo && !cloudProjectsThisSession.has(cloudInfo.projectInfo.slug)) {
+      trackEvent('cloud_sync/policy', {projectSlug: cloudInfo.projectInfo.slug});
+      cloudProjectsThisSession.add(cloudInfo.projectInfo.slug);
     }
-  }, [rootFolderPath, cloudPolicy]);
+  }, [rootFolderPath, cloudPolicy, dispatch]);
 
   useMount(() => {
-    pollCloudPolicy(store.getState(), store.dispatch);
+    pollCloudPolicy(store.getState(), dispatch);
     updateProjectInfo();
   });
 
   useEffect(() => {
-    pollCloudPolicy(store.getState(), store.dispatch);
+    pollCloudPolicy(store.getState(), dispatch);
     updateProjectInfo();
-  }, [store, rootFolderPath, updateProjectInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rootFolderPath]);
 
   useInterval(() => {
-    pollCloudPolicy(store.getState(), store.dispatch);
+    pollCloudPolicy(store.getState(), dispatch);
     updateProjectInfo();
   }, 10 * 1000);
 
-  return {cloudPolicy, projectInfo, policyLink};
+  return {cloudPolicy, projectInfo, policyInfo};
 };
 
 export const useCloudUser = () => {

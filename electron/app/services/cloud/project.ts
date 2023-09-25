@@ -1,7 +1,12 @@
+import {ProjectInfo} from '@monokle/synchronizer';
+import {CloudPolicyInfo} from '@shared/models/cloud';
+
 import {getSynchronizer} from './synchronizer';
 import {getUser} from './user';
 
-export const getProjectInfo = async (repoPath: string) => {
+export const getInfo = async (
+  repoPath: string
+): Promise<{projectInfo: ProjectInfo; policyInfo: CloudPolicyInfo} | null> => {
   const synchronizer = await getSynchronizer();
   const user = await getUser();
   if (!user?.token || !synchronizer) {
@@ -10,7 +15,9 @@ export const getProjectInfo = async (repoPath: string) => {
 
   try {
     const project = await synchronizer?.getProjectInfo(repoPath, user.token, true);
-    return project ? {info: project, link: synchronizer.generateDeepLinkProjectPolicy(project.slug)} : null;
+    return project
+      ? {projectInfo: project, policyInfo: {link: synchronizer.generateDeepLinkProjectPolicy(project.slug)}}
+      : null;
   } catch {
     return null;
   }
