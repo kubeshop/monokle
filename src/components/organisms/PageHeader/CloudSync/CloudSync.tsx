@@ -2,7 +2,13 @@ import {useCallback} from 'react';
 
 import {Button, Dropdown, Spin, Tooltip} from 'antd';
 
-import {ArrowRightOutlined, CheckCircleFilled, CloseCircleFilled, LoadingOutlined} from '@ant-design/icons';
+import {
+  ArrowRightOutlined,
+  CheckCircleFilled,
+  CloseCircleFilled,
+  InfoCircleFilled,
+  LoadingOutlined,
+} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -51,20 +57,38 @@ const CloudSync = () => {
           </Item>
           <Item>
             <Title>{projectInfo?.name ? <GreenCircle /> : <RedCircle />} Cloud project</Title>
-            <Value>{projectInfo?.name || 'Not found'}</Value>
+            <Value>
+              {projectInfo?.name ? (
+                <>
+                  <span>{projectInfo?.name}</span>
+                  <Info description="The Monokle Cloud project manages this repository." />
+                </>
+              ) : (
+                <>
+                  <span>Not found</span>
+                  <Info description="No Monokle Cloud Project that manages this repository was found." />
+                </>
+              )}
+            </Value>
           </Item>
           <Item>
             <Title>{cloudPolicy ? <GreenCircle /> : <RedCircle />} Policy</Title>
             <Value>
               {cloudPolicy ? (
-                <span
-                  onClick={() => openUrlInExternalBrowser(policyInfo?.link)}
-                  style={{cursor: 'pointer', color: Colors.blue7}}
-                >
-                  View project policy <ArrowRightOutlined />
-                </span>
+                <>
+                  <span
+                    onClick={() => openUrlInExternalBrowser(policyInfo?.link)}
+                    style={{cursor: 'pointer', color: Colors.blue7}}
+                  >
+                    View project policy <ArrowRightOutlined />
+                  </span>
+                  <Info description="A Policy is configured for this repository in Monokle Cloud. Your local Policy is in-sync and cannot be changed." />
+                </>
               ) : (
-                'Not found'
+                <>
+                  <span>Not found</span>
+                  <Info description="Couldn't find any Policy configured for this repository." />
+                </>
               )}
             </Value>
           </Item>
@@ -110,6 +134,15 @@ const CloudSync = () => {
 };
 
 export default CloudSync;
+
+const Info = (props: {description: string}) => {
+  const {description} = props;
+  return (
+    <Tooltip title={description}>
+      <InfoIcon />
+    </Tooltip>
+  );
+};
 
 const Container = styled.div<{$hasText: boolean}>`
   display: flex;
@@ -175,4 +208,10 @@ const Value = styled.div`
   flex: 1;
   text-align: left;
   margin-left: 8px;
+`;
+
+const InfoIcon = styled(InfoCircleFilled)`
+  color: ${Colors.grey6};
+  margin-left: 8px;
+  cursor: pointer;
 `;
