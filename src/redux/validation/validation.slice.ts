@@ -176,7 +176,7 @@ export const validationSlice = createSlice({
       }
     },
 
-    setCloudPolicy(state, {payload}: PayloadAction<PolicyData>) {
+    setCloudPolicy(state, {payload}: PayloadAction<PolicyData | undefined>) {
       state.cloudPolicy = payload;
     },
   },

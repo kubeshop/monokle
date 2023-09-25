@@ -29,6 +29,7 @@ export const pollCloudPolicy = async (state: RootState, dispatch: AppDispatch) =
   const previousCloudPolicy = state.validation.cloudPolicy;
 
   if (!cloudPolicy) {
+    dispatch(setCloudPolicy(undefined));
     return;
   }
 
@@ -77,7 +78,7 @@ export const useCloudUser = () => {
   const [isInitializing, setIsInitializing] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
-  const [cloudUser, setCloudUser] = useState<CloudUser>();
+  const [cloudUser, setCloudUser] = useState<CloudUser | undefined>();
 
   useAsync(async () => {
     setIsInitializing(true);
@@ -86,21 +87,21 @@ export const useCloudUser = () => {
     setIsInitializing(false);
   }, []);
 
-  const connect = useCallback(async () => {
+  const connect = async () => {
     setIsConnecting(true);
     const {user} = await startCloudLogin(undefined);
     trackEvent('cloud_sync/login');
     setCloudUser(user);
     setIsConnecting(false);
-  }, []);
+  };
 
-  const disconnect = useCallback(async () => {
+  const disconnect = async () => {
     setIsDisconnecting(true);
     await logoutFromCloud(undefined);
     trackEvent('cloud_sync/logout');
     setCloudUser(undefined);
     setIsDisconnecting(false);
-  }, []);
+  };
 
   return {
     connect,
