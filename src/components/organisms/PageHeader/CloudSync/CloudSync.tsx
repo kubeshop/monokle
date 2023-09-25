@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import {useCloudPolicy, useCloudUser} from '@redux/validation/validation.hooks';
 
 import CloudIcon from '@assets/CloudIcon.svg';
+import CloudIconWhite from '@assets/CloudIconWhite.svg';
 
 import {Colors} from '@monokle/components';
 
@@ -61,7 +62,7 @@ const CloudSync = () => {
   }, [connect, cloudUser, isConnecting, cloudPolicy, isInitializing, projectInfo]);
 
   return (
-    <Container $hasText={Boolean(projectInfo)}>
+    <Container $hasText={Boolean(projectInfo)} style={{backgroundColor: cloudUser ? Colors.blue7 : ''}}>
       <Dropdown
         trigger={['click']}
         placement="bottom"
@@ -69,8 +70,7 @@ const CloudSync = () => {
         getPopupContainer={() => document.getElementById('monokleCloudSync')!}
       >
         <div>
-          <Image src={CloudIcon} />
-          {projectInfo && <ProjectName>{projectInfo.name}</ProjectName>}
+          <Image src={cloudUser ? CloudIconWhite : CloudIcon} />
         </div>
       </Dropdown>
       <div id="monokleCloudSync" />
