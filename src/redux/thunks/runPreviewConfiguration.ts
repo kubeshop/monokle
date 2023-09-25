@@ -36,12 +36,15 @@ export const runPreviewConfiguration = createAsyncThunk<
   {
     helmConfigId: string;
     performDeploy?: boolean;
+    selectedNamespace?: string;
+    shouldCreateNamespace?: boolean;
   },
   {
     dispatch: AppDispatch;
     state: RootState;
   }
->('main/runPreviewConfiguration', async ({helmConfigId, performDeploy}, thunkAPI) => {
+>('main/runPreviewConfiguration', async (props, thunkAPI) => {
+  const {helmConfigId, performDeploy, selectedNamespace, shouldCreateNamespace} = props;
   const startTime = new Date().getTime();
   const configState = thunkAPI.getState().config;
   const mainState = thunkAPI.getState().main;
@@ -132,6 +135,16 @@ export const runPreviewConfiguration = createAsyncThunk<
     args: args.splice(1),
     env: {KUBECONFIG: kubeconfig.path},
   };
+
+  if (selectedNamespace) {
+    if (!commandOptions.args.some(arg => arg.includes('--namespace'))) {
+      commandOptions.args.push(...['--namespace', selectedNamespace]);
+    }
+
+    if (shouldCreateNamespace && !commandOptions.args.some(arg => arg.includes('--create-namespace'))) {
+      commandOptions.args.push('--create-namespace');
+    }
+  }
 
   const result = await runCommandInMainThread(commandOptions);
 
