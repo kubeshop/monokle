@@ -102,7 +102,7 @@ const SettingsPane = () => {
           label: <S.TabOption>Sync with Cloud</S.TabOption>,
           children: (
             <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
-              <CloudConnect />
+              <CloudConnect wide={Boolean(!isStartProjectPaneVisible)} />
             </S.TabItemContainer>
           ),
         },
