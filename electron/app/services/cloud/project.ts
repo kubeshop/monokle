@@ -10,7 +10,7 @@ export const getProjectInfo = async (repoPath: string) => {
 
   try {
     const project = await synchronizer?.getProjectInfo(repoPath, user.token, true);
-    return project;
+    return project ? {info: project, link: synchronizer.generateDeepLinkProjectPolicy(project.slug)} : null;
   } catch {
     return null;
   }

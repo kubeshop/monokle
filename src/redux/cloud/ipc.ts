@@ -7,4 +7,4 @@ export const startCloudLogin = invokeIpc<undefined, CloudLoginResponse>('cloud:l
 export const logoutFromCloud = invokeIpc<undefined, void>('cloud:logout');
 export const getCloudUser = invokeIpc<undefined, CloudUser>('cloud:getUser');
 export const getCloudPolicy = invokeIpc<string, PolicyData | null>('cloud:getPolicy');
-export const getCloudProjectInfo = invokeIpc<string, ProjectInfo | null>('cloud:getProjectInfo');
+export const getCloudProjectInfo = invokeIpc<string, {info: ProjectInfo; link: string} | null>('cloud:getProjectInfo');

@@ -45,10 +45,12 @@ export const useCloudPolicy = () => {
   const cloudPolicy = useAppSelector(state => state.validation.cloudPolicy);
   const rootFolderPath = useAppSelector(rootFolderSelector);
   const [projectInfo, setProjectInfo] = useState<ProjectInfo | null>();
+  const [policyLink, setPolicyLink] = useState<string>();
 
   const updateProjectInfo = useCallback(async () => {
-    const info = await getCloudProjectInfo(rootFolderPath);
+    const {info, link} = (await getCloudProjectInfo(rootFolderPath)) || {};
     setProjectInfo(info);
+    setPolicyLink(link);
 
     if (cloudPolicy && info && !cloudProjectsThisSession.has(info.slug)) {
       trackEvent('cloud_sync/policy', {projectSlug: info.slug});
@@ -71,7 +73,7 @@ export const useCloudPolicy = () => {
     updateProjectInfo();
   }, 10 * 1000);
 
-  return {cloudPolicy, projectInfo};
+  return {cloudPolicy, projectInfo, policyLink};
 };
 
 export const useCloudUser = () => {
