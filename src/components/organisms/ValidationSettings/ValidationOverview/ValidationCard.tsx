@@ -67,7 +67,7 @@ const ValidationCard: React.FC<Props> = ({configurable, plugin}) => {
 
       {hasRules && configurable && (
         <S.ConfigureButton type="primary" onClick={onConfigureHandler}>
-          Configure
+          {isUsingCloudPolicy ? 'View' : 'Configure'}
         </S.ConfigureButton>
       )}
 
