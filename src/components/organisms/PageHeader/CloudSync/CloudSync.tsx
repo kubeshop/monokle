@@ -54,7 +54,7 @@ const CloudSync = () => {
             <Value>
               {projectInfo?.name ? (
                 <>
-                  <span>{projectInfo?.name}</span>
+                  <Link onClick={() => openUrlInExternalBrowser(projectInfo.link)}>{projectInfo.name}</Link>
                   <Info description="The Monokle Cloud project manages this repository." />
                 </>
               ) : (
@@ -70,12 +70,7 @@ const CloudSync = () => {
             <Value>
               {cloudPolicy ? (
                 <>
-                  <span
-                    onClick={() => openUrlInExternalBrowser(policyInfo?.link)}
-                    style={{cursor: 'pointer', color: Colors.blue7}}
-                  >
-                    View project policy
-                  </span>
+                  <Link onClick={() => openUrlInExternalBrowser(policyInfo?.link)}>View project policy</Link>
                   <Info description="A Policy is configured for this repository in Monokle Cloud. Your local Policy is in-sync and cannot be changed." />
                 </>
               ) : (
@@ -214,4 +209,9 @@ const InfoIcon = styled(InfoCircleFilled)`
   color: ${Colors.grey6};
   margin-left: 8px;
   cursor: pointer;
+`;
+
+const Link = styled.span`
+  cursor: pointer;
+  color: ${Colors.blue7};
 `;

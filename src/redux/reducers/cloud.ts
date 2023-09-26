@@ -2,8 +2,7 @@ import {Draft, PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import initialState from '@redux/initialState';
 
-import {ProjectInfo} from '@monokle/synchronizer';
-import {CloudPolicyInfo, CloudState, CloudUser} from '@shared/models/cloud';
+import {CloudPolicyInfo, CloudProjectInfo, CloudState, CloudUser} from '@shared/models/cloud';
 
 export const cloudSlice = createSlice({
   name: 'cloud',
@@ -12,7 +11,7 @@ export const cloudSlice = createSlice({
     setCloudUser: (state: Draft<CloudState>, action: PayloadAction<CloudUser | undefined>) => {
       state.user = action.payload;
     },
-    setCloudProjectInfo: (state: Draft<CloudState>, action: PayloadAction<ProjectInfo | undefined>) => {
+    setCloudProjectInfo: (state: Draft<CloudState>, action: PayloadAction<CloudProjectInfo | undefined>) => {
       state.projectInfo = action.payload;
     },
     setCloudPolicyInfo: (state: Draft<CloudState>, action: PayloadAction<CloudPolicyInfo | undefined>) => {

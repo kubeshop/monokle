@@ -11,12 +11,16 @@ export type CloudLoginResponse = {
   user: CloudUser;
 };
 
+export type CloudProjectInfo = ProjectInfo & {
+  link: string;
+};
+
 export type CloudPolicyInfo = {
   link: string;
 };
 
 export type CloudState = {
   user?: CloudUser;
-  projectInfo?: ProjectInfo;
+  projectInfo?: CloudProjectInfo;
   policyInfo?: CloudPolicyInfo;
 };
