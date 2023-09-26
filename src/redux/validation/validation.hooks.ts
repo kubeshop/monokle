@@ -6,10 +6,12 @@ import {isEqual} from 'lodash';
 
 import {getCloudInfo, getCloudPolicy, getCloudUser, logoutFromCloud, startCloudLogin} from '@redux/cloud/ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {setAlert} from '@redux/reducers/alert';
 import {setCloudPolicyInfo, setCloudProjectInfo, setCloudUser} from '@redux/reducers/cloud';
 import {rootFolderSelector} from '@redux/selectors';
 
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
+import {AlertEnum} from '@shared/models/alert';
 import {AppDispatch} from '@shared/models/appDispatch';
 import {RootState} from '@shared/models/rootState';
 import {trackEvent} from '@shared/utils';
@@ -34,6 +36,25 @@ export const pollCloudPolicy = async (state: RootState, dispatch: AppDispatch) =
 
   if (previousCloudPolicy && isEqual(previousCloudPolicy, cloudPolicy)) {
     return;
+  }
+
+  if (!previousCloudPolicy) {
+    dispatch(
+      setAlert({
+        type: AlertEnum.Success,
+        title: 'Repository connected to Cloud Project',
+        message:
+          'This repository has been connected successfully to a Cloud Project. The Policy is now being synchronized.',
+      })
+    );
+  } else {
+    dispatch(
+      setAlert({
+        type: AlertEnum.Success,
+        title: 'Cloud Policy updated',
+        message: 'The Policy has been changed in the Cloud Project and is now being synchronized.',
+      })
+    );
   }
 
   dispatch(setCloudPolicy(cloudPolicy));
