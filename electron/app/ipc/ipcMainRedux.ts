@@ -31,7 +31,7 @@ export const createDispatchForWindow = (window: BrowserWindow) => {
 
 export const dispatchToFocusedWindow = (action: AnyAction) => {
   const focusedWebContents = webContents.getFocusedWebContents();
-  focusedWebContents.send('redux-dispatch', action);
+  focusedWebContents?.send('redux-dispatch', action);
 };
 
 export const fetchStoreState = (contents: WebContents) => {
@@ -49,11 +49,6 @@ export const fetchStoreState = (contents: WebContents) => {
     }),
     FETCH_STORE_STATE_TIMEOUT
   );
-};
-
-export const fetchFocusedWindowStoreState = () => {
-  const focusedWebContents = webContents.getFocusedWebContents();
-  return fetchStoreState(focusedWebContents);
 };
 
 export const subscribeToStoreStateChanges = (
