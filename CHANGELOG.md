@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/kubeshop/monokle/compare/v2.3.4-nightly-2023-09-27.0...v2.4.0) (2023-09-27)
+
+
+### Features
+
+* add link to cloud project ([d4ea235](https://github.com/kubeshop/monokle/commit/d4ea2355d2ddd1eef6aa890bfe7a8d6af24b8198))
+* Cloud disconnect ([7dd8d4e](https://github.com/kubeshop/monokle/commit/7dd8d4e7e35a88c70e4a8293f5cc43d1ce834181))
+* cloud ipc ([ee3abdd](https://github.com/kubeshop/monokle/commit/ee3abdd7191a993d47911dfab3ee4dc6be442b2e))
+* cloud login ([95d2702](https://github.com/kubeshop/monokle/commit/95d2702311777223dd656d01037ba30116e80b0f))
+* CloudConnect component ([691a8c7](https://github.com/kubeshop/monokle/commit/691a8c7dd112a9a090a2d248884ee2052199b4a8))
+* CloudSync component ([d634e83](https://github.com/kubeshop/monokle/commit/d634e8361f5359361ec68d3e231d73f687f39f17))
+* display cloud project for policy ([b6cc53c](https://github.com/kubeshop/monokle/commit/b6cc53cb96c6cddf3b6f8bc2f2923519099d033e))
+* fetch cloud user ([e5828f9](https://github.com/kubeshop/monokle/commit/e5828f9b0a63ec54f6e12183b7d9eec26a9244dc))
+* fetch policy ([47df598](https://github.com/kubeshop/monokle/commit/47df5989e562c37f733f19dfd573a31688049b73))
+* notify policy in overview ([d1a83ba](https://github.com/kubeshop/monokle/commit/d1a83ba0f83882c7c4d55f9e6e0898bd06acb186))
+* send notifications about Policy ([112ff17](https://github.com/kubeshop/monokle/commit/112ff1790fe4c0135c2e6fa0c05348961e2028c8))
+* setup cloud authenticator ([9941ff9](https://github.com/kubeshop/monokle/commit/9941ff98855709ec5a4c62afc5aa49d99038e9fe))
+* setup cloud synchronizer ([c1039ee](https://github.com/kubeshop/monokle/commit/c1039ee710902017879328be2dda19333501fab7))
+
+
+### Bug Fixes
+
+* CloudSync icon UI ([cee9eaa](https://github.com/kubeshop/monokle/commit/cee9eaaf1cd0938143c1209a309738b5db364cc0))
+* policy hooks ([cd991eb](https://github.com/kubeshop/monokle/commit/cd991ebe29287518da36e16a54a6897d6e26f8b9))
+* user expired cloud token ([478ff3a](https://github.com/kubeshop/monokle/commit/478ff3a0dd29652181c7b1ff5e0f018793f7a049))
+
 ### [2.3.3](https://github.com/kubeshop/monokle/compare/v2.3.3-nightly-2023-07-26.0...v2.3.3) (2023-07-26)
 
 
