@@ -1,0 +1,9 @@
+{
+  "title": "Welcome to Monokle 2.4",
+  "learnMoreUrl": "https://monokle.io/blog/monokle-2-4-release",
+  "about": {
+    "when": "September 2023",
+    "title": "2.4 focused on:",
+    "features": ["Sync with Cloud", "Bug fixes", "Stability improvements"]
+  }
+}
