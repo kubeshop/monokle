@@ -17,7 +17,7 @@ export const cloudLogin = async (): Promise<CloudLoginResponse> => {
   shell.openExternal(loginResponse.handle.verification_uri_complete);
   const user = await loginResponse.onDone;
   if (!user) {
-    throw new Error('Login to Cloud has failed');
+    throw new Error('Login to Cloud has failed. Please try again later.');
   }
   return {user: serializeUser(user)};
 };

@@ -55,7 +55,7 @@ const CloudSync = () => {
               {projectInfo?.name ? (
                 <>
                   <Link onClick={() => openUrlInExternalBrowser(projectInfo.link)}>{projectInfo.name}</Link>
-                  <Info description="The Monokle Cloud project manages this repository." />
+                  <Info description="A Monokle Cloud project manages this repository." />
                 </>
               ) : (
                 <>

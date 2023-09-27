@@ -32,7 +32,7 @@ export default function CloudConnect(props: {wide: boolean}) {
                   E-mail: <b>{cloudUser.email}</b>
                 </S.Paragraph>
                 <S.Paragraph>
-                  Thank you for syncing Monokle Desktop with Monokle Cloud. <br />
+                  You have successfuly connected to your Monokle Cloud Account. <br />
                   Your validation policies are now unified and synchronized across platforms.
                 </S.Paragraph>
                 <Popconfirm
