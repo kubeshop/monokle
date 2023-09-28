@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/kubeshop/monokle/compare/v2.4.1-nightly-2023-09-28.0...v2.4.0) (2023-09-28)
+
+
+### Features
+
+* compare clusters in quick cluster mode ([c9c0a12](https://github.com/kubeshop/monokle/commit/c9c0a12cb21eb65d99aa315082ff1501ef692b07))
+
 ### [2.3.3](https://github.com/kubeshop/monokle/compare/v2.3.3-nightly-2023-07-26.0...v2.3.3) (2023-07-26)
 
 
