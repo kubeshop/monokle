@@ -32,10 +32,12 @@ module.exports = async function (params) {
 
   try {
     await electron_notarize.notarize({
+      tool: 'notarytool',
+      teamId: process.env.APPLE_TEAM_ID,
       appBundleId: appId,
       appPath: appPath,
       appleId: process.env.APPLE_ID,
-      appleIdPassword: process.env.APPLE_ID_PASSWORD,
+      appleIdPassword: process.env.APPLE_APP_SPECIFIC_PASSWORD,
     });
   } catch (error) {
     log.error(error);

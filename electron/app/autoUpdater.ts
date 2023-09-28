@@ -1,6 +1,6 @@
 import {AppImageUpdater, MacUpdater, NsisUpdater} from 'electron-updater';
-import {GenericServerOptions} from 'electron-updater/node_modules/builder-util-runtime';
 
+import {GenericServerOptions} from 'builder-util-runtime';
 import {join} from 'path';
 
 const isDev = process.env.NODE_ENV === 'development';

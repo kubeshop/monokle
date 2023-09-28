@@ -18,7 +18,10 @@ export const loadClusterHelmReleases = createAsyncThunk<HelmRelease[], void, {di
     const helmRepoSearch = getState().ui.helmPane.chartSearchToken;
 
     const result = await runCommandInMainThread(
-      listHelmReleasesCommand({filter: helmRepoSearch, namespace: selectedNamespace?.replace('<all>', '')})
+      listHelmReleasesCommand({
+        filter: helmRepoSearch,
+        namespace: selectedNamespace?.replace('<all>', '').replace('<not-namespaced>', ''),
+      })
     );
     if (result.stderr) {
       dispatch(setAlert(errorAlert("Couldn't load cluster helm releases", result.stderr)));

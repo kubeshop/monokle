@@ -54,6 +54,7 @@ import {
   addValidationPlugin,
   changeRuleLevel,
   removeValidationPlugin,
+  setCloudPolicy,
   setConfigK8sSchemaVersion,
   toggleRule,
   toggleValidation,
@@ -81,7 +82,8 @@ const loadListener: AppListenerFn = listen => {
       toggleValidation,
       changeRuleLevel,
       addValidationPlugin,
-      removeValidationPlugin
+      removeValidationPlugin,
+      setCloudPolicy
     ),
     async effect(_action, {dispatch, delay, signal, cancelActiveListeners}) {
       trackEvent('validation/load_config', {actionType: _action.type});

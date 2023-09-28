@@ -76,7 +76,7 @@ export const WarningText = styled(Typography.Text)`
 `;
 
 export const K8sVersionText = styled(Typography.Text)`
-  color: ${Colors.blue8};
+  color: ${Colors.blue6};
 `;
 
 export const MenuItem = styled(Menu.Item)<{$selected: boolean}>`

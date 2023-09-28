@@ -10,6 +10,7 @@ import {TitleBar} from '@monokle/components';
 import {SettingsPanel} from '@shared/models/config';
 
 import ValidationSettings from '../ValidationSettings';
+import CloudConnect from './CloudConnect';
 import {CurrentProjectSettings} from './CurrentProjectSettings/CurrentProjectSettings';
 import {DefaultProjectSettings} from './DefaultProjectSettings/DefaultProjectSettings';
 import {GlobalSettings} from './GlobalSettings/GlobalSettings';
@@ -94,6 +95,18 @@ const SettingsPane = () => {
             },
           ]
         : []),
+
+      ...[
+        {
+          key: 'cloud-connect',
+          label: <S.TabOption>Sync with Cloud</S.TabOption>,
+          children: (
+            <S.TabItemContainer $isOnStartProjectPage={isOnStartProjectPage}>
+              <CloudConnect wide={Boolean(!isStartProjectPaneVisible)} />
+            </S.TabItemContainer>
+          ),
+        },
+      ],
     ],
     [activeProject, isInQuickClusterMode, isOnStartProjectPage, isStartProjectPaneVisible]
   );
