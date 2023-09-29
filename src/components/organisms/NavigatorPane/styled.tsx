@@ -1,3 +1,5 @@
+import AntdIcon from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
@@ -55,4 +57,18 @@ export const TitleBarRightButtons = styled.div`
   float: right;
   display: flex;
   align-items: center;
+`;
+
+export const FullscreenOutlined = styled(AntdIcon)<{$disabled: boolean}>`
+  color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.blue6)};
+  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
+  padding-right: 10px;
+  font-size: 16px;
+`;
+
+export const FullscreenExitOutlined = styled(AntdIcon)<{$disabled: boolean}>`
+  color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.blue6)};
+  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
+  padding-right: 10px;
+  font-size: 16px;
 `;
