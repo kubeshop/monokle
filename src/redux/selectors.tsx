@@ -199,3 +199,40 @@ export const kustomizationResourcesCountSelector = createSelector(
     return size(kustomizationResources);
   }
 );
+
+export const previewLabelSelector = createSelector(
+  [
+    (state: RootState) => state.main.preview,
+    (state: RootState) => state.main.resourceMetaMapByStorage.local,
+    (state: RootState) => state.main.helmChartMap,
+    (state: RootState) => state.config.projectConfig?.helm?.previewConfigurationMap,
+    (state: RootState) => state.config.projectConfig?.savedCommandMap,
+  ],
+  (preview, localResourceMetaMap, helmChartMap, previewConfigurationMap, savedCommandMap) => {
+    if (!preview) {
+      return undefined;
+    }
+
+    if (preview.type === 'kustomize') {
+      const resource = localResourceMetaMap[preview.kustomizationId];
+      return resource?.name;
+    }
+
+    if (preview.type === 'helm') {
+      const helmChart = helmChartMap[preview.chartId];
+      return helmChart?.name;
+    }
+
+    if (preview.type === 'helm-config') {
+      const config = previewConfigurationMap?.[preview.configId];
+      return config?.name;
+    }
+
+    if (preview.type === 'command') {
+      const command = savedCommandMap?.[preview.commandId];
+      return command?.label;
+    }
+
+    return undefined;
+  }
+);

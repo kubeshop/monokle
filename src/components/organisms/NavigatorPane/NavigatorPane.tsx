@@ -5,6 +5,9 @@ import {toggleResourceFilters} from '@redux/reducers/ui';
 
 import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
+import {isInPreviewModeSelector} from '@shared/utils';
+
+import DryRunTitleBar from './DryRunTitleBar';
 import ResourceNavigator from './ResourceNavigator';
 import {ResourceTitleBar} from './ResourceTitleBar';
 
@@ -15,6 +18,7 @@ const NavPane: React.FC = () => {
 
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
 
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
 
@@ -28,6 +32,8 @@ const NavPane: React.FC = () => {
         <S.SelectionBar>
           <CheckedResourcesActionsMenu />
         </S.SelectionBar>
+      ) : isInPreviewMode ? (
+        <DryRunTitleBar />
       ) : (
         <ResourceTitleBar />
       )}

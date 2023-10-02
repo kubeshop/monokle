@@ -119,6 +119,7 @@ export enum Colors {
   diffBackgroundHover = '#27220f',
   blueBgColor = '#202C4D',
   blueWrapperColor = '#2b3759',
+  dryRun = cyan6,
 }
 
 export enum PanelColors {

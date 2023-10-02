@@ -21,10 +21,10 @@ export const ProblemCountContainer = styled.div`
   cursor: pointer;
 `;
 
-export const ResourcesCount = styled.span`
-  color: ${Colors.grey6};
+export const ResourcesCount = styled.span<{$isPreview: boolean}>`
   font-size: 10px;
   font-weight: 700;
+  color: ${props => (props.$isPreview ? Colors.dryRun : Colors.grey6)};
 `;
 
 export const WarningsErrorsContainer = styled.div`
