@@ -99,6 +99,7 @@ export const TitleBarActions = styled.div`
 export const Container = styled.div`
   position: relative;
   height: 100%;
+  overflow-y: hidden;
 `;
 
 export const TitleBarContainer = styled.div`
