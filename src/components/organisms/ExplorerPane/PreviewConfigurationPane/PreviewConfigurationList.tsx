@@ -12,7 +12,6 @@ import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import HelmChartRenderer from './HelmChartRenderer';
-import PreviewConfigurationRenderer from './PreviewConfigurationRenderer';
 
 const ROW_HEIGHT = 26;
 
@@ -64,11 +63,7 @@ const PreviewConfigurationList: React.FC = () => {
                 transform: `translateY(${virtualItem.start}px)`,
               }}
             >
-              {node.type === 'preview-configuration-helm-chart' ? (
-                <HelmChartRenderer id={node.id} />
-              ) : node.type === 'preview-configuration' ? (
-                <PreviewConfigurationRenderer id={node.id} />
-              ) : null}
+              {node.type === 'preview-configuration-helm-chart' ? <HelmChartRenderer id={node.id} /> : null}
             </VirtualItem>
           );
         })}

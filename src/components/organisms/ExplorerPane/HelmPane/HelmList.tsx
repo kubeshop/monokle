@@ -11,8 +11,6 @@ import {helmChartListSelector} from '@redux/selectors/helmSelectors';
 import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
-import HelmChartRenderer from './HelmChartRenderer';
-import HelmValueRenderer from './HelmValueRenderer';
 import {useScroll} from './useScroll';
 
 const ROW_HEIGHT = 26;
@@ -73,13 +71,7 @@ const HelmList: React.FC = () => {
                 height: `${virtualItem.size}px`,
                 transform: `translateY(${virtualItem.start}px)`,
               }}
-            >
-              {node.type === 'helm-chart' ? (
-                <HelmChartRenderer id={node.id} />
-              ) : node.type === 'helm-value' ? (
-                <HelmValueRenderer id={node.id} />
-              ) : null}
-            </VirtualItem>
+            />
           );
         })}
       </div>

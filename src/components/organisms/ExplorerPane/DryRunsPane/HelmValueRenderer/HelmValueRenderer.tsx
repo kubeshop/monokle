@@ -5,7 +5,7 @@ import {selectHelmValuesFile} from '@redux/reducers/main';
 
 import {trackEvent} from '@shared/utils';
 
-import HelmContextMenu from '../HelmContextMenu';
+import HelmContextMenu from './HelmContextMenu';
 import HelmValueQuickAction from './HelmValueQuickAction';
 import * as S from './HelmValueRenderer.styled';
 

@@ -14,9 +14,9 @@ import {Colors} from '@shared/styles/colors';
 import {trackEvent} from '@shared/utils';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
-import HelmContextMenu from '../HelmContextMenu';
 import HelmChartCollapse from './HelmChartCollapse';
 import * as S from './HelmChartRenderer.styled';
+import HelmContextMenu from './HelmContextMenu';
 
 type IProps = {
   id: string;
