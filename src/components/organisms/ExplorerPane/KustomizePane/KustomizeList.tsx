@@ -14,7 +14,7 @@ import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import KustomizeHeaderRenderer from './KustomizeHeaderRenderer';
-import KustomizeRenderer from './KustomizeRenderer';
+// import KustomizeRenderer from './KustomizeRenderer';
 import {useScroll} from './useScroll';
 
 const ROW_HEIGHT = 26;
@@ -84,7 +84,8 @@ const KustomizeList: React.FC = () => {
               {node.type === 'kustomize-kind' ? (
                 <KustomizeHeaderRenderer node={node} />
               ) : node.type === 'kustomize' ? (
-                <KustomizeRenderer identifier={node.identifier} />
+                // <KustomizeRenderer identifier={node.identifier} />
+                <div />
               ) : node.type === 'kustomize-resource' ? (
                 <ResourceRenderer resourceIdentifier={node.identifier} disableContextMenu />
               ) : null}
