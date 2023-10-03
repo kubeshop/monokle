@@ -1,56 +1,128 @@
-import {basename} from 'path';
+import {useRef} from 'react';
+
+import {Skeleton} from 'antd';
+
+import {size} from 'lodash';
 import styled from 'styled-components';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {helmValuesFilesByChartNameSelector, kustomizationResourcesSelectors} from '@redux/selectors';
+import {useAppSelector} from '@redux/hooks';
+import {kustomizeListSelector} from '@redux/selectors/kustomizeSelectors';
 
 import {TitleBarWrapper} from '@components/atoms';
+import ResourceRenderer from '@components/organisms/NavigatorPane/ResourceRenderer';
 
-import {Colors, Icon, TitleBar} from '@monokle/components';
+import {Icon, TitleBar} from '@monokle/components';
+import {Colors} from '@shared/styles/colors';
+import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
-function DryRunsPane() {
-  const dispatch = useAppDispatch();
-  const preview = useAppSelector(state => state.main.preview);
+import KustomizeRenderer from './KustomizeRenderer';
 
-  const helmGroups = useAppSelector(helmValuesFilesByChartNameSelector);
-  const kustomizations = useAppSelector(kustomizationResourcesSelectors);
+const ROW_HEIGHT = 26;
+
+const DryRunsPane: React.FC = () => {
+  const list = useAppSelector(kustomizeListSelector);
+  const isLoading = useAppSelector(state => (state.main.previewOptions.isLoading ? true : state.ui.isFolderLoading));
+
+  const ref = useRef<HTMLUListElement>(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: list.length,
+    estimateSize: () => ROW_HEIGHT,
+    getScrollElement: () => ref.current,
+    scrollToFn: elementScroll,
+  });
+
+  if (isLoading) {
+    return (
+      <div style={{padding: '16px'}}>
+        <Skeleton active />
+      </div>
+    );
+  }
+
+  if (!size(list)) {
+    return <EmptyText>No Dry runs found in the current project.</EmptyText>;
+  }
 
   return (
     <Container>
       <TitleBarWrapper>
         <TitleBar type="secondary" headerStyle={{background: '#232A2D'}} isOpen title="Dry runs" />
       </TitleBarWrapper>
+      <ListContainer ref={ref}>
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map(virtualItem => {
+            const node = list[virtualItem.index];
 
-      {helmGroups.map(([chartName, valuesFiles]) => (
-        <StyledUl>
-          <Subheading>
-            <Icon name="helm" />
-            <span>{chartName}</span>
-          </Subheading>
-          <div>
-            {valuesFiles.map(valuesFile => (
-              <div>{basename(valuesFile.filePath)}</div>
-            ))}
-          </div>
-        </StyledUl>
-      ))}
+            if (!node) {
+              return null;
+            }
 
-      <StyledUl>
-        <Subheading>
-          <Icon name="kustomize" />
-          <span>kustomize</span>
-        </Subheading>
-        <div>
-          {kustomizations.map(kustomization => (
-            <div>{basename(kustomization.name)}</div>
-          ))}
+            return (
+              <VirtualItem
+                key={virtualItem.key}
+                style={{
+                  height: `${virtualItem.size}px`,
+                  transform: `translateY(${virtualItem.start}px)`,
+                }}
+              >
+                {node.type === 'kustomize-kind' ? (
+                  <Subheading>
+                    <Icon name="kustomize" />
+                    <span>{node.label === 'Kustomization' ? 'kustomize' : 'kustomize patches'}</span>
+                  </Subheading>
+                ) : node.type === 'kustomize' ? (
+                  <KustomizeRenderer identifier={node.identifier} />
+                ) : node.type === 'kustomize-resource' ? (
+                  <ResourceRenderer resourceIdentifier={node.identifier} disableContextMenu />
+                ) : null}
+              </VirtualItem>
+            );
+          })}
         </div>
-      </StyledUl>
+      </ListContainer>
     </Container>
   );
-}
+};
 
 export default DryRunsPane;
+
+// Styled Components
+
+const EmptyText = styled.div`
+  padding: 16px;
+  color: ${Colors.grey8};
+`;
+
+const ListContainer = styled.ul`
+  height: 100%;
+  overflow-y: auto;
+  padding: 0px 0px;
+`;
+
+const VirtualItem = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+`;
+
+const Subheading = styled.li`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+`;
 
 export const PanelContainer = styled.div`
   height: 100%;
@@ -68,21 +140,4 @@ const Container = styled(PanelContainer)`
   display: flex;
   flex-flow: column;
   overflow-y: auto;
-`;
-
-const StyledUl = styled.ul`
-  flex: auto 0;
-  padding: 0 8px;
-  margin: 0;
-  margin-bottom: 16px;
-`;
-
-const Subheading = styled.li`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-left: 12px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #fff;
 `;
