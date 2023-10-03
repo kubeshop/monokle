@@ -1,6 +1,8 @@
+import {basename} from 'path';
 import styled from 'styled-components';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {helmValuesFilesByChartNameSelector, kustomizationResourcesSelectors} from '@redux/selectors';
 
 import {TitleBarWrapper} from '@components/atoms';
 
@@ -10,24 +12,39 @@ function DryRunsPane() {
   const dispatch = useAppDispatch();
   const preview = useAppSelector(state => state.main.preview);
 
+  const helmGroups = useAppSelector(helmValuesFilesByChartNameSelector);
+  const kustomizations = useAppSelector(kustomizationResourcesSelectors);
+
   return (
     <Container>
       <TitleBarWrapper>
         <TitleBar type="secondary" headerStyle={{background: '#232A2D'}} isOpen title="Dry runs" />
       </TitleBarWrapper>
 
-      <StyledUl>
-        <Subheading>
-          <Icon name="helm" />
-          <span>helm chart</span>
-        </Subheading>
-      </StyledUl>
+      {helmGroups.map(([chartName, valuesFiles]) => (
+        <StyledUl>
+          <Subheading>
+            <Icon name="helm" />
+            <span>{chartName}</span>
+          </Subheading>
+          <div>
+            {valuesFiles.map(valuesFile => (
+              <div>{basename(valuesFile.filePath)}</div>
+            ))}
+          </div>
+        </StyledUl>
+      ))}
 
       <StyledUl>
         <Subheading>
           <Icon name="kustomize" />
           <span>kustomize</span>
         </Subheading>
+        <div>
+          {kustomizations.map(kustomization => (
+            <div>{basename(kustomization.name)}</div>
+          ))}
+        </div>
       </StyledUl>
     </Container>
   );
