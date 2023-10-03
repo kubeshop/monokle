@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {previewLabelSelector} from '@redux/selectors';
+import {dryRunLabelSelector} from '@redux/selectors/dryRunsSelectors';
 import {restartPreview, stopPreview} from '@redux/thunks/preview';
 
 import {TitleBarWrapper} from '@components/atoms';
@@ -20,7 +20,7 @@ import NavigatorDescription from './NavigatorDescription';
 const DryRunTitleBar = () => {
   const dispatch = useAppDispatch();
   const preview = useAppSelector(state => state.main.preview);
-  const previewLabel = useAppSelector(previewLabelSelector);
+  const previewLabel = useAppSelector(dryRunLabelSelector);
 
   return (
     <TitleBarWrapper $navigator>
