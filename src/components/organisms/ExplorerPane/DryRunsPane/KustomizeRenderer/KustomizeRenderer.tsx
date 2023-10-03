@@ -8,7 +8,6 @@ import {isResourceHighlighted, isResourceSelected} from '@redux/services/resourc
 import {renderKustomizeName} from '@utils/kustomize';
 import {isResourcePassingFilter} from '@utils/resources';
 
-import {ResourceIdentifier} from '@shared/models/k8sResource';
 import {trackEvent} from '@shared/utils';
 import {isEqual} from '@shared/utils/isEqual';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
@@ -20,11 +19,12 @@ import * as S from './KustomizeRenderer.styled';
 import KustomizeSuffix from './KustomizeSuffix';
 
 type IProps = {
-  identifier: ResourceIdentifier;
+  kustomizationId: string;
 };
 
 const KustomizeRenderer: React.FC<IProps> = props => {
-  const {identifier} = props;
+  const {kustomizationId} = props;
+  const identifier = {id: kustomizationId, storage: 'local' as const};
 
   const dispatch = useAppDispatch();
   const resourceMeta = useResourceMeta(identifier);

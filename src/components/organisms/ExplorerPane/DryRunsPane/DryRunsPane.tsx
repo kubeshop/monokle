@@ -2,14 +2,15 @@ import {useRef} from 'react';
 
 import {Skeleton} from 'antd';
 
+import {CodeOutlined} from '@ant-design/icons';
+
 import {size} from 'lodash';
 import styled from 'styled-components';
 
 import {useAppSelector} from '@redux/hooks';
-import {kustomizeListSelector} from '@redux/selectors/kustomizeSelectors';
+import {dryRunNodesSelector} from '@redux/selectors/dryRunsSelectors';
 
 import {TitleBarWrapper} from '@components/atoms';
-import ResourceRenderer from '@components/organisms/NavigatorPane/ResourceRenderer';
 
 import {Icon, TitleBar} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
@@ -20,7 +21,7 @@ import KustomizeRenderer from './KustomizeRenderer';
 const ROW_HEIGHT = 26;
 
 const DryRunsPane: React.FC = () => {
-  const list = useAppSelector(kustomizeListSelector);
+  const list = useAppSelector(dryRunNodesSelector);
   const isLoading = useAppSelector(state => (state.main.previewOptions.isLoading ? true : state.ui.isFolderLoading));
 
   const ref = useRef<HTMLUListElement>(null);
@@ -72,15 +73,13 @@ const DryRunsPane: React.FC = () => {
                   transform: `translateY(${virtualItem.start}px)`,
                 }}
               >
-                {node.type === 'kustomize-kind' ? (
-                  <Subheading>
-                    <Icon name="kustomize" />
-                    <span>{node.label === 'Kustomization' ? 'kustomize' : 'kustomize patches'}</span>
-                  </Subheading>
+                {node.type === 'heading' ? (
+                  <Heading>
+                    {node.icon === 'command' ? <CodeOutlined /> : <Icon name={node.icon} />}
+                    <span>{node.label}</span>
+                  </Heading>
                 ) : node.type === 'kustomize' ? (
-                  <KustomizeRenderer identifier={node.identifier} />
-                ) : node.type === 'kustomize-resource' ? (
-                  <ResourceRenderer resourceIdentifier={node.identifier} disableContextMenu />
+                  <KustomizeRenderer kustomizationId={node.kustomizationId} />
                 ) : null}
               </VirtualItem>
             );
@@ -114,7 +113,7 @@ const VirtualItem = styled.div`
   overflow: hidden;
 `;
 
-const Subheading = styled.li`
+const Heading = styled.li`
   display: flex;
   align-items: center;
   gap: 10px;
