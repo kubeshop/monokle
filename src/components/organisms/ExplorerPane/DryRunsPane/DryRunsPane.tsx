@@ -16,7 +16,10 @@ import {Icon, TitleBar} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
+import CommandRenderer from './CommandRenderer';
+import HelmValueRenderer from './HelmValueRenderer';
 import KustomizeRenderer from './KustomizeRenderer';
+import PreviewConfigurationRenderer from './PreviewConfigurationRenderer';
 
 const ROW_HEIGHT = 26;
 
@@ -80,6 +83,12 @@ const DryRunsPane: React.FC = () => {
                   </Heading>
                 ) : node.type === 'kustomize' ? (
                   <KustomizeRenderer kustomizationId={node.kustomizationId} />
+                ) : node.type === 'helm-values' ? (
+                  <HelmValueRenderer id={node.valuesId} />
+                ) : node.type === 'helm-config' ? (
+                  <PreviewConfigurationRenderer id={node.configId} />
+                ) : node.type === 'command' ? (
+                  <CommandRenderer id={node.commandId} />
                 ) : null}
               </VirtualItem>
             );
