@@ -57,8 +57,8 @@ export const SpinnerContainer = styled.div`
 export const TitleContainer = styled.div<{$actionButtonsWidth: number; $isHovered: boolean}>`
   display: flex;
   align-items: center;
-  max-width: ${({$actionButtonsWidth, $isHovered}) => ($isHovered ? `calc(100% - ${$actionButtonsWidth}px)` : '100%')};
-  width: ${({$actionButtonsWidth, $isHovered}) => ($isHovered ? `calc(100% - ${$actionButtonsWidth}px)` : '100%')};
+  max-width: ${({$actionButtonsWidth}) => `calc(100% - ${$actionButtonsWidth}px)`};
+  width: ${({$actionButtonsWidth}) => `calc(100% - ${$actionButtonsWidth}px)`};
 `;
 
 export const TitleText = styled.span<{
