@@ -138,14 +138,16 @@ export const dryRunNodesSelector = createSelector(
       .filter(isDefined)
       .sort((a, b) => a.label.localeCompare(b.label));
 
-    list.push({type: 'heading', title: 'commands', icon: 'command'});
-    commands.forEach(command => {
-      list.push({
-        type: 'command',
-        commandId: command.id,
-        commandName: command.label,
+    if (commands.length > 0) {
+      list.push({type: 'heading', title: 'commands', icon: 'command'});
+      commands.forEach(command => {
+        list.push({
+          type: 'command',
+          commandId: command.id,
+          commandName: command.label,
+        });
       });
-    });
+    }
 
     return list;
   }
