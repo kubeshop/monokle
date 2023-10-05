@@ -1,6 +1,6 @@
 import {useLayoutEffect, useRef} from 'react';
 
-import {Skeleton} from 'antd';
+import {Button, Dropdown, Skeleton} from 'antd';
 
 import {CodeOutlined} from '@ant-design/icons';
 
@@ -20,6 +20,7 @@ import CommandRenderer from './CommandRenderer';
 import HelmConfigRenderer from './HelmConfigRenderer';
 import HelmValueRenderer from './HelmValueRenderer';
 import KustomizeRenderer from './KustomizeRenderer';
+import {useNewDryRunsMenuItems} from './useNewDryRunsMenuItems';
 
 const ROW_HEIGHT = 26;
 
@@ -28,7 +29,7 @@ const DryRunsPane: React.FC = () => {
   const isLoading = useAppSelector(state => (state.main.previewOptions.isLoading ? true : state.ui.isFolderLoading));
 
   const preview = useAppSelector(state => state.main.preview);
-
+  const menuItems = useNewDryRunsMenuItems();
   const ref = useRef<HTMLUListElement>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -77,7 +78,21 @@ const DryRunsPane: React.FC = () => {
   return (
     <Container>
       <TitleBarWrapper>
-        <TitleBar type="secondary" headerStyle={{background: '#232A2D'}} isOpen title="Dry runs" />
+        <TitleBar
+          type="secondary"
+          headerStyle={{background: '#232A2D'}}
+          isOpen
+          title="Dry runs"
+          actions={
+            <div>
+              <Dropdown trigger={['click']} menu={{items: menuItems}} overlayClassName="dropdown-secondary">
+                <NewButton id="create-dry-run-button" size="small">
+                  New
+                </NewButton>
+              </Dropdown>
+            </div>
+          }
+        />
       </TitleBarWrapper>
       <ListContainer ref={ref}>
         <div
@@ -180,4 +195,8 @@ const Container = styled(PanelContainer)`
 const Prefix = styled.span`
   font-weight: 200;
   color: ${Colors.grey6};
+`;
+
+const NewButton = styled(Button)`
+  font-size: 12px;
 `;
