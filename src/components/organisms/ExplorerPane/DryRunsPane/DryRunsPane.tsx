@@ -1,4 +1,4 @@
-import {useRef} from 'react';
+import {useLayoutEffect, useRef} from 'react';
 
 import {Skeleton} from 'antd';
 
@@ -27,6 +27,8 @@ const DryRunsPane: React.FC = () => {
   const list = useAppSelector(dryRunNodesSelector);
   const isLoading = useAppSelector(state => (state.main.previewOptions.isLoading ? true : state.ui.isFolderLoading));
 
+  const preview = useAppSelector(state => state.main.preview);
+
   const ref = useRef<HTMLUListElement>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -35,6 +37,30 @@ const DryRunsPane: React.FC = () => {
     getScrollElement: () => ref.current,
     scrollToFn: elementScroll,
   });
+
+  useLayoutEffect(() => {
+    if (!preview) {
+      return;
+    }
+
+    const index = list.findIndex(item => {
+      if (item.type === 'command' && preview.type === 'command') {
+        return item.commandId === preview.commandId;
+      }
+      if (item.type === 'helm-values' && preview.type === 'helm') {
+        return item.valuesId === preview.valuesFileId;
+      }
+      if (item.type === 'helm-config' && preview.type === 'helm-config') {
+        return item.configId === preview.configId;
+      }
+      if (item.type === 'kustomize' && preview.type === 'kustomize') {
+        return item.kustomizationId === preview.kustomizationId;
+      }
+      return false;
+    });
+
+    rowVirtualizer.scrollToIndex(index);
+  }, [preview, list, rowVirtualizer]);
 
   if (isLoading) {
     return (
