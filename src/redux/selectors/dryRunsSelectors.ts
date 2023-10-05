@@ -168,7 +168,7 @@ export const dryRunLabelSelector = createSelector(
 
     if (preview.type === 'kustomize') {
       const resource = localResourceMetaMap[preview.kustomizationId];
-      return resource?.name;
+      return basename(resource.name);
     }
 
     if (preview.type === 'helm') {
