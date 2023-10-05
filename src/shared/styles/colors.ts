@@ -79,6 +79,8 @@ export enum Colors {
   cyan = '#58D1C9',
   cyan1 = '#112123',
   cyan2 = '#113536',
+  cyan3 = '#1A4C4A',
+  cyan4 = '#2D7877',
   cyan5 = '#138585',
   cyan6 = '#13A8A8',
   cyan7 = '#33BCB7',
@@ -114,13 +116,13 @@ export enum Colors {
   selectionColor = blue9,
   selectionColorHover = blue8,
   highlightColor = cyan2,
-  highlightColorHover = cyan1,
+  highlightColorHover = cyan3,
   diffBackground = '#2B2611',
   diffBackgroundHover = '#27220f',
   blueBgColor = '#202C4D',
   blueWrapperColor = '#2b3759',
   dryRun = cyan6,
-  dryRunHover = cyan5,
+  dryRunHover = cyan7,
 }
 
 export enum PanelColors {
