@@ -1,11 +1,12 @@
-import {memo, useState} from 'react';
+import {memo, useMemo, useState} from 'react';
+
+import {basename, dirname} from 'path';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {selectResource} from '@redux/reducers/main';
 import {useResourceMeta} from '@redux/selectors/resourceSelectors';
 import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
-import {renderKustomizeName} from '@utils/kustomize';
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {trackEvent} from '@shared/utils';
@@ -13,10 +14,11 @@ import {isEqual} from '@shared/utils/isEqual';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import KustomizeContextMenu from './KustomizeContextMenu';
-import KustomizePrefix from './KustomizePrefix';
-import KustomizeQuickAction from './KustomizeQuickAction';
+// import KustomizePrefix from './KustomizePrefix';
+// import KustomizeQuickAction from './KustomizeQuickAction';
 import * as S from './KustomizeRenderer.styled';
-import KustomizeSuffix from './KustomizeSuffix';
+
+// import KustomizeSuffix from './KustomizeSuffix';
 
 type IProps = {
   kustomizationId: string;
@@ -42,6 +44,14 @@ const KustomizeRenderer: React.FC<IProps> = props => {
     Boolean(identifier && isResourceSelected(identifier, state.main.selection))
   );
 
+  const kustomizationName = useMemo(() => {
+    if (!resourceMeta) {
+      return 'unnamed kustomization';
+    }
+    const folderName = basename(dirname(resourceMeta.origin.filePath));
+    return folderName.trim().length > 0 ? folderName : basename(resourceMeta.name);
+  }, [resourceMeta]);
+
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
   if (!resourceMeta) {
@@ -63,17 +73,17 @@ const KustomizeRenderer: React.FC<IProps> = props => {
         }
       }}
     >
-      <S.PrefixContainer>
+      {/* <S.PrefixContainer>
         <KustomizePrefix resourceMeta={resourceMeta} isSelected={isSelected} isDisabled={isDisabled} />
-      </S.PrefixContainer>
+      </S.PrefixContainer> */}
 
       <S.ItemName isDisabled={isDisabled} isSelected={isSelected} isHighlighted={isHighlighted}>
-        {renderKustomizeName(resourceMeta, resourceMeta.name)}
+        {kustomizationName}
       </S.ItemName>
 
-      <S.SuffixContainer>
+      {/* <S.SuffixContainer>
         <KustomizeSuffix resourceMeta={resourceMeta} isSelected={isSelected} isDisabled={isDisabled} />
-      </S.SuffixContainer>
+      </S.SuffixContainer> */}
 
       <div
         style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}
@@ -81,9 +91,9 @@ const KustomizeRenderer: React.FC<IProps> = props => {
           e.stopPropagation();
         }}
       >
-        <S.QuickActionContainer>
+        {/* <S.QuickActionContainer>
           <KustomizeQuickAction id={resourceMeta.id} isSelected={isSelected} />
-        </S.QuickActionContainer>
+        </S.QuickActionContainer> */}
 
         {isHovered ? (
           <S.ContextMenuContainer>

@@ -1,7 +1,9 @@
+import path, {basename, dirname} from 'path';
 import {createSelector} from 'reselect';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
 
+import {ResourceMeta} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {isDefined} from '@shared/utils/filter';
 
@@ -10,7 +12,8 @@ import {getResourceMetaMapFromState} from './resourceMapGetters';
 type HeadingNode = {
   type: 'heading';
   icon: 'helm' | 'kustomize' | 'command';
-  label: string;
+  subtitle?: string;
+  title: string;
 };
 
 type HelmValuesNode = {
@@ -40,6 +43,33 @@ type CommandNode = {
 
 type DryRunNode = HeadingNode | HelmValuesNode | HelmConfigNode | KustomizeNode | CommandNode;
 
+const getKustomizeFolderInfo = (str: string) => {
+  const parentFolder = basename(str);
+
+  let wasTrimmed = false;
+  let anchestorFolder = str.substring(0, str.length - parentFolder.length - 1);
+
+  if (anchestorFolder.length > 30) {
+    wasTrimmed = true;
+    anchestorFolder = anchestorFolder.substring(anchestorFolder.length - 30);
+  }
+
+  // remove all characters from prefix until you find the first path.sep
+  anchestorFolder = anchestorFolder.substring(anchestorFolder.indexOf(path.sep));
+  if (wasTrimmed) {
+    anchestorFolder = `...${anchestorFolder}`;
+  }
+
+  if (anchestorFolder.trim() === '' || anchestorFolder.trim() === path.sep) {
+    anchestorFolder = '<root>';
+  }
+
+  return {
+    anchestorFolder,
+    parentFolder,
+  };
+};
+
 export const dryRunNodesSelector = createSelector(
   [
     (state: RootState) => getResourceMetaMapFromState(state, 'local'),
@@ -51,17 +81,35 @@ export const dryRunNodesSelector = createSelector(
   (localResourceMetaMap, helmChartMap, helmValuesMap, previewConfigurationMap, savedCommandMa) => {
     const list: DryRunNode[] = [];
 
-    const kustomizations = Object.values(localResourceMetaMap)
-      .filter(i => isKustomizationResource(i))
-      .sort((a, b) => a.name.localeCompare(b.name));
-    list.push({type: 'heading', label: 'kustomize', icon: 'kustomize'});
-    list.push(
-      ...kustomizations.map(k => ({type: 'kustomize' as const, kustomizationId: k.id, kustomizationName: k.name}))
-    );
+    const kustomizationsByAnchestorFolder = Object.values(localResourceMetaMap).reduce<
+      Record<string, ResourceMeta<'local'>[]>
+    >((acc, resource) => {
+      if (!isKustomizationResource(resource)) {
+        return acc;
+      }
+      const anchestorFolder = dirname(dirname(resource.origin.filePath));
+      if (!acc[anchestorFolder]) {
+        acc[anchestorFolder] = [];
+      }
+      acc[anchestorFolder].push(resource);
+      return acc;
+    }, {});
+
+    Object.entries(kustomizationsByAnchestorFolder)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .forEach(([parentFolderPath, kustomizations]) => {
+        const {anchestorFolder, parentFolder} = getKustomizeFolderInfo(parentFolderPath);
+        list.push({type: 'heading', subtitle: anchestorFolder, title: parentFolder, icon: 'kustomize'});
+        kustomizations
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .forEach(k => {
+            list.push({type: 'kustomize', kustomizationId: k.id, kustomizationName: k.name});
+          });
+      });
 
     const helmCharts = Object.values(helmChartMap).sort((a, b) => a.name.localeCompare(b.name));
     helmCharts.forEach(helmChart => {
-      list.push({type: 'heading', label: helmChart.name, icon: 'helm'});
+      list.push({type: 'heading', title: helmChart.name, icon: 'helm'});
       const helmValues = helmChart.valueFileIds.map(id => helmValuesMap[id]).filter(isDefined);
       helmValues.forEach(helmValue => {
         list.push({
@@ -90,7 +138,7 @@ export const dryRunNodesSelector = createSelector(
       .filter(isDefined)
       .sort((a, b) => a.label.localeCompare(b.label));
 
-    list.push({type: 'heading', label: 'commands', icon: 'command'});
+    list.push({type: 'heading', title: 'commands', icon: 'command'});
     commands.forEach(command => {
       list.push({
         type: 'command',

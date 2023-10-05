@@ -79,7 +79,8 @@ const DryRunsPane: React.FC = () => {
                 {node.type === 'heading' ? (
                   <Heading>
                     {node.icon === 'command' ? <CodeOutlined /> : <Icon name={node.icon} />}
-                    <span>{node.label}</span>
+                    {node.title.trim() !== '' && <span>{node.title}</span>}
+                    {node.subtitle && <Prefix>{node.subtitle}</Prefix>}
                   </Heading>
                 ) : node.type === 'kustomize' ? (
                   <KustomizeRenderer kustomizationId={node.kustomizationId} />
@@ -126,10 +127,11 @@ const Heading = styled.li`
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-left: 12px;
+  padding-left: 20px;
   font-size: 12px;
   font-weight: 700;
   color: #fff;
+  justify-content: left;
 `;
 
 export const PanelContainer = styled.div`
@@ -148,4 +150,9 @@ const Container = styled(PanelContainer)`
   display: flex;
   flex-flow: column;
   overflow-y: auto;
+`;
+
+const Prefix = styled.span`
+  font-weight: 200;
+  color: ${Colors.grey6};
 `;

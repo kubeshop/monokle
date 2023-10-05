@@ -22,7 +22,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   > {
     min-width: 0;
   }
-  padding-left: 30px;
+  padding-left: 20px;
   padding-right: 8px;
   margin-bottom: 2px;
   cursor: pointer;
@@ -78,6 +78,8 @@ export const ItemName = styled.div<ItemNameProps>`
     }
     return `color: ${Colors.blue10};`;
   }};
+
+  padding-left: 22px;
 `;
 
 export const PrefixContainer = styled.span`
