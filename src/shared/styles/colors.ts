@@ -120,6 +120,7 @@ export enum Colors {
   blueBgColor = '#202C4D',
   blueWrapperColor = '#2b3759',
   dryRun = cyan6,
+  dryRunHover = cyan5,
 }
 
 export enum PanelColors {

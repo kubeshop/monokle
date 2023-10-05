@@ -12,9 +12,9 @@ import {AnyPreview} from '@shared/models/preview';
 import {
   AppSelection,
   CommandSelection,
+  FileSelection,
   HelmValuesFileSelection,
   PreviewConfigurationSelection,
-  ResourceSelection,
 } from '@shared/models/selection';
 import {createSliceExtraReducers, createSliceReducers} from '@shared/utils/redux';
 
@@ -90,12 +90,9 @@ export const previewExtraReducers = createSliceExtraReducers('main', builder => 
   builder
     .addCase(previewKustomization.pending, onPreviewPending)
     .addCase(previewKustomization.fulfilled, (state, action) => {
-      const initialSelection: ResourceSelection = {
-        type: 'resource',
-        resourceIdentifier: {
-          id: action.payload.preview.kustomizationId,
-          storage: 'local',
-        },
+      const initialSelection: FileSelection = {
+        type: 'file',
+        filePath: action.payload.kustomizationFilePath,
       };
 
       onPreviewSuccess(state, action.payload, initialSelection);

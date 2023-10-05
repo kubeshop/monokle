@@ -2,11 +2,11 @@ import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
 
-type ItemContainerProps = {isDisabled: boolean; isSelected: boolean; isHighlighted: boolean; isHovered: boolean};
+type ItemContainerProps = {isDisabled: boolean; isPreviewed: boolean; isHighlighted: boolean; isHovered: boolean};
 
 type ItemNameProps = {
   isDisabled: boolean;
-  isSelected: boolean;
+  isPreviewed: boolean;
   isHighlighted: boolean;
 };
 
@@ -28,17 +28,17 @@ export const ItemContainer = styled.span<ItemContainerProps>`
       return;
     }
 
-    if (!props.isSelected && props.isHighlighted) {
+    if (!props.isPreviewed && props.isHighlighted) {
       if (props.isHovered) {
         return `background: ${Colors.highlightColorHover};`;
       }
       return `background: ${Colors.highlightColor};`;
     }
-    if (props.isSelected) {
+    if (props.isPreviewed) {
       if (props.isHovered) {
-        return `background: ${Colors.selectionColorHover};`;
+        return `background: ${Colors.dryRunHover};`;
       }
-      return `background: ${Colors.selectionColor};`;
+      return `background: ${Colors.dryRun};`;
     }
     if (props.isHovered) {
       return `background: ${Colors.blackPearl};`;
@@ -55,7 +55,7 @@ export const ItemName = styled.div<ItemNameProps>`
   white-space: nowrap;
 
   ${props => {
-    if (props.isSelected) {
+    if (props.isPreviewed) {
       return `font-weight: 700;`;
     }
     if (props.isHighlighted) {
@@ -66,10 +66,10 @@ export const ItemName = styled.div<ItemNameProps>`
     if (props.isDisabled) {
       return `color: ${Colors.grey7};`;
     }
-    if (!props.isSelected && props.isHighlighted) {
+    if (!props.isPreviewed && props.isHighlighted) {
       return `color: ${Colors.cyan7};`;
     }
-    if (props.isSelected) {
+    if (props.isPreviewed) {
       return `color: ${Colors.blackPure};`;
     }
     return `color: ${Colors.blue10};`;
