@@ -7,18 +7,15 @@ import {selectResource} from '@redux/reducers/main';
 import {useResourceMeta} from '@redux/selectors/resourceSelectors';
 import {isResourceHighlighted, isResourceSelected} from '@redux/services/resource';
 
+import {ResourceRefsIconPopover} from '@components/molecules';
+
 import {isResourcePassingFilter} from '@utils/resources';
 
 import {trackEvent} from '@shared/utils';
 import {isEqual} from '@shared/utils/isEqual';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 
-import KustomizeContextMenu from './KustomizeContextMenu';
-// import KustomizePrefix from './KustomizePrefix';
-// import KustomizeQuickAction from './KustomizeQuickAction';
-import * as S from './KustomizeRenderer.styled';
-
-// import KustomizeSuffix from './KustomizeSuffix';
+import * as S from './styled';
 
 type IProps = {
   kustomizationId: string;
@@ -73,36 +70,25 @@ const KustomizeRenderer: React.FC<IProps> = props => {
         }
       }}
     >
-      {/* <S.PrefixContainer>
-        <KustomizePrefix resourceMeta={resourceMeta} isSelected={isSelected} isDisabled={isDisabled} />
-      </S.PrefixContainer> */}
+      <ResourceRefsIconPopover
+        isSelected={isSelected}
+        isDisabled={isDisabled}
+        resourceMeta={resourceMeta}
+        type="incoming"
+        placeholderWidth={22}
+      />
 
       <S.ItemName isDisabled={isDisabled} isSelected={isSelected} isHighlighted={isHighlighted}>
         {kustomizationName}
       </S.ItemName>
 
-      {/* <S.SuffixContainer>
-        <KustomizeSuffix resourceMeta={resourceMeta} isSelected={isSelected} isDisabled={isDisabled} />
-      </S.SuffixContainer> */}
-
-      <div
-        style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}
-        onClick={e => {
-          e.stopPropagation();
-        }}
-      >
-        {/* <S.QuickActionContainer>
-          <KustomizeQuickAction id={resourceMeta.id} isSelected={isSelected} />
-        </S.QuickActionContainer> */}
-
-        {isHovered ? (
-          <S.ContextMenuContainer>
-            <KustomizeContextMenu id={resourceMeta.id} isSelected={isSelected} />
-          </S.ContextMenuContainer>
-        ) : (
-          <S.ContextMenuPlaceholder />
-        )}
-      </div>
+      <ResourceRefsIconPopover
+        isSelected={isSelected}
+        isDisabled={isDisabled}
+        resourceMeta={resourceMeta}
+        type="outgoing"
+        placeholderWidth={22}
+      />
     </S.ItemContainer>
   );
 };

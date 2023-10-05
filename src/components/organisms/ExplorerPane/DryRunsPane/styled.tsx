@@ -10,10 +10,6 @@ type ItemNameProps = {
   isHighlighted: boolean;
 };
 
-export const ContextMenuPlaceholder = styled.div`
-  width: 31px;
-`;
-
 export const ItemContainer = styled.span<ItemContainerProps>`
   display: flex;
   align-items: center;
@@ -78,19 +74,4 @@ export const ItemName = styled.div<ItemNameProps>`
     }
     return `color: ${Colors.blue10};`;
   }};
-
-  padding-left: 22px;
 `;
-
-export const PrefixContainer = styled.span`
-  min-width: 40px;
-`;
-
-export const SuffixContainer = styled.span`
-  display: flex;
-  align-items: center;
-`;
-
-export const QuickActionContainer = styled.span``;
-
-export const ContextMenuContainer = styled.span``;

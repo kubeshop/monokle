@@ -21,11 +21,13 @@ const ResourceRefsIconPopover = ({
   type,
   isDisabled,
   isSelected,
+  placeholderWidth,
 }: {
   resourceMeta: ResourceMeta;
   type: 'incoming' | 'outgoing';
   isDisabled: boolean;
   isSelected: boolean;
+  placeholderWidth?: number;
 }) => {
   const resourceRefs = useMemo(
     () =>
@@ -48,7 +50,7 @@ const ResourceRefsIconPopover = ({
   const incomingColor = useMemo(() => (isSelected ? Colors.blackPure : Colors.blue10), [isSelected]);
 
   if (isDisabled || !resourceRefs || !size(resourceRefs)) {
-    return <span style={{width: '30px', minWidth: '30px'}} />;
+    return <span style={{width: `${placeholderWidth}px`, minWidth: `${placeholderWidth}px`}} />;
   }
 
   return (
