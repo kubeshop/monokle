@@ -83,7 +83,7 @@ const FileSystemTree: React.FC = () => {
           );
         }}
         treeData={treeData}
-        height={containerHeight}
+        height={containerHeight - 100}
         titleRender={node => <FileSystemTreeNode node={node} />}
         selectedKeys={
           selectedFilePath ? [selectedFilePath] : firstHighlightedFile ? [firstHighlightedFile.filePath] : []
