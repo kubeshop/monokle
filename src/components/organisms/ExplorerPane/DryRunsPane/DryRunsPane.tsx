@@ -140,7 +140,6 @@ export const PanelContainer = styled.div`
   background-color: ${Colors.grey10};
   overflow: hidden;
   z-index: -2;
-  padding-bottom: 12px;
   display: flex;
   flex-flow: column;
   overflow-y: auto;
