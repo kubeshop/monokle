@@ -17,9 +17,9 @@ import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import CommandRenderer from './CommandRenderer';
+import HelmConfigRenderer from './HelmConfigRenderer';
 import HelmValueRenderer from './HelmValueRenderer';
 import KustomizeRenderer from './KustomizeRenderer';
-import PreviewConfigurationRenderer from './PreviewConfigurationRenderer';
 
 const ROW_HEIGHT = 26;
 
@@ -87,7 +87,7 @@ const DryRunsPane: React.FC = () => {
                 ) : node.type === 'helm-values' ? (
                   <HelmValueRenderer id={node.valuesId} />
                 ) : node.type === 'helm-config' ? (
-                  <PreviewConfigurationRenderer id={node.configId} />
+                  <HelmConfigRenderer id={node.configId} />
                 ) : node.type === 'command' ? (
                   <CommandRenderer id={node.commandId} />
                 ) : null}

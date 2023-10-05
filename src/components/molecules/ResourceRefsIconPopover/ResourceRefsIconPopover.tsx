@@ -25,7 +25,7 @@ const ResourceRefsIconPopover = ({
 }: {
   resourceMeta: ResourceMeta;
   type: 'incoming' | 'outgoing';
-  isDisabled: boolean;
+  isDisabled?: boolean;
   isSelected: boolean;
   placeholderWidth?: number;
 }) => {

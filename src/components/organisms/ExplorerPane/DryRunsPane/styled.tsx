@@ -2,12 +2,18 @@ import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
 
-type ItemContainerProps = {isDisabled: boolean; isPreviewed: boolean; isHighlighted: boolean; isHovered: boolean};
+type ItemContainerProps = {
+  isDisabled?: boolean;
+  isPreviewed: boolean;
+  isHighlighted?: boolean;
+  isHovered: boolean;
+  indent?: number;
+};
 
 type ItemNameProps = {
-  isDisabled: boolean;
+  isDisabled?: boolean;
+  isHighlighted?: boolean;
   isPreviewed: boolean;
-  isHighlighted: boolean;
 };
 
 export const ItemContainer = styled.span<ItemContainerProps>`
@@ -18,7 +24,7 @@ export const ItemContainer = styled.span<ItemContainerProps>`
   > {
     min-width: 0;
   }
-  padding-left: 20px;
+  padding-left: ${props => `${20 + (props.indent ?? 0)}px`};
   padding-right: 8px;
   margin-bottom: 2px;
   cursor: pointer;

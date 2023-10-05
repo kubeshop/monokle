@@ -9,7 +9,6 @@ import {startPreview} from '@redux/thunks/preview';
 
 import {ResourceRefsIconPopover} from '@components/molecules';
 
-import {trackEvent} from '@shared/utils';
 import {isEqual} from '@shared/utils/isEqual';
 
 import * as S from './styled';
@@ -47,7 +46,6 @@ const KustomizeRenderer: React.FC<IProps> = props => {
 
   return (
     <S.ItemContainer
-      isDisabled={false}
       isHovered={isHovered}
       isPreviewed={isPreviewed}
       isHighlighted={isHighlighted}
@@ -60,12 +58,10 @@ const KustomizeRenderer: React.FC<IProps> = props => {
             kustomizationId: identifier.id,
           })
         );
-        trackEvent('explore/select_overlay');
       }}
     >
       <ResourceRefsIconPopover
         isSelected={isPreviewed}
-        isDisabled={false}
         resourceMeta={resourceMeta}
         type="incoming"
         placeholderWidth={22}
@@ -77,7 +73,6 @@ const KustomizeRenderer: React.FC<IProps> = props => {
 
       <ResourceRefsIconPopover
         isSelected={isPreviewed}
-        isDisabled={false}
         resourceMeta={resourceMeta}
         type="outgoing"
         placeholderWidth={22}
