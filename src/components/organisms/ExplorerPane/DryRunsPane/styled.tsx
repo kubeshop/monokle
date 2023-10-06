@@ -93,3 +93,5 @@ export const CloseIcon = styled(CloseCircleOutlined)`
   color: ${Colors.blackPure};
   margin-left: 8px;
 `;
+
+export const ContextMenuContainer = styled.span``;

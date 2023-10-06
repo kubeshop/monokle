@@ -17,6 +17,7 @@ import {Colors} from '@shared/styles/colors';
 import {elementScroll, useVirtualizer} from '@tanstack/react-virtual';
 
 import CommandRenderer from './CommandRenderer';
+import HelmChartRenderer from './HelmChartRenderer';
 import HelmConfigRenderer from './HelmConfigRenderer';
 import HelmValueRenderer from './HelmValueRenderer';
 import KustomizeRenderer from './KustomizeRenderer';
@@ -125,6 +126,8 @@ const DryRunsPane: React.FC = () => {
                   </Heading>
                 ) : node.type === 'kustomize' ? (
                   <KustomizeRenderer kustomizationId={node.kustomizationId} />
+                ) : node.type === 'helm-chart' ? (
+                  <HelmChartRenderer id={node.chartId} />
                 ) : node.type === 'helm-values' ? (
                   <HelmValueRenderer id={node.valuesId} />
                 ) : node.type === 'helm-config' ? (

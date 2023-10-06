@@ -11,9 +11,14 @@ import {getResourceMetaMapFromState} from './resourceMapGetters';
 
 type HeadingNode = {
   type: 'heading';
-  icon: 'helm' | 'kustomize' | 'command';
+  icon: 'kustomize' | 'command';
   subtitle?: string;
   title: string;
+};
+
+type HelmChartNode = {
+  type: 'helm-chart';
+  chartId: string;
 };
 
 type HelmValuesNode = {
@@ -41,7 +46,7 @@ type CommandNode = {
   commandName: string;
 };
 
-type DryRunNode = HeadingNode | HelmValuesNode | HelmConfigNode | KustomizeNode | CommandNode;
+type DryRunNode = HeadingNode | HelmChartNode | HelmValuesNode | HelmConfigNode | KustomizeNode | CommandNode;
 
 const getKustomizeFolderInfo = (str: string) => {
   const parentFolder = basename(str);
@@ -109,7 +114,7 @@ export const dryRunNodesSelector = createSelector(
 
     const helmCharts = Object.values(helmChartMap).sort((a, b) => a.name.localeCompare(b.name));
     helmCharts.forEach(helmChart => {
-      list.push({type: 'heading', title: helmChart.name, icon: 'helm'});
+      list.push({type: 'helm-chart', chartId: helmChart.id});
       const helmValues = helmChart.valueFileIds.map(id => helmValuesMap[id]).filter(isDefined);
       helmValues.forEach(helmValue => {
         list.push({
