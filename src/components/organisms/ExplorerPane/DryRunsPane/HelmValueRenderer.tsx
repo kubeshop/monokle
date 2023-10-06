@@ -21,7 +21,7 @@ const HelmValuesRenderer: React.FC<IProps> = props => {
     state => state.main.preview?.type === 'helm' && state.main.preview?.valuesFileId === helmValues.id
   );
   const thisPreview: HelmPreview = {type: 'helm', chartId: helmValues.helmChartId, valuesFileId: id};
-  const {isOptimisticLoading, triggerPreview} = usePreviewTrigger(thisPreview);
+  const {isOptimisticLoading, triggerPreview, renderPreviewControls} = usePreviewTrigger(thisPreview);
   const mightBePreview = isPreviewed || isOptimisticLoading;
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -39,6 +39,7 @@ const HelmValuesRenderer: React.FC<IProps> = props => {
     >
       <S.ItemName isPreviewed={mightBePreview}>{helmValues.name}</S.ItemName>
       {isOptimisticLoading && <S.ReloadIcon spin />}
+      {renderPreviewControls()}
     </S.ItemContainer>
   );
 };

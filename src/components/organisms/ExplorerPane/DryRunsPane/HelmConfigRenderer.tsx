@@ -20,7 +20,7 @@ const HelmConfigRenderer: React.FC<IProps> = props => {
     state => state.main.preview?.type === 'helm-config' && state.main.preview.configId === previewConfiguration?.id
   );
   const thisPreview: HelmConfigPreview = {type: 'helm-config', configId: id};
-  const {isOptimisticLoading, triggerPreview} = usePreviewTrigger(thisPreview);
+  const {isOptimisticLoading, triggerPreview, renderPreviewControls} = usePreviewTrigger(thisPreview);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const mightBePreview = isPreviewed || isOptimisticLoading;
 
@@ -39,6 +39,7 @@ const HelmConfigRenderer: React.FC<IProps> = props => {
     >
       <S.ItemName isPreviewed={mightBePreview}>{previewConfiguration.name}</S.ItemName>
       {isOptimisticLoading && <S.ReloadIcon spin />}
+      {renderPreviewControls()}
     </S.ItemContainer>
   );
 };

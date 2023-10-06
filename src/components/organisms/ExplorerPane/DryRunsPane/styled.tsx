@@ -1,4 +1,4 @@
-import {ReloadOutlined} from '@ant-design/icons';
+import {CloseCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -85,6 +85,11 @@ export const ItemName = styled.div<ItemNameProps>`
 `;
 
 export const ReloadIcon = styled(ReloadOutlined)`
+  color: ${Colors.blackPure};
+  margin-left: 8px;
+`;
+
+export const CloseIcon = styled(CloseCircleOutlined)`
   color: ${Colors.blackPure};
   margin-left: 8px;
 `;

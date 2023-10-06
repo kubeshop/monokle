@@ -21,7 +21,7 @@ const CommandRenderer: React.FC<IProps> = props => {
     state => state.main.preview?.type === 'command' && state.main.preview.commandId === command?.id
   );
   const thisPreview: CommandPreview = {type: 'command', commandId: id};
-  const {isOptimisticLoading, triggerPreview} = usePreviewTrigger(thisPreview);
+  const {isOptimisticLoading, triggerPreview, renderPreviewControls} = usePreviewTrigger(thisPreview);
   const mightBePreview = isPreviewed || isOptimisticLoading;
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -41,6 +41,7 @@ const CommandRenderer: React.FC<IProps> = props => {
     >
       <S.ItemName isPreviewed={mightBePreview}>{command.label}</S.ItemName>
       {isOptimisticLoading && <S.ReloadIcon spin />}
+      {renderPreviewControls()}
     </S.ItemContainer>
   );
 };

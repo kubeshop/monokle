@@ -34,7 +34,7 @@ const KustomizeRenderer: React.FC<IProps> = props => {
     type: 'kustomize',
     kustomizationId: identifier.id,
   };
-  const {isOptimisticLoading, triggerPreview} = usePreviewTrigger(thisPreview);
+  const {isOptimisticLoading, triggerPreview, renderPreviewControls} = usePreviewTrigger(thisPreview);
   const mightBePreview = isPreviewed || isOptimisticLoading;
 
   const kustomizationName = useMemo(() => {
@@ -66,19 +66,17 @@ const KustomizeRenderer: React.FC<IProps> = props => {
         type="incoming"
         placeholderWidth={22}
       />
-
       <S.ItemName isDisabled={false} isPreviewed={mightBePreview} isHighlighted={isHighlighted}>
         {kustomizationName}
       </S.ItemName>
-
       <ResourceRefsIconPopover
         isSelected={mightBePreview}
         resourceMeta={resourceMeta}
         type="outgoing"
         placeholderWidth={22}
       />
-
       {isOptimisticLoading && <S.ReloadIcon spin />}
+      {renderPreviewControls()}
     </S.ItemContainer>
   );
 };

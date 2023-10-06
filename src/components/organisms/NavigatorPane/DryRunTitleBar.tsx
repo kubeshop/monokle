@@ -1,6 +1,6 @@
 import {Tooltip} from 'antd';
 
-import {CloseCircleFilled, ReloadOutlined} from '@ant-design/icons';
+import {CloseCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -40,7 +40,7 @@ const DryRunTitleBar = () => {
                   <ReloadIcon onClick={() => preview && dispatch(restartPreview(preview))} />
                 </Tooltip>
                 <Tooltip title="Exit Dry-run" mouseEnterDelay={TOOLTIP_DELAY}>
-                  <CloseCircleFilled onClick={() => dispatch(stopPreview())} />
+                  <CloseCircleOutlined onClick={() => dispatch(stopPreview())} />
                 </Tooltip>
               </>
             )}
