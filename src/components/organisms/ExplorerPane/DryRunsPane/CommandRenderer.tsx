@@ -1,7 +1,10 @@
 import {memo, useState} from 'react';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {startPreview} from '@redux/thunks/preview';
+import {useAppSelector} from '@redux/hooks';
+
+import {CommandPreview} from '@shared/models/preview';
+
+import {usePreviewTrigger} from './usePreviewTrigger';
 
 import * as S from './styled';
 
@@ -14,10 +17,12 @@ const CommandRenderer: React.FC<IProps> = props => {
 
   const command = useAppSelector(state => state.config.projectConfig?.savedCommandMap?.[id]);
 
-  const dispatch = useAppDispatch();
   const isPreviewed = useAppSelector(
     state => state.main.preview?.type === 'command' && state.main.preview.commandId === command?.id
   );
+  const thisPreview: CommandPreview = {type: 'command', commandId: id};
+  const {isOptimisticLoading, triggerPreview} = usePreviewTrigger(thisPreview);
+  const mightBePreview = isPreviewed || isOptimisticLoading;
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
@@ -29,14 +34,13 @@ const CommandRenderer: React.FC<IProps> = props => {
     <S.ItemContainer
       indent={22}
       isHovered={isHovered}
-      isPreviewed={isPreviewed}
+      isPreviewed={mightBePreview}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => {
-        dispatch(startPreview({type: 'command', commandId: id}));
-      }}
+      onClick={triggerPreview}
     >
-      <S.ItemName isPreviewed={isPreviewed}>{command.label}</S.ItemName>
+      <S.ItemName isPreviewed={mightBePreview}>{command.label}</S.ItemName>
+      {isOptimisticLoading && <S.ReloadIcon spin />}
     </S.ItemContainer>
   );
 };

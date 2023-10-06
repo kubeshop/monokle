@@ -22,20 +22,28 @@ const DryRunTitleBar = () => {
   const preview = useAppSelector(state => state.main.preview);
   const previewLabel = useAppSelector(dryRunLabelSelector);
 
+  const isLoading = useAppSelector(state => state.main.previewOptions.isLoading);
+
   return (
     <TitleBarWrapper $navigator>
       <TitleBar
         type="secondary"
         title={
           <div style={{color: Colors.blackPure}}>
-            <Icon style={{width: 20, height: 20}} name={preview?.type === 'kustomize' ? 'kustomize' : 'helm'} />
-            <Label>{previewLabel}</Label>
-            <Tooltip title="Reload Dry-run" mouseEnterDelay={TOOLTIP_DELAY}>
-              <ReloadIcon onClick={() => preview && dispatch(restartPreview(preview))} />
-            </Tooltip>
-            <Tooltip title="Exit Dry-run" mouseEnterDelay={TOOLTIP_DELAY}>
-              <CloseCircleFilled onClick={() => dispatch(stopPreview())} />
-            </Tooltip>
+            {preview?.type && (
+              <Icon style={{width: 20, height: 20}} name={preview.type === 'kustomize' ? 'kustomize' : 'helm'} />
+            )}
+            <Label>{preview ? previewLabel : 'Loading Dry run...'}</Label>
+            {!isLoading && (
+              <>
+                <Tooltip title="Reload Dry-run" mouseEnterDelay={TOOLTIP_DELAY}>
+                  <ReloadIcon onClick={() => preview && dispatch(restartPreview(preview))} />
+                </Tooltip>
+                <Tooltip title="Exit Dry-run" mouseEnterDelay={TOOLTIP_DELAY}>
+                  <CloseCircleFilled onClick={() => dispatch(stopPreview())} />
+                </Tooltip>
+              </>
+            )}
           </div>
         }
         description={<NavigatorDescription />}
@@ -44,6 +52,7 @@ const DryRunTitleBar = () => {
           background: `${Colors.dryRun}20`,
           paddingTop: '5px',
         }}
+        actions={isLoading ? <ReloadOutlined spin style={{color: Colors.blackPure}} /> : null}
       />
     </TitleBarWrapper>
   );

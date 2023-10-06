@@ -26,7 +26,7 @@ const ROW_HEIGHT = 26;
 
 const DryRunsPane: React.FC = () => {
   const list = useAppSelector(dryRunNodesSelector);
-  const isLoading = useAppSelector(state => (state.main.previewOptions.isLoading ? true : state.ui.isFolderLoading));
+  const isLoading = useAppSelector(state => state.ui.isFolderLoading);
 
   const preview = useAppSelector(state => state.main.preview);
   const menuItems = useNewDryRunsMenuItems();

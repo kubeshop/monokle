@@ -1,7 +1,10 @@
 import {memo, useState} from 'react';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {startPreview} from '@redux/thunks/preview';
+import {useAppSelector} from '@redux/hooks';
+
+import {HelmConfigPreview} from '@shared/models/preview';
+
+import {usePreviewTrigger} from './usePreviewTrigger';
 
 import * as S from './styled';
 
@@ -12,13 +15,14 @@ type IProps = {
 const HelmConfigRenderer: React.FC<IProps> = props => {
   const {id} = props;
 
-  const dispatch = useAppDispatch();
   const previewConfiguration = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap?.[id]);
   const isPreviewed = useAppSelector(
     state => state.main.preview?.type === 'helm-config' && state.main.preview.configId === previewConfiguration?.id
   );
-
+  const thisPreview: HelmConfigPreview = {type: 'helm-config', configId: id};
+  const {isOptimisticLoading, triggerPreview} = usePreviewTrigger(thisPreview);
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const mightBePreview = isPreviewed || isOptimisticLoading;
 
   if (!previewConfiguration) {
     return null;
@@ -28,14 +32,13 @@ const HelmConfigRenderer: React.FC<IProps> = props => {
     <S.ItemContainer
       indent={22}
       isHovered={isHovered}
-      isPreviewed={isPreviewed}
+      isPreviewed={mightBePreview}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => {
-        dispatch(startPreview({type: 'helm-config', configId: id}));
-      }}
+      onClick={triggerPreview}
     >
-      <S.ItemName isPreviewed={isPreviewed}>{previewConfiguration.name}</S.ItemName>
+      <S.ItemName isPreviewed={mightBePreview}>{previewConfiguration.name}</S.ItemName>
+      {isOptimisticLoading && <S.ReloadIcon spin />}
     </S.ItemContainer>
   );
 };

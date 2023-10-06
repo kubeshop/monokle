@@ -1,3 +1,5 @@
+import {ReloadOutlined} from '@ant-design/icons';
+
 import styled from 'styled-components';
 
 import {Colors} from '@shared/styles/colors';
@@ -80,4 +82,9 @@ export const ItemName = styled.div<ItemNameProps>`
     }
     return `color: ${Colors.blue10};`;
   }};
+`;
+
+export const ReloadIcon = styled(ReloadOutlined)`
+  color: ${Colors.blackPure};
+  margin-left: 8px;
 `;

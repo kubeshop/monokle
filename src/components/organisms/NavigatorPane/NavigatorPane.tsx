@@ -32,7 +32,7 @@ const NavPane: React.FC = () => {
         <S.SelectionBar>
           <CheckedResourcesActionsMenu />
         </S.SelectionBar>
-      ) : isInPreviewMode ? (
+      ) : isInPreviewMode || isPreviewLoading ? (
         <DryRunTitleBar />
       ) : (
         <ResourceTitleBar />

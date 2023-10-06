@@ -2,14 +2,16 @@ import {memo, useMemo, useState} from 'react';
 
 import {basename, dirname} from 'path';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {useAppSelector} from '@redux/hooks';
 import {useResourceMeta} from '@redux/selectors/resourceSelectors';
 import {isResourceHighlighted} from '@redux/services/resource';
-import {startPreview} from '@redux/thunks/preview';
 
 import {ResourceRefsIconPopover} from '@components/molecules';
 
+import {KustomizePreview} from '@shared/models/preview';
 import {isEqual} from '@shared/utils/isEqual';
+
+import {usePreviewTrigger} from './usePreviewTrigger';
 
 import * as S from './styled';
 
@@ -21,7 +23,6 @@ const KustomizeRenderer: React.FC<IProps> = props => {
   const {kustomizationId} = props;
   const identifier = {id: kustomizationId, storage: 'local' as const};
 
-  const dispatch = useAppDispatch();
   const resourceMeta = useResourceMeta(identifier);
   const isHighlighted = useAppSelector(state =>
     Boolean(identifier && isResourceHighlighted(identifier, state.main.highlights))
@@ -29,6 +30,12 @@ const KustomizeRenderer: React.FC<IProps> = props => {
   const isPreviewed = useAppSelector(
     state => state.main.preview?.type === 'kustomize' && state.main.preview.kustomizationId === identifier.id
   );
+  const thisPreview: KustomizePreview = {
+    type: 'kustomize',
+    kustomizationId: identifier.id,
+  };
+  const {isOptimisticLoading, triggerPreview} = usePreviewTrigger(thisPreview);
+  const mightBePreview = isPreviewed || isOptimisticLoading;
 
   const kustomizationName = useMemo(() => {
     if (!resourceMeta) {
@@ -47,36 +54,31 @@ const KustomizeRenderer: React.FC<IProps> = props => {
   return (
     <S.ItemContainer
       isHovered={isHovered}
-      isPreviewed={isPreviewed}
+      isPreviewed={mightBePreview}
       isHighlighted={isHighlighted}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => {
-        dispatch(
-          startPreview({
-            type: 'kustomize',
-            kustomizationId: identifier.id,
-          })
-        );
-      }}
+      onClick={triggerPreview}
     >
       <ResourceRefsIconPopover
-        isSelected={isPreviewed}
+        isSelected={mightBePreview}
         resourceMeta={resourceMeta}
         type="incoming"
         placeholderWidth={22}
       />
 
-      <S.ItemName isDisabled={false} isPreviewed={isPreviewed} isHighlighted={isHighlighted}>
+      <S.ItemName isDisabled={false} isPreviewed={mightBePreview} isHighlighted={isHighlighted}>
         {kustomizationName}
       </S.ItemName>
 
       <ResourceRefsIconPopover
-        isSelected={isPreviewed}
+        isSelected={mightBePreview}
         resourceMeta={resourceMeta}
         type="outgoing"
         placeholderWidth={22}
       />
+
+      {isOptimisticLoading && <S.ReloadIcon spin />}
     </S.ItemContainer>
   );
 };
