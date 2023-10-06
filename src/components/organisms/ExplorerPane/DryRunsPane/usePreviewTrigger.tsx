@@ -9,6 +9,7 @@ import {isEqual} from 'lodash';
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {addAppListener, useAppDispatch, useAppSelector} from '@redux/hooks';
+import {selectFile} from '@redux/reducers/main';
 import {restartPreview, startPreview, stopPreview} from '@redux/thunks/preview';
 
 import {AnyPreview} from '@shared/models/preview';
@@ -20,6 +21,15 @@ export const usePreviewTrigger = (preview: AnyPreview) => {
   const [isOptimisticLoading, setIsOptimisticLoading] = useState(false);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isPreviewed = useAppSelector(state => isEqual(state.main.preview, preview));
+  const previewFilePath = useAppSelector(state => {
+    if (preview?.type === 'kustomize') {
+      return state.main.resourceMetaMapByStorage.local[preview.kustomizationId]?.origin.filePath;
+    }
+    if (preview?.type === 'helm') {
+      return state.main.helmValuesMap[preview.valuesFileId]?.filePath;
+    }
+    return undefined;
+  });
 
   // the reload of a preview can be triggered from multiple places, not only from where this hook is used
   // so we have to listen to startPreview in case our state is not up to date
@@ -49,12 +59,16 @@ export const usePreviewTrigger = (preview: AnyPreview) => {
   }, [isPreviewLoading]);
 
   const triggerPreview = useCallback(() => {
-    if (isPreviewLoading) {
+    if (previewFilePath) {
+      dispatch(selectFile({filePath: previewFilePath}));
+    }
+
+    if (isPreviewed || isPreviewLoading) {
       return;
     }
     setIsOptimisticLoading(true);
     dispatch(startPreview(preview));
-  }, [preview, dispatch, isPreviewLoading]);
+  }, [preview, dispatch, isPreviewed, isPreviewLoading, previewFilePath]);
 
   const renderPreviewControls = useCallback(() => {
     if (!isPreviewed) {
