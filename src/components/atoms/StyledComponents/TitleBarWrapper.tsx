@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const TitleBarWrapper = styled.div<{$editor?: boolean; $navigator?: boolean}>`
-  padding: 16px 20px 0px 16px;
+  padding: 16px 20px 10px 16px;
 
   ${({$editor, $navigator}) => {
     if ($editor) {

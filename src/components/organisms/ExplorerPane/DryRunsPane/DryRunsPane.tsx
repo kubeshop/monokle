@@ -1,6 +1,6 @@
 import {useLayoutEffect, useRef} from 'react';
 
-import {Button, Dropdown, Skeleton} from 'antd';
+import {Dropdown, Skeleton} from 'antd';
 
 import {CodeOutlined} from '@ant-design/icons';
 
@@ -11,6 +11,7 @@ import {useAppSelector} from '@redux/hooks';
 import {dryRunNodesSelector} from '@redux/selectors/dryRunsSelectors';
 
 import {TitleBarWrapper} from '@components/atoms';
+import HoverableButton from '@components/atoms/HoverableButton';
 
 import {Icon, TitleBar} from '@monokle/components';
 import {Colors} from '@shared/styles/colors';
@@ -87,7 +88,15 @@ const DryRunsPane: React.FC = () => {
           actions={
             <div>
               <Dropdown trigger={['click']} menu={{items: menuItems}} overlayClassName="dropdown-secondary">
-                <NewButton id="create-dry-run-button" size="small">
+                <NewButton
+                  id="create-dry-run-button"
+                  size="small"
+                  hoverProps={{type: 'primary', style: {}}}
+                  style={{
+                    color: Colors.grey9,
+                    border: `1px solid ${Colors.grey9}`,
+                  }}
+                >
                   New
                 </NewButton>
               </Dropdown>
@@ -200,6 +209,6 @@ const Prefix = styled.span`
   color: ${Colors.grey6};
 `;
 
-const NewButton = styled(Button)`
+const NewButton = styled(HoverableButton)`
   font-size: 12px;
 `;
