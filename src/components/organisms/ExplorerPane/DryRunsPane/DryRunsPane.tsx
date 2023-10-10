@@ -2,7 +2,7 @@ import {useLayoutEffect, useRef} from 'react';
 
 import {Dropdown, Skeleton} from 'antd';
 
-import {CodeOutlined} from '@ant-design/icons';
+import {CloseCircleFilled, CodeOutlined} from '@ant-design/icons';
 
 import {size} from 'lodash';
 import styled from 'styled-components';
@@ -73,10 +73,6 @@ const DryRunsPane: React.FC = () => {
     );
   }
 
-  if (!size(list)) {
-    return <EmptyText>No Dry runs found in the current project.</EmptyText>;
-  }
-
   return (
     <Container>
       <TitleBarWrapper>
@@ -104,51 +100,61 @@ const DryRunsPane: React.FC = () => {
           }
         />
       </TitleBarWrapper>
-      <ListContainer ref={ref}>
-        <div
-          style={{
-            height: `${rowVirtualizer.getTotalSize()}px`,
-            width: '100%',
-            position: 'relative',
-          }}
-        >
-          {rowVirtualizer.getVirtualItems().map(virtualItem => {
-            const node = list[virtualItem.index];
+      {!size(list) ? (
+        <EmptyContainer>
+          <EmptyIcon />
+          <p>
+            <BoldSpan>No dry runs available</BoldSpan> for this repository. Dry runs allow you to simulate the
+            installation of a chart or other component without actually creating any resources in the cluster.
+          </p>
+        </EmptyContainer>
+      ) : (
+        <ListContainer ref={ref}>
+          <div
+            style={{
+              height: `${rowVirtualizer.getTotalSize()}px`,
+              width: '100%',
+              position: 'relative',
+            }}
+          >
+            {rowVirtualizer.getVirtualItems().map(virtualItem => {
+              const node = list[virtualItem.index];
 
-            if (!node) {
-              return null;
-            }
+              if (!node) {
+                return null;
+              }
 
-            return (
-              <VirtualItem
-                key={virtualItem.key}
-                style={{
-                  height: `${virtualItem.size}px`,
-                  transform: `translateY(${virtualItem.start}px)`,
-                }}
-              >
-                {node.type === 'heading' ? (
-                  <Heading>
-                    {node.icon === 'command' ? <CodeOutlined /> : <Icon name={node.icon} />}
-                    {node.title.trim() !== '' && <span>{node.title}</span>}
-                    {node.subtitle && <Prefix>{node.subtitle}</Prefix>}
-                  </Heading>
-                ) : node.type === 'kustomize' ? (
-                  <KustomizeRenderer kustomizationId={node.kustomizationId} />
-                ) : node.type === 'helm-chart' ? (
-                  <HelmChartRenderer id={node.chartId} />
-                ) : node.type === 'helm-values' ? (
-                  <HelmValueRenderer id={node.valuesId} />
-                ) : node.type === 'helm-config' ? (
-                  <HelmConfigRenderer id={node.configId} />
-                ) : node.type === 'command' ? (
-                  <CommandRenderer id={node.commandId} />
-                ) : null}
-              </VirtualItem>
-            );
-          })}
-        </div>
-      </ListContainer>
+              return (
+                <VirtualItem
+                  key={virtualItem.key}
+                  style={{
+                    height: `${virtualItem.size}px`,
+                    transform: `translateY(${virtualItem.start}px)`,
+                  }}
+                >
+                  {node.type === 'heading' ? (
+                    <Heading>
+                      {node.icon === 'command' ? <CodeOutlined /> : <Icon name={node.icon} />}
+                      {node.title.trim() !== '' && <span>{node.title}</span>}
+                      {node.subtitle && <Prefix>{node.subtitle}</Prefix>}
+                    </Heading>
+                  ) : node.type === 'kustomize' ? (
+                    <KustomizeRenderer kustomizationId={node.kustomizationId} />
+                  ) : node.type === 'helm-chart' ? (
+                    <HelmChartRenderer id={node.chartId} />
+                  ) : node.type === 'helm-values' ? (
+                    <HelmValueRenderer id={node.valuesId} />
+                  ) : node.type === 'helm-config' ? (
+                    <HelmConfigRenderer id={node.configId} />
+                  ) : node.type === 'command' ? (
+                    <CommandRenderer id={node.commandId} />
+                  ) : null}
+                </VirtualItem>
+              );
+            })}
+          </div>
+        </ListContainer>
+      )}
     </Container>
   );
 };
@@ -211,4 +217,19 @@ const Prefix = styled.span`
 
 const NewButton = styled(HoverableButton)`
   font-size: 12px;
+`;
+
+const BoldSpan = styled.span`
+  font-weight: 700;
+`;
+
+const EmptyContainer = styled.div`
+  padding: 0 20px;
+  color: ${Colors.grey7};
+`;
+
+const EmptyIcon = styled(CloseCircleFilled)`
+  color: ${Colors.grey6};
+  font-size: 24px;
+  padding: 8px 0;
 `;
