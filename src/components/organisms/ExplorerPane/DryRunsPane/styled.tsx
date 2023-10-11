@@ -84,8 +84,8 @@ export const ItemName = styled.div<ItemNameProps>`
   }};
 `;
 
-export const EditIcon = styled(EditOutlined)`
-  color: ${Colors.blackPure};
+export const EditIcon = styled(EditOutlined)<{$isPreviewed: boolean}>`
+  color: ${props => (props.$isPreviewed ? Colors.blackPure : Colors.blue6)};
   margin-left: 8px;
 `;
 

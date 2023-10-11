@@ -33,15 +33,20 @@ const HelmConfigRenderer: React.FC<IProps> = props => {
       : undefined
   );
 
-  const onClickEdit = useCallback(() => {
-    if (!previewConfiguration || !helmChart) {
-      return;
-    }
+  const onClickEdit = useCallback<React.MouseEventHandler<HTMLSpanElement>>(
+    e => {
+      e.stopPropagation();
 
-    dispatch(
-      openPreviewConfigurationEditor({helmChartId: helmChart.id, previewConfigurationId: previewConfiguration.id})
-    );
-  }, [previewConfiguration, helmChart, dispatch]);
+      if (!previewConfiguration || !helmChart) {
+        return;
+      }
+
+      dispatch(
+        openPreviewConfigurationEditor({helmChartId: helmChart.id, previewConfigurationId: previewConfiguration.id})
+      );
+    },
+    [previewConfiguration, helmChart, dispatch]
+  );
 
   if (!previewConfiguration) {
     return null;
@@ -58,7 +63,7 @@ const HelmConfigRenderer: React.FC<IProps> = props => {
     >
       <S.ItemName isPreviewed={mightBePreview}>{previewConfiguration.name}</S.ItemName>
       {isOptimisticLoading && <S.ReloadIcon spin />}
-      <S.EditIcon onClick={onClickEdit} />
+      <S.EditIcon $isPreviewed={mightBePreview} onClick={onClickEdit} />
       {renderPreviewControls()}
     </S.ItemContainer>
   );
