@@ -1,6 +1,7 @@
-import {memo, useState} from 'react';
+import {memo, useCallback, useState} from 'react';
 
-import {useAppSelector} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {openPreviewConfigurationEditor} from '@redux/reducers/main';
 
 import {HelmConfigPreview} from '@shared/models/preview';
 
@@ -15,6 +16,8 @@ type IProps = {
 const HelmConfigRenderer: React.FC<IProps> = props => {
   const {id} = props;
 
+  const dispatch = useAppDispatch();
+
   const previewConfiguration = useAppSelector(state => state.config.projectConfig?.helm?.previewConfigurationMap?.[id]);
   const isPreviewed = useAppSelector(
     state => state.main.preview?.type === 'helm-config' && state.main.preview.configId === previewConfiguration?.id
@@ -23,6 +26,22 @@ const HelmConfigRenderer: React.FC<IProps> = props => {
   const {isOptimisticLoading, triggerPreview, renderPreviewControls} = usePreviewTrigger(thisPreview);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const mightBePreview = isPreviewed || isOptimisticLoading;
+
+  const helmChart = useAppSelector(state =>
+    previewConfiguration
+      ? Object.values(state.main.helmChartMap).find(h => h.filePath === previewConfiguration.helmChartFilePath)
+      : undefined
+  );
+
+  const onClickEdit = useCallback(() => {
+    if (!previewConfiguration || !helmChart) {
+      return;
+    }
+
+    dispatch(
+      openPreviewConfigurationEditor({helmChartId: helmChart.id, previewConfigurationId: previewConfiguration.id})
+    );
+  }, [previewConfiguration, helmChart, dispatch]);
 
   if (!previewConfiguration) {
     return null;
@@ -39,6 +58,7 @@ const HelmConfigRenderer: React.FC<IProps> = props => {
     >
       <S.ItemName isPreviewed={mightBePreview}>{previewConfiguration.name}</S.ItemName>
       {isOptimisticLoading && <S.ReloadIcon spin />}
+      <S.EditIcon onClick={onClickEdit} />
       {renderPreviewControls()}
     </S.ItemContainer>
   );
