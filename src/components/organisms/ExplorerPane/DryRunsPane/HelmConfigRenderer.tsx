@@ -1,7 +1,12 @@
 import {memo, useCallback, useState} from 'react';
 
+import {Popconfirm} from 'antd';
+
+import {DeletePreviewConfigurationTooltip} from '@constants/tooltips';
+
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {openPreviewConfigurationEditor} from '@redux/reducers/main';
+import {deletePreviewConfiguration} from '@redux/thunks/preview';
 
 import {HelmConfigPreview} from '@shared/models/preview';
 
@@ -36,7 +41,6 @@ const HelmConfigRenderer: React.FC<IProps> = props => {
   const onClickEdit = useCallback<React.MouseEventHandler<HTMLSpanElement>>(
     e => {
       e.stopPropagation();
-
       if (!previewConfiguration || !helmChart) {
         return;
       }
@@ -46,6 +50,18 @@ const HelmConfigRenderer: React.FC<IProps> = props => {
       );
     },
     [previewConfiguration, helmChart, dispatch]
+  );
+
+  const onClickDelete = useCallback<(e?: React.MouseEvent<HTMLElement, MouseEvent>) => void>(
+    e => {
+      e?.stopPropagation();
+      if (!previewConfiguration) {
+        return;
+      }
+
+      dispatch(deletePreviewConfiguration(previewConfiguration.id));
+    },
+    [previewConfiguration, dispatch]
   );
 
   if (!previewConfiguration) {
@@ -63,7 +79,14 @@ const HelmConfigRenderer: React.FC<IProps> = props => {
     >
       <S.ItemName isPreviewed={mightBePreview}>{previewConfiguration.name}</S.ItemName>
       {isOptimisticLoading && <S.ReloadIcon spin />}
-      <S.EditIcon $isPreviewed={mightBePreview} onClick={onClickEdit} />
+      {(isHovered || mightBePreview) && (
+        <>
+          <S.EditIcon $isPreviewed={mightBePreview} onClick={onClickEdit} />
+          <Popconfirm title={DeletePreviewConfigurationTooltip} onConfirm={onClickDelete}>
+            <S.DeleteIcon $isPreviewed={mightBePreview} onClick={e => e.stopPropagation()} />
+          </Popconfirm>
+        </>
+      )}
       {renderPreviewControls()}
     </S.ItemContainer>
   );

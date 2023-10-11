@@ -1,4 +1,4 @@
-import {CloseCircleOutlined, EditOutlined, ReloadOutlined} from '@ant-design/icons';
+import {CloseCircleOutlined, DeleteOutlined, EditOutlined, ReloadOutlined} from '@ant-design/icons';
 
 import styled from 'styled-components';
 
@@ -85,6 +85,11 @@ export const ItemName = styled.div<ItemNameProps>`
 `;
 
 export const EditIcon = styled(EditOutlined)<{$isPreviewed: boolean}>`
+  color: ${props => (props.$isPreviewed ? Colors.blackPure : Colors.blue6)};
+  margin-left: 8px;
+`;
+
+export const DeleteIcon = styled(DeleteOutlined)<{$isPreviewed: boolean}>`
   color: ${props => (props.$isPreviewed ? Colors.blackPure : Colors.blue6)};
   margin-left: 8px;
 `;
