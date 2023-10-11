@@ -16,16 +16,16 @@ export const startPreview = createAsyncThunk<void, AnyPreview, {dispatch: AppDis
     thunkAPI.dispatch(clearPreviewAndSelectionHistory());
 
     if (preview.type === 'kustomize') {
-      thunkAPI.dispatch(previewKustomization(preview.kustomizationId));
+      await thunkAPI.dispatch(previewKustomization(preview.kustomizationId)).unwrap();
     }
     if (preview.type === 'helm') {
-      thunkAPI.dispatch(previewHelmValuesFile(preview.valuesFileId));
+      await thunkAPI.dispatch(previewHelmValuesFile(preview.valuesFileId)).unwrap();
     }
     if (preview.type === 'helm-config') {
-      thunkAPI.dispatch(runPreviewConfiguration({helmConfigId: preview.configId}));
+      await thunkAPI.dispatch(runPreviewConfiguration({helmConfigId: preview.configId})).unwrap();
     }
     if (preview.type === 'command') {
-      thunkAPI.dispatch(previewSavedCommand(preview.commandId));
+      await thunkAPI.dispatch(previewSavedCommand(preview.commandId)).unwrap();
     }
   }
 );

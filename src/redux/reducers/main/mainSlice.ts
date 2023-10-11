@@ -24,6 +24,7 @@ import {resetSelectionHistory} from '@redux/services/selectionHistory';
 import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
+import {startPreview} from '@redux/thunks/preview';
 import {removeResources} from '@redux/thunks/removeResources';
 import {saveTransientResources} from '@redux/thunks/saveTransientResources';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
@@ -153,6 +154,13 @@ const addResourceReducer = (state: AppState, resource: K8sResource) => {
     typeof resource.storage
   >;
   resourceContentMap[content.id] = content;
+};
+
+const stopClusterConnectionReducer = (state: Draft<AppState>) => {
+  resetSelectionHistory(state);
+  clearSelectionReducer(state);
+  state.clusterConnectionOptions.isLoading = false;
+  state.clusterConnection = undefined;
 };
 
 export const mainSlice = createSlice({
@@ -360,6 +368,8 @@ export const mainSlice = createSlice({
         state.clusterConnectionOptions.isLoading = true;
       })
       .addCase(loadClusterResources.fulfilled, (state, action) => {
+        clearPreviewReducer(state);
+
         state.clusterConnectionOptions.isLoading = false;
         resetSelectionHistory(state);
         clearSelectionReducer(state);
@@ -417,10 +427,11 @@ export const mainSlice = createSlice({
       });
 
     builder.addCase(stopClusterConnection.fulfilled, state => {
-      resetSelectionHistory(state);
-      clearSelectionReducer(state);
-      state.clusterConnectionOptions.isLoading = false;
-      state.clusterConnection = undefined;
+      stopClusterConnectionReducer(state);
+    });
+
+    builder.addCase(startPreview.fulfilled, state => {
+      stopClusterConnectionReducer(state);
     });
 
     builder.addCase(setRootFolder.pending, state => {

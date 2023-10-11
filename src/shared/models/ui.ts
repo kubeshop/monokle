@@ -188,6 +188,9 @@ type UiState = {
     projectCreate?: Project;
   };
   isInQuickClusterMode?: boolean;
+  /**
+   * @deprecated Not used at the moment, might be needed in the future
+   * */
   collapsedKustomizeKinds: string[];
   collapsedHelmCharts: string[];
   collapsedPreviewConfigurationsHelmCharts: string[];

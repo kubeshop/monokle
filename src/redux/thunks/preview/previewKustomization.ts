@@ -27,6 +27,7 @@ export const previewKustomization = createAsyncThunk<
   {
     resources: K8sResource<'preview'>[];
     preview: KustomizePreview;
+    kustomizationFilePath: string;
   },
   string,
   {dispatch: AppDispatch; state: RootState}
@@ -81,6 +82,7 @@ export const previewKustomization = createAsyncThunk<
   return {
     resources,
     preview,
+    kustomizationFilePath: kustomization.origin.filePath,
   };
 });
 

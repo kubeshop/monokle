@@ -1,58 +1,26 @@
-import {useCallback, useMemo} from 'react';
-
-import {Dropdown, Tooltip} from 'antd';
-
-import AntdIcon from '@ant-design/icons';
-
-import styled from 'styled-components';
-
-import {TOOLTIP_DELAY} from '@constants/constants';
-import {
-  CollapseResourcesTooltip,
-  DisabledAddResourceTooltip,
-  ExpandResourcesTooltip,
-  NewResourceTooltip,
-} from '@constants/tooltips';
+import {useCallback} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {collapseResourceKinds, expandResourceKinds, toggleResourceFilters} from '@redux/reducers/ui';
-import {activeResourceCountSelector, navigatorResourceKindsSelector} from '@redux/selectors/resourceMapSelectors';
+import {toggleResourceFilters} from '@redux/reducers/ui';
 
 import {CheckedResourcesActionsMenu, ResourceFilter} from '@molecules';
 
-import {CollapseIcon, ExpandIcon} from '@components/atoms/Icons';
-import {TitleBarWrapper} from '@components/atoms/StyledComponents/TitleBarWrapper';
+import {isInPreviewModeSelector} from '@shared/utils';
 
-import {useNewResourceMenuItems} from '@hooks/menuItemsHooks';
-
-import {useSelectorWithRef} from '@utils/hooks';
-
-import {TitleBar} from '@monokle/components';
-import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
-import {Colors} from '@shared/styles';
-import {trackEvent} from '@shared/utils';
-import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
-
-import NavigatorDescription from './NavigatorDescription';
-import * as S from './NavigatorPane.styled';
+import DryRunTitleBar from './DryRunTitleBar';
 import ResourceNavigator from './ResourceNavigator';
+import {ResourceTitleBar} from './ResourceTitleBar';
+
+import * as S from './styled';
 
 const NavPane: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const checkedResourceIdentifiers = useAppSelector(state => state.main.checkedResourceIdentifiers);
-  const isFolderOpen = useAppSelector(state => Boolean(state.main.fileMap[ROOT_FILE_ENTRY]));
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
+
   const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isResourceFiltersOpen = useAppSelector(state => state.ui.isResourceFiltersOpen);
-
-  const newResourceMenuItems = useNewResourceMenuItems();
-
-  const isAddResourceDisabled = useMemo(
-    () => !isFolderOpen || isInPreviewMode || isInClusterMode,
-    [isFolderOpen, isInClusterMode, isInPreviewMode]
-  );
 
   const resourceFilterButtonHandler = useCallback(() => {
     dispatch(toggleResourceFilters());
@@ -64,47 +32,10 @@ const NavPane: React.FC = () => {
         <S.SelectionBar>
           <CheckedResourcesActionsMenu />
         </S.SelectionBar>
+      ) : isInPreviewMode || isPreviewLoading ? (
+        <DryRunTitleBar />
       ) : (
-        <TitleBarWrapper $navigator>
-          <TitleBar
-            type="secondary"
-            title="Kubernetes Resources"
-            description={<NavigatorDescription />}
-            descriptionStyle={{paddingTop: '5px'}}
-            actions={
-              <S.TitleBarRightButtons>
-                <CollapseAction />
-
-                <Dropdown
-                  trigger={['click']}
-                  menu={{items: newResourceMenuItems}}
-                  overlayClassName="dropdown-secondary"
-                  disabled={isAddResourceDisabled}
-                >
-                  <Tooltip
-                    mouseEnterDelay={TOOLTIP_DELAY}
-                    title={
-                      isAddResourceDisabled
-                        ? DisabledAddResourceTooltip({
-                            type: isInClusterMode ? 'cluster' : isInPreviewMode ? 'preview' : 'other',
-                          })
-                        : NewResourceTooltip
-                    }
-                  >
-                    <S.NewButton
-                      id="create-resource-button"
-                      disabled={isAddResourceDisabled}
-                      size="small"
-                      type="primary"
-                    >
-                      New
-                    </S.NewButton>
-                  </Tooltip>
-                </Dropdown>
-              </S.TitleBarRightButtons>
-            }
-          />
-        </TitleBarWrapper>
+        <ResourceTitleBar />
       )}
 
       <ResourceFilter active={isResourceFiltersOpen} onToggle={resourceFilterButtonHandler} />
@@ -117,61 +48,3 @@ const NavPane: React.FC = () => {
 };
 
 export default NavPane;
-
-function CollapseAction() {
-  const dispatch = useAppDispatch();
-  const [hasAnyActiveResources, hasAnyActiveResourcesRef] = useSelectorWithRef(
-    state => activeResourceCountSelector(state) > 0
-  );
-
-  const [collapsedKinds, collapsedKindsRef] = useSelectorWithRef(s => s.ui.navigator.collapsedResourceKinds);
-  const [navigatorKinds, navigatorKindsRef] = useSelectorWithRef(navigatorResourceKindsSelector);
-
-  const isCollapsed = useMemo(
-    () => collapsedKinds.length === navigatorKinds.length,
-    [collapsedKinds.length, navigatorKinds.length]
-  );
-
-  const onClick = useCallback(() => {
-    if (!hasAnyActiveResourcesRef.current) {
-      return;
-    }
-
-    if (collapsedKindsRef.current.length === navigatorKindsRef.current.length) {
-      dispatch(expandResourceKinds(navigatorKindsRef.current));
-      trackEvent('navigator/expand_all');
-      return;
-    }
-
-    dispatch(collapseResourceKinds(navigatorKindsRef.current));
-    trackEvent('navigator/collapse_all');
-  }, [hasAnyActiveResourcesRef, collapsedKindsRef, navigatorKindsRef, dispatch]);
-
-  return (
-    <>
-      <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandResourcesTooltip : CollapseResourcesTooltip}>
-        {isCollapsed ? (
-          <StyledFullscreenOutlined component={ExpandIcon} onClick={onClick} $disabled={!hasAnyActiveResources} />
-        ) : (
-          <StyledFullscreenExitOutlined component={CollapseIcon} onClick={onClick} $disabled={!hasAnyActiveResources} />
-        )}
-      </Tooltip>
-    </>
-  );
-}
-
-// Styled Components
-
-const StyledFullscreenOutlined = styled(AntdIcon)<{$disabled: boolean}>`
-  color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.blue6)};
-  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
-  padding-right: 10px;
-  font-size: 16px;
-`;
-
-const StyledFullscreenExitOutlined = styled(AntdIcon)<{$disabled: boolean}>`
-  color: ${({$disabled}) => ($disabled ? Colors.grey6 : Colors.blue6)};
-  cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
-  padding-right: 10px;
-  font-size: 16px;
-`;
