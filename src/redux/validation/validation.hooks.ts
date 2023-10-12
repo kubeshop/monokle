@@ -30,7 +30,9 @@ export const pollCloudPolicy = async (state: RootState, dispatch: AppDispatch) =
   const previousCloudPolicy = state.validation.cloudPolicy;
 
   if (!cloudPolicy) {
-    dispatch(setCloudPolicy(undefined));
+    if (previousCloudPolicy) {
+      dispatch(setCloudPolicy(undefined));
+    }
     return;
   }
 
@@ -45,6 +47,7 @@ export const pollCloudPolicy = async (state: RootState, dispatch: AppDispatch) =
         title: 'Repository connected to Cloud Project',
         message:
           'This repository has been connected successfully to a Cloud Project. The Policy is now being synchronized.',
+        silent: true,
       })
     );
   } else {
@@ -53,6 +56,7 @@ export const pollCloudPolicy = async (state: RootState, dispatch: AppDispatch) =
         type: AlertEnum.Success,
         title: 'Cloud Policy updated',
         message: 'The Policy has been changed in the Cloud Project and is now being synchronized.',
+        silent: true,
       })
     );
   }
@@ -93,8 +97,7 @@ export const useCloudPolicy = () => {
 
   useInterval(() => {
     pollCloudPolicy(store.getState(), dispatch);
-    updateProjectInfo();
-  }, 10 * 1000);
+  }, 20 * 1000);
 
   return {cloudPolicy, projectInfo, policyInfo};
 };

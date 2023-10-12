@@ -1,6 +1,6 @@
 import {memo, useMemo} from 'react';
 
-import {Button, CollapsePanelProps, Tooltip} from 'antd';
+import {Button, Tooltip} from 'antd';
 
 import AntdIcon, {ExclamationCircleOutlined, ReloadOutlined} from '@ant-design/icons';
 
@@ -11,30 +11,25 @@ import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setFileExplorerExpandedFolders} from '@redux/reducers/ui';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
-import {AccordionPanel} from '@components/atoms';
 import {CollapseIcon, ExpandIcon} from '@components/atoms/Icons';
 
 import {useRefSelector} from '@utils/hooks';
 
-import {TitleBar, TitleBarCount} from '@monokle/components';
+import {TitleBar} from '@monokle/components';
 import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {InjectedPanelProps} from '@shared/models/explorer';
 import {trackEvent} from '@shared/utils';
 import {isEqual} from '@shared/utils/isEqual';
-import {isInClusterModeSelector} from '@shared/utils/selectors';
 
 import * as S from './FilePane.styled';
 import FileSystemTree from './FileSystemTree';
 import {useSetFolderFromMainThread} from './useSetFolderFromMainThread';
 
-const FilePane: React.FC<InjectedPanelProps> = props => {
-  const {isActive, panelKey} = props;
-
+const FilePane: React.FC<InjectedPanelProps> = () => {
   const dispatch = useAppDispatch();
   const fileExplorerExpandedFolders = useAppSelector(state => state.ui.fileExplorerExpandedFolders);
   const fileMap = useAppSelector(state => state.main.fileMap);
   const isFolderLoading = useAppSelector(state => state.ui.isFolderLoading);
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
   const isScanExcludesUpdated = useAppSelector(state => state.config.isScanExcludesUpdated);
   const rootEntry = useAppSelector(state => state.main.fileMap[ROOT_FILE_ENTRY]);
 
@@ -53,50 +48,41 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
   useSetFolderFromMainThread();
 
   return (
-    <AccordionPanel
-      {...props}
-      collapsible={isInClusterMode ? 'disabled' : undefined}
-      showArrow={false}
-      header={
+    <S.Container>
+      <S.TitleBarContainer>
         <TitleBar
-          expandable
-          isOpen={Boolean(isActive)}
           title="Files"
           actions={
-            isActive ? (
-              <S.TitleBarActions onClick={e => e.stopPropagation()}>
-                {isScanExcludesUpdated === 'outdated' && (
-                  <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerChanged}>
-                    <ExclamationCircleOutlined />
-                  </Tooltip>
-                )}
-
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
-                  <Button
-                    size="small"
-                    onClick={() => dispatch(setRootFolder({rootFolder: rootEntry.filePath, isReload: true}))}
-                    icon={<ReloadOutlined />}
-                    type="link"
-                    disabled={isButtonDisabled}
-                  />
+            <S.TitleBarActions onClick={e => e.stopPropagation()}>
+              {isScanExcludesUpdated === 'outdated' && (
+                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={FileExplorerChanged}>
+                  <ExclamationCircleOutlined />
                 </Tooltip>
+              )}
 
-                <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}>
-                  <Button
-                    icon={isCollapsed ? <AntdIcon component={ExpandIcon} /> : <AntdIcon component={CollapseIcon} />}
-                    onClick={() => {
-                      dispatch(setFileExplorerExpandedFolders(isCollapsed ? allFolderKeysRef.current : []));
-                      trackEvent(isCollapsed ? 'explore/expand_all' : 'explore/collapse_all');
-                    }}
-                    type="link"
-                    size="small"
-                    disabled={isButtonDisabled}
-                  />
-                </Tooltip>
-              </S.TitleBarActions>
-            ) : (
-              <TitleBarCount count={filesOnly.length} isActive={false} />
-            )
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={ReloadFolderTooltip}>
+                <Button
+                  size="small"
+                  onClick={() => dispatch(setRootFolder({rootFolder: rootEntry.filePath, isReload: true}))}
+                  icon={<ReloadOutlined />}
+                  type="link"
+                  disabled={isButtonDisabled}
+                />
+              </Tooltip>
+
+              <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={isCollapsed ? ExpandTreeTooltip : CollapseTreeTooltip}>
+                <Button
+                  icon={isCollapsed ? <AntdIcon component={ExpandIcon} /> : <AntdIcon component={CollapseIcon} />}
+                  onClick={() => {
+                    dispatch(setFileExplorerExpandedFolders(isCollapsed ? allFolderKeysRef.current : []));
+                    trackEvent(isCollapsed ? 'explore/expand_all' : 'explore/collapse_all');
+                  }}
+                  type="link"
+                  size="small"
+                  disabled={isButtonDisabled}
+                />
+              </Tooltip>
+            </S.TitleBarActions>
           }
           descriptionStyle={{paddingTop: '5px'}}
           description={
@@ -114,9 +100,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
             </S.RootFolderText>
           }
         />
-      }
-      key={panelKey as CollapsePanelProps['key']}
-    >
+      </S.TitleBarContainer>
       <S.FileTreeContainer>
         {isFolderLoading ? (
           <S.Skeleton active />
@@ -128,7 +112,7 @@ const FilePane: React.FC<InjectedPanelProps> = props => {
           </S.NoFilesContainer>
         )}
       </S.FileTreeContainer>
-    </AccordionPanel>
+    </S.Container>
   );
 };
 

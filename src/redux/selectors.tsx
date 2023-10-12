@@ -68,6 +68,24 @@ export const helmValuesMapByFilePathSelector = createSelector(
   }
 );
 
+export const helmValuesFilesByChartNameSelector = createSelector(
+  [(state: RootState) => state.main.helmChartMap, (state: RootState) => state.main.helmValuesMap],
+  (helmChartMap, helmValuesMap) => {
+    const helmValuesByChartName: Record<string, HelmValuesFile[]> = {};
+    Object.values(helmValuesMap).forEach(helmValuesFile => {
+      const helmChart = helmChartMap[helmValuesFile.helmChartId];
+      if (!helmChart) {
+        return;
+      }
+      if (!helmValuesByChartName[helmChart.name]) {
+        helmValuesByChartName[helmChart.name] = [];
+      }
+      helmValuesByChartName[helmChart.name].push(helmValuesFile);
+    });
+    return Object.entries(helmValuesByChartName).sort((a, b) => a[0].localeCompare(b[0]));
+  }
+);
+
 export const selectedHelmValuesSelector = createSelector(
   [(state: RootState) => state.main.selection, (state: RootState) => state.main.helmValuesMap],
   (selection, helmValuesMap) => {

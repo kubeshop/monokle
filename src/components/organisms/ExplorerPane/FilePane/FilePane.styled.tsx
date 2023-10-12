@@ -95,3 +95,13 @@ export const TitleBarActions = styled.div`
     font-size: 16px;
   }
 `;
+
+export const Container = styled.div`
+  position: relative;
+  height: 100%;
+  overflow-y: hidden;
+`;
+
+export const TitleBarContainer = styled.div`
+  padding: 16px 24px 0px 16px;
+`;

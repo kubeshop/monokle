@@ -15,6 +15,7 @@ import {ROOT_FILE_ENTRY} from '@shared/constants/fileEntry';
 import {isFileSelection} from '@shared/models/selection';
 import {isHelmValuesFile, trackEvent} from '@shared/utils';
 
+// import { TreeRef } from 'antd';
 import * as S from './FileSystemTree.styled';
 import FileSystemTreeNode from './TreeNode';
 
@@ -28,6 +29,7 @@ const FileSystemTree: React.FC = () => {
   const [firstHighlightedFile, firstHighlightedFileRef] = useSelectorWithRef(state =>
     state.main.highlights.find(isFileSelection)
   );
+  const filePathToScrollTo = useRef<string>();
 
   const [containerRef, {height: containerHeight}] = useMeasure<HTMLDivElement>();
 
@@ -36,11 +38,13 @@ const FileSystemTree: React.FC = () => {
   const treeData = useAppSelector(projectFileTreeSelector);
 
   useLayoutEffect(() => {
-    if (!firstHighlightedFile) {
+    const targetFilePath = selectedFilePath ?? firstHighlightedFile?.filePath;
+
+    if (!targetFilePath) {
       return;
     }
 
-    const parentFolderPaths = getAllParentFolderPaths(firstHighlightedFile.filePath).filter(
+    const parentFolderPaths = getAllParentFolderPaths(targetFilePath).filter(
       folderPath => !fileExplorerExpandedFoldersRef.current.includes(folderPath)
     );
 
@@ -48,18 +52,19 @@ const FileSystemTree: React.FC = () => {
       dispatch(
         setFileExplorerExpandedFolders([...new Set([...fileExplorerExpandedFoldersRef.current, ...parentFolderPaths])])
       );
-    } else {
-      treeRef.current?.scrollTo({key: firstHighlightedFile.filePath});
     }
-  }, [dispatch, fileExplorerExpandedFoldersRef, firstHighlightedFile]);
+
+    filePathToScrollTo.current = targetFilePath;
+  }, [dispatch, selectedFilePath, fileExplorerExpandedFoldersRef, firstHighlightedFile]);
 
   useLayoutEffect(() => {
-    if (!firstHighlightedFileRef.current) {
+    if (!filePathToScrollTo.current) {
       return;
     }
 
     setTimeout(() => {
-      treeRef.current?.scrollTo({key: firstHighlightedFileRef.current?.filePath});
+      treeRef.current?.scrollTo({key: filePathToScrollTo.current});
+      filePathToScrollTo.current = undefined;
     }, 50);
   }, [fileExplorerExpandedFolders, firstHighlightedFileRef]);
 
@@ -83,7 +88,7 @@ const FileSystemTree: React.FC = () => {
           );
         }}
         treeData={treeData}
-        height={containerHeight}
+        height={containerHeight - 100}
         titleRender={node => <FileSystemTreeNode node={node} />}
         selectedKeys={
           selectedFilePath ? [selectedFilePath] : firstHighlightedFile ? [firstHighlightedFile.filePath] : []

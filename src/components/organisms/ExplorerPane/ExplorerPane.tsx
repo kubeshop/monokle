@@ -1,68 +1,39 @@
-import {Collapse as RawCollapse} from 'antd';
-
+import {Allotment} from 'allotment';
 import styled from 'styled-components';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {setExplorerSelectedSection} from '@redux/reducers/ui';
+import {PANEL_HEADER_HEIGHT} from '@components/atoms/AccordionPanel/AccordionPanel';
 
-import {isInClusterModeSelector} from '@shared/utils/selectors';
-import {trackEvent} from '@shared/utils/telemetry';
+import {Colors, PanelColors} from '@monokle/components';
 
+import DryRunsPane from './DryRunsPane';
 import FilePane from './FilePane';
-import HelmPane from './HelmPane';
-import ImagesPane from './ImagesPane';
-import KustomizePane from './KustomizePane';
-import PreviewConfigurationPane from './PreviewConfigurationPane';
 
 const ExplorerPane: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const explorerSelectedSection = useAppSelector(state => state.ui.explorerSelectedSection);
-  const isInClusterMode = useAppSelector(isInClusterModeSelector);
-
   return (
-    <CollapseContainer>
-      <Collapse
-        accordion
-        ghost
-        activeKey={isInClusterMode ? 'images' : explorerSelectedSection}
-        onChange={(key: any) => {
-          if (isInClusterMode) {
-            return;
-          }
-          dispatch(setExplorerSelectedSection(key));
-          trackEvent('left-menu/activity-changed', {activity: 'explorer', section: key});
-        }}
-      >
-        <FilePane key="files" />
-        <KustomizePane key="kustomize" />
-        <HelmPane key="helm" />
-        <PreviewConfigurationPane key="preview-configuration" />
-        <ImagesPane key="images" />
-      </Collapse>
-    </CollapseContainer>
+    <StyledAllotment vertical>
+      <Allotment.Pane minSize={PANEL_HEADER_HEIGHT + 16}>
+        <PaneContainer>
+          <FilePane key="files" />
+        </PaneContainer>
+      </Allotment.Pane>
+      <Allotment.Pane minSize={54}>
+        <PaneContainer>
+          <DryRunsPane key="dry-runs" />
+        </PaneContainer>
+      </Allotment.Pane>
+    </StyledAllotment>
   );
 };
 
 export default ExplorerPane;
 
-const Collapse = styled(RawCollapse)`
-  padding-top: 18px;
-  box-sizing: border-box;
+const PaneContainer = styled.div`
+  background: ${PanelColors.toolBar};
   height: 100%;
-  padding-bottom: 14px !important;
-  overflow: hidden;
-  max-height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  min-height: 0;
-
-  .ant-collapse-header {
-    padding: 2px 20px 0px 20px !important;
-  }
 `;
 
-const CollapseContainer = styled.div`
-  width: 100%;
-  height: 100%;
+const StyledAllotment = styled(Allotment)`
+  --sash-hover-size: 3px;
+  --separator-border: ${Colors.backgroundGrey};
+  --focus-border: ${Colors.geekblue7};
 `;
