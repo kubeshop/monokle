@@ -1,6 +1,6 @@
-import {useCallback, useMemo} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
-import {Button, Dropdown, Modal, Tooltip} from 'antd';
+import {Button, Dropdown, Tooltip} from 'antd';
 
 import {LeftOutlined, RightOutlined} from '@ant-design/icons';
 
@@ -21,6 +21,7 @@ import {runPreviewConfiguration} from '@redux/thunks/runPreviewConfiguration';
 import {selectFromHistory} from '@redux/thunks/selectFromHistory';
 
 import {TitleBarWrapper} from '@components/atoms';
+import {HelmChartModalConfirmWithNamespaceSelect} from '@components/molecules';
 
 import {useRefSelector} from '@utils/hooks';
 
@@ -50,6 +51,8 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   const selectedHelmConfig = useAppSelector(selectedHelmConfigSelector);
   const selectedImage = useAppSelector(selectedImageSelector);
 
+  const [isHelmChartApplyModalVisible, setIsHelmChartApplyModalVisible] = useState(false);
+
   const onClickEditPreviewConfiguration = useCallback(() => {
     if (!selectedHelmConfig) {
       return;
@@ -74,18 +77,23 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
     dispatch(startPreview({type: 'helm-config', configId: selectedHelmConfig.id}));
   }, [dispatch, selectedHelmConfig]);
 
-  const onClickInstallPreviewConfiguration = useCallback(() => {
-    Modal.confirm({
-      title: 'Install Helm Chart',
-      content: `Are you sure you want to install the ${selectedHelmConfig?.name} configuration to the cluster?`,
-      onOk: () => {
-        if (!selectedHelmConfig) {
-          return;
-        }
-        dispatch(runPreviewConfiguration({helmConfigId: selectedHelmConfig.id, performDeploy: true}));
-      },
-    });
-  }, [dispatch, selectedHelmConfig]);
+  const onConfirmInstallPreviewConfiguration = useCallback(
+    (selectedNamespace?: string, shouldCreateNamespace?: boolean) => {
+      if (!selectedHelmConfig) {
+        return;
+      }
+      dispatch(
+        runPreviewConfiguration({
+          helmConfigId: selectedHelmConfig.id,
+          performDeploy: true,
+          selectedNamespace,
+          shouldCreateNamespace,
+        })
+      );
+      setIsHelmChartApplyModalVisible(false);
+    },
+    [dispatch, selectedHelmConfig]
+  );
 
   const onClickLeftArrow = useCallback(() => {
     dispatch(selectFromHistory('left'));
@@ -135,6 +143,14 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
   if (selectedHelmConfig) {
     return (
       <TitleBarWrapper>
+        <HelmChartModalConfirmWithNamespaceSelect
+          isVisible={isHelmChartApplyModalVisible}
+          title="Install Helm Chart using Configuration"
+          onOk={onConfirmInstallPreviewConfiguration}
+          onCancel={() => {
+            setIsHelmChartApplyModalVisible(false);
+          }}
+        />
         <TitleBar
           title="Helm Command"
           type="secondary"
@@ -145,7 +161,7 @@ const ActionsPaneHeader: React.FC<IProps> = props => {
                 title={InstallPreviewConfigurationTooltip}
                 placement="bottomLeft"
               >
-                <Button type="primary" size="small" ghost onClick={onClickInstallPreviewConfiguration}>
+                <Button type="primary" size="small" ghost onClick={() => setIsHelmChartApplyModalVisible(true)}>
                   Install
                 </Button>
               </Tooltip>

@@ -39,14 +39,14 @@ import {showGitErrorModal} from '@utils/terminal';
 import MonokleKubeshopLogo from '@assets/NewMonokleLogoDark.svg';
 
 import {Icon} from '@monokle/components';
-import {isInClusterModeSelector, isInPreviewModeSelector} from '@shared/utils/selectors';
+import {isInClusterModeSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
+import CloudSync from './CloudSync';
 import {ClusterControls} from './ClusterControl/ClusterControls';
 import DownloadProgress from './DownloadProgress';
 import {K8sVersionSelection} from './K8sVersionSelection';
 import * as S from './PageHeader.styled';
-import {PreviewControls} from './PreviewControl/PreviewControls';
 
 const PageHeader = () => {
   const dispatch = useAppDispatch();
@@ -56,7 +56,6 @@ const PageHeader = () => {
   const gitLoading = useAppSelector(state => state.git.loading);
   const hasGitRepo = useAppSelector(state => Boolean(state.git.repo));
   const isGitInstalled = useAppSelector(state => state.git.isGitInstalled);
-  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const layoutSize = useAppSelector(state => state.ui.layoutSize);
   const unseenNotificationsCount = useAppSelector(state => state.main.notifications.filter(n => !n.hasSeen).length);
   const isNewVersionAvailable = useAppSelector(state => state.config.isNewVersionAvailable);
@@ -281,8 +280,9 @@ const PageHeader = () => {
         </div>
 
         <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
+          <CloudSync />
           <K8sVersionSelection />
-          {isInPreviewMode ? <PreviewControls /> : <ClusterControls />}
+          <ClusterControls />
 
           <Tooltip mouseEnterDelay={TOOLTIP_DELAY} title={NotificationsTooltip}>
             <Badge count={unseenNotificationsCount} size="small">

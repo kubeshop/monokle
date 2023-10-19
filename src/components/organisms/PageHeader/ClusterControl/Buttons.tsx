@@ -90,12 +90,12 @@ const SquareBtn = styled(Button)`
 `;
 
 const ConnectBtn = styled(SquareBtn)`
-  border-color: ${Colors.geekblue7};
-  background-color: ${Colors.geekblue7};
+  border-color: ${Colors.blue6};
+  background-color: ${Colors.blue6};
 `;
 
 const CloseBtn = styled(SquareBtn)`
   min-width: 20px;
   border: none;
-  color: ${Colors.geekblue7};
+  color: ${Colors.blue6};
 `;

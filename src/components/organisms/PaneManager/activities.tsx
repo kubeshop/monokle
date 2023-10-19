@@ -38,7 +38,7 @@ export const activities: ActivityType<LeftMenuSelectionType>[] = [
     icon: () => <Icon name="compare" style={{fontSize: '16px', marginTop: 4}} />,
     component: <CompareSyncPane />,
     useBadge: () => undefined,
-    isVisible: () => Boolean(useAppSelector(activeProjectSelector)),
+    isVisible: () => Boolean(useAppSelector(activeProjectSelector)) || Boolean(useAppSelector(isInClusterModeSelector)),
   },
   {
     type: 'panel',

@@ -12,11 +12,13 @@ import {AnyPreview} from '@shared/models/preview';
 import {
   AppSelection,
   CommandSelection,
+  FileSelection,
   HelmValuesFileSelection,
   PreviewConfigurationSelection,
-  ResourceSelection,
 } from '@shared/models/selection';
 import {createSliceExtraReducers, createSliceReducers} from '@shared/utils/redux';
+
+import {stopClusterConnectionReducer} from './clusterReducers';
 
 export const clearPreviewReducer = (state: Draft<AppState>) => {
   state.checkedResourceIdentifiers = [];
@@ -78,6 +80,10 @@ const onPreviewSuccess = <Preview extends AnyPreview = AnyPreview>(
   state.resourceMetaMapByStorage.preview = metaMap;
   state.resourceContentMapByStorage.preview = contentMap;
 
+  if (state.clusterConnection) {
+    stopClusterConnectionReducer(state);
+  }
+
   if (initialSelection) {
     state.selection = initialSelection;
     resetSelectionHistory(state, [initialSelection]);
@@ -90,12 +96,9 @@ export const previewExtraReducers = createSliceExtraReducers('main', builder => 
   builder
     .addCase(previewKustomization.pending, onPreviewPending)
     .addCase(previewKustomization.fulfilled, (state, action) => {
-      const initialSelection: ResourceSelection = {
-        type: 'resource',
-        resourceIdentifier: {
-          id: action.payload.preview.kustomizationId,
-          storage: 'local',
-        },
+      const initialSelection: FileSelection = {
+        type: 'file',
+        filePath: action.payload.kustomizationFilePath,
       };
 
       onPreviewSuccess(state, action.payload, initialSelection);

@@ -4,24 +4,15 @@ import log from 'loglevel';
 import path from 'path';
 import {v4 as uuidv4} from 'uuid';
 
-import {connectCluster} from '@redux/cluster/thunks/connect';
 import initialState from '@redux/initialState';
 import {processResourceRefs} from '@redux/parsing/parser.thunks';
 import {RESOURCE_PARSER} from '@redux/parsing/resourceParser';
 import {setAlert} from '@redux/reducers/alert';
 import {getResourceContentMapFromState, getResourceMetaMapFromState} from '@redux/selectors/resourceMapGetters';
-import {disconnectFromCluster} from '@redux/services/clusterResourceWatcher';
 import {createFileEntry, getFileEntryForAbsolutePath, removePath} from '@redux/services/fileEntry';
 import {HelmChartEventEmitter} from '@redux/services/helm';
-import {
-  isResourceSelected,
-  isSupportedResource,
-  saveResource,
-  splitK8sResource,
-  splitK8sResourceMap,
-} from '@redux/services/resource';
+import {isResourceSelected, isSupportedResource, saveResource, splitK8sResource} from '@redux/services/resource';
 import {resetSelectionHistory} from '@redux/services/selectionHistory';
-import {loadClusterResources, reloadClusterResources, stopClusterConnection} from '@redux/thunks/cluster';
 import {multiplePathsAdded} from '@redux/thunks/multiplePathsAdded';
 import {multiplePathsChanged} from '@redux/thunks/multiplePathsChanged';
 import {removeResources} from '@redux/thunks/removeResources';
@@ -59,10 +50,10 @@ import {
 import {PreviewType} from '@shared/models/preview';
 import {RootState} from '@shared/models/rootState';
 import {AppSelection, isResourceSelection} from '@shared/models/selection';
-import electronStore from '@shared/utils/electronStore';
 import {isEqual} from '@shared/utils/isEqual';
 import {trackEvent} from '@shared/utils/telemetry';
 
+import {clusterExtraReducers} from './clusterReducers';
 import {filterReducers} from './filterReducers';
 import {imageReducers} from './imageReducers';
 import {clearPreviewReducer, previewExtraReducers, previewReducers} from './previewReducers';
@@ -343,85 +334,7 @@ export const mainSlice = createSlice({
     });
 
     previewExtraReducers(builder);
-
-    builder.addCase(connectCluster.rejected, state => {
-      state.clusterConnectionOptions.isLoading = false;
-    });
-    builder.addCase(connectCluster.pending, state => {
-      state.clusterConnectionOptions.isLoading = true;
-    });
-    builder.addCase(connectCluster.fulfilled, state => {
-      state.clusterConnectionOptions.isLoading = false;
-    });
-
-    builder
-      .addCase(loadClusterResources.pending, state => {
-        // TODO: should we set the context of the cluster connection here?
-        state.clusterConnectionOptions.isLoading = true;
-      })
-      .addCase(loadClusterResources.fulfilled, (state, action) => {
-        state.clusterConnectionOptions.isLoading = false;
-        resetSelectionHistory(state);
-        clearSelectionReducer(state);
-        state.checkedResourceIdentifiers = [];
-
-        const {metaMap, contentMap} = splitK8sResourceMap(action.payload.resources);
-
-        state.resourceMetaMapByStorage.cluster = metaMap;
-        state.resourceContentMapByStorage.cluster = contentMap;
-        state.clusterConnection = {
-          context: action.payload.context,
-          namespace: action.payload.namespace,
-          kubeConfigPath: action.payload.kubeConfigPath,
-        };
-        state.clusterConnectionOptions.lastNamespaceLoaded = action.payload.namespace;
-        electronStore.set('appConfig.lastNamespaceLoaded', action.payload.namespace);
-      })
-      .addCase(loadClusterResources.rejected, state => {
-        state.clusterConnectionOptions.isLoading = false;
-        state.clusterConnection = undefined;
-      });
-
-    builder
-      .addCase(reloadClusterResources.pending, state => {
-        state.clusterConnectionOptions.isLoading = true;
-        disconnectFromCluster();
-      })
-      .addCase(reloadClusterResources.fulfilled, (state, action) => {
-        state.clusterConnectionOptions.isLoading = false;
-        state.checkedResourceIdentifiers = [];
-
-        if (
-          state.selection?.type === 'resource' &&
-          state.selection.resourceIdentifier.storage === 'cluster' &&
-          !state.resourceMetaMapByStorage.cluster[state.selection.resourceIdentifier.id]
-        ) {
-          clearSelectionReducer(state);
-        }
-
-        const {metaMap, contentMap} = splitK8sResourceMap(action.payload.resources);
-
-        state.resourceMetaMapByStorage.cluster = metaMap;
-        state.resourceContentMapByStorage.cluster = contentMap;
-        state.clusterConnection = {
-          context: action.payload.context,
-          namespace: action.payload.namespace,
-          kubeConfigPath: action.payload.kubeConfigPath,
-        };
-        state.clusterConnectionOptions.lastNamespaceLoaded = action.payload.namespace;
-        electronStore.set('appConfig.lastNamespaceLoaded', action.payload.namespace);
-      })
-      .addCase(reloadClusterResources.rejected, state => {
-        state.clusterConnectionOptions.isLoading = false;
-        state.clusterConnection = undefined;
-      });
-
-    builder.addCase(stopClusterConnection.fulfilled, state => {
-      resetSelectionHistory(state);
-      clearSelectionReducer(state);
-      state.clusterConnectionOptions.isLoading = false;
-      state.clusterConnection = undefined;
-    });
+    clusterExtraReducers(builder);
 
     builder.addCase(setRootFolder.pending, state => {
       const existingHelmCharts: HelmChart[] = JSON.parse(JSON.stringify(Object.values(state.helmChartMap)));

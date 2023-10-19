@@ -26,18 +26,25 @@ import {trackEvent} from '@shared/utils/telemetry';
 import {findDefaultVersionForCRD} from './findDefaultVersionForCRD';
 
 const getNonCustomClusterObjects = async (kc: any, namespace?: string, allNamespaces?: boolean) => {
+  const registeredHandlers = getRegisteredKindHandlers();
+  const filteredHandlers = registeredHandlers.filter(handler => {
+    if (handler.isCustom) {
+      return false;
+    }
+    if (allNamespaces) {
+      return true;
+    }
+    if (namespace === '<not-namespaced>') {
+      return !handler.isNamespaced;
+    }
+    return handler.isNamespaced;
+  });
   return Promise.allSettled(
-    getRegisteredKindHandlers()
-      .filter(
-        handler =>
-          !handler.isCustom &&
-          (allNamespaces ? true : namespace === '<not-namespaced>' ? !handler.isNamespaced : handler.isNamespaced)
-      )
-      .map(resourceKindHandler =>
-        resourceKindHandler
-          .listResourcesInCluster(kc, {namespace})
-          .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
-      )
+    filteredHandlers.map(resourceKindHandler =>
+      resourceKindHandler
+        .listResourcesInCluster(kc, {namespace})
+        .then(items => getK8sObjectsAsYaml(items, resourceKindHandler.kind, resourceKindHandler.clusterApiVersion))
+    )
   );
 };
 
@@ -121,8 +128,6 @@ const loadClusterResourcesHandler = async (
 
     if (currentNamespace === '<all>') {
       results = await getNonCustomClusterObjects(kc, undefined, true);
-    } else if (currentNamespace === '<not-namespaced>') {
-      results = await getNonCustomClusterObjects(kc);
     } else {
       results = await getNonCustomClusterObjects(kc, currentNamespace);
     }

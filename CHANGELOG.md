@@ -2,6 +2,57 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.4.1](https://github.com/kubeshop/monokle/compare/v2.4.1-nightly-2023-10-11.0...v2.4.1) (2023-10-11)
+
+
+### Features
+
+* context menu for helm chart dry runs ([0618e91](https://github.com/kubeshop/monokle/commit/0618e919d4db726047e66272d606f89c9fcbead2))
+* delete action for dry run config ([7fcc8d2](https://github.com/kubeshop/monokle/commit/7fcc8d20a951b34dabd815f5f3910b12c058b0f9))
+* edit action for dry run configs ([e2f55cd](https://github.com/kubeshop/monokle/commit/e2f55cda39223d8c190e0264eba78eedb944e82c))
+* grouping for kustomizations ([f808a18](https://github.com/kubeshop/monokle/commit/f808a18521ea25f1fb473885323f0c198fec4b52))
+* new dropdown for dry run configs ([ec41b51](https://github.com/kubeshop/monokle/commit/ec41b513b373421943c459dffec4ebe81abf7592))
+* new selectors for dry runs ([105b89f](https://github.com/kubeshop/monokle/commit/105b89f44dd7b6c01b68e27b30567ac15e311e3f))
+* scroll to current dry run ([a6ae883](https://github.com/kubeshop/monokle/commit/a6ae88371f6c304d07355c211f5533ddbdeb840f))
+* show list of existing dry runs ([c37a98a](https://github.com/kubeshop/monokle/commit/c37a98ad772967a8a4e0b3a8247dc90aadfba521))
+* v1 of new DryRuns panel ([1b473d4](https://github.com/kubeshop/monokle/commit/1b473d4b34c6041d45066203327eb91d7e7fc0ef))
+* virtualization for dry runs pane ([e4fcf8a](https://github.com/kubeshop/monokle/commit/e4fcf8ab7dc99fa4eaddf248145433050c87349c))
+
+
+### Bug Fixes
+
+* cloud policy polling ([439b633](https://github.com/kubeshop/monokle/commit/439b63333779ead3ec9f8fabdeb0a4579ceaf5a8))
+* dry run config edit icon ([176566e](https://github.com/kubeshop/monokle/commit/176566e6c7ebeec4f2ad9d1d923fdf5980f1d71e))
+* dry run title bar label ([02e124b](https://github.com/kubeshop/monokle/commit/02e124b97e233f39e1b860075eb6615269e2fbe3))
+* ellipsis on previewable files ([d5b2e25](https://github.com/kubeshop/monokle/commit/d5b2e25555467e816ec287142194cdee3cebad7b))
+* file tree height ([f2934c5](https://github.com/kubeshop/monokle/commit/f2934c5a26f790f6807f9f642bcd4bb90e29b277))
+* file tree scroll to file ([4ace23c](https://github.com/kubeshop/monokle/commit/4ace23cc67e683eb407dc6b4bd3a26c5baf3e529))
+* preview & cluster states ([7cb9071](https://github.com/kubeshop/monokle/commit/7cb9071e733983aa9374eab033836f06e586b0a3))
+* selecting the file of current dry run ([1f3befe](https://github.com/kubeshop/monokle/commit/1f3befe16c403f0d905a642c4e38794e605ebcfd))
+* titlebars styling ([e210303](https://github.com/kubeshop/monokle/commit/e2103033432951f1b47e9e20c194e361aef979ec))
+
+## [2.4.0](https://github.com/kubeshop/monokle/compare/v2.4.1-nightly-2023-09-28.0...v2.4.0) (2023-09-28)
+
+
+### Features
+
+* compare clusters in quick cluster mode ([c9c0a12](https://github.com/kubeshop/monokle/commit/c9c0a12cb21eb65d99aa315082ff1501ef692b07))
+
+### [2.3.3](https://github.com/kubeshop/monokle/compare/v2.3.3-nightly-2023-07-26.0...v2.3.3) (2023-07-26)
+
+
+### Features
+
+* install action for helm configurations ([c4e081a](https://github.com/kubeshop/monokle/commit/c4e081aaa738d2300190b4a81f694ab5c14c3354))
+
+
+### Bug Fixes
+
+* clear selection when closing cluster mode ([8c45eb8](https://github.com/kubeshop/monokle/commit/8c45eb8d1c59315f083a0f6e13cd46d52330c140))
+* helm dry-run configs styling ([dbdb1cc](https://github.com/kubeshop/monokle/commit/dbdb1cca0f652288e4db0089fce319d878e83f28))
+* left menu in cluster mode ([c82c6ca](https://github.com/kubeshop/monokle/commit/c82c6ca31a44d8773efbdf382d4a9419754bc6a9))
+* news feed date label ([9a2415a](https://github.com/kubeshop/monokle/commit/9a2415a8bfeb55a806ec90e18d71d721ff56970b))
+
 ### [2.3.2](https://github.com/kubeshop/monokle/compare/v2.3.2-nightly-2023-07-24.0...v2.3.2) (2023-07-24)
 
 

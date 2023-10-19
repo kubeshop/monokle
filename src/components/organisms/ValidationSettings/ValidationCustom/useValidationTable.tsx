@@ -7,7 +7,8 @@ import styled from 'styled-components';
 
 import {TOOLTIP_DELAY} from '@constants/constants';
 
-import {useAppDispatch} from '@redux/hooks';
+import {useAppDispatch, useAppSelector} from '@redux/hooks';
+import {isUsingCloudPolicySelector} from '@redux/validation/validation.selectors';
 import {changeRuleLevel, toggleRule} from '@redux/validation/validation.slice';
 
 import {Icon, IconNames} from '@monokle/components';
@@ -23,6 +24,8 @@ const VALIDATION_HIDING_LABELS_WIDTH = 450;
 
 export function useValidationTable(plugin: PluginMetadataWithConfig, width: number) {
   const dispatch = useAppDispatch();
+
+  const isUsingCloudPolicy = useAppSelector(isUsingCloudPolicySelector);
 
   const handleToggle = useCallback(
     (rule: Rule) => {
@@ -91,14 +94,14 @@ export function useValidationTable(plugin: PluginMetadataWithConfig, width: numb
           return (
             <Box>
               <Switch
-                disabled={!plugin.configuration.enabled}
+                disabled={isUsingCloudPolicy || !plugin.configuration.enabled}
                 checked={rule.enabled}
                 onChange={() => handleToggle(rule)}
               />
 
               <ValidationLevelSelect
                 rule={rule}
-                disabled={!plugin.configuration.enabled || !rule.enabled}
+                disabled={isUsingCloudPolicy || !plugin.configuration.enabled || !rule.enabled}
                 handleChange={changeLevel}
               />
             </Box>
@@ -109,7 +112,7 @@ export function useValidationTable(plugin: PluginMetadataWithConfig, width: numb
         }),
       },
     ];
-  }, [width, plugin.configuration.enabled, changeLevel, handleToggle]);
+  }, [width, plugin.configuration.enabled, changeLevel, handleToggle, isUsingCloudPolicy]);
 
   return columns;
 }

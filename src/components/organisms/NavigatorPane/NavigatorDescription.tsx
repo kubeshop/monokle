@@ -10,11 +10,13 @@ import {setValidationFilters} from '@redux/validation/validation.slice';
 import {useRefSelector} from '@utils/hooks';
 
 import {ProblemIcon} from '@monokle/components';
+import {isInPreviewModeSelector} from '@shared/utils';
 
 import * as S from './NavigatorDescription.styled';
 
 const NavigatorDescription: React.FC = () => {
   const dispatch = useAppDispatch();
+  const isInPreviewMode = useAppSelector(isInPreviewModeSelector);
   const navigatorResourcesCount = useAppSelector(navigatorResourcesCountSelector);
 
   const errorsCount = useAppSelector(errorsByResourcesFilterCountSelector);
@@ -31,7 +33,7 @@ const NavigatorDescription: React.FC = () => {
     <S.NavigatorDescriptionContainer>
       {navigatorResourcesCount ? (
         <>
-          <S.ResourcesCount>{navigatorResourcesCount} objects</S.ResourcesCount>
+          <S.ResourcesCount $isPreview={isInPreviewMode}>{navigatorResourcesCount} objects</S.ResourcesCount>
           <S.WarningsErrorsContainer>
             <S.ProblemCountContainer onClick={() => handleSetFilters('error')}>
               <ProblemIcon level="error" /> <S.Count $type="error">{errorsCount}</S.Count>
@@ -43,7 +45,7 @@ const NavigatorDescription: React.FC = () => {
           </S.WarningsErrorsContainer>
         </>
       ) : (
-        <S.ResourcesCount>No objects found</S.ResourcesCount>
+        <S.ResourcesCount $isPreview={isInPreviewMode}>No objects found</S.ResourcesCount>
       )}
     </S.NavigatorDescriptionContainer>
   );
