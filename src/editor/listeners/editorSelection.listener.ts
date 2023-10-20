@@ -101,7 +101,7 @@ export const editorSelectionListener: AppListenerFn = listen => {
 };
 
 const enableResourceSchemaValidation = (resourceMeta: ResourceMeta, state: RootState) => {
-  const k8sVersion = state.config.k8sVersion;
+  const k8sVersion = state.config.projectConfig?.k8sVersion || state.config.k8sVersion;
   const userDataDir = state.config.userDataDir;
 
   if (!userDataDir) {

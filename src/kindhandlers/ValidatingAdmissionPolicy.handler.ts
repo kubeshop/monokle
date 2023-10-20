@@ -10,8 +10,8 @@ const ValidatingAdmissionPolicyHandler: ResourceKindHandler = {
   apiVersionMatcher: '**',
   isNamespaced: false,
   navigatorPath: [navSectionNames.K8S_RESOURCES, navSectionNames.CONFIGURATION, 'ValidatingAdmissionPolicies'],
-  clusterApiVersion: 'admissionregistration.k8s.io/v1alpha1',
-  validationSchemaPrefix: 'io.k8s.api.admissionregistration.v1alpha1',
+  clusterApiVersion: 'admissionregistration.k8s.io/v1beta1',
+  validationSchemaPrefix: 'io.k8s.api.admissionregistration.v1beta1',
   isCustom: false,
   getResourceFromCluster(kubeconfig: k8s.KubeConfig, resource: ResourceMeta) {
     const k8sAdmissionregistrationV1alpha1Api = kubeconfig.makeApiClient(k8s.AdmissionregistrationV1alpha1Api);

@@ -90,7 +90,7 @@ const NewResourceWizard = () => {
   const fileMapRef = useRefSelector(state => state.main.fileMap);
   const [rootFolderEntry, rootFolderEntryRef] = useSelectorWithRef(state => state.main.fileMap[ROOT_FILE_ENTRY]);
   const userDataDirRef = useRefSelector(state => state.config.userDataDir);
-  const k8sVersionRef = useRefSelector(state => state.config.k8sVersion);
+  const k8sVersionRef = useRefSelector(state => state.config.projectConfig?.k8sVersion || state.config.k8sVersion);
 
   const [filteredResources, setFilteredResources] = useState<ResourceMeta[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
