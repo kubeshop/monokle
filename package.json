@@ -324,7 +324,7 @@
       "!**/node_modules/monaco-editor/min-maps/**/*",
       "!**/node_modules/commitlint/cli/**/*",
       "!**/node_modules/commitlint/config-conventional/**/*",
-      "!**/node_modules/**playwright**/**/*",
+      "!**/node_modules/*playwright*/**/*",
       "!**/node_modules/@types/**/*",
       "!**/node_modules/babel-plugin-styled-components/**/*",
       "!**/node_modules/*eslint*/**/*",
