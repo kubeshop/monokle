@@ -153,6 +153,8 @@ export const selectionReducers = createSliceReducers('main', {
     }
     updateSelectionHistory(state.selection, Boolean(action.payload.isVirtualSelection), state);
   },
+  // TODO: implement logic for selecting commands, we have to update the editor to show a new panel displaying the command
+  // selectCommand: (state: Draft<AppState>, action: PayloadAction<{commandId: string}>) => {
   clearSelection: (state: Draft<AppState>) => {
     clearSelectionReducer(state);
   },

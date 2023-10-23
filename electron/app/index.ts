@@ -1,11 +1,9 @@
 import {app} from 'electron';
-import log from 'electron-log';
 
 import {machineIdSync} from 'node-machine-id';
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
-import terminal from '@root/cli/terminal';
 import {init as sentryInit} from '@sentry/electron/main';
 import electronStore from '@shared/utils/electronStore';
 import '@shared/utils/segment';
@@ -55,5 +53,3 @@ if (process.env.MONOKLE_RUN_AS_NODE) {
 } else {
   openApplication();
 }
-
-terminal().catch(e => log.error(e));

@@ -18,6 +18,8 @@ import {
 } from '@shared/models/selection';
 import {createSliceExtraReducers, createSliceReducers} from '@shared/utils/redux';
 
+import {stopClusterConnectionReducer} from './clusterReducers';
+
 export const clearPreviewReducer = (state: Draft<AppState>) => {
   state.checkedResourceIdentifiers = [];
   state.resourceMetaMapByStorage.preview = {};
@@ -77,6 +79,10 @@ const onPreviewSuccess = <Preview extends AnyPreview = AnyPreview>(
 
   state.resourceMetaMapByStorage.preview = metaMap;
   state.resourceContentMapByStorage.preview = contentMap;
+
+  if (state.clusterConnection) {
+    stopClusterConnectionReducer(state);
+  }
 
   if (initialSelection) {
     state.selection = initialSelection;
