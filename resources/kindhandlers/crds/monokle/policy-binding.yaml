@@ -1,0 +1,47 @@
+# Source: monokle-admission-controller/templates/monokle-policy-binding-crd.yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: policybindings.monokle.io
+spec:
+  group: monokle.io
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - policyName
+                - validationActions
+              properties:
+                policyName:
+                  type: string
+                validationActions:
+                  type: array
+                  items:
+                    type: string
+                    enum: [ Warn ]
+                matchResources:
+                  type: object
+                  properties:
+                    namespaceSelector:
+                      type: object
+                      properties:
+                        matchLabels:
+                          type: object
+                          additionalProperties:
+                            type: string
+  scope: Cluster
+  names:
+    plural: policybindings
+    singular: policybinding
+    kind: MonoklePolicyBinding
+    shortNames:
+      - mpb

@@ -1,0 +1,19 @@
+{
+  "sectionName": "Monokle",
+  "kindSectionName": "PolicyBindings",
+  "helpLink": "https://github.com/kubeshop/monokle-admission-controller",
+  "refMappers":
+  [
+    {
+      "source": {
+        "pathParts": [
+          "spec", "policyName"
+        ]
+      },
+      "type": "name",
+      "target": {
+        "kind": "Policy"
+      }
+    }
+ ]
+}

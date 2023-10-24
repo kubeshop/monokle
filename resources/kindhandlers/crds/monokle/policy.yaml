@@ -1,0 +1,51 @@
+# Source: monokle-admission-controller/templates/monokle-policy-crd.yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: policies.monokle.io
+spec:
+  group: monokle.io
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        # For schema see:
+        # - maps/dicts - https://swagger.io/docs/specification/data-models/dictionaries/
+        # - structural schema - https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#specifying-a-structural-schema
+        #
+        # Object values as multitypes:
+        # Even though it's supported by OpenAPI spec, e.g. https://stackoverflow.com/a/46475776,
+        # Kubernetes requires "structural" definition # https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#specifying-a-structural-schema
+        # which seems to be in opposite to it "does not set description, type, default, additionalProperties, nullable
+        # within an allOf, anyOf, oneOf or not, with the exception of the two pattern for x-kubernetes-int-or-string: true (see below)."
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - plugins
+              properties:
+                plugins:
+                  type: object
+                  additionalProperties:
+                    type: boolean
+                rules:
+                  type: object
+                  additionalProperties: true
+                settings:
+                  type: object
+                  additionalProperties:
+                    type: object
+                    additionalProperties:
+                      type: string
+  scope: Cluster
+  names:
+    plural: policies
+    singular: policy
+    kind: MonoklePolicy
+    shortNames:
+      - mp
