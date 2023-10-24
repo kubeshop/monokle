@@ -12,6 +12,8 @@ import HorizontalPodAutoscalerHandler from '@src/kindhandlers/HorizontalPodAutos
 import LimitRangeHandler from '@src/kindhandlers/LimitRange.handler';
 import ResourceQuotaHandler from '@src/kindhandlers/ResourceQuota.handler';
 import StorageClassHandler from '@src/kindhandlers/StorageClass.handler';
+import ValidatingAdmissionPolicyHandler from '@src/kindhandlers/ValidatingAdmissionPolicy.handler';
+import ValidatingAdmissionPolicyBindingHandler from '@src/kindhandlers/ValidatingAdmissionPolicyBinding.handler';
 import VolumeAttachmentHandler from '@src/kindhandlers/VolumeAttachment.handler';
 import {extractKindHandler} from '@src/kindhandlers/common/customObjectKindHandler';
 
@@ -83,6 +85,8 @@ export const ResourceKindHandlers: ResourceKindHandler[] = [
   HorizontalPodAutoscalerHandler,
   NodeHandler,
   EventHandler,
+  ValidatingAdmissionPolicyHandler,
+  ValidatingAdmissionPolicyBindingHandler,
 ];
 
 const HandlerByResourceKind = Object.fromEntries(

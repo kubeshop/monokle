@@ -9,10 +9,11 @@ import {isEqual} from 'lodash';
 import {TOOLTIP_DELAY} from '@constants/constants';
 
 import {addAppListener, useAppDispatch, useAppSelector} from '@redux/hooks';
-import {selectFile} from '@redux/reducers/main';
+import {selectFile, selectPreviewConfiguration} from '@redux/reducers/main';
 import {restartPreview, startPreview, stopPreview} from '@redux/thunks/preview';
 
 import {AnyPreview} from '@shared/models/preview';
+import {AppSelection} from '@shared/models/selection';
 
 import * as S from './styled';
 
@@ -21,12 +22,21 @@ export const usePreviewTrigger = (preview: AnyPreview) => {
   const [isOptimisticLoading, setIsOptimisticLoading] = useState(false);
   const isPreviewLoading = useAppSelector(state => state.main.previewOptions.isLoading);
   const isPreviewed = useAppSelector(state => isEqual(state.main.preview, preview));
-  const previewFilePath = useAppSelector(state => {
+  const nextSelection = useAppSelector<AppSelection | undefined>(state => {
     if (preview?.type === 'kustomize') {
-      return state.main.resourceMetaMapByStorage.local[preview.kustomizationId]?.origin.filePath;
+      return {
+        type: 'file',
+        filePath: state.main.resourceMetaMapByStorage.local[preview.kustomizationId]?.origin.filePath,
+      };
     }
     if (preview?.type === 'helm') {
-      return state.main.helmValuesMap[preview.valuesFileId]?.filePath;
+      return {type: 'file', filePath: state.main.helmValuesMap[preview.valuesFileId]?.filePath};
+    }
+    if (preview?.type === 'command') {
+      return {type: 'command', commandId: preview.commandId};
+    }
+    if (preview?.type === 'helm-config') {
+      return {type: 'preview.configuration', previewConfigurationId: preview.configId};
     }
     return undefined;
   });
@@ -59,8 +69,17 @@ export const usePreviewTrigger = (preview: AnyPreview) => {
   }, [isPreviewLoading]);
 
   const triggerPreview = useCallback(() => {
-    if (previewFilePath) {
-      dispatch(selectFile({filePath: previewFilePath}));
+    if (nextSelection) {
+      switch (nextSelection.type) {
+        case 'file':
+          dispatch(selectFile(nextSelection));
+          break;
+        case 'preview.configuration':
+          dispatch(selectPreviewConfiguration(nextSelection));
+          break;
+        default:
+          break;
+      }
     }
 
     if (isPreviewed || isPreviewLoading) {
@@ -68,7 +87,7 @@ export const usePreviewTrigger = (preview: AnyPreview) => {
     }
     setIsOptimisticLoading(true);
     dispatch(startPreview(preview));
-  }, [preview, dispatch, isPreviewed, isPreviewLoading, previewFilePath]);
+  }, [preview, dispatch, isPreviewed, isPreviewLoading, nextSelection]);
 
   const renderPreviewControls = useCallback(() => {
     if (!isPreviewed) {
