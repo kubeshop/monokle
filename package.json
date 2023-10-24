@@ -32,7 +32,7 @@
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",
     "@testing-library/user-event": "14.4.3",
-    "@trivago/prettier-plugin-sort-imports": "4.1.1",
+    "@trivago/prettier-plugin-sort-imports": "4.2.1",
     "@types/analytics-node": "3.1.11",
     "@types/async": "3.2.20",
     "@types/electron-devtools-installer": "2.2.4",
