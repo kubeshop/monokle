@@ -102,7 +102,7 @@
     "@kubernetes/client-node": "0.19.0",
     "@monokle/components": "1.7.0",
     "@monokle/synchronizer": "^0.6.0",
-    "@monokle/validation": "0.24.2",
+    "@monokle/validation": "0.31.5",
     "@open-policy-agent/opa-wasm": "1.8.0",
     "@reduxjs/toolkit": "1.9.5",
     "@rjsf/antd": "5.8.1",
