@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.4.2](https://github.com/kubeshop/monokle/compare/v2.4.2-nightly-2023-10-23.0...v2.4.2) (2023-10-23)
+
+
+### Bug Fixes
+
+* remove old monokle cli ([140b428](https://github.com/kubeshop/monokle/commit/140b4280fd7d502a976357a903797a4d7553bb4c))
+* typo ([c0bd910](https://github.com/kubeshop/monokle/commit/c0bd9107ea0485b58049e5185cca1432b3f9039c))
+* values and dry run config selections ([c903c38](https://github.com/kubeshop/monokle/commit/c903c385c3032e70317b807750ed9d5754be56d2))
+
 ### [2.4.1](https://github.com/kubeshop/monokle/compare/v2.4.1-nightly-2023-10-11.0...v2.4.1) (2023-10-11)
 
 
