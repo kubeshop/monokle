@@ -2,7 +2,7 @@
   "name": "monokle",
   "version": "2.4.2",
   "author": "Kubeshop",
-  "description": "UI for managing k8s manifests",
+  "description": "Desktop IDE for working with Kubernetes Clusters and YAML configurations",
   "homepage": "./",
   "main": "build/electron/main.js",
   "contributors": [
@@ -283,8 +283,7 @@
       "maintainer": "Kubeshop",
       "vendor": "Kubeshop",
       "executableName": "Monokle",
-      "synopsis": "Your kubernetes best friend!",
-      "description": "A free, open-source tool, to help you navigate kubernetes development. By Kubeshop."
+      "synopsis": "Desktop IDE for Kubernetes"
     },
     "appImage": {
       "artifactName": "${productName}-${os}-${version}-${arch}.${ext}"
