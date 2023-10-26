@@ -26,6 +26,17 @@ export const electronStoreSchema = {
   appConfig: {
     type: 'object',
     properties: {
+      binaryPaths: {
+        type: ['object', 'null'],
+        properties: {
+          kubectl: {
+            type: 'string',
+          },
+          helm: {
+            type: 'string',
+          },
+        },
+      },
       userApiKeys: {
         type: 'object',
         properties: {
