@@ -117,6 +117,9 @@ export const electronStoreSchema = {
           allowEditInClusterMode: {
             type: 'boolean',
           },
+          disableClusterValidation: {
+            type: 'boolean',
+          },
         },
       },
       recentFolders: {
@@ -325,6 +328,7 @@ export const electronStoreDefaults = {
       createDefaultObjects: false,
       setDefaultPrimitiveValues: true,
       allowEditInClusterMode: true,
+      disableClusterValidation: false,
       enableHelmWithKustomize: true,
     },
     recentFolders: [],

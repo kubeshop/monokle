@@ -48,6 +48,18 @@ export const GlobalSettings = () => {
     [_setShouldAppendServerPath]
   );
 
+  const [disableClusterValidation, _setDisableClusterValidation] = useState<boolean>(
+    electronStore.get('appConfig.settings.disableClusterValidation') ?? false
+  );
+
+  const setDisableClusterValidation = useCallback(
+    (value: boolean) => {
+      _setDisableClusterValidation(value);
+      electronStore.set('appConfig.settings.disableClusterValidation', value);
+    },
+    [_setDisableClusterValidation]
+  );
+
   const [isOverridingBinaryPaths, _setIsOverridingBinaryPaths] = useState<boolean>(
     Boolean(electronStore.get('appConfig.binaryPaths')) ?? false
   );
@@ -191,6 +203,9 @@ export const GlobalSettings = () => {
           <S.Span>Cluster</S.Span>
           <Checkbox checked={shouldAppendServerPath} onChange={e => setShouldAppendServerPath(e.target.checked)}>
             Append Server Path to Kubectl Proxy
+          </Checkbox>
+          <Checkbox checked={disableClusterValidation} onChange={e => setDisableClusterValidation(e.target.checked)}>
+            Disable validation of cluster resources
           </Checkbox>
         </S.Div>
 
