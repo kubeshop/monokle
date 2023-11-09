@@ -202,18 +202,20 @@ export function createFileWithContent(filePath: string, content: string) {
   return fs.writeFileSync(filePath, content, {flag: 'wx'});
 }
 
-export const isFileEntryDisabled = (fileEntry?: FileEntry) => {
+export const isFileEntryDisabled = (fileEntry?: FileEntry, fileOrFolderContainedIn?: string) => {
   if (!fileEntry) {
     return true;
   }
   const isFolder = isDefined(fileEntry.children);
   const isTextFile = ALL_TEXT_EXTENSIONS.some(extension => fileEntry.name.endsWith(extension));
 
+  const isPassingFilter = !fileOrFolderContainedIn || fileEntry.filePath.startsWith(fileOrFolderContainedIn);
+
   if (isFolder) {
-    return false;
+    return isPassingFilter;
   }
 
-  return !isTextFile || fileEntry.isExcluded;
+  return !isTextFile || fileEntry.isExcluded || !isPassingFilter;
 };
 
 const getParentFolderPath = (relativePath: string): string | undefined => {
