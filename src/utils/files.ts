@@ -209,10 +209,13 @@ export const isFileEntryDisabled = (fileEntry?: FileEntry, fileOrFolderContained
   const isFolder = isDefined(fileEntry.children);
   const isTextFile = ALL_TEXT_EXTENSIONS.some(extension => fileEntry.name.endsWith(extension));
 
-  const isPassingFilter = !fileOrFolderContainedIn || fileEntry.filePath.startsWith(fileOrFolderContainedIn);
+  const isPassingFilter =
+    !fileOrFolderContainedIn ||
+    fileOrFolderContainedIn.trim() === '' ||
+    fileEntry.filePath.startsWith(fileOrFolderContainedIn);
 
   if (isFolder) {
-    return isPassingFilter;
+    return !isPassingFilter;
   }
 
   return !isTextFile || fileEntry.isExcluded || !isPassingFilter;
