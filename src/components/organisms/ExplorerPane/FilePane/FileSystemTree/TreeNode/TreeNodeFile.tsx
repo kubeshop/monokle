@@ -62,7 +62,7 @@ const TreeNodeFile: React.FC<Props> = props => {
       $isDisabled={isDisabled}
     >
       <S.TitleContainer $actionButtonsWidth={actionButtonsWidth} $isHovered={isHovered}>
-        <S.TitleText $isSelected={isSelected} $isExcluded={fileEntry.isExcluded}>
+        <S.TitleText $isSelected={isSelected} $isExcluded={fileEntry.isExcluded} $isDisabled={isDisabled}>
           <Tooltip
             overlayStyle={{fontSize: '12px', wordBreak: 'break-all'}}
             mouseEnterDelay={TOOLTIP_DELAY}

@@ -3,6 +3,8 @@ import {createSelector} from 'reselect';
 
 import {isKustomizationResource} from '@redux/services/kustomize';
 
+import {isResourcePassingFilter} from '@utils/resources';
+
 import {ResourceMeta} from '@shared/models/k8sResource';
 import {RootState} from '@shared/models/rootState';
 import {isDefined} from '@shared/utils/filter';
@@ -82,14 +84,18 @@ export const dryRunNodesSelector = createSelector(
     (state: RootState) => state.main.helmValuesMap,
     (state: RootState) => state.config.projectConfig?.helm?.previewConfigurationMap,
     (state: RootState) => state.config.projectConfig?.savedCommandMap,
+    (state: RootState) => state.main.resourceFilter,
   ],
-  (localResourceMetaMap, helmChartMap, helmValuesMap, previewConfigurationMap, savedCommandMa) => {
+  (localResourceMetaMap, helmChartMap, helmValuesMap, previewConfigurationMap, savedCommandMap, filter) => {
     const list: DryRunNode[] = [];
 
     const kustomizationsByAnchestorFolder = Object.values(localResourceMetaMap).reduce<
       Record<string, ResourceMeta<'local'>[]>
     >((acc, resource) => {
       if (!isKustomizationResource(resource)) {
+        return acc;
+      }
+      if (!isResourcePassingFilter(resource, filter)) {
         return acc;
       }
       const anchestorFolder = dirname(dirname(resource.origin.filePath));
@@ -112,7 +118,17 @@ export const dryRunNodesSelector = createSelector(
           });
       });
 
-    const helmCharts = Object.values(helmChartMap).sort((a, b) => a.name.localeCompare(b.name));
+    const helmCharts = Object.values(helmChartMap)
+      .filter(chart => {
+        if (!filter.fileOrFolderContainedIn || filter.fileOrFolderContainedIn.trim() === '') {
+          return true;
+        }
+        if (!chart.filePath.startsWith(filter.fileOrFolderContainedIn)) {
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
     helmCharts.forEach(helmChart => {
       list.push({type: 'helm-chart', chartId: helmChart.id});
       const helmValues = helmChart.valueFileIds.map(id => helmValuesMap[id]).filter(isDefined);
@@ -139,7 +155,7 @@ export const dryRunNodesSelector = createSelector(
       });
     });
 
-    const commands = Object.values(savedCommandMa ?? {})
+    const commands = Object.values(savedCommandMap ?? {})
       .filter(isDefined)
       .sort((a, b) => a.label.localeCompare(b.label));
 
