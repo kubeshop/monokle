@@ -5,13 +5,15 @@ import {useForm} from 'antd/es/form/Form';
 
 import {CheckOutlined} from '@ant-design/icons';
 
+import styled from 'styled-components';
+
 import {updateRemoteRepo} from '@redux/git';
 import {setRemote} from '@redux/git/git.ipc';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 
 import {showGitErrorModal} from '@utils/terminal';
 
-import * as S from './RemoteInput.styled';
+import {Colors} from '@shared/styles/colors';
 
 const RemoteInput: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -39,10 +41,10 @@ const RemoteInput: React.FC = () => {
   };
 
   return (
-    <S.RemoteInputContainer>
-      <S.RemoteInputInfo>To publish your branch to a remote origin:</S.RemoteInputInfo>
+    <Box>
+      <Description>To publish your branch to a remote origin:</Description>
       <Form form={form} layout="vertical">
-        <S.RemoteInputFlex>
+        <RemoteInputFlex>
           <Form.Item
             name="remoteURL"
             required
@@ -60,10 +62,28 @@ const RemoteInput: React.FC = () => {
           <Button loading={loading} type="primary" onClick={handleAddRemote}>
             <CheckOutlined />
           </Button>
-        </S.RemoteInputFlex>
+        </RemoteInputFlex>
       </Form>
-    </S.RemoteInputContainer>
+    </Box>
   );
 };
 
 export default RemoteInput;
+
+const Box = styled.div`
+  margin: 14px;
+  color: ${Colors.grey9};
+`;
+
+const RemoteInputFlex = styled.div`
+  display: flex;
+  gap: 10px;
+
+  .ant-form-item {
+    margin-bottom: 0px;
+  }
+`;
+
+const Description = styled.div`
+  margin-bottom: 12px;
+`;
