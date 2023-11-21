@@ -40,6 +40,7 @@ jobs:
           node-version: ${{ steps.get-node-version.outputs.nodeversion }}
           cache: 'npm'
 
+      # Fixes issues with node-gyp https://github.com/nodejs/node-gyp/issues/2869
       - name: Install Python utilities
         run: python3 -m pip install setuptools
 
