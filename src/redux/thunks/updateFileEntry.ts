@@ -10,6 +10,7 @@ import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 import {UpdateFileEntryPayload} from '@redux/reducers/main';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {reprocessHelm} from '@redux/services/helm';
+import {isKustomizationFile} from '@redux/services/kustomize';
 import {deleteResource, extractK8sResources, splitK8sResource} from '@redux/services/resource';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
@@ -101,6 +102,18 @@ export const updateFileEntry = createAsyncThunk<
                 },
               });
             });
+
+            // did we just replace a kustomization being dry-run? -> update the kustomizationId to the new one
+            // and restart the dry-run
+            if (
+              isKustomizationFile(fileEntry, mainState.resourceMetaMapByStorage.local) &&
+              mainState.preview?.type === 'kustomize' &&
+              mainState.preview.kustomizationId === fileSideEffect.affectedResourceIds[0]
+            ) {
+              //              mainState.preview.kustomizationId = fileSideEffect.affectedResourceIds[1];
+              // thunkAPI.dispatch(stopPreview());
+            }
+
             mainState.highlights = newHighlights;
           }
         }
