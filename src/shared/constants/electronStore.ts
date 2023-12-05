@@ -318,7 +318,7 @@ export const electronStoreDefaults = {
     useKubectlProxy: false,
     loadLastProjectOnStartup: false,
     fileExplorerSortOrder: 'folders',
-    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp'],
+    scanExcludes: ['**/node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp'],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {
       theme: 'dark',
