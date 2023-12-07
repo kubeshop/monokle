@@ -88,8 +88,14 @@ export const updateFileEntry = createAsyncThunk<
             });
 
             const newHighlights: AppSelection[] = [];
-            Object.values(extractedResources).forEach(r => {
-              fileSideEffect.affectedResourceIds.push(r.id);
+            Object.values(extractedResources).forEach((r, ix) => {
+              // if we're just replacing one resource with another consider this an update
+              if (extractedResources.length === fileSideEffect.affectedResourceIds.length) {
+                r.id = fileSideEffect.affectedResourceIds[ix];
+              } else {
+                fileSideEffect.affectedResourceIds.push(r.id);
+              }
+
               const {meta, content} = splitK8sResource(r);
               mainState.resourceMetaMapByStorage.local[meta.id] = meta;
               mainState.resourceContentMapByStorage.local[content.id] = content;
@@ -101,7 +107,6 @@ export const updateFileEntry = createAsyncThunk<
                 },
               });
             });
-            mainState.highlights = newHighlights;
           }
         }
 
