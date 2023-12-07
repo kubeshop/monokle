@@ -10,7 +10,6 @@ import {HELM_CHART_ENTRY_FILE} from '@constants/constants';
 import {UpdateFileEntryPayload} from '@redux/reducers/main';
 import {getLocalResourceMetasForPath} from '@redux/services/fileEntry';
 import {reprocessHelm} from '@redux/services/helm';
-import {isKustomizationFile} from '@redux/services/kustomize';
 import {deleteResource, extractK8sResources, splitK8sResource} from '@redux/services/resource';
 
 import {getFileStats, getFileTimestamp} from '@utils/files';
@@ -89,8 +88,14 @@ export const updateFileEntry = createAsyncThunk<
             });
 
             const newHighlights: AppSelection[] = [];
-            Object.values(extractedResources).forEach(r => {
-              fileSideEffect.affectedResourceIds.push(r.id);
+            Object.values(extractedResources).forEach((r, ix) => {
+              // if we're just replacing one resource with another consider this an update
+              if (extractedResources.length === fileSideEffect.affectedResourceIds.length) {
+                r.id = fileSideEffect.affectedResourceIds[ix];
+              } else {
+                fileSideEffect.affectedResourceIds.push(r.id);
+              }
+
               const {meta, content} = splitK8sResource(r);
               mainState.resourceMetaMapByStorage.local[meta.id] = meta;
               mainState.resourceContentMapByStorage.local[content.id] = content;
@@ -102,19 +107,6 @@ export const updateFileEntry = createAsyncThunk<
                 },
               });
             });
-
-            // did we just replace a kustomization being dry-run? -> update the kustomizationId to the new one
-            // and restart the dry-run
-            if (
-              isKustomizationFile(fileEntry, mainState.resourceMetaMapByStorage.local) &&
-              mainState.preview?.type === 'kustomize' &&
-              mainState.preview.kustomizationId === fileSideEffect.affectedResourceIds[0]
-            ) {
-              //              mainState.preview.kustomizationId = fileSideEffect.affectedResourceIds[1];
-              // thunkAPI.dispatch(stopPreview());
-            }
-
-            mainState.highlights = newHighlights;
           }
         }
 

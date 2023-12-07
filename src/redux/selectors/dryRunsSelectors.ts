@@ -189,7 +189,7 @@ export const dryRunLabelSelector = createSelector(
 
     if (preview.type === 'kustomize') {
       const resource = localResourceMetaMap[preview.kustomizationId];
-      return basename(resource.name);
+      return resource ? basename(resource.name) : 'Kustomize Overlay';
     }
 
     if (preview.type === 'helm') {

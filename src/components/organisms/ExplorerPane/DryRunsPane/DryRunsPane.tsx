@@ -62,7 +62,9 @@ const DryRunsPane: React.FC = () => {
       return false;
     });
 
-    rowVirtualizer.scrollToIndex(index);
+    if (index >= 0) {
+      rowVirtualizer.scrollToIndex(index);
+    }
   }, [preview, list, rowVirtualizer]);
 
   if (isLoading) {
