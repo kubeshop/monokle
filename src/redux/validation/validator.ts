@@ -1,12 +1,9 @@
 import log from 'loglevel';
 
-import {RESOURCE_PARSER} from '@redux/parsing/resourceParser';
-
 import {createWorkerEventPromise} from '@utils/worker';
 
-import {CustomSchema, MonokleValidator, SchemaLoader, createExtensibleMonokleValidator} from '@monokle/validation';
+import {CustomSchema, MonokleValidator, SchemaLoader, createDefaultMonokleValidator} from '@monokle/validation';
 
-import {validationCustomPluginLoader} from './validation.loader';
 import {
   LoadValidationMessage,
   LoadValidationMessageType,
@@ -24,11 +21,7 @@ class ValidationWorker {
 
   constructor() {
     this.#worker = new Worker(new URL('./validation.worker', import.meta.url));
-    this.#validator = createExtensibleMonokleValidator(
-      RESOURCE_PARSER.getParser(),
-      SCHEMA_LOADER,
-      validationCustomPluginLoader
-    );
+    this.#validator = createDefaultMonokleValidator();
   }
 
   get metadata() {
@@ -71,10 +64,6 @@ class ValidationWorker {
       worker: this.#worker,
       input,
     });
-  }
-
-  isRuleEnabled(rule: string) {
-    return this.#validator.isRuleEnabled(rule);
   }
 
   getPlugin(name: string) {

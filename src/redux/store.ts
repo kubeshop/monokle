@@ -2,6 +2,8 @@ import {Middleware, combineReducers, configureStore, createAction} from '@reduxj
 
 import {createLogger} from 'redux-logger';
 
+import {shouldStopKustomizeDryRunListener} from '@redux/thunks/listeners/shouldStopKustomizeDryRunListener';
+
 import {editorSlice} from '@editor/editor.slice';
 import {editorListeners} from '@editor/listeners';
 
@@ -55,6 +57,7 @@ combineListeners([
   ...appConfigListeners,
   ...clusterListeners,
   imageListParserListener,
+  shouldStopKustomizeDryRunListener,
 ]);
 
 const appReducer = combineReducers({

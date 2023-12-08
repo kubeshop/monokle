@@ -46,6 +46,7 @@ import {startExecutionTimer} from '@utils/executionTime';
 import {doesSchemaExist} from '@utils/index';
 
 import {ResourceIdentifier, ResourceStorage} from '@shared/models/k8sResource';
+import {electronStore} from '@shared/utils';
 import {isDefined} from '@shared/utils/filter';
 import {isEqual} from '@shared/utils/isEqual';
 import {trackEvent} from '@shared/utils/telemetry';
@@ -88,6 +89,10 @@ const loadListener: AppListenerFn = listen => {
     async effect(_action, {dispatch, delay, signal, cancelActiveListeners}) {
       trackEvent('validation/load_config', {actionType: _action.type});
       if (isAnyOf(setIsInQuickClusterMode)(_action)) {
+        const disableClusterValidation = electronStore.get('appConfig.settings.disableClusterValidation') ?? false;
+        if (disableClusterValidation) {
+          return;
+        }
         if (!_action.payload) {
           return;
         }
@@ -127,6 +132,20 @@ const validateListener: AppListenerFn = listen => {
       restartPreview.rejected
     ),
     async effect(_action, {dispatch, getState, cancelActiveListeners, signal, delay}) {
+      const disableClusterValidation = electronStore.get('appConfig.settings.disableClusterValidation') ?? false;
+
+      if (disableClusterValidation) {
+        if (
+          isAnyOf(
+            loadClusterResources.fulfilled,
+            reloadClusterResources.fulfilled,
+            deleteMultipleClusterResources
+          )(_action)
+        ) {
+          return;
+        }
+      }
+
       const stopExecutionTimer = startExecutionTimer();
       cancelActiveListeners();
 

@@ -56,10 +56,9 @@ const TableView = ({
           columns={columns}
           rowKey="id"
           scroll={{
-            y: tableScrollHeight || height - 212 - (bottomSelection === 'terminal' ? terminalHeight : 0),
+            y: tableScrollHeight || height - 270 - (bottomSelection === 'terminal' ? terminalHeight : 0),
           }}
           rowClassName={(record: ResourceMeta | any) => (record.id === selectedResourceId ? 'selected' : '')}
-          pagination={false}
           sticky
           onRow={(record: ResourceMeta | any) => {
             return {

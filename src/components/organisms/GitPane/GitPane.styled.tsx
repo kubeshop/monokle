@@ -83,10 +83,9 @@ export const FilePath = styled.div`
   line-height: 22px;
 `;
 
-export const FileContainer = styled.div<{$height: number}>`
+export const FileContainer = styled.div`
   position: relative;
-  ${props => `height: ${props.$height ? `${props.$height}px` : '100%'};`}
-  margin-top: 12px;
+  flex-grow: 1;
   overflow-y: auto;
 `;
 
@@ -101,8 +100,8 @@ export const GitPaneContainer = styled.div<{$height: number}>`
     height: ${$height}px;
   `}
 
-  display: grid;
-  grid-template-rows: max-content 1fr max-content;
+  display: flex;
+  flex-direction: column;
 `;
 
 export const NoChangedFilesLabel = styled.div`

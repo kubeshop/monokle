@@ -65,6 +65,10 @@ jobs:
           node-version: ${{ steps.get-node-version.outputs.nodeversion }}
           cache: 'npm'
 
+      # Fixes issues with node-gyp https://github.com/nodejs/node-gyp/issues/2869
+      - name: Install Python utilities
+        run: python3 -m pip install setuptools
+
       - name: Install Dependencies
         run: |
           env
@@ -197,6 +201,10 @@ jobs:
           node-version: ${{ steps.get-node-version.outputs.nodeversion }}
           cache: 'npm'
 
+      # Fixes issues with node-gyp https://github.com/nodejs/node-gyp/issues/2869
+      - name: Install Python utilities
+        run: python3 -m pip install setuptools
+
       # Install Dependencies
       - name: Install Dependencies
         run: |
@@ -295,6 +303,10 @@ jobs:
         with:
           node-version: ${{ steps.get-node-version.outputs.nodeversion }}
           cache: 'npm'
+
+      # Fixes issues with node-gyp https://github.com/nodejs/node-gyp/issues/2869
+      - name: Install Python utilities
+        run: python3 -m pip install setuptools
 
       - name: Install Dependencies
         run: |

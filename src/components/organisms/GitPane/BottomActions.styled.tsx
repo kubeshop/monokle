@@ -14,6 +14,7 @@ export const BottomActionsContainer = styled.div`
   padding: 0px 14px;
   width: 100%;
   overflow-x: hidden;
+  flex-shrink: 0;
 `;
 
 export const CommitButton = styled(RawButton)`

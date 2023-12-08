@@ -79,6 +79,20 @@ export const ADDITIONAL_SUPPORTED_FILES = [
   '.env.development',
   '.github',
   '.vscode',
+  'OWNERS',
+  'SECURITY_CONTACTS',
+  'SECURITY',
+  'CODEOWNERS',
+  'CODE_OF_CONDUCT',
+  'CONTRIBUTING',
+  'CONTRIBUTORS',
+  'AUTHORS',
+  'PULL_REQUEST_TEMPLATE',
+  'ISSUE_TEMPLATE',
+  'README',
+  'CHANGELOG',
+  'LICENSE_TEMPLATE',
+  'OWNERS_ALIASES',
 ];
 
 export const CLUSTER_DASHBOARD_HELP_URL: string = 'https://kubeshop.github.io/monokle/cluster-mode';

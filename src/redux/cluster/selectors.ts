@@ -3,6 +3,7 @@ import {Context} from '@kubernetes/client-node';
 import {TypedUseSelectorHook} from 'react-redux';
 
 import {uniq} from 'lodash';
+import path from 'path';
 import {createSelector} from 'reselect';
 
 import {useAppSelector} from '@redux/hooks';
@@ -31,8 +32,8 @@ export const selectKubeconfigPaths = (state: RootState): string[] => {
     allConfigs
       .map(config => {
         // KUBECONFIG ENV VAR can contain multiple paths separated by ':'
-        if (config.includes(':')) {
-          return config.split(':');
+        if (config.includes(path.delimiter)) {
+          return config.split(path.delimiter);
         }
         return config;
       })

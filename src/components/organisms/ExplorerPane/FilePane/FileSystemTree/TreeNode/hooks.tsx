@@ -121,9 +121,10 @@ export const useRename = () => {
 };
 
 export const useIsDisabled = (fileEntry?: FileEntry) => {
+  const fileOrFolderContainedIn = useAppSelector(state => state.main.resourceFilter.fileOrFolderContainedIn);
   const isDisabled = useMemo(() => {
-    return isFileEntryDisabled(fileEntry);
-  }, [fileEntry]);
+    return isFileEntryDisabled(fileEntry, fileOrFolderContainedIn);
+  }, [fileEntry, fileOrFolderContainedIn]);
   return isDisabled;
 };
 

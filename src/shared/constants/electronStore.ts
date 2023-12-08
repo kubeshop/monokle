@@ -26,6 +26,17 @@ export const electronStoreSchema = {
   appConfig: {
     type: 'object',
     properties: {
+      binaryPaths: {
+        type: ['object', 'null'],
+        properties: {
+          kubectl: {
+            type: 'string',
+          },
+          helm: {
+            type: 'string',
+          },
+        },
+      },
       userApiKeys: {
         type: 'object',
         properties: {
@@ -104,6 +115,9 @@ export const electronStoreSchema = {
             type: 'boolean',
           },
           allowEditInClusterMode: {
+            type: 'boolean',
+          },
+          disableClusterValidation: {
             type: 'boolean',
           },
         },
@@ -304,7 +318,7 @@ export const electronStoreDefaults = {
     useKubectlProxy: false,
     loadLastProjectOnStartup: false,
     fileExplorerSortOrder: 'folders',
-    scanExcludes: ['node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp'],
+    scanExcludes: ['**/node_modules', '**/.git', '**/pkg/mod/**', '**/.kube', '**/*.swp'],
     fileIncludes: ['*.yaml', '*.yml'],
     settings: {
       theme: 'dark',
@@ -314,6 +328,7 @@ export const electronStoreDefaults = {
       createDefaultObjects: false,
       setDefaultPrimitiveValues: true,
       allowEditInClusterMode: true,
+      disableClusterValidation: false,
       enableHelmWithKustomize: true,
     },
     recentFolders: [],

@@ -48,6 +48,52 @@ export const GlobalSettings = () => {
     [_setShouldAppendServerPath]
   );
 
+  const [disableClusterValidation, _setDisableClusterValidation] = useState<boolean>(
+    electronStore.get('appConfig.settings.disableClusterValidation') ?? false
+  );
+
+  const setDisableClusterValidation = useCallback(
+    (value: boolean) => {
+      _setDisableClusterValidation(value);
+      electronStore.set('appConfig.settings.disableClusterValidation', value);
+    },
+    [_setDisableClusterValidation]
+  );
+
+  const [isOverridingBinaryPaths, _setIsOverridingBinaryPaths] = useState<boolean>(
+    Boolean(electronStore.get('appConfig.binaryPaths')) ?? false
+  );
+
+  const setIsOverridingBinaryPaths = useCallback(
+    (value: boolean) => {
+      _setIsOverridingBinaryPaths(value);
+      electronStore.set('appConfig.binaryPaths', value === false ? null : {});
+    },
+    [_setIsOverridingBinaryPaths]
+  );
+
+  const [kubectlBinaryPath, _setKubectlBinaryPath] = useState<string>(
+    electronStore.get('appConfig.binaryPaths.kubectl') ?? ''
+  );
+
+  const setKubectlBinaryPath = useCallback(
+    (value: string) => {
+      _setKubectlBinaryPath(value);
+      electronStore.set('appConfig.binaryPaths.kubectl', value);
+    },
+    [_setKubectlBinaryPath]
+  );
+
+  const [helmBinaryPath, _setHelmBinaryPath] = useState<string>(electronStore.get('appConfig.binaryPaths.helm') ?? '');
+
+  const setHelmBinaryPath = useCallback(
+    (value: string) => {
+      _setHelmBinaryPath(value);
+      electronStore.set('appConfig.binaryPaths.helm', value);
+    },
+    [_setHelmBinaryPath]
+  );
+
   const [currentProjectsRootPath, setCurrentProjectsRootPath] = useState(projectsRootPath);
 
   const [settingsForm] = useForm();
@@ -158,6 +204,26 @@ export const GlobalSettings = () => {
           <Checkbox checked={shouldAppendServerPath} onChange={e => setShouldAppendServerPath(e.target.checked)}>
             Append Server Path to Kubectl Proxy
           </Checkbox>
+          <Checkbox checked={disableClusterValidation} onChange={e => setDisableClusterValidation(e.target.checked)}>
+            Disable validation of cluster resources
+          </Checkbox>
+        </S.Div>
+
+        <S.Div>
+          <S.Span>Binary Configuration</S.Span>
+          <Checkbox checked={isOverridingBinaryPaths} onChange={e => setIsOverridingBinaryPaths(e.target.checked)}>
+            Override binary paths
+          </Checkbox>
+          {isOverridingBinaryPaths && (
+            <>
+              <Form.Item label="kubectl path">
+                <Input value={kubectlBinaryPath} onChange={e => setKubectlBinaryPath(e.target.value)} />
+              </Form.Item>
+              <Form.Item label="helm path">
+                <Input value={helmBinaryPath} onChange={e => setHelmBinaryPath(e.target.value)} />
+              </Form.Item>
+            </>
+          )}
         </S.Div>
       </div>
 

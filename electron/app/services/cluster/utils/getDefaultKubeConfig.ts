@@ -18,5 +18,5 @@ export function getDefaultKubeConfig() {
 
 export function getEnvKubeconfigs(): string[] {
   const kubeconfig = getDefaultKubeConfig();
-  return kubeconfig.split(':');
+  return kubeconfig.split(path.delimiter);
 }

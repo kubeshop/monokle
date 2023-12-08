@@ -1,10 +1,7 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {useMeasure} from 'react-use';
+import React, {useEffect, useState} from 'react';
 
 import {Checkbox} from 'antd';
 import {CheckboxChangeEvent} from 'antd/lib/checkbox';
-
-import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 
 import {setGitLoading} from '@redux/git';
 import {stageChangedFiles, unstageFiles} from '@redux/git/git.ipc';
@@ -37,25 +34,7 @@ const GitPane: React.FC = () => {
   const [stagedFiles, setStagedFiles] = useState<GitChangedFile[]>([]);
   const [unstagedFiles, setUnstagedFiles] = useState<GitChangedFile[]>([]);
 
-  const [remoteInputRef, {height: remoteInputHeight}] = useMeasure<HTMLDivElement>();
-  const [bottomActionsRef, {height: bottomActionsHeight}] = useMeasure<HTMLDivElement>();
-
   const height = usePaneHeight();
-
-  const fileContainerHeight = useMemo(() => {
-    let h: number = height - DEFAULT_PANE_TITLE_HEIGHT - 22;
-
-    // 12 is the margin top of the git pane content
-    if (gitRepo) {
-      h -= bottomActionsHeight + 12;
-    }
-
-    if (!remoteRepo?.exists) {
-      h -= remoteInputHeight;
-    }
-
-    return h;
-  }, [bottomActionsHeight, gitRepo, remoteRepo, height, remoteInputHeight]);
 
   const handleSelect = (event: CheckboxChangeEvent, item: GitChangedFile) => {
     if (event.target.checked) {
@@ -142,13 +121,9 @@ const GitPane: React.FC = () => {
         </S.AuthRequiredContainer>
       ) : changedFiles.length ? (
         <>
-          {!remoteRepo?.exists ? (
-            <S.RemoteInputContainer ref={remoteInputRef}>
-              <RemoteInput />
-            </S.RemoteInputContainer>
-          ) : null}
+          {!remoteRepo?.exists ? <RemoteInput /> : null}
 
-          <S.FileContainer $height={fileContainerHeight}>
+          <S.FileContainer>
             <S.ChangeList>
               Changelist <S.ChangeListStatus>{changedFiles.length} files</S.ChangeListStatus>
             </S.ChangeList>
@@ -218,11 +193,7 @@ const GitPane: React.FC = () => {
         </S.NoChangedFilesLabel>
       )}
 
-      {gitRepo ? (
-        <S.BottomActionsRef ref={bottomActionsRef}>
-          <BottomActions />
-        </S.BottomActionsRef>
-      ) : null}
+      {gitRepo ? <BottomActions /> : null}
     </S.GitPaneContainer>
   );
 };
