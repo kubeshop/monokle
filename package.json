@@ -1,6 +1,6 @@
 {
   "name": "monokle",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "author": "Kubeshop",
   "description": "Desktop IDE for working with Kubernetes Clusters and YAML configurations",
   "homepage": "./",
