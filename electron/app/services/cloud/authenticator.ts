@@ -2,12 +2,15 @@ import {app} from 'electron';
 
 import {join} from 'path';
 
-import {Authenticator, StorageHandlerAuth, createDefaultMonokleAuthenticator} from '@monokle/synchronizer';
+import {Authenticator, StorageHandlerAuth, createMonokleAuthenticatorFromOrigin} from '@monokle/synchronizer';
+import {getClientConfig} from './client-config';
+
+export const AUTH_CLIENT_ID = 'mc-cli';
 
 let authenticator: Authenticator | undefined;
 
 const initAuthenticator = async (cloudStorageDir: string) => {
-  const newAuthenticator = createDefaultMonokleAuthenticator(new StorageHandlerAuth(cloudStorageDir));
+  const newAuthenticator = await createMonokleAuthenticatorFromOrigin(AUTH_CLIENT_ID, getClientConfig(), undefined, new StorageHandlerAuth(cloudStorageDir));
   authenticator = newAuthenticator;
   return newAuthenticator;
 };

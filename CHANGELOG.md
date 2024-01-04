@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.4.4](https://github.com/kubeshop/monokle/compare/v2.4.3...v2.4.4) (2024-01-04)
+
+
+### Bug Fixes
+
+* add client data to synchronizer instances ([46ffb9f](https://github.com/kubeshop/monokle/commit/46ffb9fed0dc0b152637485fd8443097ebb8fd0d))
+* fix synchronizer invalid calls ([178b830](https://github.com/kubeshop/monokle/commit/178b83029796fe0163c41d92757052498c04e1bf))
+* send machineId only when tracking enabled ([44c35df](https://github.com/kubeshop/monokle/commit/44c35df10de3884e865ec2d6b1ab568f0694ec1f))
+
 ### [2.4.3](https://github.com/kubeshop/monokle/compare/v2.4.3-nightly-2023-12-08.0...v2.4.3) (2023-12-08)
 
 ### [2.4.2](https://github.com/kubeshop/monokle/compare/v2.4.2-nightly-2023-10-23.0...v2.4.2) (2023-10-23)

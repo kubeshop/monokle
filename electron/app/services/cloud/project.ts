@@ -8,12 +8,12 @@ export const getInfo = async (
 ): Promise<{projectInfo: CloudProjectInfo; policyInfo: CloudPolicyInfo} | null> => {
   const synchronizer = await getSynchronizer();
   const user = await getUser();
-  if (!user?.token || !synchronizer) {
+  if (!user?.tokenInfo || !synchronizer) {
     return null;
   }
 
   try {
-    const project = await synchronizer?.getProjectInfo(repoPath, user.token, true);
+    const project = await synchronizer?.getProjectInfo(repoPath, user.tokenInfo, true);
     return project
       ? {
           projectInfo: {...project, link: synchronizer.generateDeepLinkProject(project.slug)},
