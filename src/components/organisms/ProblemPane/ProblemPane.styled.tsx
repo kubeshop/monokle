@@ -28,6 +28,7 @@ export const TextContainer = styled.div`
   width: 756px;
   border-radius: 4px;
   border: 1px solid ${Colors.grey4};
+  overflow: auto;
 `;
 
 export const TextTitle = styled.div`
