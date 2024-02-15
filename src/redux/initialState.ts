@@ -5,7 +5,6 @@ import {DEFAULT_PANE_CONFIGURATION} from '@constants/constants';
 import {PREDEFINED_K8S_VERSION} from '@shared/constants/k8s';
 import {AlertState} from '@shared/models/alert';
 import {AppState} from '@shared/models/appState';
-import {CloudState} from '@shared/models/cloud';
 import {AppConfig, NewVersionCode, SettingsPanel} from '@shared/models/config';
 import {ExtensionState} from '@shared/models/extension';
 import {TerminalState} from '@shared/models/terminal';
@@ -270,8 +269,6 @@ const initialTerminalState: TerminalState = {
   terminalsMap: {},
 };
 
-const initialCloudState: CloudState = {};
-
 export default {
   alert: initialAlertState,
   config: initialAppConfigState,
@@ -279,5 +276,4 @@ export default {
   main: initialAppState,
   terminal: initialTerminalState,
   ui: initialUiState,
-  cloud: initialCloudState,
 };

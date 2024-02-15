@@ -1,6 +1,5 @@
 import {AlertState} from './alert';
 import {AppState} from './appState';
-import {CloudState} from './cloud';
 import {ClusterState} from './clusterState';
 import {CompareState} from './compare';
 import {AppConfig} from './config';
@@ -29,7 +28,6 @@ type RootState = {
   validation: ValidationState;
   dashboard: DashboardState;
   cluster: ClusterState;
-  cloud: CloudState;
 };
 
 type ElectronMenuDataType = {

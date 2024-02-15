@@ -195,9 +195,6 @@ export type EventMap = {
   'project_summary/new_empty_resource': undefined;
   'project_summary/new_ai_resource': undefined;
   'project_summary/select_explorer_section': {section: string};
-  'cloud_sync/login': undefined;
-  'cloud_sync/logout': undefined;
-  'cloud_sync/policy': {projectSlug: string};
 };
 
 export const APP_INSTALLED = 'APP_INSTALLED';

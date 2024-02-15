@@ -2,12 +2,8 @@ import {shell} from 'electron';
 
 import {useCallback, useState} from 'react';
 
-import {useAppDispatch, useAppSelector} from '@redux/hooks';
-import {
-  isUsingCloudPolicySelector,
-  pluginRulesSelector,
-  useValidationSelector,
-} from '@redux/validation/validation.selectors';
+import {useAppDispatch} from '@redux/hooks';
+import {pluginRulesSelector, useValidationSelector} from '@redux/validation/validation.selectors';
 import {toggleValidation, updateSelectedPluginConfiguration} from '@redux/validation/validation.slice';
 
 import {IconNames} from '@monokle/components';
@@ -34,8 +30,6 @@ const ValidationCard: React.FC<Props> = ({configurable, plugin}) => {
 
   const dispatch = useAppDispatch();
   const hasRules = useValidationSelector(s => pluginRulesSelector(s, name).length > 0);
-
-  const isUsingCloudPolicy = useAppSelector(isUsingCloudPolicySelector);
 
   const [isChecked, setIsChecked] = useState(enabled);
 
@@ -67,11 +61,11 @@ const ValidationCard: React.FC<Props> = ({configurable, plugin}) => {
 
       {hasRules && configurable && (
         <S.ConfigureButton type="primary" onClick={onConfigureHandler}>
-          {isUsingCloudPolicy ? 'View' : 'Configure'}
+          Configure
         </S.ConfigureButton>
       )}
 
-      <S.Switch disabled={isUsingCloudPolicy} checked={isChecked} size="small" onChange={toggleEnabled} />
+      <S.Switch checked={isChecked} size="small" onChange={toggleEnabled} />
     </S.ValidationCardContainer>
   );
 };

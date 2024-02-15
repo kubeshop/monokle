@@ -219,8 +219,7 @@ export const activePluginsSelector = createDeepEqualSelector(
 );
 
 export const pluginEnabledSelector = createDeepEqualSelector(
-  (state: RootState, id: string) =>
-    state.validation.cloudPolicy?.policy?.plugins?.[id] ?? state.validation.config?.plugins?.[id],
+  (state: RootState, id: string) => state.validation.config?.plugins?.[id],
   (_: RootState, id: string) => id,
   (_config, id): boolean => VALIDATOR.getPlugin(id)?.enabled ?? false
 );
@@ -280,9 +279,4 @@ export const problemResourceAndRangeSelector = createDeepEqualSelector(
 
     return {resourceId, storage, range};
   }
-);
-
-export const isUsingCloudPolicySelector = createSelector(
-  (state: RootState) => state.validation.cloudPolicy,
-  cloudPolicy => Boolean(cloudPolicy?.policy && cloudPolicy?.valid)
 );

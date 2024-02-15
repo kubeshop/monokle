@@ -23,7 +23,6 @@ import {
   openGitHubAction,
   openMonokleChromeExtension,
   openMonokleCli,
-  openMonokleCloud,
 } from '@shared/utils/shell';
 
 import {useAppVersion} from '../useAppVersion';
@@ -80,9 +79,6 @@ export function useHelpMenuItems() {
             {renderMenuItem('Discover More', <GlobalOutlined />, false, false)}
 
             <MenuItemLinks>
-              <HelpLink type="link" size="small" onClick={() => openMonokleCloud()}>
-                Monokle Cloud
-              </HelpLink>
               <HelpLink type="link" size="small" onClick={() => openGitHubAction()}>
                 Monokle GitHub Action
               </HelpLink>

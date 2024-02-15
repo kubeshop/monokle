@@ -9,7 +9,7 @@ import {activeResourceStorageSelector} from '@redux/selectors/resourceMapSelecto
 
 import {getResourceKindHandler} from '@src/kindhandlers';
 
-import {CORE_PLUGINS, Config, ResourceRefType, ValidationResponse} from '@monokle/validation';
+import {CORE_PLUGINS, ResourceRefType, ValidationResponse} from '@monokle/validation';
 import {K8sResource, ResourceMeta} from '@shared/models/k8sResource';
 import type {ThunkApi} from '@shared/models/thunk';
 import type {LoadValidationResult, ValidationArgs, ValidationResource} from '@shared/models/validation';
@@ -30,12 +30,7 @@ export const loadValidation = createAsyncThunk<LoadValidationResult, undefined, 
     merge(localConfig, state.config);
     electronStore.set('validation.config', localConfig);
 
-    let cloudConfig: Config | undefined;
-    if (state.cloudPolicy?.policy && state.cloudPolicy.valid) {
-      cloudConfig = state.cloudPolicy.policy;
-    }
-
-    await VALIDATOR.loadValidation({config: cloudConfig ?? localConfig});
+    await VALIDATOR.loadValidation({config: localConfig});
 
     return {
       metadata: VALIDATOR.metadata,

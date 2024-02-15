@@ -28,11 +28,6 @@ export function openGitHubBot() {
   shell.openExternal('https://github.com/kubeshop/monokle');
 }
 
-export function openMonokleCloud() {
-  trackEvent('help/open_link', {linkType: 'monokle-cloud'});
-  shell.openExternal('https://monokle.io/cloud-ide');
-}
-
 export function openMonokleCli() {
   trackEvent('help/open_link', {linkType: 'monokle-cli'});
   shell.openExternal('https://github.com/kubeshop/monokle-cli');

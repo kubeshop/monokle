@@ -42,7 +42,6 @@ import {Icon} from '@monokle/components';
 import {isInClusterModeSelector} from '@shared/utils/selectors';
 import {trackEvent} from '@shared/utils/telemetry';
 
-import CloudSync from './CloudSync';
 import {ClusterControls} from './ClusterControl/ClusterControls';
 import DownloadProgress from './DownloadProgress';
 import {K8sVersionSelection} from './K8sVersionSelection';
@@ -280,7 +279,6 @@ const PageHeader = () => {
         </div>
 
         <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
-          <CloudSync />
           <K8sVersionSelection />
           <ClusterControls />
 
