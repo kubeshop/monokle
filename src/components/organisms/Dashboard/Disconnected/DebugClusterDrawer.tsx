@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import {Tooltip} from '@components/atoms/Tooltip/Tooltip';
 
 import {useMainPaneDimensions} from '@utils/hooks';
+import {preserveControlCharacters} from '@utils/preserveControlCharacters';
 
 import {ContextId} from '@shared/ipc';
 import {Colors} from '@shared/styles';
@@ -82,7 +83,7 @@ export function DebugClusterDrawer({contextId, open, onClose}: Props) {
                 <LogMeta>
                   [{DateTime.fromMillis(l.timestamp).toFormat('HH:MM:ss')} - {l.type}]
                 </LogMeta>
-                <LogContent $wrap={wordWrap}>{l.content}</LogContent>
+                <LogContent $wrap={wordWrap}>{preserveControlCharacters(l.content)}</LogContent>
               </LogEntry>
             ))}
           </div>
