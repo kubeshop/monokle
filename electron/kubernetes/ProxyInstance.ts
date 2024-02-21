@@ -51,8 +51,8 @@ export class ProxyInstance {
       throw new Error('MONOKLE_PROXY_EMPTY_CONTEXT');
     }
 
-    const globalOptions = [`--context=${this.context}`];
-    if (this.kubeconfig) globalOptions.push(`--kubeconfig=${this.kubeconfig}`);
+    const globalOptions = [`--context=${JSON.stringify(this.context)}`];
+    if (this.kubeconfig) globalOptions.push(`--kubeconfig=${JSON.stringify(this.kubeconfig)}`);
     if (this.verbosity) globalOptions.push(`-v=${this.verbosity}`);
 
     const proxyOptions = [`--port=${this.port}`];
