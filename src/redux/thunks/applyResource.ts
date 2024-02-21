@@ -69,7 +69,7 @@ function applyKustomization(
 ) {
   const folder = getAbsoluteResourceFolder(resourceMeta, fileMap);
 
-  const args: string[] = ['--context', context];
+  const args: string[] = ['--context', JSON.stringify(context)];
   if (namespace) {
     args.push(...['--namespace', namespace.name]);
   }
