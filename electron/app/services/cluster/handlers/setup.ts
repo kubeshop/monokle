@@ -48,6 +48,12 @@ function determineError(reason: string, contextId: ContextId): MonokleClusterErr
   if (reason === 'MONOKLE_PROXY_EMPTY_CONTEXT') {
     return getMonokleClusterError('proxy-empty-context', contextId);
   }
+  if (reason === 'MONOKLE_PROXY_MISSING_CONTEXT') {
+    return getMonokleClusterError('proxy-missing-context', contextId);
+  }
+  if (reason === 'MONOKLE_PROXY_INVALID_CONFIG') {
+    return getMonokleClusterError('proxy-invalid-config', contextId);
+  }
 
   // Kubectl user authentication error.
   // These happen within the local kube-proxy.
