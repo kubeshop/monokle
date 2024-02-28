@@ -14,6 +14,14 @@ const errors = createErrors({
     title: 'Cannot connect to the cluster',
     description: 'There is no current context selected.',
   },
+  'proxy-missing-context': {
+    title: 'Cannot connect to the cluster',
+    description: 'The specified context does not exist. Please check your kubeconfig file.',
+  },
+  'proxy-invalid-config': {
+    title: 'Cannot connect to the cluster',
+    description: 'The proxy connection arguments were invalid.',
+  },
   'local-connection-refused': {
     title: 'Cannot connect to the cluster',
     description: 'The connection was refused - is your Docker Engine or VM running?',

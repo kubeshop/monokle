@@ -6,7 +6,7 @@ export function createKubectlApplyCommand(
   {context, namespace, input}: KubectlApplyArgs,
   env?: KubectlEnv
 ): CommandOptions {
-  const args = ['--context', context, 'apply', '-f', '-'];
+  const args = ['--context', JSON.stringify(context), 'apply', '-f', '-'];
 
   if (namespace) {
     args.unshift('--namespace', namespace);

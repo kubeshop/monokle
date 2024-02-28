@@ -36,6 +36,14 @@ jobs:
         run: |
           brew install jq
 
+      - name: Check MacOS certs expiration
+        run: |
+          ls -la
+          chmod +x .github/workflows/scripts/check-osx-cert-exp.sh && .github/workflows/scripts/check-osx-cert-exp.sh
+        env:
+          CERTIFICATE_OSX_APPLICATION: ${{ secrets.MONOKLE_MACOS_CERTS }}
+          CERTIFICATE_PASSWORD: ${{ secrets.MONOKLE_MACOS_CERTS_PASSWORD }}
+
       - name: Add MacOS certs
         run: |
           ls -la

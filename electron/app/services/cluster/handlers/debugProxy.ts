@@ -16,6 +16,9 @@ export async function debugProxy({context, kubeconfig}: DebugProxyArgs): Promise
       return proxy.debugInfo;
     }
 
+    const proxy = await PROXY_SERVICE.getLast();
+    if (proxy) return proxy.debugInfo;
+
     return {
       cmd: 'kubectl proxy exited',
       logs: [

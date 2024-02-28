@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import {Tooltip} from '@components/atoms/Tooltip/Tooltip';
 
 import {useMainPaneDimensions} from '@utils/hooks';
+import {preserveControlCharacters} from '@utils/preserveControlCharacters';
 
 import {ContextId} from '@shared/ipc';
 import {Colors} from '@shared/styles';
@@ -77,12 +78,17 @@ export function DebugClusterDrawer({contextId, open, onClose}: Props) {
           <div />
 
           <div style={{paddingBottom: 8}}>
+            {Boolean(data?.cmd) && (
+              <CodeBlock>
+                <pre>{data?.cmd}</pre>
+              </CodeBlock>
+            )}
             {logs.map(l => (
               <LogEntry key={l.timestamp}>
                 <LogMeta>
                   [{DateTime.fromMillis(l.timestamp).toFormat('HH:MM:ss')} - {l.type}]
                 </LogMeta>
-                <LogContent $wrap={wordWrap}>{l.content}</LogContent>
+                <LogContent $wrap={wordWrap}>{preserveControlCharacters(l.content)}</LogContent>
               </LogEntry>
             ))}
           </div>
@@ -133,5 +139,19 @@ const ButtonBox = styled.div<{$wrap: boolean}>`
   :active {
     background: ${Colors.grey3b};
     color: ${Colors.lightSeaGreen};
+  }
+`;
+
+const CodeBlock = styled.code`
+  > pre {
+    width: min-content;
+    max-width: 100%;
+    overflow: auto;
+    display: block;
+    white-space: no-wrap;
+    padding: 8px;
+    border-radius: 4px;
+    background: ${Colors.grey3b};
+    color: ${Colors.grey8};
   }
 `;

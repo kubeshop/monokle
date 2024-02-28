@@ -5,6 +5,7 @@ const PROXY_MAX_ATTEMPTS = 25;
 export class ProxyService {
   private nextPort = 30001;
   private proxies: ProxyInstance[] = [];
+  private last: ProxyInstance | undefined;
 
   get(context: string, kubeconfig?: string): Promise<ProxyInstance> {
     const proxy = this.proxies.find(p => p.context === context && p.kubeconfig === kubeconfig);
@@ -21,6 +22,10 @@ export class ProxyService {
     return this.start(context, kubeconfig);
   }
 
+  async getLast(): Promise<ProxyInstance | undefined> {
+    return this.last;
+  }
+
   find(context: string) {
     return this.proxies.find(p => p.context === context);
   }
@@ -34,6 +39,7 @@ export class ProxyService {
         this.nextPort += 1;
 
         const proxy = new ProxyInstance({context, kubeconfig, port, verbosity: undefined});
+        this.last = proxy;
         await proxy.start();
 
         proxy.onDelete = () => {

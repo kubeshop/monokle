@@ -44,7 +44,7 @@ export const KUBECTL = {
 
 function createGlobalArgs(globals: KubectlGlobal) {
   const globalArgs = [];
-  if (globals.kubeconfig) globalArgs.push(`--kubeconfig=${globals.kubeconfig}`);
-  if (globals.context) globalArgs.push(`--context=${globals.context}`);
+  if (globals.kubeconfig) globalArgs.push(`--kubeconfig=${JSON.stringify(globals.kubeconfig)}`);
+  if (globals.context) globalArgs.push(`--context=${JSON.stringify(globals.context)}`);
   return globalArgs;
 }

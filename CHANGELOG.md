@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.4.5](https://github.com/kubeshop/monokle/compare/v2.4.4...v2.4.5) (2024-02-28)
+
+
+### Bug Fixes
+
+* access debug logs for failed proxy setups ([a05348d](https://github.com/kubeshop/monokle/commit/a05348d37afbde808ea46ee9d2dcbac7580aaca3))
+* missing crds folder runtime error ([75fb95a](https://github.com/kubeshop/monokle/commit/75fb95a8bf70f3ae28f72efed05fc81a231b883b))
+* preserve \n\t\r control characters when displaying logs ([ed6a412](https://github.com/kubeshop/monokle/commit/ed6a4120fe35cc9e90dab762ec4a87b61610eb33))
+* stringify the `context` and `kubeconfig` cli arguments ([93e6652](https://github.com/kubeshop/monokle/commit/93e665267b061efecc5d61702e6ef63b605747ed))
+
 ### [2.4.4](https://github.com/kubeshop/monokle/compare/v2.4.3...v2.4.4) (2024-01-04)
 
 

@@ -51,8 +51,8 @@ export class ProxyInstance {
       throw new Error('MONOKLE_PROXY_EMPTY_CONTEXT');
     }
 
-    const globalOptions = [`--context=${this.context}`];
-    if (this.kubeconfig) globalOptions.push(`--kubeconfig=${this.kubeconfig}`);
+    const globalOptions = [`--context=${JSON.stringify(this.context)}`];
+    if (this.kubeconfig) globalOptions.push(`--kubeconfig=${JSON.stringify(this.kubeconfig)}`);
     if (this.verbosity) globalOptions.push(`-v=${this.verbosity}`);
 
     const proxyOptions = [`--port=${this.port}`];
@@ -113,6 +113,10 @@ export class ProxyInstance {
           proxySignal.reject(new Error('EADDRINUSE'));
         } else if (msg.includes('error: The gcp auth plugin has been removed')) {
           proxySignal.reject(new Error('MONOKLE_PROXY_GCP_LEGACY_PLUGIN'));
+        } else if (/^error: flags cannot be placed before/i.test(msg)) {
+          proxySignal.reject(new Error('MONOKLE_PROXY_INVALID_CONFIG'));
+        } else if (/^(error: context).*(does not exist)/i.test(msg)) {
+          proxySignal.reject(new Error('MONOKLE_PROXY_MISSING_CONTEXT'));
         } else {
           // do nothing and let the timeout reject eventually.
           // For instance, high verbosity logs plenty of details
