@@ -2,7 +2,7 @@ import {Tabs as RawTabs} from 'antd';
 
 import styled from 'styled-components';
 
-import {BackgroundColors} from '@shared/styles';
+import {BackgroundColors, Colors} from '@shared/styles';
 
 export const ProblemPaneContainer = styled.div`
   background-color: ${BackgroundColors.darkThemeBackground};
@@ -11,6 +11,81 @@ export const ProblemPaneContainer = styled.div`
   display: grid;
   grid-template-rows: max-content 1fr max-content;
   grid-gap: 15px;
+`;
+
+export const MainBox = styled.div`
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+export const TextContainer = styled.div`
+  display: grid;
+  grid-template-columns: 119px 119px 139px 150px;
+  grid-column-gap: 50px;
+  padding: 20px 20px 27px 48px;
+  width: 756px;
+  border-radius: 4px;
+  border: 1px solid ${Colors.grey4};
+  overflow: auto;
+`;
+
+export const TextTitle = styled.div`
+  color: ${Colors.geekblue8};
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin: 30px 0px 30px 0px;
+`;
+
+export const Text = styled.div`
+  color: ${Colors.grey8};
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px; /* 171.429% */
+  margin: 10px 0px 20px 0px;
+`;
+
+export const MainColumn = styled.div`
+  grid-column: 1 / 4;
+  grid-row: 1;
+`;
+
+export const ImageColumn = styled.div`
+  grid-column: 4;
+  grid-row: 1 / 5;
+`;
+
+export const ValidationImage = styled.img`
+  width: 150px;
+  height: 138px;
+  margin-top: 40px;
+`;
+
+export const TextColumn1 = styled.div`
+  grid-column: 1 / 2;
+  grid-row: 2;
+`;
+
+export const TextColumn2 = styled.div`
+  grid-column: 2 / 3;
+  grid-row: 2;
+`;
+
+export const TextColumn3 = styled.div`
+  grid-column: 3 / 4;
+  grid-row: 2;
+  padding-right: 20px;
+`;
+
+export const TextIcon = styled.img`
+  cursor: pointer;
+  height: 32px;
+  width: 32px;
+  margin-bottom: 15px;
 `;
 
 export const Tabs = styled(RawTabs)`
