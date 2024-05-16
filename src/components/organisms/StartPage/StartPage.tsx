@@ -1,5 +1,3 @@
-import {shell} from 'electron';
-
 import {useEffect} from 'react';
 
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
@@ -18,14 +16,11 @@ import {useStartPageOptions} from '@hooks/useStartPageOptions';
 
 import {useWindowSize} from '@utils/hooks';
 
-import AnnotationHeart from '@assets/AnnotationHeart.svg';
-
 import {StartPageMenuOptions} from '@shared/models/ui';
 import {trackEvent} from '@shared/utils/telemetry';
 
 import * as S from './StartPage.styled';
 import StartPageHeader from './StartPageHeader';
-import {useNewsFeed} from './useNewsFeed';
 
 export interface NewsFeedItem {
   title: string;
@@ -43,8 +38,6 @@ const StartPage: React.FC = () => {
   const projects = useAppSelector(state => state.config.projects);
   const selectedOption = useAppSelector(state => state.ui.startPage.selectedMenuOption);
   const isFromBackToStart = useAppSelector(state => state.ui.startPage.fromBackToStart);
-
-  const newsFeed = useNewsFeed();
 
   const {height, width} = useWindowSize();
 
@@ -83,11 +76,6 @@ const StartPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const openNewsFeedItem = (url: string) => {
-    trackEvent('app_start/select_news_item', {itemUrl: url});
-    shell.openExternal(url);
-  };
-
   return (
     <S.StartPageContainer $height={height}>
       <StartPageHeader />
@@ -125,56 +113,9 @@ const StartPage: React.FC = () => {
         <S.ContentContainer>
           <S.ContentTitle>{options[selectedOption].title}</S.ContentTitle>
           {options[selectedOption].content}
-          <S.NewsFeedBottom>
-            <S.NewsFeedHeader>
-              <S.NewsFeedIcon>
-                <img src={AnnotationHeart} alt="news feed icon" />
-              </S.NewsFeedIcon>
-              What&lsquo;s New?
-            </S.NewsFeedHeader>
-            <S.NewsFeedContent>
-              {newsFeed.map(item => (
-                <S.NewsFeeditemBottom
-                  onClick={() => {
-                    openNewsFeedItem(item.url);
-                  }}
-                >
-                  <S.NewsFeedItemTimeBottom>
-                    {Math.floor((new Date().getTime() - new Date(item.date).getTime()) / (1000 * 60 * 60 * 24))}
-                    {' days'}
-                  </S.NewsFeedItemTimeBottom>
-                  <S.NewsFeedItemTitle>{item.title}</S.NewsFeedItemTitle>
-                </S.NewsFeeditemBottom>
-              ))}
-            </S.NewsFeedContent>
-          </S.NewsFeedBottom>
         </S.ContentContainer>
 
-        <S.NewsFeedContainer>
-          <S.NewsFeed>
-            <S.NewsFeedHeader>
-              <S.NewsFeedIcon>
-                <img src={AnnotationHeart} alt="news feed icon" />
-              </S.NewsFeedIcon>
-              What&lsquo;s New?
-            </S.NewsFeedHeader>
-            <S.NewsFeedContent>
-              {newsFeed.map(item => (
-                <S.NewsFeeditem
-                  onClick={() => {
-                    openNewsFeedItem(item.url);
-                  }}
-                >
-                  <S.NewsFeedItemTime>
-                    {Math.floor((new Date().getTime() - new Date(item.date).getTime()) / (1000 * 60 * 60 * 24))}
-                    {' days ago'}
-                  </S.NewsFeedItemTime>
-                  <S.NewsFeedItemTitle>{item.title}</S.NewsFeedItemTitle>
-                </S.NewsFeeditem>
-              ))}
-            </S.NewsFeedContent>
-          </S.NewsFeed>
-        </S.NewsFeedContainer>
+        <S.AsideContainer />
       </S.MainContainer>
     </S.StartPageContainer>
   );

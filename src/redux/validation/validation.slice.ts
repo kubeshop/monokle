@@ -7,7 +7,6 @@ import {stopClusterConnection} from '@redux/thunks/cluster';
 import {setRootFolder} from '@redux/thunks/setRootFolder';
 
 import {ValidationFiltersValueType} from '@monokle/components';
-import type {PolicyData} from '@monokle/synchronizer';
 import {CORE_PLUGINS, PluginMetadataWithConfig} from '@monokle/validation';
 import {SelectedProblem, ValidationState} from '@shared/models/validation';
 import {CustomValidationPlugin} from '@shared/models/validationPlugins';
@@ -175,16 +174,11 @@ export const validationSlice = createSlice({
         state.config.plugins = pick(state.config.plugins, CORE_PLUGINS);
       }
     },
-
-    setCloudPolicy(state, {payload}: PayloadAction<PolicyData | undefined>) {
-      state.cloudPolicy = payload;
-    },
   },
   extraReducers: builder => {
     builder.addCase(setRootFolder.fulfilled, state => {
       state.validationOverview.selectedProblem = undefined;
       state.lastResponse = undefined;
-      state.cloudPolicy = undefined;
       state.validationOverview.newProblemsIntroducedType = 'initial';
     });
 
@@ -243,6 +237,5 @@ export const {
   updateSelectedPluginConfiguration,
   addValidationPlugin,
   removeValidationPlugin,
-  setCloudPolicy,
 } = validationSlice.actions;
 export default validationSlice.reducer;

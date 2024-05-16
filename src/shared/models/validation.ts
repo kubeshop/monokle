@@ -1,5 +1,4 @@
 import type {ValidationFiltersValueType} from '@monokle/components';
-import type {PolicyData} from '@monokle/synchronizer';
 import type {
   Config,
   PluginMetadataWithConfig,
@@ -22,7 +21,6 @@ export type SelectedProblem = {
 
 export type ValidationState = {
   config: Config;
-  cloudPolicy?: PolicyData;
   status: Initialization;
   lastResponse?: ValidationResponse;
   loadRequestId?: string;

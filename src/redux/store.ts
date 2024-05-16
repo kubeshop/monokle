@@ -18,7 +18,6 @@ import {formSlice} from './forms';
 import {gitSlice} from './git';
 import {combineListeners, listenerMiddleware} from './listeners/base';
 import {alertSlice} from './reducers/alert';
-import {cloudSlice} from './reducers/cloud';
 import {extensionSlice} from './reducers/extension';
 import {mainSlice} from './reducers/main';
 import {imageListParserListener} from './reducers/main/mainListeners';
@@ -74,7 +73,6 @@ const appReducer = combineReducers({
   dashboard: dashboardSlice.reducer,
   cluster: clusterSlice.reducer,
   editor: editorSlice.reducer,
-  cloud: cloudSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) => {
