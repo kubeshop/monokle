@@ -22,7 +22,7 @@ const TitleBarDescription: React.FC = () => {
     <S.Container>
       <img src={TemplateExplorerDescription} />
       <S.Text>
-        No need to be a K8s expert anymore! Create reosurces through easy forms.{' '}
+        No need to be a K8s expert anymore! Create resources through easy forms.{' '}
         <Link onClick={onLinkClickHandler}>Install additional templates using Plugins here</Link>
       </S.Text>
     </S.Container>
