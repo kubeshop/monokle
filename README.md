@@ -1,3 +1,11 @@
+
+ <em>**Note:** Unfortunately [we are not able to maintain or evolve Monokle at this time](https://github.com/kubeshop/monokle/issues/4265).
+
+ We are of course happy to help anyone interested in [contributing](https://kubeshop.github.io/monokle/contributing) to resolve any outstanding issues! Thanks for your understanding!</em>
+ 
+ @olensmar
+
+
 <p align="center">
     <img src="src/assets/MonokleLogoLight.svg#gh-light-mode-only" alt="Monokle Logo Light"/>
     <img src="src/assets/MonokleLogoDark.svg#gh-dark-mode-only" alt="Monokle Logo Dark" />
