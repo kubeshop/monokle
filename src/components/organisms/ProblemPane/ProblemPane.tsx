@@ -6,16 +6,40 @@ import {DEFAULT_PANE_TITLE_HEIGHT} from '@constants/constants';
 import {useAppDispatch, useAppSelector} from '@redux/hooks';
 import {setLeftMenuSelection} from '@redux/reducers/ui';
 
-import {SelectItemImage} from '@atoms';
-
 import {useProblemPaneMenuItems} from '@hooks/menuItemsHooks';
 import {usePaneHeight} from '@hooks/usePaneHeight';
 
+import CiCdIcon from '@assets/CiCdIcon.svg';
+import KubernetesIcon from '@assets/KubernetesIcon.svg';
+import ValidationSettings from '@assets/ValidationSettings.svg';
+import VsCodeIcon from '@assets/VsCodeIcon.svg';
+
 import {ProblemInfo, TitleBar} from '@monokle/components';
 import {getRuleForResultV2} from '@monokle/validation';
+import {
+  ADMISSION_CONTROLLER_URL,
+  MONOKLE_CLI_URL,
+  MONOKLE_CLOUD_URL,
+  POLICIES_101_BLOGPOST_URL,
+  VSCODE_EXTENSION_URL,
+} from '@shared/constants/urls';
 import {openUrlInExternalBrowser} from '@shared/utils';
 
-import * as S from './ProblemPane.styled';
+import {
+  ImageColumn,
+  MainBox,
+  MainColumn,
+  ProblemPaneContainer,
+  Tabs,
+  Text,
+  TextColumn1,
+  TextColumn2,
+  TextColumn3,
+  TextContainer,
+  TextIcon,
+  TextTitle,
+  ValidationImage,
+} from './ProblemPane.styled';
 
 const ProblemPane: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -46,15 +70,65 @@ const ProblemPane: React.FC = () => {
 
   if (!rule || !selectedProblem) {
     return (
-      <SelectItemImage text="Select an error from the left to examine it, and receive hints and additional information on fixing it" />
+      <MainBox>
+        <TextContainer>
+          <MainColumn>
+            <TextTitle>
+              Check out misconfigurations and <b>fix them</b>
+            </TextTitle>
+            <Text>
+              ← See a list of all found misconfigurations for the current validation settings to the left.{' '}
+              <b>Click on any of them</b> to see and fix these misconfigurations in your YAML resources.
+            </Text>
+            <Text>
+              Tweak default validation rules and learn about configuration policies in{' '}
+              <a onClick={() => dispatch(setLeftMenuSelection('settings'))}>Validation Settings</a>
+            </Text>
+            <TextTitle>
+              Enforce policies <b>everywhere!</b>
+            </TextTitle>
+            <Text>
+              <a onClick={() => openUrlInExternalBrowser(MONOKLE_CLOUD_URL)}>Monokle Cloud</a> allows you to define your
+              policies in one place and enforce them across the entire software development lifecycle
+            </Text>
+          </MainColumn>
+          <ImageColumn>
+            <ValidationImage src={ValidationSettings} />
+          </ImageColumn>
+          <TextColumn1>
+            <TextIcon src={VsCodeIcon} />
+            <Text>Locally in Monokle Desktop and VS Code</Text>
+            <Text>
+              <a onClick={() => openUrlInExternalBrowser(VSCODE_EXTENSION_URL)}>VSC Extension</a>
+            </Text>
+          </TextColumn1>
+          <TextColumn2>
+            <TextIcon src={CiCdIcon} />
+            <Text>In your CI/CD and GitOps pipelines with the CLI</Text>
+            <Text>
+              <a onClick={() => openUrlInExternalBrowser(MONOKLE_CLI_URL)}>See on GitHub</a>
+            </Text>
+          </TextColumn2>
+          <TextColumn3>
+            <TextIcon src={KubernetesIcon} />
+            <Text>In clusters with the Admission Controller</Text>
+            <Text>
+              <a onClick={() => openUrlInExternalBrowser(ADMISSION_CONTROLLER_URL)}>See on GitHub</a>
+            </Text>
+          </TextColumn3>
+          <Text style={{gridColumn: '1 / 4', marginTop: '20px'}}>
+            Read <a onClick={() => openUrlInExternalBrowser(POLICIES_101_BLOGPOST_URL)}>Kubernetes YAML Policies 101</a>{' '}
+            to learn more!
+          </Text>
+        </TextContainer>
+      </MainBox>
     );
   }
 
   return (
-    <S.ProblemPaneContainer ref={containerRef} key={sarifValue}>
+    <ProblemPaneContainer ref={containerRef} key={sarifValue}>
       <TitleBar title="Editor" type="secondary" />
-
-      <S.Tabs defaultActiveKey="editor" items={tabsItems} />
+      <Tabs defaultActiveKey="editor" items={tabsItems} />
 
       {selectedProblem && (
         <div ref={problemInfoRef}>
@@ -66,7 +140,7 @@ const ProblemPane: React.FC = () => {
           />
         </div>
       )}
-    </S.ProblemPaneContainer>
+    </ProblemPaneContainer>
   );
 };
 

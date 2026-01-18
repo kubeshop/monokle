@@ -1,4 +1,4 @@
-import SelectItemFromLeft from '@assets/SelectItemFromLeft.svg';
+import ValidationSettings from '@assets/ValidationSettings.svg';
 
 import * as S from './SelectItemImage.styled';
 
@@ -13,7 +13,7 @@ const SelectItemImage: React.FC<IProps> = props => {
 
   return (
     <S.Container style={style}>
-      <S.Image style={imageStyle} src={SelectItemFromLeft} />
+      <S.Image style={imageStyle} src={ValidationSettings} />
       <S.Text>{text}</S.Text>
     </S.Container>
   );
